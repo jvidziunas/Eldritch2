@@ -37,21 +37,21 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>	PrivateAllocator;
-		typedef ::rde::vector<StoredObject, PrivateAllocator>			UnderlyingContainer;
+		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using UnderlyingContainer	= ::rde::vector<StoredObject, PrivateAllocator>;
 
 	public:
-		typedef typename UnderlyingContainer::value_type		ValueType;
-		typedef ValueType*										Pointer;
-		typedef const ValueType*								ConstPointer;
-		typedef ValueType&										Reference;
-		typedef const ValueType&								ConstReference;
-		typedef Allocator										AllocatorType;
-		typedef typename UnderlyingContainer::iterator			Iterator;
-		typedef typename UnderlyingContainer::const_iterator	ConstIterator;
-		typedef ::std::reverse_iterator<Iterator>				ReverseIterator;
-		typedef ::std::reverse_iterator<ConstIterator>			ReverseConstIterator;
-		typedef typename UnderlyingContainer::size_type			SizeType;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using Pointer				= ValueType*;
+		using ConstPointer			= const ValueType*;
+		using Reference				= ValueType&;
+		using ConstReference		= const ValueType&;
+		using AllocatorType			= Allocator;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using ReverseIterator		= ::std::reverse_iterator<Iterator>;
+		using ReverseConstIterator	= ::std::reverse_iterator<ConstIterator>;
+		using SizeType				= typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

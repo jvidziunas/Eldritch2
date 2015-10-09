@@ -28,16 +28,16 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR -------------------------- 
 
 	public:
-		// Constructs this RadianMeasure instance.
+		//!	Constructs this @ref RadianMeasure instance.
 		ETForceInlineHint RadianMeasure();
-		// Constructs this RadianMeasure instance.
+		//!	Constructs this @ref RadianMeasure instance.
 		ETForceInlineHint explicit RadianMeasure( ::Eldritch2::float32 value );
-		// Constructs this RadianMeasure instance.
+		//!	Constructs this @ref RadianMeasure instance.
 		ETForceInlineHint RadianMeasure( const ::Eldritch2::DegreeMeasure& value );
-		// Constructs this RadianMeasure instance.
+		//!	Constructs this @ref RadianMeasure instance.
 		ETForceInlineHint RadianMeasure( const ::Eldritch2::RadianMeasure& value );
 
-		// Destroys this RadianMeasure instance.
+		//!	Destroys this @ref RadianMeasure instance.
 		ETForceInlineHint ~RadianMeasure();
 
 	// ---------------------------------------------------
@@ -67,16 +67,16 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR -------------------------- 
 
 	public:
-		// Constructs this DegreeMeasure instance.
+		//!	Constructs this @ref DegreeMeasure instance.
 		ETForceInlineHint DegreeMeasure();
-		// Constructs this DegreeMeasure instance.
+		//!	Constructs this @ref DegreeMeasure instance.
 		ETForceInlineHint explicit DegreeMeasure( ::Eldritch2::float32 value );
-		// Constructs this DegreeMeasure instance.
+		//!	Constructs this @ref DegreeMeasure instance.
 		ETForceInlineHint DegreeMeasure( const ::Eldritch2::DegreeMeasure& value );
-		// Constructs this DegreeMeasure instance.
+		//!	Constructs this @ref DegreeMeasure instance.
 		ETForceInlineHint DegreeMeasure( const ::Eldritch2::RadianMeasure& value );
 
-		// Destroys this DegreeMeasure instance.
+		//!	Destroys this @ref DegreeMeasure instance.
 		ETForceInlineHint ~DegreeMeasure();
 
 	// ---------------------------------------------------

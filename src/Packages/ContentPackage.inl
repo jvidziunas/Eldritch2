@@ -65,7 +65,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint void ContentPackage::UpdateResidencyState( const ContentPackage::ResidencyState newState ) {
+	ETInlineHint void ContentPackage::UpdateResidencyStateOnLoaderThread( const ContentPackage::ResidencyState newState ) {
 		_residencyState.store( newState, ::std::memory_order_release );
 	}
 

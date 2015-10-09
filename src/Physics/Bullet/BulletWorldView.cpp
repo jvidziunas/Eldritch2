@@ -122,7 +122,7 @@ namespace Physics {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this SimulateWorldTask instance.
+			//! Constructs this @ref SimulateWorldTask instance.
 			ETInlineHint SimulateWorldTask( BulletWorldView& owner, WorkerContext& executingContext, Task& postScriptTickTask ) : CRTPTransientTask<SimulateWorldTask>( postScriptTickTask, Scheduler::CodependentTaskSemantics ),
 																																  _owner( owner ) {
 				TrySchedulingOnContext( executingContext );

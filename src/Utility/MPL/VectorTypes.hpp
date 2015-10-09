@@ -33,11 +33,11 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this Float4 instance.
+		// Constructs this @ref Float4 instance.
 		ETForceInlineHint Float4();
-		// Constructs this Float4 instance.
+		// Constructs this @ref Float4 instance.
 		ETForceInlineHint Float4( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		// Constructs this Float4 instance.
+		// Constructs this @ref Float4 instance.
 		ETForceInlineHint Float4( const ::Eldritch2::float32* const values );
 
 	// ---------------------------------------------------
@@ -81,11 +81,11 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 		
-		// Constructs this Quaternion instance.
+		// Constructs this @ref Quaternion instance.
 		ETForceInlineHint Quaternion();
-		// Constructs this Quaternion instance.
+		// Constructs this @ref Quaternion instance.
 		ETForceInlineHint Quaternion( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		// Constructs this Quaternion instance.
+		// Constructs this @ref Quaternion instance.
 		ETForceInlineHint Quaternion( const ::Eldritch2::float32* const values );
 
 	// ---------------------------------------------------

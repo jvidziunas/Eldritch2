@@ -21,11 +21,13 @@ namespace Eldritch2 {
 
 	template <typename Iterator>
 	class Range {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
-		typedef Iterator													IteratorType;
-		typedef typename ::std::iterator_traits<Iterator>::value_type		ValueType;
-		typedef typename ::std::iterator_traits<Iterator>::reference		Reference;
-		typedef typename ::std::iterator_traits<Iterator>::distance_type	DistanceType;
+		using IteratorType	= Iterator;
+		using ValueType		= typename ::std::iterator_traits<Iterator>::value_type;
+		using Reference		= typename ::std::iterator_traits<Iterator>::reference;
+		using DistanceType	= typename ::std::iterator_traits<Iterator>::distance_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

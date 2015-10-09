@@ -27,38 +27,27 @@ using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 using namespace ::std;
 
-namespace {
-
-	enum : uint32 {
-		TERMINATE_EXECUTION	= 0u,
-		CONTINUE_EXECUTION	= 1u
-	};
-
-}	// anonymous namespace
-
 namespace Eldritch2 {
 namespace FileSystem {
 
 	LoaderThread::LoaderThread( TaskScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L( "Loader Thread Allocator" ) ),
-																				   _loadSemaphore( scheduler.AllocateSemaphore( _allocator, 0u, 128u ).object ),
-																				   _executionBehavior( CONTINUE_EXECUTION ) {}
+																				   _loadSemaphore( scheduler.AllocateSemaphore( _allocator, 0u, 128u ).object, { _allocator } ),
+																				   _executionBehavior( ExecutionBehavior::CONTINUE ) {}
 
 // ---------------------------------------------------
 
 	LoaderThread::~LoaderThread() {
 		auto&	threadAllocator( _allocator );
 
-		_outstandingLoads.ClearAndDispose( [&threadAllocator] ( PackageDeserializationContext& context ) {
+		_outstandingLoadList.ClearAndDispose( [&threadAllocator] ( PackageDeserializationContext& context ) {
 			threadAllocator.Delete( context );
 		} );
-
-		_allocator.Delete( _loadSemaphore );
 	}
 
 // ---------------------------------------------------
 
 	void LoaderThread::RequestGracefulShutdown() {
-		_executionBehavior.store( TERMINATE_EXECUTION, memory_order_release );
+		_executionBehavior.store( ExecutionBehavior::TERMINATE, memory_order_release );
 
 		// Mark the semaphore so the thread knows to wake up.
 		if( _loadSemaphore ) {
@@ -101,49 +90,47 @@ namespace FileSystem {
 	// ---
 
 		auto&	threadAllocator( _allocator );
+		auto&	loadList( _outstandingLoadList );
 
 		if( !_loadSemaphore ) {
 			return Errors::INVALID_OBJECT_STATE;
 		}
 
-		// TODO: This is rather dense.
-
-		while( (_loadSemaphore->Acquire(), CONTINUE_EXECUTION == _executionBehavior.load( memory_order_consume )) ) {
-			if( PackageDeserializationContext* const context = _initializationQueue.PopFront() ) {
-				// Ensure the game engine still wants the package loaded before continuing.
-				if( context->DeserializeDependencies() ) {
-					_outstandingLoads.PushFront( *context );
+		while( (_loadSemaphore->Acquire(), ExecutionBehavior::CONTINUE == _executionBehavior.load( memory_order_acquire )) ) {
+			// Initialize any new deserialization, and add to the 
+			_initializationQueue.PopAndDisposeFront( [&threadAllocator, &loadList] ( PackageDeserializationContext& context ) {
+				if( context.DeserializeDependencies() ) {
+					loadList.PushFront( context );
 				} else {
-					threadAllocator.Delete( *context );
-					continue;
+					threadAllocator.Delete( context );
+				}
+			} );
+
+			// This should execute even if the new addition failed initialization; this will help the failure notification propagate out to other queued packages so they can abort.
+			loadList.RemoveAndDisposeIf( [] ( const PackageDeserializationContext& context ) {
+				bool	dependenciesLoaded( true );
+
+				for( const auto& referencedPackage : context.GetBoundPackage().GetReferencedPackageCollection() ) {
+					switch( referencedPackage->GetResidencyState() ) {
+						case ResidencyState::FAILED: {
+							// We have a load failure. Early out by returning true.
+							return true;
+						}	// case ResidencyState::FAILED
+
+						case ResidencyState::LOADING: {
+							// This dependency is unloaded. Mark this, but continue looping through the other dependencies so we can catch/propagate actual
+							// failures instead of silently stopping on the first unloaded dependency we encounter.
+							dependenciesLoaded = false;
+							continue;
+						}	// case ResidencyState::LOADING
+					};	// switch( referencedPackage->GetResidencyState() )
 				}
 
-				// This should execute even if the new addition failed initialization; this will help the failure notification propagate out to other queued packages so they can abort.
-				_outstandingLoads.RemoveAndDisposeIf( [] ( const PackageDeserializationContext& context ) {
-					bool	dependenciesLoaded( true );
-
-					for( const auto& referencedPackage : context.GetBoundPackage().GetReferencedPackageCollection() ) {
-						switch( referencedPackage->GetResidencyState() ) {
-							case ResidencyState::FAILED: {
-								// We have a load failure. Early out by returning true.
-								return true;
-							}	// case ResidencyState::FAILED
-
-							case ResidencyState::LOADING: {
-								// This dependency is unloaded. Mark this, but continue looping through the other dependencies so we can catch/propagate actual
-								// failures instead of silently stopping on the first unloaded dependency we encounter.
-								dependenciesLoaded = false;
-								continue;
-							}	// case ResidencyState::LOADING
-						};	// switch( referencedPackage->GetResidencyState() )
-					}
-
-					return dependenciesLoaded;
-				}, [&threadAllocator] ( PackageDeserializationContext& context ) {
-					context.DeserializeContent();
-					threadAllocator.Delete( context );
-				} );
-			}
+				return dependenciesLoaded;
+			}, [&threadAllocator] ( PackageDeserializationContext& context ) {
+				context.DeserializeContent();
+				threadAllocator.Delete( context );
+			} );
 		}
 
 		return Errors::NONE;

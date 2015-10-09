@@ -26,18 +26,18 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::Eldritch2::ResizableArray<::rde::pair<Key, StoredObject>, Allocator>	UnderlyingContainer;
+		using UnderlyingContainer					= ::Eldritch2::ResizableArray<::rde::pair<Key, StoredObject>, Allocator>;
 
 	public:
 		using UnderlyingContainer::ValueType;
-		typedef typename ValueType::first_type											KeyType;
-		typedef typename ValueType::second_type											MappedType;
-		typedef typename OrderingPredicate												OrderingPredicateType;
+		using KeyType								= typename ValueType::first_type;
+		using MappedType							= typename ValueType::second_type;
+		using OrderingPredicateType					= OrderingPredicate;
 		using UnderlyingContainer::AllocatorType;
 		using UnderlyingContainer::Iterator;
 		using UnderlyingContainer::ConstIterator;
 		using UnderlyingContainer::SizeType;
-		typedef ::rde::pair<Iterator, bool>												InsertResult;
+		using InsertResult							= ::rde::pair<Iterator, bool>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

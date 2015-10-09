@@ -66,6 +66,7 @@ namespace Scripting {
 				// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 				public:
+					//!	Constructs this @ref CollectPreScriptTickTasksTask instance.
 					ETInlineHint CollectPreScriptTickTasksTask( AngelscriptWorldView& host, WorkerContext& executingContext, CollectScriptTickTasksTask& parent, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
 																																																 _host( host ),
 																																																 _subtaskAllocator( subtaskAllocator ) {
@@ -89,9 +90,7 @@ namespace Scripting {
 					}
 
 					Task* Execute( WorkerContext& executingContext ) override sealed {
-						WorldView::PreScriptTickTaskVisitor	visitor;
-
-						GetHost().BroadcastTaskVisitor( GetSubtaskAllocator(), executingContext, *this, visitor );
+						GetHost().BroadcastTaskVisitor( GetSubtaskAllocator(), executingContext, *this, WorldView::PreScriptTickTaskVisitor() );
 
 						return nullptr;
 					}
@@ -105,6 +104,7 @@ namespace Scripting {
 
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+				//!	Constructs this @ref CollectScriptTickTasksTask instance.
 				ETInlineHint CollectScriptTickTasksTask( AngelscriptWorldView& host, WorkerContext& executingContext, CollectPostScriptTickTasksTask& parent, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
 																																															  _collectPreTickTasksTask( host, executingContext, *this, subtaskAllocator ) {
 					TrySchedulingOnContext( executingContext );
@@ -127,9 +127,7 @@ namespace Scripting {
 				}
 
 				Task* Execute( WorkerContext& executingContext ) override sealed {
-					WorldView::ScriptTickTaskVisitor	visitor;
-
-					GetHost().BroadcastTaskVisitor( GetSubtaskAllocator(), executingContext, *this, visitor );
+					GetHost().BroadcastTaskVisitor( GetSubtaskAllocator(), executingContext, *this, WorldView::ScriptTickTaskVisitor() );
 
 					return nullptr;
 				}
@@ -142,7 +140,7 @@ namespace Scripting {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this CollectPostScriptTickTasksTask instance.
+			//!	Constructs this @ref CollectPostScriptTickTasksTask instance.
 			ETInlineHint CollectPostScriptTickTasksTask( AngelscriptWorldView& host, WorkerContext& executingContext, Task& tickTask, Allocator& subtaskAllocator ) : CRTPTransientTask<CollectPostScriptTickTasksTask>( tickTask, Scheduler::CodependentTaskSemantics ),
 																																									  _collectScriptTickTasksTask( host, executingContext, *this, subtaskAllocator ) {
 				TrySchedulingOnContext( executingContext );
@@ -155,8 +153,7 @@ namespace Scripting {
 			}
 
 			Task* Execute( WorkerContext& executingContext ) override sealed {
-				WorldView::PostScriptTickTaskVisitor	visitor;
-				_collectScriptTickTasksTask.GetHost().BroadcastTaskVisitor( _collectScriptTickTasksTask.GetSubtaskAllocator(), executingContext, *this, visitor );
+				_collectScriptTickTasksTask.GetHost().BroadcastTaskVisitor( _collectScriptTickTasksTask.GetSubtaskAllocator(), executingContext, *this, WorldView::PostScriptTickTaskVisitor() );
 
 				return nullptr;
 			}
@@ -167,9 +164,11 @@ namespace Scripting {
 			CollectScriptTickTasksTask	_collectScriptTickTasksTask;
 		};
 
+		using	AllocationOption = Allocator::AllocationOption;
+
 	// ---
 
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) CollectPostScriptTickTasksTask( *this, executingContext, visitingTask, subtaskAllocator );
+		new(subtaskAllocator, AllocationOption::TEMPORARY_ALLOCATION) CollectPostScriptTickTasksTask( *this, executingContext, visitingTask, subtaskAllocator );
 	}
 
 // ---------------------------------------------------
@@ -179,7 +178,7 @@ namespace Scripting {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this TickScriptsTask instance.
+			//!	Constructs this @ref TickScriptsTask instance.
 			ETInlineHint TickScriptsTask( AngelscriptWorldView& host, WorkerContext& executingContext, Task& tickTask ) : CRTPTransientTask<TickScriptsTask>( tickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
@@ -204,9 +203,11 @@ namespace Scripting {
 			AngelscriptWorldView&	_host;
 		};
 
+		using	AllocationOption = Allocator::AllocationOption;
+
 	// ---
 
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) TickScriptsTask( *this, executingContext, visitingTask );
+		new(subtaskAllocator, AllocationOption::TEMPORARY_ALLOCATION) TickScriptsTask( *this, executingContext, visitingTask );
 	}
 
 // ---------------------------------------------------

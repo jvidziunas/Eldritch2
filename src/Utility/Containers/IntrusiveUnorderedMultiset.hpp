@@ -34,23 +34,23 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::Eldritch2::ResizableArray<typename ::boost::intrusive::unordered_bucket<CollectionOptions>::type, BucketAllocator>	BucketCollection;
-		typedef ::boost::intrusive::unordered_multiset<StoredObject,
-													   CollectionOptions,
-													   ::boost::intrusive::hash<HashPredicate>,
-													   ::boost::intrusive::equal<EqualityPredicate>,
-													   ::boost::intrusive::compare_hash<true>>			UnderlyingContainer;
+		using BucketCollection		= ::Eldritch2::ResizableArray<typename ::boost::intrusive::unordered_bucket<CollectionOptions>::type, BucketAllocator>;
+		using UnderlyingContainer	= ::boost::intrusive::unordered_multiset<StoredObject,
+																			 CollectionOptions,
+																			 ::boost::intrusive::hash<HashPredicate>,
+																			 ::boost::intrusive::equal<EqualityPredicate>,
+																			 ::boost::intrusive::compare_hash<true>>;
 
 	public:
-		typedef typename UnderlyingContainer::value_type		ValueType;
-		typedef typename UnderlyingContainer::reference			Reference;
-		typedef typename UnderlyingContainer::const_reference	ConstReference;
-		typedef typename UnderlyingContainer::size_type			SizeType;
-		typedef typename UnderlyingContainer::key_equal			EqualityPredicate;
-		typedef typename UnderlyingContainer::hasher			HashPredicate;
-		typedef typename UnderlyingContainer::iterator			Iterator;
-		typedef typename UnderlyingContainer::const_iterator	ConstIterator;
-		typedef BucketAllocator									BucketAllocatorType;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using Reference				= typename UnderlyingContainer::reference;
+		using ConstReference		= typename UnderlyingContainer::const_reference;
+		using SizeType				= typename UnderlyingContainer::size_type;
+		using EqualityPredicate		= typename UnderlyingContainer::key_equal;
+		using HashPredicate			= typename UnderlyingContainer::hasher;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstIterator			= typename  UnderlyingContainer::const_iterator;
+		using BucketAllocatorType	= BucketAllocator;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

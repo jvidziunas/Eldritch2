@@ -25,15 +25,15 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::Eldritch2::ResizableArray<StoredObject, Allocator>	UnderlyingContainer;
+		using UnderlyingContainer					= ::Eldritch2::ResizableArray<StoredObject, Allocator>;
 
 	public:
 		using UnderlyingContainer::ValueType;
-		typedef typename OrderingPredicate								OrderingPredicateType;
+		using OrderingPredicateType					= OrderingPredicate;
 		using UnderlyingContainer::AllocatorType;
 		using UnderlyingContainer::Iterator;
 		using UnderlyingContainer::ConstIterator;
-		typedef ::rde::pair<Iterator, bool>								InsertResult;
+		using InsertResult							= ::rde::pair<Iterator, bool>;
 		using UnderlyingContainer::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

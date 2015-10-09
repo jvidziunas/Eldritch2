@@ -79,23 +79,23 @@ namespace Foundation {
 
 	protected:
 		template <typename TaskVisitor>
-		void	BroadcastTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, TaskVisitor& visitor );
+		void	BroadcastTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, TaskVisitor&& visitor );
 
 		template <typename ViewVisitor>
 		void	BroadcastViewVisitor( ViewVisitor&& visitor );
 
 	// - WORLD VIEW SANDBOX METHODS ----------------------
 
-		// Retrieves a read-only view of the hosting world. Useful for inspecting shared state.
+		//!	Retrieves a read-only view of the hosting world. Useful for inspecting shared state.
 		ETInlineHint const Foundation::World&	GetOwningWorld() const;
 
-		// Retrieves the hosting game engine's content library.
+		//!	Retrieves the hosting game engine's content library.
 		const FileSystem::ContentLibrary&		GetEngineContentLibrary() const;
 
-		// Retrieves the hosting world's general-purpose memory allocator.
+		//!	Retrieves the hosting world's general-purpose memory allocator.
 		::Eldritch2::Allocator&					GetWorldAllocator();
 
-		// Notifies the world that a view is interested in pausing simulation.
+		//!	Notifies the world that a view is interested in pausing simulation.
 		void									SetPaused( bool paused = true );
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

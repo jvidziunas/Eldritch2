@@ -24,17 +24,17 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::rde::hash_map<Key, StoredObject, Hasher, loadFactor, KeyEqualityComparator, ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>>	UnderlyingContainer;
+		using UnderlyingContainer	= ::rde::hash_map<Key, StoredObject, Hasher, loadFactor, KeyEqualityComparator, ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>>;
 
 	public:
-		typedef typename UnderlyingContainer::value_type		ValueType;
-		typedef typename UnderlyingContainer::key_type			KeyType;
-		typedef typename UnderlyingContainer::mapped_type		MappedType;
-		typedef Allocator										AllocatorType;
-		typedef typename UnderlyingContainer::size_type			SizeType;
-		typedef typename UnderlyingContainer::iterator			Iterator;
-		typedef typename UnderlyingContainer::const_iterator	ConstIterator;
-		typedef ::rde::pair<Iterator, bool>						InsertResult;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using KeyType				= typename UnderlyingContainer::key_type;
+		using MappedType			= typename UnderlyingContainer::mapped_type;
+		using AllocatorType			= Allocator;
+		using SizeType				= typename UnderlyingContainer::size_type;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using InsertResult			= ::rde::pair<Iterator, bool>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

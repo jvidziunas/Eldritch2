@@ -44,26 +44,23 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>	PrivateAllocator;
-		typedef typename Hasher::CellIndex								CellIndex;
-		typedef ::rde::hash_map<CellIndex,
-								StoredObject,
-								Hasher,
-								4,
-								::rde::equal_to<CellIndex>,
-								PrivateAllocator>						UnderlyingContainer;
-		typedef typename UnderlyingContainer::size_type					SizeType;
+		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using UnderlyingContainer	= ::rde::hash_map<typename Hasher::CellIndex, StoredObject, Hasher, 4, ::rde::equal_to<typename Hasher::CellIndex>, PrivateAllocator>;
+
+	public:
+		using CellIndex				= typename Hasher::CellIndex;
+		using SizeType				= typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this SpatialHash instance.
+		//! Constructs this @ref SpatialHash instance.
 		template <typename... AllocatorConstructorArguments>
 		ETInlineHint SpatialHash( const SizeType						initialBucketCount,
 								  const ::Eldritch2::float32			horizontalCellResolution,
 								  const ::Eldritch2::float32			verticalCellResolution,
 								  AllocatorConstructorArguments&&...	allocatorConstructorArguments );
-		// Constructs this SpatialHash instance.
+		//! Constructs this @ref SpatialHash instance.
 		template <typename... AllocatorConstructorArguments>
 		ETInlineHint SpatialHash( const SizeType						initialBucketCount,
 								  const Hasher&							hasher,
@@ -71,8 +68,8 @@ namespace Eldritch2 {
 								  const ::Eldritch2::float32			verticalCellResolution,
 								  AllocatorConstructorArguments&&...	allocatorConstructorArguments );
 
-		// Destroys this SpatialHash instance.
-		ETInlineHint ~SpatialHash();
+		//! Destroys this @ref SpatialHash instance.
+		ETInlineHint ~SpatialHash() = default;
 
 	// - ELEMENT ACCESS ----------------------------------
 

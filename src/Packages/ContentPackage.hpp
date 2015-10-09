@@ -59,6 +59,12 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
+		//!	Adds the specified package to the list 
+		/*!	@param[in] dependencyName @parblock Null-terminated C string containing the name of the package file to add to this @ref ContentPackage instance's dependencies.
+				There are no lifetime restrictions on the pointer/memory past this function call. @endparblock
+			@returns @ref ::Eldritch2::Errors::NONE if the dependency was registered successfully, or an @ref ErrorCode describing why a failure occurred.
+			@remarks Not thread-safe.
+			*/
 		virtual ::Eldritch2::ErrorCode	AddDependency( const ::Eldritch2::UTF8Char* const dependencyName ) abstract;
 
 		virtual ::Eldritch2::ErrorCode	AddContent( const FileSystem::ResourceView::Initializer& sourceAssetData ) abstract;
@@ -79,13 +85,17 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
+		//!	Returns the set of @ref ContentPackage instances the @ref ResourceView instances of the @ref ContentPackage require to be fully resident.
+		/*!	@returns A const @ref ResizeableArray reference to the internal list of referenced packages.
+			@remarks Not thread-safe.
+			*/
 		ETInlineHint const ::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>&	GetReferencedPackageCollection() const;
 
 		ETInlineHint const ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceView>&							GetExportedResourceCollection() const;
 
 	// ---------------------------------------------------
 
-		ETInlineHint void	UpdateResidencyState( const ContentPackage::ResidencyState newState );
+		ETInlineHint void	UpdateResidencyStateOnLoaderThread( const ContentPackage::ResidencyState newState );
 
 	// ---------------------------------------------------
 
@@ -102,7 +112,6 @@ namespace FileSystem {
 		/*!	@param[in] name Null-terminated C string containing the name of the package. A copy of this will be kept internally, and there are no additional lifetime requirements after the constructor call.
 			@param[in] owningLibrary The @ref ContentLibrary instance that owns this @ref ContentPackage. The @ref ContentPackage will route additional load requests through this @ref ContentLibrary.
 			@param[in] allocator The @ref Allocator instance the @ref ContentPackage will use to allocate memory.
-			@see @ref UnpublishHandler
 			*/
 		ContentPackage( const ::Eldritch2::UTF8Char* const name, FileSystem::ContentLibrary& owningLibrary, ::Eldritch2::Allocator& allocator );
 

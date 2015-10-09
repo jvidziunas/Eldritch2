@@ -35,10 +35,6 @@ namespace Eldritch2 {
 	ETInlineHint SpatialHash<StoredObject, Hasher, Allocator>::SpatialHash( const SizeType initialBucketCount, const Hasher& hasher, const ::Eldritch2::float32 horizontalCellResolution, const ::Eldritch2::float32 verticalCellResolution, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _inverseResolution( 1.0f / horizontalCellResolution, 1.0f / verticalCellResolution, 1.0f / horizontalCellResolution, 0.0f ),
 																																																																												  _underlyingContainer( initialBucketCount, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
 
-// ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, typename Allocator>
-	ETInlineHint SpatialHash<StoredObject, Hasher, Allocator>::~SpatialHash() {}
 
 // ---------------------------------------------------
 

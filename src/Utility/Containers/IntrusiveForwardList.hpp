@@ -21,15 +21,15 @@ namespace Eldritch2 {
 	class IntrusiveForwardList {
 	// - TYPE PUBLISHING ---------------------------------
 	private:
-		typedef ::rde::intrusive_slist<StoredObject>			UnderlyingContainer;
+		using UnderlyingContainer	= ::rde::intrusive_slist<StoredObject>;
 
 	public:
-		typedef typename UnderlyingContainer::value_type		ValueType;
-		typedef	ValueType&										Reference;
-		typedef	const ValueType&								ConstReference;
-		typedef typename UnderlyingContainer::iterator			Iterator;
-		typedef typename UnderlyingContainer::const_iterator	ConstIterator;
-		typedef size_t											SizeType;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using Reference				= ValueType&;
+		using ConstReference		= const ValueType&;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using SizeType				= size_t;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

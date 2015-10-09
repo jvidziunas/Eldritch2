@@ -25,30 +25,30 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>	PrivateAllocator;
-		typedef ::rde::set<StoredObject, PrivateAllocator>				UnderlyingContainer;
+		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using UnderlyingContainer	= ::rde::set<StoredObject, PrivateAllocator>;
 
 	public:
-		typedef typename UnderlyingContainer::value_type				ValueType;
-		typedef Allocator												AllocatorType;
-		typedef typename UnderlyingContainer::iterator					Iterator;
-		typedef typename UnderlyingContainer::const_iterator			ConstIterator;
-		typedef ::rde::pair<Iterator, bool>								InsertResult;
-		typedef typename AllocatorType::SizeType						SizeType;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using AllocatorType			= Allocator;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using InsertResult			= ::rde::pair<Iterator, bool>;
+		using SizeType				= typename AllocatorType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this OrderedSet instance.
+		//!	Constructs this @ref OrderedSet instance.
 		template <typename... AllocatorConstructorArguments>
 		ETInlineHint OrderedSet( AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		// Constructs this OrderedSet instance.
+		//!	Constructs this @ref OrderedSet instance.
 		template <typename InputIterator, typename... AllocatorConstructorArguments>
 		ETInlineHint OrderedSet( InputIterator begin, InputIterator end, AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		// Constructs this OrderedSet instance.
+		//!	Constructs this @ref OrderedSet instance.
 		template <class AlternateAllocator, typename... AllocatorConstructorArguments>
 		ETInlineHint OrderedSet( const ::Eldritch2::OrderedSet<StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
 
-		// Destroys this OrderedSet instance.
+		//!	Destroys this @ref OrderedSet instance.
 		ETInlineHint ~OrderedSet();
 
 	// - ALGORITHMS --------------------------------------

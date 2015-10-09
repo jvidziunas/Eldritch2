@@ -29,39 +29,36 @@ namespace Eldritch2 {
 
 	template <typename StoredObject, typename HashPredicate, typename EqualityPredicate = ::std::equal_to<StoredObject>, typename BucketAllocator = ::Eldritch2::ChildAllocator>
 	class IntrusiveUnorderedSet {
-		// - TYPE PUBLISHING ---------------------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::boost::intrusive::unordered_set<StoredObject,
-												  ::boost::intrusive::hash<HashPredicate>,
-												  ::boost::intrusive::equal<EqualityPredicate>,
-												  ::boost::intrusive::compare_hash<true>>	UnderlyingContainer;
-		typedef typename UnderlyingContainer::value_traits									UnderlyingValueTraits;
-		typedef ::Eldritch2::ResizableArray<typename ::boost::intrusive::unordered_bucket<UnderlyingValueTraits>::type, BucketAllocator>	BucketCollection;
-		
+		using UnderlyingContainer	= ::boost::intrusive::unordered_set<StoredObject, ::boost::intrusive::hash<HashPredicate>, ::boost::intrusive::equal<EqualityPredicate>, ::boost::intrusive::compare_hash<true>>;
+		using UnderlyingValueTraits	= typename UnderlyingContainer::value_traits;
+		using Bucket				= typename ::boost::intrusive::unordered_bucket<UnderlyingValueTraits>::type;
+		using BucketCollection		= ::Eldritch2::ResizableArray<Bucket, BucketAllocator>;
 
 	public:
-		typedef typename UnderlyingContainer::value_type			ValueType;
-		typedef typename UnderlyingContainer::reference				Reference;
-		typedef typename UnderlyingContainer::const_reference		ConstReference;
-		typedef typename UnderlyingContainer::size_type				SizeType;
-		typedef typename UnderlyingContainer::key_equal				EqualityPredicate;
-		typedef typename UnderlyingContainer::hasher				HashPredicate;
-		typedef typename UnderlyingContainer::iterator				Iterator;
-		typedef typename UnderlyingContainer::const_iterator		ConstIterator;
-		typedef typename UnderlyingContainer::insert_commit_data	InsertCommitData;
-		typedef BucketAllocator										BucketAllocatorType;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using Reference				= typename UnderlyingContainer::reference;
+		using ConstReference		= typename UnderlyingContainer::const_reference;
+		using SizeType				= typename UnderlyingContainer::size_type;
+		using EqualityPredicate		= typename UnderlyingContainer::key_equal;
+		using HashPredicate			= typename UnderlyingContainer::hasher;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using InsertCommitData		= typename UnderlyingContainer::insert_commit_data;
+		using BucketAllocatorType	= BucketAllocator;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this IntrusiveUnorderedSet instance.
+		//! Constructs this @ref IntrusiveUnorderedSet instance.
 		template <typename... AllocatorConstructorArguments>
 		ETInlineHint explicit IntrusiveUnorderedSet( const SizeType initialBucketCount, AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		// Constructs this IntrusiveUnorderedSet instance.
+		//! Constructs this @ref IntrusiveUnorderedSet instance.
 		template <typename... AllocatorConstructorArguments>
 		ETInlineHint IntrusiveUnorderedSet( const SizeType initialBucketCount, const HashPredicate& hasher, const EqualityPredicate& equalityPredicate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
 
-		// Destroys this IntrusiveUnorderedSet instance.
+		//! Destroys this @ref IntrusiveUnorderedSet instance.
 		ETInlineHint ~IntrusiveUnorderedSet();
 
 	// - ALGORITHMS --------------------------------------

@@ -25,28 +25,28 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		typedef ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>	PrivateAllocator;
-		typedef ::rde::map<Key, StoredObject, PrivateAllocator>			UnderlyingContainer;
+		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using UnderlyingContainer	= ::rde::map<Key, StoredObject, PrivateAllocator>;
 
 	public:
-		typedef typename UnderlyingContainer::value_type				ValueType;
-		typedef typename UnderlyingContainer::key_type					KeyType;
-		typedef typename UnderlyingContainer::data_type					MappedType;
-		typedef Allocator												AllocatorType;
-		typedef typename UnderlyingContainer::iterator					Iterator;
-		typedef typename UnderlyingContainer::const_iterator			ConstIterator;
-		typedef typename UnderlyingContainer::size_type					SizeType;
-		typedef ::rde::pair<Iterator, bool>								InsertResult;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using KeyType				= typename UnderlyingContainer::key_type;
+		using MappedType			= typename UnderlyingContainer::data_type;
+		using AllocatorType			= Allocator;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using SizeType				= typename UnderlyingContainer::size_type;
+		using InsertResult			= ::rde::pair<Iterator, bool>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this OrderedMap instance.
+		//! Constructs this @ref OrderedMap instance.
 		template <typename... AllocatorConstructorArguments>
 		ETInlineHint OrderedMap( AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		// Constructs this OrderedMap instance.
+		//! Constructs this @ref OrderedMap instance.
 		template <typename InputIterator, typename... AllocatorConstructorArguments>
 		ETInlineHint OrderedMap( InputIterator begin, InputIterator end, AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		// Constructs this OrderedMap instance.
+		//! Constructs this @ref OrderedMap instance.
 		template <class AlternateAllocator, typename... AllocatorConstructorArguments>
 		ETInlineHint OrderedMap( const ::Eldritch2::OrderedMap<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
 

@@ -52,9 +52,17 @@ namespace Physics {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		typedef ::btSoftBodyWorldMixin<::btDiscreteDynamicsMixinWrapper<>>	BulletWorld;
+		using BulletWorld				= ::btSoftBodyWorldMixin<::btDiscreteDynamicsMixinWrapper<>>;
+		using CollisionConfiguration	= BulletWorld::CollisionConfiguration;
+		using CollisionDispatcher		= ::btCollisionDispatcher;
+		using OverlappingPairCache		= ::btHashedOverlappingPairCache;
+		using BroadphaseInterface		= ::bt32BitAxisSweep3;
+		using ConstraintSolver			= BulletWorld::ConstraintSolver;
+		using SoftBodySolver			= ::btDefaultSoftBodySolver;
 
-		enum FilterBehaviors : short {
+	// ---
+
+		enum FilterBehaviors : unsigned short {
 			DEFAULT_FILTER			= 1,
 			STATIC_FILTER			= 2,
 			KINEMATIC_FILTER		= 4,
@@ -63,6 +71,7 @@ namespace Physics {
 			CHARACTER_FILTER		= 32,
 			VISIBILITY_FILTER		= 64,
 			PROJECTILE_FILTER		= 128,
+			CUSTOM_GROUP_BEGIN		= 256,
 			ALL						= -1,
 			NONE					= 0
 		};
@@ -70,10 +79,10 @@ namespace Physics {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this BulletWorldView instance.
+		//!	Constructs this @ref BulletWorldView instance.
 		BulletWorldView( Foundation::World& owningWorld, const Physics::BulletEngine& hostingEngine );
 
-		// Destroys this BulletWorldView instance.
+		//!	Destroys this @ref BulletWorldView instance.
 		~BulletWorldView();
 
 	// ---------------------------------------------------
@@ -102,21 +111,21 @@ namespace Physics {
 
 		public:
 			enum : short {
-				COLLISION_FILTER_GROUP	= FilterBehaviors::CHARACTER_FILTER,
+				COLLISION_FILTER_GROUP	= (FilterBehaviors::CHARACTER_FILTER),
 				COLLISION_FILTER_MASK	= (FilterBehaviors::STATIC_FILTER | FilterBehaviors::DEFAULT_FILTER | FilterBehaviors::SENSOR_TRIGGER_FILTER)
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this CharacterArmatureComponent instance.
+			//! Constructs this @ref CharacterArmatureComponent instance.
 			CharacterArmatureComponent( Physics::BulletWorldView& owningWorldView = GetActiveWorldView() );
 
-			// Destroys this CharacterArmatureComponent instance.
+			//!	Destroys this @ref CharacterArmatureComponent instance.
 			~CharacterArmatureComponent();
 
 		// - SCRIPT API REFERENCE ----------------------------
 
-			// Registers all script-callable methods for the CharacterArmatureComponent type with the specified script type registrar.
+			//! Registers all script-callable methods for the @ref CharacterArmatureComponent type with the specified script type registrar.
 			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
 
 			void						Dispose() override sealed;
@@ -144,16 +153,16 @@ namespace Physics {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this TerrainColliderComponent.
+			//! Constructs this @ref TerrainColliderComponent.
 			TerrainColliderComponent( Physics::BulletWorldView& owningView = GetActiveWorldView() );
 
-			// Constructs this TerrainColliderComponent.
+			//! Constructs this @ref TerrainColliderComponent.
 			~TerrainColliderComponent();
 
 		// - SCRIPT API REFERENCE ----------------------------
 
 		public:
-			// Registers all script-callable methods for the SceneCameraComponent type with the specified script type registrar.
+			//!	Registers all script-callable methods for the @ref TerrainColliderComponent type with the specified script type registrar.
 			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
@@ -183,16 +192,16 @@ namespace Physics {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this TriggerVolumeComponent.
+			//!	Constructs this @ref TriggerVolumeComponent.
 			TriggerVolumeComponent( Physics::BulletWorldView& owningView = GetActiveWorldView() );
 
-			// Constructs this TriggerVolumeComponent.
+			//!	Constructs this @ref TriggerVolumeComponent.
 			~TriggerVolumeComponent();
 
 		// - SCRIPT API REFERENCE ----------------------------
 
 		public:
-			// Registers all script-callable methods for the SceneCameraComponent type with the specified script type registrar.
+			//!	Registers all script-callable methods for the @ref TriggerVolumeComponent type with the specified script type registrar.
 			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
@@ -221,16 +230,16 @@ namespace Physics {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this PhysicalSoftBodyComponent.
+			//!	Constructs this @ref PhysicalSoftBodyComponent.
 			PhysicalSoftBodyComponent( Physics::BulletWorldView& owningView = GetActiveWorldView() );
 
-			// Constructs this PhysicalSoftBodyComponent.
+			//!	Constructs this @ref PhysicalSoftBodyComponent.
 			~PhysicalSoftBodyComponent();
 
 		// - SCRIPT API REFERENCE ----------------------------
 
 		public:
-			// Registers all script-callable methods for the SceneCameraComponent type with the specified script type registrar.
+			//!	Registers all script-callable methods for the @ref PhysicalSoftBodyComponent type with the specified script type registrar.
 			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
@@ -249,16 +258,16 @@ namespace Physics {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::btPoolAllocator					_persistentManifoldPool;
-		::btPoolAllocator					_collisionAlgorithmPool;
-		::btDefaultSoftBodySolver			_softBodySolver;
-		BulletWorld::CollisionConfiguration	_collisionConfiguration;
-		::btCollisionDispatcher				_dispatcher;
-		::btHashedOverlappingPairCache		_pairCache;
-		::bt32BitAxisSweep3					_broadphaseInterface;
-		BulletWorld::ConstraintSolver		_constraintSolver;
-		BulletWorld							_dynamicsWorld;
-		::btGhostPairCallback				_ghostPairCallback;
+		::btPoolAllocator				_persistentManifoldPool;
+		::btPoolAllocator				_collisionAlgorithmPool;
+		SoftBodySolver					_softBodySolver;
+		CollisionConfiguration			_collisionConfiguration;
+		CollisionDispatcher				_dispatcher;
+		OverlappingPairCache			_pairCache;
+		BroadphaseInterface				_broadphaseInterface;
+		ConstraintSolver				_constraintSolver;
+		BulletWorld						_dynamicsWorld;
+		::btGhostPairCallback			_ghostPairCallback;
 	};
 
 }	// namespace Physics
