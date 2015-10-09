@@ -1,0 +1,25 @@
+{
+	AttributeStreams : Array
+	{
+		BulkData
+
+		...
+	}
+
+	IndexData : BulkData
+
+	Attributes : Object
+	{
+		<SemanticName> : Object
+		{
+			ElementStride	: uint32
+			Layout		: uint16
+			StorageFormat	: uint8
+			StreamIndex	: uint8
+		}
+
+		...
+	}
+
+	
+}

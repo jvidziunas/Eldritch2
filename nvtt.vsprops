@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="nvtt"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(OrigSolutionDir)&quot;;&quot;$(SrcDir)&quot;;&quot;$(PoshDir)&quot;;&quot;$(GnuWinDir)\include&quot;;"
+	/>
+	<UserMacro
+		Name="OrigSolutionDir"
+		Value="$(ExternSrcDir)nvidia-texture-tools\project\vc9\"
+	/>
+	<UserMacro
+		Name="SrcDir"
+		Value="$(ExternSrcDir)nvidia-texture-tools\src\"
+	/>
+	<UserMacro
+		Name="ExternDir"
+		Value="$(SrcDir)..\extern\"
+	/>
+	<UserMacro
+		Name="PoshDir"
+		Value="$(ExternDir)poshlib"
+	/>
+	<UserMacro
+		Name="GnuWinDir"
+		Value="$(ExternDir)gnuwin32"
+	/>
+	<UserMacro
+		Name="FreeImageDir"
+		Value="$(ExternDir)FreeImage"
+	/>
+	<UserMacro
+		Name="GlewDir"
+		Value="$(ExternDir)glew"
+	/>
+</VisualStudioPropertySheet>

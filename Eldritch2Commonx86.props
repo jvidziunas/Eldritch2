@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <MainSrcDir>$(SolutionDir)src\</MainSrcDir>
+    <ExternSrcDir>$(SolutionDir)extern\</ExternSrcDir>
+    <ProjectSrcDir>$(SolutionDir)$(ProjectName)\</ProjectSrcDir>
+    <IntermediateDir>$(SolutionDir)obj\$(ProjectName)\x86\$(Configuration)\</IntermediateDir>
+    <ExternLibDir>$(ExternSrcDir)lib\x86\$(Configuration)\</ExternLibDir>
+    <BinaryDir>$(SolutionDir)bin\x86\$(Configuration)\</BinaryDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MainSrcDir);$(ExternSrcDir);$(ProjectSrcDir);$(SolutionDir);L:\Boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="MainSrcDir">
+      <Value>$(MainSrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExternSrcDir">
+      <Value>$(ExternSrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjectSrcDir">
+      <Value>$(ProjectSrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="IntermediateDir">
+      <Value>$(IntermediateDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExternLibDir">
+      <Value>$(ExternLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BinaryDir">
+      <Value>$(BinaryDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

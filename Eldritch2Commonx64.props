@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <IntermediateDir>$(SolutionDir)obj\$(ProjectName)\x64\$(Configuration)\</IntermediateDir>
+    <ExternLibDir>$(ExternSrcDir)lib\x64\$(Configuration)\</ExternLibDir>
+    <BinaryDir>$(SolutionDir)bin\x64\$(Configuration)\</BinaryDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="IntermediateDir">
+      <Value>$(IntermediateDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExternLibDir">
+      <Value>$(ExternLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BinaryDir">
+      <Value>$(BinaryDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

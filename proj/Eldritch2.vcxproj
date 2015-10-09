@@ -1,0 +1,449 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FEF2E044-4B9B-4856-9D35-F82F0F0FE27D}</ProjectGuid>
+    <RootNamespace>Eldritch2</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx86.props" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx64.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx86.props" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx64.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(BinaryDir)</OutDir>
+    <IntDir>$(IntermediateDir)</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(ExternSrcDir)PhysXSDK\Lib\Win64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(BinaryDir)</OutDir>
+    <IntDir>$(IntermediateDir)</IntDir>
+    <LibraryPath>$(ExternSrcDir)PhysXSDK\Lib\Win64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Command>call "$(SolutionDir)Prebuild.bat"</Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)src_Hero;$(ExternSrcDir)angelscript-svn\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;AS_NO_COMPILER;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnablePREfast>true</EnablePREfast>
+      <StringPooling>true</StringPooling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript-svn\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEvent>
+      <Command>call "$(SolutionDir)Prebuild.bat"</Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src_Hero;$(ExternSrcDir)angelscript-svn\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING 0;NOMINMAX;AS_NO_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnablePREfast>true</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>false</OpenMPSupport>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript-svn\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>true</Profile>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(SolutionDir)bin\"
+call "deploy.x64.bat"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Animation\LocalSpaceAnimationLayer.cpp" />
+    <ClCompile Include="..\src\Animation\LocomotionAnimationLayer.cpp" />
+    <ClCompile Include="..\src\Build.cpp" />
+    <ClCompile Include="..\examples\Win32EntryPoint.cpp" />
+    <ClCompile Include="..\src\Configuration\ConfigurablePODVariable.cpp" />
+    <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp" />
+    <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp" />
+    <ClCompile Include="..\src\Foundation\WorldView.cpp" />
+    <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp" />
+    <ClCompile Include="..\src\Input\Keyboard.cpp" />
+    <ClCompile Include="..\src\Input\Mouse.cpp" />
+    <ClCompile Include="..\src\Input\PlaystationController.cpp" />
+    <ClCompile Include="..\src\Input\Win32InputService.Keyboard.cpp" />
+    <ClCompile Include="..\src\Input\Win32InputService.Mouse.cpp" />
+    <ClCompile Include="..\src\Input\Win32InputService.RawInputPollingThread.cpp" />
+    <ClCompile Include="..\src\Input\XInputService.Controller.cpp" />
+    <ClCompile Include="..\src\Input\XInputService.cpp" />
+    <ClCompile Include="..\src\Networking\SteamworksNetworkingService.cpp" />
+    <ClCompile Include="..\src\Networking\SteamworksNetworkingService.Player.cpp" />
+    <ClCompile Include="..\src\Networking\Steamworks\SteamworksWorldView.cpp" />
+    <ClCompile Include="..\src\Packages\DeserializationContext.cpp" />
+    <ClCompile Include="..\src\Packages\LoaderThread.cpp" />
+    <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
+    <ClCompile Include="..\src\Physics\BulletEngine.cpp" />
+    <ClCompile Include="..\src\Physics\Bullet\btHeightfieldTerrainShapeEx.cpp" />
+    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.cpp" />
+    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.CharacterArmatureComponent.cpp" />
+    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.TerrainColliderComponent.cpp" />
+    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.TriggerVolumeComponent.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11MeshView.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11HLSLPipelineDefinitionView.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11ShaderResourceView.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11SwapChain.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.MeshComponent.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.SceneCameraComponent.cpp" />
+    <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp" />
+    <ClCompile Include="..\src\Scheduler\Win32Scheduler.WorkerThread.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackage.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.cpp" />
+    <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp" />
+    <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp" />
+    <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp" />
+    <ClCompile Include="..\src\foundation\GameEngine.cpp" />
+    <ClCompile Include="..\src\foundation\GameEngineService.cpp" />
+    <ClCompile Include="..\src\configuration\ConfigurationService.cpp" />
+    <ClCompile Include="..\src\foundation\Window.cpp" />
+    <ClCompile Include="..\src\foundation\Player.cpp" />
+    <ClCompile Include="..\src\system\SystemInterface.cpp" />
+    <ClCompile Include="..\src\system\Win32SystemInterface.cpp" />
+    <ClCompile Include="..\src\Foundation\World.cpp" />
+    <ClCompile Include="..\src\input\Win32InputService.cpp" />
+    <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp" />
+    <ClCompile Include="..\src\logging\Logger.cpp" />
+    <ClCompile Include="..\src\Logging\NullLogger.cpp" />
+    <ClCompile Include="..\src\packages\ContentProvider.cpp" />
+    <ClCompile Include="..\src\Packages\ContentLibrary.cpp" />
+    <ClCompile Include="..\src\Packages\ContentPackage.cpp" />
+    <ClCompile Include="..\src\Packages\ResourceView.cpp" />
+    <ClCompile Include="..\src\packages\Win32ContentProvider.cpp" />
+    <ClCompile Include="..\src\physics\PhysicalMaterial.cpp" />
+    <ClCompile Include="..\src\renderer\Camera.cpp" />
+    <ClCompile Include="..\src\renderer\D3D11\D3D11FormatHelpers.cpp" />
+    <ClCompile Include="..\src\renderer\Direct3D11Renderer.cpp" />
+    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11BufferBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Builders\Direct3D11DeviceBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\D3D11\Builders\D3D11RenderTargetViewBuilder.cpp" />
+    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11SwapChainBuilder.cpp" />
+    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp" />
+    <ClCompile Include="..\src\renderer\textures\Texture.cpp" />
+    <ClCompile Include="..\src\Renderer\OpenGLRenderer.cpp" />
+    <ClCompile Include="..\src\Scheduler\Thread.cpp" />
+    <ClCompile Include="..\src\Scheduler\Task.cpp" />
+    <ClCompile Include="..\src\scheduler\TaskScheduler.cpp" />
+    <ClCompile Include="..\src\Scheduler\WorkerContext.cpp" />
+    <ClCompile Include="..\src\scheduler\Win32Scheduler.cpp" />
+    <ClCompile Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.cpp" />
+    <ClCompile Include="..\src\scripting\AngelscriptEngine.cpp" />
+    <ClCompile Include="..\src\scripting\Angelscript\AngelscriptWorldView.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptNativeBindings.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp" />
+    <ClCompile Include="..\src\Sound\XAudio2AudioRenderer.cpp" />
+    <ClCompile Include="..\src\Utility\Assert.cpp" />
+    <ClCompile Include="..\src\Utility\Concurrency\UserSemaphore.cpp" />
+    <ClCompile Include="..\src\Utility\Concurrency\WaitableUserEvent.cpp" />
+    <ClCompile Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.cpp" />
+    <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp" />
+    <ClCompile Include="..\src\Utility\DebugController.cpp" />
+    <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
+    <ClCompile Include="..\src\Utility\FourCCGenerator.cpp" />
+    <ClCompile Include="..\src\Utility\IntrusivePointerBase.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp" />
+    <ClCompile Include="..\src\Utility\MessagePackBase.cpp" />
+    <ClCompile Include="..\src\Utility\MessagePackReader.cpp" />
+    <ClCompile Include="..\src\Utility\MessagePackWriter.cpp" />
+    <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp" />
+    <ClCompile Include="..\src\Utility\RandomNumberGenerator.cpp" />
+    <ClCompile Include="..\src\Utility\ScopedFPUController.cpp" />
+    <ClCompile Include="..\src\Utility\StringOperators.cpp" />
+    <ClCompile Include="..\src\Utility\SurjectiveQueryEngine.cpp" />
+    <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
+    <ClCompile Include="..\src\Utility\concurrency\Lock.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp" />
+    <ClCompile Include="..\src\Utility\memory\InstanceNew.cpp" />
+    <ClCompile Include="..\src\Utility\memory\Allocator.cpp" />
+    <ClCompile Include="..\src\Utility\memory\ArenaAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp" />
+    <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp" />
+    <ClCompile Include="..\src\Utility\AsynchronousFileReader.cpp" />
+    <ClCompile Include="..\src\Utility\AsynchronousFileWriter.cpp" />
+    <ClCompile Include="..\src\Utility\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src\Utility\SynchronousFileAppender.cpp" />
+    <ClCompile Include="..\src\Utility\SynchronousFileReader.cpp" />
+    <ClCompile Include="..\src\Utility\SynchronousFileWriter.cpp" />
+    <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp" />
+    <ClCompile Include="..\src\Animation\Armature.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Animation\LocalSpaceAnimationLayer.hpp" />
+    <ClInclude Include="..\src\Animation\LocomotionAnimationLayer.hpp" />
+    <ClInclude Include="..\src\Build.hpp" />
+    <ClInclude Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.hpp" />
+    <ClInclude Include="..\src\Configuration\INIParser.hpp" />
+    <ClInclude Include="..\src\Configuration\SimpleConfigurableVariableWithStorage.hpp" />
+    <ClInclude Include="..\src\Configuration\ConfigurablePODVariable.hpp" />
+    <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp" />
+    <ClInclude Include="..\src\Input\Keyboard.hpp" />
+    <ClInclude Include="..\src\Input\Mouse.hpp" />
+    <ClInclude Include="..\src\Input\PlaystationController.hpp" />
+    <ClInclude Include="..\src\Input\XInputService.hpp" />
+    <ClInclude Include="..\src\Networking\SteamworksNetworkingService.hpp" />
+    <ClInclude Include="..\src\Networking\Steamworks\SteamworksWorldView.hpp" />
+    <ClInclude Include="..\src\Packages\DeserializationContext.hpp" />
+    <ClInclude Include="..\src\Packages\LoaderThread.hpp" />
+    <ClInclude Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.hpp" />
+    <ClInclude Include="..\src\Physics\BulletEngine.hpp" />
+    <ClInclude Include="..\src\Physics\Bullet\btDiscreteDynamicsMixinWrapper.hpp" />
+    <ClInclude Include="..\src\Physics\Bullet\btHeightfieldTerrainShapeEx.hpp" />
+    <ClInclude Include="..\src\Physics\Bullet\btMultiBodyWorldMixin.hpp" />
+    <ClInclude Include="..\src\Physics\Bullet\btSoftBodyWorldMixin.hpp" />
+    <ClInclude Include="..\src\Physics\Bullet\BulletWorldView.hpp" />
+    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11MeshView.hpp" />
+    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11HLSLPipelineDefinitionView.hpp" />
+    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11ShaderResourceView.hpp" />
+    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11SwapChain.hpp" />
+    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11WorldView.hpp" />
+    <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp" />
+    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackage.hpp" />
+    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.hpp" />
+    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.hpp" />
+    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.hpp" />
+    <ClInclude Include="..\src\Scripting\ReferenceTypeBase.hpp" />
+    <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp" />
+    <ClInclude Include="..\src\packages\ContentProvider.hpp" />
+    <ClInclude Include="..\src\packages\ContentLibrary.hpp" />
+    <ClInclude Include="..\src\Packages\ContentPackage.hpp" />
+    <ClInclude Include="..\src\Packages\ResourceView.hpp" />
+    <ClInclude Include="..\src\packages\Win32ContentProvider.hpp" />
+    <ClInclude Include="..\src\Scripting\ObjectHandle.hpp" />
+    <ClInclude Include="..\src\Utility\Algorithms.hpp" />
+    <ClInclude Include="..\src\Utility\Assert.hpp" />
+    <ClInclude Include="..\src\Utility\COMPointer.hpp" />
+    <ClInclude Include="..\src\Utility\Concurrency\StripedLock.hpp" />
+    <ClInclude Include="..\src\Utility\Concurrency\StripedReaderWriterLock.hpp" />
+    <ClInclude Include="..\src\Utility\Concurrency\WaitableUserEvent.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedSet.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
+    <ClInclude Include="..\src\Utility\DisposingResultPair.hpp" />
+    <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
+    <ClInclude Include="..\src\Utility\MessagePackReader.hpp" />
+    <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
+    <ClInclude Include="..\src\Utility\StringOperators.hpp" />
+    <ClInclude Include="..\src\Utility\DebugController.hpp" />
+    <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
+    <ClInclude Include="..\src\Utility\FourCCGenerator.hpp" />
+    <ClInclude Include="..\src\Utility\IdentifierPool.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\RandomNumberGenerator.hpp" />
+    <ClInclude Include="..\src\Utility\ResultPair.hpp" />
+    <ClInclude Include="..\src\Utility\ScopedFPUController.hpp" />
+    <ClInclude Include="..\src\Utility\SurjectiveQueryEngine.hpp" />
+    <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp" />
+    <ClInclude Include="..\src\Utility\concurrency\Lock.hpp" />
+    <ClInclude Include="..\src\Utility\Concurrency\UserSemaphore.hpp" />
+    <ClInclude Include="..\src\Utility\memory\InstanceNew.hpp" />
+    <ClInclude Include="..\src\Utility\memory\IntrusiveDisposers.hpp" />
+    <ClInclude Include="..\src\Utility\memory\MemStdLib.hpp" />
+    <ClInclude Include="..\src\Utility\memory\ObjectPool.hpp" />
+    <ClInclude Include="..\src\Utility\memory\Prefetch.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\ThreadsafeObjectPool.hpp" />
+    <ClInclude Include="..\src\Utility\memory\Allocator.hpp" />
+    <ClInclude Include="..\src\Utility\memory\ArenaAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp" />
+    <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapter.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Alignof.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\AngleTypes.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\FloatTypes.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\IntTypes.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\MatrixTypes.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Noncopyable.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\VectorTypes.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Compiler.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Platform.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Platform.Linux.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Platform.MacOS.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Platform.PS3.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Platform.Win.hpp" />
+    <ClInclude Include="..\src\Utility\mpl\Platform.Xenon.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\Event.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\ResizableArray.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardListHook.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveList.hpp" />
+    <ClInclude Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\List.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\FlatOrderedMap.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\OrderedMap.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\OrderedSet.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp" />
+    <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp" />
+    <ClInclude Include="..\src\Utility\math\MathUtils.hpp" />
+    <ClInclude Include="..\src\Utility\AsynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\Utility\AsynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\Utility\ReadableMemoryMappedFile.hpp" />
+    <ClInclude Include="..\src\Utility\SynchronousFileAppender.hpp" />
+    <ClInclude Include="..\src\Utility\SynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\Utility\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\physics\PhysicalMaterial.hpp" />
+    <ClInclude Include="..\src\renderer\Camera.hpp" />
+    <ClInclude Include="..\src\Renderer\GPUFormats.hpp" />
+    <ClInclude Include="..\src\renderer\D3D11\D3D11FormatHelpers.hpp" />
+    <ClInclude Include="..\src\renderer\D3D11\D3D11ForwardDeclarations.hpp" />
+    <ClInclude Include="..\src\renderer\Direct3D11Renderer.hpp" />
+    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11BufferBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\D3D11\Builders\Direct3D11DeviceBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\D3D11\Builders\D3D11RenderTargetViewBuilder.hpp" />
+    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11SwapChainBuilder.hpp" />
+    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.hpp" />
+    <ClInclude Include="..\src\renderer\D3D11\Direct3D11ResourceCommon.hpp" />
+    <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp" />
+    <ClInclude Include="..\src\renderer\textures\Texture.hpp" />
+    <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp" />
+    <ClInclude Include="..\src\Renderer\OpenGLRenderer.hpp" />
+    <ClInclude Include="..\src\Scheduler\Thread.hpp" />
+    <ClInclude Include="..\src\Scheduler\Task.hpp" />
+    <ClInclude Include="..\src\scheduler\TaskScheduler.hpp" />
+    <ClInclude Include="..\src\Scheduler\WorkerContext.hpp" />
+    <ClInclude Include="..\src\scheduler\Win32Scheduler.hpp" />
+    <ClInclude Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.hpp" />
+    <ClInclude Include="..\src\scripting\AngelscriptEngine.hpp" />
+    <ClInclude Include="..\src\scripting\Angelscript\AngelscriptWorldView.hpp" />
+    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptNativeBindings.hpp" />
+    <ClInclude Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.hpp" />
+    <ClInclude Include="..\src\Sound\XAudio2AudioRenderer.hpp" />
+    <ClInclude Include="..\src\configuration\ConfigurableUTF8String.hpp" />
+    <ClInclude Include="..\src\configuration\ConfigurableVariable.hpp" />
+    <ClInclude Include="..\src\configuration\ConfigurationDatabase.hpp" />
+    <ClInclude Include="..\src\configuration\ConfigurationService.hpp" />
+    <ClInclude Include="..\src\foundation\Window.hpp" />
+    <ClInclude Include="..\src\foundation\GameEngine.hpp" />
+    <ClInclude Include="..\src\foundation\GameEngineService.hpp" />
+    <ClInclude Include="..\src\foundation\Player.hpp" />
+    <ClInclude Include="..\src\foundation\PlayerCommon.hpp" />
+    <ClInclude Include="..\src\system\SystemInterface.hpp" />
+    <ClInclude Include="..\src\system\Win32SystemInterface.hpp" />
+    <ClInclude Include="..\src\foundation\World.hpp" />
+    <ClInclude Include="..\src\Foundation\WorldView.hpp" />
+    <ClInclude Include="..\src\input\Win32InputService.hpp" />
+    <ClInclude Include="..\src\Logging\FileAppendingLogger.hpp" />
+    <ClInclude Include="..\src\logging\Logger.hpp" />
+    <ClInclude Include="..\src\Logging\NullLogger.hpp" />
+    <ClInclude Include="..\src\Animation\AnimationTypes.hpp" />
+    <ClInclude Include="..\src\Animation\Armature.hpp" />
+    <ClInclude Include="..\resources\Eldritch2.Resources.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\Eldritch2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\resources\Eldritch2.resources.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\resources\Eldritch2.Resources.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

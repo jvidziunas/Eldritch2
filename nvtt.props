@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <OrigSolutionDir>$(ExternSrcDir)nvidia-texture-tools\project\vc9\</OrigSolutionDir>
+    <SrcDir>$(ExternSrcDir)nvidia-texture-tools\src\</SrcDir>
+    <ExternDir>$(SrcDir)..\extern\</ExternDir>
+    <PoshDir>$(ExternDir)poshlib</PoshDir>
+    <GnuWinDir>$(ExternDir)gnuwin32</GnuWinDir>
+    <FreeImageDir>$(ExternDir)FreeImage</FreeImageDir>
+    <GlewDir>$(ExternDir)glew</GlewDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OrigSolutionDir);$(SrcDir);$(PoshDir);$(GnuWinDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="OrigSolutionDir">
+      <Value>$(OrigSolutionDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SrcDir">
+      <Value>$(SrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExternDir">
+      <Value>$(ExternDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PoshDir">
+      <Value>$(PoshDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GnuWinDir">
+      <Value>$(GnuWinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="FreeImageDir">
+      <Value>$(FreeImageDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GlewDir">
+      <Value>$(GlewDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
