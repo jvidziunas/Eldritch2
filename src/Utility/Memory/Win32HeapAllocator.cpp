@@ -15,20 +15,21 @@
 //==================================================================//
 #include <Utility/Memory/Win32HeapAllocator.hpp>
 #include <Utility/Memory/MemStdLib.hpp>
-#include <Utility/Concurrency/AtomicOperations.hpp>
 #include <Utility/Assert.hpp>
-#include <algorithm>
+//------------------------------------------------------------------//
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
+//------------------------------------------------------------------//
+#include <algorithm>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2;
 using namespace ::std;
 
 // There are a few combo assignment/conditional expressions in
-// the heap manipulation functions here. All are currently intentional.
+// the heap manipulation functions here. All are intentional.
 #if( ET_COMPILER_IS_MSVC )
 #	pragma warning( push )
 #		pragma warning( disable : 4706 )
@@ -51,10 +52,6 @@ namespace Eldritch2Detail {
 	Win32HeapAllocatorBase::Win32HeapAllocatorBase( const ::HANDLE heapHandle, const UTF8Char* const name ) : Allocator( name ), _heap( heapHandle ) {
 		ETRuntimeAssert( nullptr != _heap );
 	}
-
-// ---------------------------------------------------
-
-	Win32HeapAllocatorBase::~Win32HeapAllocatorBase() {}
 
 // ---------------------------------------------------
 
@@ -119,10 +116,6 @@ namespace Eldritch2Detail {
 namespace Eldritch2 {
 
 	Win32GlobalHeapAllocator::Win32GlobalHeapAllocator( const ::Eldritch2::UTF8Char* const name ) : ::Eldritch2Detail::Win32HeapAllocatorBase( reinterpret_cast<::HANDLE>(::_get_heap_handle()), name ) {}
-
-// ---------------------------------------------------
-
-	Win32GlobalHeapAllocator::~Win32GlobalHeapAllocator() {}
 
 // ---------------------------------------------------
 

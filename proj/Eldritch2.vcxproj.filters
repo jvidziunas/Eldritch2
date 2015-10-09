@@ -636,9 +636,6 @@
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp">
       <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Packages\DeserializationContext.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Packages\LoaderThread.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
     </ClCompile>
@@ -653,6 +650,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp">
       <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp">
+      <Filter>Source Files\Engine\Packages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1142,10 +1142,10 @@
     <ClInclude Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.hpp">
       <Filter>Header Files\Engine\Utility\Containers\Linked Lists</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Packages\DeserializationContext.hpp">
+    <ClInclude Include="..\src\Packages\LoaderThread.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Packages\LoaderThread.hpp">
+    <ClInclude Include="..\src\Packages\PackageDeserializationContext.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
     </ClInclude>
   </ItemGroup>

@@ -47,7 +47,7 @@ namespace FileSystem {
 	LoaderThread::~LoaderThread() {
 		auto&	threadAllocator( _allocator );
 
-		_outstandingLoads.ClearAndDispose( [&threadAllocator] ( DeserializationContext& context ) {
+		_outstandingLoads.ClearAndDispose( [&threadAllocator] ( PackageDeserializationContext& context ) {
 			threadAllocator.Delete( context );
 		} );
 
@@ -67,7 +67,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	void LoaderThread::AddDeserializationContext( DeserializationContext& context ) {
+	void LoaderThread::AddDeserializationContext( PackageDeserializationContext& context ) {
 		_initializationQueue.PushBack( context );
 
 		// Mark the semaphore so the thread knows to wake up.
@@ -98,7 +98,7 @@ namespace FileSystem {
 		// TODO: This is rather dense.
 
 		while( (_loadSemaphore->Acquire(), CONTINUE_EXECUTION == _executionBehavior.load( memory_order_consume )) ) {
-			if( DeserializationContext* const context = _initializationQueue.PopFront() ) {
+			if( PackageDeserializationContext* const context = _initializationQueue.PopFront() ) {
 				// Ensure the game engine still wants the package loaded before continuing.
 				if( context->DeserializeDependencies() ) {
 					_outstandingLoads.PushFront( *context );
@@ -108,7 +108,7 @@ namespace FileSystem {
 				}
 
 				// This should execute even if the new addition failed initialization; this will help the failure notification propagate out to other queued packages so they can abort.
-				_outstandingLoads.RemoveAndDisposeIf( [] ( const DeserializationContext& context ) {
+				_outstandingLoads.RemoveAndDisposeIf( [] ( const PackageDeserializationContext& context ) {
 					bool	dependenciesLoaded( true );
 
 					for( const auto& referencedPackage : context.GetBoundPackage().GetReferencedPackageCollection() ) {
@@ -128,7 +128,7 @@ namespace FileSystem {
 					}
 
 					return dependenciesLoaded;
-				}, [&threadAllocator] ( DeserializationContext& context ) {
+				}, [&threadAllocator] ( PackageDeserializationContext& context ) {
 					context.DeserializeContent();
 					threadAllocator.Delete( context );
 				} );

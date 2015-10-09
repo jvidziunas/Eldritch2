@@ -9,14 +9,13 @@
   fidelity, often requiring external allocation size profiles, etc.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Concurrency/AtomicOperations.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
@@ -24,15 +23,16 @@
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2;
+using namespace ::std;
 
 namespace Eldritch2Detail {
 
-	ArenaAllocatorBase::ArenaAllocatorBase( void* pool, const SizeType allocationLimitInBytes, const UTF8Char* const name ) : Allocator( name ), _arenaPtr( static_cast<char*>(pool) ), _arenaEnd( static_cast<char*>(pool) + allocationLimitInBytes ) {}
+	ArenaAllocatorBase::ArenaAllocatorBase( void* pool, const SizeType allocationLimitInBytes, const UTF8Char* const name ) : Allocator( name ), _allocationPointer( static_cast<char*>(pool) ), _arenaEnd( static_cast<char*>(pool) + allocationLimitInBytes ) {}
 
 // ---------------------------------------------------
 
 	ETRestrictHint void* ArenaAllocatorBase::Allocate( const SizeType sizeInBytes, const AllocationOptions /*options*/ ) {
-		char* const	newMemory( reinterpret_cast<char*>(AtomicAdd( reinterpret_cast<uintptr&>(_arenaPtr), sizeInBytes )) );
+		char* const	newMemory( _allocationPointer.fetch_add( sizeInBytes ) );
 
 		if( (newMemory + sizeInBytes) <= _arenaEnd ) {
 			return newMemory;
@@ -75,16 +75,16 @@ namespace Eldritch2Detail {
 // ---------------------------------------------------
 
 	const void* ArenaAllocatorBase::GetCheckpoint() const {
-		return _arenaPtr;
+		return _allocationPointer;
 	}
 
 // ---------------------------------------------------
 
 	void ArenaAllocatorBase::RestoreCheckpoint( const void* const checkpoint ) {
 		// Verify the checkpoint is legal.
-		ETRuntimeAssert( static_cast<const char*>(checkpoint) <= _arenaPtr );
+		ETRuntimeAssert( static_cast<const char*>(checkpoint) <= _allocationPointer.load( memory_order_relaxed ) );
 
-		_arenaPtr = static_cast<char*>(const_cast<void*>(checkpoint));
+		_allocationPointer = static_cast<char*>(const_cast<void*>(checkpoint));
 	}
 
 // ---------------------------------------------------
@@ -101,7 +101,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ArenaChildAllocator::ArenaChildAllocator( Allocator& parent, const SizeType allocationLimitInBytes, const AllocationOptions allocationOptions, const UTF8Char* const name ) : ArenaAllocatorBase( parent.Allocate( allocationLimitInBytes, 16u, allocationOptions ), allocationLimitInBytes, name ), _parent( parent ), _allocation( _arenaPtr ) {}
+	ArenaChildAllocator::ArenaChildAllocator( Allocator& parent, const SizeType allocationLimitInBytes, const AllocationOptions allocationOptions, const UTF8Char* const name ) : ArenaAllocatorBase( parent.Allocate( allocationLimitInBytes, 16u, allocationOptions ), allocationLimitInBytes, name ), _parent( parent ), _allocation( _allocationPointer ) {}
 
 // ---------------------------------------------------
 

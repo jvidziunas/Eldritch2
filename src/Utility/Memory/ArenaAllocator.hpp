@@ -14,6 +14,8 @@
 //==================================================================//
 #include <Utility/Memory/Allocator.hpp>
 //------------------------------------------------------------------//
+#include <atomic>
+//------------------------------------------------------------------//
 
 namespace Eldritch2Detail {
 
@@ -51,8 +53,8 @@ namespace Eldritch2Detail {
 
 	// - DATA MEMBERS ------------------------------------
 
-		char*		_arenaPtr;
-		char* const	_arenaEnd;
+		::std::atomic<char*>	_allocationPointer;
+		char* const				_arenaEnd;
 	};
 
 }	// namespace Eldritch2Detail

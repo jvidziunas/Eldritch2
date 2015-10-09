@@ -164,7 +164,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Networking\SteamworksNetworkingService.cpp" />
     <ClCompile Include="..\src\Networking\SteamworksNetworkingService.Player.cpp" />
     <ClCompile Include="..\src\Networking\Steamworks\SteamworksWorldView.cpp" />
-    <ClCompile Include="..\src\Packages\DeserializationContext.cpp" />
+    <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp" />
     <ClCompile Include="..\src\Packages\LoaderThread.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Physics\BulletEngine.cpp" />
@@ -283,7 +283,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Input\XInputService.hpp" />
     <ClInclude Include="..\src\Networking\SteamworksNetworkingService.hpp" />
     <ClInclude Include="..\src\Networking\Steamworks\SteamworksWorldView.hpp" />
-    <ClInclude Include="..\src\Packages\DeserializationContext.hpp" />
+    <ClInclude Include="..\src\Packages\PackageDeserializationContext.hpp" />
     <ClInclude Include="..\src\Packages\LoaderThread.hpp" />
     <ClInclude Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Physics\BulletEngine.hpp" />

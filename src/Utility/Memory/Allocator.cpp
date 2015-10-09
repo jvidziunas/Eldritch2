@@ -11,17 +11,18 @@
   ETStdAllocator.hpp.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Concurrency/AtomicOperations.hpp>
 #include <Utility/Memory/Allocator.hpp>
 #include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Assert.hpp>
 #include <Logging/Logger.hpp>
+//------------------------------------------------------------------//
 #include <memory>
 //------------------------------------------------------------------//
 

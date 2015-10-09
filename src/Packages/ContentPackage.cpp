@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Packages/DeserializationContext.hpp>
+#include <Packages/PackageDeserializationContext.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/ContentLibrary.hpp>
 //------------------------------------------------------------------//
@@ -32,7 +32,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ContentPackage::ContentPackage( ContentLibrary& owningLibrary, Allocator& allocator ) : _allocator( allocator, UTF8L("Package Resource View Allocator") ),
+	ContentPackage::ContentPackage( ContentLibrary& owningLibrary, Allocator& allocator ) : _allocator( allocator, UTF8L("Package Allocator") ),
 																							_owningLibrary( owningLibrary ),
 																							_name( ::Eldritch2::EmptyStringSemantics, allocator, UTF8L("Package Name Allocator") ),
 																							_referencedPackages( 0u, allocator, UTF8L("Package Dependency Collection Allocator") ) {}
@@ -42,7 +42,7 @@ namespace FileSystem {
 	ContentPackage::~ContentPackage() {
 		DeleteContent();
 
-		DeserializationContext::UnpublishPackage( *this );
+		PackageDeserializationContext::UnpublishPackage( *this );
 	}
 
 // ---------------------------------------------------

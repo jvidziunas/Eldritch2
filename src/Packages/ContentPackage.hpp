@@ -25,7 +25,7 @@
 
 namespace Eldritch2 {
 	namespace FileSystem {
-		class	DeserializationContext;
+		class	PackageDeserializationContext;
 		class	ContentLibrary;
 	}
 
@@ -74,6 +74,11 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
+		//!	Gets the base name of the package.
+		/*!	@returns A null-terminated C string containing the name of the package. Both the address and contents are guaranteed to remain constant throughout the life of the package.
+			*/
+		ETInlineHint const ::Eldritch2::UTF8Char* const	GetName() const;
+
 		//! Queries the current residency state of the package.
 		/*!	@returns A @ref ResidencyState enum describing the state of the package. This can be used to check whether or not content is available, i.e. a world resource.
 			@remarks Thread-safe.
@@ -94,10 +99,12 @@ namespace FileSystem {
 	// ---------------------------------------------------
 
 	protected:
+		ETInlineHint void	UpdateResidencyState( const ContentPackage::ResidencyState newState );
+
 		//! Deallocates and invokes the destructor on every @ref ResourceView contained in the @ref ContentPackage.
 		/*!	@remarks Not thread-safe.
 			*/
-		void	DeleteContent();
+		void				DeleteContent();
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -111,7 +118,7 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		friend class FileSystem::DeserializationContext;
+		friend class FileSystem::PackageDeserializationContext;
 	};
 
 }	// namespace FileSystem

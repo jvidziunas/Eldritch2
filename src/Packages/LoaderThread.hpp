@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveVyukovMPSCQueue.hpp>
 #include <Utility/Containers/IntrusiveForwardList.hpp>
-#include <Packages/DeserializationContext.hpp>
+#include <Packages/PackageDeserializationContext.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Scheduler/Thread.hpp>
 //------------------------------------------------------------------//
@@ -39,7 +39,7 @@ namespace FileSystem {
 	public:
 		//! Constructs this @ref LoaderThread instance.
 		/*! @param[in] scheduler @ref TaskScheduler instance that will run this @ref LoaderThread.
-			@param[in] allocator @ref Allocator the @ref LoaderThread should use to create @ref DeserializationContext instances.
+			@param[in] allocator @ref Allocator the @ref LoaderThread should use to create @ref PackageDeserializationContext instances.
 			*/
 		LoaderThread( Scheduler::TaskScheduler& scheduler, ::Eldritch2::Allocator& allocator );
 
@@ -56,7 +56,7 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		void	AddDeserializationContext( FileSystem::DeserializationContext& context );
+		void	AddDeserializationContext( FileSystem::PackageDeserializationContext& context );
 
 	// ---------------------------------------------------
 
@@ -70,8 +70,8 @@ namespace FileSystem {
 
 	private:
 		::Eldritch2::ChildAllocator													_allocator;
-		::Eldritch2::IntrusiveVyukovMPSCQueue<FileSystem::DeserializationContext>	_initializationQueue;
-		::Eldritch2::IntrusiveForwardList<FileSystem::DeserializationContext>		_outstandingLoads;
+		::Eldritch2::IntrusiveVyukovMPSCQueue<FileSystem::PackageDeserializationContext>	_initializationQueue;
+		::Eldritch2::IntrusiveForwardList<FileSystem::PackageDeserializationContext>		_outstandingLoads;
 		Utility::UserSemaphore*														_loadSemaphore;
 		::std::atomic<::Eldritch2::uint32>											_executionBehavior;
 	};

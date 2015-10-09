@@ -35,8 +35,20 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
+	ETInlineHint const ::Eldritch2::UTF8Char* const ContentPackage::GetName() const {
+		return _name.GetCharacterArray();
+	}
+
+// ---------------------------------------------------
+
 	ETInlineHint ContentPackage::ResidencyState	ContentPackage::GetResidencyState() const {
 		return _residencyState.load( ::std::memory_order_acquire );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint void ContentPackage::UpdateResidencyState( const ContentPackage::ResidencyState newState ) {
+		_residencyState.store( newState, ::std::memory_order_release );
 	}
 
 }	// namespace FileSystem

@@ -74,7 +74,8 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	DisposingResultPair<ContentPackage> ContentLibrary::ResolvePackageByName( const UTF8Char* const packageName ) {
-		using AllocationOption = Allocator::AllocationOption;
+		using AllocationOption	= Allocator::AllocationOption;
+		using PackageLibrary	= decltype(_contentPackageLibrary);
 
 	// ---
 
@@ -88,7 +89,8 @@ namespace FileSystem {
 
 		// Try to create a new package. It will add itself to our collection.
 		if( auto* const newPackage = new(_allocator, AllocationOption::PERMANENT_ALLOCATION) ContentPackage( packageName, *this, _allocator ) ) {
-			if( auto* const newDeserializer = new(_deserializationContextAllocator, AllocationOption::TEMPORARY_ALLOCATION) DeserializationContext( ObjectHandle<ContentPackage>( newPackage ) ) ) {
+			if( auto* const newDeserializer = new(_deserializationContextAllocator, AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( ObjectHandle<ContentPackage>( newPackage ) ) ) {
+				_contentPackageLibrary.Insert( PackageLibrary::ValueType( newPackage->GetName(), newPackage ) );
 				_loaderThread->AddDeserializationContext( *newDeserializer );
 
 				return { ObjectHandle<ContentPackage>( newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics ), Errors::NONE };

@@ -317,14 +317,14 @@ namespace Eldritch2 {
 
 	template <size_t stringSizeInCharacters>
 	ETForceInlineHint ETNoAliasHint auto CopyString( char (&destinationString)[stringSizeInCharacters], const char* sourceString ) -> decltype(destinationString) {
-		return (::Eldritch2::CopyString( static_cast<const char*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
+		return (::Eldritch2::CopyString( static_cast<char*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
 	}
 
 // ---------------------------------------------------
 
 	template <size_t stringSizeInCharacters>
 	ETForceInlineHint ETNoAliasHint auto CopyString( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* sourceString ) -> decltype(destinationString) {
-		return (::Eldritch2::CopyString( static_cast<const wchar_t*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
+		return (::Eldritch2::CopyString( static_cast<wchar_t*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
 	}
 
 // ---------------------------------------------------
@@ -343,14 +343,14 @@ namespace Eldritch2 {
 
 	template <size_t stringSizeInCharacters>
 	ETForceInlineHint ETNoAliasHint auto AppendString( char (&destinationString)[stringSizeInCharacters], const char* sourceString ) -> decltype(destinationString) {
-		return (::Eldritch2::AppendString( static_cast<const char*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
+		return (::Eldritch2::AppendString( static_cast<char*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
 	}
 
 // ---------------------------------------------------
 
 	template <size_t stringSizeInCharacters>
 	ETForceInlineHint ETNoAliasHint auto AppendString( wchar_t( &destinationString )[stringSizeInCharacters], const wchar_t* sourceString ) -> decltype(destinationString) {
-		return (::Eldritch2::AppendString( static_cast<const wchar_t*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
+		return (::Eldritch2::AppendString( static_cast<wchar_t*>(destinationString), sourceString, stringSizeInCharacters ), destinationString);
 	}
 
 // ---------------------------------------------------

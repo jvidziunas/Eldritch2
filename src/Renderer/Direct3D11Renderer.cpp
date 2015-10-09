@@ -122,6 +122,7 @@ namespace Renderer {
 				TrySchedulingOnContext( executingContext );
 			}
 
+			// Destroys this @ref CreateDeviceTask instance.
 			ETInlineHint ~CreateDeviceTask() = default;
 
 		// ---------------------------------------------------
@@ -150,12 +151,8 @@ namespace Renderer {
 // ---------------------------------------------------
 
 	void Direct3D11Renderer::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( this, sizeof( Direct3D11WorldView ), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
-			// Convert back to the renderer type.
-			auto&	renderer( *static_cast<Direct3D11Renderer*>(parameter) );
-			auto&	defaultView( renderer.GetEngineContentLibrary().ResolveViewByName( renderer._defaultMeshName.GetCharacterArray(), *renderer._defaultMeshView ) );
-
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Direct3D11WorldView( world, defaultView ) ? Errors::NONE : Errors::OUT_OF_MEMORY;
+		visitor.PublishFactory( this, sizeof( Direct3D11WorldView ), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
+			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Direct3D11WorldView( world, *static_cast<Direct3D11Renderer*>(renderer)->_defaultMeshView ) ? Errors::NONE : Errors::OUT_OF_MEMORY;
 		} );
 	}
 
@@ -166,17 +163,20 @@ namespace Renderer {
 
 	// ---
 
-		visitor.PublishFactory( Direct3D11MeshView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*parameter*/ ) -> ResultPair<ResourceView> {
+		// Mesh view.
+		visitor.PublishFactory( Direct3D11MeshView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*renderer*/ ) -> ResultPair<ResourceView> {
 			auto* const	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11MeshView( initializer, allocator ) );
 
 			return { view, view ? Errors::NONE : Errors::OUT_OF_MEMORY };
 		} )
-		.PublishFactory( Direct3D11HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*parameter*/ ) -> ResultPair<ResourceView> {
+		// HLSL Pipeline Definition view.
+		.PublishFactory( Direct3D11HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*renderer*/ ) -> ResultPair<ResourceView> {
 			auto* const view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11HLSLPipelineDefinitionView( initializer, allocator ) );
 
 			return { view, view ? Errors::NONE : Errors::OUT_OF_MEMORY };
 		} )
-		.PublishFactory( Direct3D11ShaderResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*parameter*/ ) -> ResultPair<ResourceView> {
+		// Shader resource view.
+		.PublishFactory( Direct3D11ShaderResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*renderer*/ ) -> ResultPair<ResourceView> {
 			COMPointer<::ID3D11ShaderResourceView>	deviceView( nullptr );
 			auto* const								view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11ShaderResourceView( ::std::move( deviceView ), initializer, allocator ) );
 

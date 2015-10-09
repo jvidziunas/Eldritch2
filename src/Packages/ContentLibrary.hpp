@@ -22,7 +22,7 @@
 namespace Eldritch2 {
 	namespace FileSystem {
 		class	ResourceViewFactoryPublishingInitializationVisitor;
-		class	DeserializationContext;
+		class	PackageDeserializationContext;
 		class	ContentProvider;
 		class	ContentPackage;
 		class	LoaderThread;
@@ -152,7 +152,7 @@ namespace FileSystem {
 	// - FRIEND CLASS DECLARATION ------------------------
 
 		friend class ::Eldritch2::FileSystem::ResourceViewFactoryPublishingInitializationVisitor;
-		friend class ::Eldritch2::FileSystem::DeserializationContext;
+		friend class ::Eldritch2::FileSystem::PackageDeserializationContext;
 	};
 
 }	// namespace FileSystem
