@@ -117,24 +117,41 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	bool AngelscriptBytecodePackage::Serialize( MessagePackWriter& writer ) {
-		class BytecodeStream : public ::asIBinaryStream {
+		class BytecodeSerializer {
 		public:
-			ETInlineHint BytecodeStream( ::asIScriptModule& module ) : _module( module ) {}
+			ETInlineHint BytecodeSerializer( ::asIScriptModule& module ) : _module( module ) {}
 
 		// ---------------------------------------------------
 
-			void Read( void* /*destination*/, ::asUINT /*sizeInBytes*/ ) override sealed {
-				// Purposely unimplemented.
-				ETRuntimeAssert( false );
-			}
+			ETForceInlineHint bool Serialize( MessagePackWriter& writer ) {
+				class BytecodeStream : public ::asIBinaryStream {
+				public:
+					ETInlineHint BytecodeStream( MessagePackWriter& writer ) : _writer( writer ), _writtenBytes( 0u ) {}
 
-			void Write( const void* source, ::asUINT sizeInBytes ) override sealed {
-			}
+					void Read( void* /*destination*/, ::asUINT /*sizeInBytes*/ ) override sealed {
+						// Purposely unimplemented.
+						ETRuntimeAssert( false );
+					}
 
-		// ---------------------------------------------------
+					void Write( const void* source, ::asUINT sizeInBytes ) override sealed {
+						_writer.WriteRaw( source, sizeInBytes );
+						_writtenBytes += sizeInBytes;
+					}
 
-			ETForceInlineHint bool Serialize( MessagePackWriter& reader ) {
-				
+					bool Finalize() {
+						return true;
+					}
+
+				private:
+					MessagePackWriter&	_writer;
+					::asUINT			_writtenBytes;
+				};
+
+			// ---
+
+				BytecodeStream	stream( writer );
+
+				return (0 <= _module.SaveByteCode( &stream )) ? stream.Finalize() : false;
 			}
 
 		// - DATA MEMBERS ------------------------------------
@@ -145,7 +162,7 @@ namespace Scripting {
 
 	// ---
 
-		return writer( BytecodeStream( *_module ), MessagePackWriter::WrapMapContainer( _typeMetadata, [] () {} ), MessagePackWriter::WrapMapContainer( _functionMetadata, [] () {} ) );
+		return writer( BytecodeSerializer( *_module ), MessagePackWriter::WrapMapContainer( _typeMetadata, [] () {} ), MessagePackWriter::WrapMapContainer( _functionMetadata, [] () {} ) );
 	}
 
 }	// namespace Scripting

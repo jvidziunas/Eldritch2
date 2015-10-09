@@ -342,7 +342,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\concurrency\Lock.hpp" />
     <ClInclude Include="..\src\Utility\Concurrency\UserSemaphore.hpp" />
     <ClInclude Include="..\src\Utility\memory\InstanceNew.hpp" />
-    <ClInclude Include="..\src\Utility\memory\IntrusiveDisposers.hpp" />
+    <ClInclude Include="..\src\Utility\memory\InstanceDeleters.hpp" />
     <ClInclude Include="..\src\Utility\memory\MemStdLib.hpp" />
     <ClInclude Include="..\src\Utility\memory\ObjectPool.hpp" />
     <ClInclude Include="..\src\Utility\memory\Prefetch.hpp" />

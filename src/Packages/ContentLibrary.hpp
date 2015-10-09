@@ -85,7 +85,7 @@ namespace FileSystem {
 		const View&	ResolveViewByName( const ::Eldritch2::UTF8Char* const name, const View& defaultView ) const;
 
 	// - TYPE PUBLISHING ---------------------------------
-
+	
 	private:
 		class ResourceViewFactoryKey : public ::std::pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*> {
 		// - TYPE PUBLISHING ---------------------------------
@@ -125,29 +125,29 @@ namespace FileSystem {
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator																_allocator;
-		::Eldritch2::ChildAllocator																_deserializationContextAllocator;
-		FileSystem::ContentProvider&															_contentProvider;
+		::Eldritch2::ChildAllocator																	_allocator;
+		::Eldritch2::ChildAllocator																	_deserializationContextAllocator;
+		FileSystem::ContentProvider&																_contentProvider;
 		
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		Utility::ReaderWriterUserMutex*															_contentPackageLibraryMutex;
+		Utility::ReaderWriterUserMutex*																_contentPackageLibraryMutex;
 
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		Utility::ReaderWriterUserMutex*															_resourceViewLibraryMutex;		
+		Utility::ReaderWriterUserMutex*																_resourceViewLibraryMutex;		
 
 		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*,
 								  Utility::StringHash,
-								  Utility::StringEqualComparator<>>								_contentPackageLibrary;
+								  Utility::StringEqualComparator<>>									_contentPackageLibrary;
 
 		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, const FileSystem::ResourceView*,
 								  Utility::StringHash,
-								  Utility::StringEqualComparator<>>								_resourceViewLibrary;
+								  Utility::StringEqualComparator<>>									_resourceViewLibrary;
 
 		::Eldritch2::UnorderedMap<ResourceViewFactoryKey,
 								  ::Eldritch2::ResizableArray<ResourceViewFactory>,
-								  ResourceViewFactoryKey::Hash>									_resourceViewFactoryLibrary;
+								  ResourceViewFactoryKey::Hash>										_resourceViewFactoryLibrary;
 
-		FileSystem::LoaderThread*																_loaderThread;
+		FileSystem::LoaderThread*																	_loaderThread;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

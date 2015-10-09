@@ -56,7 +56,7 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		void	AddDeserializationContext( FileSystem::PackageDeserializationContext& context );
+		ErrorCode	BeginLoad( FileSystem::ContentPackage& package );
 
 	// ---------------------------------------------------
 
@@ -69,11 +69,11 @@ namespace FileSystem {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator													_allocator;
+		::Eldritch2::ChildAllocator															_allocator;
 		::Eldritch2::IntrusiveVyukovMPSCQueue<FileSystem::PackageDeserializationContext>	_initializationQueue;
 		::Eldritch2::IntrusiveForwardList<FileSystem::PackageDeserializationContext>		_outstandingLoads;
-		Utility::UserSemaphore*														_loadSemaphore;
-		::std::atomic<::Eldritch2::uint32>											_executionBehavior;
+		Utility::UserSemaphore*																_loadSemaphore;
+		::std::atomic<::Eldritch2::uint32>													_executionBehavior;
 	};
 
 }	// namespace FileSystem

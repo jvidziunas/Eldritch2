@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Concurrency/UserSemaphore.hpp>
+#include <Utility/Memory/InstanceNew.hpp>
 #include <Scheduler/TaskScheduler.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/LoaderThread.hpp>
@@ -67,13 +68,23 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	void LoaderThread::AddDeserializationContext( PackageDeserializationContext& context ) {
-		_initializationQueue.PushBack( context );
+	ErrorCode LoaderThread::BeginLoad( ContentPackage& package ) {
+		using AllocationOption	= Allocator::AllocationOption;
 
-		// Mark the semaphore so the thread knows to wake up.
-		if( _loadSemaphore ) {
-			_loadSemaphore->IncreaseCount();
+	// ---
+
+		if( PackageDeserializationContext* context { new(_allocator, AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( { package } ) } ) {
+			_initializationQueue.PushBack( *context );
+
+			// Mark the semaphore so the thread knows to wake up.
+			if( _loadSemaphore ) {
+				_loadSemaphore->IncreaseCount();
+			}
+
+			return Errors::NONE;
 		}
+
+		return Errors::OUT_OF_MEMORY;
 	}
 
 // ---------------------------------------------------

@@ -704,9 +704,6 @@
     <ClInclude Include="..\src\Utility\concurrency\Lock.hpp">
       <Filter>Header Files\Engine\Utility\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\IntrusiveDisposers.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\memory\MemStdLib.hpp">
       <Filter>Header Files\Engine\Utility\Memory</Filter>
     </ClInclude>
@@ -1147,6 +1144,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Packages\PackageDeserializationContext.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\InstanceDeleters.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

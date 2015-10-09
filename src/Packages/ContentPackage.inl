@@ -47,6 +47,24 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
+	ETInlineHint ::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>& ContentPackage::GetDependencies() {
+		return _referencedPackages;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint::Eldritch2::Allocator& ContentPackage::GetAllocator() {
+		return _allocator;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint FileSystem::ContentLibrary& ContentPackage::GetLibrary() const {
+		return _owningLibrary;
+	}
+
+// ---------------------------------------------------
+
 	ETInlineHint void ContentPackage::UpdateResidencyState( const ContentPackage::ResidencyState newState ) {
 		_residencyState.store( newState, ::std::memory_order_release );
 	}

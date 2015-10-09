@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/DisposingResultPair.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
@@ -22,6 +23,8 @@
 #include <Utility/ResultPair.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
+#include <memory>
+//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Scheduler;
@@ -29,6 +32,9 @@ using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 using namespace ::std;
+
+using AllocationOption	= Allocator::AllocationOption;
+using PackageHandle		= unique_ptr<ContentPackage, InstanceDeleter>;
 
 namespace Eldritch2 {
 namespace FileSystem {
@@ -74,8 +80,75 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	DisposingResultPair<ContentPackage> ContentLibrary::ResolvePackageByName( const UTF8Char* const packageName ) {
-		using AllocationOption	= Allocator::AllocationOption;
-		using PackageLibrary	= decltype(_contentPackageLibrary);
+		class DeserializedContentPackage : public ContentPackage {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//! Constructs this @ref DeserializedContentPackage instance.
+			ETInlineHint DeserializedContentPackage( const UTF8Char* const name, ContentLibrary& owner, Allocator& allocator ) : ContentPackage( name, owner, allocator ) {}
+
+			//! Destroys this @ref DeserializedContentPackage instance.
+			~DeserializedContentPackage() {
+				auto&	contentLibrary( GetLibrary() );
+				// Erase all the views from the shared library.
+				{	ScopedLock	_( contentLibrary._resourceViewLibraryMutex );
+					auto&	resourceViewLibrary( contentLibrary._resourceViewLibrary );
+
+					for( const auto& view : GetExportedResourceCollection() ) {
+						const auto findViewResult( resourceViewLibrary.Find( view.GetName().GetCharacterArray() ) );
+
+						if( findViewResult != resourceViewLibrary.End() && findViewResult->second == &view ) {
+							resourceViewLibrary.Erase( findViewResult );
+						}
+					}
+				}
+
+				// Remove the package from the shared library.
+				{	ScopedLock	_( contentLibrary._contentPackageLibraryMutex );
+					contentLibrary._contentPackageLibrary.Erase( GetName() );
+				}
+			}
+
+		// ---------------------------------------------------
+
+			ErrorCode AddDependency( const UTF8Char* const dependencyName ) override sealed {
+				const auto	dereferenceResult( GetLibrary().ResolvePackageByName( dependencyName ) );
+
+				if( dereferenceResult ) {
+					GetDependencies().PushBack( move( dereferenceResult.object ) );
+				}
+
+				return dereferenceResult.resultCode;
+			}
+
+			ErrorCode AddContent( const ResourceView::Initializer& sourceAssetData ) override sealed {
+				auto&		factoryLibrary( GetLibrary()._resourceViewFactoryLibrary );
+				const auto	findFactoriesResult( factoryLibrary.Find( { sourceAssetData.name.first, sourceAssetData.name.onePastLast } ) );
+				ErrorCode	result( Errors::NONE );
+
+				if( findFactoriesResult != factoryLibrary.End() ) {
+					auto&	viewLibrary( GetLibrary()._resourceViewLibrary );
+					auto&	viewMutex( GetLibrary()._resourceViewLibraryMutex );
+					auto&	resourceAllocator( GetAllocator() );
+
+					for( const auto& factory : findFactoriesResult->second ) {
+						if( const auto createResourceResult = factory.factoryFunction( resourceAllocator, sourceAssetData, factory.parameter ) ) {
+							ScopedLock	_( viewMutex );
+							viewLibrary.Insert( { createResourceResult.object->GetName().GetCharacterArray(), createResourceResult.object } );
+						} else {
+							result = createResourceResult.resultCode;
+							break;
+						}
+					}
+				}
+
+				return result;
+			}
+
+			void Dispose() override {
+				GetLibrary()._allocator.Delete( *this );
+			}
+		};
 
 	// ---
 
@@ -84,34 +157,62 @@ namespace FileSystem {
 
 		if( candidate != _contentPackageLibrary.End() ) {
 			// Yes, we already have loaded this package. Increment the reference count and return it.
-			return { ObjectHandle<ContentPackage>( candidate->second ), Errors::NONE };
+			return { { candidate->second }, Errors::NONE };
 		}
 
-		// Try to create a new package. It will add itself to our collection.
-		if( auto* const newPackage = new(_allocator, AllocationOption::PERMANENT_ALLOCATION) ContentPackage( packageName, *this, _allocator ) ) {
-			if( auto* const newDeserializer = new(_deserializationContextAllocator, AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( ObjectHandle<ContentPackage>( newPackage ) ) ) {
-				_contentPackageLibrary.Insert( PackageLibrary::ValueType( newPackage->GetName(), newPackage ) );
-				_loaderThread->AddDeserializationContext( *newDeserializer );
+		if( PackageHandle package { new(_allocator, AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator ), { _allocator } } ) {
+			auto	beginLoadResult( _loaderThread->BeginLoad( *package ) );
 
-				return { ObjectHandle<ContentPackage>( newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics ), Errors::NONE };
+			if( beginLoadResult ) {
+				_contentPackageLibrary.Insert( { package->GetName(), package.get() } );
+				// This is the first external reference to the package, so we want the passthrough reference counting semantics.
+				return { { *package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics }, Errors::NONE };
 			}
-			
-			_allocator.Delete( *newPackage );
+
+			return { { nullptr }, beginLoadResult };
 		}
 		
-		return { ObjectHandle<ContentPackage>( nullptr ), Errors::OUT_OF_MEMORY };
+		return { { nullptr }, Errors::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
 
 	DisposingResultPair<ContentPackage> ContentLibrary::CreatePackageForEditorWorld() {
-		using AllocationOption = Allocator::AllocationOption;
+		class EditorPackage : public ContentPackage {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			// Constructs this @ref EditorPackage instance.
+			ETInlineHint EditorPackage( ContentLibrary& owningLibrary, Allocator& allocator ) : ContentPackage( UTF8L("<Editor Package>"), owningLibrary, allocator ) {}
+
+			~EditorPackage() = default;
+
+		// ---------------------------------------------------
+
+			ErrorCode AddDependency( const UTF8Char* const dependencyName ) override sealed {
+				const auto	dereferenceResult( GetLibrary().ResolvePackageByName( dependencyName ) );
+
+				if( dereferenceResult ) {
+					GetDependencies().PushBack( move( dereferenceResult.object ) );
+				}
+
+				return dereferenceResult.resultCode;
+			}
+
+			ErrorCode AddContent( const ResourceView::Initializer& /*sourceAssetData*/ ) override sealed {
+				return Errors::OPERATION_NOT_SUPPORTED;
+			}
+
+			void Dispose() override sealed {
+				GetLibrary()._allocator.Delete( *this );
+			}
+		};
 
 	// ---
 
-		auto* const	newPackage( new(_allocator, AllocationOption::PERMANENT_ALLOCATION) ContentPackage( *this, _allocator ) );
+		auto* const	newPackage( new(_allocator, AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) );
 
-		return { ObjectHandle<ContentPackage>( newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics ), newPackage ? Errors::NONE : Errors::OUT_OF_MEMORY };
+		return { { newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics }, newPackage ? Errors::NONE : Errors::OUT_OF_MEMORY };
 	}
 
 }	// namespace FileSystem

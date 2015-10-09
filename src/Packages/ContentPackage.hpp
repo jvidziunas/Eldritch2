@@ -34,6 +34,8 @@ namespace Eldritch2 {
 		template <typename ResultObjectType>
 		struct	ResultPair;
 	}
+
+	class	ErrorCode;
 }
 
 namespace Eldritch2 {
@@ -55,22 +57,11 @@ namespace FileSystem {
 			PUBLISHED	//!< The package, its dependencies and their contents have loaded fully.
 		};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	// ---------------------------------------------------
 
-		//! Constructs this @ref ContentPackage instance.
-		/*!	@param[in] name Null-terminated C string containing the name of the package. A copy of this will be kept internally, and there are no additional lifetime requirements after the constructor call.
-			@param[in] owningLibrary The @ref ContentLibrary instance that owns this @ref ContentPackage. The @ref ContentPackage will route additional load requests through this @ref ContentLibrary.
-			@param[in] allocator The @ref Allocator instance the @ref ContentPackage will use to allocate memory.
-			*/
-		ContentPackage( const ::Eldritch2::UTF8Char* const name, FileSystem::ContentLibrary& owningLibrary, ::Eldritch2::Allocator& allocator );
-		//! Constructs this @ref ContentPackage instance, with anonymous/editor semantics.
-		/*!	@param[in] owningLibrary The ContentLibrary instance that owns this @ref ContentPackage. The @ref ContentPackage will route additional load requests through this @ref ContentLibrary.
-			@param[in] allocator The Allocator instance the @ref ContentPackage will use to allocate memory.
-			*/
-		ContentPackage( FileSystem::ContentLibrary& owningLibrary, ::Eldritch2::Allocator& allocator );
+		virtual ::Eldritch2::ErrorCode	AddDependency( const ::Eldritch2::UTF8Char* const dependencyName ) abstract;
 
-		//! Destroys this @ref ContentPackage instance.
-		~ContentPackage();
+		virtual ::Eldritch2::ErrorCode	AddContent( const FileSystem::ResourceView::Initializer& sourceAssetData ) abstract;
 
 	// ---------------------------------------------------
 
@@ -84,7 +75,7 @@ namespace FileSystem {
 			@remarks Thread-safe.
 			@see @ref ResidencyState
 			*/
-		ETInlineHint ResidencyState	GetResidencyState() const;
+		ETInlineHint ResidencyState						GetResidencyState() const;
 
 	// ---------------------------------------------------
 
@@ -94,31 +85,40 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		void	Dispose() override sealed;
+		ETInlineHint void	UpdateResidencyState( const ContentPackage::ResidencyState newState );
 
 	// ---------------------------------------------------
 
 	protected:
-		ETInlineHint void	UpdateResidencyState( const ContentPackage::ResidencyState newState );
+		ETInlineHint ::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>&	GetDependencies();
 
-		//! Deallocates and invokes the destructor on every @ref ResourceView contained in the @ref ContentPackage.
-		/*!	@remarks Not thread-safe.
+		ETInlineHint FileSystem::ContentLibrary&														GetLibrary() const;
+
+		ETInlineHint ::Eldritch2::Allocator&															GetAllocator();
+
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		//! Constructs this @ref ContentPackage instance.
+		/*!	@param[in] name Null-terminated C string containing the name of the package. A copy of this will be kept internally, and there are no additional lifetime requirements after the constructor call.
+			@param[in] owningLibrary The @ref ContentLibrary instance that owns this @ref ContentPackage. The @ref ContentPackage will route additional load requests through this @ref ContentLibrary.
+			@param[in] allocator The @ref Allocator instance the @ref ContentPackage will use to allocate memory.
+			@see @ref UnpublishHandler
 			*/
-		void				DeleteContent();
+		ContentPackage( const ::Eldritch2::UTF8Char* const name, FileSystem::ContentLibrary& owningLibrary, ::Eldritch2::Allocator& allocator );
+
+	public:
+		//! Destroys this @ref ContentPackage instance.
+		virtual ~ContentPackage();
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		::Eldritch2::ChildAllocator															_allocator;
-		::Eldritch2::UTF8String<>															_name;
+		const ::Eldritch2::UTF8String<>														_name;
 		FileSystem::ContentLibrary&															_owningLibrary;
 		::std::atomic<ResidencyState>														_residencyState;
 		::Eldritch2::IntrusiveForwardList<FileSystem::ResourceView>							_exportedResources;
 		::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>	_referencedPackages;
-
-	// ---------------------------------------------------
-
-		friend class FileSystem::PackageDeserializationContext;
 	};
 
 }	// namespace FileSystem
