@@ -7,7 +7,7 @@
   equivalent to the compiler's at worst) than their ANSI equivalent.
 
   ------------------------------------------------------------------
-  ©2010-2011 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -509,36 +509,6 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint char* PrintFormatted( char* destinationString, const char* formatString, va_list args ) {
-#		if( !ET_COMPILER_IS_MSVC )
-			va_list argsCopy;
-
-			va_copy( argsCopy, args )
-			vsprintf( destinationString, formatString, argsCopy );
-#		else
-			vsprintf( destinationString, formatString, args );
-#		endif
-
-		return destinationString;
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ETNoAliasHint wchar_t* PrintFormatted( wchar_t* destinationString, const wchar_t* formatString, va_list args ) {
-#		if( !ET_COMPILER_IS_MSVC )
-			va_list argsCopy;
-
-			va_copy( argsCopy, args )
-			vswprintf( destinationString, formatString, argsCopy );
-#		else
-			vswprintf( destinationString, formatString, args );
-#		endif
-
-		return destinationString;
-	}
-
-// ---------------------------------------------------
-
 	ETForceInlineHint ETNoAliasHint char* PrintFormatted( char* destinationString, size_t maxCharacters, const char* formatString, va_list args ) {
 #		if( !ET_COMPILER_IS_MSVC )
 			va_list	argsCopy;
@@ -570,7 +540,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint auto PrintFormatted( char (&destinationString)[stringSizeInCharacters], const char* formatStr, va_list args ) -> decltype(destinationString) {
+	ETForceInlineHint ETNoAliasHint auto PrintFormatted( char (&destinationString)[stringSizeInCharacters], const char* formatString, va_list args ) -> decltype(destinationString) {
 #		if( !ET_COMPILER_IS_MSVC )
 			va_list argsCopy;
 
@@ -586,7 +556,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint auto PrintFormatted( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* formatStr, va_list args ) -> decltype(destinationString) {
+	ETForceInlineHint ETNoAliasHint auto PrintFormatted( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* formatString, va_list args ) -> decltype(destinationString) {
 #		if( !ET_COMPILER_IS_MSVC )
 			va_list argsCopy;
 

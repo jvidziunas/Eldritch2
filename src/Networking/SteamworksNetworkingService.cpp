@@ -5,7 +5,7 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -104,7 +104,7 @@ namespace Networking {
 // ---------------------------------------------------
 
 	bool SteamworksNetworkingService::TryRecievePacket( const int channelID, ::CSteamID& senderID, char (&packetBuffer)[NETWORK_MTU_SIZE] ) {
-		ScopedLock	_( _networkMutex );
+		ScopedLock	_( *_networkMutex );
 
 		return ::SteamGameServerNetworking()->ReadP2PPacket( packetBuffer, static_cast<uint32>(sizeof(packetBuffer)), nullptr, &senderID, channelID );
 	}
@@ -118,7 +118,7 @@ namespace Networking {
 // ---------------------------------------------------
 
 	void SteamworksNetworkingService::CloseReplicationOnChannel( const int channelID ) {
-		ScopedLock	_( _networkMutex );
+		ScopedLock	_( *_networkMutex );
 
 		// ::SteamGameServerNetworking()->CloseP2PChannelWithUser( channelID );
 	}

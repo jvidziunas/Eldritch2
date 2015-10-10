@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/MPL/Noncopyable.hpp>
+#include <Utility/MPL/CharTypes.hpp>
 #include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
 
@@ -38,19 +39,21 @@ namespace Renderer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Direct3D11DeviceBuilder instance.
+		//!	Constructs this @ref Direct3D11DeviceBuilder instance.
 		Direct3D11DeviceBuilder();
 
-		// Constructs this Direct3D11DeviceBuilder instance.
+		//!	Constructs this @ref Direct3D11DeviceBuilder instance.
 		~Direct3D11DeviceBuilder();
 
 	// ---------------------------------------------------
+
+		Renderer::Direct3D11DeviceBuilder&	SetDriverThreadingOptimizationsEnabled( bool enabled = true );
 
 		Renderer::Direct3D11DeviceBuilder&	SetDebuggingEnabled( bool enabled = true );
 
 		Renderer::Direct3D11DeviceBuilder&	SetBGRASupportEnabled( bool enabled = true );
 
-		Renderer::Direct3D11DeviceBuilder&	SetDesiredAdapterID( ::UINT adapterID );
+		Renderer::Direct3D11DeviceBuilder&	SetDesiredAdapterName( const ::Eldritch2::UTF8Char* const adapterName );
 
 		Renderer::Direct3D11DeviceBuilder&	SetFreeThreadedModeEnabled( bool enabled = true );
 
@@ -71,7 +74,7 @@ namespace Renderer {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::UINT										_adapterID;
+		const ::Eldritch2::UTF8Char*				_adapterName;
 		::UINT										_deviceFlags;
 		::UINT										_maximumFramesToRenderAhead;
 		Utility::COMPointer<::ID3D11Device>			_device;

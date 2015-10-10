@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -30,14 +30,14 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this Noncopyable instance.
+		// Constructs this @ref Noncopyable instance.
 		ETInlineHint ETNoAliasHint Noncopyable() = default;
-		// Constructs this Noncopyable instance.
+		// Constructs this @ref Noncopyable instance.
 		ETInlineHint ETNoAliasHint Noncopyable( const Utility::Noncopyable& ) = delete;
 
 		ETInlineHint ETNoAliasHint Noncopyable&	operator=(const Utility::Noncopyable&) = delete;
 
-		// Destroys this Noncopyable instance.
+		// Destroys this @ref Noncopyable instance.
 		ETInlineHint ETNoAliasHint ~Noncopyable() = default;
 	};
 
@@ -47,10 +47,10 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this ExplicitCopyable instance.
+		//! Constructs this @ref ExplicitCopyable instance.
 		ETInlineHint ETNoAliasHint ExplicitCopyable() = default;
 
-		// Constructs this ExplicitCopyable instance.
+		//! Constructs this @ref ExplicitCopyable instance.
 		ETInlineHint ETNoAliasHint explicit ExplicitCopyable( const Utility::ExplicitCopyable& ) = default;
 	};
 

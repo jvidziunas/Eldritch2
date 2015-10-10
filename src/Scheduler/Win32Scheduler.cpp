@@ -6,7 +6,7 @@
   specific implementations of job queuing functionalities.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
@@ -46,14 +46,22 @@ namespace {
 
 // ---------------------------------------------------
 
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( push )
+/*	 MSVC warns about the SEH code used here to name a thread in the debugger.
+	This is safe and is taken from official documentation, so disable the warnings here.
+	*/
+#	pragma warning( disable : 6312, 6322 )
+#endif
+
 	static unsigned int ETStdCall ThreadEntryPoint( void* thread ) {
 	// Taken from http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 #pragma pack( push, 8 )
 	struct THREADNAME_INFO {
-		::DWORD		dwType;		// Must be 0x1000.
-		::LPCSTR	szName;		// Pointer to name (in user address space).
-		::DWORD		dwThreadID;	// Thread ID (-1 = caller thread).
-		::DWORD		dwFlags;	// Reserved for future use, must be zero.
+		::DWORD		dwType;		//!<	Must be 0x1000.
+		::LPCSTR	szName;		//!<	Pointer to name (in user address space).
+		::DWORD		dwThreadID;	//!<	Thread ID (-1 = caller thread).
+		::DWORD		dwFlags;	//!<	Reserved for future use, must be 0.
 	};
 #pragma pack( pop )
 
@@ -87,14 +95,16 @@ namespace {
 		return 0u;
 	}
 
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
+
 }	// anonymous namespace
 
 namespace Eldritch2 {
 namespace Scheduler {
 
-	Win32Scheduler::Win32Scheduler( const Win32SystemInterface& systemInterface, Allocator& allocator ) : _allocator( allocator, UTF8L("Win32 Scheduler Allocator") ),
-																										  _workerThreads( nullptr, nullptr ),
-																										  _systemCacheLineSizeInBytes( systemInterface.GetL0CacheLineSizeInBytes() ) {
+	Win32Scheduler::Win32Scheduler( const Win32SystemInterface& systemInterface, Allocator& allocator ) : _allocator( allocator, UTF8L("Win32 Scheduler Allocator") ), _workerThreads( nullptr, nullptr ), _systemCacheLineSizeInBytes( systemInterface.GetL0CacheLineSizeInBytes() ) {
 		::MicroProfileInit();
 	}
 
@@ -224,13 +234,13 @@ namespace Scheduler {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this UserMutex instance.
+			//!	Constructs this @ref UserMutex instance.
 			ETForceInlineHint UserMutex() {
 				::InitializeSRWLock( &_lock );
 			}
 
-			// Destroys this UserMutex instance.
-			ETForceInlineHint ~UserMutex() {}
+			//!	Destroys this @ref UserMutex instance.
+			ETForceInlineHint ~UserMutex() = default;
 
 		// ---------------------------------------------------
 
@@ -280,10 +290,10 @@ namespace Scheduler {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this Event instance.
+			//!	Constructs this @ref Event instance.
 			ETForceInlineHint Event( const ::HANDLE event ) : _event( event ) {}
 
-			// Destroys this Event instance.
+			//!	Destroys this @ref Event instance.
 			~Event() {
 				::CloseHandle( _event );
 			}
@@ -329,10 +339,10 @@ namespace Scheduler {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this Semaphore instance.
+			//!	Constructs this @ref Semaphore instance.
 			ETForceInlineHint Semaphore( const ::HANDLE semaphore ) : _semaphore( semaphore ) {}
 
-			// Destroys this Semaphore instance.
+			//! Destroys this @ref Semaphore instance.
 			~Semaphore() {
 				::CloseHandle( _semaphore );
 			}
@@ -395,19 +405,17 @@ namespace Scheduler {
 // ---------------------------------------------------
 
 	Win32Scheduler::WorkerThread& Win32Scheduler::GetRandomWorkerThread( const WorkerThread& executingWorker, size_t& randomSeed ) {
-		struct FastRandHelper {
-			static ETNoAliasHint ETForceInlineHint size_t FastRand( size_t& seed ) {
-				enum : size_t {
-					SHIFT = static_cast<size_t>(sizeof( size_t ) == sizeof( uint64 ) ? 32 : 16),
-					MASK = static_cast<size_t>(sizeof( size_t ) == sizeof( uint64 ) ? 0x7FFFFFFF : 0x7FFF)
-				};
+		auto	FastRand( [] ( size_t& seed ) -> size_t {
+			enum : size_t {
+				SHIFT	= static_cast<size_t>(sizeof(size_t) == sizeof(uint64) ? 32u : 16u),
+				MASK	= static_cast<size_t>(sizeof(size_t) == sizeof(uint64) ? 0x7FFFFFFF : 0x7FFF)
+			};
 
-				seed = (214013 * seed + 2531011);
-				return (seed >> SHIFT) & MASK;
-			}
-		};
+			seed = (214013u * seed + 2531011u);
+			return (seed >> SHIFT) & MASK;
+		} );
 
-		size_t	workerIndex( FastRandHelper::FastRand( randomSeed ) % _workerThreads.Size() );
+		size_t	workerIndex( FastRand( randomSeed ) % _workerThreads.Size() );
 
 		if( _workerThreads.first + workerIndex == &executingWorker ) {
 			workerIndex = (workerIndex + 1) % _workerThreads.Size();

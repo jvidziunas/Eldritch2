@@ -60,7 +60,7 @@ namespace FileSystem {
 		/*! @param[in] contentProvider @ref ContentProvider that will translate package names into operating system file objects.
 			@param[in] scheduler @ref TaskScheduler instance that will be responsible for running the internal @ref LoaderThread instance.
 			@param[in] allocator @ref Allocator instance this @ref ContentProvider should use to perform internal allocations.
-			@see @ref ContentProvider, @ContentProvider::LoaderThread, @ref ContentPackage
+			@see @ref ContentProvider, @ref LoaderThread, @ref ContentPackage
 			*/
 		ContentLibrary( FileSystem::ContentProvider& contentProvider, Scheduler::TaskScheduler& scheduler, ::Eldritch2::Allocator& allocator );
 
@@ -73,7 +73,7 @@ namespace FileSystem {
 		/*! @param[in] packageName A null-terminated C string containing the name of the package file, without any suffix or file extension.
 			@returns a @ref DisposingResultPair containing the content package, or an @ref ErrorCode indicating why a failure occurred.
 			@remark If the desired package is already resident in memory, then a reference to it is added instead.
-			@see @ref ContentPackage, @ref ContentLibrary::CreatePackageForEditorWorld()
+			@see @ref ContentPackage, @ref CreatePackageForEditorWorld()
 			*/
 		Utility::DisposingResultPair<FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
 

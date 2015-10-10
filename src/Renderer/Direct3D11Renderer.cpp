@@ -65,8 +65,9 @@ namespace Renderer {
 																		 _adaptiveResolutionMaxAreaFraction( 1.0f ),
 																		 _adaptiveResolutionMinAreaFraction( 0.25f ),
 									 									 _VSyncMode( 0u ),
-									 									 _adapterIndex( 0u ),
+																		 _preferredAdapterName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
 																		 _forceDebugRuntime( false ),
+																		 _allowDriverThreadingOptimizations( true ),
 																		 _maximumFramesToRenderAhead( 3u ),
 																		 _defaultMeshView( nullptr ) {}
 
@@ -105,7 +106,7 @@ namespace Renderer {
 	void Direct3D11Renderer::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
 		visitor.PushSection( UTF8L("Direct3D11") );
 
-		visitor.Register( UTF8L("VSyncMode"), _VSyncMode ).Register( UTF8L("AdapterIndex"), _adapterIndex ).Register( UTF8L("ForceDebugRuntime"), _forceDebugRuntime );
+		visitor.Register( UTF8L("VSyncMode"), _VSyncMode ).Register( UTF8L("PreferredAdapterName"), _preferredAdapterName ).Register( UTF8L("ForceDebugRuntime"), _forceDebugRuntime );
 		visitor.Register( UTF8L("MSAASamplesPerPixel"), _MSAACount ).Register( UTF8L("MSAAQualityLevel"), _MSAAQuality ).Register( UTF8L("MaximumFramesToRenderAhead"), _maximumFramesToRenderAhead );
 		visitor.Register( UTF8L("MaximumAdaptiveResolutionScreenFraction"), _adaptiveResolutionMaxAreaFraction ).Register( UTF8L("MinimumAdaptiveResolutionScreenFraction"), _adaptiveResolutionMinAreaFraction );
 	}
@@ -192,8 +193,8 @@ namespace Renderer {
 
 		FormatAndLogString( UTF8L("Creating Direct3D %sdevice.") ET_UTF8_NEWLINE_LITERAL, (useDebugLayer ? UTF8L("debug ") : UTF8L("")) );
 
-		deviceBuilder.SetBGRASupportEnabled().SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled();
-		deviceBuilder.SetDesiredAdapterID( _adapterIndex ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
+		deviceBuilder.SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled().SetDriverThreadingOptimizationsEnabled( _allowDriverThreadingOptimizations );
+		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.GetCharacterArray() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
 
 		if( const auto createDeviceResult = deviceBuilder.Build() ) {
 			_immediateContext	= deviceBuilder.GetImmediateContext();

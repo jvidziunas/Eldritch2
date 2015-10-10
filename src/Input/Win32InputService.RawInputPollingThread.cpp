@@ -7,7 +7,7 @@
   moves a stick or shifts the mouse.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
@@ -96,7 +96,7 @@ namespace Input {
 					::UINT		rawInputSize( sizeof(rawInput) );
 
 					if( static_cast<::UINT>(-1) != ::GetRawInputData( reinterpret_cast<::HRAWINPUT>(receivedMessage.lParam), RID_INPUT, &rawInput, &rawInputSize, sizeof(::RAWINPUTHEADER) ) ) {
-						ScopedReaderLock	_( _hostingInputService._deviceDirectoryMutex );
+						ScopedReaderLock	_( *_hostingInputService._deviceDirectoryMutex );
 						// Dispatch the message to the appropriate device, or have the null device eat the packet.
 						_hostingInputService._deviceDirectory.Find( rawInput.header.hDevice, &nullDevice )->ReadInputPacket( rawInput );
 					}

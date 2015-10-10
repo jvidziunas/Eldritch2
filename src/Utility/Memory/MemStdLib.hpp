@@ -7,7 +7,7 @@
   equivalent to the compiler's at worst) than their ANSI equivalent.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -329,12 +329,6 @@ namespace Eldritch2 {
 
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint char*							PrintFormatted( char* destinationString, const char* formatString, ... );
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint wchar_t*						PrintFormatted( wchar_t* destinationString, const wchar_t* formatString, ... );
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
 	ETNoAliasHint char*							PrintFormatted( char* destinationString, size_t maxCharacters, const char* formatString, ... );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
@@ -347,12 +341,6 @@ namespace Eldritch2 {
 	// according to the format rules laid out by the C standard library function printf/sprintf.
 	template <size_t stringSizeInCharacters>
 	ETNoAliasHint auto							PrintFormatted( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* formatString, ... ) -> decltype(destinationString);
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETForceInlineHint ETNoAliasHint char*		PrintFormatted( char* destinationString, const char* formatString, va_list args );
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETForceInlineHint ETNoAliasHint wchar_t*	PrintFormatted( wchar_t* destinationString, const wchar_t* formatString, va_list args );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
 	ETForceInlineHint ETNoAliasHint char*		PrintFormatted( char* destinationString, size_t maxCharacters, const char* formatString, va_list args );

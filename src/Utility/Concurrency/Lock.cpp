@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
@@ -21,24 +21,18 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Utility {
 
-	UserMutex::UserMutex() {}
+	void UserMutex::Enter() {
+		while( !TryEnter() ) {
+			// Busy loop
+		}
+	}
 
 // ---------------------------------------------------
 
-	UserMutex::~UserMutex() {}
-
-// ---------------------------------------------------
-
-	ReaderWriterUserMutex::ReaderWriterUserMutex() {}
-
-// ---------------------------------------------------
-
-	ReaderWriterUserMutex::~ReaderWriterUserMutex() {}
-
-// ---------------------------------------------------
-
-	ScopedLock::ScopedLock( UserMutex* const lock ) : _mutex( *lock ) {
-		_mutex.Enter();
+	void ReaderWriterUserMutex::EnterAsReader() {
+		while( !TryEnterAsReader() ) {
+			// Busy loop
+		}
 	}
 
 // ---------------------------------------------------
@@ -57,12 +51,6 @@ namespace Utility {
 
 	bool ScopedLock::IsAttachedTo( const Utility::UserMutex& lock ) const {
 		return &lock == &_mutex;
-	}
-
-// ---------------------------------------------------
-
-	ScopedReaderLock::ScopedReaderLock( ReaderWriterUserMutex* const lock ) : _mutex( *lock ) {
-		_mutex.EnterAsReader();
 	}
 
 // ---------------------------------------------------

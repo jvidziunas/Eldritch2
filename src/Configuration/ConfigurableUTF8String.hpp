@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -27,10 +27,12 @@ namespace Configuration {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ConfigurableUTF8String instance.
+		//!	Constructs this @ref ConfigurableUTF8String instance.
 		ConfigurableUTF8String( const ::Eldritch2::UTF8Char* const value, ::Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref ConfigurableUTF8String instance.
+		ConfigurableUTF8String( const EmptyStringSemantics, ::Eldritch2::Allocator& allocator );
 
-		// Destroys this ConfigurableUTF8String instance.
+		//!	Destroys this @ref ConfigurableUTF8String instance.
 		~ConfigurableUTF8String();
 
 	// ---------------------------------------------------

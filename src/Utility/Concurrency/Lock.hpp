@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -26,21 +26,39 @@ namespace Utility {
 	// ---------------------------------------------------
 
 	public:
-		virtual void	Enter() abstract;
+		//!	Acquires exclusive modification rights to access a shared resource.
+		/*!	@remarks Blocks until rights are obtained. If aborting in the presence of contention is more appropriate, use @ref TryEnter() instead.
+			@remarks The default implementation calls @ref TryEnter() in a busy loop.
+			@see @ref Leave(), @ref TryEnter(), @ref ScopedLock
+			*/
+		virtual void	Enter();
 
-		virtual void	Leave() abstract;
-
+		//!	Acquires exclusive modification rights to access a shared resource, in an interruptible fashion.
+		/*!	@returns _True_ if exclusive write access was acquired, or _false_ if another thread currently has modification rights.
+			@remarks Unlike @ref Enter(), the function will return immediately in the event another thread has write access.
+			@see @ref Enter(), @ref Leave(), @ref ScopedLock
+			*/
 		virtual bool	TryEnter() abstract;
+
+		//!	Releases exclusive modification rights to access a shared resource.
+		/*!	@pre Modification rights should previously have been obtained for the caller via a call to one of @ref Enter() or @ref TryEnter().
+			@see @ref Enter(), @ref TryEnter(), @ref ScopedLock
+			*/
+		virtual void	Leave() abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this UserMutex instance.
-		UserMutex();
+		//!	Constructs this @ref UserMutex instance.
+		/*!	Designed to be called from within subclasses.
+			*/
+		UserMutex() = default;
 
 	public:
-		// Destroys this UserMutex instance.
-		virtual ~UserMutex();
+		//!	Destroys this @ref UserMutex instance.
+		/*!	Designed to be called from within subclasses.
+			*/
+		virtual ~UserMutex() = default;
 	};
 
 // ---------------------------------------------------
@@ -49,21 +67,36 @@ namespace Utility {
 	// ---------------------------------------------------
 
 	public:
-		virtual void	EnterAsReader() abstract;
-
-		virtual void	LeaveAsReader() abstract;
+		//!	Acquires safe read-only access to a shared resource.
+		/*!	@remarks Blocks until rights are obtained. If aborting in the presence of contention is more appropriate, use @ref TryEnterAsReader() instead.
+			@remarks The default implementation calls @ref TryEnterAsReader() in a busy loop.
+			@remarks @parblock Multiple threads can all have read access to a resource, but only one thread may have write access at a time.
+				Additionally, no threads may hold read access while any one thread has write access. @endparblock
+			@see @ref LeaveAsReader(), @ref TryEnterAsReader(), @ref ScopedReaderLock
+			*/
+		virtual void	EnterAsReader();
 
 		virtual bool	TryEnterAsReader() abstract;
+
+		//!	Releases shared inspection rights for a shared resource.
+		/*!	@pre Read rights should previously have been obtained for the caller via a call to one of @ref EnterAsReader or @ref TryEnterAsReader().
+			@see @ref EnterAsReader(), @ref TryEnterAsReader() @ref ScopedReaderLock
+			*/
+		virtual void	LeaveAsReader() abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this ReaderWriterUserMutex instance.
-		ReaderWriterUserMutex();
+		//! Constructs this @ref ReaderWriterUserMutex instance.
+		/*!	Designed to be called from within subclasses.
+			*/
+		ReaderWriterUserMutex() = default;
 
 	public:
-		// Destroys this ReaderWriterUserMutex instance.
-		virtual ~ReaderWriterUserMutex();
+		//! Destroys this @ref ReaderWriterUserMutex instance.
+		/*!	Designed to be called from within subclasses.
+			*/
+		virtual ~ReaderWriterUserMutex() = default;
 	};
 
 // ---------------------------------------------------
@@ -72,12 +105,10 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ScopedLock instance.
-		ScopedLock( Utility::UserMutex* const mutex );
-		// Constructs this ScopedLock instance.
+		//!	Constructs this @ref ScopedLock instance.
 		ScopedLock( Utility::UserMutex& mutex );
 
-		// Destroys this ScopedLock instance.
+		//!	Destroys this @ref ScopedLock instance.
 		~ScopedLock();
 
 	// ---------------------------------------------------
@@ -96,12 +127,10 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ScopedReaderLock instance.
-		ScopedReaderLock( Utility::ReaderWriterUserMutex* const mutex );
-		// Constructs this ScopedReaderLock instance.
+		//!	Constructs this @ref ScopedReaderLock instance.
 		ScopedReaderLock( Utility::ReaderWriterUserMutex& mutex );
 
-		// Destroys this ScopedReaderLock instance.
+		//!	Destroys this @ref ScopedReaderLock instance.
 		~ScopedReaderLock();
 
 	// ---------------------------------------------------

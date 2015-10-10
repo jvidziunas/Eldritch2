@@ -46,7 +46,7 @@ namespace FileSystem {
 
 		static_assert( ::std::is_base_of<FileSystem::ResourceView, View>::value, "ResolveViewByName must be used to convert to ResourceView-derived types!" );
 
-		Utility::ScopedReaderLock	_( _resourceViewLibraryMutex );
+		Utility::ScopedReaderLock	_( *_resourceViewLibraryMutex );
 		ViewLibrary::ConstIterator	resourceCandidate( _resourceViewLibrary.Find( name ) );
 
 		if( resourceCandidate != _resourceViewLibrary.End() ) {

@@ -33,9 +33,6 @@ using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 using namespace ::std;
 
-using AllocationOption	= Allocator::AllocationOption;
-using PackageHandle		= unique_ptr<ContentPackage, InstanceDeleter>;
-
 namespace Eldritch2 {
 namespace FileSystem {
 
@@ -91,7 +88,7 @@ namespace FileSystem {
 			~DeserializedContentPackage() {
 				auto&	contentLibrary( GetLibrary() );
 				// Erase all the views from the shared library.
-				{	ScopedLock	_( contentLibrary._resourceViewLibraryMutex );
+				{	ScopedLock	_( *contentLibrary._resourceViewLibraryMutex );
 					auto&	resourceViewLibrary( contentLibrary._resourceViewLibrary );
 
 					for( const auto& view : GetExportedResourceCollection() ) {
@@ -104,7 +101,7 @@ namespace FileSystem {
 				}
 
 				// Remove the package from the shared library.
-				{	ScopedLock	_( contentLibrary._contentPackageLibraryMutex );
+				{	ScopedLock	_( *contentLibrary._contentPackageLibraryMutex );
 					contentLibrary._contentPackageLibrary.Erase( GetName() );
 				}
 			}
@@ -128,7 +125,7 @@ namespace FileSystem {
 
 				if( findFactoriesResult != factoryLibrary.End() ) {
 					auto&	viewLibrary( GetLibrary()._resourceViewLibrary );
-					auto&	viewMutex( GetLibrary()._resourceViewLibraryMutex );
+					auto&	viewMutex( *GetLibrary()._resourceViewLibraryMutex );
 					auto&	resourceAllocator( GetAllocator() );
 
 					for( const auto& factory : findFactoriesResult->second ) {
@@ -150,9 +147,12 @@ namespace FileSystem {
 			}
 		};
 
+		using AllocationOption	= Allocator::AllocationOption;
+		using PackageHandle		= unique_ptr<ContentPackage, InstanceDeleter>;
+
 	// ---
 
-		ScopedLock	packageTableLock( _contentPackageLibraryMutex );
+		ScopedLock	packageTableLock( *_contentPackageLibraryMutex );
 		const auto	candidate( _contentPackageLibrary.Find( packageName ) );
 
 		if( candidate != _contentPackageLibrary.End() ) {
@@ -210,6 +210,8 @@ namespace FileSystem {
 				GetLibrary()._allocator.Delete( *this );
 			}
 		};
+
+		using AllocationOption = Allocator::AllocationOption;
 
 	// ---
 

@@ -5,7 +5,7 @@
   Forward type declarations for working with Microsoft's D3D11 API.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 

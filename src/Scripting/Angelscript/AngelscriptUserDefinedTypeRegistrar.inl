@@ -322,6 +322,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename ResultObject>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeValueCastTo() {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 		struct CastFunctionHelper {
@@ -336,7 +337,7 @@ namespace Scripting {
 		basic_array_sink<char>		sink( signature );
 		stream<decltype(sink)>		stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<ResultObject>::Format( stream, "f", true );
+		AngelscriptFunctionDeclarationFormatter<ResultObject>::Format( stream, "f", true );
 
 		const int	result( _scriptEngine.RegisterObjectBehaviour( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_VALUE_CAST, signature, ::asFunctionPtr( &CastFunctionHelper::Cast ), ::asCALL_CDECL_OBJFIRST ) );
 
@@ -350,6 +351,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Property>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeProperty( const char* const propertyName, Property Native::* propertyPointer ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -358,7 +360,7 @@ namespace Scripting {
 		basic_array_sink<char>		sink( signature );
 		stream<decltype(sink)>		stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptPropertyDeclarationFormatter<Property>::Format( stream, propertyName );
+		AngelscriptPropertyDeclarationFormatter<Property>::Format( stream, propertyName );
 
 		const int	result( _scriptEngine.RegisterObjectProperty( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), signature, ::std::distance( reinterpret_cast<char*>(1), reinterpret_cast<char*>(&(reinterpret_cast<Native*>(1)->*propertyPointer)) ) ) );
 
@@ -372,6 +374,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Property>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeVirtualProperty( const char* const propertyName, Property (Native::*getterFunction)() ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 		using namespace ::Eldritch2;
 
@@ -381,7 +384,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "get_%s", propertyName ) );
+		AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "get_%s", propertyName ) );
 
 		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(getterFunction) );
 	}
@@ -391,6 +394,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Property>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeVirtualProperty( const char* const propertyName, Property (Native::*getterFunction)() const ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 		using namespace ::Eldritch2;
 
@@ -399,8 +403,9 @@ namespace Scripting {
 		char					signature[128];
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
+		const size_t			nameBufferSize( StringLength( propertyName ) + 5u );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "get_%s", propertyName ), true );
+		AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "get_%s", propertyName ), true );
 
 		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(getterFunction) );
 	}
@@ -410,6 +415,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Property>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeVirtualProperty( const char* const propertyName, Property (ETScriptAPICall* getterFunction)( Native* ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 		using namespace ::Eldritch2;
 
@@ -418,8 +424,9 @@ namespace Scripting {
 		char					signature[128];
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
+		const size_t			nameBufferSize( StringLength( propertyName ) + 5u );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "get_%s", propertyName ) );
+		AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "get_%s", propertyName ) );
 
 		return this->RegisterFunction( signature, ::asFunctionPtr( getterFunction ) );
 	}
@@ -429,6 +436,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Property>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeVirtualProperty( const char* const propertyName, Property (ETScriptAPICall* getterFunction)( const Native* ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 		using namespace ::Eldritch2;
 
@@ -437,8 +445,9 @@ namespace Scripting {
 		char					signature[128];
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
+		const size_t			nameBufferSize( StringLength( propertyName ) + 5u );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "get_%s", propertyName ), true );
+		AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "get_%s", propertyName ), true );
 
 		return this->RegisterFunction( signature, ::asFunctionPtr( getterFunction ) );
 	}
@@ -448,6 +457,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Property>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeVirtualProperty( const char* const propertyName, void (Native::*setterFunction)(Property) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 		using namespace ::Eldritch2;
 
@@ -456,8 +466,9 @@ namespace Scripting {
 		char					signature[128];
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
+		const size_t			nameBufferSize( StringLength( propertyName ) + 5u );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<void, Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "set_%s", propertyName ) );
+		AngelscriptFunctionDeclarationFormatter<void, Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "set_%s", propertyName ) );
 
 		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(setterFunction) );
 	}
@@ -467,6 +478,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Property>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeVirtualProperty( const char* const propertyName, void (ETScriptAPICall* setterFunction)( Native*, Property ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 		using namespace ::Eldritch2;
 
@@ -475,8 +487,9 @@ namespace Scripting {
 		char					signature[128];
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
+		const size_t			nameBufferSize( StringLength( propertyName ) + 5u );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<void, Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "set_%s", propertyName ) );
+		AngelscriptFunctionDeclarationFormatter<void, Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "set_%s", propertyName ) );
 
 		return this->RegisterFunction( signature, ::asFunctionPtr( setterFunction ) );
 	}
@@ -486,6 +499,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Return, typename... Arguments>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeMethod( const char* const methodName, Return (Native::*method)( Arguments... ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -494,7 +508,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName );
+		AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName );
 
 		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(method) );
 	}
@@ -504,6 +518,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Return, typename... Arguments>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeMethod( const char* const methodName, Return (Native::*method)( Arguments... ) const ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -512,7 +527,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName, true );
+		AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName, true );
 
 		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(method) );
 	}
@@ -522,6 +537,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Return, typename... Arguments>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeMethod( const char* const methodName, Return (ETScriptAPICall* method)( Native*, Arguments... ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -530,7 +546,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName );
+		AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName );
 
 		return this->RegisterFunction( signature, ::asFunctionPtr( method ) );
 	}
@@ -540,6 +556,7 @@ namespace Scripting {
 	template <typename Native, typename ImplementingType>
 	template <typename Return, typename... Arguments>
 	ImplementingType& AngelscriptUserDefinedTypeRegistrar::TypeBuilderCRTPBase<Native, ImplementingType>::ExposeMethod( const char* const methodName, Return (ETScriptAPICall* method)( const Native*, Arguments... ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -548,7 +565,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName, true );
+		AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName, true );
 
 		return this->RegisterFunction( signature, ::asFunctionPtr( method ) );
 	}
@@ -669,6 +686,7 @@ namespace Scripting {
 	template <typename Native>
 	template <typename... Arguments>
 	AngelscriptUserDefinedTypeRegistrar::ValueTypeBuilder<Native>& AngelscriptUserDefinedTypeRegistrar::ValueTypeBuilder<Native>::ExposeConstructor( void (ETScriptAPICall* function)( void* const, Arguments... ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -677,7 +695,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<void, Arguments...>::Format( stream, "f" );
+		AngelscriptFunctionDeclarationFormatter<void, Arguments...>::Format( stream, "f" );
 
 		const int	result( _scriptEngine.RegisterObjectBehaviour( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_CONSTRUCT, signature, ::asFunctionPtr( function ), ::asCALL_CDECL_OBJFIRST ) );
 
@@ -699,6 +717,9 @@ namespace Scripting {
 		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
+		using ConstCastFunction	= const ResultObject* (ETScriptAPICall*)( const Native* const );
+		using CastFunction		= ResultObject* (ETScriptAPICall*)( Native* const );
+
 	// ---
 
 		char	signature[128];
@@ -708,7 +729,7 @@ namespace Scripting {
 			stream<decltype(sink)>	stream( sink );
 
 			AngelscriptFunctionDeclarationFormatter<ResultObject*>::Format( stream, "opCast" );
-			this->RegisterFunction( signature, ::asFunctionPtr( static_cast<ResultObject* (ETScriptAPICall*)(Native* const)>([] ( Native* const thisPointer ) { return static_cast<ResultObject*>( thisPointer ); } ) ) );
+			this->RegisterFunction( signature, ::asFunctionPtr( static_cast<CastFunction>([] ( Native* const thisPointer ) { return static_cast<ResultObject*>(thisPointer); }) ) );
 		}
 
 		{
@@ -716,7 +737,7 @@ namespace Scripting {
 			stream<decltype(sink)>	stream( sink );
 
 			AngelscriptFunctionDeclarationFormatter<ResultObject*>::Format( stream, "opCast", true );
-			this->RegisterFunction( signature, ::asFunctionPtr( static_cast<const ResultObject* (ETScriptAPICall*)(const Native* const)>([] ( const Native* const thisPointer ) { return static_cast<const ResultObject*>( thisPointer ); } ) ) );
+			this->RegisterFunction( signature, ::asFunctionPtr( static_cast<ConstCastFunction>([] ( const Native* const thisPointer ) { return static_cast<const ResultObject*>(thisPointer); }) ) );
 		}
 		
 		return *this;
@@ -727,6 +748,7 @@ namespace Scripting {
 	template <typename Native>
 	template <typename... Arguments>
 	AngelscriptUserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>& AngelscriptUserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>::ExposeFactory( Native* (ETScriptAPICall* function)( Arguments... ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -735,7 +757,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Native*, Arguments...>::Format( stream, "f" );
+		AngelscriptFunctionDeclarationFormatter<Native*, Arguments...>::Format( stream, "f" );
 
 		const int	result( _scriptEngine.RegisterObjectBehaviour( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_FACTORY, signature, ::asFUNCTION( function ), ::asCALL_CDECL ) );
 
@@ -772,13 +794,14 @@ namespace Scripting {
 
 	template <typename Native>
 	Utility::ResultPair<AngelscriptUserDefinedTypeRegistrar::ValueTypeBuilder<Native>> AngelscriptUserDefinedTypeRegistrar::RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator ) {
-		using BuilderType = AngelscriptUserDefinedTypeRegistrar::ValueTypeBuilder<Native>;
-
 		struct DestructorWrapper {
-			static void	Invoke( void* const object ) {
+			static void ETCDecl	Invoke( void* const object ) {
 				static_cast<Native*>(object)->~Native();
 			}
 		};
+
+		using AllocationOption	= Allocator::AllocationOption;
+		using BuilderType		= AngelscriptUserDefinedTypeRegistrar::ValueTypeBuilder<Native>;
 
 	// ---
 
@@ -788,7 +811,7 @@ namespace Scripting {
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		Utility::ResultPair<BuilderType>	resultPair { new(builderAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ), Errors::NONE };
+		Utility::ResultPair<BuilderType>	resultPair { new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ), Errors::NONE };
 
 		if( !resultPair.object ) {
 			resultPair.resultCode = ::Eldritch2::Errors::OUT_OF_MEMORY;
@@ -801,13 +824,14 @@ namespace Scripting {
 
 	template <typename Enum>
 	Utility::ResultPair<AngelscriptUserDefinedTypeRegistrar::UserDefinedEnumBuilder<Enum>> AngelscriptUserDefinedTypeRegistrar::RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator ) {
-		using BuilderType = AngelscriptUserDefinedTypeRegistrar::UserDefinedEnumBuilder<Enum>;
+		using AllocationOption	= Allocator::AllocationOption;
+		using BuilderType		= AngelscriptUserDefinedTypeRegistrar::UserDefinedEnumBuilder<Enum>;
 
 	// ---
 
 		EnsureEnumDeclared<Enum>();
 
-		Utility::ResultPair<BuilderType>	result { new(builderAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ), Errors::NONE };
+		Utility::ResultPair<BuilderType>	result { new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ), Errors::NONE };
 
 		if( !result.object ) {
 			result.resultCode = ::Eldritch2::Errors::OUT_OF_MEMORY;
@@ -821,6 +845,9 @@ namespace Scripting {
 	template <typename Native>
 	Scripting::AngelscriptUserDefinedTypeRegistrar& AngelscriptUserDefinedTypeRegistrar::EnsureReferenceTypeDeclared() {
 		static_assert( ::std::is_class<Native>::value, "Type must be a class or struct!" );
+
+	// ---
+
 		const int	result( _scriptEngine.RegisterObjectType( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), sizeof(Native), ::asOBJ_REF ) );
 		
 		ETRuntimeVerificationWithMsg( (::asSUCCESS <= result) || (::asALREADY_REGISTERED == result), "Failed exposing script API to engine!" );
@@ -833,6 +860,9 @@ namespace Scripting {
 	template <typename Native>
 	Scripting::AngelscriptUserDefinedTypeRegistrar& AngelscriptUserDefinedTypeRegistrar::EnsureValueTypeDeclared() {
 		static_assert( ::std::is_class<Native>::value, "Type must be a class or struct!" );
+
+	// ---
+
 		const int	result( _scriptEngine.RegisterObjectType( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), sizeof(Native), ::asOBJ_VALUE | ::asGetTypeTraits<Native>() ) );
 		
 		ETRuntimeVerificationWithMsg( (::asSUCCESS <= result) || (::asALREADY_REGISTERED == result), "Failed exposing script API to engine!" );
@@ -845,7 +875,9 @@ namespace Scripting {
 	template <typename Enum>
 	Scripting::AngelscriptUserDefinedTypeRegistrar& AngelscriptUserDefinedTypeRegistrar::EnsureEnumDeclared() {
 		static_assert( ::std::is_enum<Enum>::value, "Type must be an enum!" );
-		static_assert( ::std::is_same<::std::underlying_type<Enum>::type, int>::value, "Enum types must be backed by an int for correct handing." );
+		static_assert( ::std::is_same<::std::underlying_type<Enum>::type, int>::value, "Enum types must be backed by an int for correct handing.!" );
+
+	// ---
 
 		const int	result( _scriptEngine.RegisterEnum( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName() ) );
 
@@ -858,6 +890,7 @@ namespace Scripting {
 
 	template <typename Return, typename... Arguments>
 	Scripting::AngelscriptUserDefinedTypeRegistrar& AngelscriptUserDefinedTypeRegistrar::ExposeFunction( const char* const functionName, Return (ETScriptAPICall* function)( Arguments... ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -866,7 +899,7 @@ namespace Scripting {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, functionName );
+		AngelscriptFunctionDeclarationFormatter<Return, Arguments...>::Format( stream, functionName );
 		const int	result( _scriptEngine.RegisterGlobalFunction( signature, ::asFUNCTION( function ), ::asCALL_CDECL ) );
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
@@ -878,6 +911,7 @@ namespace Scripting {
 
 	template <typename Property>
 	Scripting::AngelscriptUserDefinedTypeRegistrar& AngelscriptUserDefinedTypeRegistrar::ExposeVirtualProperty( const char* const propertyName, Property (ETScriptAPICall* getterFunction)() ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -885,8 +919,9 @@ namespace Scripting {
 		char					signature[128];
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
+		const size_t			nameBufferSize( ::Eldritch2::StringLength( propertyName ) + 5u );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, ::Eldritch2::PrintFormatted( static_cast<char*>(_alloca( ::Eldritch2::StringLength( propertyName ) + 5u )), "get_%s", propertyName ) );
+		AngelscriptFunctionDeclarationFormatter<Property>::Format( stream, ::Eldritch2::PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "get_%s", propertyName ) );
 		const int	result( _scriptEngine.RegisterGlobalFunction( signature, ::asFUNCTION( getterFunction ), ::asCALL_CDECL ) );
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
@@ -898,6 +933,7 @@ namespace Scripting {
 
 	template <typename Property>
 	Scripting::AngelscriptUserDefinedTypeRegistrar& AngelscriptUserDefinedTypeRegistrar::ExposeVirtualProperty( const char* const propertyName, void (ETScriptAPICall* setterFunction)( Property ) ) {
+		using namespace ::Eldritch2Detail::Scripting;
 		using namespace ::boost::iostreams;
 
 	// ---
@@ -905,8 +941,9 @@ namespace Scripting {
 		char					signature[128];
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
+		const size_t			nameBufferSize( ::Eldritch2::StringLength( propertyName ) + 5u );
 
-		::Eldritch2Detail::Scripting::AngelscriptFunctionDeclarationFormatter<void, Property>::Format( stream, ::Eldritch2::PrintFormatted( static_cast<char*>(_alloca( ::Eldritch2::StringLength( propertyName ) + 5u )), "set_%s", propertyName ) );
+		AngelscriptFunctionDeclarationFormatter<void, Property>::Format( stream, ::Eldritch2::PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "set_%s", propertyName) );
 		const int	result( _scriptEngine.RegisterGlobalFunction( signature, ::asFUNCTION( setterFunction ), ::asCALL_CDECL ) );
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );

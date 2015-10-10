@@ -7,7 +7,7 @@
   moves a stick or shifts the mouse.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
@@ -153,7 +153,7 @@ namespace Input {
 
 	// ---
 
-		ScopedLock	_( _deviceDirectoryMutex );
+		ScopedLock	_( *_deviceDirectoryMutex );
 		::UINT		deviceCount( 0u );
 
 		// Ask Windows how many raw input devices it knows about.

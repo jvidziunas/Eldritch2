@@ -7,7 +7,7 @@
   equivalent to the compiler's at worst) than their ANSI equivalent.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
@@ -20,28 +20,6 @@
 using namespace ::Eldritch2;
 
 namespace Eldritch2 {
-
-	ETNoAliasHint char* PrintFormatted( char* destinationString, const char* formatString, ... ) {
-		va_list args;
-		va_start( args, formatString );
-			PrintFormatted( destinationString, formatString, args );
-		va_end( args );
-
-		return destinationString;
-	}
-
-// ---------------------------------------------------
-
-	ETNoAliasHint wchar_t* PrintFormatted( wchar_t* destinationString, const wchar_t* formatString, ... ) {
-		va_list args;
-		va_start( args, formatString );
-			PrintFormatted( destinationString, formatString, args );
-		va_end( args );
-
-		return destinationString;
-	}
-
-// ---------------------------------------------------
 
 	ETNoAliasHint char* PrintFormatted( char* destinationString, size_t maxCharacters, const char* formatString, ... ) {
 		va_list args;

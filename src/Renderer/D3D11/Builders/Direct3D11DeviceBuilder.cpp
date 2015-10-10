@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/Builders/Direct3D11DeviceBuilder.hpp>
+#include <Utility/Memory/MemStdLib.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <D3D11.h>
 //------------------------------------------------------------------//
@@ -28,6 +29,7 @@ ET_LINK_LIBRARY( "DXGI.lib" )
 using namespace ::Eldritch2::Renderer;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
+using namespace ::std;
 
 namespace {
 
@@ -41,37 +43,40 @@ namespace {
 namespace Eldritch2 {
 namespace Renderer {
 
-	Direct3D11DeviceBuilder::Direct3D11DeviceBuilder() : _adapterID( 0u ), _deviceFlags( 0u ), _maximumFramesToRenderAhead ( 1u ) {}
+	Direct3D11DeviceBuilder::Direct3D11DeviceBuilder() : _adapterName( nullptr ), _deviceFlags( ::D3D11_CREATE_DEVICE_SINGLETHREADED ), _maximumFramesToRenderAhead( 1u ) {}
 
 // ---------------------------------------------------
 
-	Direct3D11DeviceBuilder::~Direct3D11DeviceBuilder() {}
+	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetDriverThreadingOptimizationsEnabled( bool enabled ) {
+		UpdateFlag( _deviceFlags, ::D3D11_CREATE_DEVICE_PREVENT_INTERNAL_THREADING_OPTIMIZATIONS, !enabled );
+		return *this;
+	}
 
 // ---------------------------------------------------
 
 	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetDebuggingEnabled( bool enabled ) {
-		UpdateFlag( _deviceFlags, D3D11_CREATE_DEVICE_DEBUG, enabled );
+		UpdateFlag( _deviceFlags, ::D3D11_CREATE_DEVICE_DEBUG, enabled );
 		return *this;
 	}
 
 // ---------------------------------------------------
 
 	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetBGRASupportEnabled( bool enabled ) {
-		UpdateFlag( _deviceFlags, D3D11_CREATE_DEVICE_BGRA_SUPPORT, enabled );
+		UpdateFlag( _deviceFlags, ::D3D11_CREATE_DEVICE_BGRA_SUPPORT, enabled );
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetDesiredAdapterID( ::UINT adapterID ) {
-		_adapterID = adapterID;
+	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetDesiredAdapterName( const UTF8Char* const adapterName ) {
+		_adapterName = adapterName;
 		return *this;
 	}
 
 // ---------------------------------------------------
 
 	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetFreeThreadedModeEnabled( bool enabled ) {
-		UpdateFlag( _deviceFlags, D3D11_CREATE_DEVICE_SINGLETHREADED, enabled );
+		UpdateFlag( _deviceFlags, ::D3D11_CREATE_DEVICE_SINGLETHREADED, enabled );
 		return *this;
 	}
 
@@ -98,12 +103,16 @@ namespace Renderer {
 			goto End;
 		}
 
-		// Fancy mechanism at play-- count backwards from the user desired adapter ID and keep it if it actually exists.
-		for( ::UINT i( _adapterID ); DXGI_ERROR_NOT_FOUND == _factory->EnumAdapters1( i, adapter.GetInterfacePointer() ); --i );
+		if( (nullptr != _adapterName) && !EqualityCompareString( _adapterName, UTF8L("") ) ) {
+			COMPointer<::IDXGIAdapter1>	temporaryAdapter;
+			::DXGI_ADAPTER_DESC1		adapterDescription;
+			wchar_t						wideAdapterName[128u];
 
-		if( !adapter ) {
-			result = Errors::UNSPECIFIED;
-			goto End;
+			for( ::UINT adapterID( 0u ); DXGI_ERROR_NOT_FOUND != _factory->EnumAdapters1( adapterID, temporaryAdapter.GetInterfacePointer() ); ++adapterID ) {
+				if( SUCCEEDED( adapter->GetDesc1( &adapterDescription ) ) && EqualityCompareString( adapterDescription.Description, wideAdapterName ) ) {
+					adapter = move( temporaryAdapter );
+				}
+			}
 		}
 
 		nativeResult = ::D3D11CreateDevice( adapter.GetUnadornedPointer(),

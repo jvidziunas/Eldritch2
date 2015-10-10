@@ -82,7 +82,7 @@ namespace Renderer {
 		Configuration::ConfigurableUTF8String						_defaultMeshName;
 
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_VSyncMode;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_adapterIndex;
+		Configuration::ConfigurableUTF8String						_preferredAdapterName;
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_maximumFramesToRenderAhead;
 
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_MSAACount;
@@ -90,6 +90,7 @@ namespace Renderer {
 		Configuration::ConfigurablePODVariable<float>				_adaptiveResolutionMaxAreaFraction;
 		Configuration::ConfigurablePODVariable<float>				_adaptiveResolutionMinAreaFraction;
 		Configuration::ConfigurablePODVariable<bool>				_forceDebugRuntime;
+		Configuration::ConfigurablePODVariable<bool>				_allowDriverThreadingOptimizations;
 
 		const Renderer::Direct3D11MeshView*							_defaultMeshView;
 		Scripting::ObjectHandle<Renderer::Direct3D11SwapChain>		_primarySwapChain;

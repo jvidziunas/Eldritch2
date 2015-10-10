@@ -7,7 +7,7 @@
   by way of a macro with very similar usage semantics to the
   built-in C++ sizeof() operator.
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
