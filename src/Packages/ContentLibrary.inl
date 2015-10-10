@@ -28,34 +28,44 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint ContentLibrary::ResourceViewFactoryKey::ResourceViewFactoryKey() : ResourceViewFactoryKey( nullptr, nullptr ) {}
+	ETInlineHint ETNoAliasHint size_t ContentLibrary::ResourceViewFactoryKey::Hash::operator()( const ResourceViewFactoryKey& key, const size_t seed ) const {
+		return StringHash::operator()( key.first, key.second, seed );
+	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint size_t ContentLibrary::ResourceViewFactoryKey::Hash::operator()( const ResourceViewFactoryKey string, const size_t seed ) const {
-		return StringHash::operator()( string.first, string.second, seed );
+	ETInlineHint ETNoAliasHint size_t ContentLibrary::ResourceViewKey::Hash::operator()( const ResourceViewKey& key, const size_t seed ) const {
+		using StringHash = Utility::StringHash;
+
+	// ---
+
+		return StringHash::operator()( key.first, StringHash::operator()( key.second->name(), seed ) );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint bool ContentLibrary::ResourceViewKey::operator==( const ContentLibrary::ResourceViewKey& other ) const {
+		return (*second == *other.second) && Utility::StringEqualComparator<>()( first, other.first );
 	}
 
 // ---------------------------------------------------
 
 	template <typename View>
 	const View& ContentLibrary::ResolveViewByName( const UTF8Char* const name, const View& defaultView ) const {
-		using ViewLibrary = decltype(_resourceViewLibrary);
+		static_assert( ::std::is_base_of<FileSystem::ResourceView, View>::value, "ResolveViewByName must be used to convert to ResourceView-derived types!" );
 
 	// ---
 
-		static_assert( ::std::is_base_of<FileSystem::ResourceView, View>::value, "ResolveViewByName must be used to convert to ResourceView-derived types!" );
+		Utility::ScopedReaderLock	_( *_resourceViewCollectionMutex );
+		const auto					candidate( _resourceViewCollection.Find( name ) );
 
-		Utility::ScopedReaderLock	_( *_resourceViewLibraryMutex );
-		ViewLibrary::ConstIterator	resourceCandidate( _resourceViewLibrary.Find( name ) );
+		return (candidate != _resourceViewCollection.End()) ? (*static_cast<const View*>(candidate->second)) : defaultView;
+	}
 
-		if( resourceCandidate != _resourceViewLibrary.End() ) {
-			if( auto* const	concreteView = dynamic_cast<const View*>(resourceCandidate->second) ) {
-				return *concreteView;
-			}
-		}
+// ---------------------------------------------------
 
-		return defaultView;
+	ETInlineHint FileSystem::ContentProvider& ContentLibrary::GetContentProvider() const {
+		return _contentProvider;
 	}
 
 }	// namespace FileSystem

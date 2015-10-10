@@ -66,7 +66,7 @@ namespace {
 
 	class Win32Application : public Win32SystemInterface, public Win32Scheduler, public Win32ContentProvider, public GameEngine {
 	public:
-		// Constructs this Win32Application instance.
+		//!	Constructs this @ref Win32Application instance.
 		Win32Application( Allocator& allocator ) : Win32SystemInterface(),
 												   Win32Scheduler( GetSystemInterface(), allocator ),
 												   Win32ContentProvider( GetSystemInterface() ),
@@ -80,7 +80,7 @@ namespace {
 												   _renderer( GetGameEngine() ),
 												   _audioRenderer( GetGameEngine() ) {}
 
-		// Destroys this Win32Application instance.
+		//!	Destroys this @ref Win32Application instance.
 		~Win32Application() {
 			ClearAttachedServices();
 		}
@@ -117,10 +117,20 @@ namespace {
 
 // ---------------------------------------------------
 
-	static struct {
+	struct Globals {
 		ET16ByteAligned char	globalAllocatorMemory[sizeof(Win32GlobalHeapAllocator)];
 		ET16ByteAligned char	applicationObjectMemory[sizeof(Win32Application)];
-	}	globalObjects;
+
+		ETForceInlineHint Win32Application&	GetApplicationObject() {
+			return *reinterpret_cast<Win32Application*>(applicationObjectMemory);
+		}
+
+	// ---------------------------------------------------
+
+		ETForceInlineHint Win32GlobalHeapAllocator& GetGlobalAllocator() {
+			return *reinterpret_cast<Win32GlobalHeapAllocator*>(globalAllocatorMemory);
+		}
+	};
 	
 // ---------------------------------------------------
 
@@ -161,34 +171,22 @@ namespace {
 
 // ---------------------------------------------------
 
-	static ETForceInlineHint Win32Application&	GetApplicationObject() {
-		return *reinterpret_cast<Win32Application*>(globalObjects.applicationObjectMemory);
-	}
-
-// ---------------------------------------------------
-
-	static ETForceInlineHint Win32GlobalHeapAllocator& GetGlobalAllocator() {
-		return *reinterpret_cast<Win32GlobalHeapAllocator*>(globalObjects.globalAllocatorMemory);
-	}
+	static Globals	globals;
 
 }	// anonymous namespace
 
  int WINAPI wWinMain( __in ::HINSTANCE hInstance, __in_opt ::HINSTANCE /*hPrevInstance*/, __in ::LPWSTR /*lpCmdLine*/, __in int nCmdShow ) {
-	int	returnValue;
+	int	returnValue( -1 );
 
 #if( ET_ENABLE_EXCEPTION_HANDLER && ET_DEBUG_MODE_ENABLED )
 	__try {
 #endif
 		StoreMainArguments( hInstance, nCmdShow );
 
-		auto* const	globalAllocator( new(globalObjects.globalAllocatorMemory) Win32GlobalHeapAllocator( UTF8L("Root Allocator") ) );
+		returnValue = (new(&globals.GetApplicationObject()) Win32Application( *new(&globals.GetGlobalAllocator()) Win32GlobalHeapAllocator( UTF8L("Root Allocator") ) ))->GetGameEngine().ApplicationEntryPoint();
 
-		new(globalObjects.applicationObjectMemory) Win32Application( *globalAllocator );
-
-		returnValue = GetApplicationObject().GetGameEngine().ApplicationEntryPoint();
-
-		GetApplicationObject().~Win32Application();
-		globalAllocator->~Win32GlobalHeapAllocator();
+		globals.GetApplicationObject().~Win32Application();
+		globals.GetGlobalAllocator().~Win32GlobalHeapAllocator();
 
 #if( ET_ENABLE_EXCEPTION_HANDLER && ET_DEBUG_MODE_ENABLED )
 	}  __except( GenerateDump( GetExceptionInformation() ) ) {

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/FlatOrderedMap.hpp>
+#include <Utility/Containers/UnorderedMap.hpp>
 //------------------------------------------------------------------//
 #include <angelscript.h>
 //------------------------------------------------------------------//
@@ -79,6 +79,11 @@ namespace Scripting {
 			/*! @param[in] allocator @ref Allocator the @ref TypeMetadata instance should use to perform allocations.
 				*/
 			TypeMetadata( ::Eldritch2::Allocator& allocator );
+			//! Constructs this @ref TypeMetadata instance.
+			/*! @remarks @parblock This overload is provided only for container compatibility. _Always_ use
+					TypeMetadata(Allocator&) when constructing real instances of the type. @endparblock
+				*/
+			TypeMetadata();
 
 		// ---------------------------------------------------
 
@@ -92,8 +97,8 @@ namespace Scripting {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::Eldritch2::FlatOrderedMap<::asUINT, FunctionMetadata>	_methodMetadata;
-			::Eldritch2::FlatOrderedMap<::asUINT, PropertyMetadata>	_propertyMetadata;
+			::Eldritch2::UnorderedMap<::asUINT, FunctionMetadata>	_methodMetadata;
+			::Eldritch2::UnorderedMap<::asUINT, PropertyMetadata>	_propertyMetadata;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -129,8 +134,8 @@ namespace Scripting {
 
 	private:
 		::std::unique_ptr<::asIScriptModule>					_module;
-		::Eldritch2::FlatOrderedMap<::asUINT, TypeMetadata>		_typeMetadata;
-		::Eldritch2::FlatOrderedMap<::asUINT, FunctionMetadata>	_functionMetadata;
+		::Eldritch2::UnorderedMap<::asUINT, TypeMetadata>		_typeMetadata;
+		::Eldritch2::UnorderedMap<::asUINT, FunctionMetadata>	_functionMetadata;
 	};
 
 }	// namespace Scripting

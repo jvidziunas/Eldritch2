@@ -18,6 +18,8 @@
 #include <Utility/StringOperators.hpp>
 #include <Packages/ResourceView.hpp>
 //------------------------------------------------------------------//
+#include <typeinfo>
+//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace FileSystem {
@@ -81,8 +83,17 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
+		//!	Locates a resource view in the database.
+		/*!	@param[in] name Null-terminated C string containing the name of the resource to search for.
+			@param[in] defaultView A reference to the @ref ResourceView to return in the event the search was unsuccessful.
+			@returns A reference to the found view, if successful, or a reference to _defaultView_ if no compatible views were found in the database.
+			*/
 		template <typename View>
 		const View&	ResolveViewByName( const ::Eldritch2::UTF8Char* const name, const View& defaultView ) const;
+
+	// ---------------------------------------------------
+
+		ETInlineHint FileSystem::ContentProvider&	GetContentProvider() const;
 
 	// - TYPE PUBLISHING ---------------------------------
 	
@@ -93,19 +104,19 @@ namespace FileSystem {
 		public:
 			class Hash : public Utility::StringHash {
 			public:
-				ETInlineHint ETNoAliasHint size_t	operator()( const ResourceViewFactoryKey string, const size_t seed = 0u ) const;
+				ETInlineHint ETNoAliasHint size_t	operator()( const ResourceViewFactoryKey& key, const size_t seed = 0u ) const;
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//! Constructs this @ref ResourceViewFactoryKey instance.
 			/*! @param[in] begin Pointer to the beginning of a C string containing the name of a resource type. Does not have to be null-terminated.
-				@param[in] end Pointer to one past the last character of the string headed by the _begin_ parameter. This does not necessarily have to point to a null character.
+				@param[in] end Pointer to one past the last character of the string headed by the _begin_ parameter. This does not necessarily have to (but may) point to a null character.
 				*/
 			ETInlineHint ResourceViewFactoryKey( const ::Eldritch2::UTF8Char* const begin, const ::Eldritch2::UTF8Char* const end );
 
 			//! Constructs this @ref ResourceViewFactoryKey instance.
-			ETInlineHint ResourceViewFactoryKey();
+			ETInlineHint ResourceViewFactoryKey() = default;
 
 		// ---------------------------------------------------
 
@@ -113,7 +124,35 @@ namespace FileSystem {
 			/*! @param[in] other The second @ref ResourceViewFactoryKey in the comparison.
 				@returns _True_ if the two keys describe the same view type, _false_ if they reference different types.
 				*/
-			bool	operator==( const ResourceViewFactoryKey& other ) const;
+			ETNoAliasHint bool	operator==( const ResourceViewFactoryKey& other ) const;
+		};
+
+	// ---
+
+		class ResourceViewKey : public ::std::pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*> {
+		public:
+			class Hash : public Utility::StringHash {
+			public:
+				ETInlineHint ETNoAliasHint size_t	operator()( const ResourceViewKey& key, const size_t seed = 0u ) const;
+			};
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+			//! Constructs this @ref ResourceViewKey instance.
+			/*! @param[in] view @ref ResourceView to create a key for.
+				*/
+			ResourceViewKey( const FileSystem::ResourceView& view );
+
+			//! Constructs this @ref ResourceViewKey instance.
+			ETInlineHint ResourceViewKey() = default;
+
+		// ---------------------------------------------------
+
+			//! Tests two @ref ResourceViewKey instances for equality.
+			/*! @param[in] other The second @ref ResourceViewKey in the comparison.
+				@returns _True_ if the two keys describe the same view, _false_ if they reference different types.
+				*/
+			ETInlineHint ETNoAliasHint bool	operator==( const ResourceViewKey& other ) const;
 		};
 
 	// ---
@@ -130,22 +169,21 @@ namespace FileSystem {
 		FileSystem::ContentProvider&																_contentProvider;
 		
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		Utility::ReaderWriterUserMutex*																_contentPackageLibraryMutex;
+		Utility::ReaderWriterUserMutex*																_contentPackageCollectionMutex;
 
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		Utility::ReaderWriterUserMutex*																_resourceViewLibraryMutex;		
+		Utility::ReaderWriterUserMutex*																_resourceViewCollectionMutex;		
 
 		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*,
 								  Utility::StringHash,
-								  Utility::StringEqualComparator<>>									_contentPackageLibrary;
+								  Utility::StringEqualComparator<>>									_contentPackageCollection;
 
-		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, const FileSystem::ResourceView*,
-								  Utility::StringHash,
-								  Utility::StringEqualComparator<>>									_resourceViewLibrary;
+		//! This is left as a void* to prevent slicing for resource views that use multiple inheritance.
+		::Eldritch2::UnorderedMap<ResourceViewKey, const void*, ResourceViewKey::Hash>				_resourceViewCollection;
 
 		::Eldritch2::UnorderedMap<ResourceViewFactoryKey,
 								  ::Eldritch2::ResizableArray<ResourceViewFactory>,
-								  ResourceViewFactoryKey::Hash>										_resourceViewFactoryLibrary;
+								  ResourceViewFactoryKey::Hash>										_resourceViewFactoryCollection;
 
 		FileSystem::LoaderThread*																	_loaderThread;
 

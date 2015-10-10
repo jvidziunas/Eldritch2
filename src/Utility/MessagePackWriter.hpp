@@ -32,55 +32,6 @@ namespace Utility {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		template <class Container>
-		class ArrayWrapper {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//! Constructs this @ref ArrayWrapper instance.
-			ArrayWrapper( Container& container );
-
-		// ---------------------------------------------------
-
-			bool	Serialize( Utility::MessagePackWriter& writer );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			Container&	_container;
-		};
-
-	// ---
-
-		template <class Container, class KeyExtractor = MessagePackBase::DefaultKeyExtractor<Container>, class ValueExtractor = MessagePackBase::DefaultValueExtractor<Container>>
-		class MapWrapper {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//! Constructs this @ref MapWrapper instance.
-			/*! @param[in] container Container to be serialized.
-				@param[in] keyExtractor Key extractor predicate.
-				@param[in] valueExtractor Value extractor predicate.
-				*/
-			MapWrapper( Container& container, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor );
-
-		// ---------------------------------------------------
-
-			bool	Serialize( Utility::MessagePackWriter& writer );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			Container&		_container;
-			KeyExtractor	_keyExtractor;
-			ValueExtractor	_valueExtractor;
-		};
-
-	// ---
-
-		struct TypeString {
-
-		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -91,16 +42,6 @@ namespace Utility {
 
 		//! Destroys this @ref MessagePackWriter instance.
 		~MessagePackWriter() = default;
-
-	// ---------------------------------------------------
-
-		template <class Container, typename Ignored>
-		static MessagePackWriter::ArrayWrapper<Container>&&								WrapArrayContainer( Container& container, Ignored&& );
-
-		template <class Container, typename Ignored, class KeyExtractor, class ValueExtractor>
-		static MessagePackWriter::MapWrapper<Container, KeyExtractor, ValueExtractor>&&	WrapMapContainer( Container& container, Ignored&&, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor );
-		template <class Container, typename Ignored>
-		static MessagePackWriter::MapWrapper<Container>&&								WrapMapContainer( Container& container, Ignored&& );
 
 	// ---------------------------------------------------
 

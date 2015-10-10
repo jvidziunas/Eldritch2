@@ -12,8 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Packages/ContentProvider.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/ContentLibrary.hpp>
+#include <Utility/ResultPair.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
@@ -39,6 +41,18 @@ namespace FileSystem {
 		_exportedResources.ClearAndDispose( [&allocator] ( ResourceView& currentResource ) {
 			allocator.Delete( currentResource );
 		} );
+	}
+
+// ---------------------------------------------------
+
+	ResultPair<ReadableMemoryMappedFile> ContentPackage::CreateBackingFile( Allocator& allocator, const UTF8Char* const suffix ) const {
+		using KnownContentLocation	= ContentProvider::KnownContentLocation;
+
+	// ---
+
+		UTF8Char	fileName[128u];
+
+		return GetLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, KnownContentLocation::PACKAGE_DIRECTORY, AppendString( CopyString( fileName, GetName() ), suffix ? suffix : UTF8L("") ) );
 	}
 
 }	// namespace FileSystem

@@ -18,6 +18,13 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+	namespace Utility {
+		class	MessagePackReader;
+		class	MessagePackWriter;
+	}
+}
+
+namespace Eldritch2 {
 namespace Utility {
 
 	namespace Utility	= ::Eldritch2::Utility;
@@ -35,7 +42,7 @@ namespace Utility {
 			FLOAT4,
 			INT4,
 
-			CUSTOM_TYPE_BEGIN	= 100
+			CUSTOM_TYPE_BEGIN	= 64
 		};
 
 	// ---
@@ -66,32 +73,35 @@ namespace Utility {
 
 	// ---
 
-		struct Nil {};
-
-	// ---
-
-		struct ArrayHeader {
-			::Eldritch2::uint32 arraySizeInElements;
+		struct Nil {
+			bool	Serialize( Utility::MessagePackReader& reader );
+			bool	Serialize( Utility::MessagePackWriter& writer );
 		};
 
 	// ---
 
-		struct MapHeader {
-			::Eldritch2::uint32 mapSizeInPairs;
+		struct ArrayHeader {
+			::Eldritch2::uint32 sizeInElements;
+
+			bool	Serialize( Utility::MessagePackReader& reader );
+			bool	Serialize( Utility::MessagePackWriter& writer );
 		};
 
 	// ---
 
 		struct ObjectReference {
 			::Eldritch2::uint32	identifier;
+
+			bool	Serialize( Utility::MessagePackReader& reader );
+			bool	Serialize( Utility::MessagePackWriter& writer );
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//! Constructs this MessagePackBase instance.
+		//! Constructs this @ref MessagePackBase instance.
 		MessagePackBase( const ::cmp_reader readFunction, const void* const buffer = nullptr );
-		//! Constructs this MessagePackBase instance.
+		//! Constructs this @ref MessagePackBase instance.
 		MessagePackBase( const ::cmp_writer writeFunction, void* const buffer = nullptr );
 	};
 

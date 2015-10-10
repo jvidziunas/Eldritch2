@@ -25,7 +25,7 @@
 
 namespace Eldritch2 {
 	namespace FileSystem {
-		class	PackageDeserializationContext;
+		class	ReadableMemoryMappedFile;
 		class	ContentLibrary;
 	}
 
@@ -96,6 +96,10 @@ namespace FileSystem {
 	// ---------------------------------------------------
 
 		ETInlineHint void	UpdateResidencyStateOnLoaderThread( const ContentPackage::ResidencyState newState );
+
+	// ---------------------------------------------------
+
+		Utility::ResultPair<FileSystem::ReadableMemoryMappedFile>	CreateBackingFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const suffix ) const;
 
 	// ---------------------------------------------------
 

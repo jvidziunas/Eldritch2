@@ -17,12 +17,16 @@
 #include <atomic>
 //------------------------------------------------------------------//
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
 
 	class ETPureAbstractHint ArenaAllocatorBase : public ::Eldritch2::Allocator {
-	// - MEMORY ALLOCATION/DEALLOCATION ------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		using Checkpoint	= const void*;
+
+	// - MEMORY ALLOCATION/DEALLOCATION ------------------
+
 		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
 		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) override sealed;
 
@@ -34,9 +38,9 @@ namespace Eldritch2Detail {
 
 	// ---------------------------------------------------
 
-		const void*	GetCheckpoint() const;
+		Checkpoint	CreateCheckpoint() const;
 
-		void		RestoreCheckpoint( const void* const checkpoint );
+		void		RestoreCheckpoint( const Checkpoint checkpoint );
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -57,11 +61,9 @@ namespace Eldritch2Detail {
 		char* const				_arenaEnd;
 	};
 
-}	// namespace Eldritch2Detail
+// ---------------------------------------------------
 
-namespace Eldritch2 {
-
-	class ExternalArenaAllocator : public ::Eldritch2Detail::ArenaAllocatorBase {
+	class ExternalArenaAllocator : public ::Eldritch2::ArenaAllocatorBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -74,7 +76,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	class ArenaChildAllocator : public ::Eldritch2Detail::ArenaAllocatorBase {
+	class ArenaChildAllocator : public ::Eldritch2::ArenaAllocatorBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -94,7 +96,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <size_t arenaSizeInBytes>
-	class FixedStackAllocator : public ::Eldritch2Detail::ArenaAllocatorBase {
+	class FixedStackAllocator : public ::Eldritch2::ArenaAllocatorBase {
 	public:
 		enum : size_t {
 			RESERVED_SIZE_IN_BYTES = arenaSizeInBytes
@@ -106,7 +108,7 @@ namespace Eldritch2 {
 		FixedStackAllocator( const ::Eldritch2::UTF8Char* const name );
 
 		//! Destroys this @ref FixedStackAllocator instance.
-		~FixedStackAllocator();
+		~FixedStackAllocator() = default;
 
 	// - DATA MEMBERS ------------------------------------
 

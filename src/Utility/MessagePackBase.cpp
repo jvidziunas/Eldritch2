@@ -12,6 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/MessagePackReader.hpp>
+#include <Utility/MessagePackWriter.hpp>
 #include <Utility/MessagePackBase.hpp>
 //------------------------------------------------------------------//
 
@@ -33,6 +35,42 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Utility {
+
+	bool MessagePackBase::Nil::Serialize( MessagePackReader& reader ) {
+		return ::cmp_read_nil( &reader );
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::Nil::Serialize( MessagePackWriter& writer ) {
+		return ::cmp_write_nil( &writer );
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::ArrayHeader::Serialize( MessagePackReader& reader ) {
+		return ::cmp_read_array( &reader, &sizeInElements );
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::ArrayHeader::Serialize( MessagePackWriter& writer ) {
+		return ::cmp_write_array( &writer, sizeInElements );
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::ObjectReference::Serialize( MessagePackReader& reader ) {
+		return ::cmp_read_ext( &reader, )
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::ObjectReference::Serialize( MessagePackWriter& writer ) {
+
+	}
+
+// ---------------------------------------------------
 
 	MessagePackBase::MessagePackBase( const ::cmp_reader readFunction, const void* const buffer ) {
 		::cmp_init( this, const_cast<void*>(buffer), readFunction, [] ( cmp_ctx_t* /*context*/, const void* /*sourceData*/, size_t /*sourceLengthInBytes*/ ) -> size_t { return 0u; } );

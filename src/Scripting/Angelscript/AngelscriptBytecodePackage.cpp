@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Angelscript/AngelscriptBytecodePackage.hpp>
+#include <Utility/Memory/NullAllocator.hpp>
 #include <Utility/MessagePackReader.hpp>
 #include <Utility/MessagePackWriter.hpp>
 #include <Utility/Memory/MemStdLib.hpp>
@@ -23,17 +24,27 @@ using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 using namespace ::std;
 
+namespace {
+
+	static const UTF8Char	methodMetadataBucketAllocator[]		= UTF8L("Angelscript Type Metadata Method Metadata Allocator");
+	static const UTF8Char	propertyMetadataBucketAllocator[]	= UTF8L( "Angelscript Type Metadata Property Metadata Allocator" );
+
+}	// anonymous namespace
+
 namespace Eldritch2 {
 namespace Scripting {
 
-	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( 0u, ::rde::less<::asUINT>(), allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") ),
-																					 _propertyMetadata( 0u, ::rde::less<::asUINT>(), allocator, UTF8L("Angelscript Type Metadata Property Metadata Allocator") ) {}
+	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( 0u, allocator, methodMetadataBucketAllocator ), _propertyMetadata( 0u, allocator, propertyMetadataBucketAllocator ) {}
 
 // ---------------------------------------------------
 
-	AngelscriptBytecodePackage::AngelscriptBytecodePackage( unique_ptr<::asIScriptModule>&& ownedModule, Allocator& allocator ) : _module( ::std::move( ownedModule ) ),
-																																  _typeMetadata( 0u, ::rde::less<::asUINT>(), allocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") ),
-																																  _functionMetadata( 0u, ::rde::less<::asUINT>(), allocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") ) {
+	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata() : _methodMetadata( 0u, NullAllocator::GetInstance(), methodMetadataBucketAllocator ), _propertyMetadata( 0u, NullAllocator::GetInstance(), propertyMetadataBucketAllocator ) {}
+
+// ---------------------------------------------------
+
+	AngelscriptBytecodePackage::AngelscriptBytecodePackage( unique_ptr<::asIScriptModule>&& ownedModule, Allocator& allocator ) : _module( move( ownedModule ) ),
+																																  _typeMetadata( 0u, allocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") ),
+																																  _functionMetadata( 0u, allocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") ) {
 		_module->SetUserData( this );
 	}
 
@@ -80,11 +91,14 @@ namespace Scripting {
 			::asIScriptModule&	_module;
 		};
 
+		using FunctionMetadataCollection	= decltype(_functionMetadata);
+		using TypeMetadataCollection		= decltype(_typeMetadata);
+
 	// ---
 
 		auto&	typeMetadataAllocator( _typeMetadata.GetAllocator().GetParent() );
-		auto	CreateTypeMetadata( [&typeMetadataAllocator] () -> TypeMetadata&& { return { typeMetadataAllocator }; } );
-		auto	CreateFunctionMetadata( [] () -> FunctionMetadata&& { return {}; } );
+		auto	CreateTypeMetadata( [&typeMetadataAllocator]()->TypeMetadataCollection::ValueType&& { return { 0u, { typeMetadataAllocator } }; } );
+		auto	CreateFunctionMetadata( []()->FunctionMetadataCollection::ValueType&& { return { 0u, {} }; } );
 
 		if( reader( BytecodeStream( *_module ), MessagePackReader::WrapMapContainer( _typeMetadata, CreateTypeMetadata ), MessagePackReader::WrapMapContainer( _functionMetadata, CreateFunctionMetadata ) ) ) {
 			// Bind the deserialized metadata to the user data pointers in the native Angelscript type/function objects.

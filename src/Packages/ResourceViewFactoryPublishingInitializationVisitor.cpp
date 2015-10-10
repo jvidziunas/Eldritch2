@@ -28,18 +28,18 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ResourceViewFactoryPublishingInitializationVisitor& ResourceViewFactoryPublishingInitializationVisitor::PublishFactory( const UTF8Char* const className, void* const parameter, ResultPair<ResourceView> (*factory)( Allocator&, const ResourceView::Initializer&, void* ) ) {
-		using ResourceViewFactoryLibrary	= decltype(_contentLibrary._resourceViewFactoryLibrary);
+		using ResourceViewFactoryLibrary	= decltype(_contentLibrary._resourceViewFactoryCollection);
 		using MappedType					= ResourceViewFactoryLibrary::MappedType;
 		using KeyType						= ResourceViewFactoryLibrary::KeyType;
 
 	// ---
 
-		auto&		library( _contentLibrary._resourceViewFactoryLibrary );
+		auto&		factoryCollection( _contentLibrary._resourceViewFactoryCollection );
 		const auto	key( KeyType( className, FindEndOfString( className ) ) );
-		const auto	collectionCandidate( library.Find( key ) );
+		const auto	candidate( factoryCollection.Find( key ) );
 
 		// This is a little yuck, but the default operator[] will just default-construct the element and we explicitly don't want that.
-		auto&		destination( (collectionCandidate != library.End() ? collectionCandidate : library.Insert( { key, MappedType( 1u, _contentLibrary._allocator, UTF8L("Resource View") ) } ).first)->second );
+		auto&		destination( (candidate != factoryCollection.End() ? candidate : factoryCollection.Insert( { key, MappedType( 1u, _contentLibrary._allocator, UTF8L("Resource View") ) } ).first)->second );
 
 		destination.PushBack( { factory, parameter } );
 

@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Utility/MessagePackReader.hpp>
 #include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Utility;
@@ -63,6 +64,21 @@ namespace Utility {
 		}
 
 		return false;
+	}
+
+// ---------------------------------------------------
+
+	MessagePackReader::Checkpoint MessagePackReader::CreateCheckpoint() const {
+		return buf;
+	}
+
+// ---------------------------------------------------
+
+	void MessagePackReader::RestoreCheckpoint( const Checkpoint checkpoint ) {
+		// Verify the checkpoint is legal.
+		ETRuntimeAssert( checkpoint <= buf );
+
+		buf = const_cast<void*>(checkpoint);
 	}
 
 }	// namespace Utility

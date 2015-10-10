@@ -25,7 +25,7 @@
 using namespace ::Eldritch2;
 using namespace ::std;
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
 
 	ArenaAllocatorBase::ArenaAllocatorBase( void* pool, const SizeType allocationLimitInBytes, const UTF8Char* const name ) : Allocator( name ), _allocationPointer( static_cast<char*>(pool) ), _arenaEnd( static_cast<char*>(pool) + allocationLimitInBytes ) {}
 
@@ -74,13 +74,13 @@ namespace Eldritch2Detail {
 
 // ---------------------------------------------------
 
-	const void* ArenaAllocatorBase::GetCheckpoint() const {
+	ArenaAllocatorBase::Checkpoint ArenaAllocatorBase::CreateCheckpoint() const {
 		return _allocationPointer;
 	}
 
 // ---------------------------------------------------
 
-	void ArenaAllocatorBase::RestoreCheckpoint( const void* const checkpoint ) {
+	void ArenaAllocatorBase::RestoreCheckpoint( const Checkpoint checkpoint ) {
 		// Verify the checkpoint is legal.
 		ETRuntimeAssert( static_cast<const char*>(checkpoint) <= _allocationPointer.load( memory_order_relaxed ) );
 
@@ -93,9 +93,7 @@ namespace Eldritch2Detail {
 		return allocationSizeInBytes + (alignmentInBytes - 1u);
 	}
 
-}	// namespace Eldritch2Detail
-
-namespace Eldritch2 {
+// ---------------------------------------------------
 
 	ExternalArenaAllocator::ExternalArenaAllocator( void* pool, const SizeType allocationLimitInBytes, const UTF8Char* const name ) : ArenaAllocatorBase( pool, allocationLimitInBytes, name ) {}
 

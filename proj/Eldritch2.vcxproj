@@ -351,7 +351,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\memory\ArenaAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp" />
-    <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapter.hpp" />
+    <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapterMixin.hpp" />
     <ClInclude Include="..\src\Utility\mpl\Alignof.hpp" />
     <ClInclude Include="..\src\Utility\mpl\AngleTypes.hpp" />
     <ClInclude Include="..\src\Utility\mpl\FloatTypes.hpp" />

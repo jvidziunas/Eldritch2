@@ -36,7 +36,7 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	bool ContentLibrary::ResourceViewFactoryKey::operator==( const ResourceViewFactoryKey& right ) const {
+	ETNoAliasHint bool ContentLibrary::ResourceViewFactoryKey::operator==( const ResourceViewFactoryKey& right ) const {
 		const auto	size( second - first );
 
 		return (size == (right.second - right.first)) && CompareMemory( first, right.first, size );
@@ -44,17 +44,21 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
+	ContentLibrary::ResourceViewKey::ResourceViewKey( const ResourceView& view ) : pair<const UTF8Char*, const type_info*>( view.GetName().GetCharacterArray(), &typeid(view) ) {}
+
+// ---------------------------------------------------
+
 	ContentLibrary::ContentLibrary( ContentProvider& contentProvider, TaskScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Content Library Package Data Allocator") ),
 																														 _deserializationContextAllocator( allocator, UTF8L("Content Library Package Data Allocator") ),
 																														 _contentProvider( contentProvider ),
-																														 _contentPackageLibraryMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
-																														 _resourceViewLibraryMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
-																														 _contentPackageLibrary( 64u, allocator, UTF8L("Content Library Package Bucket Allocator") ),
-																														 _resourceViewLibrary( 512u, allocator, UTF8L("Content Library Resource View Bucket Allocator") ),
-																														 _resourceViewFactoryLibrary( 32u, allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") ),
+																														 _contentPackageCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
+																														 _resourceViewCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
+																														 _contentPackageCollection( 64u, allocator, UTF8L("Content Library Package Bucket Allocator") ),
+																														 _resourceViewCollection( 512u, allocator, UTF8L("Content Library Resource View Bucket Allocator") ),
+																														 _resourceViewFactoryCollection( 32u, allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") ),
 																														 _loaderThread( new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) LoaderThread( scheduler, _allocator ) ) {
 		// Don't bother launching the thread if we have no synchronization mechanisms (Highly unlikely in practice!)
-		if( ETBranchLikelyHint( _contentPackageLibraryMutex && _resourceViewLibraryMutex && _loaderThread ) ) {
+		if( ETBranchLikelyHint( _contentPackageCollectionMutex && _resourceViewCollectionMutex && _loaderThread ) ) {
 			scheduler.Enqueue( *_loaderThread );
 		}
 	}
@@ -62,16 +66,16 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ContentLibrary::~ContentLibrary() {
-		ETRuntimeAssert( _contentPackageLibrary.Empty() );
-		ETRuntimeAssert( _resourceViewLibrary.Empty() );
+		ETRuntimeAssert( _contentPackageCollection.Empty() );
+		ETRuntimeAssert( _resourceViewCollection.Empty() );
 
 		if( auto* const thread = _loaderThread ) {
 			thread->EnsureTerminated();
 			_allocator.Delete( *thread );
 		}
 
-		_allocator.Delete( _contentPackageLibraryMutex, ::Eldritch2::AlignedDeallocationSemantics );
-		_allocator.Delete( _resourceViewLibraryMutex, ::Eldritch2::AlignedDeallocationSemantics );
+		_allocator.Delete( _contentPackageCollectionMutex, ::Eldritch2::AlignedDeallocationSemantics );
+		_allocator.Delete( _resourceViewCollectionMutex, ::Eldritch2::AlignedDeallocationSemantics );
 	}
 
 // ---------------------------------------------------
@@ -88,11 +92,11 @@ namespace FileSystem {
 			~DeserializedContentPackage() {
 				auto&	contentLibrary( GetLibrary() );
 				// Erase all the views from the shared library.
-				{	ScopedLock	_( *contentLibrary._resourceViewLibraryMutex );
-					auto&	resourceViewLibrary( contentLibrary._resourceViewLibrary );
+				{	ScopedLock	_( *contentLibrary._resourceViewCollectionMutex );
+					auto&	resourceViewLibrary( contentLibrary._resourceViewCollection );
 
 					for( const auto& view : GetExportedResourceCollection() ) {
-						const auto findViewResult( resourceViewLibrary.Find( view.GetName().GetCharacterArray() ) );
+						const auto findViewResult( resourceViewLibrary.Find( { view } ) );
 
 						if( findViewResult != resourceViewLibrary.End() && findViewResult->second == &view ) {
 							resourceViewLibrary.Erase( findViewResult );
@@ -101,8 +105,8 @@ namespace FileSystem {
 				}
 
 				// Remove the package from the shared library.
-				{	ScopedLock	_( *contentLibrary._contentPackageLibraryMutex );
-					contentLibrary._contentPackageLibrary.Erase( GetName() );
+				{	ScopedLock	_( *contentLibrary._contentPackageCollectionMutex );
+					contentLibrary._contentPackageCollection.Erase( GetName() );
 				}
 			}
 
@@ -119,19 +123,19 @@ namespace FileSystem {
 			}
 
 			ErrorCode AddContent( const ResourceView::Initializer& sourceAssetData ) override sealed {
-				auto&		factoryLibrary( GetLibrary()._resourceViewFactoryLibrary );
+				auto&		factoryLibrary( GetLibrary()._resourceViewFactoryCollection );
 				const auto	findFactoriesResult( factoryLibrary.Find( { sourceAssetData.name.first, sourceAssetData.name.onePastLast } ) );
 				ErrorCode	result( Errors::NONE );
 
 				if( findFactoriesResult != factoryLibrary.End() ) {
-					auto&	viewLibrary( GetLibrary()._resourceViewLibrary );
-					auto&	viewMutex( *GetLibrary()._resourceViewLibraryMutex );
+					auto&	viewCollection( GetLibrary()._resourceViewCollection );
+					auto&	viewMutex( *GetLibrary()._resourceViewCollectionMutex );
 					auto&	resourceAllocator( GetAllocator() );
 
 					for( const auto& factory : findFactoriesResult->second ) {
 						if( const auto createResourceResult = factory.factoryFunction( resourceAllocator, sourceAssetData, factory.parameter ) ) {
 							ScopedLock	_( viewMutex );
-							viewLibrary.Insert( { createResourceResult.object->GetName().GetCharacterArray(), createResourceResult.object } );
+							viewCollection.Insert( { { *createResourceResult.object }, createResourceResult.object } );
 						} else {
 							result = createResourceResult.resultCode;
 							break;
@@ -152,10 +156,10 @@ namespace FileSystem {
 
 	// ---
 
-		ScopedLock	packageTableLock( *_contentPackageLibraryMutex );
-		const auto	candidate( _contentPackageLibrary.Find( packageName ) );
+		ScopedLock	packageTableLock( *_contentPackageCollectionMutex );
+		const auto	candidate( _contentPackageCollection.Find( packageName ) );
 
-		if( candidate != _contentPackageLibrary.End() ) {
+		if( candidate != _contentPackageCollection.End() ) {
 			// Yes, we already have loaded this package. Increment the reference count and return it.
 			return { { candidate->second }, Errors::NONE };
 		}
@@ -164,7 +168,7 @@ namespace FileSystem {
 			auto	beginLoadResult( _loaderThread->BeginLoad( *package ) );
 
 			if( beginLoadResult ) {
-				_contentPackageLibrary.Insert( { package->GetName(), package.get() } );
+				_contentPackageCollection.Insert( { package->GetName(), package.get() } );
 				// This is the first external reference to the package, so we want the passthrough reference counting semantics.
 				return { { *package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics }, Errors::NONE };
 			}

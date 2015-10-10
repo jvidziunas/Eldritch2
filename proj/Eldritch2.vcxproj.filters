@@ -725,9 +725,6 @@
     <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp">
       <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapter.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Alignof.hpp">
       <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
     </ClInclude>
@@ -1147,6 +1144,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\InstanceDeleters.hpp">
       <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapterMixin.hpp">
+      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

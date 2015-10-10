@@ -32,10 +32,13 @@ namespace Utility {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this DynamicElement instance.
+			//! Constructs this @ref DynamicElement instance.
 			ETInlineHint DynamicElement( Utility::MessagePackReader& reader );
-			//! Constructs this DynamicElement instance.
+			//! Constructs this @ref DynamicElement instance.
 			DynamicElement( const DynamicElement& ) = delete;
+
+			//!	Destroys this @ref DynamicElement instance.
+			~DynamicElement() = default;
 
 		// ---------------------------------------------------
 
@@ -57,81 +60,7 @@ namespace Utility {
 			MessagePackReader&	_reader;
 		};
 
-	// ---
-
-		struct InPlaceString : public ::Eldritch2::Range<const char*> {
-			//! Constructs this InPlaceString instance.
-			ETInlineHint InPlaceString();
-		};
-
-	// ---
-
-		struct InPlaceBulkData : public ::Eldritch2::Range<const char*> {
-			//! Constructs this InPlaceBulkData instance.
-			ETInlineHint InPlaceBulkData();
-		};
-
-	// ---
-
-		struct TypeString : public InPlaceString {
-			using InPlaceString::InPlaceString;
-		};
-
-	// ---
-
-		template <class Container, class DefaultElementProvider>
-		class ArrayWrapper {
-		// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			typedef Container				ContainerType;
-			typedef DefaultElementProvider	DefaultElementProviderType;
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			//! Constructs this @ref ArrayWrapper instance.
-			ArrayWrapper( Container& container, DefaultElementProvider&& defaultElementProvider );
-
-		// ---------------------------------------------------
-
-			bool	Serialize( Utility::MessagePackReader& reader );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			Container&				_container;
-			DefaultElementProvider	_defaultElementProvider;
-		};
-
-	// ---
-
-		template <class Container, class DefaultElementProvider, class KeyExtractor = MessagePackBase::DefaultKeyExtractor<Container>, class ValueExtractor = MessagePackBase::DefaultValueExtractor<Container>>
-		class MapWrapper {
-		// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			typedef Container				ContainerType;
-			typedef DefaultElementProvider	DefaultElementProviderType;
-			typedef KeyExtractor			KeyExtractorType;
-			typedef ValueExtractor			ValueExtractorType;
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			//! Constructs this @ref MapWrapper instance.
-			MapWrapper( Container& container, DefaultElementProvider&& defaultElementProvider, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor );
-
-		// ---------------------------------------------------
-
-			bool	Serialize( Utility::MessagePackReader& reader );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			Container&				_container;
-			DefaultElementProvider	_defaultElementProvider;
-			KeyExtractor			_keyExtractor;
-			ValueExtractor			_valueExtractor;
-		};
+		using Checkpoint = const void*;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -143,20 +72,12 @@ namespace Utility {
 
 	// ---------------------------------------------------
 
-		template <class Container, class DefaultElementProvider>
-		static MessagePackReader::ArrayWrapper<Container, DefaultElementProvider>&&								WrapArrayContainer( Container& container, DefaultElementProvider&& elementProvider );
-
-		template <class Container, class DefaultElementProvider, class KeyExtractor, class ValueExtractor>
-		static MessagePackReader::MapWrapper<Container, DefaultElementProvider, KeyExtractor, ValueExtractor>&&	WrapMapContainer( Container& container, DefaultElementProvider&& elementProvider, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor );
-		template <class Container, class DefaultElementProvider>
-		static MessagePackReader::MapWrapper<Container, DefaultElementProvider>&&								WrapMapContainer( Container& container, DefaultElementProvider&& elementProvider );
-
-	// ---------------------------------------------------
-
-		//! <BriefDescription>
+		//! Parses at most one of the passed-in elements.
 		/*!	@param[out] indexOfUsedElement Zero-based index of the actual parsed element. The function will not modify this value if no elements are parsed.
 			@param[in] fields Parameter pack containing elements to attempt deserialization on. The function will attempt to deserialize each element, in order, until a match is found.
 			@returns A bool indicating whether _any_ element was successfully parsed.
+			@remarks The function creates read checkpoints and will roll back any reads in the event a type isn't parsed fully. If none of the elements
+			@see @ref CreateCheckpoint(), @ref RestoreCheckpoint()
 			*/
 		template <typename... Fields>
 		ETInlineHint bool	ParseOneOf( size_t&& indexOfUsedElement, Fields&&... fields );
@@ -174,6 +95,12 @@ namespace Utility {
 
 	protected:
 		bool	GetInPlaceDataSpan( const size_t spanSizeInBytes, ::Eldritch2::Range<const char*>& range );
+
+	// ---------------------------------------------------
+
+		Checkpoint	CreateCheckpoint() const;
+
+		void		RestoreCheckpoint( const Checkpoint checkpoint );
 
 	// ---------------------------------------------------
 
