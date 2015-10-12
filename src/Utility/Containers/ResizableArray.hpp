@@ -214,8 +214,9 @@ namespace Eldritch2 {
 		template <typename DisposerPredicate>
 		ETInlineHint Iterator	EraseAndDispose( Iterator beginPosition, Iterator endPosition, DisposerPredicate disposer );
 
-		// Removes all elements from this vector (calls their destructors).
-		// Doesn't release memory.
+		//! Removes all elements from this vector and calls their destructors.
+		/*!	@remarks Doesn't release memory.
+			*/
 		ETInlineHint void	Clear();
 		// EA STL concept.
 		// Resets container to an initialized, unallocated state.

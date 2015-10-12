@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/ArenaAllocator.hpp>
 #include <Packages/ContentProvider.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/ContentLibrary.hpp>
@@ -50,9 +51,12 @@ namespace FileSystem {
 
 	// ---
 
-		UTF8Char	fileName[128u];
+		UTF8String<FixedStackAllocator<128u>>	fileName( ::Eldritch2::EmptyStringSemantics, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") );
 
-		return GetLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, KnownContentLocation::PACKAGE_DIRECTORY, AppendString( CopyString( fileName, GetName() ), suffix ? suffix : UTF8L("") ) );
+		fileName.Reserve( _name.Length() + StringLength( suffix ) );
+		fileName.Append( _name ).Append( suffix ? suffix : UTF8L("") );
+
+		return GetLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, KnownContentLocation::PACKAGE_DIRECTORY, fileName.GetCharacterArray() );
 	}
 
 }	// namespace FileSystem

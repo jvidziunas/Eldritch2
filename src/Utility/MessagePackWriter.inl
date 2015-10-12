@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -25,95 +25,6 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	template <class Container>
-	MessagePackWriter::ArrayHeaderProxy<Container>::ArrayHeaderProxy( Container& container ) : _container( container ) {}
-
-// ---------------------------------------------------
-
-	template <class Container>
-	bool MessagePackWriter::ArrayHeaderProxy<Container>::Serialize( MessagePackWriter& writer ) {
-		return ::cmp_write_array( &writer, static_cast<::Eldritch2::uint32>(_container.Size()) );
-	}
-
-// ---------------------------------------------------
-
-	template <class Container>
-	MessagePackWriter::MapHeaderProxy<Container>::MapHeaderProxy( Container& container ) : _container( container ) {}
-
-// ---------------------------------------------------
-
-	template <class Container>
-	bool MessagePackWriter::MapHeaderProxy<Container>::Serialize( MessagePackWriter& writer ) {
-		return ::cmp_write_map( &writer, static_cast<::Eldritch2::uint32>(_container.Size()) );
-	}
-
-// ---------------------------------------------------
-
-	template <class Container>
-	MessagePackWriter::ArrayProxy<Container>::ArrayProxy( Container& container ) : _container( container ) {}
-
-// ---------------------------------------------------
-
-	template <class Container>
-	bool MessagePackWriter::ArrayProxy<Container>::Serialize( Utility::MessagePackWriter& writer ) {
-		if( !writer( MessagePackWriter::ArrayHeaderProxy<Container>( _container ) ) ) {
-			return false;
-		}
-
-		for( const auto& element : _container ) {
-			if( !writer( element ) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-// ---------------------------------------------------
-
-	template <class Container, typename KeyExtractor, typename ValueExtractor>
-	MessagePackWriter::MapProxy<Container, KeyExtractor, ValueExtractor>::MapProxy( Container& container, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor ) : _container( container ), _keyExtractor( keyExtractor ), _valueExtractor( valueExtractor ) {}
-
-// ---------------------------------------------------
-
-	template <class Container, typename KeyExtractor, typename ValueExtractor>
-	bool MessagePackWriter::MapProxy<Container, KeyExtractor, ValueExtractor>::Serialize( Utility::MessagePackWriter& writer ) {
-		if( !writer( MessagePackWriter::MapHeaderProxy<Container>( _container ) ) ) {
-			return false;
-		}
-
-		for( auto& element : _container ) {
-			if( !writer( _keyExtractor( element ), _valueExtractor( element ) ) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-// ---------------------------------------------------
-
-	template <class Container, typename Ignored>
-	typename MessagePackWriter::ArrayProxy<Container>&& MessagePackWriter::WrapArrayContainer( Container& container, Ignored&& /*ignored*/ ) {
-		return { container };
-	}
-
-// ---------------------------------------------------
-
-	template <class Container, typename Ignored, class KeyExtractor, class ValueExtractor>
-	typename MessagePackWriter::MapProxy<Container, KeyExtractor, ValueExtractor>&& MessagePackWriter::WrapMapContainer( Container& container, Ignored&& /*ignored*/, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor ) {
-		return { container, ::std::forward<KeyExtractor>( keyExtractor ), ::std::forward<ValueExtractor>( valueExtractor ) };
-	}
-
-// ---------------------------------------------------
-
-	template <class Container, typename Ignored>
-	typename MessagePackWriter::MapProxy<Container>&& MessagePackWriter::WrapMapContainer( Container& container, Ignored&& /*ignored*/ ) {
-		return { container, MessagePackBase::DefaultKeyExtractor<Container>(), MessagePackBase::DefaultValueExtractor<Container>() };
-	}
-
-// ---------------------------------------------------
-
 	template <typename... Fields>
 	ETInlineHint bool MessagePackWriter::operator()( Fields&&... fields ) {
 		static_assert( 0u != sizeof...(fields), "MessagePackWriter::operator() must be called with at least one field!" );
@@ -125,13 +36,6 @@ namespace Utility {
 	template <typename Head, typename... Tail>
 	bool MessagePackWriter::Write( Head&& head, Tail&&... tail ) {
 		return Write( ::std::forward<Head>( head ) ) ? Write( ::std::forward<Tail>( tail )... ) : false;
-	}
-
-// ---------------------------------------------------
-
-	template <>
-	bool MessagePackWriter::Write<Utility::MessagePackWriter::Nil>( Utility::MessagePackWriter::Nil&& /*value*/ ) {
-		return ::cmp_write_nil( this );
 	}
 
 // ---------------------------------------------------

@@ -21,7 +21,7 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	template <typename... AllocatorConstructorArgs>
-	ETInlineHint UTF8String<Allocator>::UTF8String( const EmptyStringSemantics, AllocatorConstructorArgs&&... allocatorConstructorArgs) : _underlyingContainer( ::std::forward<AllocatorConstructorArgs>(allocatorConstructorArgs)... ) {}
+	ETInlineHint UTF8String<Allocator>::UTF8String( const EmptyStringSemantics, AllocatorConstructorArgs&&... allocatorConstructorArgs ) : _underlyingContainer( "", static_cast<SizeType>(0), ::std::forward<AllocatorConstructorArgs>( allocatorConstructorArgs )... ) {}
 
 // ---------------------------------------------------
 	
@@ -34,11 +34,6 @@ namespace Eldritch2 {
 	template <class Allocator>
 	template <class AlternateAllocator, typename... AllocatorConstructorArgs>
 	ETInlineHint UTF8String<Allocator>::UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorConstructorArgs&&... allocatorConstructorArgs ) : _underlyingContainer( string, ::std::forward<AllocatorConstructorArgs>( allocatorConstructorArgs )... ) {}
-
-// ---------------------------------------------------
-
-	template <class Allocator>
-	ETInlineHint UTF8String<Allocator>::~UTF8String() {}
 
 // ---------------------------------------------------
 
@@ -342,8 +337,8 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Allocator>
-	ETInlineHint typename UTF8String<Allocator>::CharacterType* UTF8String<Allocator>::Reserve( const SizeType capacityHintInBytes ) {
-		return _underlyingContainer.reserve( capacityHintInBytes );
+	ETInlineHint void UTF8String<Allocator>::Reserve( const SizeType capacityHintInBytes ) {
+		_underlyingContainer.reserve( capacityHintInBytes );
 	}
 
 // ---------------------------------------------------

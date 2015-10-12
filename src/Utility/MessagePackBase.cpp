@@ -48,6 +48,10 @@ namespace Utility {
 
 // ---------------------------------------------------
 
+	MessagePackBase::ArrayHeader::ArrayHeader( const uint32 elementCount ) : sizeInElements( elementCount ) {}
+
+// ---------------------------------------------------
+
 	bool MessagePackBase::ArrayHeader::Serialize( MessagePackReader& reader ) {
 		return ::cmp_read_array( &reader, &sizeInElements );
 	}
@@ -60,14 +64,18 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	bool MessagePackBase::ObjectReference::Serialize( MessagePackReader& reader ) {
-		return ::cmp_read_ext( &reader, )
+	MessagePackBase::MapHeader::MapHeader( const uint32 pairCount ) : sizeInPairs( pairCount ) {}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::MapHeader::Serialize( MessagePackReader& reader ) {
+		return ::cmp_read_array( &reader, &sizeInPairs );
 	}
 
 // ---------------------------------------------------
 
-	bool MessagePackBase::ObjectReference::Serialize( MessagePackWriter& writer ) {
-
+	bool MessagePackBase::MapHeader::Serialize( MessagePackWriter& writer ) {
+		return ::cmp_write_array( &writer, sizeInPairs );
 	}
 
 // ---------------------------------------------------

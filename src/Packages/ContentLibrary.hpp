@@ -73,8 +73,9 @@ namespace FileSystem {
 
 		//! Signals to the @ref ContentLibrary that the resources in the specified package will be needed in the near future.
 		/*! @param[in] packageName A null-terminated C string containing the name of the package file, without any suffix or file extension.
-			@returns a @ref DisposingResultPair containing the content package, or an @ref ErrorCode indicating why a failure occurred.
-			@remark If the desired package is already resident in memory, then a reference to it is added instead.
+			@returns A @ref DisposingResultPair containing the content package, or an @ref ErrorCode indicating why a failure occurred.
+			@remarks If the desired package is already resident in memory, then a reference to it is added instead.
+			@remarks Thread-safe.
 			@see @ref ContentPackage, @ref CreatePackageForEditorWorld()
 			*/
 		Utility::DisposingResultPair<FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
@@ -87,12 +88,17 @@ namespace FileSystem {
 		/*!	@param[in] name Null-terminated C string containing the name of the resource to search for.
 			@param[in] defaultView A reference to the @ref ResourceView to return in the event the search was unsuccessful.
 			@returns A reference to the found view, if successful, or a reference to _defaultView_ if no compatible views were found in the database.
+			@remarks Thread-safe.
 			*/
 		template <typename View>
 		const View&	ResolveViewByName( const ::Eldritch2::UTF8Char* const name, const View& defaultView ) const;
 
 	// ---------------------------------------------------
 
+		//!	Retrieves the @ref ContentProvider this @ref ContentLibrary should use to satisfy file load requests.
+		/*!	@returns A reference to the @ref ContentProvider this @ref ContentLibrary should use to satisfy file load requests.
+			@remarks Thread-safe.
+			*/
 		ETInlineHint FileSystem::ContentProvider&	GetContentProvider() const;
 
 	// - TYPE PUBLISHING ---------------------------------
@@ -138,6 +144,12 @@ namespace FileSystem {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+
+			//!	Constructs this @ref ResourceViewKey instance.
+			/*!	@param[in] resourceName The name of the @ref ResourceView to find.
+				@param[in] resourceType The concrete polymorphic type of the @ref ResourceView
+				*/
+			ETInlineHint ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType );
 			//! Constructs this @ref ResourceViewKey instance.
 			/*! @param[in] view @ref ResourceView to create a key for.
 				*/
@@ -178,7 +190,7 @@ namespace FileSystem {
 								  Utility::StringHash,
 								  Utility::StringEqualComparator<>>									_contentPackageCollection;
 
-		//! This is left as a void* to prevent slicing for resource views that use multiple inheritance.
+		//! The value type is left as a void* to prevent slicing for resource views that use multiple inheritance.
 		::Eldritch2::UnorderedMap<ResourceViewKey, const void*, ResourceViewKey::Hash>				_resourceViewCollection;
 
 		::Eldritch2::UnorderedMap<ResourceViewFactoryKey,

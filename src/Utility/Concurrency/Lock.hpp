@@ -67,7 +67,7 @@ namespace Utility {
 	// ---------------------------------------------------
 
 	public:
-		//!	Acquires safe read-only access to a shared resource.
+		//!	Acquires shared inspection rights for a shared resource.
 		/*!	@remarks Blocks until rights are obtained. If aborting in the presence of contention is more appropriate, use @ref TryEnterAsReader() instead.
 			@remarks The default implementation calls @ref TryEnterAsReader() in a busy loop.
 			@remarks @parblock Multiple threads can all have read access to a resource, but only one thread may have write access at a time.
@@ -76,10 +76,15 @@ namespace Utility {
 			*/
 		virtual void	EnterAsReader();
 
+		//!	Acquires shared inspection rights for a shared resource, in an interruptible fashion.
+		/*!	@returns _True_ if read access was acquired, or _false_ if another thread currently has modification rights.
+			@remarks Unlike @ref EnterAsReader(), the function will return immediately in the event another thread has write access.
+			@see @ref EnterAsReader(), @ref LeaveAsReader(), @ref ScopedReaderLock
+			*/
 		virtual bool	TryEnterAsReader() abstract;
 
 		//!	Releases shared inspection rights for a shared resource.
-		/*!	@pre Read rights should previously have been obtained for the caller via a call to one of @ref EnterAsReader or @ref TryEnterAsReader().
+		/*!	@pre Read rights should previously have been obtained for the caller via a call to one of @ref EnterAsReader() or @ref TryEnterAsReader().
 			@see @ref EnterAsReader(), @ref TryEnterAsReader() @ref ScopedReaderLock
 			*/
 		virtual void	LeaveAsReader() abstract;

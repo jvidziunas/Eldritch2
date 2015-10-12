@@ -20,6 +20,7 @@
 #include <Scripting/Angelscript/AngelscriptNativeBindings.hpp>
 #include <Scripting/Angelscript/AngelscriptWorldView.hpp>
 #include <Configuration/ConfigurationDatabase.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Scripting/AngelscriptEngine.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
@@ -30,6 +31,7 @@
 #include <angelscript.h>
 //------------------------------------------------------------------//
 #include <memory>
+
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -101,26 +103,30 @@ namespace Scripting {
 	void AngelscriptEngine::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
 		using Initializer		= ResourceView::Initializer;
+		using ViewHandle		= unique_ptr<AngelscriptBytecodePackageView, InstanceDeleter>;
 
 	// ---
 
 		// Bytecode package
-		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> ResultPair<ResourceView> {
-			auto&	scriptEngine( static_cast<AngelscriptEngine*>(parameter)->GetScriptEngine() );
-
-			if( unique_ptr<::asIScriptModule> module { scriptEngine.GetModule( initializer.name.first, asGM_ALWAYS_CREATE ) } ) {
-				auto* const view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) AngelscriptBytecodePackageView( move( module ), initializer, allocator ) );
+		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), _scriptEngine, [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> ResultPair<ResourceView> {
+			// We'll need to null-terminate the name, so create a temporary string on the stack.
+			UTF8String<FixedStackAllocator<64u>>	moduleName( initializer.name.first, initializer.name.Size(), UTF8L("Module Name String Allocator") );
+			
+			// First, we'll need an Angelscript module. The unique_ptr will take care of releasing resources in the event something pukes.
+			if( unique_ptr<::asIScriptModule> module { static_cast<::asIScriptEngine*>(parameter)->GetModule( moduleName.GetCharacterArray(), asGM_ALWAYS_CREATE ) } ) {
 				
-				if( !view ) {
+				// Next, allocate the returned resource view object. Once again, the unique_ptr will handle deleting in the event this explodes.
+				if( ViewHandle view { new(allocator, AllocationOption::PERMANENT_ALLOCATION) AngelscriptBytecodePackageView( move( module ), initializer, allocator ), { allocator } } ) {
+					
+					// Finally, try to load from the source asset data.
+					if( view->SerializeAndBindToModule( MessagePackReader( initializer.serializedAsset ) ) ) {
+						return { view.release(), Errors::NONE };
+					} else {
+						return { nullptr, Errors::INVALID_PARAMETER };
+					}
+
 					return { nullptr, Errors::OUT_OF_MEMORY };
 				}
-
-				if( MessagePackReader( initializer.serializedAsset )(*view) ) {
-					return { view, Errors::NONE };
-				}
-					
-				allocator.Delete( *view );
-				return { nullptr, Errors::INVALID_PARAMETER };
 			}
 
 			return { nullptr, Errors::UNSPECIFIED };

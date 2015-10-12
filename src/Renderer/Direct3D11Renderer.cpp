@@ -47,6 +47,7 @@ using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Renderer;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
+using namespace ::std;
 
 namespace {
 
@@ -179,7 +180,7 @@ namespace Renderer {
 		// Shader resource view.
 		.PublishFactory( Direct3D11ShaderResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*renderer*/ ) -> ResultPair<ResourceView> {
 			COMPointer<::ID3D11ShaderResourceView>	deviceView( nullptr );
-			auto* const								view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11ShaderResourceView( ::std::move( deviceView ), initializer, allocator ) );
+			auto* const								view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11ShaderResourceView( move( deviceView ), initializer, allocator ) );
 
 			return { view, view ? Errors::NONE : Errors::OUT_OF_MEMORY };
 		} );

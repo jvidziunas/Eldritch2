@@ -15,7 +15,6 @@
 #include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 //------------------------------------------------------------------//
-#include <utfcpp/v2_0/source/utf8/unchecked.h>
 #include <rdestl/basic_string.h>
 //------------------------------------------------------------------//
 #include <iterator>
@@ -51,18 +50,18 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this UTF8String instance.
+		//!	Constructs this @ref UTF8String instance.
 		template <typename... AllocatorConstructorArgs>
 		ETInlineHint explicit UTF8String( const EmptyStringSemantics, AllocatorConstructorArgs&&... allocatorConstructorArgs );
-		// Constructs this UTF8String instance.
+		//!	Constructs this @ref UTF8String instance.
 		template <typename... AllocatorConstructorArgs>
 		ETInlineHint UTF8String( const CharacterType* const string, const SizeType stringLengthInBytes, AllocatorConstructorArgs&&... allocatorConstructorArgs );
-		// Constructs this UTF8String instance.
+		//!	Constructs this @ref UTF8String instance.
 		template <class AlternateAllocator, typename... AllocatorConstructorArgs>
 		ETInlineHint UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorConstructorArgs&&... allocatorConstructorArgs );
 
-		// Destroys this UTF8String instance.
-		ETInlineHint ~UTF8String();
+		//!	Destroys this @ref UTF8String instance.
+		ETInlineHint ~UTF8String() = default;
 
 	// - ALGORITHMS --------------------------------------
 
@@ -150,7 +149,7 @@ namespace Eldritch2 {
 
 	// - CAPACITY QUERY ----------------------------------
 
-		ETInlineHint CharacterType*	Reserve( const SizeType capacityHintInBytes );
+		ETInlineHint void		Reserve( const SizeType capacityHintInBytes );
 
 		ETInlineHint SizeType	CapacityInBytes() const;
 

@@ -90,14 +90,18 @@ namespace FileSystem {
 
 			//! Destroys this @ref DeserializedContentPackage instance.
 			~DeserializedContentPackage() {
+				// Cache this.
 				auto&	contentLibrary( GetLibrary() );
+				
 				// Erase all the views from the shared library.
 				{	ScopedLock	_( *contentLibrary._resourceViewCollectionMutex );
+					// Caching.
 					auto&	resourceViewLibrary( contentLibrary._resourceViewCollection );
 
 					for( const auto& view : GetExportedResourceCollection() ) {
 						const auto findViewResult( resourceViewLibrary.Find( { view } ) );
 
+						// Ensure we're not accidentally erasing another resource.
 						if( findViewResult != resourceViewLibrary.End() && findViewResult->second == &view ) {
 							resourceViewLibrary.Erase( findViewResult );
 						}
@@ -128,11 +132,14 @@ namespace FileSystem {
 				ErrorCode	result( Errors::NONE );
 
 				if( findFactoriesResult != factoryLibrary.End() ) {
+					// Caching these.
 					auto&	viewCollection( GetLibrary()._resourceViewCollection );
 					auto&	viewMutex( *GetLibrary()._resourceViewCollectionMutex );
 					auto&	resourceAllocator( GetAllocator() );
 
+					// Loop through all the resource view factories...
 					for( const auto& factory : findFactoriesResult->second ) {
+						// ... attempting to 
 						if( const auto createResourceResult = factory.factoryFunction( resourceAllocator, sourceAssetData, factory.parameter ) ) {
 							ScopedLock	_( viewMutex );
 							viewCollection.Insert( { { *createResourceResult.object }, createResourceResult.object } );
@@ -151,8 +158,9 @@ namespace FileSystem {
 			}
 		};
 
+	// ---
+
 		using AllocationOption	= Allocator::AllocationOption;
-		using PackageHandle		= unique_ptr<ContentPackage, InstanceDeleter>;
 
 	// ---
 
@@ -164,13 +172,13 @@ namespace FileSystem {
 			return { { candidate->second }, Errors::NONE };
 		}
 
-		if( PackageHandle package { new(_allocator, AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator ), { _allocator } } ) {
+		if( unique_ptr<ContentPackage, InstanceDeleter> package { new(_allocator, AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator ), { _allocator } } ) {
 			auto	beginLoadResult( _loaderThread->BeginLoad( *package ) );
 
 			if( beginLoadResult ) {
 				_contentPackageCollection.Insert( { package->GetName(), package.get() } );
 				// This is the first external reference to the package, so we want the passthrough reference counting semantics.
-				return { { *package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics }, Errors::NONE };
+				return { { package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics }, Errors::NONE };
 			}
 
 			return { { nullptr }, beginLoadResult };

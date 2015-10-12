@@ -50,7 +50,7 @@ namespace Scheduler {
 	// - TYPE PUBLISHING ---------------------------------
 	public:
 
-		// Execution priority for a thread. 
+		//!	Execution priority for a thread. 
 		enum class ThreadPriority {
 			BELOW_NORMAL,
 			NORMAL,
@@ -69,12 +69,12 @@ namespace Scheduler {
 
 	// ---
 
-		// Minimal state used for incremental backoff.
+		//!	Minimal state used for incremental backoff.
 		typedef Scheduler::BackoffContext	BackoffContext;
 
 	// - WORK SCHEDULING ---------------------------------
 
-		// Attempts to assign exclusive ownership of the denoted Module instance to this Scheduler.
+		// Attempts to assign exclusive ownership of the denoted Module instance to this @ref TaskScheduler.
 		// If the operation succeeds, the associated code for the Module will be executed continually
 		// on a unique operating system thread until it is either dequeued from the Scheduler or
 		// manually told to cease execution.
@@ -102,7 +102,7 @@ namespace Scheduler {
 
 	// - SYNCHRONIZATION OBJECT ALLOCATION/DEALLOCATION --
 
-		//! Instructs the Scheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
+		//!	Instructs the Scheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
 		virtual Utility::ResultPair<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
 
 		virtual Utility::ResultPair<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) abstract;
@@ -116,10 +116,10 @@ namespace Scheduler {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//! Constructs this @ref TaskScheduler instance.
+		//!	Constructs this @ref TaskScheduler instance.
 		TaskScheduler() = default;
 
-		//! Destroys this @ref TaskScheduler instance.
+		//!	Destroys this @ref TaskScheduler instance.
 		~TaskScheduler() = default;
 	};
 

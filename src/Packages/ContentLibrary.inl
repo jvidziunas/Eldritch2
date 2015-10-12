@@ -44,7 +44,11 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint bool ContentLibrary::ResourceViewKey::operator==( const ContentLibrary::ResourceViewKey& other ) const {
+	ETInlineHint ContentLibrary::ResourceViewKey::ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType ) : ::std::pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*>( resourceName, resourceType ) {}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETNoAliasHint bool ContentLibrary::ResourceViewKey::operator==( const ContentLibrary::ResourceViewKey& other ) const {
 		return (*second == *other.second) && Utility::StringEqualComparator<>()( first, other.first );
 	}
 
@@ -57,7 +61,7 @@ namespace FileSystem {
 	// ---
 
 		Utility::ScopedReaderLock	_( *_resourceViewCollectionMutex );
-		const auto					candidate( _resourceViewCollection.Find( name ) );
+		const auto					candidate( _resourceViewCollection.Find( { name, &typeid(defaultView) } ) );
 
 		return (candidate != _resourceViewCollection.End()) ? (*static_cast<const View*>(candidate->second)) : defaultView;
 	}

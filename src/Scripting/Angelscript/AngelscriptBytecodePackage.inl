@@ -39,7 +39,23 @@ namespace Scripting {
 
 	template <class Archive>
 	bool AngelscriptBytecodePackage::TypeMetadata::Serialize( Archive& archive ) {
-		return archive( typename Archive::MapWrapper<decltype(_methodMetadata)>( _methodMetadata ), typename Archive::MapWrapper<decltype(_propertyMetadata)>( _propertyMetadata ) );
+		return archive( Archive::AdaptMap( _methodMetadata ), Archive::AdaptMap( _propertyMetadata ) );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Archive>
+	bool AngelscriptBytecodePackage::Serialize( Archive& archive ) {
+		using TypeMetadataCollection = decltype(_typeMetadata);
+
+	// ---
+
+		auto&	rootAllocator( _rootAllocator );
+		auto	DefaultTypeMetadata( [&rootAllocator] () -> TypeMetadataCollection::ValueType {
+			return { 0u, { rootAllocator } };
+		} );
+
+		return archive( Archive::AdaptMap( _typeMetadata, DefaultTypeMetadata ), Archive::AdaptMap( _functionMetadata ) );
 	}
 
 }	// namespace Scripting

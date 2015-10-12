@@ -767,9 +767,6 @@
     <ClInclude Include="..\src\Utility\mpl\Platform.Xenon.hpp">
       <Filter>Header Files\Engine\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\Event.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\Range.hpp">
       <Filter>Header Files\Engine\Utility\Containers</Filter>
     </ClInclude>

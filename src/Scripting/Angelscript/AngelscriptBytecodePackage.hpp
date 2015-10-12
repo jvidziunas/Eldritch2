@@ -119,21 +119,16 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
-		//! Input serialization entry point.
-		/*! @param[in] reader The archive to serialize from.
-			@returns _true_ if serialization was successful, _false_ if serialization was not successful.
-			*/
-		bool	Serialize( Utility::MessagePackReader& reader );
-		//! Output serialization entry point.
-		/*! @param[out] writer the archive to serialize into.
-			@returns _true_ if serialization was successful, _false_ if serialization was not successful.
-			*/
-		bool	Serialize( Utility::MessagePackWriter& writer );
+		bool	SerializeAndBindToModule( Utility::MessagePackReader& reader );
+
+		template <typename Archive>
+		bool	Serialize( Archive& archive );
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		::std::unique_ptr<::asIScriptModule>					_module;
+		::Eldritch2::ChildAllocator								_rootAllocator;
 		::Eldritch2::UnorderedMap<::asUINT, TypeMetadata>		_typeMetadata;
 		::Eldritch2::UnorderedMap<::asUINT, FunctionMetadata>	_functionMetadata;
 	};

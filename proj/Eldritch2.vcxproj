@@ -366,7 +366,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\mpl\Platform.PS3.hpp" />
     <ClInclude Include="..\src\Utility\mpl\Platform.Win.hpp" />
     <ClInclude Include="..\src\Utility\mpl\Platform.Xenon.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\Event.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
     <ClInclude Include="..\src\Utility\Containers\ResizableArray.hpp" />
     <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp" />
