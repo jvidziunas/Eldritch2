@@ -12,10 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptMarshalTypes.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Scripting/ScriptMarshalTypes.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scripting;

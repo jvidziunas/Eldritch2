@@ -117,11 +117,9 @@ XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll
     <ClCompile Include="..\src_bakinator\Bakinator.cpp" />
     <ClCompile Include="..\src_bakinator\BakinatorCookerStrategy.cpp" />
     <ClCompile Include="..\src\Tools\ContentCooker.cpp" />
-    <ClCompile Include="..\src\Tools\CookerStrategy.cpp" />
     <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
     <ClCompile Include="..\src\Utility\FourCCGenerator.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\OperatorNewOverride.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\FileReadAccessStrategy.cpp" />
     <ClCompile Include="..\src\Tools\FileStrategyFactory.cpp" />
     <ClCompile Include="..\src\Utility\FileWriteAccessStrategy.cpp" />
@@ -148,7 +146,7 @@ XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll
     <ClInclude Include="..\src\Tools\CookerStrategy.hpp" />
     <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
     <ClInclude Include="..\src\Utility\FourCCGenerator.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\MemStdLib.hpp" />
+    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\FileReadAccessStrategy.hpp" />
     <ClInclude Include="..\src\Tools\FileStrategyFactory.hpp" />
     <ClInclude Include="..\src\Tools\FileStrategyIterator.hpp" />

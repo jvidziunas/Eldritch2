@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Scheduler/TaskScheduler.hpp>
 #include <System/SystemInterface.hpp>
 #include <Foundation/GameEngine.hpp>
@@ -27,9 +28,9 @@ using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 using namespace ::std;
 
-// Disable 'conditional expression is constant' warning
 #if( ET_COMPILER_IS_MSVC )
 #	pragma warning( push )
+//	Disable 'conditional expression is constant' warning
 #		pragma warning( disable : 4127 )
 #endif
 
@@ -50,7 +51,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	int GameEngine::ApplicationEntryPoint() {
-		_managementService.BootstrapEngine( Max<size_t>( 1u, _systemInterface.GetThreadCount() - 1u) );
+		_managementService.BootstrapEngine( Max<size_t>( _systemInterface.GetThreadCount() - 1u, 1u ) );
 
 		return 0;
 	}
@@ -81,7 +82,7 @@ namespace Foundation {
 			}
 		}
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

@@ -13,10 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Angelscript/AngelscriptBytecodePackage.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Memory/NullAllocator.hpp>
 #include <Utility/MessagePackReader.hpp>
 #include <Utility/MessagePackWriter.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scripting;
@@ -57,7 +57,7 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	bool AngelscriptBytecodePackage::SerializeAndBindToModule( MessagePackReader& reader ) {
+	bool AngelscriptBytecodePackage::SerializeAndBindToModule( MessagePackReader&& reader ) {
 		if( !Serialize( reader ) ) {
 			return false;
 		}

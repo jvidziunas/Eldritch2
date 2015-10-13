@@ -19,8 +19,8 @@ namespace Eldritch2 {
 namespace Utility {
 
 	template <class Container>
-	typename MessagePackBase::DefaultElementProvider<Container>::ValueType&& MessagePackBase::DefaultElementProvider<Container>::operator()() const {
-		return ValueType();
+	typename MessagePackBase::DefaultElementProvider<Container>::ValueType MessagePackBase::DefaultElementProvider<Container>::operator()() const {
+		return {};
 	}
 
 // ---------------------------------------------------

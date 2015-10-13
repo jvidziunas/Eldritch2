@@ -13,8 +13,9 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Angelscript/AngelscriptNativeBindings.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/Assert.hpp>
+//------------------------------------------------------------------//
 #include <angelscript.h>
 //------------------------------------------------------------------//
 
@@ -131,38 +132,38 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	void RegisterAlgorithmLibrary( asIScriptEngine* const engine ) {
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Max( float&in, float&in )", asFUNCTIONPR( Max<float32>, (const float32&, const float32&), float32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Max( double&in, double&in )", asFUNCTIONPR( Max<float64>, (const float64&, const float64&), float64 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 Max( int8&in, int8&in )", asFUNCTIONPR( Max<int8>, (const int8&, const int8&), int8 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint8 Max( uint8&in, uint8&in )", asFUNCTIONPR( Max<uint8>, (const uint8&, const uint8&), uint8 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 Max( int16&in, int16&in )", asFUNCTIONPR( Max<int16>, (const int16&, const int16&), int16 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint16 Max( uint16&in, uint16&in )", asFUNCTIONPR( Max<uint16>, (const uint16&, const uint16&), uint16 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 Max( int32&in, int32&in )", asFUNCTIONPR( Max<int32>, (const int32&, const int32&), int32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint32 Max( uint32&in, uint32&in )", asFUNCTIONPR( Max<uint32>, (const uint32&, const uint32&), uint32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 Max( int64&in, int64&in )", asFUNCTIONPR( Max<int64>, (const int64&, const int64&), int64 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint64 Max( uint64&in, uint64&in )", asFUNCTIONPR( Max<uint64>, (const uint64&, const uint64&), uint64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Max( float&in, float&in )", asFUNCTIONPR( Max<float32>, (const float32, const float32), float32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Max( double&in, double&in )", asFUNCTIONPR( Max<float64>, (const float64, const float64), float64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 Max( int8&in, int8&in )", asFUNCTIONPR( Max<int8>, (const int8, const int8), int8 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint8 Max( uint8&in, uint8&in )", asFUNCTIONPR( Max<uint8>, (const uint8, const uint8), uint8 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 Max( int16&in, int16&in )", asFUNCTIONPR( Max<int16>, (const int16, const int16), int16 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint16 Max( uint16&in, uint16&in )", asFUNCTIONPR( Max<uint16>, (const uint16, const uint16), uint16 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 Max( int32&in, int32&in )", asFUNCTIONPR( Max<int32>, (const int32, const int32), int32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint32 Max( uint32&in, uint32&in )", asFUNCTIONPR( Max<uint32>, (const uint32, const uint32), uint32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 Max( int64&in, int64&in )", asFUNCTIONPR( Max<int64>, (const int64, const int64), int64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint64 Max( uint64&in, uint64&in )", asFUNCTIONPR( Max<uint64>, (const uint64, const uint64), uint64 ), asCALL_CDECL ) );
 
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Min( float&in, float&in )", asFUNCTIONPR( Min<float32>, (const float32&, const float32&), float32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Min( double&in, double&in )", asFUNCTIONPR( Min<float64>, (const float64&, const float64&), float64 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 Min( int8&in, int8&in )", asFUNCTIONPR( Min<int8>, (const int8&, const int8&), int8 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint8 Min( uint8&in, uint8&in )", asFUNCTIONPR( Min<uint8>, (const uint8&, const uint8&), uint8 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 Min( int16&in, int16&in )", asFUNCTIONPR( Min<int16>, (const int16&, const int16&), int16 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint16 Min( uint16&in, uint16&in )", asFUNCTIONPR( Min<uint16>, (const uint16&, const uint16&), uint16 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 Min( int32&in, int32&in )", asFUNCTIONPR( Min<int32>, (const int32&, const int32&), int32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint32 Min( uint32&in, uint32&in )", asFUNCTIONPR( Min<uint32>, (const uint32&, const uint32&), uint32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 Min( int64&in, int64&in )", asFUNCTIONPR( Min<int64>, (const int64&, const int64&), int64 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint64 Min( uint64&in, uint64&in )", asFUNCTIONPR( Min<uint64>, (const uint64&, const uint64&), uint64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Min( float&in, float&in )", asFUNCTIONPR( Min<float32>, (const float32, const float32), float32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Min( double&in, double&in )", asFUNCTIONPR( Min<float64>, (const float64, const float64), float64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 Min( int8&in, int8&in )", asFUNCTIONPR( Min<int8>, (const int8, const int8), int8 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint8 Min( uint8&in, uint8&in )", asFUNCTIONPR( Min<uint8>, (const uint8, const uint8), uint8 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 Min( int16&in, int16&in )", asFUNCTIONPR( Min<int16>, (const int16, const int16), int16 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint16 Min( uint16&in, uint16&in )", asFUNCTIONPR( Min<uint16>, (const uint16, const uint16), uint16 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 Min( int32&in, int32&in )", asFUNCTIONPR( Min<int32>, (const int32, const int32), int32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint32 Min( uint32&in, uint32&in )", asFUNCTIONPR( Min<uint32>, (const uint32, const uint32), uint32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 Min( int64&in, int64&in )", asFUNCTIONPR( Min<int64>, (const int64, const int64), int64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint64 Min( uint64&in, uint64&in )", asFUNCTIONPR( Min<uint64>, (const uint64, const uint64), uint64 ), asCALL_CDECL ) );
 
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Clamp( float&in, float&in, float&in )", asFUNCTIONPR( Clamp<float32>, (const float32&, const float32&, const float32&), float32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Clamp( double&in, double&in, double&in )", asFUNCTIONPR( Clamp<float64>, (const float64&, const float64&, const float64&), float64 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 Clamp( int8&in, int8&in, int8&in )", asFUNCTIONPR( Clamp<int8>, (const int8&, const int8&, const int8&), int8 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint8 Clamp( uint8&in, uint8&in, uint8&in )", asFUNCTIONPR( Clamp<uint8>, (const uint8&, const uint8&, const uint8&), uint8 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 Clamp( int16&in, int16&in, int16&in )", asFUNCTIONPR( Clamp<int16>, (const int16&, const int16&, const int16&), int16 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint16 Clamp( uint16&in, uint16&in, uint16&in )", asFUNCTIONPR( Clamp<uint16>, (const uint16&, const uint16&, const uint16&), uint16 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 Clamp( int32&in, int32&in, int32&in )", asFUNCTIONPR( Clamp<int32>, (const int32&, const int32&, const int32&), int32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint32 Clamp( uint32&in, uint32&in, uint32&in )", asFUNCTIONPR( Clamp<uint32>, (const uint32&, const uint32&, const uint32&), uint32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 Clamp( int64&in, int64&in, int64&in )", asFUNCTIONPR( Clamp<int64>, (const int64&, const int64&, const int64&), int64 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint64 Clamp( uint64&in, uint64&in, uint64&in )", asFUNCTIONPR( Clamp<uint64>, (const uint64&, const uint64&, const uint64&), uint64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Clamp( float&in, float&in, float&in )", asFUNCTIONPR( Clamp<float32>, (const float32, const float32, const float32), float32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Clamp( double&in, double&in, double&in )", asFUNCTIONPR( Clamp<float64>, (const float64, const float64, const float64), float64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 Clamp( int8&in, int8&in, int8&in )", asFUNCTIONPR( Clamp<int8>, (const int8, const int8, const int8), int8 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint8 Clamp( uint8&in, uint8&in, uint8&in )", asFUNCTIONPR( Clamp<uint8>, (const uint8, const uint8, const uint8), uint8 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 Clamp( int16&in, int16&in, int16&in )", asFUNCTIONPR( Clamp<int16>, (const int16, const int16, const int16), int16 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint16 Clamp( uint16&in, uint16&in, uint16&in )", asFUNCTIONPR( Clamp<uint16>, (const uint16, const uint16, const uint16), uint16 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 Clamp( int32&in, int32&in, int32&in )", asFUNCTIONPR( Clamp<int32>, (const int32, const int32, const int32), int32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint32 Clamp( uint32&in, uint32&in, uint32&in )", asFUNCTIONPR( Clamp<uint32>, (const uint32, const uint32, const uint32), uint32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 Clamp( int64&in, int64&in, int64&in )", asFUNCTIONPR( Clamp<int64>, (const int64, const int64, const int64), int64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "uint64 Clamp( uint64&in, uint64&in, uint64&in )", asFUNCTIONPR( Clamp<uint64>, (const uint64, const uint64, const uint64), uint64 ), asCALL_CDECL ) );
 
 		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Saturate( float )", asFUNCTIONPR( Saturate, (float32), float32 ), asCALL_CDECL ) );
 		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Saturate( double )", asFUNCTIONPR( Saturate, (float64), float64 ), asCALL_CDECL ) );

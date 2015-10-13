@@ -28,11 +28,11 @@ namespace Utility {
 
 	public:
 		template <typename Container, typename ElementProvider>
-		class ArrayProxy : protected MessagePackBase::ArrayHeader {
+		class ArrayAdapter : protected MessagePackBase::ArrayHeader {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			ArrayProxy( Container& container, ElementProvider elementProvider );
+			ArrayAdapter( Container& container, ElementProvider elementProvider );
 
 		// ---------------------------------------------------
 
@@ -48,11 +48,11 @@ namespace Utility {
 	// ---
 
 		template <typename Container, typename ElementProvider, typename KeyExtractor, typename ValueExtractor>
-		class MapProxy : protected MessagePackBase::MapHeader {
+		class MapAdapter : protected MessagePackBase::MapHeader {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			MapProxy( Container& container, ElementProvider elementProvider, KeyExtractor keyExtractor, ValueExtractor valueExtractor );
+			MapAdapter( Container& container, ElementProvider elementProvider, KeyExtractor keyExtractor, ValueExtractor valueExtractor );
 
 		// ---------------------------------------------------
 
@@ -82,10 +82,10 @@ namespace Utility {
 	// ---------------------------------------------------
 
 		template <typename Container, typename ElementProvider = DefaultElementProvider<Container>, typename KeyExtractor = DefaultKeyExtractor<Container>, typename ValueExtractor = DefaultValueExtractor<Container>>
-		static MapProxy<Container, ElementProvider, KeyExtractor, ValueExtractor>&&	AdaptMap( Container& container, ElementProvider&& elementProvider = ElementProvider(), KeyExtractor&& keyExtractor = KeyExtractor(), ValueExtractor&& valueExtractor = ValueExtractor() );
+		static MapAdapter<Container, ElementProvider, KeyExtractor, ValueExtractor>&&	AdaptMap( Container& container, ElementProvider&& elementProvider = ElementProvider(), KeyExtractor&& keyExtractor = KeyExtractor(), ValueExtractor&& valueExtractor = ValueExtractor() );
 
 		template <typename Container, typename ElementProvider = DefaultElementProvider<Container>>
-		static ArrayProxy<Container, ElementProvider>&&								AdaptArray( Container& container, ElementProvider&& elementProvider = ElementProvider() );
+		static ArrayAdapter<Container, ElementProvider>&&								AdaptArray( Container& container, ElementProvider&& elementProvider = ElementProvider() );
 
 	// ---------------------------------------------------
 

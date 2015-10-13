@@ -21,21 +21,17 @@
 
 namespace Eldritch2 {
 
-	namespace Errors {
-
-		ENUM_CLASS( ::Eldritch2::int32 ) {
-			OPERATION_NOT_SUPPORTED	= -9,
-			ACCESS_DENIED			= -7,
-			INVALID_OBJECT_STATE	= -6,
-			BAD_FILE_NAME			= -5,
-			NULL_PARAMETER			= -4,
-			INVALID_PARAMETER		= -3,
-			OUT_OF_MEMORY			= -2,
-			UNSPECIFIED				= -1,
-			NONE					=  0
-		};
-
-	}	// namespace Errors
+	enum class Error : ::Eldritch2::int32 {
+		OPERATION_NOT_SUPPORTED	= -9,
+		ACCESS_DENIED			= -7,
+		INVALID_OBJECT_STATE	= -6,
+		BAD_FILE_NAME			= -5,
+		NULL_PARAMETER			= -4,
+		INVALID_PARAMETER		= -3,
+		OUT_OF_MEMORY			= -2,
+		UNSPECIFIED				= -1,
+		NONE					=  0
+	};
 
 // ---------------------------------------------------
 
@@ -43,30 +39,36 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ErrorCode instance.
-		ETForceInlineHint ErrorCode( ::Eldritch2::int32 bitfield = ::Eldritch2::Errors::NONE );
-		// Constructs this ErrorCode instance.
-		ETForceInlineHint ErrorCode( const ::Eldritch2::ErrorCode& src );
+		//!	Constructs this @ref ErrorCode instance.
+		ETForceInlineHint ErrorCode( const ::Eldritch2::Error bitfield = ::Eldritch2::Error::NONE );
+		//!	Constructs this @ref ErrorCode instance.
+		ETForceInlineHint ErrorCode( const ::Eldritch2::ErrorCode& source ) = default;
 
-		// Destroys this ErrorCode instance.
-		ETForceInlineHint ~ErrorCode();
+		//!	Destroys this @ref ErrorCode instance.
+		ETForceInlineHint ~ErrorCode() = default;
 
 	// - ERROR DETECTION ---------------------------------
 		
-		// Examines this ErrorCode to determine if it indicates a failure condition.
+		//!	Examines this @ref ErrorCode to determine if it indicates a failure condition.
 		ETForceInlineHint	operator bool() const;
 
 	// - ASSIGNMENT --------------------------------------
 
-		ETForceInlineHint const ::Eldritch2::ErrorCode&	operator=( const ::Eldritch2::ErrorCode& src );
+		//!	Copies an @ref ErrorCode.
+		/*!	@param[in] source The @ref ErrorCode to copy.
+			@returns A reference to *this for operator chaining.
+			*/
+		ETForceInlineHint ::Eldritch2::ErrorCode&	operator=( const ::Eldritch2::ErrorCode& source ) = default;
 
 	// - DEBUG/LOGGING INFORMATION -----------------------
 
-		// Returns 
-		ETForceInlineHint ::Eldritch2::int32	ToInt() const;
-
-		// Retrieves a human-readable string describing this ErrorCode instance.
-		const ::Eldritch2::UTF8Char*			ToUTF8String() const;
+		//!	Gets a human-readable string describing the result condition this @ref ErrorCode instance represents.
+		/*!	@returns A null-terminated string of static storage duration containing the error description.
+			*/
+		const ::Eldritch2::UTF8Char*	ToUTF8String() const;
+		
+		//!	Returns a POSIX-compliant integer description of the error state.
+		ETForceInlineHint int			ToInt() const;
 
 	// - DATA MEMBERS ------------------------------------
 		

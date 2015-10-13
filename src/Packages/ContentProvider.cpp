@@ -33,7 +33,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ErrorCode ContentProvider::RegisterConfigurableVariables( ConfigurationDatabase& ) {
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 }	// namespace Foundation

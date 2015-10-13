@@ -13,7 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/RandomNumberGenerator.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
+//------------------------------------------------------------------//
 #include <dSFMT/dSFMT.c>
 //------------------------------------------------------------------//
 

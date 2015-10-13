@@ -43,10 +43,10 @@ namespace Physics {
 
 	ErrorCode BulletCollisionShapeView::DeserializeFromPackageExport( Allocator& allocator, const Initializer& initializer, BulletEngine& /*physicsEngine*/ ) {
 		if( auto* const view = new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) BulletCollisionShapeView( initializer, allocator ) ) {
-			return Errors::NONE;
+			return Error::NONE;
 		}
 
-		return Errors::OUT_OF_MEMORY;
+		return Error::OUT_OF_MEMORY;
 	}
 
 // ---------------------------------------------------
@@ -83,7 +83,7 @@ namespace Physics {
 		visitor.PublishFactory( this, sizeof(BulletWorldView) + (alignof(BulletWorldView) - 1u), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
 			// Important to use aligned allocation. Visual Studio uses a movaps instruction for the compiler-generated btVector3::operator=() method, and it's quite common for
 			// one of the vectors to end up on an unaligned boundary.
-			return new(allocator, alignof(BulletWorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) BulletWorldView( world, *static_cast<BulletEngine*>(parameter) ) ? Errors::NONE : Errors::OUT_OF_MEMORY;
+			return new(allocator, alignof(BulletWorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) BulletWorldView( world, *static_cast<BulletEngine*>(parameter) ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 

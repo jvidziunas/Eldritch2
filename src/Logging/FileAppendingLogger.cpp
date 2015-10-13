@@ -28,7 +28,7 @@ namespace {
 	class NullAppender : public SynchronousFileAppender {
 	public:
 		ErrorCode Append( const void* const /*sourceData*/, const size_t /*lengthToWriteInBytes*/ ) {
-			return Errors::NONE;
+			return Error::NONE;
 		}
 	};
 

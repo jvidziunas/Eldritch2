@@ -12,8 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Containers/Range.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
 #include <Utility/Algorithms.hpp>
 //------------------------------------------------------------------//
 

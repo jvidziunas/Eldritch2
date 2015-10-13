@@ -134,16 +134,16 @@ namespace Renderer {
 		};
 
 		if( FAILED( _factory->CreateSwapChain( device, &desc, &tempChain ) ) ) {
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 		_swapChain.Acquire( tempChain );
 
 		if( FAILED( _factory->MakeWindowAssociation( _windowHandle, _associationFlags ) ) ) {
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

@@ -14,8 +14,8 @@
 //==================================================================//
 #include <BakinatorCookerStrategy.hpp>
 #include <Packages/PackageHeader.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/FourCCGenerator.hpp>
 #include <Utility/FileReadAccessStrategyIterator.hpp>
 #include <Utility/FileWriteAccessStrategy.hpp>
@@ -202,17 +202,17 @@ namespace Eldritch2
 
 				headerFactory.DestroyPackageHeader( *packageHeader, GetFileDataAllocator() );
 
-				return Errors::NONE;
+				return Error::NONE;
 			}
 
-			return Errors::OUT_OF_MEMORY;
+			return Error::OUT_OF_MEMORY;
 		}
 
 	// ---------------------------------------------------
 
 		ErrorCode BakinatorCookerStrategy::EndCook( FileWriteAccessStrategy& fileAccessor )
 		{
-			return Errors::NONE;
+			return Error::NONE;
 		}
 
 	// ---------------------------------------------------

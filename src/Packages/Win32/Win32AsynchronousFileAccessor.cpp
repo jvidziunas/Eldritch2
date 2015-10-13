@@ -17,7 +17,7 @@
 //==================================================================//
 #include <Utility/AsynchronousFileReader.hpp>
 #include <Utility/AsynchronousFileWriter.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
@@ -109,7 +109,7 @@ namespace {
 										destinationBuffer,
 										static_cast<::DWORD>( lengthToReadInBytes ),
 										nullptr,
-										&_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Errors::UNSPECIFIED : Errors::NONE;
+										&_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Error::UNSPECIFIED : Error::NONE;
 		}
 
 	// ---------------------------------------------------
@@ -152,7 +152,7 @@ namespace {
 										 sourceBuffer,
 										 static_cast<::DWORD>(lengthToWriteInBytes),
 										 nullptr,
-										 &_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Errors::UNSPECIFIED : Errors::NONE;
+										 &_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Error::UNSPECIFIED : Error::NONE;
 		}
 
 	// ---------------------------------------------------
@@ -179,7 +179,7 @@ namespace {
 			::DWORD			readBytes( 0u );
 			const ::BOOL	overlappedResult( ::GetOverlappedResult( _fileHandle, &_overlapped, &readBytes, BLOCK_UNTIL_COMPLETE ) );
 
-			return AsynchronousFileReader::BlockingResult( ( ( FALSE == overlappedResult ) | IsFatalErrorCondition( ::GetLastError() ) ) ? Errors::UNSPECIFIED : Errors::NONE,
+			return AsynchronousFileReader::BlockingResult( ( ( FALSE == overlappedResult ) | IsFatalErrorCondition( ::GetLastError() ) ) ? Error::UNSPECIFIED : Error::NONE,
 														   _additionalReadBytes + readBytes );
 		}
 
@@ -189,7 +189,7 @@ namespace {
 			::DWORD			writtenBytes( 0u );
 			const ::BOOL	overlappedResult( ::GetOverlappedResult( _fileHandle, &_overlapped, &writtenBytes, BLOCK_UNTIL_COMPLETE ) );
 
-			return AsynchronousFileWriter::BlockingResult( ( ( FALSE == overlappedResult ) | IsFatalErrorCondition( ::GetLastError() ) ) ? Errors::UNSPECIFIED : Errors::NONE,
+			return AsynchronousFileWriter::BlockingResult( ( ( FALSE == overlappedResult ) | IsFatalErrorCondition( ::GetLastError() ) ) ? Error::UNSPECIFIED : Error::NONE,
 														   _additionalWrittenBytes + writtenBytes );
 		}
 

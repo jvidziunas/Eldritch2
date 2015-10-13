@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/MPL/FloatTypes.hpp>
+#include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {

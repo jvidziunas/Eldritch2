@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Renderer/D3D11/Builders/D3D11RenderTargetViewBuilder.hpp>
 #include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 
@@ -196,7 +196,7 @@ namespace Renderer {
 			_view->SetPrivateData( ::WKPDID_D3DDebugObjectName, static_cast<::UINT>( StringLength( _debugName ) ), _debugName );
 		}
 
-		return SUCCEEDED( nativeResult ) ? Errors::NONE : Errors::UNSPECIFIED;
+		return SUCCEEDED( nativeResult ) ? Error::NONE : Error::UNSPECIFIED;
 	}
 
 // ---------------------------------------------------

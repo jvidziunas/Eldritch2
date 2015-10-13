@@ -1,5 +1,5 @@
 /*==================================================================*\
-  MemStdLib.hpp
+  StandardLibrary.hpp
   ------------------------------------------------------------------
   Purpose:
   Utility functions that serve as replacements for standard C bulk
@@ -84,17 +84,17 @@ namespace Eldritch2 {
 		*/
 	ETForceInlineHint ETNoAliasHint void*		CopyMemoryNonTemporal( void* ETRestrictPtrHint destinationBuffer, const void* ETRestrictPtrHint sourceBuffer, const size_t lengthInBytes );
 
-	// Utility wrapper around CopyMemory that handles casting and automatically adjusts for element size.
+	//!	Utility wrapper around @ref CopyMemory() that handles casting and automatically adjusts for element size.
 	template <typename T>
 	ETForceInlineHint ETNoAliasHint T*			CopyArray( T* ETRestrictPtrHint destinationArray, const T* ETRestrictPtrHint sourceArray, const size_t arraySizeInElements );
-	// Utility wrapper around CopyMemory that handles casting and automatically adjusts for element size.
+	//!	Utility wrapper around @ref CopyMemory() that handles casting and automatically adjusts for element size.
 	template <typename T, size_t arraySizeInElements>
 	ETForceInlineHint ETNoAliasHint auto		CopyArray( T(&destinationArray)[arraySizeInElements], const T(&sourceArray)[arraySizeInElements] ) -> decltype(destinationArray);
 
-	// Utility wrapper around CopyMemoryNonTemporal that handles casting and automatically adjusts for element size.
+	//!	Utility wrapper around @ref CopyMemoryNonTemporal that handles casting and automatically adjusts for element size.
 	template <typename T>
 	ETForceInlineHint ETNoAliasHint T*			CopyArrayNonTemporal( T* ETRestrictPtrHint destinationArray, const T* ETRestrictPtrHint sourceArray, const size_t arraySizeInElements );
-	// Utility wrapper around CopyMemoryNonTemporal that handles casting and automatically adjusts for element size.
+	//!	Utility wrapper around @ref CopyMemoryNonTemporal that handles casting and automatically adjusts for element size.
 	template <typename T, size_t arraySizeInElements>
 	ETForceInlineHint ETNoAliasHint auto		CopyArrayNonTemporal( T(&destinationArray)[arraySizeInElements], const T(&sourceArray)[arraySizeInElements] ) -> decltype(destinationArray);
 
@@ -111,18 +111,14 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	// Sets the value of length bytes in the array specified by destination to the bit pattern denoted in bitPattern.
+	//!	Sets the value of length bytes in the array specified by destination to the bit pattern denoted in bitPattern.
 	ETForceInlineHint ETNoAliasHint void*	SetMemory( void* destinationBuffer, const int bitPattern, const size_t lengthInBytes );
 
-	// Zeroes out the entirety of numElements instances of type T. Note that this is generally
-	// not safe to call on non-POD object types as it can corrupt vtable pointers for
-	// inheritance hierarchies.
+	//!	Zeroes out the entirety of numElements instances of type T.
 	template <typename T>
 	ETForceInlineHint ETNoAliasHint T*		ZeroMemory( T* destinationArray, size_t arraySizeInElements );
 
-	// Zeroes out the entirety of numElements instances of type T. Note that this is generally
-	// not safe to call on non-POD object types as it can corrupt vtable pointers for
-	// inheritance hierarchies.
+	//!	Zeroes out the entirety of numElements instances of type T.
 	template <typename T, size_t arraySizeInElements>
 	ETForceInlineHint ETNoAliasHint auto	ZeroMemory( T(&destinationArray)[arraySizeInElements] ) -> decltype(destinationArray);
 
@@ -377,11 +373,11 @@ namespace Eldritch2 {
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
 #if( ET_PLATFORM_WINDOWS )
-#	include <Utility/Memory/MemStdLib.Win.inl>
+#	include <Utility/Memory/StandardLibrary.Win.inl>
 #elif( ET_PLATFORM_MAC )
-#	include <Utility/Memory/MemStdLib.Mac.inl>
+#	include <Utility/Memory/StandardLibrary.Mac.inl>
 #elif( ET_PLATFORM_LINUX )
-#	include <Utility/Memory/MemStdLib.Linux.inl>
+#	include <Utility/Memory/StandardLibrary.Linux.inl>
 #endif
 //------------------------------------------------------------------//
 

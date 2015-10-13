@@ -12,9 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Renderer/Textures/Texture.hpp>
 #include <Renderer/Textures/TextureUtilities.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
+#include <Renderer/Textures/Texture.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Renderer;
@@ -24,7 +24,7 @@ using namespace ::std;
 
 namespace {
 
-	ENUM_CLASS( uint32 ) {
+	enum : uint32 {
 		NUM_CUBEMAP_FACES = 6u
 	};
 

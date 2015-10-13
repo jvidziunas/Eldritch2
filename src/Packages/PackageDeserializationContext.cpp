@@ -58,20 +58,22 @@ namespace FileSystem {
 	// ---
 
 		MessagePackReader::ArrayHeader	header;
-		ErrorCode						result( Errors::NONE );
+		ErrorCode						result( Error::NONE );
 		auto&							package( GetBoundPackage() );
 
 		if( _reader( header ) ) {
 			// Keep assembling import records from the data stream.
-			for( MessagePackReader::InPlaceString dependencyName; 0u != header.arraySizeInElements; --header.arraySizeInElements ) {
-				result = _reader( dependencyName ) ? package.AddDependency( dependencyName.first ) : Errors::INVALID_PARAMETER;
+			for( MessagePackReader::String dependencyName; 0u != header.arraySizeInElements; --header.arraySizeInElements ) {
+				const UTF8String<FixedStackAllocator<64u>>	terminatedName( dependencyName.first, dependencyName.Size(), UTF8L("Dependency Name Temporary Allocator") );
+
+				result = _reader( dependencyName ) ? package.AddDependency( terminatedName.GetCharacterArray() ) : Error::INVALID_PARAMETER;
 
 				if( !result ) {
 					break;
 				}
 			}
 		} else {
-			result = Errors::INVALID_PARAMETER;
+			result = Error::INVALID_PARAMETER;
 		}
 
 		// Publish load failure in the event something went wrong.
@@ -85,7 +87,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ErrorCode PackageDeserializationContext::DeserializeContent() {
-		struct SerializedExportRecord {
+		struct ExportRecord {
 			ETInlineHint operator ResourceView::Initializer() const {
 				return { name, typeName, serializedAsset };
 			}
@@ -96,9 +98,9 @@ namespace FileSystem {
 
 		// - DATA MEMBERS ------------------------------------
 
-			MessagePackReader::InPlaceString	name;
-			MessagePackReader::TypeString		typeName;
-			MessagePackReader::InPlaceBulkData	serializedAsset;
+			MessagePackReader::String		name;
+			MessagePackReader::String		typeName;
+			MessagePackReader::BinaryData	serializedAsset;
 		};
 
 		using ResidencyState = ContentPackage::ResidencyState;
@@ -106,20 +108,20 @@ namespace FileSystem {
 	// ---
 
 		MessagePackReader::ArrayHeader	header;
-		ErrorCode						result( Errors::NONE );
+		ErrorCode						result( Error::NONE );
 		auto&							package( GetBoundPackage() );
 
 		if( _reader( header ) ) {
 			// Keep assembling import records from the data stream
-			for( SerializedExportRecord exportRecord; 0u != header.arraySizeInElements; --header.arraySizeInElements ) {
-				result = _reader( exportRecord ) ? package.AddContent( exportRecord ) : Errors::INVALID_PARAMETER;
+			for( ExportRecord exportRecord; 0u != header.arraySizeInElements; --header.arraySizeInElements ) {
+				result = _reader( exportRecord ) ? package.AddContent( exportRecord ) : Error::INVALID_PARAMETER;
 
 				if( !result ) {
 					break;
 				}
 			}
 		} else {
-			result = Errors::INVALID_PARAMETER;
+			result = Error::INVALID_PARAMETER;
 		}
 
 		// Broadcast the new residency state (either published or failed) depending on whether or not the load was successful.

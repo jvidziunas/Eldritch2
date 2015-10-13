@@ -13,7 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Win32ApplicationHelpers.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+//------------------------------------------------------------------//
 #include <wchar.h>
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN

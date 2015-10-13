@@ -23,7 +23,7 @@ namespace Eldritch2
 
 	namespace FileSystem
 	{
-		FileReadAccessStrategy::BlockingResult::BlockingResult() : result( Errors::NONE ),
+		FileReadAccessStrategy::BlockingResult::BlockingResult() : result( Error::NONE ),
 																   readAmountInBytes( 0u )
 		{
 		}

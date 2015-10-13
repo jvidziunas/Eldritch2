@@ -13,8 +13,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/FourCCGenerator.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+//------------------------------------------------------------------//
 #include <algorithm>
 #include <cctype>
 //------------------------------------------------------------------//

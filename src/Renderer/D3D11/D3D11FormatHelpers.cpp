@@ -13,12 +13,13 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/D3D11FormatHelpers.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
+//------------------------------------------------------------------//
 #include <DXGIFormat.h>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
 using namespace ::Eldritch2::Renderer;
+using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Renderer {

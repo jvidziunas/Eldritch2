@@ -72,11 +72,17 @@ namespace Scripting {
 
 		void						CreateScriptAPI();
 
-	// - DATA MEMBERS ------------------------------------
+	// ---------------------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator	_allocator;
-		::asIScriptEngine*			_scriptEngine;
+		struct EngineDeleter {
+			void	operator()( ::asIScriptEngine* const scriptEngine );
+		};
+
+	// - DATA MEMBERS ------------------------------------
+
+		::Eldritch2::ChildAllocator							_allocator;
+		::std::unique_ptr<::asIScriptEngine, EngineDeleter>	_scriptEngine;
 	};
 
 }	// namespace Scripting

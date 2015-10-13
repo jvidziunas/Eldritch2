@@ -141,7 +141,7 @@ namespace Sound {
 			FormatAndLogError( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
 		}
 
-		return audio ? Errors::NONE : Errors::UNSPECIFIED;
+		return audio ? Error::NONE : Error::UNSPECIFIED;
 	}
 
 // ---------------------------------------------------

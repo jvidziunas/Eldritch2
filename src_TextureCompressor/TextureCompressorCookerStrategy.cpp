@@ -17,8 +17,8 @@
 #include <Renderer/Textures/Texture.hpp>
 #include <Tools/FileWriteStrategyFactory.hpp>
 #include <Tools/FileReadStrategyFactory.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/FileWriteAccessStrategy.hpp>
 #include <Utility/FileReadAccessStrategy.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -699,7 +699,7 @@ namespace Eldritch2
 								  compressionOptions,
 								  outputOptions );
 
-			return Errors::NONE;
+			return Error::NONE;
 		}
 
 	// ---------------------------------------------------
@@ -746,7 +746,7 @@ namespace Eldritch2
 								  compressionOptions,
 								  outputOptions );
 
-			return Errors::NONE;
+			return Error::NONE;
 		}
 
 	}	// namespace Tools

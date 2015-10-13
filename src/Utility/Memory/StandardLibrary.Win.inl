@@ -1,5 +1,5 @@
 /*==================================================================*\
-  MemStdLib.Win.inl
+  StandardLibrary.Win.inl
   ------------------------------------------------------------------
   Purpose:
   Utility functions that serve as replacements for standard C bulk
@@ -14,11 +14,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Math/MathUtils.hpp>
 #include <cstdarg>
 #include <cstring>
 #include <cstdio>
-#include <wchar.h>
+#include <cwchar>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -84,6 +83,9 @@ namespace Eldritch2 {
 	template <typename T>
 	ETForceInlineHint ETNoAliasHint T* ZeroMemory( T* destination, const size_t arraySizeInElements ) {
 		static_assert( ::std::is_trivially_copyable<T>::value, "Zeroing polymorphic types destroys virtual function tables and is disabled." );
+
+	// ---
+
 		return static_cast<T*>(::Eldritch2::SetMemory( destination, 0, arraySizeInElements * sizeof(T) ));
 	}
 

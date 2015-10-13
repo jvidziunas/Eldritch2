@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <algorithm>

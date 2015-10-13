@@ -104,7 +104,7 @@
     <ClCompile Include="..\src\Tools\ContentCooker.cpp" />
     <ClCompile Include="..\src\Tools\ContentCookerStrategy.cpp" />
     <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\System\SystemInterface.cpp" />
     <ClCompile Include="..\src_texturecompressor\TextureCompressorCookerStrategy.cpp" />
     <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
@@ -127,7 +127,7 @@
     <ClInclude Include="..\src\Tools\ContentCooker.hpp" />
     <ClInclude Include="..\src\Tools\ContentCookerStrategy.hpp" />
     <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\MemStdLib.hpp" />
+    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\System\SystemInterface.hpp" />
     <ClInclude Include="..\src_texturecompressor\TextureCompressorCookerStrategy.hpp" />
     <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp" />

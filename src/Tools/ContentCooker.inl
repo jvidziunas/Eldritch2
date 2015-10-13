@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <malloc.h>
 //------------------------------------------------------------------//

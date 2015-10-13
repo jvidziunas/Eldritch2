@@ -13,8 +13,9 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/Win32DiskSectorAllocator.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
+//------------------------------------------------------------------//
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN
 #endif

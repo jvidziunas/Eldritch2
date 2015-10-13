@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Win32FileReadAccessStrategy.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 
@@ -41,12 +41,12 @@ namespace FileSystem {
 
 	ErrorCode Win32FileReadAccessStrategy::BeginRead( void* destinationBuffer, size_t lengthToReadInBytes ) {
 		if( TRUE == ::ReadFile( _fileHandle, destinationBuffer, static_cast<::DWORD>(lengthToReadInBytes), nullptr, &_overlapped ) ) {
-			return Errors::NONE;
+			return Error::NONE;
 		}
 
 		const ::DWORD	lastError( ::GetLastError() );
 
-		return ( ( ERROR_IO_PENDING == lastError ) | ( ERROR_HANDLE_EOF == lastError ) ) ? Errors::NONE : Errors::UNSPECIFIED;
+		return ( ( ERROR_IO_PENDING == lastError ) | ( ERROR_HANDLE_EOF == lastError ) ) ? Error::NONE : Error::UNSPECIFIED;
 	}
 
 // ---------------------------------------------------
@@ -77,7 +77,7 @@ namespace FileSystem {
 
 		fileOffsetHelper.QuadPart += readBytes;
 
-		result.result				= funcResult ? Errors::NONE : Errors::UNSPECIFIED;
+		result.result				= funcResult ? Error::NONE : Error::UNSPECIFIED;
 		result.readAmountInBytes	= readBytes;
 
 		return result;

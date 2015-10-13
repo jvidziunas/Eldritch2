@@ -18,8 +18,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/Memory/Allocator.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
 #include <Utility/Assert.hpp>
 #include <Logging/Logger.hpp>
 //------------------------------------------------------------------//

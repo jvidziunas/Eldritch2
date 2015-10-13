@@ -15,7 +15,7 @@
 #include <Tools/Win32FileStrategyFactory.hpp>
 #include <Utility/Win32FileWriteAccessStrategy.hpp>
 #include <Utility/Win32FileReadAccessStrategy.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/ResultPair.hpp>
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN
@@ -65,7 +65,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	ResultPair<FileReadAccessStrategy> Win32FileStrategyFactory::GetAccessor( Allocator& allocator, const char* filePath, FileReadAccessorBehaviors behaviors ) {
-		ResultPair<FileReadAccessStrategy>	result = { nullptr, Errors::UNSPECIFIED };
+		ResultPair<FileReadAccessStrategy>	result = { nullptr, Error::UNSPECIFIED };
 		const ::HANDLE						fileHandle( ::CreateFileA( filePath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, Win32FileAttributesFromAccessorBehaviors( behaviors ), nullptr ) );
 
 		if( ETBranchLikelyHint( INVALID_HANDLE_VALUE != fileHandle ) ) {
@@ -78,14 +78,14 @@ namespace Tools {
 // ---------------------------------------------------
 
 	ResultPair<FileReadAccessStrategy> Win32FileStrategyFactory::GetAccessor( Allocator& allocator, const wchar_t* filePath, FileReadAccessorBehaviors behaviors ) {
-		ResultPair<FileReadAccessStrategy>	result = { nullptr, Errors::UNSPECIFIED };
+		ResultPair<FileReadAccessStrategy>	result = { nullptr, Error::UNSPECIFIED };
 		const ::HANDLE						fileHandle( ::CreateFileW( filePath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, Win32FileAttributesFromAccessorBehaviors( behaviors ), nullptr ) );
 
 		if( ETBranchLikelyHint( INVALID_HANDLE_VALUE != fileHandle ) ) {
 			result.object = new(allocator) Win32FileReadAccessStrategy( fileHandle, GetSectorSizeFromHandle( fileHandle ) );
 
 			if( result.object ) {
-				result.resultCode = Errors::NONE;
+				result.resultCode = Error::NONE;
 			}
 		}	
 
@@ -95,14 +95,14 @@ namespace Tools {
 // ---------------------------------------------------
 
 	ResultPair<FileWriteAccessStrategy> Win32FileStrategyFactory::GetAccessor( Allocator& allocator, const char* filePath, FileWriteAccessorBehaviors behaviors ) {
-		ResultPair<FileWriteAccessStrategy>	result = { nullptr, Errors::UNSPECIFIED };
+		ResultPair<FileWriteAccessStrategy>	result = { nullptr, Error::UNSPECIFIED };
 		const ::HANDLE						fileHandle( ::CreateFileA( filePath, GENERIC_WRITE, FILE_SHARE_NONE, nullptr, OPEN_ALWAYS, Win32FileAttributesFromAccessorBehaviors( behaviors ), nullptr ) );
 
 		if( ETBranchLikelyHint( INVALID_HANDLE_VALUE != fileHandle ) ) {
 			result.object = new(allocator) Win32FileWriteAccessStrategy( fileHandle, GetSectorSizeFromHandle( fileHandle ) );
 
 			if( result.object ) {
-				result.resultCode = Errors::NONE;
+				result.resultCode = Error::NONE;
 			}
 		}
 
@@ -112,14 +112,14 @@ namespace Tools {
 // ---------------------------------------------------
 
 	ResultPair<FileWriteAccessStrategy> Win32FileStrategyFactory::GetAccessor( Allocator& allocator, const wchar_t* filePath, FileWriteAccessorBehaviors behaviors ) {
-		ResultPair<FileWriteAccessStrategy>	result = { nullptr, Errors::UNSPECIFIED };
+		ResultPair<FileWriteAccessStrategy>	result = { nullptr, Error::UNSPECIFIED };
 		const ::HANDLE						fileHandle( ::CreateFileW( filePath, GENERIC_WRITE, FILE_SHARE_NONE, nullptr, OPEN_ALWAYS, Win32FileAttributesFromAccessorBehaviors( behaviors ), nullptr ) );
 
 		if( ETBranchLikelyHint( INVALID_HANDLE_VALUE != fileHandle ) ) {
 			result.object = new(allocator) Win32FileWriteAccessStrategy( fileHandle, GetSectorSizeFromHandle( fileHandle ) );
 
 			if( result.object ) {
-				result.resultCode = Errors::NONE;
+				result.resultCode = Error::NONE;
 			}
 		}
 

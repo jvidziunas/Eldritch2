@@ -41,7 +41,7 @@ namespace Foundation {
 																					   _package( ::std::move( package ) ),
 																					   _isPaused( 1u ),
 																					   _isLoaded( 0u ),
-																					   _lastError( Errors::NONE ) {
+																					   _lastError( Error::NONE ) {
 		using LogMessageType = GameEngine::LogMessageType;
 
 	// ---

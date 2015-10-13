@@ -20,12 +20,12 @@ namespace Eldritch2 {
 namespace Utility {
 
 	template <typename Container, typename ElementProvider>
-	MessagePackReader::ArrayProxy<Container, ElementProvider>::ArrayProxy( Container& container, ElementProvider elementProvider ) : MessagePackBase::ArrayHeader(), _container( container ), _elementProvider( elementProvider ) {}
+	MessagePackReader::ArrayAdapter<Container, ElementProvider>::ArrayAdapter( Container& container, ElementProvider elementProvider ) : MessagePackBase::ArrayHeader(), _container( container ), _elementProvider( elementProvider ) {}
 
 // ---------------------------------------------------
 
 	template <typename Container, typename ElementProvider>
-	bool MessagePackReader::ArrayProxy<Container, ElementProvider>::Serialize( MessagePackReader& reader ) {
+	bool MessagePackReader::ArrayAdapter<Container, ElementProvider>::Serialize( MessagePackReader& reader ) {
 		if( !ArrayHeader::Serialize( reader ) ) {
 			return false;
 		}
@@ -46,19 +46,19 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename Container, typename ElementProvider, typename KeyExtractor, typename ValueExtractor>
-	MessagePackReader::MapProxy<Container, ElementProvider, KeyExtractor, ValueExtractor>::MapProxy( Container&			container,
-																									 ElementProvider	elementProvider,
-																									 KeyExtractor		keyExtractor,
-																									 ValueExtractor		valueExtractor ) : MessagePackBase::MapHeader(),
-																																		   _container( container ),
-																																		   _elementProvider( elementProvider ),
-																																		   _keyExtractor( keyExtractor ),
-																																		   _valueExtractor( valueExtractor ) {}
+	MessagePackReader::MapAdapter<Container, ElementProvider, KeyExtractor, ValueExtractor>::MapAdapter( Container&			container,
+																										 ElementProvider	elementProvider,
+																										 KeyExtractor		keyExtractor,
+																										 ValueExtractor		valueExtractor ) : MessagePackBase::MapHeader(),
+																																			   _container( container ),
+																																			   _elementProvider( elementProvider ),
+																																			   _keyExtractor( keyExtractor ),
+																																			   _valueExtractor( valueExtractor ) {}
 
 // ---------------------------------------------------
 
 	template <typename Container, typename KeyExtractor, typename ValueExtractor, typename ElementProvider>
-	bool MessagePackReader::MapProxy<Container, KeyExtractor, ValueExtractor, ElementProvider>::Serialize( MessagePackReader& reader ) {
+	bool MessagePackReader::MapAdapter<Container, KeyExtractor, ValueExtractor, ElementProvider>::Serialize( MessagePackReader& reader ) {
 		if( !MapHeader::Serialize( reader ) ) {
 			return false;
 		}
@@ -79,14 +79,14 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename Container, typename ElementProvider, typename KeyExtractor, typename ValueExtractor>
-	MessagePackReader::MapProxy<Container, ElementProvider, KeyExtractor, ValueExtractor>&& MessagePackReader::AdaptMap( Container& container, ElementProvider&& elementProvider, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor ) {
+	MessagePackReader::MapAdapter<Container, ElementProvider, KeyExtractor, ValueExtractor>&& MessagePackReader::AdaptMap( Container& container, ElementProvider&& elementProvider, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor ) {
 		return { container, ::std::forward<ElementProvider>( elementProvider ), ::std::forward<KeyExtractor>( keyExtractor ), ::std::forward<ValueExtractor>( valueExtractor ) };
 	}
 
 // ---------------------------------------------------
 
 	template <typename Container, typename ElementProvider>
-	MessagePackReader::ArrayProxy<Container, ElementProvider>&& MessagePackReader::AdaptArray( Container& container, ElementProvider&& elementProvider ) {
+	MessagePackReader::ArrayAdapter<Container, ElementProvider>&& MessagePackReader::AdaptArray( Container& container, ElementProvider&& elementProvider ) {
 		return { container, ::std::forward<ElementProvider>( elementProvider ) };
 	}
 

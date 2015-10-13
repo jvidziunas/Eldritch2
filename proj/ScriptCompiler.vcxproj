@@ -108,7 +108,7 @@
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
     <ClCompile Include="..\src\Tools\ContentCooker.cpp" />
     <ClCompile Include="..\src\Tools\ContentCookerStrategy.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp" />
     <ClCompile Include="..\src\Utility\Memory\OperatorNewOverride.cpp" />
     <ClCompile Include="..\src_scriptcompiler\ScriptCompilerCookerStrategy.cpp" />
@@ -136,7 +136,7 @@
     <ClInclude Include="..\src\Tools\ContentCooker.hpp" />
     <ClInclude Include="..\src\Tools\ContentCookerStrategy.hpp" />
     <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\MemStdLib.hpp" />
+    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp" />
     <ClInclude Include="..\src_scriptcompiler\ScriptCompilerCookerStrategy.hpp" />
     <ClInclude Include="..\src\System\SystemInterface.hpp" />

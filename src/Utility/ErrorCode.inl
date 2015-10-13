@@ -8,7 +8,7 @@
   standard C++ exception model.
 
   ------------------------------------------------------------------
-  ©2010-2012 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -20,32 +20,17 @@
 
 namespace Eldritch2 {
 
-	ETForceInlineHint ErrorCode::ErrorCode( ::Eldritch2::int32 bitfield ) : _value( bitfield ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ErrorCode::ErrorCode( const ::Eldritch2::ErrorCode& src ) : _value( src._value ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ErrorCode::~ErrorCode() {}
+	ETForceInlineHint ErrorCode::ErrorCode( const ::Eldritch2::Error bitfield ) : _value( static_cast<::Eldritch2::int32>(bitfield) ) {}
 
 // ---------------------------------------------------
 
 	ETForceInlineHint ErrorCode::operator bool() const {
-		return( Errors::NONE <= _value );
+		return( static_cast<::Eldritch2::int32>(::Eldritch2::Error::NONE) <= _value );
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint const ::Eldritch2::ErrorCode& ErrorCode::operator=( const ::Eldritch2::ErrorCode& src ) {
-		_value = src._value;
-		return( *this );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ::Eldritch2::int32 ErrorCode::ToInt() const {
+	ETForceInlineHint int ErrorCode::ToInt() const {
 		return _value;
 	}
 

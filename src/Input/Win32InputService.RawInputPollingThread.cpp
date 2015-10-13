@@ -112,7 +112,7 @@ namespace Input {
 
 		_threadID = 0u;
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

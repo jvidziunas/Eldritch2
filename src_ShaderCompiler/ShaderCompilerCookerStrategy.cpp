@@ -15,8 +15,8 @@
 #include <ShaderCompilerCookerStrategy.hpp>
 #include <Eldritch2ShaderCompilerInclude.hpp>
 #include <Tools/FileReadStrategyFactory.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/FileWriteAccessStrategy.hpp>
 #include <Utility/FileReadAccessStrategy.hpp>
 #include <Utility/COMPointer.hpp>
@@ -328,7 +328,7 @@ namespace Eldritch2
 				}
 			}
 
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 	// ---------------------------------------------------

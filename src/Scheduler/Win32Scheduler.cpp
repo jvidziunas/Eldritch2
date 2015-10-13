@@ -15,12 +15,13 @@
 //==================================================================//
 #include <Utility/Concurrency/WaitableUserEvent.hpp>
 #include <Utility/Concurrency/UserSemaphore.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <System/Win32SystemInterface.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Scheduler/Win32Scheduler.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
 #include <Utility/ResultPair.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
@@ -51,7 +52,8 @@ namespace {
 /*	 MSVC warns about the SEH code used here to name a thread in the debugger.
 	This is safe and is taken from official documentation, so disable the warnings here.
 	*/
-#	pragma warning( disable : 6312, 6322 )
+#	pragma warning( disable : 6312 )
+#	pragma warning( disable : 6322 )
 #endif
 
 	static unsigned int ETStdCall ThreadEntryPoint( void* thread ) {
@@ -122,11 +124,11 @@ namespace Scheduler {
 // ---------------------------------------------------
 
 	ErrorCode Win32Scheduler::Bootstrap( Task& initialTask, size_t totalWorkerCount ) {
-		ErrorCode	result( Errors::NONE );
+		ErrorCode	result( Error::NONE );
 
 		// Make sure we aren't trying to re-bootstrap after the initial launch.
 		if( _workerThreads ) {
-			return Errors::INVALID_OBJECT_STATE;
+			return Error::INVALID_OBJECT_STATE;
 		}
 
 		totalWorkerCount = Max<size_t>( totalWorkerCount, 1u );
@@ -156,7 +158,7 @@ namespace Scheduler {
 				result	= ConvertCallerToThread( *_workerThreads.first );
 			}
 		} else {
-			result = Errors::OUT_OF_MEMORY;
+			result = Error::OUT_OF_MEMORY;
 		}
 
 		return result;
@@ -280,7 +282,7 @@ namespace Scheduler {
 
 		auto* const	mutex( new(allocator, _systemCacheLineSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) UserMutex() );
 
-		return { mutex, mutex ? Errors::NONE : Errors::OUT_OF_MEMORY };
+		return { mutex, mutex ? Error::NONE : Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
@@ -326,10 +328,10 @@ namespace Scheduler {
 				::CloseHandle( eventHandle );
 			}
 
-			return { event, event ? Errors::NONE : Errors::OUT_OF_MEMORY };
+			return { event, event ? Error::NONE : Error::OUT_OF_MEMORY };
 		}
 
-		return { nullptr, Errors::UNSPECIFIED };
+		return { nullptr, Error::UNSPECIFIED };
 	}
 
 // ---------------------------------------------------
@@ -372,13 +374,13 @@ namespace Scheduler {
 			auto* const	semaphore( new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) );
 
 			if( semaphore ) {
-				return { semaphore, Errors::NONE };
+				return { semaphore, Error::NONE };
 			} else {
 				::CloseHandle( semaphoreHandle );
 			}
 		}
 
-		return { nullptr, Errors::UNSPECIFIED };
+		return { nullptr, Error::UNSPECIFIED };
 	}
 
 // ---------------------------------------------------
@@ -391,14 +393,14 @@ namespace Scheduler {
 				this->Backoff( backoffContext );
 			}
 
-			return Errors::NONE;
+			return Error::NONE;
 		}
 
 		// We received an invalid handle, let's try to figure out why
 		switch( errno ) {
-			case EINVAL:	{ return Errors::INVALID_PARAMETER; break; }	// case EINVAL
-			case EACCES:	{ return Errors::OUT_OF_MEMORY; break; }	// case EACCES
-			default:		{ return Errors::UNSPECIFIED; break; }	// default case
+			case EINVAL:	{ return Error::INVALID_PARAMETER; break; }	// case EINVAL
+			case EACCES:	{ return Error::OUT_OF_MEMORY; break; }	// case EACCES
+			default:		{ return Error::UNSPECIFIED; break; }	// default case
 		}	// switch( errno )
 	}
 
@@ -435,7 +437,7 @@ namespace Scheduler {
 	ErrorCode Win32Scheduler::ConvertCallerToThread( Thread& thread ) {
 		ThreadEntryPoint( &thread );
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 }	// namespace Scheduler

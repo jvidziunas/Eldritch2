@@ -45,9 +45,6 @@
     <ClCompile Include="..\src\Utility\ErrorCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -108,6 +105,9 @@
     <ClCompile Include="..\src\Utility\GBSON\GBSONCommon.cpp">
       <Filter>Source Files\GBSON</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Utility\Memory\Allocator.hpp">
@@ -120,9 +120,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ErrorCode.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\MemStdLib.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp">
@@ -178,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\GBSON\GBSONCommon.hpp">
       <Filter>Header Files\GBSON</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

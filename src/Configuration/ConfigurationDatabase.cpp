@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Configuration/ConfigurationDatabase.hpp>
 #include <Configuration/ConfigurableVariable.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;

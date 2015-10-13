@@ -1,11 +1,11 @@
 /*==================================================================*\
-  MathUtils.inl
+  StandardLibrary.inl
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -420,14 +420,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename T>
-	ETNoAliasHint ETNoThrowHint ETInlineHint T Min( const T& lValue, const T& rValue ) {
-		return lValue > rValue ? rValue : lValue;
+	ETNoAliasHint ETNoThrowHint ETInlineHint T Min( const T lValue, const T rValue ) {
+		return lValue < rValue ? lValue : rValue;
 	}
 
 // ---------------------------------------------------
 
 	template <>
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Min<::Eldritch2::float32>( const ::Eldritch2::float32& lValue, const ::Eldritch2::float32& rValue ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Min<::Eldritch2::float32>( const ::Eldritch2::float32 lValue, const ::Eldritch2::float32 rValue ) {
 #	if( ET_PLATFORM_X86 )
 		return _mm_cvtss_f32( ::_mm_min_ss( ::_mm_set_ss( lValue ), ::_mm_set_ss( rValue ) ) );
 #	else
@@ -438,7 +438,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <>
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Min<::Eldritch2::float64>( const ::Eldritch2::float64& lValue, const ::Eldritch2::float64& rValue ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Min<::Eldritch2::float64>( const ::Eldritch2::float64 lValue, const ::Eldritch2::float64 rValue ) {
 #	if( ET_PLATFORM_X86 )
 		return ::_mm_cvtsd_f64( ::_mm_min_sd( ::_mm_set_sd( lValue ), ::_mm_set_sd( rValue ) ) );
 #	else
@@ -449,14 +449,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename T>
-	ETNoAliasHint ETNoThrowHint ETInlineHint T Max( const T& lValue, const T& rValue ) {
-		return lValue > rValue ? lValue : rValue;
+	ETNoAliasHint ETNoThrowHint ETInlineHint T Max( const T lValue, const T rValue ) {
+		return lValue < rValue ? rValue : lValue;
 	}
 
 // ---------------------------------------------------
 
 	template <>
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Max<::Eldritch2::float32>( const ::Eldritch2::float32& lValue, const ::Eldritch2::float32& rValue ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Max<::Eldritch2::float32>( const ::Eldritch2::float32 lValue, const ::Eldritch2::float32 rValue ) {
 #	if( ET_PLATFORM_X86 )
 		return ::_mm_cvtss_f32( ::_mm_max_ss( ::_mm_set_ss( lValue ), ::_mm_set_ss( rValue ) ) );
 #	else
@@ -467,7 +467,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <>
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Max<::Eldritch2::float64>( const ::Eldritch2::float64& lValue, const ::Eldritch2::float64& rValue ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Max<::Eldritch2::float64>( const ::Eldritch2::float64 lValue, const ::Eldritch2::float64 rValue ) {
 #	if( ET_PLATFORM_X86 )
 		return ::_mm_cvtsd_f64( ::_mm_max_sd( ::_mm_set_sd( lValue ), ::_mm_set_sd( rValue ) ) );
 #	else
@@ -478,14 +478,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
     template <typename T>
-	ETNoAliasHint ETNoThrowHint ETInlineHint T Clamp( const T& value, const T& minValue, const T& maxValue ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint T Clamp( const T value, const T minValue, const T maxValue ) {
 		return ::Eldritch2::Max( ::Eldritch2::Min( maxValue, value ), minValue );
 	}
 
 // ---------------------------------------------------
 
 	template<>
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Clamp<::Eldritch2::float32>( const ::Eldritch2::float32& value, const ::Eldritch2::float32& minValue, const ::Eldritch2::float32& maxValue ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Clamp<::Eldritch2::float32>( const ::Eldritch2::float32 value, const ::Eldritch2::float32 minValue, const ::Eldritch2::float32 maxValue ) {
 #	if( ET_PLATFORM_X86 )
 		return ::_mm_cvtss_f32( ::_mm_min_ss( ::_mm_max_ss( ::_mm_set_ss( value ), ::_mm_set_ss( minValue ) ), ::_mm_set_ss( maxValue ) ) );
 #	else
@@ -496,7 +496,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template<>
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Clamp<Eldritch2::float64>( const ::Eldritch2::float64& value, const ::Eldritch2::float64& minValue, const ::Eldritch2::float64& maxValue ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Clamp<Eldritch2::float64>( const ::Eldritch2::float64 value, const ::Eldritch2::float64 minValue, const ::Eldritch2::float64 maxValue ) {
 #	if( ET_PLATFORM_X86 )
 		return ::_mm_cvtsd_f64( ::_mm_min_sd( ::_mm_max_sd( ::_mm_set_sd( value ), ::_mm_set_sd( minValue ) ), ::_mm_set_sd( maxValue ) ) );
 #	else

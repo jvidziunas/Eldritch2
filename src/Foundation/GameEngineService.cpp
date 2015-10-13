@@ -54,19 +54,19 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	DisposingResultPair<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
-		DisposingResultPair<World>	result { nullptr, Errors::UNSPECIFIED };
+		DisposingResultPair<World>	result { nullptr, Error::UNSPECIFIED };
 
 		if( auto worldContent = _owningEngine._contentLibrary.ResolvePackageByName( worldResourceName ) ) {
 			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( ::std::move( worldContent.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
 				if( world->GetLastError() ) {
 					// Transfer ownership of the world to the result object and thus to outer code.
 					result.object		= ::std::move( world );
-					result.resultCode	= Errors::NONE;
+					result.resultCode	= Error::NONE;
 				} else {
 					result.resultCode = world->GetLastError();
 				}
 			} else {
-				result.resultCode = Errors::OUT_OF_MEMORY;
+				result.resultCode = Error::OUT_OF_MEMORY;
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	DisposingResultPair<World> GameEngineService::CreateEditorWorld() {
-		DisposingResultPair<World>	result { nullptr, Errors::UNSPECIFIED };
+		DisposingResultPair<World>	result { nullptr, Error::UNSPECIFIED };
 
 		if( auto worldContent = _owningEngine._contentLibrary.CreatePackageForEditorWorld() ) {
 			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( ::std::move( worldContent.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
@@ -90,7 +90,7 @@ namespace Foundation {
 
 				result.resultCode = world->GetLastError();
 			} else {
-				result.resultCode = Errors::OUT_OF_MEMORY;
+				result.resultCode = Error::OUT_OF_MEMORY;
 			}
 		}
 

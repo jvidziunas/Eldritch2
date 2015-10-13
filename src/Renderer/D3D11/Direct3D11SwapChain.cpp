@@ -105,7 +105,7 @@ namespace Renderer {
 																			this ) );
 
 		if( nullptr == windowHandle ) {
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 		::ShowWindow( windowHandle, GetCmdShow() );
@@ -115,7 +115,7 @@ namespace Renderer {
 			::DispatchMessage( &receivedMessage );
 		}
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/SynchronousFileWriter.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/MessagePackWriter.hpp>
-#include <Utility/Math/MathUtils.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;

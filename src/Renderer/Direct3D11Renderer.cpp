@@ -154,7 +154,7 @@ namespace Renderer {
 
 	void Direct3D11Renderer::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
 		visitor.PublishFactory( this, sizeof( Direct3D11WorldView ), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Direct3D11WorldView( world, *static_cast<Direct3D11Renderer*>(renderer)->_defaultMeshView ) ? Errors::NONE : Errors::OUT_OF_MEMORY;
+			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Direct3D11WorldView( world, *static_cast<Direct3D11Renderer*>(renderer)->_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 
@@ -169,20 +169,20 @@ namespace Renderer {
 		visitor.PublishFactory( Direct3D11MeshView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*renderer*/ ) -> ResultPair<ResourceView> {
 			auto* const	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11MeshView( initializer, allocator ) );
 
-			return { view, view ? Errors::NONE : Errors::OUT_OF_MEMORY };
+			return { view, view ? Error::NONE : Error::OUT_OF_MEMORY };
 		} )
 		// HLSL Pipeline Definition view.
 		.PublishFactory( Direct3D11HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*renderer*/ ) -> ResultPair<ResourceView> {
 			auto* const view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11HLSLPipelineDefinitionView( initializer, allocator ) );
 
-			return { view, view ? Errors::NONE : Errors::OUT_OF_MEMORY };
+			return { view, view ? Error::NONE : Error::OUT_OF_MEMORY };
 		} )
 		// Shader resource view.
 		.PublishFactory( Direct3D11ShaderResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const ResourceView::Initializer& initializer, void* /*renderer*/ ) -> ResultPair<ResourceView> {
 			COMPointer<::ID3D11ShaderResourceView>	deviceView( nullptr );
 			auto* const								view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) Direct3D11ShaderResourceView( move( deviceView ), initializer, allocator ) );
 
-			return { view, view ? Errors::NONE : Errors::OUT_OF_MEMORY };
+			return { view, view ? Error::NONE : Error::OUT_OF_MEMORY };
 		} );
 	}
 

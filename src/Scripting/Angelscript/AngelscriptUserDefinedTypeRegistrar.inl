@@ -12,14 +12,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/MPL/FloatTypes.hpp>
 #include <Utility/ResultPair.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
-#include <angelscript.h>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <angelscript.h>
 //------------------------------------------------------------------//
 #include <type_traits>
 //------------------------------------------------------------------//
@@ -770,7 +771,8 @@ namespace Scripting {
 
 	template <typename Native>
 	Utility::ResultPair<AngelscriptUserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>> AngelscriptUserDefinedTypeRegistrar::RegisterUserDefinedReferenceType( Allocator& builderAllocator ) {
-		using BuilderType = AngelscriptUserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>;
+		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
+		using BuilderType		= AngelscriptUserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>;
 
 	// ---
 
@@ -781,13 +783,9 @@ namespace Scripting {
 		result = _scriptEngine.RegisterObjectBehaviour( AngelscriptUserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_RELEASE, "void f()", ::asMETHOD( Native, ReleaseReference ), ::asCALL_THISCALL );
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		Utility::ResultPair<BuilderType>	resultPair { new(builderAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ), Errors::NONE };
+		auto* const	builder( new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) );
 
-		if( !resultPair.object ) {
-			resultPair.resultCode = ::Eldritch2::Errors::OUT_OF_MEMORY;
-		}
-
-		return resultPair;
+		return { builder, builder ? Error::NONE : Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
@@ -800,7 +798,7 @@ namespace Scripting {
 			}
 		};
 
-		using AllocationOption	= Allocator::AllocationOption;
+		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
 		using BuilderType		= AngelscriptUserDefinedTypeRegistrar::ValueTypeBuilder<Native>;
 
 	// ---
@@ -811,33 +809,25 @@ namespace Scripting {
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		Utility::ResultPair<BuilderType>	resultPair { new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ), Errors::NONE };
+		auto* const	builder( new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) );
 
-		if( !resultPair.object ) {
-			resultPair.resultCode = ::Eldritch2::Errors::OUT_OF_MEMORY;
-		}
-
-		return resultPair;
+		return { builder, builder ? Error::NONE : Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
 
 	template <typename Enum>
 	Utility::ResultPair<AngelscriptUserDefinedTypeRegistrar::UserDefinedEnumBuilder<Enum>> AngelscriptUserDefinedTypeRegistrar::RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator ) {
-		using AllocationOption	= Allocator::AllocationOption;
+		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
 		using BuilderType		= AngelscriptUserDefinedTypeRegistrar::UserDefinedEnumBuilder<Enum>;
 
 	// ---
 
 		EnsureEnumDeclared<Enum>();
 
-		Utility::ResultPair<BuilderType>	result { new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ), Errors::NONE };
+		auto* const	builder( new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) );
 
-		if( !result.object ) {
-			result.resultCode = ::Eldritch2::Errors::OUT_OF_MEMORY;
-		}
-
-		return result;
+		return { builder, builder ? Error::NONE : Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------

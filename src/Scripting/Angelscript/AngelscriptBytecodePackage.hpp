@@ -119,7 +119,7 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
-		bool	SerializeAndBindToModule( Utility::MessagePackReader& reader );
+		bool	SerializeAndBindToModule( Utility::MessagePackReader&& reader );
 
 		template <typename Archive>
 		bool	Serialize( Archive& archive );

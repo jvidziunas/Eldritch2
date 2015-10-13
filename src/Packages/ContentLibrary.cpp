@@ -129,7 +129,7 @@ namespace FileSystem {
 			ErrorCode AddContent( const ResourceView::Initializer& sourceAssetData ) override sealed {
 				auto&		factoryLibrary( GetLibrary()._resourceViewFactoryCollection );
 				const auto	findFactoriesResult( factoryLibrary.Find( { sourceAssetData.name.first, sourceAssetData.name.onePastLast } ) );
-				ErrorCode	result( Errors::NONE );
+				ErrorCode	result( Error::NONE );
 
 				if( findFactoriesResult != factoryLibrary.End() ) {
 					// Caching these.
@@ -169,7 +169,7 @@ namespace FileSystem {
 
 		if( candidate != _contentPackageCollection.End() ) {
 			// Yes, we already have loaded this package. Increment the reference count and return it.
-			return { { candidate->second }, Errors::NONE };
+			return { { candidate->second }, Error::NONE };
 		}
 
 		if( unique_ptr<ContentPackage, InstanceDeleter> package { new(_allocator, AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator ), { _allocator } } ) {
@@ -178,13 +178,13 @@ namespace FileSystem {
 			if( beginLoadResult ) {
 				_contentPackageCollection.Insert( { package->GetName(), package.get() } );
 				// This is the first external reference to the package, so we want the passthrough reference counting semantics.
-				return { { package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics }, Errors::NONE };
+				return { { package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics }, Error::NONE };
 			}
 
 			return { { nullptr }, beginLoadResult };
 		}
 		
-		return { { nullptr }, Errors::OUT_OF_MEMORY };
+		return { { nullptr }, Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
@@ -215,7 +215,7 @@ namespace FileSystem {
 			}
 
 			ErrorCode AddContent( const ResourceView::Initializer& /*sourceAssetData*/ ) override sealed {
-				return Errors::OPERATION_NOT_SUPPORTED;
+				return Error::OPERATION_NOT_SUPPORTED;
 			}
 
 			void Dispose() override sealed {
@@ -229,7 +229,7 @@ namespace FileSystem {
 
 		auto* const	newPackage( new(_allocator, AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) );
 
-		return { { newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics }, newPackage ? Errors::NONE : Errors::OUT_OF_MEMORY };
+		return { { newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics }, newPackage ? Error::NONE : Error::OUT_OF_MEMORY };
 	}
 
 }	// namespace FileSystem

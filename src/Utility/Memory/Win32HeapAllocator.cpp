@@ -14,7 +14,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #ifndef WIN32_LEAN_AND_MEAN

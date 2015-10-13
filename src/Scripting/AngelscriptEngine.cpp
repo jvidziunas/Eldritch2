@@ -85,7 +85,7 @@ namespace Scripting {
 
 	void AngelscriptEngine::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
 		visitor.PublishFactory( this, sizeof( AngelscriptWorldView ), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) AngelscriptWorldView( world, static_cast<AngelscriptEngine*>(parameter)->GetScriptEngine() ) ? Errors::NONE : Errors::OUT_OF_MEMORY;
+			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) AngelscriptWorldView( world, static_cast<AngelscriptEngine*>(parameter)->GetScriptEngine() ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 
@@ -103,12 +103,15 @@ namespace Scripting {
 	void AngelscriptEngine::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
 		using Initializer		= ResourceView::Initializer;
-		using ViewHandle		= unique_ptr<AngelscriptBytecodePackageView, InstanceDeleter>;
 
 	// ---
 
 		// Bytecode package
-		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), _scriptEngine, [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> ResultPair<ResourceView> {
+		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), _scriptEngine.get(), [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> ResultPair<ResourceView> {
+			using View = AngelscriptBytecodePackageView;
+
+		// ---
+
 			// We'll need to null-terminate the name, so create a temporary string on the stack.
 			UTF8String<FixedStackAllocator<64u>>	moduleName( initializer.name.first, initializer.name.Size(), UTF8L("Module Name String Allocator") );
 			
@@ -116,26 +119,30 @@ namespace Scripting {
 			if( unique_ptr<::asIScriptModule> module { static_cast<::asIScriptEngine*>(parameter)->GetModule( moduleName.GetCharacterArray(), asGM_ALWAYS_CREATE ) } ) {
 				
 				// Next, allocate the returned resource view object. Once again, the unique_ptr will handle deleting in the event this explodes.
-				if( ViewHandle view { new(allocator, AllocationOption::PERMANENT_ALLOCATION) AngelscriptBytecodePackageView( move( module ), initializer, allocator ), { allocator } } ) {
+				if( unique_ptr<View, InstanceDeleter> view { new(allocator, AllocationOption::PERMANENT_ALLOCATION) View( move( module ), initializer, allocator ), { allocator } } ) {
 					
 					// Finally, try to load from the source asset data.
 					if( view->SerializeAndBindToModule( MessagePackReader( initializer.serializedAsset ) ) ) {
-						return { view.release(), Errors::NONE };
-					} else {
-						return { nullptr, Errors::INVALID_PARAMETER };
+						return { view.release(), Error::NONE };
 					}
 
-					return { nullptr, Errors::OUT_OF_MEMORY };
+					return { nullptr, Error::INVALID_PARAMETER };
 				}
+
+				return { nullptr, Error::OUT_OF_MEMORY };
 			}
 
-			return { nullptr, Errors::UNSPECIFIED };
+			return { nullptr, Error::UNSPECIFIED };
 		} )
 		// Object graph
 		.PublishFactory( AngelscriptObjectGraphView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*parameter*/ ) -> ResultPair<ResourceView> {
-			auto* const	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) AngelscriptObjectGraphView( initializer, allocator ) );
+			using View = AngelscriptObjectGraphView;
 
-			return { view, view ? Errors::NONE : Errors::OUT_OF_MEMORY };
+		// ---
+
+			auto* const	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) View( initializer, allocator ) );
+
+			return { view, view ? Error::NONE : Error::OUT_OF_MEMORY };
 		} );
 	}
 
@@ -242,19 +249,20 @@ namespace Scripting {
 	void AngelscriptEngine::CreateScriptAPI() {
 		FormatAndLogString( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
 
-		if( ::asIScriptEngine* const scriptEngine = ::asCreateScriptEngine( ANGELSCRIPT_VERSION ) ) {
-			_scriptEngine = scriptEngine;
-
+		if( decltype(_scriptEngine) scriptEngine { ::asCreateScriptEngine( ANGELSCRIPT_VERSION ) } ) {
 			scriptEngine->SetMessageCallback( ::asMETHOD( AngelscriptEngine, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
-			// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
 
 			BroadcastInitializationVisitor( ScriptAPIRegistrationInitializationVisitor( *scriptEngine ) );
 
-			RegisterCMathLibrary( scriptEngine );
-			RegisterAlgorithmLibrary( scriptEngine );
+			RegisterCMathLibrary( scriptEngine.get() );
+			RegisterAlgorithmLibrary( scriptEngine.get() );
 			scriptEngine->RegisterStringFactory( StringMarshal::scriptTypeName, ::asMETHOD( AngelscriptEngine, MarshalStringLiteral ), ::asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
+			// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
 
-			FormatAndLogString( UTF8L("Script API registered successfully.") ET_UTF8_NEWLINE_LITERAL );
+			FormatAndLogString( UTF8L( "Script API registered successfully." ) ET_UTF8_NEWLINE_LITERAL );
+
+			// Transfer ownership to the main engine.
+			_scriptEngine.swap( scriptEngine );
 		} else {
 			FormatAndLogError( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
 		}

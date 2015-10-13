@@ -98,7 +98,7 @@
     <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src_shadercompiler\Eldritch2ShaderCompilerInclude.cpp" />
     <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp" />
     <ClCompile Include="..\src_shadercompiler\ShaderCompiler.cpp" />
     <ClCompile Include="..\src\System\SystemInterface.cpp" />
@@ -125,7 +125,7 @@
     <ClInclude Include="..\src\Utility\Assert.hpp" />
     <ClInclude Include="..\src_shadercompiler\Eldritch2ShaderCompilerInclude.hpp" />
     <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\MemStdLib.hpp" />
+    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp" />
     <ClInclude Include="..\src\System\SystemInterface.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Win32DiskSectorAllocator.hpp" />

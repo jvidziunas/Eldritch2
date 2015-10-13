@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/MPL/FloatTypes.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//

@@ -51,11 +51,9 @@ namespace Scripting {
 	// ---
 
 		auto&	rootAllocator( _rootAllocator );
-		auto	DefaultTypeMetadata( [&rootAllocator] () -> TypeMetadataCollection::ValueType {
-			return { 0u, { rootAllocator } };
-		} );
 
-		return archive( Archive::AdaptMap( _typeMetadata, DefaultTypeMetadata ), Archive::AdaptMap( _functionMetadata ) );
+		return archive( Archive::AdaptMap( _typeMetadata, [&rootAllocator] () -> TypeMetadataCollection::ValueType { return { 0u, { rootAllocator } }; } ),
+						Archive::AdaptMap( _functionMetadata ) );
 	}
 
 }	// namespace Scripting

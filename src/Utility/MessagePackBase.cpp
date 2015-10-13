@@ -19,7 +19,7 @@
 
 #if( ET_COMPILER_IS_MSVC )
 #	pragma warning( push )
-// Disable warnings about type conversion/promotion.
+//	Disable warnings about type conversion/promotion.
 #	pragma warning( disable : 4800 )
 #	pragma warning( disable : 4244 )
 #endif
@@ -44,6 +44,52 @@ namespace Utility {
 
 	bool MessagePackBase::Nil::Serialize( MessagePackWriter& writer ) {
 		return ::cmp_write_nil( &writer );
+	}
+
+// ---------------------------------------------------
+
+	MessagePackBase::String::String( const UTF8Char* begin, const UTF8Char* const end ) : Range<const UTF8Char*>( begin, end ) {}
+
+// ---------------------------------------------------
+
+	MessagePackBase::String::String() : Range<const UTF8Char*>( Range<const UTF8Char*>::EmptySet() ) {}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::String::Serialize( MessagePackReader& reader ) {
+		uint32 lengthInOctets;
+
+		if( ::cmp_read_str_size( &reader, &lengthInOctets ) ) {
+			// const UTF8Char*	stringBegin( reader.SkipBytes() );
+			return true;
+		}
+
+		return false;
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::String::Serialize( MessagePackWriter& writer ) {
+		return ::cmp_write_str( &writer, first, static_cast<uint32>(Size()) );
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::BinaryData::Serialize( MessagePackReader& reader ) {
+		uint32 lengthInBytes;
+
+		if( ::cmp_read_bin_size( &reader, &lengthInBytes ) ) {
+			// const UTF8Char*	stringBegin( reader.SkipBytes() );
+			return true;
+		}
+
+		return false;
+	}
+
+// ---------------------------------------------------
+
+	bool MessagePackBase::BinaryData::Serialize( MessagePackWriter& writer ) {
+		return ::cmp_write_bin( &writer, first, static_cast<uint32>(Size()) );
 	}
 
 // ---------------------------------------------------

@@ -17,7 +17,7 @@
 //==================================================================//
 #include <Utility/SynchronousFileReader.hpp>
 #include <Utility/SynchronousFileWriter.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
@@ -62,7 +62,7 @@ namespace {
 				writePointer	+= numberOfBytesReadThisIteration;
 			}
 
-			return { FALSE != readResult ? Errors::NONE : Errors::UNSPECIFIED, static_cast<size_t>(writePointer - static_cast<char*>(destinationBuffer)) };
+			return { FALSE != readResult ? Error::NONE : Error::UNSPECIFIED, static_cast<size_t>(writePointer - static_cast<char*>(destinationBuffer)) };
 		}
 
 	// ---------------------------------------------------
@@ -104,7 +104,7 @@ namespace {
 				readPointer	+= numberOfBytesWrittenThisIteration;
 			}
 			
-			return { FALSE != writeResult ? Errors::NONE : Errors::UNSPECIFIED, static_cast<size_t>(readPointer - static_cast<const char*>(sourceBuffer)) };
+			return { FALSE != writeResult ? Error::NONE : Error::UNSPECIFIED, static_cast<size_t>(readPointer - static_cast<const char*>(sourceBuffer)) };
 		}
 
 	// ---------------------------------------------------

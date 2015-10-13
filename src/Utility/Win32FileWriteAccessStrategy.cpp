@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Win32FileWriteAccessStrategy.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
-#include <Utility/Math/MathUtils.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <limits>
 //------------------------------------------------------------------//
 
@@ -53,10 +53,10 @@ namespace Eldritch2
 									  &_overlapped ) ||
 				ERROR_IO_PENDING == ::GetLastError() )
 			{
-				return Errors::NONE;
+				return Error::NONE;
 			}
 
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 	// ---------------------------------------------------

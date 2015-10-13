@@ -13,9 +13,12 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/Builders/Direct3D11DeviceBuilder.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
+//------------------------------------------------------------------//
 #include <D3D11.h>
+//------------------------------------------------------------------//
+#include <utility>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -96,10 +99,10 @@ namespace Renderer {
 
 		COMPointer<::IDXGIAdapter1>	adapter;
 		::HRESULT					nativeResult;
-		ErrorCode					result( Errors::NONE );
+		ErrorCode					result( Error::NONE );
 
 		if( FAILED( ::CreateDXGIFactory1( __uuidof(::IDXGIFactory1), reinterpret_cast<void**>(_factory.GetInterfacePointer()) ) ) ) {
-			result = Errors::UNSPECIFIED;
+			result = Error::UNSPECIFIED;
 			goto End;
 		}
 
@@ -127,7 +130,7 @@ namespace Renderer {
 											_immediateContext.GetInterfacePointer() );
 
 		if( FAILED( nativeResult ) ) {
-			result = Errors::UNSPECIFIED;
+			result = Error::UNSPECIFIED;
 			goto End;
 		}
 

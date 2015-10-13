@@ -51,9 +51,6 @@
     <ClCompile Include="..\src\Utility\ErrorCode.cpp">
       <Filter>Source Files\Tools Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\System\SystemInterface.cpp">
       <Filter>Source Files\Tools Framework</Filter>
     </ClCompile>
@@ -99,6 +96,9 @@
     <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp">
       <Filter>Source Files\Tools Framework\Memory Allocation</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
+      <Filter>Source Files\Tools Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src_texturecompressor\NVTTStandardOutputHandler.hpp">
@@ -114,9 +114,6 @@
       <Filter>Header Files\Tools Framework</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ErrorCode.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\MemStdLib.hpp">
       <Filter>Header Files\Tools Framework</Filter>
     </ClInclude>
     <ClInclude Include="..\src\System\SystemInterface.hpp">
@@ -163,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
       <Filter>Header Files\Tools Framework\Memory Allocation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp">
+      <Filter>Header Files\Tools Framework</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

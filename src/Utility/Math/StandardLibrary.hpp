@@ -1,5 +1,5 @@
 /*==================================================================*\
-  MathUtils.hpp
+  StandardLibrary.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -108,17 +108,17 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename T>
-	ETNoAliasHint ETNoThrowHint ETInlineHint T	Min( const T& lValue, const T& rValue );
+	ETNoAliasHint ETNoThrowHint ETInlineHint T	Min( const T lValue, const T rValue );
 
 // ---------------------------------------------------
 
 	template <typename T>
-	ETNoAliasHint ETNoThrowHint ETInlineHint T	Max( const T& lValue, const T& rValue );
+	ETNoAliasHint ETNoThrowHint ETInlineHint T	Max( const T lValue, const T rValue );
 
 // ---------------------------------------------------
 
 	template <typename T>
-	ETNoAliasHint ETNoThrowHint ETInlineHint T	Clamp( const T& value, const T& minValue, const T& maxValue );
+	ETNoAliasHint ETNoThrowHint ETInlineHint T	Clamp( const T value, const T minValue, const T maxValue );
 
 // ---------------------------------------------------
 
@@ -192,5 +192,5 @@ namespace Eldritch2 {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/Math/MathUtils.inl>
+#include <Utility/Math/StandardLibrary.inl>
 //------------------------------------------------------------------//

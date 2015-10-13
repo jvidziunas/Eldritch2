@@ -399,9 +399,6 @@
     <ClCompile Include="..\src\Utility\concurrency\Lock.cpp">
       <Filter>Source Files\Engine\Utility\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
       <Filter>Source Files\Engine\Utility\Memory</Filter>
     </ClCompile>
@@ -654,6 +651,9 @@
     <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Build.hpp">
@@ -703,9 +703,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\concurrency\Lock.hpp">
       <Filter>Header Files\Engine\Utility\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\MemStdLib.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\ObjectPool.hpp">
       <Filter>Header Files\Engine\Utility\Memory</Filter>
@@ -795,9 +792,6 @@
       <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp">
-      <Filter>Header Files\Engine\Utility\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\math\MathUtils.hpp">
       <Filter>Header Files\Engine\Utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\AsynchronousFileReader.hpp">
@@ -1144,6 +1138,12 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapterMixin.hpp">
       <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp">
+      <Filter>Header Files\Engine\Utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

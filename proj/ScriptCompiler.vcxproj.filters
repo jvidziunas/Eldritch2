@@ -69,9 +69,6 @@
     <ClCompile Include="..\src\Tools\ContentCookerStrategy.cpp">
       <Filter>Source Files\Tools Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
       <Filter>Source Files\Tools Framework</Filter>
     </ClCompile>
@@ -117,6 +114,9 @@
     <ClCompile Include="..\src\Utility\Win32FileWriteAccessStrategy.cpp">
       <Filter>Source Files\Tools Framework\Filesystem</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
+      <Filter>Source Files\Tools Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Utility\Assert.hpp">
@@ -147,9 +147,6 @@
       <Filter>Header Files\Tools Framework</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ErrorCode.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\MemStdLib.hpp">
       <Filter>Header Files\Tools Framework</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp">
@@ -193,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\Win32FileWriteAccessStrategy.hpp">
       <Filter>Header Files\Tools Framework\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp">
+      <Filter>Header Files\Tools Framework</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

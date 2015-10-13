@@ -15,7 +15,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
+//------------------------------------------------------------------//
 #include <cstdlib>
 //------------------------------------------------------------------//
 
@@ -25,18 +27,21 @@ namespace Eldritch2 {
 
 	const UTF8Char* ErrorCode::ToUTF8String() const {
 		static const UTF8Char*	errorStrings[] = {
-			UTF8L( "Invalid object internal state" ),
-			UTF8L( "Invalid or nonexistent file path" ),
-			UTF8L( "Null pointer argument sent to function expecting a valid target" ),
-			UTF8L( "Invalid parameter sent as argument to function" ),
-			UTF8L( "Insufficient free memory" ),
-			UTF8L( "Unspecified error" ),
 			UTF8L( "Operation successful" )
+			UTF8L( "Unspecified error" ),
+			UTF8L( "Insufficient free memory" ),
+			UTF8L( "Invalid parameter sent as argument to function" ),
+			UTF8L( "Null pointer argument sent to function expecting a valid target" ),
+			UTF8L( "Invalid or nonexistent file path" ),
+			UTF8L( "Invalid object internal state" ),
+			UTF8L( "Access denied" ),
+			UTF8L( "Operation not supported for this object" ),
+			UTF8L( "<Undefined>" )
 		};
 
-		const size_t	stringIndex( _value - static_cast<int32>(Errors::INVALID_OBJECT_STATE) );
+	// ---
 
-		return errorStrings[stringIndex < _countof(errorStrings) ? stringIndex : _countof(errorStrings)];
+		return errorStrings[Clamp( -_value, 0, static_cast<int32>(_countof(errorStrings)) )];
 	}
 
 }	// namespace Eldritch2

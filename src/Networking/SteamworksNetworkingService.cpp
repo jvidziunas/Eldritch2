@@ -150,7 +150,7 @@ namespace Networking {
 			auto&	networkingService( *static_cast<SteamworksNetworkingService*>(parameter) );
 			auto	networkID( networkingService._worldIDCounter.fetch_add( 1u, memory_order_acquire ) );
 
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) SteamworksWorldView( networkingService, networkID, world ) ? Errors::NONE : Errors::OUT_OF_MEMORY;
+			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) SteamworksWorldView( networkingService, networkID, world ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 
@@ -269,13 +269,13 @@ namespace Networking {
 			if( auto* const player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
 				_playerDirectory.Insert( ::rde::make_pair( networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) ) );
 				
-				return { player, Errors::NONE };
+				return { player, Error::NONE };
 			}
 
-			return { nullptr, Errors::OUT_OF_MEMORY };
+			return { nullptr, Error::OUT_OF_MEMORY };
 		} else {
 			FormatAndLogWarning( UTF8L("Received duplicate player join notification for player %ull (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
-			return { candidate->second, Errors::NONE };
+			return { candidate->second, Error::NONE };
 		}
 	}
 
@@ -318,7 +318,7 @@ namespace Networking {
 			}
 		}
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

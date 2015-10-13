@@ -63,7 +63,7 @@ namespace Scheduler {
 			stealingWorker->_transferBarrier.store( BarrierStatus::COMPLETE, memory_order_release );
 		}
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

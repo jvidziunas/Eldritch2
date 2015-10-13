@@ -13,10 +13,11 @@
 // INCLUDES
 //==================================================================//
 #include <Eldritch2ShaderCompilerInclude.hpp>
-#include <Tools/FileReadStrategyFactory.hpp>
 #include <Utility/FileReadAccessStrategy.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Tools/FileReadStrategyFactory.hpp>
 #include <Utility/ErrorCode.hpp>
+//------------------------------------------------------------------//
 #include <Shlwapi.h>
 #include <tchar.h>
 //------------------------------------------------------------------//

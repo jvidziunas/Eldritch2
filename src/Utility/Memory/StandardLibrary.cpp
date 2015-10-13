@@ -1,5 +1,5 @@
 /*==================================================================*\
-  MemStdLib.cpp
+  StandardLibrary.cpp
   ------------------------------------------------------------------
   Purpose:
   Utility functions that serve as replacements for standard C bulk
@@ -14,7 +14,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2;

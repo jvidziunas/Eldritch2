@@ -250,7 +250,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\SurjectiveQueryEngine.cpp" />
     <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
     <ClCompile Include="..\src\Utility\concurrency\Lock.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\MemStdLib.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp" />
     <ClCompile Include="..\src\Utility\memory\InstanceNew.cpp" />
     <ClCompile Include="..\src\Utility\memory\Allocator.cpp" />
@@ -325,6 +325,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackReader.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
@@ -343,7 +344,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Concurrency\UserSemaphore.hpp" />
     <ClInclude Include="..\src\Utility\memory\InstanceNew.hpp" />
     <ClInclude Include="..\src\Utility\memory\InstanceDeleters.hpp" />
-    <ClInclude Include="..\src\Utility\memory\MemStdLib.hpp" />
     <ClInclude Include="..\src\Utility\memory\ObjectPool.hpp" />
     <ClInclude Include="..\src\Utility\memory\Prefetch.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ThreadsafeObjectPool.hpp" />
@@ -378,7 +378,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\OrderedSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp" />
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp" />
-    <ClInclude Include="..\src\Utility\math\MathUtils.hpp" />
+    <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\AsynchronousFileReader.hpp" />
     <ClInclude Include="..\src\Utility\AsynchronousFileWriter.hpp" />
     <ClInclude Include="..\src\Utility\ReadableMemoryMappedFile.hpp" />

@@ -6,23 +6,22 @@
   provide a baseline for floating-point types instead of fixed.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
-#include <Utility/Math/MathUtils.hpp>
 #include <xmmintrin.h>
 #include <emmintrin.h>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2;
 
-namespace
-{
+namespace {
 
 	static ET16ByteAligned uint32	_abs[4]      = { 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF };
 	static ET16ByteAligned uint32	_infinity[4] = { 0x47FFEFFF, 0x47FFEFFF, 0x47FFEFFF, 0x47FFEFFF };
@@ -44,8 +43,7 @@ namespace
 	// Adapted from the original by Jonathan Blow, see http://number-none.com/product/Hacking%20Quaternions/index.html
 	// In particular, the alpha parameter has been changed to take the cosine thereof to exploit the quaternion dot product
 	// along with factoring out a few terms to be global constants (see above) instead of parameters.
-	float32 QuaternionAlphaCorrection( float32 t, float32 cosAlpha )
-	{
+	float32 QuaternionAlphaCorrection( float32 t, float32 cosAlpha ) {
 		const float64	factor( 1.0 - ( alphaAttenuation * cosAlpha ) );
 		const float32	k( alphaK * factor * factor );
 		const float32	b(  2.0f * k );
@@ -57,11 +55,9 @@ namespace
 
 }	// anonymous namespace
 
-namespace Eldritch2
-{
+namespace Eldritch2 {
 
-	void Float4ToHalf4( half4& dst, const float4& src )
-	{
+	void Float4ToHalf4( half4& dst, const float4& src ) {
 		register union
 		{
 			__m128 xmm0;
@@ -109,30 +105,26 @@ namespace Eldritch2
 
 // ---------------------------------------------------
 
-	Quaternion QuaternionLerp( const Quaternion& src0, const Quaternion& src1, float32 alpha )
-	{
+	Quaternion QuaternionLerp( const Quaternion& src0, const Quaternion& src1, float32 alpha ) {
 		return Quaternion( src0.coeffs() + alpha * ( src1.coeffs() - src0.coeffs() ) ).normalized();
 	}
 
 // ---------------------------------------------------
 
-	Quaternion SplinedQuaternionLerp( const Quaternion& src0, const Quaternion& src1, float32 alpha )
-	{
+	Quaternion SplinedQuaternionLerp( const Quaternion& src0, const Quaternion& src1, float32 alpha ) {
 		return QuaternionLerp( src0, src1, QuaternionAlphaCorrection( alpha, src0.dot( src1 ) ) );
 	}
 
 // ---------------------------------------------------
 
-	void InPlaceQuaternionLerp( Quaternion& src0, const Quaternion& src1, float32 alpha )
-	{
+	void InPlaceQuaternionLerp( Quaternion& src0, const Quaternion& src1, float32 alpha ) {
 		src0 = src0.coeffs() + alpha * ( src1.coeffs() - src0.coeffs() );
 		src0.normalize();
 	}
 
 // ---------------------------------------------------
 
-	void InPlaceSplinedQuaternionLerp( Quaternion& src0, const Quaternion& src1, float32 alpha )
-	{
+	void InPlaceSplinedQuaternionLerp( Quaternion& src0, const Quaternion& src1, float32 alpha ) {
 		InPlaceQuaternionLerp( src0, src1, QuaternionAlphaCorrection( alpha, src0.dot( src1 ) ) );
 	}
 

@@ -91,7 +91,7 @@ namespace
 					fileBuffer[readResult.readAmountInBytes] = '\0';
 
 					readResult.result = ( ::asSUCCESS <= AddSectionFromMemory( fileBuffer,
-																			   string( file, FindEndOfString( file ) ).c_str() ) ) ? Errors::NONE : Errors::UNSPECIFIED;
+																			   string( file, FindEndOfString( file ) ).c_str() ) ) ? Error::NONE : Error::UNSPECIFIED;
 				}
 
 				_readStrategyFactory.GetFileDataAllocator().DeallocateAligned( fileBuffer );
@@ -127,7 +127,7 @@ namespace
 
 		// ---
 
-			return( ::asSUCCESS <= GetModule()->SaveByteCode( &FileStream( output ) ) ? Errors::NONE : Errors::UNSPECIFIED );
+			return( ::asSUCCESS <= GetModule()->SaveByteCode( &FileStream( output ) ) ? Error::NONE : Error::UNSPECIFIED );
 		}
 
 	// ---------------------------------------------------
@@ -213,7 +213,7 @@ namespace Eldritch2
 			{
 				Eldritch2ScriptBuilder	scriptBuilder( scriptEngine,
 													   readStrategyFactory );
-				ErrorCode				result( Errors::UNSPECIFIED );
+				ErrorCode				result( Error::UNSPECIFIED );
 
 #if( ET_PLATFORM_WINDOWS )
 				const ::HMODULE			engineLibraryModule( ::LoadLibraryEx( SL( "Eldritch2.exe" ),
@@ -248,7 +248,7 @@ namespace Eldritch2
 				return result;
 			}
 
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 	// ---------------------------------------------------

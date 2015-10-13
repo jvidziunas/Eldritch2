@@ -23,7 +23,7 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Scheduler {
 
-	Thread::Thread() : _resultCode( Errors::NONE ), _executionState( ExecutionState::UNINITIALIZED ) {}
+	Thread::Thread() : _resultCode( Error::NONE ), _executionState( ExecutionState::UNINITIALIZED ) {}
 
 // ---------------------------------------------------
 

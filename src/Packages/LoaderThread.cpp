@@ -70,10 +70,10 @@ namespace FileSystem {
 				_loadSemaphore->IncreaseCount();
 			}
 
-			return Errors::NONE;
+			return Error::NONE;
 		}
 
-		return Errors::OUT_OF_MEMORY;
+		return Error::OUT_OF_MEMORY;
 	}
 
 // ---------------------------------------------------
@@ -93,7 +93,7 @@ namespace FileSystem {
 		auto&	loadList( _outstandingLoadList );
 
 		if( !_loadSemaphore ) {
-			return Errors::INVALID_OBJECT_STATE;
+			return Error::INVALID_OBJECT_STATE;
 		}
 
 		while( (_loadSemaphore->Acquire(), ExecutionBehavior::CONTINUE == _executionBehavior.load( memory_order_acquire )) ) {
@@ -133,7 +133,7 @@ namespace FileSystem {
 			} );
 		}
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 }	// namespace FileSystem

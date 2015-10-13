@@ -12,6 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/Range.hpp>
+#include <Utility/MPL/CharTypes.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//
 #include <cmp/cmp.h>
@@ -57,7 +59,7 @@ namespace Utility {
 
 		// ---------------------------------------------------
 
-			ValueType&&	operator()() const;
+			ValueType	operator()() const;
 		};
 
 	// ---
@@ -93,6 +95,30 @@ namespace Utility {
 	// ---
 
 		struct Nil {
+			bool	Serialize( Utility::MessagePackReader& reader );
+			bool	Serialize( Utility::MessagePackWriter& writer );
+		};
+
+	// ---
+
+		struct String : public ::Eldritch2::Range<const ::Eldritch2::UTF8Char*> {
+			String( const ::Eldritch2::UTF8Char* begin, const ::Eldritch2::UTF8Char* const end );
+			String();
+
+		// ---------------------------------------------------
+			
+			bool	Serialize( Utility::MessagePackReader& reader );
+			bool	Serialize( Utility::MessagePackWriter& writer );
+		};
+
+	// ---
+
+		struct BinaryData : public ::Eldritch2::Range<const char*> {
+			BinaryData( const void* begin, const void* const end );
+			BinaryData();
+
+		// ---------------------------------------------------
+			
 			bool	Serialize( Utility::MessagePackReader& reader );
 			bool	Serialize( Utility::MessagePackWriter& writer );
 		};

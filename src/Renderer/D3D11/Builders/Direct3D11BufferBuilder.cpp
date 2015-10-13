@@ -13,12 +13,14 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/Builders/Direct3D11BufferBuilder.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
+//------------------------------------------------------------------//
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN
 #endif
 #include <D3D11.h>
+//------------------------------------------------------------------//
 #include <limits>
 //------------------------------------------------------------------//
 
@@ -286,15 +288,15 @@ namespace Renderer {
 		}
 
 		if( FAILED( device->CreateBuffer( &desc, _initialData ? &initialData : nullptr, _out.GetInterfacePointer() ) ) ) {
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 		if( needsSRV && FAILED( device->CreateShaderResourceView( _out.GetUnadornedPointer(), &viewDesc, _outView.GetInterfacePointer() ) ) ) {
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 		if( needsUAV && FAILED( device->CreateUnorderedAccessView( _out.GetUnadornedPointer(), &unorderedViewDesc, _outUnorderedAccessView.GetInterfacePointer() ) ) ) {
-			return Errors::UNSPECIFIED;
+			return Error::UNSPECIFIED;
 		}
 
 #	if( ET_DEBUG_MODE_ENABLED )
@@ -305,7 +307,7 @@ namespace Renderer {
 		}
 #	endif
 
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

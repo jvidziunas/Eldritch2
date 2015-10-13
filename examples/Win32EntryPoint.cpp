@@ -12,26 +12,26 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#define BOOST_ERROR_CODE_HEADER_ONLY
-#include <boost/system/error_code.hpp>
-#include <Foundation/GameEngine.hpp>
-#include <Configuration/ConfigurationService.hpp>
-#include <Scripting/AngelscriptEngine.hpp>
-#include <Packages/Win32ContentProvider.hpp>
-#include <System/Win32SystemInterface.hpp>
-#include <Scheduler/Win32Scheduler.hpp>
-#include <Renderer/Direct3D11Renderer.hpp>
-#include <Physics/BulletEngine.hpp>
-#include <Sound/XAudio2AudioRenderer.hpp>
-#include <Foundation/Application.hpp>
-#include <Input/Win32InputService.hpp>
-#include <Input/XInputService.hpp>
 #include <Networking/SteamworksNetworkingService.hpp>
+#include <Configuration/ConfigurationService.hpp>
 #include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
 #include <Utility/Win32ApplicationHelpers.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Packages/Win32ContentProvider.hpp>
+#include <Scripting/AngelscriptEngine.hpp>
+#include <System/Win32SystemInterface.hpp>
+#include <Renderer/Direct3D11Renderer.hpp>
+#include <Sound/XAudio2AudioRenderer.hpp>
+#include <Scheduler/Win32Scheduler.hpp>
+#include <Input/Win32InputService.hpp>
+#include <Foundation/GameEngine.hpp>
+#include <Physics/BulletEngine.hpp>
+#include <Input/XInputService.hpp>
 #include <Utility/Assert.hpp>
 #include <Build.hpp>
+//------------------------------------------------------------------//
+#define BOOST_ERROR_CODE_HEADER_ONLY
+#include <boost/system/error_code.hpp>
 #include <shellapi.h>
 #include <windows.h>
 #include <Shlwapi.h>

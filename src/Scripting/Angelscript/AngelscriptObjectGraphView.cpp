@@ -30,7 +30,7 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	ErrorCode AngelscriptObjectGraphView::DeserializeIntoWorldView( AngelscriptWorldView& /*worldView*/ ) const {
-		return Errors::NONE;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

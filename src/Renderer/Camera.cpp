@@ -12,9 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/MPL/MatrixTypes.hpp>
 #include <Utility/MPL/AngleTypes.hpp>
-#include <Utility/Math/MathUtils.hpp>
 #include <Renderer/Camera.hpp>
 //------------------------------------------------------------------//
 

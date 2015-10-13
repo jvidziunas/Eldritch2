@@ -14,8 +14,9 @@
 //==================================================================//
 #include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
 #include <Renderer/D3D11/D3D11FormatHelpers.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Renderer/Textures/Texture.hpp>
-#include <Utility/Memory/MemStdLib.hpp>
 #include <Utility/Memory/Allocator.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -27,9 +28,9 @@ ET_LINK_LIBRARY( "D3D11.lib" )
 ET_LINK_LIBRARY( "DXGUID.lib" )
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
 using namespace ::Eldritch2::Renderer;
 using namespace ::Eldritch2::Utility;
+using namespace ::Eldritch2;
 
 namespace {
 
@@ -446,7 +447,7 @@ namespace Renderer {
 			DeleteTemporaryArray( temporaryAllocator, resourceInitialData );
 		}
 
-		return SUCCEEDED( result ) ? Errors::NONE : Errors::INVALID_OBJECT_STATE;
+		return SUCCEEDED( result ) ? Error::NONE : Error::INVALID_OBJECT_STATE;
 	}
 
 // ---------------------------------------------------
