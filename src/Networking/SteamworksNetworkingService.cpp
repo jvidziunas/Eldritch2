@@ -17,13 +17,12 @@
 #include <Networking/Steamworks/SteamworksWorldView.hpp>
 #include <Networking/SteamworksNetworkingService.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
-#include <Utility/DisposingResultPair.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Scheduler/TaskScheduler.hpp>
+#include <Utility/DisposingResult.hpp>
 #include <Foundation/GameEngine.hpp>
-#include <Utility/ResultPair.hpp>
-#include <Utility/ErrorCode.hpp>
+#include <Utility/Result.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
 
@@ -172,7 +171,7 @@ namespace Networking {
 		class InitializeSteamworksTask : public CRTPTransientTask<InitializeSteamworksTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 		public:
-			// Constructs this InitializeSteamworksTask instance.
+			//!	Constructs this @ref InitializeSteamworksTask instance.
 			ETInlineHint InitializeSteamworksTask( SteamworksNetworkingService& host, Task& postConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeSteamworksTask>( postConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ),
 																																										 _host( host ) {
 				TrySchedulingOnContext( executingContext );
@@ -209,7 +208,7 @@ namespace Networking {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this ProcessCallbacksTask instance.
+			//!	Constructs this @ref ProcessCallbacksTask instance.
 			ETInlineHint ProcessCallbacksTask( SteamworksNetworkingService& host, Task& serviceTickTask, WorkerContext& executingContext ) : CRTPTransientTask<ProcessCallbacksTask>( serviceTickTask, Scheduler::CodependentTaskSemantics ),
 																																			 _host( host ) {
 				TrySchedulingOnContext( executingContext );
@@ -260,7 +259,7 @@ namespace Networking {
 
 // ---------------------------------------------------
 
-	ResultPair<SteamworksNetworkingService::Player> SteamworksNetworkingService::AcknowledgePlayerConnection( const NetworkID& networkID ) {
+	Result<SteamworksNetworkingService::Player> SteamworksNetworkingService::AcknowledgePlayerConnection( const NetworkID& networkID ) {
 		const auto	candidate( _playerDirectory.Find( networkID ) );
 
 		if( candidate == _playerDirectory.End() ) {
@@ -269,13 +268,13 @@ namespace Networking {
 			if( auto* const player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
 				_playerDirectory.Insert( ::rde::make_pair( networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) ) );
 				
-				return { player, Error::NONE };
+				return { *player };
 			}
 
-			return { nullptr, Error::OUT_OF_MEMORY };
+			return { Error::OUT_OF_MEMORY };
 		} else {
 			FormatAndLogWarning( UTF8L("Received duplicate player join notification for player %ull (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
-			return { candidate->second, Error::NONE };
+			return { *candidate->second };
 		}
 	}
 

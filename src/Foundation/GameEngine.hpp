@@ -36,7 +36,7 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		template <typename ResultObjectType>
-		struct	ResultPair;
+		struct	Result;
 	}
 
 	class	ErrorCode;

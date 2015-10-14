@@ -22,7 +22,7 @@
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Scheduler/Win32Scheduler.hpp>
-#include <Utility/ResultPair.hpp>
+#include <Utility/Result.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
@@ -223,15 +223,13 @@ namespace Scheduler {
 
 // ---------------------------------------------------
 
-	ResultPair<UserMutex> Win32Scheduler::AllocateUserMutex( Allocator& allocator ) {
-		const auto	tempResult( AllocateReaderWriterUserMutex( allocator ) );
-
-		return { static_cast<UserMutex*>(tempResult.object), tempResult.resultCode };
+	Result<UserMutex> Win32Scheduler::AllocateUserMutex( Allocator& allocator ) {
+		return AllocateReaderWriterUserMutex( allocator );
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<ReaderWriterUserMutex> Win32Scheduler::AllocateReaderWriterUserMutex( Allocator& allocator ) {
+	Result<ReaderWriterUserMutex> Win32Scheduler::AllocateReaderWriterUserMutex( Allocator& allocator ) {
 		class UserMutex : public ReaderWriterUserMutex {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -280,14 +278,16 @@ namespace Scheduler {
 
 	// ---
 
-		auto* const	mutex( new(allocator, _systemCacheLineSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) UserMutex() );
+		if( auto* const	mutex = new(allocator, _systemCacheLineSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) UserMutex ) {
+			return { *mutex };
+		}
 
-		return { mutex, mutex ? Error::NONE : Error::OUT_OF_MEMORY };
+		return { Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<WaitableUserEvent> Win32Scheduler::AllocateWaitableEvent( Allocator& allocator, const EventInitialState initialState ) {
+	Result<WaitableUserEvent> Win32Scheduler::AllocateWaitableEvent( Allocator& allocator, const EventInitialState initialState ) {
 		class Event : public WaitableUserEvent {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -323,20 +323,21 @@ namespace Scheduler {
 	// ---
 
 		if( const auto eventHandle = ::CreateEventW( nullptr, FALSE, (EventInitialState::UNSIGNALED == initialState ? FALSE : TRUE), nullptr ) ) {
-			auto* const	event( new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) );
-			if( !event ) {
-				::CloseHandle( eventHandle );
+			if( auto* const event = new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) ) {
+				return { *event };
 			}
 
-			return { event, event ? Error::NONE : Error::OUT_OF_MEMORY };
+			::CloseHandle( eventHandle );
+
+			return { Error::OUT_OF_MEMORY };
 		}
 
-		return { nullptr, Error::UNSPECIFIED };
+		return { Error::UNSPECIFIED };
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<UserSemaphore> Win32Scheduler::AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) {
+	Result<UserSemaphore> Win32Scheduler::AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) {
 		class Semaphore : public UserSemaphore {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -371,16 +372,15 @@ namespace Scheduler {
 	// ---
 
 		if( const auto semaphoreHandle = ::CreateSemaphore( nullptr, static_cast<::LONG>(initialCount), static_cast<::LONG>(maximumCount), nullptr ) ) {
-			auto* const	semaphore( new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) );
-
-			if( semaphore ) {
-				return { semaphore, Error::NONE };
-			} else {
-				::CloseHandle( semaphoreHandle );
+			 if( auto* const semaphore = new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
+				return { *semaphore };
 			}
+
+			::CloseHandle( semaphoreHandle );
+			return { Error::OUT_OF_MEMORY };
 		}
 
-		return { nullptr, Error::UNSPECIFIED };
+		return { Error::UNSPECIFIED };
 	}
 
 // ---------------------------------------------------
@@ -399,9 +399,10 @@ namespace Scheduler {
 		// We received an invalid handle, let's try to figure out why
 		switch( errno ) {
 			case EINVAL:	{ return Error::INVALID_PARAMETER; break; }	// case EINVAL
-			case EACCES:	{ return Error::OUT_OF_MEMORY; break; }	// case EACCES
-			default:		{ return Error::UNSPECIFIED; break; }	// default case
+			case EACCES:	{ return Error::OUT_OF_MEMORY; break; }		// case EACCES
 		}	// switch( errno )
+
+		return Error::UNSPECIFIED;
 	}
 
 // ---------------------------------------------------

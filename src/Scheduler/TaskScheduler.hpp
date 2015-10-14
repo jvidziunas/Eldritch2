@@ -24,10 +24,10 @@ namespace Eldritch2 {
 	namespace Utility {
 		class	ReaderWriterUserMutex;
 		class	WaitableUserEvent;
-		template <typename ResultObjectType>
-		struct	ResultPair;
 		class	UserSemaphore;
 		class	UserMutex;
+		template <typename ResultObjectType>
+		struct	Result;
 	}
 
 	class	Allocator;
@@ -102,16 +102,16 @@ namespace Scheduler {
 
 	// - SYNCHRONIZATION OBJECT ALLOCATION/DEALLOCATION --
 
-		//!	Instructs the Scheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
-		virtual Utility::ResultPair<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
+		//!	Instructs the @ref TaskScheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
+		virtual Utility::Result<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
 
-		virtual Utility::ResultPair<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) abstract;
+		virtual Utility::Result<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) abstract;
 
-		//! Instructs the Scheduler to allocate a semaphore object useful for limiting the degree of concurrent access to a shared resource.
-		virtual Utility::ResultPair<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) abstract;
+		//!	Instructs the @ref TaskScheduler to allocate a semaphore object useful for limiting the degree of concurrent access to a shared resource.
+		virtual Utility::Result<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) abstract;
 
-		//! Instructs the Scheduler to allocate a basic mutually-exclusive lock.
-		virtual Utility::ResultPair<Utility::UserMutex>				AllocateUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
+		//!	Instructs the @ref TaskScheduler to allocate a basic mutually-exclusive lock.
+		virtual Utility::Result<Utility::UserMutex>				AllocateUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

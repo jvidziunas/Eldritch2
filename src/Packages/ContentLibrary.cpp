@@ -13,14 +13,14 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/InstanceDeleters.hpp>
-#include <Utility/DisposingResultPair.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Scheduler/TaskScheduler.hpp>
+#include <Utility/DisposingResult.hpp>
 #include <Packages/LoaderThread.hpp>
-#include <Utility/ResultPair.hpp>
+#include <Utility/Result.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #include <memory>
@@ -80,7 +80,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	DisposingResultPair<ContentPackage> ContentLibrary::ResolvePackageByName( const UTF8Char* const packageName ) {
+	DisposingResult<ContentPackage> ContentLibrary::ResolvePackageByName( const UTF8Char* const packageName ) {
 		class DeserializedContentPackage : public ContentPackage {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -169,7 +169,7 @@ namespace FileSystem {
 
 		if( candidate != _contentPackageCollection.End() ) {
 			// Yes, we already have loaded this package. Increment the reference count and return it.
-			return { { candidate->second }, Error::NONE };
+			return { ObjectHandle<ContentPackage>( *candidate->second ) };
 		}
 
 		if( unique_ptr<ContentPackage, InstanceDeleter> package { new(_allocator, AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator ), { _allocator } } ) {
@@ -178,18 +178,18 @@ namespace FileSystem {
 			if( beginLoadResult ) {
 				_contentPackageCollection.Insert( { package->GetName(), package.get() } );
 				// This is the first external reference to the package, so we want the passthrough reference counting semantics.
-				return { { package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics }, Error::NONE };
+				return { { package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics } };
 			}
 
-			return { { nullptr }, beginLoadResult };
+			return { beginLoadResult };
 		}
 		
-		return { { nullptr }, Error::OUT_OF_MEMORY };
+		return { Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
 
-	DisposingResultPair<ContentPackage> ContentLibrary::CreatePackageForEditorWorld() {
+	DisposingResult<ContentPackage> ContentLibrary::CreatePackageForEditorWorld() {
 		class EditorPackage : public ContentPackage {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -227,9 +227,11 @@ namespace FileSystem {
 
 	// ---
 
-		auto* const	newPackage( new(_allocator, AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) );
+		if( auto* const	newPackage = new(_allocator, AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) ) {
+			return { { newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics } };
+		}
 
-		return { { newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics }, newPackage ? Error::NONE : Error::OUT_OF_MEMORY };
+		return { Error::OUT_OF_MEMORY };
 	}
 
 }	// namespace FileSystem

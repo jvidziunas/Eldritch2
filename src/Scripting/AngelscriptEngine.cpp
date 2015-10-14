@@ -107,7 +107,7 @@ namespace Scripting {
 	// ---
 
 		// Bytecode package
-		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), _scriptEngine.get(), [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> ResultPair<ResourceView> {
+		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), _scriptEngine.get(), [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> Result<ResourceView> {
 			using View = AngelscriptBytecodePackageView;
 
 		// ---
@@ -123,26 +123,28 @@ namespace Scripting {
 					
 					// Finally, try to load from the source asset data.
 					if( view->SerializeAndBindToModule( MessagePackReader( initializer.serializedAsset ) ) ) {
-						return { view.release(), Error::NONE };
+						return { *view.release() };
 					}
 
-					return { nullptr, Error::INVALID_PARAMETER };
+					return { Error::INVALID_PARAMETER };
 				}
 
-				return { nullptr, Error::OUT_OF_MEMORY };
+				return { Error::OUT_OF_MEMORY };
 			}
 
-			return { nullptr, Error::UNSPECIFIED };
+			return { Error::UNSPECIFIED };
 		} )
 		// Object graph
-		.PublishFactory( AngelscriptObjectGraphView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*parameter*/ ) -> ResultPair<ResourceView> {
+		.PublishFactory( AngelscriptObjectGraphView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*parameter*/ ) -> Result<ResourceView> {
 			using View = AngelscriptObjectGraphView;
 
 		// ---
 
-			auto* const	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) View( initializer, allocator ) );
+			if( auto* const	view = new(allocator, AllocationOption::PERMANENT_ALLOCATION) View( initializer, allocator ) ) {
+				return { *view };
+			}
 
-			return { view, view ? Error::NONE : Error::OUT_OF_MEMORY };
+			return { Error::OUT_OF_MEMORY };
 		} );
 	}
 

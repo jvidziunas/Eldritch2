@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ResultPair.hpp
+  Result.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -23,7 +23,11 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	struct ResultPair {
+	struct Result {
+		ETForceInlineHint Result( const ::Eldritch2::ErrorCode error );
+		ETForceInlineHint Result( ResultObject& object );
+		
+
 		ETForceInlineHint operator ::Eldritch2::ErrorCode&();
 		ETForceInlineHint operator const ::Eldritch2::ErrorCode&() const;
 
@@ -41,5 +45,5 @@ namespace Utility {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/ResultPair.inl>
+#include <Utility/Result.inl>
 //------------------------------------------------------------------//

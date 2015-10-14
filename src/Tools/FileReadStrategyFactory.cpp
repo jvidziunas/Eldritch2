@@ -15,25 +15,5 @@
 #include <Tools/FileReadStrategyFactory.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
 using namespace ::Eldritch2::Tools;
-
-namespace Eldritch2
-{
-
-	namespace Tools
-	{
-
-		FileReadStrategyFactory::FileReadStrategyFactory()
-		{
-		}
-
-	// ---------------------------------------------------
-
-		FileReadStrategyFactory::~FileReadStrategyFactory()
-		{
-		}
-
-	}	// namespace Tools
-
-}	// namespace Eldritch2
+using namespace ::Eldritch2;

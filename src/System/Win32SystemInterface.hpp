@@ -32,10 +32,10 @@ namespace Foundation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Win32SystemInterface instance.
+		//!	Constructs this @ref Win32SystemInterface instance.
 		Win32SystemInterface();
 
-		// Destroys this Win32SystemInterface instance.
+		//!	Destroys this @ref Win32SystemInterface instance.
 		~Win32SystemInterface();
 
 	// - MEMORY STATISTICS -------------------------------

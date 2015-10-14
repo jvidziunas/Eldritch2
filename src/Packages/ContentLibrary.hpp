@@ -37,9 +37,9 @@ namespace Eldritch2 {
 	namespace Utility {
 		class	ReaderWriterUserMutex;
 		template <typename ResultObjectType>
-		struct	DisposingResultPair;
+		struct	DisposingResult;
 		template <typename ResultObjectType>
-		struct	ResultPair;
+		struct	Result;
 	}
 
 	class	ErrorCode;
@@ -73,14 +73,14 @@ namespace FileSystem {
 
 		//! Signals to the @ref ContentLibrary that the resources in the specified package will be needed in the near future.
 		/*! @param[in] packageName A null-terminated C string containing the name of the package file, without any suffix or file extension.
-			@returns A @ref DisposingResultPair containing the content package, or an @ref ErrorCode indicating why a failure occurred.
+			@returns A @ref DisposingResult containing the content package, or an @ref ErrorCode indicating why a failure occurred.
 			@remarks If the desired package is already resident in memory, then a reference to it is added instead.
 			@remarks Thread-safe.
 			@see @ref ContentPackage, @ref CreatePackageForEditorWorld()
 			*/
-		Utility::DisposingResultPair<FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
+		Utility::DisposingResult<FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
 
-		Utility::DisposingResultPair<FileSystem::ContentPackage>	CreatePackageForEditorWorld();
+		Utility::DisposingResult<FileSystem::ContentPackage>	CreatePackageForEditorWorld();
 
 	// ---------------------------------------------------
 
@@ -170,7 +170,7 @@ namespace FileSystem {
 	// ---
 
 		struct ResourceViewFactory {
-			Utility::ResultPair<ResourceView> (*factoryFunction)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* );
+			Utility::Result<ResourceView> (*factoryFunction)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* );
 			void*	parameter;
 		};
 

@@ -1,11 +1,11 @@
 /*==================================================================*\
-  DisposingResultPair.inl
+  Result.inl
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -23,32 +23,32 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETInlineHint DisposingResultPair<ResultObject>::DisposingResultPair( Scripting::ObjectHandle<ResultObject>&& object, const ::Eldritch2::ErrorCode resultCode ) : object( ::std::move( object ) ), resultCode( resultCode ) {}
+	ETForceInlineHint Result<ResultObject>::Result( const ::Eldritch2::ErrorCode error ) : object( nullptr ), resultCode( error ) {}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETInlineHint DisposingResultPair<ResultObject>::DisposingResultPair( Utility::DisposingResultPair<ResultObject>&& rhs ) : object( ::std::move( rhs.object ) ), resultCode( rhs.resultCode ) {}
+	ETForceInlineHint Result<ResultObject>::Result( ResultObject& object ) : object( &object ), resultCode( ::Eldritch2::Error::NONE ) {}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETForceInlineHint DisposingResultPair<ResultObject>::operator ::Eldritch2::ErrorCode&() {
+	ETForceInlineHint Result<ResultObject>::operator ::Eldritch2::ErrorCode&() {
 		return resultCode;
 	}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETForceInlineHint DisposingResultPair<ResultObject>::operator const ::Eldritch2::ErrorCode&() const {
+	ETForceInlineHint Result<ResultObject>::operator const ::Eldritch2::ErrorCode&() const {
 		return resultCode;
 	}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETForceInlineHint DisposingResultPair<ResultObject>::operator bool() const {
-		return static_cast<bool>(resultCode);
+	ETForceInlineHint Result<ResultObject>::operator bool() const {
+		return static_cast<bool>( resultCode );
 	}
 
 }	// namespace Utility

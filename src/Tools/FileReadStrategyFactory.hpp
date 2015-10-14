@@ -22,7 +22,7 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		template <typename ResultObject>
-		struct	ResultPair;
+		struct	Result;
 	}
 
 	class	Allocator;
@@ -37,20 +37,14 @@ namespace Tools {
 
 // ---------------------------------------------------
 
-	namespace FileReadAccessorBehavior {
+	enum FileReadAccessorBehavior : ::Eldritch2::uint32 {
+		NORMAL = 0u,
+		UNBUFFERED = 1u,
 
-		STRONG_ENUM_CLASS( FileReadAccessorBehaviors, ::Eldritch2::uint32 ) {
-			NORMAL		= 0u,
-			UNBUFFERED	= 1u,
+	// ---
 
-		// ---
-
-			DEFAULT	= NORMAL
-		};
-
-	}	// namespace FileReadAccessorBehavior
-
-	typedef Tools::FileReadAccessorBehavior::FileReadAccessorBehaviors	FileReadAccessorBehaviors;
+		DEFAULT = NORMAL
+	};
 
 // ---------------------------------------------------
 
@@ -58,8 +52,8 @@ namespace Tools {
 	// - FILE READER OBJECT CONSTRUCTION -----------------
 
 	public:
-		virtual Utility::ResultPair<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const char* filePath, Tools::FileReadAccessorBehaviors behavior = Tools::FileReadAccessorBehavior::DEFAULT ) abstract;
-		virtual Utility::ResultPair<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const wchar_t* filePath, Tools::FileReadAccessorBehaviors behavior = Tools::FileReadAccessorBehavior::DEFAULT ) abstract;
+		virtual Utility::Result<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const char* filePath, Tools::FileReadAccessorBehavior behavior = Tools::FileReadAccessorBehavior::DEFAULT ) abstract;
+		virtual Utility::Result<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const wchar_t* filePath, Tools::FileReadAccessorBehavior behavior = Tools::FileReadAccessorBehavior::DEFAULT ) abstract;
 
 	// ---------------------------------------------------
 
@@ -68,11 +62,11 @@ namespace Tools {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this FileReadStrategyFactory instance.
-		FileReadStrategyFactory();
+		//!	Constructs this @ref FileReadStrategyFactory instance.
+		FileReadStrategyFactory() = default;
 		
-		// Destroys this FileReadStrategyFactory instance.
-		~FileReadStrategyFactory();
+		//!	Destroys this @ref FileReadStrategyFactory instance.
+		~FileReadStrategyFactory() = default;
 	};
 
 }	// namespace Tools

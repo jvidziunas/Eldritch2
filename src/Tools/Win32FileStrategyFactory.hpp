@@ -30,21 +30,21 @@ namespace Tools {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Win32FileStrategyFactory instance.
+		//!	Constructs this @ref Win32FileStrategyFactory instance.
 		Win32FileStrategyFactory( ::Eldritch2::Allocator& fileDataAllocator );
 
-		// Destroys this Win32FileStrategyFactory instance.
-		~Win32FileStrategyFactory();
+		//!	Destroys this @ref Win32FileStrategyFactory instance.
+		~Win32FileStrategyFactory() = default;
 
 	// - FILE READER OBJECT CONSTRUCTION -----------------
 
-		Utility::ResultPair<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const char* filePath, Tools::FileReadAccessorBehaviors behaviors = Tools::FileReadAccessorBehavior::DEFAULT ) override sealed;
-		Utility::ResultPair<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const wchar_t* filePath, Tools::FileReadAccessorBehaviors behaviors = Tools::FileReadAccessorBehavior::DEFAULT ) override sealed;
+		Utility::Result<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const char* filePath, Tools::FileReadAccessorBehavior behaviors = Tools::FileReadAccessorBehavior::DEFAULT ) override sealed;
+		Utility::Result<FileSystem::FileReadAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const wchar_t* filePath, Tools::FileReadAccessorBehavior behaviors = Tools::FileReadAccessorBehavior::DEFAULT ) override sealed;
 
 	// - FILE WRITER OBJECT CONSTRUCTION -----------------
 
-		Utility::ResultPair<FileSystem::FileWriteAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const char* filePath, Tools::FileWriteAccessorBehaviors behaviors = Tools::FileWriteAccessorBehavior::DEFAULT ) override sealed;
-		Utility::ResultPair<FileSystem::FileWriteAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const wchar_t* filePath, Tools::FileWriteAccessorBehaviors	behaviors = Tools::FileWriteAccessorBehavior::DEFAULT ) override sealed;
+		Utility::Result<FileSystem::FileWriteAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const char* filePath, Tools::FileWriteAccessorBehavior behaviors = Tools::FileWriteAccessorBehavior::DEFAULT ) override sealed;
+		Utility::Result<FileSystem::FileWriteAccessStrategy>	GetAccessor( ::Eldritch2::Allocator& allocator, const wchar_t* filePath, Tools::FileWriteAccessorBehavior behaviors = Tools::FileWriteAccessorBehavior::DEFAULT ) override sealed;
 
 	// ---------------------------------------------------
 

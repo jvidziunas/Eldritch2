@@ -1,5 +1,5 @@
 /*==================================================================*\
-  DisposingResultPair.hpp
+  DisposingResult.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -24,13 +24,15 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	struct DisposingResultPair {
+	struct DisposingResult {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this DisposingResultPair instance.
-		ETInlineHint DisposingResultPair( Scripting::ObjectHandle<ResultObject>&& object, const ::Eldritch2::ErrorCode resultCode );
-		// Constructs this DisposingResultPair instance.
-		ETInlineHint DisposingResultPair( Utility::DisposingResultPair<ResultObject>&& rhs );
+		//!	Constructs this @ref DisposingResult instance.
+		ETInlineHint DisposingResult( Scripting::ObjectHandle<ResultObject>&& object );
+		//!	Constructs this @ref DisposingResult instance.
+		ETInlineHint DisposingResult( const ::Eldritch2::ErrorCode errorCode );
+		//! Constructs this @ref DisposingResult instance.
+		ETInlineHint DisposingResult( Utility::DisposingResult<ResultObject>&& rhs );
 
 	// ---------------------------------------------------
 
@@ -51,5 +53,5 @@ namespace Utility {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/DisposingResultPair.inl>
+#include <Utility/DisposingResult.inl>
 //------------------------------------------------------------------//

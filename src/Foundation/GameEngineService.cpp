@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Configuration/ConfigurationDatabase.hpp>
 #include <Foundation/GameEngineService.hpp>
-#include <Utility/DisposingResultPair.hpp>
+#include <Utility/DisposingResult.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Scheduler/TaskScheduler.hpp>
 #include <Packages/ContentPackage.hpp>
@@ -53,52 +53,44 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	DisposingResultPair<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
-		DisposingResultPair<World>	result { nullptr, Error::UNSPECIFIED };
+	DisposingResult<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
+		auto	createWorldPackageResult( _owningEngine._contentLibrary.ResolvePackageByName( worldResourceName ) );
 
-		if( auto worldContent = _owningEngine._contentLibrary.ResolvePackageByName( worldResourceName ) ) {
-			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( ::std::move( worldContent.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
+		if( createWorldPackageResult ) {
+			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( move( createWorldPackageResult.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
 				if( world->GetLastError() ) {
 					// Transfer ownership of the world to the result object and thus to outer code.
-					result.object		= ::std::move( world );
-					result.resultCode	= Error::NONE;
+					return { move( world ) };
 				} else {
-					result.resultCode = world->GetLastError();
+					return { world->GetLastError() };
 				}
-			} else {
-				result.resultCode = Error::OUT_OF_MEMORY;
 			}
+
+			return { Error::OUT_OF_MEMORY };
 		}
 
-		if( !result.resultCode ) {
-			FormatAndLogError( UTF8L("Unable to create world '%s': %s.") ET_UTF8_NEWLINE_LITERAL, worldResourceName, result.resultCode.ToUTF8String() );
-		}
-		
-		return result;
+		return { createWorldPackageResult.resultCode };
 	}
 
 // ---------------------------------------------------
 
-	DisposingResultPair<World> GameEngineService::CreateEditorWorld() {
-		DisposingResultPair<World>	result { nullptr, Error::UNSPECIFIED };
+	DisposingResult<World> GameEngineService::CreateEditorWorld() {
+		auto	createWorldPackageResult( _owningEngine._contentLibrary.CreatePackageForEditorWorld() );
 
-		if( auto worldContent = _owningEngine._contentLibrary.CreatePackageForEditorWorld() ) {
-			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( ::std::move( worldContent.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
+		if( createWorldPackageResult ) {
+			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( move( createWorldPackageResult.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
 				if( world->GetLastError() ) {
-					result.object = ::std::move( world );
+					// Transfer ownership of the world to the result object and thus to outer code.
+					return { move( world ) };
+				} else {
+					return { world->GetLastError() };
 				}
-
-				result.resultCode = world->GetLastError();
-			} else {
-				result.resultCode = Error::OUT_OF_MEMORY;
 			}
+
+			return { Error::OUT_OF_MEMORY };
 		}
 
-		if( !result.resultCode ) {
-			FormatAndLogError( UTF8L("Unable to create editor world: %s.") ET_UTF8_NEWLINE_LITERAL, result.resultCode.ToUTF8String() );
-		}
-
-		return result;
+		return { createWorldPackageResult.resultCode };
 	}
 
 // ---------------------------------------------------

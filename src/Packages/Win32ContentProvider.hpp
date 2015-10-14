@@ -44,10 +44,10 @@ namespace FileSystem {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Win32ContentProvider instance.
+		//!	Constructs this @ref Win32ContentProvider instance.
 		Win32ContentProvider( const Foundation::Win32SystemInterface& systemInterface );
 
-		// Destroys this Win32ContentProvider instance.
+		//!	Destroys this @ref Win32ContentProvider instance.
 		~Win32ContentProvider();
 
 	// - FILE READ ACCESS --------------------------------
@@ -55,33 +55,33 @@ namespace FileSystem {
 		// Creates an asynchronous file reader object that can be used to access the contents of a file/stream in such a way that other tasks can (optionally)
 		// complete while waiting for the backing device to finish the request.
 		using ContentProvider::CreateAsynchronousFileReader;
-		Utility::ResultPair<FileSystem::AsynchronousFileReader>		CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		Utility::Result<FileSystem::AsynchronousFileReader>		CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 		// Creates an synchronous file reader object that can be used to access the contents of a file/stream without requiring that the calling thread be able to
 		// complete additional work while the underlying device operates.
 		using ContentProvider::CreateSynchronousFileReader;
-		Utility::ResultPair<FileSystem::SynchronousFileReader>		CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		Utility::Result<FileSystem::SynchronousFileReader>		CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 		// Creates a memory-mapped file object that can be read from (but not written to).
 		using ContentProvider::CreateReadableMemoryMappedFile;
-		Utility::ResultPair<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		Utility::Result<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 	// - FILE WRITE ACCESS -------------------------------
 
 		// Creates an asynchronous file writer object that can be used to access the contents of a file/stream in such a way that other tasks can (optionally)
 		// complete while waiting for the backing device to finish the request.
 		using ContentProvider::CreateAsynchronousFileWriter;
-		Utility::ResultPair<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
+		Utility::Result<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
 
 		// Creates an synchronous file writer object that can be used to access the contents of a file/stream without requiring that the calling thread be able to
 		// complete additional work while the underlying device operates.
 		using ContentProvider::CreateSynchronousFileWriter;
-		Utility::ResultPair<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
+		Utility::Result<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
 
 	// - FILE APPEND ACCESS ------------------------------
 
 		using ContentProvider::CreateSynchronousFileAppender;
-		Utility::ResultPair<FileSystem::SynchronousFileAppender>	CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		Utility::Result<FileSystem::SynchronousFileAppender>	CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 	// - FREE (UNPACKAGED) FILE MANIPULATION -------------
 

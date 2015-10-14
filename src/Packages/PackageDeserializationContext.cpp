@@ -14,11 +14,11 @@
 //==================================================================//
 #include <Packages/PackageDeserializationContext.hpp>
 #include <Utility/ReadableMemoryMappedFile.hpp>
-#include <Utility/DisposingResultPair.hpp>
+#include <Utility/DisposingResult.hpp>
 #include <Packages/ContentProvider.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Packages/ContentPackage.hpp>
-#include <Utility/ResultPair.hpp>
+#include <Utility/Result.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 

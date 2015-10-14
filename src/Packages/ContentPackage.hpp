@@ -32,7 +32,7 @@ namespace Eldritch2 {
 	namespace Utility {
 		class	ScopedLock;
 		template <typename ResultObjectType>
-		struct	ResultPair;
+		struct	Result;
 	}
 
 	class	ErrorCode;
@@ -99,7 +99,7 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		Utility::ResultPair<FileSystem::ReadableMemoryMappedFile>	CreateBackingFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const suffix ) const;
+		Utility::Result<FileSystem::ReadableMemoryMappedFile>	CreateBackingFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const suffix ) const;
 
 	// ---------------------------------------------------
 

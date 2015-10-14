@@ -24,7 +24,7 @@
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Scheduler/TaskScheduler.hpp>
-#include <Utility/ResultPair.hpp>
+#include <Utility/Result.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
 #include <utfcpp/v2_0/source/utf8/unchecked.h>
@@ -269,69 +269,65 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ResultPair<AsynchronousFileReader> Win32ContentProvider::CreateAsynchronousFileReader( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
-		ResultPair<AsynchronousFileReader>	result { nullptr, Error::BAD_FILE_NAME };
-		wchar_t								filePath[DIR_LENGTH];
-		const ::HANDLE						file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
-																 GENERIC_READ,
-																 FILE_SHARE_READ,
-																 nullptr,
-																 OPEN_EXISTING,
-																 AGGREGATE_READ_ATTRIBUTES,
-																 nullptr ) );
+	Result<AsynchronousFileReader> Win32ContentProvider::CreateAsynchronousFileReader( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
+		wchar_t			filePath[DIR_LENGTH];
+		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
+											 GENERIC_READ,
+											 FILE_SHARE_READ,
+											 nullptr,
+											 OPEN_EXISTING,
+											 AGGREGATE_READ_ATTRIBUTES,
+											 nullptr ) );
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			result.object		= new( allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION ) Win32AsynchronousFileAccessor( file, diskSectorSizeInBytes );
-			result.resultCode	= result.object ? Error::NONE : Error::OUT_OF_MEMORY;
+			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32AsynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+				return { *accessor };
+			}
 		}
 
 		// If the reader creation failed, we're responsible for closing the file handle here (the reader will not be able to do this in the destructor)
-		if( !result ) {
-			::CloseHandle( file );
-		}
+		::CloseHandle( file );
 
-		return result;
+		return { Error::BAD_FILE_NAME };
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<SynchronousFileReader> Win32ContentProvider::CreateSynchronousFileReader( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
-		ResultPair<SynchronousFileReader>	result { nullptr, Error::BAD_FILE_NAME };
-		wchar_t								filePath[DIR_LENGTH];
-		const ::HANDLE						file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
-																 GENERIC_READ,
-																 FILE_SHARE_READ,
-																 nullptr,
-																 OPEN_EXISTING,
-																 AGGREGATE_SYNCHRONOUS_READ_ATTRIBUTES,
-																 nullptr ) );
+	Result<SynchronousFileReader> Win32ContentProvider::CreateSynchronousFileReader( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
+		wchar_t			filePath[DIR_LENGTH];
+		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
+											 GENERIC_READ,
+											 FILE_SHARE_READ,
+											 nullptr,
+											 OPEN_EXISTING,
+											 AGGREGATE_SYNCHRONOUS_READ_ATTRIBUTES,
+											 nullptr ) );
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			result.object		= new( allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION ) Win32SynchronousFileAccessor( file, diskSectorSizeInBytes );
-			result.resultCode	= result.object ? Error::NONE : Error::OUT_OF_MEMORY;
+			if( auto * const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+				return { *accessor };
+			}
 		}
 
 		// If the reader creation failed, we're responsible for closing the file handle here (the reader will not be able to do this in the destructor)
-		if( !result ) {
-			::CloseHandle( file );
-		}
+		::CloseHandle( file );
 
-		return result;
+		return { Error::BAD_FILE_NAME };
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<ReadableMemoryMappedFile> Win32ContentProvider::CreateReadableMemoryMappedFile( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
+	Result<ReadableMemoryMappedFile> Win32ContentProvider::CreateReadableMemoryMappedFile( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
 		class Win32ReadableMemoryMappedFile : public ReadableMemoryMappedFile {
 		public:
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this Win32ReadableMemoryMappedFile instance.
+			//!	Constructs this @ref Win32ReadableMemoryMappedFile instance.
 			Win32ReadableMemoryMappedFile( const Range<const char*> mappedRegion ) : _region( mappedRegion ) {}
 
-			// Destroys this Win32ReadableMemoryMappedFile instance.
+			//!	Destroys this @ref Win32ReadableMemoryMappedFile instance.
 			~Win32ReadableMemoryMappedFile() {
 				::UnmapViewOfFile( _region.first );
 			}
@@ -393,22 +389,24 @@ namespace FileSystem {
 		};
 #endif
 
+		using AllocationOption	= Allocator::AllocationOption;
+
 	// ---
 
-		ResultPair<ReadableMemoryMappedFile>	result { nullptr, Error::BAD_FILE_NAME };
-		wchar_t									filePath[DIR_LENGTH];
-		const ::HANDLE							file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
-																	 GENERIC_READ,
-																	 FILE_SHARE_READ,
-																	 nullptr,
-																	 OPEN_EXISTING,
-																	 AGGREGATE_SYNCHRONOUS_READ_ATTRIBUTES,
-																	 nullptr ) );
+		wchar_t			filePath[DIR_LENGTH];
+		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
+											 GENERIC_READ,
+											 FILE_SHARE_READ,
+											 nullptr,
+											 OPEN_EXISTING,
+											 AGGREGATE_SYNCHRONOUS_READ_ATTRIBUTES,
+											 nullptr ) );
 
-		if( const ::HANDLE fileMapping = ::CreateFileMapping( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) ) {
+		if( const ::HANDLE fileMapping { ::CreateFileMapping( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) } ) {
 			if( const void* const mappedView = ::MapViewOfFile( fileMapping, FILE_MAP_READ, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), static_cast<::SIZE_T>(0u) ) ) {
-				result.object		= new( allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION ) Win32ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) );
-				result.resultCode	= result.object ? Error::NONE : Error::OUT_OF_MEMORY;
+				if( auto* const resultObject = new(allocator, AllocationOption::TEMPORARY_ALLOCATION) Win32ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) ) ) {
+					return { *resultObject };
+				}
 			}
 
 			::CloseHandle( fileMapping );
@@ -416,74 +414,70 @@ namespace FileSystem {
 
 		::CloseHandle( file );
 
-		return result;
+		return { Error::BAD_FILE_NAME };
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<AsynchronousFileWriter> Win32ContentProvider::CreateAsynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
-		ResultPair<AsynchronousFileWriter>	result { nullptr, Error::BAD_FILE_NAME };
-		wchar_t								filePath[DIR_LENGTH];
-		const ::HANDLE						file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
-																 GENERIC_WRITE,
-																 FILE_SHARE_WRITE,
-																 nullptr,
-																 FileOverwriteBehavior::FAIL_IF_FILE_EXISTS == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
-																 AGGREGATE_WRITE_ATTRIBUTES,
-																 nullptr ) );
+	Result<AsynchronousFileWriter> Win32ContentProvider::CreateAsynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
+		wchar_t			filePath[DIR_LENGTH];
+		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
+											 GENERIC_WRITE,
+											 FILE_SHARE_WRITE,
+											 nullptr,
+											 FileOverwriteBehavior::FAIL_IF_FILE_EXISTS == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
+											 AGGREGATE_WRITE_ATTRIBUTES,
+											 nullptr ) );
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			result.object		= new( allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION ) Win32AsynchronousFileAccessor( file, diskSectorSizeInBytes );
-			result.resultCode	= result.object ? Error::NONE : Error::OUT_OF_MEMORY;
+			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32AsynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+				return { *accessor };
+			}
 		}
 
 		// If the writer creation failed, we're responsible for closing the file handle here (the writer will not be able to do this in the destructor)
-		if( !result ) {
-			::CloseHandle( file );
-		}
+		::CloseHandle( file );
 
-		return result;
+		return { Error::BAD_FILE_NAME };
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<SynchronousFileWriter> Win32ContentProvider::CreateSynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
-		ResultPair<SynchronousFileWriter>	result{ nullptr, Error::BAD_FILE_NAME };
-		wchar_t								filePath[DIR_LENGTH];
-		const ::HANDLE						file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
-																 GENERIC_WRITE,
-																 FILE_SHARE_WRITE,
-																 nullptr,
-																 FileOverwriteBehavior::FAIL_IF_FILE_EXISTS == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
-																 AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES,
-																 nullptr ) );
+	Result<SynchronousFileWriter> Win32ContentProvider::CreateSynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
+		wchar_t			filePath[DIR_LENGTH];
+		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
+											 GENERIC_WRITE,
+											 FILE_SHARE_WRITE,
+											 nullptr,
+											 FileOverwriteBehavior::FAIL_IF_FILE_EXISTS == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
+											 AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES,
+											 nullptr ) );
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			result.object		= new( allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION ) Win32SynchronousFileAccessor( file, diskSectorSizeInBytes );
-			result.resultCode	= result.object ? Error::NONE : Error::OUT_OF_MEMORY;
+			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+				return { *accessor };
+			}
 		}
 
 		// If the writer creation failed, we're responsible for closing the file handle here (the writer will not be able to do this in the destructor)
-		if( !result ) {
-			::CloseHandle( file );
-		}
+		::CloseHandle( file );
 
-		return result;
+		return { Error::BAD_FILE_NAME };
 	}
 
 // ---------------------------------------------------
 
-	ResultPair<SynchronousFileAppender> Win32ContentProvider::CreateSynchronousFileAppender( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
+	Result<SynchronousFileAppender> Win32ContentProvider::CreateSynchronousFileAppender( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
 		class Win32SynchronousFileAppender : public SynchronousFileAppender {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this Win32SynchronousFileAppender instance.
+			//!	Constructs this @ref Win32SynchronousFileAppender instance.
 			Win32SynchronousFileAppender( const ::HANDLE fileHandle ) : _fileHandle( fileHandle ) {}
 
-			// Destroys this Win32SynchronousFileAppender instance.
+			//! Destroys this @ref Win32SynchronousFileAppender instance.
 			~Win32SynchronousFileAppender() {
 				::CloseHandle( _fileHandle );
 			}
@@ -504,25 +498,27 @@ namespace FileSystem {
 
 	// ---
 
-		ResultPair<SynchronousFileAppender>	result{ nullptr, Error::BAD_FILE_NAME };
-		wchar_t								filePath[DIR_LENGTH];
-		const ::HANDLE						file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
-																 FILE_APPEND_DATA,
-																 FILE_SHARE_READ,
-																 nullptr,
-																 OPEN_ALWAYS,
-																 AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES,
-																 nullptr ) );
+		wchar_t			filePath[DIR_LENGTH];
+		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
+											 FILE_APPEND_DATA,
+											 FILE_SHARE_READ,
+											 nullptr,
+											 OPEN_ALWAYS,
+											 AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES,
+											 nullptr ) );
 
-		result.object		= new( allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION ) Win32SynchronousFileAppender( file );
-		result.resultCode	= result.object ? Error::NONE : Error::OUT_OF_MEMORY;
+		if( INVALID_HANDLE_VALUE != file ) {
+			if( auto* const appender = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAppender( file ) ) {
+				return { *appender };
+			}
 
-		// If the writer creation failed, we're responsible for closing the file handle here (the writer will not be able to do this in the destructor)
-		if( !result ) {
-			::CloseHandle( file );
+			return { Error::OUT_OF_MEMORY };
 		}
 
-		return result;
+		// If the writer creation failed, we're responsible for closing the file handle here (the writer will not be able to do this in the destructor)
+		::CloseHandle( file );
+
+		return { Error::BAD_FILE_NAME };
 	}
 
 // ---------------------------------------------------

@@ -17,7 +17,7 @@
 #include <Scheduler/TaskScheduler.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/LoaderThread.hpp>
-#include <Utility/ResultPair.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;

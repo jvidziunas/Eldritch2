@@ -24,7 +24,7 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		template <typename ResultObject>
-		struct	ResultPair;
+		struct	Result;
 	}
 
 	class	Allocator;
@@ -77,11 +77,11 @@ namespace Foundation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this SystemInterface instance.
-		SystemInterface();
+		//!	Constructs this @ref SystemInterface instance.
+		SystemInterface() = default;
 
-		// Destroys this SystemInterface instance.
-		~SystemInterface();
+		//!	Destroys this @ref SystemInterface instance.
+		~SystemInterface() = default;
 	};
 
 }	// namespace Foundation

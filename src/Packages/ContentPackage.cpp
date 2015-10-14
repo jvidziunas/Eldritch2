@@ -16,7 +16,7 @@
 #include <Packages/ContentProvider.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/ContentLibrary.hpp>
-#include <Utility/ResultPair.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
@@ -46,7 +46,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ResultPair<ReadableMemoryMappedFile> ContentPackage::CreateBackingFile( Allocator& allocator, const UTF8Char* const suffix ) const {
+	Result<ReadableMemoryMappedFile> ContentPackage::CreateBackingFile( Allocator& allocator, const UTF8Char* const suffix ) const {
 		using KnownContentLocation	= ContentProvider::KnownContentLocation;
 
 	// ---

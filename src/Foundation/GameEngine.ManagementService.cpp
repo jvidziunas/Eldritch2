@@ -24,7 +24,6 @@
 #include <Scheduler/WorkerContext.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Foundation/WorldView.hpp>
-#include <Utility/ResultPair.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
 //------------------------------------------------------------------//

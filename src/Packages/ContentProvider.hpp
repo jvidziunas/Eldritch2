@@ -37,7 +37,7 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		template <typename ResultObjectType>
-		struct	ResultPair;
+		struct	Result;
 	}
 
 	class	Allocator;
@@ -96,40 +96,40 @@ namespace FileSystem {
 		// Creates an asynchronous file reader object that can be used to access the contents of a file/stream in such a way that other tasks can (optionally)
 		// complete while waiting for the backing device to finish the request.
 		template <typename KnownContentLocationIterator>
-		Utility::ResultPair<FileSystem::AsynchronousFileReader>			CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName );
-		virtual Utility::ResultPair<FileSystem::AsynchronousFileReader>	CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
+		Utility::Result<FileSystem::AsynchronousFileReader>			CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName );
+		virtual Utility::Result<FileSystem::AsynchronousFileReader>	CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
 		
 		// Creates an synchronous file reader object that can be used to access the contents of a file/stream without requiring that the calling thread be able to
 		// complete additional work while the underlying device operates.
 		template <typename KnownContentLocationIterator>
-		Utility::ResultPair<FileSystem::SynchronousFileReader>			CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName );
-		virtual Utility::ResultPair<FileSystem::SynchronousFileReader>	CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
+		Utility::Result<FileSystem::SynchronousFileReader>			CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName );
+		virtual Utility::Result<FileSystem::SynchronousFileReader>	CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
 
 		
 		// Creates a memory-mapped file object that can be read from (but not written to).
 		template <typename KnownContentLocationIterator>
-		Utility::ResultPair<FileSystem::ReadableMemoryMappedFile>			CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator> locations, const ::Eldritch2::UTF8Char* const fileName );
-		virtual Utility::ResultPair<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
+		Utility::Result<FileSystem::ReadableMemoryMappedFile>			CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator> locations, const ::Eldritch2::UTF8Char* const fileName );
+		virtual Utility::Result<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
 
 	// - FILE WRITE ACCESS -------------------------------
 
 		// Creates an asynchronous file writer object that can be used to access the contents of a file/stream in such a way that other tasks can (optionally)
 		// complete while waiting for the backing device to finish the request.
 		template <typename KnownContentLocationIterator>
-		Utility::ResultPair<FileSystem::AsynchronousFileWriter>			CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT );
-		virtual Utility::ResultPair<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT ) abstract;
+		Utility::Result<FileSystem::AsynchronousFileWriter>			CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT );
+		virtual Utility::Result<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT ) abstract;
 
 		// Creates an synchronous file writer object that can be used to access the contents of a file/stream without requiring that the calling thread be able to
 		// complete additional work while the underlying device operates.
 		template <typename KnownContentLocationIterator>
-		Utility::ResultPair<FileSystem::SynchronousFileWriter>			CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT );
-		virtual Utility::ResultPair<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT ) abstract;
+		Utility::Result<FileSystem::SynchronousFileWriter>			CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT );
+		virtual Utility::Result<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT ) abstract;
 
 	// - FILE APPEND ACCESS ------------------------------
 
 		template <typename KnownContentLocationIterator>
-		Utility::ResultPair<FileSystem::SynchronousFileAppender>			CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName );
-		virtual Utility::ResultPair<FileSystem::SynchronousFileAppender>	CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
+		Utility::Result<FileSystem::SynchronousFileAppender>			CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName );
+		virtual Utility::Result<FileSystem::SynchronousFileAppender>	CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
 
 	// - FREE (UNPACKAGED) FILE MANIPULATION -------------
 

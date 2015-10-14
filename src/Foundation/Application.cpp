@@ -7,7 +7,7 @@
   subclassed and extended for specific compile-time functionality.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
@@ -16,7 +16,7 @@
 //==================================================================//
 #include <Foundation/Application.hpp>
 #include <System/SystemInterface.hpp>
-#include <Utility/ResultPair.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Foundation;

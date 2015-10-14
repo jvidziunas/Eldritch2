@@ -37,9 +37,9 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		template <typename ResultObject>
-		struct	DisposingResultPair;
+		struct	DisposingResult;
 		template <typename ResultObject>
-		struct	ResultPair;
+		struct	Result;
 	}
 }
 
@@ -70,10 +70,10 @@ namespace Networking {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this Player instance.
+			//!	Constructs this @ref Player instance.
 			Player( const NetworkID& networkID, SteamworksNetworkingService& networkingService, ::Eldritch2::Allocator& allocator );
 
-			// Destroys this Player instance.
+			//!	Destroys this @ref Player instance.
 			~Player();
 		
 		// ---------------------------------------------------
@@ -96,10 +96,10 @@ namespace Networking {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Initializes this SteamworksNetworkingService instance.
+		//! Constructs this @ref SteamworksNetworkingService instance.
 		SteamworksNetworkingService( Foundation::GameEngine& owningEngine );
 
-		// Destroys this SteamworksNetworkingService instance.
+		//! Destroys this @ref SteamworksNetworkingService instance.
 		~SteamworksNetworkingService();
 
 	// ---------------------------------------------------
@@ -127,15 +127,15 @@ namespace Networking {
 
 	// ---------------------------------------------------
 
-		Utility::ResultPair<Player>	AcknowledgePlayerConnection( const NetworkID& networkID );
+		Utility::Result<Player>	AcknowledgePlayerConnection( const NetworkID& networkID );
 
-		::Eldritch2::ErrorCode		ProcessAndDispatchCallbacks();
+		::Eldritch2::ErrorCode	ProcessAndDispatchCallbacks();
 
-		void						InitiateSteamConnection();
+		void					InitiateSteamConnection();
 
-		void						AcknowledgePlayerDisconnection( const NetworkID& networkID );
+		void					AcknowledgePlayerDisconnection( const NetworkID& networkID );
 
-		void						AcknowledgeClientDisconnection( const ::CSteamID clientID );
+		void					AcknowledgeClientDisconnection( const ::CSteamID clientID );
 
 	// - DATA MEMBERS ------------------------------------
 

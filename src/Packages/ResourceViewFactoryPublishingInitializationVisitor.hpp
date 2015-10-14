@@ -22,7 +22,7 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		template <typename ResultObjectType>
-		struct	ResultPair;
+		struct	Result;
 	}
 }
 
@@ -50,10 +50,10 @@ namespace FileSystem {
 		//!	Registers an object creation handler for a specified class of resource view object.
 		/*!	@param[in] className Null-terminated C string containing the type name of the resource.
 			@param[in] parameter Pointer parameter to be sent to the callback for resource creation.
-			@param[in] factory Factory function. This should attempt to allocate a new instance of a @ref ResourceView subclass and return it in the ResultPair for the function.
+			@param[in] factory Factory function. This should attempt to allocate a new instance of a @ref ResourceView subclass and return it in the Result for the function.
 			@returns A reference to *this for method chaining.
 			*/
-		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, Utility::ResultPair<FileSystem::ResourceView> (*factory)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* ) );
+		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, Utility::Result<FileSystem::ResourceView> (*factory)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* ) );
 		
 	// - DATA MEMBERS ------------------------------------
 

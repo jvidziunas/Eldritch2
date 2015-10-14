@@ -27,7 +27,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ResourceViewFactoryPublishingInitializationVisitor& ResourceViewFactoryPublishingInitializationVisitor::PublishFactory( const UTF8Char* const className, void* const parameter, ResultPair<ResourceView> (*factory)( Allocator&, const ResourceView::Initializer&, void* ) ) {
+	ResourceViewFactoryPublishingInitializationVisitor& ResourceViewFactoryPublishingInitializationVisitor::PublishFactory( const UTF8Char* const className, void* const parameter, Result<ResourceView> (*factory)( Allocator&, const ResourceView::Initializer&, void* ) ) {
 		using ResourceViewFactoryLibrary	= decltype(_contentLibrary._resourceViewFactoryCollection);
 		using MappedType					= ResourceViewFactoryLibrary::MappedType;
 		using KeyType						= ResourceViewFactoryLibrary::KeyType;

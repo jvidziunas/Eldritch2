@@ -300,9 +300,6 @@
     <ClCompile Include="..\src\foundation\Player.cpp">
       <Filter>Source Files\Engine\Foundation\Players</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\system\SystemInterface.cpp">
-      <Filter>Source Files\Engine\Foundation\System</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\system\Win32SystemInterface.cpp">
       <Filter>Source Files\Engine\Foundation\System</Filter>
     </ClCompile>
@@ -687,9 +684,6 @@
       <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\RandomNumberGenerator.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\ResultPair.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ScopedFPUController.hpp">
@@ -1079,9 +1073,6 @@
     <ClInclude Include="..\src\Physics\Bullet\btSoftBodyWorldMixin.hpp">
       <Filter>Header Files\Engine\Physics\Bullet\Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\DisposingResultPair.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
@@ -1144,6 +1135,12 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp">
       <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Result.hpp">
+      <Filter>Header Files\Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\DisposingResult.hpp">
+      <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

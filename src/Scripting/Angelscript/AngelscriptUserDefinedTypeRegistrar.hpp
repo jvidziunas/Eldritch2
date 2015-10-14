@@ -18,7 +18,7 @@
 namespace Eldritch2 {
 	namespace Utility {
 		template <typename ResultObjectType>
-		struct	ResultPair;
+		struct	Result;
 	}
 
 	class	ErrorCode;
@@ -203,31 +203,31 @@ namespace Scripting {
 	// ---------------------------------------------------
 
 		template <typename Native>
-		Utility::ResultPair<ReferenceTypeBuilder<Native>>	RegisterUserDefinedReferenceType( ::Eldritch2::Allocator& builderAllocator );
+		Utility::Result<ReferenceTypeBuilder<Native>>	RegisterUserDefinedReferenceType( ::Eldritch2::Allocator& builderAllocator );
 
 		template <typename Native>
-		Utility::ResultPair<ValueTypeBuilder<Native>>		RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator );
+		Utility::Result<ValueTypeBuilder<Native>>		RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator );
 
 		template <typename Enum>
-		Utility::ResultPair<UserDefinedEnumBuilder<Enum>>	RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator );
+		Utility::Result<UserDefinedEnumBuilder<Enum>>	RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator );
 
 		template <typename Native>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&		EnsureReferenceTypeDeclared();
+		Scripting::AngelscriptUserDefinedTypeRegistrar&	EnsureReferenceTypeDeclared();
 
 		template <typename Native>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&		EnsureValueTypeDeclared();
+		Scripting::AngelscriptUserDefinedTypeRegistrar&	EnsureValueTypeDeclared();
 
 		template <typename Enum>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&		EnsureEnumDeclared();
+		Scripting::AngelscriptUserDefinedTypeRegistrar&	EnsureEnumDeclared();
 
 		template <typename Return, typename... Arguments>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&		ExposeFunction( const char* const functionName, Return (ETScriptAPICall* method)( Arguments... ) );
+		Scripting::AngelscriptUserDefinedTypeRegistrar&	ExposeFunction( const char* const functionName, Return (ETScriptAPICall* method)( Arguments... ) );
 
 		template <typename Property>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&		ExposeVirtualProperty( const char* const propertyName, Property (ETScriptAPICall* getterFunction)() );
+		Scripting::AngelscriptUserDefinedTypeRegistrar&	ExposeVirtualProperty( const char* const propertyName, Property (ETScriptAPICall* getterFunction)() );
 
 		template <typename Property>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&		ExposeVirtualProperty( const char* const propertyName, void (ETScriptAPICall* setterFunction)( Property ) );
+		Scripting::AngelscriptUserDefinedTypeRegistrar&	ExposeVirtualProperty( const char* const propertyName, void (ETScriptAPICall* setterFunction)( Property ) );
 
 	// - DATA MEMBERS ------------------------------------
 

@@ -194,7 +194,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\configuration\ConfigurationService.cpp" />
     <ClCompile Include="..\src\foundation\Window.cpp" />
     <ClCompile Include="..\src\foundation\Player.cpp" />
-    <ClCompile Include="..\src\system\SystemInterface.cpp" />
     <ClCompile Include="..\src\system\Win32SystemInterface.cpp" />
     <ClCompile Include="..\src\Foundation\World.cpp" />
     <ClCompile Include="..\src\input\Win32InputService.cpp" />
@@ -321,7 +320,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
-    <ClInclude Include="..\src\Utility\DisposingResultPair.hpp" />
+    <ClInclude Include="..\src\Utility\DisposingResult.hpp" />
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp" />
@@ -336,7 +335,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\IdentifierPool.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="..\src\Utility\RandomNumberGenerator.hpp" />
-    <ClInclude Include="..\src\Utility\ResultPair.hpp" />
+    <ClInclude Include="..\src\Utility\Result.hpp" />
     <ClInclude Include="..\src\Utility\ScopedFPUController.hpp" />
     <ClInclude Include="..\src\Utility\SurjectiveQueryEngine.hpp" />
     <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp" />
