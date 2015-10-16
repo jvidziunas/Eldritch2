@@ -317,8 +317,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Concurrency\WaitableUserEvent.hpp" />
     <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
     <ClInclude Include="..\src\Utility\DisposingResult.hpp" />
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp" />

@@ -24,28 +24,22 @@ using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 using namespace ::std;
 
-namespace {
-
-	static const UTF8Char	methodMetadataBucketAllocator[]		= UTF8L("Angelscript Type Metadata Method Metadata Allocator");
-	static const UTF8Char	propertyMetadataBucketAllocator[]	= UTF8L("Angelscript Type Metadata Property Metadata Allocator");
-
-}	// anonymous namespace
-
 namespace Eldritch2 {
 namespace Scripting {
 
-	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( 0u, allocator, methodMetadataBucketAllocator ), _propertyMetadata( 0u, allocator, propertyMetadataBucketAllocator ) {}
+	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( { allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") } ),
+																					 _propertyMetadata( { allocator, UTF8L("Angelscript Type Metadata Property Metadata Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata() : _methodMetadata( 0u, NullAllocator::GetInstance(), methodMetadataBucketAllocator ), _propertyMetadata( 0u, NullAllocator::GetInstance(), propertyMetadataBucketAllocator ) {}
+	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata() : TypeMetadata( NullAllocator::GetInstance() ) {}
 
 // ---------------------------------------------------
 
 	AngelscriptBytecodePackage::AngelscriptBytecodePackage( unique_ptr<::asIScriptModule>&& ownedModule, Allocator& allocator ) : _module( move( ownedModule ) ),
-																																  _rootAllocator( allocator, UTF8L("Angelscript Bytecode Package Metadata Root Allocator") ),
-																																  _typeMetadata( 0u, _rootAllocator, UTF8L( "Angelscript Bytecode Package Type Metadata Allocator" ) ),
-																																  _functionMetadata( 0u, _rootAllocator, UTF8L( "Angelscript Bytecode Package Function Metadata Allocator" ) ) {
+																																  _rootAllocator( { allocator, UTF8L("Angelscript Bytecode Package Metadata Root Allocator") } ),
+																																  _typeMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") } ),
+																																  _functionMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") } ) {
 		_module->SetUserData( this );
 	}
 

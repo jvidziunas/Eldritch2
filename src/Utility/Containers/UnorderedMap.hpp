@@ -39,17 +39,17 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref UnorderedMap instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint explicit UnorderedMap( const SizeType initialBucketCount, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint explicit UnorderedMap( AllocatorType&& allocatorType = AllocatorType() );
 		//! Constructs this @ref UnorderedMap instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint UnorderedMap( const SizeType initialBucketCount, const Hasher& hasher, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint UnorderedMap( const SizeType initialCapacity, Hasher&& hasher = Hasher(), AllocatorType&& allocatorType = AllocatorType() );
 		//! Constructs this @ref UnorderedMap instance.
-		template <class AlternateAllocator, int alternateLoadFactor, typename... AllocatorConstructorArguments>
-		ETInlineHint UnorderedMap( const ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		template <class AlternateAllocator, int alternateLoadFactor>
+		ETInlineHint UnorderedMap( const ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocatorType = AllocatorType() );
+		//! Constructs this @ref UnorderedMap instance.
+		ETInlineHint UnorderedMap( ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource );
 
 		//! Destroys this @ref UnorderedMap instance.
-		ETInlineHint ~UnorderedMap();
+		ETInlineHint ~UnorderedMap() = default;
 
 	// - ALGORITHMS --------------------------------------
 

@@ -27,10 +27,10 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	ContentPackage::ContentPackage( const UTF8Char* const name, ContentLibrary& owningLibrary, Allocator& allocator ) : _allocator( allocator, UTF8L("Package Allocator") ),
-																														_name( name, StringLength( name ), allocator, UTF8L("Package Name Allocator") ),
+																														_name( name, name + StringLength( name ), { allocator, UTF8L("Package Name Allocator") } ),
 																														_owningLibrary( owningLibrary ),
 																														_residencyState( ResidencyState::LOADING ),
-																														_referencedPackages( 0u, allocator, UTF8L("Package Dependency Collection Allocator") ) {}
+																														_referencedPackages( { allocator, UTF8L("Package Dependency Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -48,10 +48,13 @@ namespace FileSystem {
 
 	Result<ReadableMemoryMappedFile> ContentPackage::CreateBackingFile( Allocator& allocator, const UTF8Char* const suffix ) const {
 		using KnownContentLocation	= ContentProvider::KnownContentLocation;
+		enum : ExternalArenaAllocator::SizeType {
+			STRING_SIZE_IN_BYTES = 128u
+		};
 
 	// ---
 
-		UTF8String<FixedStackAllocator<128u>>	fileName( ::Eldritch2::EmptyStringSemantics, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") );
+		UTF8String<ExternalArenaAllocator>	fileName( ::Eldritch2::EmptyStringSemantics, { _alloca( STRING_SIZE_IN_BYTES ), STRING_SIZE_IN_BYTES, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") } );
 
 		fileName.Reserve( _name.Length() + StringLength( suffix ) );
 		fileName.Append( _name ).Append( suffix ? suffix : UTF8L("") );

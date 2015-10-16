@@ -31,7 +31,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Renderer {
 
-	Direct3D11HLSLPipelineDefinitionView::Direct3D11HLSLPipelineDefinitionView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _usages( 0u, allocator, UTF8L("Direct3D11 Pipeline Definition Usage Directory Allocator") ) {}
+	Direct3D11HLSLPipelineDefinitionView::Direct3D11HLSLPipelineDefinitionView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _usages( { allocator, UTF8L("Direct3D11 Pipeline Definition Usage Directory Allocator") } ) {}
 
 // ---------------------------------------------------
 

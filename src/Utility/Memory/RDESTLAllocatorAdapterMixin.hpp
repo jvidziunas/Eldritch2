@@ -35,10 +35,9 @@ namespace Eldritch2Detail {
 			*/
 		ETForceInlineHint RDESTLAllocatorAdapterMixin( ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>&& allocator );
 		//! Constructs this @ref RDESTLAllocatorAdapterMixin instance.
-		/*!	@param[in] allocatorConstructorArguments Template parameter pack containing the arguments to be forwarded to the underlying @ref Allocator instance.
+		/*!	@param[in] allocator Movable @ref Allocator subclass instance from which resources will be moved.
 			*/
-		template <typename... AllocatorConstructorArguments>
-		ETForceInlineHint RDESTLAllocatorAdapterMixin( AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETForceInlineHint RDESTLAllocatorAdapterMixin( PublicAllocatorType&& allocator );
 
 		//! Destroys this @ref RDESTLAllocatorAdapterMixin instance.
 		ETForceInlineHint ~RDESTLAllocatorAdapterMixin() = default;

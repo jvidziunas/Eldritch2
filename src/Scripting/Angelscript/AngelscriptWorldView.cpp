@@ -34,9 +34,9 @@ namespace Eldritch2 {
 namespace Scripting {
 
 	AngelscriptWorldView::AngelscriptWorldView( World& owningWorld, ::asIScriptEngine& scriptEngine ) : WorldView( owningWorld ),
-																										_stringAllocator( GetWorldAllocator(), UTF8L("World String Root Allocator") ),
+																										_stringAllocator( { GetWorldAllocator(), UTF8L("World String Root Allocator") } ),
 																										_scriptEngine( (scriptEngine.AddRef(), scriptEngine) ),
-																										_entityDispatchTable( 0u, GetWorldAllocator(), UTF8L("Angelscript World View Dispatch Table Allocator") ),
+																										_entityDispatchTable( { GetWorldAllocator(), UTF8L("Angelscript World View Dispatch Table Allocator") } ),
 																										_gameRulesEntity( nullptr ) {}
 
 // ---------------------------------------------------

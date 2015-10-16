@@ -11,10 +11,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
-#include <Utility/Memory/ChildAllocator.hpp>
-//------------------------------------------------------------------//
-#include <rdestl/hash_map.h>
+#include <Utility/Containers/UnorderedMap.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -40,12 +37,11 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Hasher = ::Eldritch2::SpatialHasher, typename Allocator = ::Eldritch2::ChildAllocator>
-	class SpatialHash {
+	class SpatialHash : public ::Eldritch2::UnorderedMap<typename Hasher::CellIndex, StoredObject, Hasher, ::rde::equal_to<typename Hasher::CellIndex>, Allocator> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::hash_map<typename Hasher::CellIndex, StoredObject, Hasher, 4, ::rde::equal_to<typename Hasher::CellIndex>, PrivateAllocator>;
+		using UnderlyingContainer	= ::Eldritch2::UnorderedMap<typename Hasher::CellIndex, StoredObject, Hasher, ::rde::equal_to<typename Hasher::CellIndex>, Allocator>;
 
 	public:
 		using CellIndex				= typename Hasher::CellIndex;
@@ -55,18 +51,9 @@ namespace Eldritch2 {
 
 	public:
 		//! Constructs this @ref SpatialHash instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint SpatialHash( const SizeType						initialBucketCount,
-								  const ::Eldritch2::float32			horizontalCellResolution,
-								  const ::Eldritch2::float32			verticalCellResolution,
-								  AllocatorConstructorArguments&&...	allocatorConstructorArguments );
+		ETInlineHint SpatialHash( const SizeType initialBucketCount, const ::Eldritch2::float32 horizontalCellResolution, const ::Eldritch2::float32 verticalCellResolution, AllocatorType&& allocator = AllocatorType() );
 		//! Constructs this @ref SpatialHash instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint SpatialHash( const SizeType						initialBucketCount,
-								  const Hasher&							hasher,
-								  const ::Eldritch2::float32			horizontalCellResolution,
-								  const ::Eldritch2::float32			verticalCellResolution,
-								  AllocatorConstructorArguments&&...	allocatorConstructorArguments );
+		ETInlineHint SpatialHash( const SizeType initialBucketCount, const Hasher& hasher, const ::Eldritch2::float32 horizontalCellResolution, const ::Eldritch2::float32 verticalCellResolution, AllocatorType&& allocator = AllocatorType() );
 
 		//! Destroys this @ref SpatialHash instance.
 		ETInlineHint ~SpatialHash() = default;
@@ -76,32 +63,10 @@ namespace Eldritch2 {
 		ETInlineHint StoredObject&			operator[]( const ::Eldritch2::Float4 position );
 		ETInlineHint const StoredObject&	operator[]( const ::Eldritch2::Float4 position ) const;
 
-	// ---------------------------------------------------
-
-		template <typename Predicate>
-		ETInlineHint void	RemoveIf( Predicate predicate );
-
-		ETInlineHint void	Clear();
-
-	// - CAPACITY QUERY ----------------------------------
-
-		ETInlineHint void		Reserve( const SizeType minimumSizeHint );
-
-		ETInlineHint SizeType	BucketCount() const;
-
-		ETInlineHint SizeType	NonemptyBucketCount() const;
-
-		ETInlineHint SizeType	UsedMemory() const;
-
-	// - ALLOCATOR ACCESS --------------------------------
-
-		ETInlineHint const Allocator&	GetAllocator() const;
-
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		const ::Eldritch2::Float4	_inverseResolution;
-		UnderlyingContainer			_underlyingContainer;
 	};
 
 }	// namespace Eldritch2

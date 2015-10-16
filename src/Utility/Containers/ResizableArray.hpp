@@ -57,26 +57,28 @@ namespace Eldritch2 {
 
 		//! Constructs this @ref ResizableArray instance.
 		/*!	@param[in] initialSize Initial capacity hint, in elements.
-			@param[in] allocatorConstructorArguments Template parameter pack consisting of all arguments to be forwarded to the allocator constructor.
+			@param[in] allocator Movable reference to an allocator to be moved into the container.
 			*/
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint explicit ResizableArray( const SizeType initialSize, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint explicit ResizableArray( AllocatorType&& allocator = Allocator() );
+		//! Constructs this @ref ResizableArray instance.
+		ETInlineHint explicit ResizableArray( ::Eldritch2::ResizableArray<StoredObject, Allocator>&& moveSource );
+		//! Constructs this @ref ResizableArray instance.
+		/*!	@param[in] initialSize Initial capacity hint, in elements.
+			@param[in] allocator Movable reference to an allocator to be moved into the container.
+			*/
+		ETInlineHint ResizableArray( const SizeType initialSize, AllocatorType&& allocator = Allocator() );
 		//! Constructs this @ref ResizableArray instance.
 		/*!	@param[in] first Pointer to the beginning element in a continuous array of objects the container will copy into itself.
 			@param[in] last Pointer to one past the end of the array headed by the _first_ parameter. May be equal to _first_.
-			@param[in] allocatorConstructorArguments Template parameter pack consisting of all arguments to be forwarded to the allocator constructor.
+			@param[in] allocator Movable reference to an allocator to be moved into the container.
 			*/
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint ResizableArray( const StoredObject* first, const StoredObject* last, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint ResizableArray( const StoredObject* first, const StoredObject* last, AllocatorType&& allocator = Allocator() );
 		//! Constructs this @ref ResizableArray instance.
 		/*!	@param[in] containerTemplate Reference to a ResizableArray whose elements will be copy constructed into the container.
-			@param[in] allocatorConstructorArguments Template parameter pack consisting of all arguments to be forwarded to the allocator constructor.
+			@param[in] allocator Movable reference to an allocator to be moved into the container.
 			*/
-		template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-		ETInlineHint ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
-
-		//! Constructs this @ref ResizableArray instance.
-		ETInlineHint ResizableArray();
+		template <class AlternateAllocator>
+		ETInlineHint ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = Allocator() );
 
 		//! Destroys this ResizableArray instance.
 		ETInlineHint ~ResizableArray() = default;

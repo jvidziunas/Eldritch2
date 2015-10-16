@@ -21,7 +21,7 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 
-	ETNoAliasHint char* PrintFormatted( char* destinationString, size_t maxCharacters, const char* formatString, ... ) {
+	ETNoAliasHint char* PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, ... ) {
 		va_list args;
 		va_start( args, formatString );
 			PrintFormatted( destinationString, maxCharacters, formatString, args );
@@ -32,7 +32,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint wchar_t* PrintFormatted( wchar_t* destinationString, size_t maxCharacters, const wchar_t* formatString, ... ) {
+	ETNoAliasHint wchar_t* PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, ... ) {
 		va_list args;
 		va_start( args, formatString );
 			PrintFormatted( destinationString, maxCharacters, formatString, args );
@@ -43,24 +43,22 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template <size_t stringSizeInCharacters>
-	ETNoAliasHint auto PrintFormatted( char (&destinationString)[stringSizeInCharacters], const char* formatString, ... ) -> decltype(destinationString) {
-		va_list args;
-		va_start( args, formatString );
-			PrintFormatted( destinationString, stringSizeInCharacters, formatString, args );
-		va_end( args );
+	ETNoAliasHint char* PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, va_list args ) {
+		va_list forwardedArgs;
+		va_copy( forwardedArgs, args );
+			::std::vsnprintf( destinationString, maxCharacters, formatString, forwardedArgs );
+		va_end( forwardedArgs );
 
 		return destinationString;
 	}
 
 // ---------------------------------------------------
 
-	template <size_t stringSizeInCharacters>
-	ETNoAliasHint auto PrintFormatted( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* formatString, ... ) -> decltype(destinationString) {
-		va_list args;
-		va_start( args, formatString );
-			PrintFormatted( destinationString, stringSizeInCharacters, formatString, args );
-		va_end( args );
+	ETNoAliasHint wchar_t* PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, va_list args ) {
+		va_list forwardedArgs;
+		va_copy( forwardedArgs, args );
+			::std::vswprintf( destinationString, maxCharacters, formatString, forwardedArgs );
+		va_end( forwardedArgs );
 
 		return destinationString;
 	}

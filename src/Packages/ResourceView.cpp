@@ -23,7 +23,7 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ResourceView::ResourceView( const Initializer& initializer, Allocator& nameAllocator ) : _name( initializer.name.first, initializer.name.Size(), nameAllocator, UTF8L("Package Name Allocator") ) {}
+	ResourceView::ResourceView( const Initializer& initializer, Allocator& nameAllocator ) : _name( initializer.name.first, initializer.name.onePastLast, { nameAllocator, UTF8L("Package Name Allocator") } ) {}
 
 }	// namespace FileSystem
 }	// namespace Eldritch2

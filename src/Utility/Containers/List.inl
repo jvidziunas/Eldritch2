@@ -19,25 +19,19 @@
 namespace Eldritch2 {
 	
 	template <typename StoredObject, typename Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint List<StoredObject, Allocator>::List( AllocatorConstructorArguments&&... allocatorConstructorArguments ) : UnderlyingContainer( ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint List<StoredObject, Allocator>::List( AllocatorType&& allocator ) : UnderlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
-	template <typename InputIterator, typename... AllocatorConstructorArguments>
-	ETInlineHint List<StoredObject, Allocator>::List( InputIterator first, InputIterator last, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : UnderlyingContainer( first, last, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	template <typename InputIterator>
+	ETInlineHint List<StoredObject, Allocator>::List( InputIterator first, InputIterator last, AllocatorType&& allocator ) : UnderlyingContainer( first, last, ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
-	template <typename AlternateAllocator, typename... AllocatorConstructorArguments>
-	ETInlineHint List<StoredObject, Allocator>::List( const ::Eldritch2::List<StoredObject, AlternateAllocator>& listTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : UnderlyingContainer( listTemplate.Begin(), listTemplate.End(), ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint List<StoredObject, Allocator>::~List() {}
+	template <typename AlternateAllocator>
+	ETInlineHint List<StoredObject, Allocator>::List( const ::Eldritch2::List<StoredObject, AlternateAllocator>& listTemplate, AllocatorType&& allocator ) : List<StoredObject, Allocator>( listTemplate.Begin(), listTemplate.End(), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 

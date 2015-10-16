@@ -46,7 +46,13 @@ namespace Eldritch2 {
 
 	protected:
 		//! Constructs this @ref ArenaAllocatorBase instance.
-		ArenaAllocatorBase( void* pool, const SizeType allocationLimitInBytes, const ::Eldritch2::UTF8Char* const name );
+		ArenaAllocatorBase( void* const pool, const void* const poolEnd, const ::Eldritch2::UTF8Char* const name );
+		//! Constructs this @ref ArenaAllocatorBase instance.
+		ArenaAllocatorBase( void* const pool, const SizeType poolCapacityInBytes, const ::Eldritch2::UTF8Char* const name );
+		//! Constructs this @ref ArenaAllocatorBase instance.
+		ArenaAllocatorBase( const ArenaAllocatorBase& ) = delete;
+		//! Constructs this @ref ArenaAllocatorBase instance.
+		ArenaAllocatorBase( ArenaAllocatorBase&& allocator );
 
 		//! Destroys this @ref ArenaAllocatorBase instance.
 		~ArenaAllocatorBase() = default;
@@ -58,7 +64,7 @@ namespace Eldritch2 {
 	// - DATA MEMBERS ------------------------------------
 
 		::std::atomic<char*>	_allocationPointer;
-		char* const				_arenaEnd;
+		const char* const		_arenaEnd;
 	};
 
 // ---------------------------------------------------
@@ -68,10 +74,20 @@ namespace Eldritch2 {
 
 	public:
 		//!	Constructs this @ref ExternalArenaAllocator instance.
-		ExternalArenaAllocator( void* pool, const Allocator::SizeType allocationLimitInBytes, const ::Eldritch2::UTF8Char* const name );
+		ExternalArenaAllocator( void* const pool, const void* const poolEnd, const ::Eldritch2::UTF8Char* const name );
+		//!	Constructs this @ref ExternalArenaAllocator instance.
+		ExternalArenaAllocator( void* const pool, const SizeType poolCapacityInBytes, const ::Eldritch2::UTF8Char* const name );
+		//!	Constructs this @ref ExternalArenaAllocator instance.
+		ExternalArenaAllocator( ExternalArenaAllocator&& allocator );
+		//!	Constructs this @ref ExternalArenaAllocator instance.
+		ExternalArenaAllocator( const ExternalArenaAllocator& ) = delete;
 
 		//!	Destroys this @ref ExternalArenaAllocator instance.
 		~ExternalArenaAllocator() = default;
+
+	// ---------------------------------------------------
+
+		ExternalArenaAllocator&	operator=(const ExternalArenaAllocator&) = delete;
 	};
 
 // ---------------------------------------------------
@@ -82,15 +98,23 @@ namespace Eldritch2 {
 	public:
 		//!	Constructs this @ref ArenaChildAllocator instance.
 		ArenaChildAllocator( ::Eldritch2::Allocator& parent, const Allocator::SizeType allocationLimitInBytes, const Allocator::AllocationOptions allocationOptions, const ::Eldritch2::UTF8Char* const name );
+		//!	Constructs this @ref ArenaChildAllocator instance.
+		ArenaChildAllocator( ArenaChildAllocator&& allocator );
+		//!	Constructs this @ref ArenaChildAllocator instance.
+		ArenaChildAllocator( const ArenaChildAllocator& ) = delete;
 
 		//!	Destroys this @ref ArenaChildAllocator instance.
 		~ArenaChildAllocator();
+
+	// ---------------------------------------------------
+
+		ArenaChildAllocator&	operator=(const ArenaChildAllocator&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		::Eldritch2::Allocator&	_parent;
-		void* const				_allocation;
+		void*					_allocation;
 	};
 
 // ---------------------------------------------------
@@ -106,9 +130,15 @@ namespace Eldritch2 {
 
 		//! Constructs this @ref FixedStackAllocator instance.
 		FixedStackAllocator( const ::Eldritch2::UTF8Char* const name );
+		//!	Constructs this @ref FixedStackAllocator instance.
+		FixedStackAllocator( const FixedStackAllocator<arenaSizeInBytes>& ) = delete;
 
 		//! Destroys this @ref FixedStackAllocator instance.
 		~FixedStackAllocator() = default;
+
+	// ---------------------------------------------------
+
+		FixedStackAllocator<arenaSizeInBytes>&	operator=(const FixedStackAllocator<arenaSizeInBytes>&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 

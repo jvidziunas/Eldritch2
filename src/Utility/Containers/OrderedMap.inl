@@ -20,26 +20,24 @@ namespace Eldritch2 {
 
 	template <typename Key, typename StoredObject, class Allocator>
 	template <typename... AllocatorConstructorArguments>
-	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::OrderedMap( AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::OrderedMap( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Allocator>
 	template <typename InputIterator, typename... AllocatorConstructorArguments>
-	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::OrderedMap( InputIterator begin, InputIterator end, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( begin, end, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::OrderedMap( InputIterator begin, InputIterator end, AllocatorType&& allocator ) : _underlyingContainer( begin, end, ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Allocator>
 	template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::OrderedMap( const ::Eldritch2::OrderedMap<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( containerTemplate.Begin(),
-																																																														   containerTemplate.End(),
-																																																														   ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::OrderedMap( const ::Eldritch2::OrderedMap<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::~OrderedMap() {}
+	ETInlineHint OrderedMap<Key, StoredObject, Allocator>::OrderedMap( ::Eldritch2::OrderedMap<Key, StoredObject, Allocator>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
 
 // ---------------------------------------------------
 

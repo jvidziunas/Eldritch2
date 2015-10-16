@@ -150,6 +150,8 @@ namespace Renderer {
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<Direct3D11SwapChain>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );
 
+			typeRegistrar.EnsureValueTypeDeclared<StringMarshal>();
+
 			typeBuilder.ExposeVirtualProperty( "Caption", &FunctionHelper::SetCaption );
 
 			temporaryAllocator.Delete( typeBuilder );

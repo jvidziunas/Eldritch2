@@ -19,36 +19,31 @@
 namespace Eldritch2 {
 
 	template <typename StoredObject, typename OrderingPredicate, class Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( const SizeType reservedSizeInElements, OrderingPredicateType orderingPredicate, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : UnderlyingContainer( reservedSizeInElements, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ),
-																																																												  _orderingPredicate( orderingPredicate ) {}
+	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( AllocatorType&& allocator ) : UnderlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename OrderingPredicate, class Allocator>
-	template <typename InputIterator, typename... AllocatorConstructorArguments>
-	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( InputIterator						begin,
-																							 InputIterator						end,
-																							 OrderingPredicateType				orderingPredicate,
-																							 AllocatorConstructorArguments&&...	allocatorConstructorArguments ) : UnderlyingContainer( begin, end, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ),
-																																								  _orderingPredicate( orderingPredicate ) {
+	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( reservedSizeInElements, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {}
+
+// ---------------------------------------------------
+
+	template <typename StoredObject, typename OrderingPredicate, class Allocator>
+	template <typename InputIterator>
+	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( begin, end, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {
 		UnderlyingContainer::Sort( _orderingPredicate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename OrderingPredicate, class Allocator>
-	template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( const ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, AlternateAllocator>&	containerTemplate,
-																							 AllocatorConstructorArguments&&...															allocatorConstructorArguments ) : UnderlyingContainer( containerTemplate.Begin(),
-																																																											   containerTemplate.End(),
-																																																											   ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ),
-																																																						  _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
+	template <class AlternateAllocator>
+	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( const ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : UnderlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ), _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::~FlatOrderedSet() {}
+	ETInlineHint FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>::FlatOrderedSet( ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>&& moveSource ) : UnderlyingContainer( ::std::move( moveSource ) ), _orderingPredicate( ::std::move( moveSource._orderingPredicate ) ) {}
 
 // ---------------------------------------------------
 

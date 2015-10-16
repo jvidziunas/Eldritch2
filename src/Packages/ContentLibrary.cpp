@@ -53,9 +53,9 @@ namespace FileSystem {
 																														 _contentProvider( contentProvider ),
 																														 _contentPackageCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
 																														 _resourceViewCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
-																														 _contentPackageCollection( 64u, allocator, UTF8L("Content Library Package Bucket Allocator") ),
-																														 _resourceViewCollection( 512u, allocator, UTF8L("Content Library Resource View Bucket Allocator") ),
-																														 _resourceViewFactoryCollection( 32u, allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") ),
+																														 _contentPackageCollection( 64u, {}, { allocator, UTF8L("Content Library Package Bucket Allocator") } ),
+																														 _resourceViewCollection( 128u, {}, { allocator, UTF8L("Content Library Resource View Bucket Allocator") } ),
+																														 _resourceViewFactoryCollection( 16u, {}, { allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") } ),
 																														 _loaderThread( new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) LoaderThread( scheduler, _allocator ) ) {
 		// Don't bother launching the thread if we have no synchronization mechanisms (Highly unlikely in practice!)
 		if( ETBranchLikelyHint( _contentPackageCollectionMutex && _resourceViewCollectionMutex && _loaderThread ) ) {

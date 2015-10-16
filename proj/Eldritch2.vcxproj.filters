@@ -965,9 +965,6 @@
     <ClInclude Include="..\src\Input\PlaystationController.hpp">
       <Filter>Header Files\Engine\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp">
       <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
     </ClInclude>
@@ -988,9 +985,6 @@
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurableUTF8String.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedSet.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\D3D11\Direct3D11SwapChain.hpp">
       <Filter>Header Files\Engine\Renderer\D3D11</Filter>

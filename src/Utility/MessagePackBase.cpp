@@ -75,6 +75,14 @@ namespace Utility {
 
 // ---------------------------------------------------
 
+	MessagePackBase::BinaryData::BinaryData( const void* begin, const void* const end ) : Range<const char*>( static_cast<const char*>(begin), static_cast<const char*>(end) ) {}
+
+// ---------------------------------------------------
+
+	MessagePackBase::BinaryData::BinaryData() : Range<const char*>( Range<const char*>::EmptySet() ) {}
+
+// ---------------------------------------------------
+
 	bool MessagePackBase::BinaryData::Serialize( MessagePackReader& reader ) {
 		uint32 lengthInBytes;
 
@@ -94,33 +102,33 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	MessagePackBase::ArrayHeader::ArrayHeader( const uint32 elementCount ) : sizeInElements( elementCount ) {}
+	MessagePackBase::Array::Array( const uint32 elementCount ) : sizeInElements( elementCount ) {}
 
 // ---------------------------------------------------
 
-	bool MessagePackBase::ArrayHeader::Serialize( MessagePackReader& reader ) {
+	bool MessagePackBase::Array::Serialize( MessagePackReader& reader ) {
 		return ::cmp_read_array( &reader, &sizeInElements );
 	}
 
 // ---------------------------------------------------
 
-	bool MessagePackBase::ArrayHeader::Serialize( MessagePackWriter& writer ) {
+	bool MessagePackBase::Array::Serialize( MessagePackWriter& writer ) {
 		return ::cmp_write_array( &writer, sizeInElements );
 	}
 
 // ---------------------------------------------------
 
-	MessagePackBase::MapHeader::MapHeader( const uint32 pairCount ) : sizeInPairs( pairCount ) {}
+	MessagePackBase::Map::Map( const uint32 pairCount ) : sizeInPairs( pairCount ) {}
 
 // ---------------------------------------------------
 
-	bool MessagePackBase::MapHeader::Serialize( MessagePackReader& reader ) {
+	bool MessagePackBase::Map::Serialize( MessagePackReader& reader ) {
 		return ::cmp_read_array( &reader, &sizeInPairs );
 	}
 
 // ---------------------------------------------------
 
-	bool MessagePackBase::MapHeader::Serialize( MessagePackWriter& writer ) {
+	bool MessagePackBase::Map::Serialize( MessagePackWriter& writer ) {
 		return ::cmp_write_array( &writer, sizeInPairs );
 	}
 

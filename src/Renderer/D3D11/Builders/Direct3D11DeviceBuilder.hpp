@@ -16,14 +16,12 @@
 #include <Utility/MPL/CharTypes.hpp>
 #include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
+#include <D3D11.h>
+//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	class	ErrorCode;
 }
-
-struct ID3D11DeviceContext;
-struct IDXGIFactory1;
-struct ID3D11Device;
 
 typedef unsigned int UINT;
 
@@ -43,7 +41,7 @@ namespace Renderer {
 		Direct3D11DeviceBuilder();
 
 		//!	Constructs this @ref Direct3D11DeviceBuilder instance.
-		~Direct3D11DeviceBuilder();
+		~Direct3D11DeviceBuilder() = default;
 
 	// ---------------------------------------------------
 

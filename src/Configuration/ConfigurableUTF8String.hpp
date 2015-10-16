@@ -33,7 +33,7 @@ namespace Configuration {
 		ConfigurableUTF8String( const EmptyStringSemantics, ::Eldritch2::Allocator& allocator );
 
 		//!	Destroys this @ref ConfigurableUTF8String instance.
-		~ConfigurableUTF8String();
+		~ConfigurableUTF8String() = default;
 
 	// ---------------------------------------------------
 		

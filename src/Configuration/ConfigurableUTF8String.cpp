@@ -13,9 +13,9 @@
 // INCLUDES
 //==================================================================//
 #include <Configuration/ConfigurableUTF8String.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/Containers/Range.hpp>
-#include <Utility/Memory/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
@@ -31,11 +31,11 @@ namespace {
 namespace Eldritch2 {
 namespace Configuration {
 
-	ConfigurableUTF8String::ConfigurableUTF8String( const UTF8Char* const value, Allocator& allocator ) : UTF8String<>( value, static_cast<SizeType>(::Eldritch2::StringLength( value )), allocator, configurableStringAllocatorName ) {}
+	ConfigurableUTF8String::ConfigurableUTF8String( const UTF8Char* const value, Allocator& allocator ) : UTF8String<>( value, FindEndOfString( value ), { allocator, configurableStringAllocatorName } ) {}
 
 // ---------------------------------------------------
 
-	ConfigurableUTF8String::ConfigurableUTF8String( const EmptyStringSemantics semantics, Allocator& allocator ) : UTF8String<>( semantics, allocator, configurableStringAllocatorName ) {}
+	ConfigurableUTF8String::ConfigurableUTF8String( const EmptyStringSemantics semantics, Allocator& allocator ) : UTF8String<>( semantics, { allocator, configurableStringAllocatorName } ) {}
 
 // ---------------------------------------------------
 	

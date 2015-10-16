@@ -68,10 +68,10 @@ namespace Eldritch2 {
 namespace Input {
 
 	Win32InputService::Win32InputService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-																	   _allocator( GetEngineAllocator(), UTF8L("Win32 Input Service Allocator") ),
+																	   _allocator( { GetEngineAllocator(), UTF8L("Win32 Input Service Allocator") } ),
 																	   _keyboardHook( ::SetWindowsHookEx( WH_KEYBOARD_LL, &WinKeyEatHook, ::GetModuleHandle( nullptr ), 0 ) ),
 																	   _deviceDirectoryMutex( GetEngineTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
-																	   _deviceDirectory( 0u, ::rde::less<::HANDLE>(), _allocator, UTF8L("Win32 Raw Input Device Directory Allocator") ),
+																	   _deviceDirectory( 0u, ::rde::less<::HANDLE>(), { _allocator, UTF8L("Win32 Raw Input Device Directory Allocator") } ),
 																	   _pollingThread( *this ) {
 		ETRuntimeAssert( nullptr != _deviceDirectoryMutex );
 	}

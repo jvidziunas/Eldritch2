@@ -45,7 +45,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ChildAllocator::ChildAllocator( ChildAllocator&& allocator ) : Allocator( ::std::move( allocator ) ), _parent( ::std::move( allocator._parent ) ) {}
+	ChildAllocator::ChildAllocator( ChildAllocator&& allocator ) : Allocator( ::std::move( allocator ) ), _parent( allocator._parent ) {}
 
 // ---------------------------------------------------
 

@@ -31,20 +31,15 @@
 #include <angelscript.h>
 //------------------------------------------------------------------//
 #include <memory>
-
 //------------------------------------------------------------------//
 
 //==================================================================//
 // LIBRARIES
 //==================================================================//
-#if( ET_DEBUG_MODE_ENABLED )
-#if( ET_PLATFORM_X86 && ET_PLATFORM_64BIT )
-ET_LINK_LIBRARY( "angelscript64d.lib" )
-#endif
-#else
-#if( ET_PLATFORM_X86 && ET_PLATFORM_64BIT )
-ET_LINK_LIBRARY( "angelscript64.lib" )
-#endif
+#if( ET_DEBUG_MODE_ENABLED && ET_PLATFORM_X86 && ET_PLATFORM_64BIT )
+	ET_LINK_LIBRARY( "angelscript64d.lib" )
+#elif( ET_PLATFORM_X86 && ET_PLATFORM_64BIT )
+	ET_LINK_LIBRARY( "angelscript64.lib" )
 #endif
 //------------------------------------------------------------------//
 
@@ -65,15 +60,13 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Scripting {
 
-	AngelscriptEngine::AngelscriptEngine( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ), _scriptEngine( nullptr ) {}
+	void AngelscriptEngine::EngineDeleter::operator()( ::asIScriptEngine* const scriptEngine ) {
+		scriptEngine->ShutDownAndRelease();
+	}
 
 // ---------------------------------------------------
 
-	AngelscriptEngine::~AngelscriptEngine() {
-		if( _scriptEngine ) {
-			_scriptEngine->ShutDownAndRelease();
-		}
-	}
+	AngelscriptEngine::AngelscriptEngine( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ), _scriptEngine( nullptr ) {}
 
 // ---------------------------------------------------
 
@@ -92,9 +85,6 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	void AngelscriptEngine::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
-		StringMarshal::ExposeScriptAPI( visitor );
-		Float4Marshal::ExposeScriptAPI( visitor );
-		OrientationMarshal::ExposeScriptAPI( visitor );
 		AngelscriptWorldView::ExposeScriptAPI( visitor );
 	}
 
@@ -112,8 +102,10 @@ namespace Scripting {
 
 		// ---
 
+			const ExternalArenaAllocator::SizeType	stringSize( initializer.name.Size() + 1 );
+
 			// We'll need to null-terminate the name, so create a temporary string on the stack.
-			UTF8String<FixedStackAllocator<64u>>	moduleName( initializer.name.first, initializer.name.Size(), UTF8L("Module Name String Allocator") );
+			UTF8String<ExternalArenaAllocator>	moduleName( initializer.name.first, initializer.name.onePastLast, { _alloca( stringSize ), stringSize, UTF8L( "Module Name String Allocator" ) } );
 			
 			// First, we'll need an Angelscript module. The unique_ptr will take care of releasing resources in the event something pukes.
 			if( unique_ptr<::asIScriptModule> module { static_cast<::asIScriptEngine*>(parameter)->GetModule( moduleName.GetCharacterArray(), asGM_ALWAYS_CREATE ) } ) {
@@ -254,7 +246,16 @@ namespace Scripting {
 		if( decltype(_scriptEngine) scriptEngine { ::asCreateScriptEngine( ANGELSCRIPT_VERSION ) } ) {
 			scriptEngine->SetMessageCallback( ::asMETHOD( AngelscriptEngine, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
 
-			BroadcastInitializationVisitor( ScriptAPIRegistrationInitializationVisitor( *scriptEngine ) );
+			{
+				ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
+				
+				// Register critical components first.
+				StringMarshal::ExposeScriptAPI( registrationVisitor );
+				Float4Marshal::ExposeScriptAPI( registrationVisitor );
+				OrientationMarshal::ExposeScriptAPI( registrationVisitor );
+				
+				BroadcastInitializationVisitor( registrationVisitor );
+			}
 
 			RegisterCMathLibrary( scriptEngine.get() );
 			RegisterAlgorithmLibrary( scriptEngine.get() );
@@ -264,7 +265,7 @@ namespace Scripting {
 			FormatAndLogString( UTF8L( "Script API registered successfully." ) ET_UTF8_NEWLINE_LITERAL );
 
 			// Transfer ownership to the main engine.
-			_scriptEngine.swap( scriptEngine );
+			_scriptEngine = move( scriptEngine );
 		} else {
 			FormatAndLogError( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
 		}

@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -19,25 +19,28 @@
 namespace Eldritch2 {
 
 	template <typename StoredObject, typename Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const SizeType initialSize, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( initialSize, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const StoredObject* first, const StoredObject* last, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( first, last, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const SizeType initialSize, AllocatorType&& allocator ) : _underlyingContainer( initialSize, ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
-	template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const StoredObject* first, const StoredObject* last, AllocatorType&& allocator ) : _underlyingContainer( first, last, ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
-	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray() {}
+	template <class AlternateAllocator>
+	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ) {}
+
+// ---------------------------------------------------
+
+	template <typename StoredObject, typename Allocator>
+	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( ::Eldritch2::ResizableArray<StoredObject, Allocator>&& moveSource ) : _underlyingContainer( ::std::move( moveSource._underlyingContainer ) ) {}
 
 // ---------------------------------------------------
 

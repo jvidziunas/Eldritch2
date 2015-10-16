@@ -32,6 +32,55 @@ namespace Utility {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		template <typename Container>
+		class ArrayAdapter : public MessagePackBase::Array {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref ArrayAdapter instance.
+			/*!	@param[in] container Container to read serializable elements from.
+				*/
+			ArrayAdapter( Container& container );
+
+			//!	Destroys this @ref ArrayAdapter instance.
+			~ArrayAdapter() = default;
+
+		// ---------------------------------------------------
+
+			bool	Serialize( Utility::MessagePackWriter& writer );
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			Container&	_container;
+		};
+
+	// ---
+
+		template <typename Container>
+		class MapAdapter : public MessagePackBase::Map {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref MapAdapter instance.
+			/*!	@param[in] container Container to read serializable elements from.
+				*/
+			MapAdapter( Container& container );
+
+			//!	Destroys this @ref MapAdapter instance.
+			~MapAdapter() = default;
+
+		// ---------------------------------------------------
+
+			bool	Serialize( Utility::MessagePackWriter& writer );
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			Container&	_container;
+		};
+
+	// ---
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -42,6 +91,14 @@ namespace Utility {
 
 		//! Destroys this @ref MessagePackWriter instance.
 		~MessagePackWriter() = default;
+
+	// ---------------------------------------------------
+
+		template <typename Container, typename Ignored>
+		static MapAdapter<Container>	AdaptMap( Container& container, Ignored&& );
+
+		template <typename Container, typename Ignored>
+		static ArrayAdapter<Container>	AdaptArray( Container& container, Ignored&& );
 
 	// ---------------------------------------------------
 

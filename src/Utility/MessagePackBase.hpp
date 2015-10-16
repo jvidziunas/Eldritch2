@@ -15,6 +15,7 @@
 #include <Utility/Containers/Range.hpp>
 #include <Utility/MPL/CharTypes.hpp>
 #include <Utility/MPL/IntTypes.hpp>
+#include <type_traits>
 //------------------------------------------------------------------//
 #include <cmp/cmp.h>
 //------------------------------------------------------------------//
@@ -30,6 +31,73 @@ namespace Eldritch2 {
 namespace Utility {
 
 	namespace Utility	= ::Eldritch2::Utility;
+
+// ---------------------------------------------------
+
+	namespace Detail {
+
+		namespace Detail = ::Eldritch2::Utility::Detail;
+
+	// ---------------------------------------------------
+
+		template <class Class, typename FunctionSignature>
+		struct HasMemberSerializeFunction {
+			static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Second template parameter needs to be of function type." );
+		};
+
+	// ---------------------------------------------------
+
+		template <class Class, typename DesiredReturn, typename... Arguments>
+		struct HasMemberSerializeFunction<Class, DesiredReturn( Arguments... )> {
+		private:
+			template <typename T>
+			static typename ::std::is_same<DesiredReturn, decltype(::std::declval<T>().Serialize( ::std::declval<Arguments>()... ))>::type Check( T* );
+
+			template <typename>
+			static ::std::false_type Check( ... );
+
+		// ---
+
+			using Type	= decltype(Check<Class>(nullptr));
+
+		public:
+			static const bool	value = Type::value;
+		};
+
+	// ---------------------------------------------------
+
+		template <class Class, typename FunctionSignature>
+		struct HasFreeSerializeFunction {
+			static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Second template parameter needs to be of function type." );
+		};
+
+	// ---------------------------------------------------
+
+		template <class Class, typename DesiredReturn, typename... Arguments>
+		struct HasFreeSerializeFunction<Class, DesiredReturn( Arguments... )> {
+		private:
+			template <typename T>
+			static typename ::std::is_same<DesiredReturn, decltype(Serialize( ::std::declval<T>(), ::std::declval<Arguments>()... ))>::type Check( T* );
+
+			template <typename>
+			static ::std::false_type Check( ... );
+
+		// ---
+
+			using Type = decltype(Check<Class>( nullptr ));
+
+		public:
+			static const bool	value = Type::value;
+		};
+
+	// ---------------------------------------------------
+
+		template <typename ContainerValue, typename Archive, bool typeHasMemberSerializeFunction = Detail::HasMemberSerializeFunction<ContainerValue, bool(Archive&)>::value>
+		struct SerializeDispatcher {
+			static bool Dispatch( ContainerValue& value, Archive& archive );
+		};
+
+	}	// namespace Detail
 
 // ---------------------------------------------------
 
@@ -51,11 +119,12 @@ namespace Utility {
 
 	// ---
 
-		template <class Container>
-		struct DefaultElementProvider {
+		template <class Element>
+		class DefaultElementProvider {
 		// - TYPE PUBLISHING ---------------------------------
 
-			using ValueType		= typename Container::ValueType;
+		public:
+			using ValueType	= Element;
 
 		// ---------------------------------------------------
 
@@ -63,80 +132,69 @@ namespace Utility {
 		};
 
 	// ---
-
-		template <class Container>
-		struct DefaultKeyExtractor {
-		// - TYPE PUBLISHING ---------------------------------
-
-			using ExtractedType	= typename Container::KeyType;
-			using ValueType		= typename Container::ValueType;
-
-		// ---------------------------------------------------
-
-			ExtractedType&			operator()( ValueType& value ) const;
-			const ExtractedType&	operator()( const ValueType& value ) const;
-		};
-
-	// ---
-
-		template <class Container>
-		struct DefaultValueExtractor {
-		// - TYPE PUBLISHING ---------------------------------
-
-			using ExtractedType = typename Container::MappedType;
-			using ValueType		= typename Container::ValueType;
-
-		// ---------------------------------------------------
-
-			ExtractedType&			operator()( ValueType& value ) const;
-			const ExtractedType&	operator()( const ValueType& value ) const;
-		};
-
-	// ---
-
-		struct Nil {
+		
+		class Nil {
+		public:
 			bool	Serialize( Utility::MessagePackReader& reader );
 			bool	Serialize( Utility::MessagePackWriter& writer );
 		};
 
 	// ---
 
-		struct String : public ::Eldritch2::Range<const ::Eldritch2::UTF8Char*> {
-			String( const ::Eldritch2::UTF8Char* begin, const ::Eldritch2::UTF8Char* const end );
-			String();
-
-		// ---------------------------------------------------
-			
-			bool	Serialize( Utility::MessagePackReader& reader );
-			bool	Serialize( Utility::MessagePackWriter& writer );
-		};
-
-	// ---
-
-		struct BinaryData : public ::Eldritch2::Range<const char*> {
-			BinaryData( const void* begin, const void* const end );
-			BinaryData();
-
-		// ---------------------------------------------------
-			
-			bool	Serialize( Utility::MessagePackReader& reader );
-			bool	Serialize( Utility::MessagePackWriter& writer );
-		};
-
-	// ---
-
-		class ArrayHeader {
+		class String : public ::Eldritch2::Range<const ::Eldritch2::UTF8Char*> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref ArrayHeader instance.
+			String( const ::Eldritch2::UTF8Char* begin, const ::Eldritch2::UTF8Char* const end );
+			//!	Constructs this @ref String instance.
+			String();
+
+			//!	Destroys this @ref String instance.
+			~String() = default;
+
+		// ---------------------------------------------------
+			
+			bool	Serialize( Utility::MessagePackReader& reader );
+			bool	Serialize( Utility::MessagePackWriter& writer );
+		};
+
+	// ---
+
+		class BinaryData : public ::Eldritch2::Range<const char*> {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref BinaryData instance.
+			/*!	@param[in] begin Pointer to the first byte of data that will comprise the body of the new @ref BinaryData instance.
+				@param[in] end Pointer to one past the last byte of data that will comprise the body of the new @ref BinaryData instance.
+				@remarks This overload is designed to be called in a write context.
+				*/
+			BinaryData( const void* begin, const void* const end );
+			//!	Constructs this @ref BinaryData instance.
+			BinaryData();
+
+			//!	Destroys this @ref BinaryData instance.
+			~BinaryData() = default;
+
+		// ---------------------------------------------------
+			
+			bool	Serialize( Utility::MessagePackReader& reader );
+			bool	Serialize( Utility::MessagePackWriter& writer );
+		};
+
+	// ---
+
+		class Array {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref Array instance.
 			/*!	@param[in] elementCount Number of elements in the array.
 				@remarks This overload is designed to be called in a write context.
 				*/
-			ArrayHeader( const ::Eldritch2::uint32 elementCount );
-
-			//!	Constructs this @ref ArrayHeader instance.
-			ArrayHeader() = default;
+			Array( const ::Eldritch2::uint32 elementCount );
+			//!	Constructs this @ref Array instance.
+			Array() = default;
 
 		// ---------------------------------------------------
 
@@ -145,23 +203,22 @@ namespace Utility {
 
 		// - DATA MEMBERS ------------------------------------
 
-		protected:
 			::Eldritch2::uint32 sizeInElements;
 		};
 
 	// ---
 
-		class MapHeader {
+		class Map {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref MapHeader instance.
+			//!	Constructs this @ref Map instance.
 			/*!	@param[in] pairCount Number of pairs in the map.
 				@remarks This overload is designed to be called in a write context.
 				*/
-			MapHeader( const ::Eldritch2::uint32 pairCount );
-			//!	Constructs this @ref MapHeader instance.
-			MapHeader() = default;
+			Map( const ::Eldritch2::uint32 pairCount );
+			//!	Constructs this @ref Map instance.
+			Map() = default;
 
 		// ---------------------------------------------------
 
@@ -170,7 +227,6 @@ namespace Utility {
 
 		// - DATA MEMBERS ------------------------------------
 
-		protected:
 			::Eldritch2::uint32 sizeInPairs;
 		};
 

@@ -31,7 +31,7 @@ namespace Physics {
 
 	BulletCollisionShapeView::BulletCollisionShapeView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ),
 																												 _shapeAllocator( allocator, UTF8L("Bullet Collision Shape Allocator") ),
-																												 _shapes( 0u, allocator, UTF8L("Bullet Collision Shape View Subshape Collection Allocator") ) {}
+																												 _shapes( { allocator, UTF8L("Bullet Collision Shape View Subshape Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 

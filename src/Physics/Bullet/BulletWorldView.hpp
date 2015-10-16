@@ -72,8 +72,8 @@ namespace Physics {
 			VISIBILITY_FILTER		= 64,
 			PROJECTILE_FILTER		= 128,
 			CUSTOM_GROUP_BEGIN		= 256,
-			ALL						= -1,
-			NONE					= 0
+			NONE					= 0,
+			ALL						= ~NONE,
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

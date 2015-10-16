@@ -35,7 +35,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Renderer {
 
-	Direct3D11MeshView::Direct3D11MeshView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _submeshes( 0u, allocator, UTF8L("Direct3D11 Mesh View Submesh Allocator") ) {}
+	Direct3D11MeshView::Direct3D11MeshView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _submeshes( { allocator, UTF8L("Direct3D11 Mesh View Submesh Allocator") } ) {}
 
 // ---------------------------------------------------
 

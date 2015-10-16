@@ -30,7 +30,7 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	LoaderThread::LoaderThread( TaskScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L( "Loader Thread Allocator" ) ),
+	LoaderThread::LoaderThread( TaskScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Loader Thread Allocator") ),
 																				   _loadSemaphore( scheduler.AllocateSemaphore( _allocator, 0u, 128u ).object, { _allocator } ),
 																				   _executionBehavior( ExecutionBehavior::CONTINUE ) {}
 

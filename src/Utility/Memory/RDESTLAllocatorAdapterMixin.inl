@@ -18,13 +18,12 @@
 namespace Eldritch2Detail {
 
 	template <typename PublicAllocatorType>
-	template <typename... AllocatorConstructorArguments>
-	ETForceInlineHint RDESTLAllocatorAdapterMixin<PublicAllocatorType>::RDESTLAllocatorAdapterMixin( AllocatorConstructorArguments&&... allocatorConstructorArguments ) : PublicAllocatorType( ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETForceInlineHint RDESTLAllocatorAdapterMixin<PublicAllocatorType>::RDESTLAllocatorAdapterMixin( ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>&& allocator ) : RDESTLAllocatorAdapterMixin<PublicAllocatorType>( static_cast<PublicAllocatorType&&>( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename PublicAllocatorType>
-	ETForceInlineHint RDESTLAllocatorAdapterMixin<PublicAllocatorType>::RDESTLAllocatorAdapterMixin( ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>&& allocator ) : PublicAllocatorType( ::std::move( allocator ) ) {}
+	ETForceInlineHint RDESTLAllocatorAdapterMixin<PublicAllocatorType>::RDESTLAllocatorAdapterMixin( PublicAllocatorType&& allocator ) : PublicAllocatorType( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 

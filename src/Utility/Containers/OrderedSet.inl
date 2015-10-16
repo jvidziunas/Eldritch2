@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -19,14 +19,13 @@
 namespace Eldritch2 {
 
 	template <typename StoredObject, class Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	template <typename InputIterator, typename... AllocatorConstructorArguments>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( InputIterator begin, InputIterator end, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {
+	template <typename InputIterator>
+	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( InputIterator begin, InputIterator end, AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {
 		while( begin != end ) {
 			this->Insert( *begin++ );
 		}
@@ -35,8 +34,8 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( const ::Eldritch2::OrderedSet<StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {
+	template <class AlternateAllocator>
+	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( const ::Eldritch2::OrderedSet<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {
 		for( auto&& value : containerTemplate ) {
 			this->Insert( value );
 		}
@@ -45,7 +44,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::~OrderedSet() {}
+	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( ::Eldritch2::OrderedSet<StoredObject, Allocator>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
 
 // ---------------------------------------------------
 

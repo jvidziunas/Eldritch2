@@ -12,13 +12,25 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <type_traits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Utility {
 
 	namespace Utility	= ::Eldritch2::Utility;
+
+// ---------------------------------------------------
+
+	template <typename ResultObject>
+	template <typename DerivedResultObject>
+	ETForceInlineHint Result<ResultObject>::Result( const Utility::Result<DerivedResultObject>& result ) : resultCode( result.resultCode ) {
+		static_assert( ::std::is_base_of<ResultObject, DerivedResultObject>::value, "" );
+
+	// ---
+
+		object = static_cast<ResultObject*>( result.object );
+	}
 
 // ---------------------------------------------------
 

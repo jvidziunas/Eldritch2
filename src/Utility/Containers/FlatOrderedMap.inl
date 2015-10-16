@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -19,29 +19,30 @@
 namespace Eldritch2 {
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( const SizeType reservedSizeInElements, OrderingPredicateType orderingPredicate, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : UnderlyingContainer( reservedSizeInElements, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ),
-																																																													   _orderingPredicate( orderingPredicate ) {}
+	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( AllocatorType&& allocator ) : UnderlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	template <typename InputIterator, typename... AllocatorConstructorArguments>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( InputIterator begin, InputIterator end,
-																								  OrderingPredicateType					orderingPredicate,
-																								  AllocatorConstructorArguments&&...	allocatorConstructorArguments ) : UnderlyingContainer( begin, end, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ),
-																																										  _orderingPredicate( orderingPredicate ) {
+	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( reservedSizeInElements, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
+	template <typename InputIterator>
+	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( begin, end, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {
 		UnderlyingContainer::Sort( _orderingPredicate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>&	containerTemplate,
-																								  AllocatorConstructorArguments&&...													allocatorConstructorArguments ) : UnderlyingContainer( containerTemplate.Begin(), containerTemplate.End(),
-																																																											   ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ),
-																																																						  _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
+	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator ) : UnderlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ), _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
+	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource ) : UnderlyingContainer( ::std::move( containerTemplate ) ), _orderingPredicate( ::std::move( moveSource._orderingPredicate ) ) {}
 
 // ---------------------------------------------------
 

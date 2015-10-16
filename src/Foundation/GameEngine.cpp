@@ -41,7 +41,7 @@ namespace Foundation {
 																																				   _logger( contentProvider, UTF8L("Eldritch2.log") ),
 																																				   _systemInterface( systemInterface ),
 																																				   _scheduler( scheduler ),
-																																				   _worldViewFactories( 0u, _allocator, UTF8L("Game Engine World View Factory Collection Allocator") ),
+																																				   _worldViewFactories( 0u, { _allocator, UTF8L("Game Engine World View Factory Collection Allocator") } ),
 																																				   _worldViewAllocationHintInBytes( 16u ),
 																																				   _contentLibrary( contentProvider, scheduler, _allocator ),
 																																				   _logEchoThreshold( LogMessageType::VERBOSE_WARNING ),

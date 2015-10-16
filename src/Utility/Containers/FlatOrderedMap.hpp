@@ -42,14 +42,16 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref FlatOrderedMap instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint FlatOrderedMap( const SizeType reservedSizeInElements, OrderingPredicateType orderingPredicate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint explicit FlatOrderedMap( AllocatorType&& allocator = AllocatorType() );
 		//! Constructs this @ref FlatOrderedMap instance.
-		template <typename InputIterator, typename... AllocatorConstructorArguments>
-		ETInlineHint FlatOrderedMap( InputIterator begin, InputIterator end, OrderingPredicateType orderingPredicate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint FlatOrderedMap( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate = OrderingPredicate(), AllocatorType&& allocator = AllocatorType() );
 		//! Constructs this @ref FlatOrderedMap instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint FlatOrderedMap( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		template <typename InputIterator>
+		ETInlineHint FlatOrderedMap( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate = OrderingPredicate(), AllocatorType&& allocator = AllocatorType() );
+		//! Constructs this @ref FlatOrderedMap instance.
+		ETInlineHint FlatOrderedMap( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
+		//! Constructs this @ref FlatOrderedMap instance.
+		ETInlineHint FlatOrderedMap( ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource );
 
 		//! Destroys this @ref FlatOrderedMap instance.
 		ETInlineHint ~FlatOrderedMap() = default;

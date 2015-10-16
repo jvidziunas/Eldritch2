@@ -51,14 +51,15 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref UTF8String instance.
-		template <typename... AllocatorConstructorArgs>
-		ETInlineHint explicit UTF8String( const EmptyStringSemantics, AllocatorConstructorArgs&&... allocatorConstructorArgs );
+		ETInlineHint UTF8String( const EmptyStringSemantics, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
-		template <typename... AllocatorConstructorArgs>
-		ETInlineHint UTF8String( const CharacterType* const string, const SizeType stringLengthInBytes, AllocatorConstructorArgs&&... allocatorConstructorArgs );
+		ETInlineHint UTF8String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
-		template <class AlternateAllocator, typename... AllocatorConstructorArgs>
-		ETInlineHint UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorConstructorArgs&&... allocatorConstructorArgs );
+		template <size_t literalLength>
+		ETInlineHint UTF8String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref UTF8String instance.
+		template <class AlternateAllocator>
+		ETInlineHint UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
 
 		//!	Destroys this @ref UTF8String instance.
 		ETInlineHint ~UTF8String() = default;

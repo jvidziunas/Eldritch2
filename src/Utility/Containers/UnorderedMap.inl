@@ -19,25 +19,23 @@
 namespace Eldritch2 {
 
 	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( const SizeType initialBucketCount, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( initialBucketCount, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( const SizeType initialBucketCount, const Hasher& hasher, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( initialBucketCount, hasher, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( const SizeType initialCapacity, Hasher&& hasher, AllocatorType&& allocator ) : _underlyingContainer( initialCapacity, ::std::move( hasher ), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <class AlternateAllocator, int alternateLoadFactor, typename... AllocatorConstructorArguments>
-	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( const ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _underlyingContainer( containerTemplate, ::std::forward<AllocatorConstructorArguments>( allocatorConstructorArguments )... ) {}
+	template <class AlternateAllocator, int alternateLoadFactor>
+	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( const ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate, ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::~UnorderedMap() {}
+	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
 
 // ---------------------------------------------------
 

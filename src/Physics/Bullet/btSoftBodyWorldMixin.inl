@@ -352,7 +352,7 @@ void btSoftBodyWorldMixin<BaseType>::rayTest( const ::btVector3& rayFromWorld, c
 
 	// ---
 
-		// Constructs this btSoftSingleRayCallback instance.
+		//!	Constructs this @ref btSoftSingleRayCallback instance.
 		btSoftSingleRayCallback( const ::btVector3& rayFromWorld, const ::btVector3& rayToWorld, const ThisType* world, ::btCollisionWorld::RayResultCallback& resultCallback ) : m_rayFromWorld( rayFromWorld ),
 																																												  m_rayToWorld( rayToWorld ),
 																																												  m_world( world ),
@@ -365,7 +365,7 @@ void btSoftBodyWorldMixin<BaseType>::rayTest( const ::btVector3& rayFromWorld, c
 			::btVector3	rayDir = (rayToWorld - rayFromWorld);
 
 			rayDir.normalize();
-			///what about division by zero? --> just set rayDirection[i] to INF/1e30
+			/// what about division by zero? --> just set rayDirection[i] to INF/1e30
 			m_rayDirectionInverse[0] = rayDir[0] == btScalar( 0.0 ) ? btScalar( 1e30 ) : btScalar( 1.0 ) / rayDir[0];
 			m_rayDirectionInverse[1] = rayDir[1] == btScalar( 0.0 ) ? btScalar( 1e30 ) : btScalar( 1.0 ) / rayDir[1];
 			m_rayDirectionInverse[2] = rayDir[2] == btScalar( 0.0 ) ? btScalar( 1e30 ) : btScalar( 1.0 ) / rayDir[2];
@@ -379,19 +379,24 @@ void btSoftBodyWorldMixin<BaseType>::rayTest( const ::btVector3& rayFromWorld, c
 	// ---------------------------------------------------
 
 		virtual bool process( const ::btBroadphaseProxy* proxy ) override sealed {
-			///terminate further ray tests, once the closestHitFraction reached zero
+			/// terminate further ray tests, once the closestHitFraction reached zero
 			if( m_resultCallback.m_closestHitFraction == ::btScalar( 0.f ) )
 				return false;
 
 			::btCollisionObject*	collisionObject = static_cast<::btCollisionObject*>(proxy->m_clientObject);
 
-			//only perform raycast if filterMask matches
+			// only perform raycast if filterMask matches
 			if( m_resultCallback.needsCollision( collisionObject->getBroadphaseHandle() ) ) {
 				m_world->rayTestSingle( m_rayFromTrans, m_rayToTrans, collisionObject, collisionObject->getCollisionShape(), collisionObject->getWorldTransform(), m_resultCallback );
 			}
 
 			return true;
 		}
+
+	// ---------------------------------------------------
+
+	private:
+		btSoftSingleRayCallback&	operator=(const btSoftSingleRayCallback&) = delete;
 
 	// ---------------------------------------------------
 

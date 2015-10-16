@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -22,20 +22,25 @@
 namespace Eldritch2 {
 
 	template <class Allocator>
-	template <typename... AllocatorConstructorArgs>
-	ETInlineHint UTF8String<Allocator>::UTF8String( const EmptyStringSemantics, AllocatorConstructorArgs&&... allocatorConstructorArgs ) : _underlyingContainer( "", static_cast<SizeType>(0), ::std::forward<AllocatorConstructorArgs>( allocatorConstructorArgs )... ) {}
+	ETInlineHint UTF8String<Allocator>::UTF8String( const EmptyStringSemantics, AllocatorType&& allocator ) : UTF8String<Allocator>( "", ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 	
 	template <class Allocator>
-	template <typename... AllocatorConstructorArgs>
-	ETInlineHint UTF8String<Allocator>::UTF8String( const CharacterType* const string, const SizeType stringLengthInBytes, AllocatorConstructorArgs&&... allocatorConstructorArgs ) : _underlyingContainer( string, stringLengthInBytes, ::std::forward<AllocatorConstructorArgs>( allocatorConstructorArgs )... ) {}
+	ETInlineHint UTF8String<Allocator>::UTF8String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator ) : _underlyingContainer( string, static_cast<SizeType>(stringEnd - string), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
-	
+
 	template <class Allocator>
-	template <class AlternateAllocator, typename... AllocatorConstructorArgs>
-	ETInlineHint UTF8String<Allocator>::UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorConstructorArgs&&... allocatorConstructorArgs ) : _underlyingContainer( string, ::std::forward<AllocatorConstructorArgs>( allocatorConstructorArgs )... ) {}
+	template <size_t literalLength>
+	// Remember to subtract 1 here to account for the terminating null character.
+	ETInlineHint UTF8String<Allocator>::UTF8String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator ) : _underlyingContainer( stringLiteral, static_cast<SizeType>(literalLength-1), ::std::move( allocator ) ) {}
+	
+// ---------------------------------------------------
+
+	template <class Allocator>
+	template <class AlternateAllocator>
+	ETInlineHint UTF8String<Allocator>::UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorType&& allocator ) : UTF8String<Allocator>( string.Begin(), string.End(), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
@@ -219,7 +224,7 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint ::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::Append( const CharacterType* const string ) {
-		return this->Append( string, ::Eldritch2::StringLength( string ) );
+		return this->Append( string, static_cast<SizeType>(::Eldritch2::StringLength( string )) );
 	}
 
 // ---------------------------------------------------

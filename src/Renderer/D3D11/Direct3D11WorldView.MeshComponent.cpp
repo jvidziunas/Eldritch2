@@ -79,7 +79,7 @@ namespace Renderer {
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<MeshComponent>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );
 
-			typeRegistrar.EnsureValueTypeDeclared<StringMarshal>();
+			typeRegistrar.EnsureValueTypeDeclared<StringMarshal>().EnsureReferenceTypeDeclared<Armature>();
 
 			typeBuilder.ExposeFactory( &FunctionHelper::Factory0 );
 			typeBuilder.ExposeVirtualProperty( "Visible", &FunctionHelper::GetVisible ).ExposeVirtualProperty( "Visible", &FunctionHelper::SetVisible );

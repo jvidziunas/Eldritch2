@@ -38,18 +38,20 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this OrderedSet instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint FlatOrderedSet( const SizeType reservedSizeInElements, OrderingPredicateType orderingPredicate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		// Constructs this OrderedSet instance.
-		template <typename InputIterator, typename... AllocatorConstructorArguments>
-		ETInlineHint FlatOrderedSet( InputIterator begin, InputIterator end, OrderingPredicateType orderingPredicate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		// Constructs this OrderedSet instance.
-		template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-		ETInlineHint FlatOrderedSet( const ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint explicit FlatOrderedSet( AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatOrderedSet instance.
+		ETInlineHint FlatOrderedSet( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate = OrderingPredicateType(), AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatOrderedSet instance.
+		template <typename InputIterator>
+		ETInlineHint FlatOrderedSet( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate = OrderingPredicateType(), AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatOrderedSet instance.
+		template <class AlternateAllocator>
+		ETInlineHint FlatOrderedSet( const ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatOrderedSet instance.
+		ETInlineHint FlatOrderedSet( ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>&& moveSource );
 
-		// Destroys this OrderedSet instance.
-		ETInlineHint ~FlatOrderedSet();
+		//!	Destroys this @ref FlatOrderedSet instance.
+		ETInlineHint ~FlatOrderedSet() = default;
 
 	// - ALGORITHMS --------------------------------------
 

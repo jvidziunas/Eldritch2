@@ -21,7 +21,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Scheduler {
 
-	WorkerContext::WorkerContext( const WorkItem& defaultWorkItem, ::Eldritch2::Allocator& allocator ) : _workItems( 0u, allocator, UTF8L("Worker Context Job Queue Allocator") ) {
+	WorkerContext::WorkerContext( const WorkItem& defaultWorkItem, ::Eldritch2::Allocator& allocator ) : _workItems( 0u, { allocator, UTF8L("Worker Context Job Queue Allocator") } ) {
 		_workItems.Reserve( 64u );
 		_workItems.EmplaceBack( defaultWorkItem );
 	}

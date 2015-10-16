@@ -20,17 +20,19 @@ namespace Eldritch2 {
 namespace Utility {
 
 	template <typename Container, typename ElementProvider>
-	MessagePackReader::ArrayAdapter<Container, ElementProvider>::ArrayAdapter( Container& container, ElementProvider elementProvider ) : MessagePackBase::ArrayHeader(), _container( container ), _elementProvider( elementProvider ) {}
+	MessagePackReader::ArrayAdapter<Container, ElementProvider>::ArrayAdapter( Container& container, ElementProvider elementProvider ) : _container( container ), _elementProvider( elementProvider ) {}
 
 // ---------------------------------------------------
 
 	template <typename Container, typename ElementProvider>
 	bool MessagePackReader::ArrayAdapter<Container, ElementProvider>::Serialize( MessagePackReader& reader ) {
-		if( !ArrayHeader::Serialize( reader ) ) {
+		MessagePackBase::Array	arrayHeader;
+
+		if( !reader( arrayHeader ) ) {
 			return false;
 		}
 
-		for( auto currentElement( _container.End() ); 0u != sizeInElements; --sizeInElements ) {
+		for( auto currentElement( _container.End() ); 0u != arrayHeader.sizeInElements; --arrayHeader.sizeInElements ) {
 			auto&&	deserializingValue( _elementProvider() );
 
 			if( !reader( deserializingValue ) ) {
@@ -45,28 +47,23 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	template <typename Container, typename ElementProvider, typename KeyExtractor, typename ValueExtractor>
-	MessagePackReader::MapAdapter<Container, ElementProvider, KeyExtractor, ValueExtractor>::MapAdapter( Container&			container,
-																										 ElementProvider	elementProvider,
-																										 KeyExtractor		keyExtractor,
-																										 ValueExtractor		valueExtractor ) : MessagePackBase::MapHeader(),
-																																			   _container( container ),
-																																			   _elementProvider( elementProvider ),
-																																			   _keyExtractor( keyExtractor ),
-																																			   _valueExtractor( valueExtractor ) {}
+	template <typename Container, typename ElementProvider>
+	MessagePackReader::MapAdapter<Container, ElementProvider>::MapAdapter( Container& container, ElementProvider&& elementProvider ) : _container( container ), _elementProvider( elementProvider ) {}
 
 // ---------------------------------------------------
 
-	template <typename Container, typename KeyExtractor, typename ValueExtractor, typename ElementProvider>
-	bool MessagePackReader::MapAdapter<Container, KeyExtractor, ValueExtractor, ElementProvider>::Serialize( MessagePackReader& reader ) {
-		if( !MapHeader::Serialize( reader ) ) {
+	template <typename Container, typename ElementProvider>
+	bool MessagePackReader::MapAdapter<Container, ElementProvider>::Serialize( MessagePackReader& reader ) {
+		MessagePackBase::Map	mapHeader;
+
+		if( !reader( mapHeader ) ) {
 			return false;
 		}
 
-		for( ; 0u != sizeInPairs; --sizeInPairs ) {
+		for( ; 0u != mapHeader.sizeInPairs; --mapHeader.sizeInPairs ) {
 			auto&&	deserializingValue( _elementProvider() );
 
-			if( !reader( _keyExtractor( deserializingValue ), _valueExtractor( deserializingValue ) ) ) {
+			if( !reader( deserializingValue ) ) {
 				return false;
 			}
 
@@ -78,15 +75,15 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	template <typename Container, typename ElementProvider, typename KeyExtractor, typename ValueExtractor>
-	MessagePackReader::MapAdapter<Container, ElementProvider, KeyExtractor, ValueExtractor>&& MessagePackReader::AdaptMap( Container& container, ElementProvider&& elementProvider, KeyExtractor&& keyExtractor, ValueExtractor&& valueExtractor ) {
-		return { container, ::std::forward<ElementProvider>( elementProvider ), ::std::forward<KeyExtractor>( keyExtractor ), ::std::forward<ValueExtractor>( valueExtractor ) };
+	template <typename Container, typename ElementProvider>
+	MessagePackReader::MapAdapter<Container, ElementProvider> MessagePackReader::AdaptMap( Container& container, ElementProvider&& elementProvider ) {
+		return { container, ::std::forward<ElementProvider>( elementProvider ) };
 	}
 
 // ---------------------------------------------------
 
 	template <typename Container, typename ElementProvider>
-	MessagePackReader::ArrayAdapter<Container, ElementProvider>&& MessagePackReader::AdaptArray( Container& container, ElementProvider&& elementProvider ) {
+	MessagePackReader::ArrayAdapter<Container, ElementProvider> MessagePackReader::AdaptArray( Container& container, ElementProvider&& elementProvider ) {
 		return { container, ::std::forward<ElementProvider>( elementProvider ) };
 	}
 
@@ -94,7 +91,7 @@ namespace Utility {
 
 	template <typename... Fields>
 	ETInlineHint bool MessagePackReader::ParseOneOf( size_t&& indexOfUsedElement, Fields&&... fields ) {
-		static_assert( 1 < sizeof...(fields), "MessagePackReader::ParseOneOf() requires at least two fields to choose from" );
+		static_assert( 1 < sizeof...(fields), "MessagePackReader::ParseOneOf() requires at least two fields to choose from." );
 
 	// ---
 
@@ -105,7 +102,7 @@ namespace Utility {
 
 	template <typename... Fields>
 	ETInlineHint bool MessagePackReader::operator()( Fields&&... fields ) {
-		static_assert( sizeof...(fields) > 0u, "MessagePackReader::operator() requires at least one field!" );
+		static_assert( sizeof...(fields) > 0u, "MessagePackReader::operator() requires at least one field to parse!" );
 
 	// ---
 
@@ -130,7 +127,7 @@ namespace Utility {
 			return true;
 		}
 
-		// We encountered the wrong type. This really should have been in the header, but whatever.
+		// We encountered the wrong type. This really should have been public in the header, but whatever.
 		if( 7 == error ) {
 			// Didn't parse correctly. Revert changes.
 			RestoreCheckpoint( checkpoint );
@@ -238,7 +235,7 @@ namespace Utility {
 
 	template <typename Head>
 	ETInlineHint bool MessagePackReader::Parse( Head& element ) {
-		return element.Serialize( *this );
+		return Detail::SerializeDispatcher<Head, MessagePackReader>::Dispatch( element, *this );
 	}
 
 }	// namespace Utility

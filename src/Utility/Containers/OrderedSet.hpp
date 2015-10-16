@@ -39,17 +39,18 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref OrderedSet instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint OrderedSet( AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint explicit OrderedSet( AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref OrderedSet instance.
-		template <typename InputIterator, typename... AllocatorConstructorArguments>
-		ETInlineHint OrderedSet( InputIterator begin, InputIterator end, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		template <typename InputIterator>
+		ETInlineHint OrderedSet( InputIterator begin, InputIterator end, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref OrderedSet instance.
-		template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-		ETInlineHint OrderedSet( const ::Eldritch2::OrderedSet<StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		template <class AlternateAllocator>
+		ETInlineHint OrderedSet( const ::Eldritch2::OrderedSet<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref OrderedSet instance.
+		ETInlineHint OrderedSet( ::Eldritch2::OrderedSet<StoredObject, Allocator>&& moveSource );
 
 		//!	Destroys this @ref OrderedSet instance.
-		ETInlineHint ~OrderedSet();
+		ETInlineHint ~OrderedSet() = default;
 
 	// - ALGORITHMS --------------------------------------
 

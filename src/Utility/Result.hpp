@@ -24,6 +24,8 @@ namespace Utility {
 
 	template <typename ResultObject>
 	struct Result {
+		template <typename DerivedResultObject>
+		ETForceInlineHint Result( const Utility::Result<DerivedResultObject>& result );
 		ETForceInlineHint Result( const ::Eldritch2::ErrorCode error );
 		ETForceInlineHint Result( ResultObject& object );
 		

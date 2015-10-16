@@ -32,11 +32,11 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( const EmptyStringSemantics emptyStringSemantics, Allocator& allocator ) : UTF8String<>( emptyStringSemantics, allocator, UTF8L("String Allocator") ) {}
+	StringMarshal::StringMarshal( const EmptyStringSemantics emptyStringSemantics, Allocator& allocator ) : UTF8String<>( emptyStringSemantics, { allocator, UTF8L("String Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( const UTF8Char* const string, const size_t stringLengthInOctets, Allocator& allocator ) : UTF8String<>( string, stringLengthInOctets, allocator, UTF8L("String Allocator") ) {}
+	StringMarshal::StringMarshal( const UTF8Char* const string, const size_t stringLengthInOctets, Allocator& allocator ) : UTF8String<>( string, (string + stringLengthInOctets), { allocator, UTF8L("String Allocator") } ) {}
 
 // ---------------------------------------------------
 

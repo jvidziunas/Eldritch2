@@ -40,18 +40,19 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref OrderedMap instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint OrderedMap( AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		//! Constructs this @ref OrderedMap instance.
-		template <typename InputIterator, typename... AllocatorConstructorArguments>
-		ETInlineHint OrderedMap( InputIterator begin, InputIterator end, AllocatorConstructorArguments&&... allocatorConstructorArguments );
-		//! Constructs this @ref OrderedMap instance.
-		template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-		ETInlineHint OrderedMap( const ::Eldritch2::OrderedMap<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		//!	Constructs this @ref OrderedMap instance.
+		ETInlineHint explicit OrderedMap( AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref OrderedMap instance.
+		template <typename InputIterator>
+		ETInlineHint OrderedMap( InputIterator begin, InputIterator end, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref OrderedMap instance.
+		template <class AlternateAllocator>
+		ETInlineHint OrderedMap( const ::Eldritch2::OrderedMap<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref OrderedMap instance.
+		ETInlineHint OrderedMap( ::Eldritch2::OrderedMap<Key, StoredObject, Allocator>&& moveSource );
 
-		// Destroys this OrderedMap instance.
-		ETInlineHint ~OrderedMap();
+		//!	Destroys this @ref OrderedMap instance.
+		ETInlineHint ~OrderedMap() = default;
 
 	// - ALGORITHMS --------------------------------------
 

@@ -28,11 +28,18 @@ namespace Utility {
 
 	public:
 		template <typename Container, typename ElementProvider>
-		class ArrayAdapter : protected MessagePackBase::ArrayHeader {
+		class ArrayAdapter {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
+			//!	Constructs this @ref ArrayAdapter instance.
+			/*!	@param[in] container Container to insert deserialized elements into.
+				@param[in] elementProvider Default element provider the @ref ArrayAdapter will use to construct elements before deserializing fields.
+				*/
 			ArrayAdapter( Container& container, ElementProvider elementProvider );
+
+			//!	Destroys this @ref ArrayAdapter instance.
+			~ArrayAdapter() = default;
 
 		// ---------------------------------------------------
 
@@ -47,12 +54,19 @@ namespace Utility {
 
 	// ---
 
-		template <typename Container, typename ElementProvider, typename KeyExtractor, typename ValueExtractor>
-		class MapAdapter : protected MessagePackBase::MapHeader {
+		template <typename Container, typename ElementProvider>
+		class MapAdapter {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			MapAdapter( Container& container, ElementProvider elementProvider, KeyExtractor keyExtractor, ValueExtractor valueExtractor );
+			//!	Constructs this @ref MapAdapter instance.
+			/*!	@param[in] container Container to insert deserialized elements into.
+				@param[in] elementProvider Default element provider the @ref MapAdapter will use to construct elements before deserializing fields.
+				*/
+			MapAdapter( Container& container, ElementProvider&& elementProvider );
+
+			//!	Destroys this @ref MapAdapter instance.
+			~MapAdapter() = default;
 
 		// ---------------------------------------------------
 
@@ -63,8 +77,6 @@ namespace Utility {
 		private:
 			Container&		_container;
 			ElementProvider	_elementProvider;
-			KeyExtractor	_keyExtractor;
-			ValueExtractor	_valueExtractor;
 		};
 
 	// ---
@@ -81,11 +93,11 @@ namespace Utility {
 
 	// ---------------------------------------------------
 
-		template <typename Container, typename ElementProvider = DefaultElementProvider<Container>, typename KeyExtractor = DefaultKeyExtractor<Container>, typename ValueExtractor = DefaultValueExtractor<Container>>
-		static MapAdapter<Container, ElementProvider, KeyExtractor, ValueExtractor>&&	AdaptMap( Container& container, ElementProvider&& elementProvider = ElementProvider(), KeyExtractor&& keyExtractor = KeyExtractor(), ValueExtractor&& valueExtractor = ValueExtractor() );
+		template <typename Container, typename ElementProvider = DefaultElementProvider<typename Container::ValueType>>
+		static MapAdapter<Container, ElementProvider>	AdaptMap( Container& container, ElementProvider&& elementProvider = ElementProvider() );
 
-		template <typename Container, typename ElementProvider = DefaultElementProvider<Container>>
-		static ArrayAdapter<Container, ElementProvider>&&								AdaptArray( Container& container, ElementProvider&& elementProvider = ElementProvider() );
+		template <typename Container, typename ElementProvider = DefaultElementProvider<typename Container::ValueType>>
+		static ArrayAdapter<Container, ElementProvider>	AdaptArray( Container& container, ElementProvider&& elementProvider = ElementProvider() );
 
 	// ---------------------------------------------------
 

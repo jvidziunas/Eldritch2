@@ -27,7 +27,15 @@ using namespace ::std;
 
 namespace Eldritch2 {
 
-	ArenaAllocatorBase::ArenaAllocatorBase( void* pool, const SizeType allocationLimitInBytes, const UTF8Char* const name ) : Allocator( name ), _allocationPointer( static_cast<char*>(pool) ), _arenaEnd( static_cast<char*>(pool) + allocationLimitInBytes ) {}
+	ArenaAllocatorBase::ArenaAllocatorBase( void* pool, const void* const poolEnd, const UTF8Char* const name ) : Allocator( name ), _allocationPointer( static_cast<char*>(pool) ), _arenaEnd( static_cast<const char*>(poolEnd) ) {}
+
+// ---------------------------------------------------
+
+	ArenaAllocatorBase::ArenaAllocatorBase( void* const pool, const SizeType poolCapacityInBytes, const ::Eldritch2::UTF8Char* const name ) : ArenaAllocatorBase( pool, static_cast<char*>(pool) + poolCapacityInBytes, name ) {}
+
+// ---------------------------------------------------
+
+	ArenaAllocatorBase::ArenaAllocatorBase( ArenaAllocatorBase&& allocator ) : Allocator( allocator.GetName() ), _allocationPointer( allocator._allocationPointer.load( memory_order_relaxed ) ), _arenaEnd( allocator._arenaEnd ) {}
 
 // ---------------------------------------------------
 
@@ -95,16 +103,32 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ExternalArenaAllocator::ExternalArenaAllocator( void* pool, const SizeType allocationLimitInBytes, const UTF8Char* const name ) : ArenaAllocatorBase( pool, allocationLimitInBytes, name ) {}
+	ExternalArenaAllocator::ExternalArenaAllocator( void* const pool, const void* const poolEnd, const UTF8Char* const name ) : ArenaAllocatorBase( pool, poolEnd, name ) {}
+
+// ---------------------------------------------------
+
+	ExternalArenaAllocator::ExternalArenaAllocator( void* const pool, const SizeType poolCapacityInBytes, const UTF8Char* const name ) : ExternalArenaAllocator( pool, static_cast<char*>(pool)+poolCapacityInBytes, name ) {}
+
+// ---------------------------------------------------
+
+	ExternalArenaAllocator::ExternalArenaAllocator( ExternalArenaAllocator&& allocator ) : ArenaAllocatorBase( move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	ArenaChildAllocator::ArenaChildAllocator( Allocator& parent, const SizeType allocationLimitInBytes, const AllocationOptions allocationOptions, const UTF8Char* const name ) : ArenaAllocatorBase( parent.Allocate( allocationLimitInBytes, 16u, allocationOptions ), allocationLimitInBytes, name ), _parent( parent ), _allocation( _allocationPointer ) {}
 
 // ---------------------------------------------------
+	
+	ArenaChildAllocator::ArenaChildAllocator( ArenaChildAllocator&& allocator ) : ArenaAllocatorBase( move( allocator ) ), _allocation( allocator._allocation ), _parent( allocator._parent ) {
+		allocator._allocation = nullptr;
+	}
+
+// ---------------------------------------------------
 
 	ArenaChildAllocator::~ArenaChildAllocator() {
-		_parent.Deallocate( _allocation, ::Eldritch2::AlignedDeallocationSemantics );
+		if( _allocation ) {
+			_parent.Deallocate( _allocation, ::Eldritch2::AlignedDeallocationSemantics );
+		}
 	}
 
 }	// namespace Eldritch2

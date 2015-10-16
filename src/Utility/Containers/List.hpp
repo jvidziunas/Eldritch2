@@ -21,7 +21,7 @@
 namespace Eldritch2 {
 
 	template <typename StoredObject, typename Allocator = ::Eldritch2::ChildAllocator>
-	class List : private ::rde::list<StoredObject, ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator> > {
+	class List : private ::rde::list<StoredObject, ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
@@ -40,17 +40,16 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref List instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint List( AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		ETInlineHint explicit List( AllocatorType&& allocatorType = AllocatorType() );
 		//! Constructs this @ref List instance.
-		template <typename InputIterator, typename... AllocatorConstructorArguments>
-		ETInlineHint List( InputIterator first, InputIterator last, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		template <typename InputIterator>
+		ETInlineHint List( InputIterator first, InputIterator last, AllocatorType&& allocatorType = AllocatorType() );
 		//! Constructs this @ref List instance.
-		template <typename AlternateAllocator, typename... AllocatorConstructorArguments>
-		ETInlineHint List( const ::Eldritch2::List<StoredObject, AlternateAllocator>& listTemplate, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		template <typename AlternateAllocator>
+		ETInlineHint List( const ::Eldritch2::List<StoredObject, AlternateAllocator>& listTemplate, AllocatorType&& allocatorType = AllocatorType() );
 
 		//! Destroys this @ref List instance.
-		ETInlineHint ~List();
+		ETInlineHint ~List() = default;
 
 	// - ALGORITHMS --------------------------------------
 

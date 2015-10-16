@@ -44,7 +44,7 @@ namespace Scripting {
 		AngelscriptEngine( Foundation::GameEngine& owningEngine );
 
 		//! Destroys this @ref AngelscriptEngine instance.
-		~AngelscriptEngine();
+		~AngelscriptEngine() = default;
 
 	// ---------------------------------------------------
 

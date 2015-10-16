@@ -23,7 +23,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Networking {
 
-	SteamworksNetworkingService::Player::Player( const NetworkID& networkID, SteamworksNetworkingService& networkingService, Allocator& allocator ) : _name( ::Eldritch2::EmptyStringSemantics, allocator, UTF8L( "Player Name Allocator" ) ),
+	SteamworksNetworkingService::Player::Player( const NetworkID& networkID, SteamworksNetworkingService& networkingService, Allocator& allocator ) : _name( ::Eldritch2::EmptyStringSemantics, { allocator, UTF8L("Player Name Allocator") } ),
 																																					  _networkingService( networkingService ),
 																																					  _networkID( networkID ) {}
 

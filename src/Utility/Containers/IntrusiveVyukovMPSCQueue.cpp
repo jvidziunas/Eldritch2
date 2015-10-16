@@ -25,6 +25,11 @@ namespace {
 		return atomic_load_explicit( reinterpret_cast<atomic<T>*>(&value), order );
 	}
 
+	template <typename T>
+	ETForceInlineHint ETNoAliasHint void AtomicStore( T& value, T desiredValue, memory_order order ) {
+		return atomic_store_explicit( reinterpret_cast<atomic<T>*>(&value), desiredValue, order );
+	}
+
 }	// anonymous namespace
 
 namespace Eldritch2Detail {
@@ -71,11 +76,9 @@ namespace Eldritch2Detail {
 // ---------------------------------------------------
 
 	void IntrusiveVyukovMPSCQueueBase::PushBack( intrusive_slist_node& object ) {
-		atomic_store_explicit( reinterpret_cast<atomic<decltype(&object)>*>(&object.next), nullptr, memory_order_release );
+		AtomicStore( object.next, static_cast<intrusive_slist_node*>(nullptr), memory_order_release );
 
-		auto* const	prev( _head.exchange( &object, memory_order_release ) );
-
-		atomic_store_explicit( reinterpret_cast<atomic<decltype(&object)>*>(prev->next), &object, memory_order_release );
+		AtomicStore( _head.exchange( &object, memory_order_release )->next, &object, memory_order_release ); 
 	}
 
 }	// namespace Eldritch2Detail

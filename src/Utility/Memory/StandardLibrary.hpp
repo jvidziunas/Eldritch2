@@ -325,32 +325,24 @@ namespace Eldritch2 {
 
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint char*							PrintFormatted( char* destinationString, size_t maxCharacters, const char* formatString, ... );
+	ETNoAliasHint char*							PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, ... );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint wchar_t*						PrintFormatted( wchar_t* destinationString, size_t maxCharacters, const wchar_t* formatString, ... );
+	ETNoAliasHint wchar_t*						PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, ... );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	template <size_t stringSizeInCharacters>
-	ETNoAliasHint auto							PrintFormatted( char (&destinationString)[stringSizeInCharacters], const char* formatString, ... ) -> decltype(destinationString);
+	template <typename Character, size_t stringSizeInCharacters>
+	ETNoAliasHint auto							PrintFormatted( Character (&destinationString)[stringSizeInCharacters], const Character* const formatString, ... ) -> decltype(destinationString);
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	template <size_t stringSizeInCharacters>
-	ETNoAliasHint auto							PrintFormatted( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* formatString, ... ) -> decltype(destinationString);
+	ETNoAliasHint char*							PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, va_list args );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETForceInlineHint ETNoAliasHint char*		PrintFormatted( char* destinationString, size_t maxCharacters, const char* formatString, va_list args );
+	ETNoAliasHint wchar_t*						PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, va_list args );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETForceInlineHint ETNoAliasHint wchar_t*	PrintFormatted( wchar_t* destinationString, size_t maxCharacters, const wchar_t* formatString, va_list args );
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint auto		PrintFormatted( char (&destinationString)[stringSizeInCharacters], const char* formatString, va_list args ) -> decltype(destinationString);
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint auto		PrintFormatted( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* formatString, va_list args ) -> decltype(destinationString);
+	template <typename Character, size_t stringSizeInCharacters>
+	ETNoAliasHint auto							PrintFormatted( Character (&destinationString)[stringSizeInCharacters], const Character* const formatString, va_list args ) -> decltype(destinationString);
 
 // ---------------------------------------------------
 

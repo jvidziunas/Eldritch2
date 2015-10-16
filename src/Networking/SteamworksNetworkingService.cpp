@@ -70,8 +70,8 @@ namespace Networking {
 																						   _replicationDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
 																						   _contentDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
 																						   _contentUploadBandwidthLimitInKilobytesPerSecond( 1024u ),
-																						   _banList( 0u, ::rde::less<::CSteamID>(), _allocator, UTF8L("Steamworks Ban List Allocator") ),
-																						   _playerDirectory( 0u, ::rde::less<NetworkID>(), _allocator, UTF8L("Steamworks Player Directory Allocator") ) {}
+																						   _banList( { _allocator, UTF8L("Steamworks Ban List Allocator") } ),
+																						   _playerDirectory( { _allocator, UTF8L("Steamworks Player Directory Allocator") } ) {}
 
 // ---------------------------------------------------
 

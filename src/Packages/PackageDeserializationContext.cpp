@@ -53,24 +53,47 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ErrorCode PackageDeserializationContext::DeserializeDependencies() {
+		struct ImportRecord {
+			ETInlineHint ImportRecord( Allocator& allocator, ContentPackage& package ) : _allocator( allocator ), _package( package ) {}
+			
+			ETInlineHint bool Serialize( MessagePackReader& reader ) {
+				MessagePackReader::String dependencyName;
+
+				if( reader( dependencyName ) ) {
+					UTF8String<>	terminatedName( dependencyName.first, dependencyName.onePastLast, { _allocator, UTF8L("ImportRecord::Serialize() Temporary Name Allocator") } );
+
+					return _package.AddDependency( terminatedName.GetCharacterArray() );
+				}
+
+				return false;
+			}
+
+		// - DATA MEMBERS ------------------------------------
+
+			Allocator&		_allocator;
+			ContentPackage&	_package;
+		};
+
+	// ---
+
 		using ResidencyState = ContentPackage::ResidencyState;
 
 	// ---
 
-		MessagePackReader::ArrayHeader	header;
-		ErrorCode						result( Error::NONE );
-		auto&							package( GetBoundPackage() );
+		FixedStackAllocator<128u>	dependencyAllocator( UTF8L("PackageDeserializationContext::DeserializeDependencies() Temporary Allocator") );
+		MessagePackReader::Array	header;
+		ErrorCode					result( Error::NONE );
 
 		if( _reader( header ) ) {
-			// Keep assembling import records from the data stream.
-			for( MessagePackReader::String dependencyName; 0u != header.arraySizeInElements; --header.arraySizeInElements ) {
-				const UTF8String<FixedStackAllocator<64u>>	terminatedName( dependencyName.first, dependencyName.Size(), UTF8L("Dependency Name Temporary Allocator") );
+			const auto	checkpoint( dependencyAllocator.CreateCheckpoint() );
 
-				result = _reader( dependencyName ) ? package.AddDependency( terminatedName.GetCharacterArray() ) : Error::INVALID_PARAMETER;
-
-				if( !result ) {
+			for( ; 0u != header.sizeInElements; --header.sizeInElements ) {
+				if( !_reader( ImportRecord( dependencyAllocator, GetBoundPackage() ) ) ) {
+					result = Error::INVALID_PARAMETER;
 					break;
 				}
+
+				dependencyAllocator.RestoreCheckpoint( checkpoint );
 			}
 		} else {
 			result = Error::INVALID_PARAMETER;
@@ -78,7 +101,7 @@ namespace FileSystem {
 
 		// Publish load failure in the event something went wrong.
 		if( !result ) {
-			package.UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+			GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
 		}
 		
 		return result;
@@ -103,18 +126,19 @@ namespace FileSystem {
 			MessagePackReader::BinaryData	serializedAsset;
 		};
 
+	// ---
+
 		using ResidencyState = ContentPackage::ResidencyState;
 
 	// ---
 
-		MessagePackReader::ArrayHeader	header;
-		ErrorCode						result( Error::NONE );
-		auto&							package( GetBoundPackage() );
+		MessagePackReader::Array	header;
+		ErrorCode					result( Error::NONE );
 
 		if( _reader( header ) ) {
 			// Keep assembling import records from the data stream
-			for( ExportRecord exportRecord; 0u != header.arraySizeInElements; --header.arraySizeInElements ) {
-				result = _reader( exportRecord ) ? package.AddContent( exportRecord ) : Error::INVALID_PARAMETER;
+			for( ExportRecord exportRecord; 0u != header.sizeInElements; --header.sizeInElements ) {
+				result = _reader( exportRecord ) ? GetBoundPackage().AddContent( exportRecord ) : Error::INVALID_PARAMETER;
 
 				if( !result ) {
 					break;
@@ -125,7 +149,7 @@ namespace FileSystem {
 		}
 
 		// Broadcast the new residency state (either published or failed) depending on whether or not the load was successful.
-		package.UpdateResidencyStateOnLoaderThread( result ? ResidencyState::PUBLISHED : ResidencyState::FAILED );
+		GetBoundPackage().UpdateResidencyStateOnLoaderThread( result ? ResidencyState::PUBLISHED : ResidencyState::FAILED );
 
 		return result;
 	}
