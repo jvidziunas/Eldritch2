@@ -38,7 +38,7 @@ namespace Foundation {
 	World::World( ObjectHandle<ContentPackage>&& package, GameEngine& owningEngine ) : _allocator( owningEngine._allocator, UTF8L( "World Allocator" ) ),
 																					   _viewAllocator( _allocator, owningEngine._worldViewAllocationHintInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World View Allocator") ),
 																					   _owningEngine( owningEngine ),
-																					   _package( ::std::move( package ) ),
+																					   _package( move( package ) ),
 																					   _isPaused( 1u ),
 																					   _isLoaded( 0u ),
 																					   _lastError( Error::NONE ) {
@@ -48,7 +48,7 @@ namespace Foundation {
 
 		UTF8Char	logString[128u];
 
-		owningEngine._attachedWorlds.PushFront( *this );
+		owningEngine._tickingWorlds.PushBack( *this );
 
 		if( const auto instantiateViewsResult = owningEngine.InstantiateViewsForWorld( _viewAllocator, *this ) ) {
 			owningEngine.GetLoggerForMessageType( LogMessageType::MESSAGE ).WriteString( PrintFormatted( logString, UTF8L("Loading world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) ) );
@@ -64,7 +64,6 @@ namespace Foundation {
 		UTF8Char	logString[128u];
 
 		_owningEngine->GetLoggerForMessageType( GameEngine::LogMessageType::MESSAGE ).WriteString( PrintFormatted( logString, UTF8L("Destroying world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) ) );
-		_owningEngine->_attachedWorlds.Erase( _owningEngine->_attachedWorlds.IteratorTo( *this ) );
 		DeleteViews();
 	}
 
@@ -73,8 +72,9 @@ namespace Foundation {
 	void World::QueueUpdateTasks( Allocator& frameTaskAllocator, WorkerContext& executingContext, Task& frameWorldUpdatesCompleteTask ) {
 		class TickWorldTask : public CRTPTransientTask<TickWorldTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		
 		public:
-			// Constructs this TickWorldTask instance.
+			//!	Constructs this @ref TickWorldTask instance.
 			ETInlineHint TickWorldTask( World& world, WorkerContext& executingContext, Task& updatesCompleteTask, Allocator& frameTaskAllocator ) : CRTPTransientTask<TickWorldTask>( updatesCompleteTask, Scheduler::CodependentTaskSemantics ),
 																																					_worldReference( world ),
 																																					_frameTaskAllocator( frameTaskAllocator ) {
@@ -97,6 +97,14 @@ namespace Foundation {
 				return nullptr;
 			}
 
+			void Finalize( WorkerContext& executingContext ) override {
+				if( _worldReference->GetLastError() ) {
+					_worldReference->_owningEngine->_tickingWorlds.PushBack( *_worldReference.Release() );
+				}
+
+				CRTPTransientTask<TickWorldTask>::Finalize( executingContext );
+			}
+
 		// - DATA MEMBERS ------------------------------------
 
 		private:
@@ -110,7 +118,7 @@ namespace Foundation {
 		class TryFinalizeLoadTask : public CRTPTransientTask<TryFinalizeLoadTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 		public:
-			// Constructs this FinalizeLoadTask instance.
+			//!	Constructs this @ref FinalizeLoadTask instance.
 			ETInlineHint TryFinalizeLoadTask( World& world, WorkerContext& executingContext, Task& updatesCompleteTask ) : CRTPTransientTask<TryFinalizeLoadTask>( updatesCompleteTask, Scheduler::CodependentTaskSemantics ),
 																														   _worldReference( world ) {
 				TrySchedulingOnContext( executingContext );
@@ -123,13 +131,37 @@ namespace Foundation {
 			}
 
 			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				const bool	canFinalizeLoad( _worldReference->GetRootPackage().GetResidencyState() == ContentPackage::ResidencyState::PUBLISHED );
+				using ResidencyState = ContentPackage::ResidencyState;
 
-				if( canFinalizeLoad ) {
-					_worldReference->_isLoaded = 1u;
-				}
+			// ---
+
+				switch( _worldReference->GetRootPackage().GetResidencyState() ) {
+					case ResidencyState::PUBLISHED: {
+						const WorldView::LoadFinalizationVisitor	visitor;
+
+						for( WorldView& currentView : _worldReference->_attachedViews ) {
+							currentView.AcceptViewVisitor( visitor );
+						}
+
+						_worldReference->_isLoaded = 1u;
+						break;
+					}	// case ResidencyState::PUBLISHED
+
+					case ResidencyState::FAILED: {
+						_worldReference->_lastError = Error::UNSPECIFIED;
+						break;
+					}	// case ResidencyState::FAILED
+				}	// switch( _worldReference->GetRootPackage().GetResidencyState() )
 
 				return nullptr;
+			}
+
+			void Finalize( WorkerContext& executingContext ) override {
+				if( _worldReference->GetLastError() ) {
+					_worldReference->_owningEngine->_tickingWorlds.PushBack( *_worldReference.Release() );
+				}
+
+				CRTPTransientTask<TryFinalizeLoadTask>::Finalize( executingContext );
 			}
 
 		// - DATA MEMBERS ------------------------------------

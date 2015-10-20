@@ -47,6 +47,10 @@ namespace Renderer {
 
 	// ---------------------------------------------------
 
+		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes, const Utility::COMPointer<::ID3D11Device>& device );
+
+	// ---------------------------------------------------
+
 		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
 
 	// ---------------------------------------------------

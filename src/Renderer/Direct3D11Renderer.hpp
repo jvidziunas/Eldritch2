@@ -58,6 +58,10 @@ namespace Renderer {
 
 	// ---------------------------------------------------
 
+		ETInlineHint const Utility::COMPointer<::ID3D11Device>&	GetDevice() const;
+
+	// ---------------------------------------------------
+
 	protected:
 		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
@@ -98,3 +102,9 @@ namespace Renderer {
 
 }	// namespace Renderer
 }	// namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Renderer/Direct3D11Renderer.inl>
+//------------------------------------------------------------------//

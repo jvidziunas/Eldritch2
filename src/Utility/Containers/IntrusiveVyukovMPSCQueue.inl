@@ -27,7 +27,7 @@ namespace Eldritch2 {
 
 	template <class StoredObject>
 	template <typename Disposer>
-	bool IntrusiveVyukovMPSCQueue<StoredObject>::PopAndDisposeFront( Disposer disposer ) {
+	bool IntrusiveVyukovMPSCQueue<StoredObject>::PopFrontAndDispose( Disposer disposer ) {
 		if( auto* const element = PopFront() ) {
 			disposer( *element );
 			return true;
@@ -41,6 +41,14 @@ namespace Eldritch2 {
 	template <class StoredObject>
 	void IntrusiveVyukovMPSCQueue<StoredObject>::PushBack( ValueType& object ) {
 		IntrusiveVyukovMPSCQueueBase::PushBack( object );
+	}
+
+// ---------------------------------------------------
+
+	template <class StoredObject>
+	template <typename Disposer>
+	void IntrusiveVyukovMPSCQueue<StoredObject>::ClearAndDispose( Disposer disposer ) {
+		while( PopFrontAndDispose( disposer ) );
 	}
 
 }	// namespace Eldritch2

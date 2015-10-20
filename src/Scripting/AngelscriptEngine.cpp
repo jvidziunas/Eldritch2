@@ -24,7 +24,6 @@
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Scripting/AngelscriptEngine.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
-#include <Utility/MessagePackReader.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -97,42 +96,20 @@ namespace Scripting {
 	// ---
 
 		// Bytecode package
-		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), _scriptEngine.get(), [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> Result<ResourceView> {
-			using View = AngelscriptBytecodePackageView;
-
-		// ---
-
-			const ExternalArenaAllocator::SizeType	stringSize( initializer.name.Size() + 1 );
-
-			// We'll need to null-terminate the name, so create a temporary string on the stack.
-			UTF8String<ExternalArenaAllocator>	moduleName( initializer.name.first, initializer.name.onePastLast, { _alloca( stringSize ), stringSize, UTF8L( "Module Name String Allocator" ) } );
-			
-			// First, we'll need an Angelscript module. The unique_ptr will take care of releasing resources in the event something pukes.
-			if( unique_ptr<::asIScriptModule> module { static_cast<::asIScriptEngine*>(parameter)->GetModule( moduleName.GetCharacterArray(), asGM_ALWAYS_CREATE ) } ) {
-				
-				// Next, allocate the returned resource view object. Once again, the unique_ptr will handle deleting in the event this explodes.
-				if( unique_ptr<View, InstanceDeleter> view { new(allocator, AllocationOption::PERMANENT_ALLOCATION) View( move( module ), initializer, allocator ), { allocator } } ) {
+		visitor.PublishFactory( AngelscriptBytecodePackageView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> Result<ResourceView> {
+			unique_ptr<AngelscriptBytecodePackageView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) AngelscriptBytecodePackageView( initializer, allocator ), { allocator } );
 					
-					// Finally, try to load from the source asset data.
-					if( view->SerializeAndBindToModule( MessagePackReader( initializer.serializedAsset ) ) ) {
-						return { *view.release() };
-					}
-
-					return { Error::INVALID_PARAMETER };
-				}
-
-				return { Error::OUT_OF_MEMORY };
+			// Try to load from the source asset data.
+			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<AngelscriptEngine*>(parameter)->GetScriptEngine() ) ) {
+				return { *view.release() };
 			}
 
-			return { Error::UNSPECIFIED };
+			// If we were able to allocate a view, then something was wrong with the source data. If we didn't get that far, the allocator ran out of resources.
+			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
 		} )
 		// Object graph
 		.PublishFactory( AngelscriptObjectGraphView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*parameter*/ ) -> Result<ResourceView> {
-			using View = AngelscriptObjectGraphView;
-
-		// ---
-
-			if( auto* const	view = new(allocator, AllocationOption::PERMANENT_ALLOCATION) View( initializer, allocator ) ) {
+			if( auto* const	view = new(allocator, AllocationOption::PERMANENT_ALLOCATION) AngelscriptObjectGraphView( initializer, allocator ) ) {
 				return { *view };
 			}
 

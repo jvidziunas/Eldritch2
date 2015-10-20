@@ -578,7 +578,7 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ::DXGI_FORMAT BuildDXGIFormat( const Renderer::GPUSamplingDescriptor& formatDescriptor ) {
+	ETNoAliasHint ::DXGI_FORMAT BuildDXGIFormat( const GPULayout layout, const GPUStorageFormat format, const FilteringFlags flags ) {
 		struct FormatData {
 			struct sRGBData {
 				::DXGI_FORMAT	sRGBFormats[2];
@@ -746,8 +746,8 @@ namespace Renderer {
 			}}
 		};
 
-		if( (formatDescriptor.layout < GPULayout::COUNT) & (formatDescriptor.storageFormat < GPUStorageFormat::COUNT) ) {
-			return textureLayouts[static_cast<size_t>(formatDescriptor.layout)].formats[static_cast<size_t>(formatDescriptor.storageFormat)].sRGBFormats[static_cast<bool>(formatDescriptor.filteringFlags & FilteringFlag::SAMPLE_AS_SRGB)];
+		if( (layout < GPULayout::COUNT) & (format < GPUStorageFormat::COUNT) ) {
+			return textureLayouts[static_cast<size_t>(layout)].formats[static_cast<size_t>(format)].sRGBFormats[static_cast<bool>(flags & FilteringFlags::SAMPLE_AS_SRGB)];
 		}
 
 		return ::DXGI_FORMAT_UNKNOWN;

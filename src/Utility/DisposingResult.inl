@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -23,17 +23,19 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETInlineHint DisposingResult<ResultObject>::DisposingResult( Scripting::ObjectHandle<ResultObject>&& object ) : object( ::std::move( object ) ), resultCode( ::Eldritch2::Error::NONE ) {}
+	template <typename CompatibleResultObject>
+	ETInlineHint DisposingResult<ResultObject>::DisposingResult( Scripting::ObjectHandle<CompatibleResultObject>&& object ) : object( ::std::move( object ) ), resultCode( ::Eldritch2::Error::NONE ) {}
+
+// ---------------------------------------------------
+
+	template <typename ResultObject>
+	template <typename CompatibleResultObject>
+	ETInlineHint DisposingResult<ResultObject>::DisposingResult( Utility::DisposingResult<CompatibleResultObject>&& rhs ) : object( ::std::move( rhs.object ) ), resultCode( rhs.resultCode ) {}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
 	ETInlineHint DisposingResult<ResultObject>::DisposingResult( const ::Eldritch2::ErrorCode errorCode ) : object( nullptr ), resultCode( errorCode ) {}
-
-// ---------------------------------------------------
-
-	template <typename ResultObject>
-	ETInlineHint DisposingResult<ResultObject>::DisposingResult( Utility::DisposingResult<ResultObject>&& rhs ) : object( ::std::move( rhs.object ) ), resultCode( rhs.resultCode ) {}
 
 // ---------------------------------------------------
 

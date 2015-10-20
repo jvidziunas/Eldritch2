@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -17,10 +17,6 @@
 
 namespace Eldritch2 {
 namespace FileSystem {
-
-	ETInlineHint SynchronousFileReader::BlockingResult::BlockingResult( const BlockingResult& itemTemplate ) : result( itemTemplate.result ), readAmountInBytes( itemTemplate.readAmountInBytes ) {}
-
-// ---------------------------------------------------
 
 	ETInlineHint SynchronousFileReader::BlockingResult::BlockingResult( const ::Eldritch2::ErrorCode readResult, const size_t successfullyReadAmountInBytes ) : result( readResult ), readAmountInBytes( successfullyReadAmountInBytes ) {}
 

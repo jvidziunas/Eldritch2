@@ -12,19 +12,18 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptBytecodePackage.hpp>
+#include <Scripting/Angelscript/AngelscriptBytecodeMetadata.hpp>
 #include <Packages/ResourceView.hpp>
+//------------------------------------------------------------------//
+#include <memory>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Scripting {
-		class	AngelscriptEngine;
-	}
-
 	class	ErrorCode;
-	template <typename Iterator>
-	class	Range;
 }
+
+class	asIScriptEngine;
+class	asIScriptModule;
 
 namespace Eldritch2 {
 namespace Scripting {
@@ -35,15 +34,33 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class AngelscriptBytecodePackageView : public FileSystem::ResourceView, public Scripting::AngelscriptBytecodePackage {
+	class AngelscriptBytecodePackageView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref AngelscriptBytecodePackageView instance.
-		AngelscriptBytecodePackageView( ::std::unique_ptr<::asIScriptModule>&& ownedModule, const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		AngelscriptBytecodePackageView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref AngelscriptBytecodePackageView instance.
 		~AngelscriptBytecodePackageView() = default;
+
+	// ---------------------------------------------------
+
+		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes, ::asIScriptEngine& engine );
+
+	// ---------------------------------------------------
+
+		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
+
+	// ---------------------------------------------------
+
+	private:
+		struct ModuleDeleter {
+			void	operator()( ::asIScriptModule* const module );
+		};
+
+		::std::unique_ptr<::asIScriptModule, ModuleDeleter>	_module;
+		Scripting::AngelscriptBytecodeMetadata				_metadata;
 	};
 
 }	// namespace Scripting

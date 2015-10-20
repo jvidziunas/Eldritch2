@@ -16,17 +16,9 @@
 #include <Packages/ResourceView.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 #include <Utility/COMPointer.hpp>
+//------------------------------------------------------------------//
 #include <D3D11.h>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-	namespace Renderer {
-		class	Direct3D11Renderer;
-	}
-
-	template <typename Iterator>
-	class	Range;
-}
 
 namespace Eldritch2 {
 namespace Renderer {
@@ -41,10 +33,14 @@ namespace Renderer {
 
 	public:
 		//! Constructs this @ref Direct3D11ShaderResourceView instance.
-		Direct3D11ShaderResourceView( Utility::COMPointer<::ID3D11ShaderResourceView>&& shaderView, const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		Direct3D11ShaderResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref Direct3D11ShaderResourceView instance.
 		~Direct3D11ShaderResourceView() = default;
+
+	// ---------------------------------------------------
+
+		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes, const Utility::COMPointer<::ID3D11Device>& device );
 
 	// ---------------------------------------------------
 

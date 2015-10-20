@@ -27,24 +27,30 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this COMPointer instance.
-		ETInlineHint COMPointer( InterfaceType* const pointer, const PassthroughReferenceCountingSemantics );
-		// Constructs this COMPointer instance.
-		ETInlineHint COMPointer( InterfaceType* const pointer );
-		// Constructs this COMPointer instance.
-		ETInlineHint COMPointer( InterfaceType& reference, const PassthroughReferenceCountingSemantics );
-		// Constructs this COMPointer instance.
-		ETInlineHint COMPointer( InterfaceType& reference );
-		// Constructs this COMPointer instance.
-		ETInlineHint COMPointer( const Utility::COMPointer<InterfaceType>& handle );
-		// Constructs this COMPointer instance.
-		ETInlineHint COMPointer( Utility::COMPointer<InterfaceType>&& handle );
-		// Constructs this COMPointer instance.
+		//! Constructs this @ref COMPointer instance.
+		template <class CompatibleInterfaceType>
+		ETInlineHint COMPointer( CompatibleInterfaceType* const pointer, const PassthroughReferenceCountingSemantics );
+		//!	Constructs this @ref COMPointer instance.
+		template <class CompatibleInterfaceType>
+		ETInlineHint COMPointer( CompatibleInterfaceType* const pointer );
+		//!	Constructs this @ref COMPointer instance.
+		template <class CompatibleInterfaceType>
+		ETInlineHint COMPointer( CompatibleInterfaceType& reference, const PassthroughReferenceCountingSemantics );
+		//!	Constructs this @ref COMPointer instance.
+		template <class CompatibleInterfaceType>
+		ETInlineHint explicit COMPointer( CompatibleInterfaceType& reference );
+		//!	Constructs this @ref COMPointer instance.
+		template <class CompatibleInterfaceType>
+		ETInlineHint COMPointer( const Utility::COMPointer<CompatibleInterfaceType>& handle );
+		//!	Constructs this @ref COMPointer instance.
+		template <class CompatibleInterfaceType>
+		ETInlineHint COMPointer( Utility::COMPointer<CompatibleInterfaceType>&& handle );
+		//!	Constructs this @ref COMPointer instance.
 		ETInlineHint COMPointer( decltype(nullptr) );
-		// Constructs this COMPointer instance.
+		//!	Constructs this @ref COMPointer instance.
 		ETInlineHint COMPointer();
 
-		// Destroys this COMPointer instance.
+		//!	Destroys this @ref COMPointer instance.
 		ETInlineHint ~COMPointer();
 
 	// ---------------------------------------------------
@@ -58,16 +64,16 @@ namespace Utility {
 
 	// ---------------------------------------------------
 
-		template <class DerivedInterfaceType>
-		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( const Utility::COMPointer<DerivedInterfaceType>& other );
-		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( const Utility::COMPointer<InterfaceType>& handle );
-		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( Utility::COMPointer<InterfaceType>&& handle );
-		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( InterfaceType* const object );
+		template <class CompatibleInterfaceType>
+		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( const Utility::COMPointer<CompatibleInterfaceType>& other );
+		template <class CompatibleInterfaceType>
+		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( Utility::COMPointer<CompatibleInterfaceType>&& handle );
+		template <class CompatibleInterfaceType>
+		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( CompatibleInterfaceType* const object );
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint const InterfaceType*	operator->() const; // never throws
-		ETForceInlineHint InterfaceType*		operator->(); // never throws
+		ETForceInlineHint InterfaceType*		operator->() const; // never throws
 		ETForceInlineHint						operator bool() const; // never throws
 
 		ETForceInlineHint InterfaceType**		GetInterfacePointer();

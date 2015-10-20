@@ -5,14 +5,14 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <type_traits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -23,7 +23,64 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	template <class Object>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle() : ObjectHandle( nullptr, ::Eldritch2::PassthroughReferenceCountingSemantics ) {}
+	template <typename CompatibleObject>
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( CompatibleObject* const pointer, const DefaultReferenceCountingSemantics ) : ObjectHandle( pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+
+	// ---
+
+		if( pointer ) {
+			pointer->AddReference();
+		}
+	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	template <typename CompatibleObject>
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( CompatibleObject* const pointer, const PassthroughReferenceCountingSemantics ) : _pointer( pointer ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	template <typename CompatibleObject>
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( CompatibleObject& reference, const DefaultReferenceCountingSemantics ) : ObjectHandle( reference, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+
+	// ---
+
+		reference.AddReference();
+	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	template <typename CompatibleObject>
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( CompatibleObject& reference, const PassthroughReferenceCountingSemantics ) : _pointer( &reference ) {
+		static_assert(::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!");
+	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	template <typename CompatibleObject>
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( const Scripting::ObjectHandle<CompatibleObject>& handle ) : ObjectHandle( handle._pointer ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	template <typename CompatibleObject>
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( Scripting::ObjectHandle<CompatibleObject>&& handle ) : ObjectHandle( handle._pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+
+	// ---
+
+		handle._pointer = nullptr;
+	}
 
 // ---------------------------------------------------
 
@@ -33,40 +90,7 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	template <class Object>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( Object* const pointer, const DefaultReferenceCountingSemantics ) : ObjectHandle( pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
-		if( pointer ) {
-			pointer->AddReference();
-		}
-	}
-
-// ---------------------------------------------------
-
-	template <class Object>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( Object* const pointer, const PassthroughReferenceCountingSemantics ) : _pointer( pointer ) {}
-
-// ---------------------------------------------------
-
-	template <class Object>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( Object& reference, const DefaultReferenceCountingSemantics ) : ObjectHandle( reference, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
-		reference.AddReference();
-	}
-
-// ---------------------------------------------------
-
-	template <class Object>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( Object& reference, const PassthroughReferenceCountingSemantics ) : _pointer( &reference ) {}
-
-// ---------------------------------------------------
-
-	template <class Object>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( const Scripting::ObjectHandle<Object>& handle ) : ObjectHandle( handle._pointer ) {}
-
-// ---------------------------------------------------
-
-	template <class Object>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( Scripting::ObjectHandle<Object>&& handle ) : ObjectHandle( handle._pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
-		handle._pointer = nullptr;
-	}
+	ETInlineHint ObjectHandle<Object>::ObjectHandle() : ObjectHandle( nullptr ) {}
 
 // ---------------------------------------------------
 
@@ -82,6 +106,17 @@ namespace Scripting {
 	template <class Object>
 	ETInlineHint bool ObjectHandle<Object>::IsSoleReferenceToObject() const {
 		return (1u == _pointer->GetReferenceCount());
+	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	ETInlineHint Object* ObjectHandle<Object>::Release() {
+		Object*	const	result( _pointer );
+
+		_pointer = nullptr;
+
+		return _pointer;
 	}
 
 // ---------------------------------------------------
@@ -115,14 +150,24 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	template <class Object>
-	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( const Scripting::ObjectHandle<Object>& handle ) {
+	template <typename CompatibleObject>
+	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( const Scripting::ObjectHandle<CompatibleObject>& handle ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+
+	// ---
+
 		return (*this) = handle._pointer;
 	}
 
 // ---------------------------------------------------
 
 	template <class Object>
-	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( Scripting::ObjectHandle<Object>&& handle ) {
+	template <typename CompatibleObject>
+	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( Scripting::ObjectHandle<CompatibleObject>&& handle ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+
+	// ---
+
 		if( _pointer ) {
 			_pointer->ReleaseReference();
 		}
@@ -137,7 +182,12 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	template <class Object>
-	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( Object* const object ) {
+	template <typename CompatibleObject>
+	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( CompatibleObject* const object ) {
+		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
+
+	// ---
+
 		if( object ) {
 			object->AddReference();
 		}

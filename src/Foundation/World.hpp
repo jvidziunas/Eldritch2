@@ -16,6 +16,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
+#include <Utility/Containers/UnorderedMap.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ReferenceTypeBase.hpp>

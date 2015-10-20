@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AsynchronousFileReader.cpp
+  Direct3D11Renderer.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -7,25 +7,22 @@
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
+#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/AsynchronousFileReader.hpp>
+
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::FileSystem;
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
-namespace FileSystem {
+namespace Renderer {
 
-	AsynchronousFileReader::AsynchronousFileReader() {}
+	ETInlineHint const Utility::COMPointer<::ID3D11Device>&	Direct3D11Renderer::GetDevice() const {
+		return _device;
+	}
 
-// ---------------------------------------------------
-
-	AsynchronousFileReader::~AsynchronousFileReader() {}
-
-}	// namespace FileSystem
+}	// namespace Renderer
 }	// namespace Eldritch2
+
+

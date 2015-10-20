@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodePackage.hpp
+  AngelscriptBytecodeMetadata.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -24,28 +24,28 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	template <class Archive>
-	bool AngelscriptBytecodePackage::FunctionMetadata::Serialize( Archive& /*archive*/ ) {
+	bool AngelscriptBytecodeMetadata::FunctionMetadata::Serialize( Archive& /*archive*/ ) {
 		return true;
 	}
 
 // ---------------------------------------------------
 
 	template <class Archive>
-	bool AngelscriptBytecodePackage::TypeMetadata::PropertyMetadata::Serialize( Archive& /*archive*/ ) {
+	bool AngelscriptBytecodeMetadata::TypeMetadata::PropertyMetadata::Serialize( Archive& /*archive*/ ) {
 		return true;
 	}
 
 // ---------------------------------------------------
 
 	template <class Archive>
-	bool AngelscriptBytecodePackage::TypeMetadata::Serialize( Archive& archive ) {
+	bool AngelscriptBytecodeMetadata::TypeMetadata::Serialize( Archive& archive ) {
 		return archive( Archive::AdaptMap( _methodMetadata ), Archive::AdaptMap( _propertyMetadata ) );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Archive>
-	bool AngelscriptBytecodePackage::Serialize( Archive& archive ) {
+	bool AngelscriptBytecodeMetadata::Serialize( Archive& archive ) {
 		using TypeMetadataCollection = decltype(_typeMetadata);
 
 	// ---

@@ -23,24 +23,23 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	template <typename DerivedResultObject>
-	ETForceInlineHint Result<ResultObject>::Result( const Utility::Result<DerivedResultObject>& result ) : resultCode( result.resultCode ) {
-		static_assert( ::std::is_base_of<ResultObject, DerivedResultObject>::value, "" );
+	template <typename CompatibleResultObject>
+	ETForceInlineHint Result<ResultObject>::Result( const Utility::Result<CompatibleResultObject>& result ) : object( static_cast<ResultObject*>(result.object) ), resultCode( result.resultCode ) {
+		static_assert( ::std::is_convertible<CompatibleResultObject*, ResultObject*>::value, "Result types must be constructed from compatible types!" );
+	}
 
-	// ---
+// ---------------------------------------------------
 
-		object = static_cast<ResultObject*>( result.object );
+	template <typename ResultObject>
+	template <typename CompatibleResultObject>
+	ETForceInlineHint Result<ResultObject>::Result( CompatibleResultObject& object ) : object( &object ), resultCode( ::Eldritch2::Error::NONE ) {
+		static_assert( ::std::is_convertible<CompatibleResultObject*, ResultObject*>::value, "Result types must be constructed from compatible types!" );
 	}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
 	ETForceInlineHint Result<ResultObject>::Result( const ::Eldritch2::ErrorCode error ) : object( nullptr ), resultCode( error ) {}
-
-// ---------------------------------------------------
-
-	template <typename ResultObject>
-	ETForceInlineHint Result<ResultObject>::Result( ResultObject& object ) : object( &object ), resultCode( ::Eldritch2::Error::NONE ) {}
 
 // ---------------------------------------------------
 

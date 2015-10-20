@@ -20,6 +20,7 @@ namespace Eldritch2 {
 	template <class StoredObject>
 	class IntrusiveForwardList {
 	// - TYPE PUBLISHING ---------------------------------
+
 	private:
 		using UnderlyingContainer	= ::rde::intrusive_slist<StoredObject>;
 

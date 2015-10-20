@@ -32,7 +32,7 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ::DXGI_FORMAT	BuildDXGIFormat( const Renderer::GPUSamplingDescriptor& formatDescriptor );
+	ETNoAliasHint::DXGI_FORMAT	BuildDXGIFormat( const Renderer::GPULayout layout, const Renderer::GPUStorageFormat format, const Renderer::FilteringFlags flags );
 
 // ---------------------------------------------------
 

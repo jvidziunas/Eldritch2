@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2012 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -29,7 +29,8 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	ETInlineHint COMPointer<InterfaceType>::COMPointer( InterfaceType* const pointer ) : COMPointer<InterfaceType>( pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+	template <class CompatibleInterfaceType>
+	ETInlineHint COMPointer<InterfaceType>::COMPointer( CompatibleInterfaceType* const pointer ) : COMPointer<InterfaceType>( pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
 		if( pointer ) {
 			pointer->AddRef();
 		}
@@ -38,29 +39,34 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	ETInlineHint COMPointer<InterfaceType>::COMPointer( InterfaceType* const pointer, const PassthroughReferenceCountingSemantics ) : _pointer( pointer ) {}
+	template <class CompatibleInterfaceType>
+	ETInlineHint COMPointer<InterfaceType>::COMPointer( CompatibleInterfaceType* const pointer, const PassthroughReferenceCountingSemantics ) : _pointer( pointer ) {}
 
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	ETInlineHint COMPointer<InterfaceType>::COMPointer( InterfaceType& reference ) : COMPointer<InterfaceType>( reference, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+	template <class CompatibleInterfaceType>
+	ETInlineHint COMPointer<InterfaceType>::COMPointer( CompatibleInterfaceType& reference ) : COMPointer<InterfaceType>( reference, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
 		reference.AddRef();
 	}
 
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	ETInlineHint COMPointer<InterfaceType>::COMPointer( InterfaceType& reference, const PassthroughReferenceCountingSemantics ) : _pointer( &reference ) {}
+	template <class CompatibleInterfaceType>
+	ETInlineHint COMPointer<InterfaceType>::COMPointer( CompatibleInterfaceType& reference, const PassthroughReferenceCountingSemantics ) : _pointer( &reference ) {}
 
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	ETInlineHint COMPointer<InterfaceType>::COMPointer( const Utility::COMPointer<InterfaceType>& handle ) : COMPointer<InterfaceType>( handle._pointer ) {}
+	template <class CompatibleInterfaceType>
+	ETInlineHint COMPointer<InterfaceType>::COMPointer( const Utility::COMPointer<CompatibleInterfaceType>& handle ) : COMPointer<InterfaceType>( handle._pointer ) {}
 
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	ETInlineHint COMPointer<InterfaceType>::COMPointer( Utility::COMPointer<InterfaceType>&& handle ) : COMPointer<InterfaceType>( handle._pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+	template <class CompatibleInterfaceType>
+	ETInlineHint COMPointer<InterfaceType>::COMPointer( Utility::COMPointer<CompatibleInterfaceType>&& handle ) : COMPointer<InterfaceType>( handle._pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
 		handle._pointer = nullptr;
 	}
 
@@ -112,8 +118,13 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	Utility::COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( const Utility::COMPointer<InterfaceType>& other ) {
-		Acquire( other._pointer );
+	template <class CompatibleInterfaceType>
+	ETInlineHint Utility::COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( const Utility::COMPointer<CompatibleInterfaceType>& other ) {
+		static_assert( ::std::is_convertible<CompatibleInterfaceType*, InterfaceType*>::value, "COM pointers can only be assigned to compatible types!" );
+
+	// ---
+
+		Acquire( static_cast<InterfaceType*>(other._pointer) );
 
 		return *this;
 	}
@@ -121,7 +132,12 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	ETInlineHint Utility::COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( Utility::COMPointer<InterfaceType>&& other ) {
+	template <class CompatibleInterfaceType>
+	ETInlineHint Utility::COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( Utility::COMPointer<CompatibleInterfaceType>&& other ) {
+		static_assert( ::std::is_convertible<CompatibleInterfaceType*, InterfaceType*>::value, "COM pointers can only be assigned to compatible types!" );
+
+	// ---
+
 		Acquire( other._pointer, ::Eldritch2::PassthroughReferenceCountingSemantics );
 		other._pointer = nullptr;
 
@@ -131,7 +147,12 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( InterfaceType* const pointer ) {
+	template <class CompatibleInterfaceType>
+	COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( CompatibleInterfaceType* const pointer ) {
+		static_assert( ::std::is_convertible<CompatibleInterfaceType*, InterfaceType*>::value, "COM pointers can only be assigned to compatible types!" );
+
+	// ---
+
 		Acquire( pointer );
 
 		return *this;
@@ -140,24 +161,7 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <class InterfaceType>
-	template <class DerivedInterfaceType>
-	ETInlineHint Utility::COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( const Utility::COMPointer<DerivedInterfaceType>& other ) {
-		Acquire( static_cast<InterfaceType*>(other._pointer) );
-
-		return *this;
-	}
-
-// ---------------------------------------------------
-
-	template <class InterfaceType>
-	ETForceInlineHint const InterfaceType* COMPointer<InterfaceType>::operator->() const {
-		return _pointer;
-	}
-
-// ---------------------------------------------------
-
-	template <class InterfaceType>
-	ETForceInlineHint InterfaceType* COMPointer<InterfaceType>::operator->() {
+	ETForceInlineHint InterfaceType* COMPointer<InterfaceType>::operator->() const {
 		return _pointer;
 	}
 

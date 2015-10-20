@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodePackage.hpp
+  AngelscriptBytecodeMetadata.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -14,28 +14,10 @@
 //==================================================================//
 #include <Utility/Containers/UnorderedMap.hpp>
 //------------------------------------------------------------------//
-#include <angelscript.h>
-//------------------------------------------------------------------//
-#include <memory>
-//------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Utility {
-		class	MessagePackReader;
-		class	MessagePackWriter;
-	}
-}
+class	asIScriptModule;
 
-namespace std {
-
-	template<>
-	struct default_delete<::asIScriptModule> {
-		ETInlineHint void operator()( ::asIScriptModule* const module ) {
-			module->Discard();
-		}
-	};
-
-}	// namespace std
+using asUINT = unsigned int;
 
 namespace Eldritch2 {
 namespace Scripting {
@@ -45,7 +27,7 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class AngelscriptBytecodePackage {
+	class AngelscriptBytecodeMetadata {
 	// - TYPE PUBLISHING ---------------------------------
 	public:
 		class FunctionMetadata {
@@ -104,22 +86,17 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref AngelscriptBytecodePackage instance.
-		/*! @param[in] ownedModule Movable object handle to an @ref asIScriptModule. This @ref AngelscriptBytecodePackage will assume responsibility for freeing resources.
-			@param[in] allocator @ref Allocator instance this @ref AngelscriptBytecodePackage should use to perform internal allocations.
+		//! Constructs this @ref AngelscriptBytecodeMetadata instance.
+		/*! @param[in] allocator @ref Allocator instance this @ref AngelscriptBytecodeMetadata should use to perform internal allocations.
 			*/
-		AngelscriptBytecodePackage( ::std::unique_ptr<::asIScriptModule>&& ownedModule, ::Eldritch2::Allocator& allocator );
+		AngelscriptBytecodeMetadata( ::Eldritch2::Allocator& allocator );
 
-		//! Destroys this @ref AngelscriptBytecodePackage instance.
-		~AngelscriptBytecodePackage() = default;
-
-	// ---------------------------------------------------
-
-		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
+		//! Destroys this @ref AngelscriptBytecodeMetadata instance.
+		~AngelscriptBytecodeMetadata() = default;
 
 	// ---------------------------------------------------
 
-		bool	SerializeAndBindToModule( Utility::MessagePackReader&& reader );
+		bool	BindToModule( ::asIScriptModule& module );
 
 		template <typename Archive>
 		bool	Serialize( Archive& archive );
@@ -127,7 +104,6 @@ namespace Scripting {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::std::unique_ptr<::asIScriptModule>					_module;
 		::Eldritch2::ChildAllocator								_rootAllocator;
 		::Eldritch2::UnorderedMap<::asUINT, TypeMetadata>		_typeMetadata;
 		::Eldritch2::UnorderedMap<::asUINT, FunctionMetadata>	_functionMetadata;
@@ -139,5 +115,5 @@ namespace Scripting {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptBytecodePackage.inl>
+#include <Scripting/Angelscript/AngelscriptBytecodeMetadata.inl>
 //------------------------------------------------------------------//

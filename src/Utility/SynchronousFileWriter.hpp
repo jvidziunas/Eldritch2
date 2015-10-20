@@ -29,15 +29,17 @@ namespace FileSystem {
 		struct BlockingResult {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Constructs this BlockingResult instance.
+			//!	Constructs this @ref BlockingResult instance.
 			/*!	@param[in] writeResult a ResultCode describing the ultimate result of the write operation, optionally containing information on why a failure occurred.
 				@param[in] successfullyWrittenAmountInBytes Amount of source data successfully committed to backing storage before a failure occurred.
 				*/
 			ETInlineHint BlockingResult( const ::Eldritch2::ErrorCode writeResult, const size_t successfullyWrittenAmountInBytes );
-			//!	Constructs this BlockingResult instance.
-			/*!	@param[in] itemTemplate the template BlockingResult that will be copied.
+			//!	Constructs this @ref BlockingResult instance.
+			/*!	@param[in] itemTemplate the template @ref BlockingResult that will be copied.
 				*/
 			ETInlineHint BlockingResult( const BlockingResult& itemTemplate ) = default;
+
+		// ---------------------------------------------------
 
 			ETInlineHint operator bool() const;
 
@@ -56,18 +58,18 @@ namespace FileSystem {
 		/*!	@param[in] sourceBuffer Pointer to a region of memory containing the bit patterns to be written.
 			@param[in] lengthToWriteInBytes Number of bytes to write.
 			@param[in] fileOffsetInBytes Offset into the file to begin writing data. This must be a multiple of the backing media sector size.
-			@returns a BlockingResult describing the result of the operation.
-			@sa GetPhysicalMediaSectorSizeInBytes()
+			@returns a @ref BlockingResult describing the result of the operation.
+			@see @ref GetPhysicalMediaSectorSizeInBytes()
 			*/
-		virtual BlockingResult	Write( const void* sourceBuffer, const size_t lengthToWriteInBytes, const ::Eldritch2::uint64 fileOffsetInBytes ) abstract;
+		virtual BlockingResult	Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes, const ::Eldritch2::uint64 fileOffsetInBytes ) abstract;
 		//!	Performs a blocking write operation to the output device this SynchronousFileWriter uses as its backing.
 		/*!	@param[in] sourceBuffer Pointer to a region of memory containing the bit patterns to be written.
 			@param[in] lengthToWriteInBytes Number of bytes to write. This must be a multiple of the backing media sector size.
 			@returns a BlockingResult describing the result of the operation.
-			@sa GetPhysicalMediaSectorSizeInBytes()
-			@sa Write( const void*, const size_t, const ::Eldritch2::uint64 )
+			@see @ref GetPhysicalMediaSectorSizeInBytes()
+			@see @ref Write( const void*, const size_t, const ::Eldritch2::uint64 )
 			*/
-		virtual BlockingResult	Write( const void* sourceBuffer, const size_t lengthToWriteInBytes ) abstract;
+		virtual BlockingResult	Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes ) abstract;
 
 	// ---------------------------------------------------
 
@@ -86,10 +88,10 @@ namespace FileSystem {
 
 		//! Retrieves the physical media sector size for this file/pseudofile.
 		/*!	@returns The sector size for the file.
-			@remark All write offsets passed to Write(const void*, const size_t, const ::Eldritch2::uint64) must be multiples of this value.
-			@remark All write lengths passed to Write() must be a multiple of this value.
+			@remark All write offsets passed to @ref Write(const void*, const size_t, const ::Eldritch2::uint64) must be multiples of this value.
+			@remark All write lengths passed to @ref Write() must be a multiple of this value.
 			@remark Thread-safe.
-			@sa Write()
+			@see @ref Write()
 			*/
 		virtual size_t				GetPhysicalMediaSectorSizeInBytes() const abstract;
 

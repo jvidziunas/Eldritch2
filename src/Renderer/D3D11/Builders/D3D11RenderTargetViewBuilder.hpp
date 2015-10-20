@@ -12,15 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
 #include <Renderer/D3D11/D3D11ForwardDeclarations.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 #include <Utility/COMPointer.hpp>
-//------------------------------------------------------------------//
-#ifndef WIN32_LEAN_AND_MEAN
-#	define WIN32_LEAN_AND_MEAN
-#endif
-#include <D3D11.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -43,11 +39,11 @@ namespace Renderer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this D3D11RenderTargetViewBuilder instance.
-		explicit D3D11RenderTargetViewBuilder( Renderer::Direct3D11TextureBuilder& textureBuilder );
+		//!	Constructs this @ref D3D11RenderTargetViewBuilder instance.
+		D3D11RenderTargetViewBuilder();
 
-		// Destroys this D3D11RenderTargetViewBuilder instance.
-		~D3D11RenderTargetViewBuilder();
+		//!	Destroys this @ref D3D11RenderTargetViewBuilder instance.
+		~D3D11RenderTargetViewBuilder() = default;
 
 	// - MULTISAMPLING CONTROL ---------------------------
 
@@ -71,25 +67,22 @@ namespace Renderer {
 
 	// - RESOURCE CONSTRUCTION KICK -----------------------
 
-		::Eldritch2::ErrorCode	Compile( ::ID3D11Device* const device );
-		::Eldritch2::ErrorCode	Compile( const Utility::COMPointer<::ID3D11Device>& device );
-
-	// - GENERATED RESOURCE ACCESS ------------------------
-
-		const Utility::COMPointer<::ID3D11RenderTargetView>&	GetView() const;
+		Utility::COMPointer<::ID3D11RenderTargetView>	Compile( const Utility::COMPointer<::ID3D11Resource>& targetResource );
+		Utility::COMPointer<::ID3D11RenderTargetView>	Compile( ::ID3D11Resource* const targetResource );
+		Utility::COMPointer<::ID3D11RenderTargetView>	Compile( const Utility::COMPointer<::ID3D11Texture2D>& targetResource );
+		Utility::COMPointer<::ID3D11RenderTargetView>	Compile( ::ID3D11Texture2D* const targetResource );
+		Utility::COMPointer<::ID3D11RenderTargetView>	Compile( const Utility::COMPointer<::ID3D11Texture3D>& targetResource );
+		Utility::COMPointer<::ID3D11RenderTargetView>	Compile( ::ID3D11Texture3D* const targetResource );
 
 	// - DATA MEMBERS -------------------------------------
 
 	private:
-		Utility::COMPointer<::ID3D11RenderTargetView>	_view;
-		Renderer::Direct3D11TextureBuilder&				_textureBuilder;
+		::DXGI_FORMAT	_formatOverride;
+		::UINT			_initialSlice;
+		::UINT			_sizeInSlices;
+		::UINT			_mipIndex;
 
-		::DXGI_FORMAT									_format;
-		::UINT											_initialSlice;
-		::UINT											_sizeInSlices;
-		::UINT											_mipIndex;
-
-		const char*										_debugName;
+		const char*		_debugName;
 	};
 
 }	// namespace Renderer

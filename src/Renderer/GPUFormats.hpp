@@ -68,10 +68,6 @@ namespace Renderer {
 		sRGB_NORMALIZED,
 		SIGNED_NORMALIZED,
 
-		FRACTIONAL			= NORMALIZED,
-		sRGB_FRACTIONAL		= sRGB_NORMALIZED,
-		SIGNED_FRACTIONAL	= SIGNED_NORMALIZED,
-
 		INTEGER,
 		SIGNED_INTEGER,
 
@@ -83,40 +79,9 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	enum class TextureType : ::Eldritch2::uint8 {
-		TEXTURE_1D,
-		TEXTURE_2D,
-		TEXTURE_3D,
-		CUBEMAP,
-
-		COUNT,
-		MALFORMED = COUNT
-	};
-
-// ---------------------------------------------------
-
-	typedef ::Eldritch2::uint8	FilteringFlags;
-
-	enum FilteringFlag : Renderer::FilteringFlags {
+	enum FilteringFlags : ::Eldritch2::uint8 {
 		INTERPOLATE_AT_16_BIT_IF_AVAILABLE	= 1u,
 		SAMPLE_AS_SRGB						= 2u
-	};
-
-// ---------------------------------------------------
-
-	typedef ::Eldritch2::uint8	ExtraLayoutFlags;
-
-	enum ExtraLayoutFlag : Renderer::ExtraLayoutFlags {
-		CREATE_IN_EDRAM_IF_AVAILABLE	= 1u,
-	};
-
-// ---------------------------------------------------
-
-	struct GPUSamplingDescriptor {
-		Renderer::GPULayout			layout;
-		Renderer::GPUStorageFormat	storageFormat;
-		Renderer::FilteringFlags	filteringFlags;
-		Renderer::ExtraLayoutFlags	extraLayoutFlags;
 	};
 
 }	// namespace Renderer

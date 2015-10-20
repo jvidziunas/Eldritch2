@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/IntrusiveVyukovMPSCQueue.hpp>
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Configuration/ConfigurablePODVariable.hpp>
 #include <Utility/Containers/ResizableArray.hpp>
@@ -168,7 +169,7 @@ namespace Foundation {
 		Configuration::ConfigurablePODVariable<LogMessageType>				_logEchoThreshold;
 		Configuration::ConfigurablePODVariable<size_t>						_taskArenaPerThreadAllocationSizeInBytes;
 
-		::Eldritch2::IntrusiveForwardList<Foundation::World>				_attachedWorlds;
+		::Eldritch2::IntrusiveVyukovMPSCQueue<Foundation::World>			_tickingWorlds;
 
 		ManagementService													_managementService;		
 

@@ -44,17 +44,17 @@ namespace FileSystem {
 		ETInlineHint const Structure*						TryGetStructureAtOffset( const size_t rawFileOffsetInBytes ) const;
 
 		template <typename Structure>
-		ETInlineHint::Eldritch2::Range<const Structure*>	TryGetStructureArrayAtOffset( const size_t rawFileOffsetInBytes, const size_t arraySizeInElements ) const;
+		ETInlineHint ::Eldritch2::Range<const Structure*>	TryGetStructureArrayAtOffset( const size_t rawFileOffsetInBytes, const size_t arraySizeInElements ) const;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this ReadableMemoryMappedFile instance.
-		ReadableMemoryMappedFile();
+		//!	Constructs this @ref ReadableMemoryMappedFile instance.
+		ReadableMemoryMappedFile() = default;
 
 	public:
-		// Destroys this ReadableMemoryMappedFile instance.
-		virtual ~ReadableMemoryMappedFile();
+		//!	Destroys this @ref ReadableMemoryMappedFile instance.
+		virtual ~ReadableMemoryMappedFile() = default;
 	};
 
 }	// namespace FileSystem

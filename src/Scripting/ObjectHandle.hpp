@@ -27,24 +27,30 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ObjectHandle instance.
-		ETInlineHint ObjectHandle( Object* const pointer, const PassthroughReferenceCountingSemantics );
-		// Constructs this ObjectHandle instance.
-		ETInlineHint ObjectHandle( Object* const pointer, const DefaultReferenceCountingSemantics = ::Eldritch2::DefaultReferenceCountingSemantics );
-		// Constructs this ObjectHandle instance.
-		ETInlineHint ObjectHandle( Object& reference, const PassthroughReferenceCountingSemantics );
-		// Constructs this ObjectHandle instance.
-		ETInlineHint ObjectHandle( Object& reference, const DefaultReferenceCountingSemantics = ::Eldritch2::DefaultReferenceCountingSemantics );
-		// Constructs this ObjectHandle instance.
-		ETInlineHint ObjectHandle( const Scripting::ObjectHandle<Object>& handle );
-		// Constructs this ObjectHandle instance.
-		ETInlineHint ObjectHandle( Scripting::ObjectHandle<Object>&& handle );
-		// Constructs this ObjectHandle instance.
+		//!	Constructs this @ref ObjectHandle instance.
+		template <typename CompatibleObject>
+		ETInlineHint ObjectHandle( CompatibleObject* const pointer, const PassthroughReferenceCountingSemantics );
+		//!	Constructs this @ref ObjectHandle instance.
+		template <typename CompatibleObject>
+		ETInlineHint ObjectHandle( CompatibleObject* const pointer, const DefaultReferenceCountingSemantics = ::Eldritch2::DefaultReferenceCountingSemantics );
+		//!	Constructs this @ref ObjectHandle instance.
+		template <typename CompatibleObject>
+		ETInlineHint ObjectHandle( CompatibleObject& reference, const PassthroughReferenceCountingSemantics );
+		//!	Constructs this @ref ObjectHandle instance.
+		template <typename CompatibleObject>
+		ETInlineHint ObjectHandle( CompatibleObject& reference, const DefaultReferenceCountingSemantics = ::Eldritch2::DefaultReferenceCountingSemantics );
+		//!	Constructs this @ref ObjectHandle instance.
+		template <typename CompatibleObject>
+		ETInlineHint ObjectHandle( const Scripting::ObjectHandle<CompatibleObject>& handle );
+		//!	Constructs this @ref ObjectHandle instance.
+		template <typename CompatibleObject>
+		ETInlineHint ObjectHandle( Scripting::ObjectHandle<CompatibleObject>&& handle );
+		//!	Constructs this @ref ObjectHandle instance.
 		ETInlineHint ObjectHandle( decltype(nullptr) );
-		// Constructs this ObjectHandle instance.
+		//!	Constructs this @ref ObjectHandle instance.
 		ETInlineHint ObjectHandle();
 
-		// Destroys this ObjectHandle instance.
+		//!	Destroys this @ref ObjectHandle instance.
 		ETInlineHint ~ObjectHandle();
 
 	// ---------------------------------------------------
@@ -53,9 +59,16 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
-		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( const Scripting::ObjectHandle<Object>& handle );
-		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( Scripting::ObjectHandle<Object>&& handle );
-		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( Object* const object );
+		ETInlineHint Object*	Release();
+
+	// ---------------------------------------------------
+
+		template <typename CompatibleObject>
+		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( const Scripting::ObjectHandle<CompatibleObject>& handle );
+		template <typename CompatibleObject>
+		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( Scripting::ObjectHandle<CompatibleObject>&& handle );
+		template <typename CompatibleObject>
+		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( CompatibleObject* const object );
 
 	// ---------------------------------------------------
 

@@ -28,11 +28,13 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref DisposingResult instance.
-		ETInlineHint DisposingResult( Scripting::ObjectHandle<ResultObject>&& object );
+		template <typename CompatibleResultObject>
+		ETInlineHint DisposingResult( Scripting::ObjectHandle<CompatibleResultObject>&& object );
+		//! Constructs this @ref DisposingResult instance.
+		template <typename CompatibleResultObject>
+		ETInlineHint DisposingResult( Utility::DisposingResult<CompatibleResultObject>&& rhs );
 		//!	Constructs this @ref DisposingResult instance.
 		ETInlineHint DisposingResult( const ::Eldritch2::ErrorCode errorCode );
-		//! Constructs this @ref DisposingResult instance.
-		ETInlineHint DisposingResult( Utility::DisposingResult<ResultObject>&& rhs );
 
 	// ---------------------------------------------------
 

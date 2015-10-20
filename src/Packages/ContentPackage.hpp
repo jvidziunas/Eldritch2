@@ -62,7 +62,7 @@ namespace FileSystem {
 		//!	Adds the specified package to the list 
 		/*!	@param[in] dependencyName @parblock Null-terminated C string containing the name of the package file to add to this @ref ContentPackage instance's dependencies.
 				There are no lifetime restrictions on the pointer/memory past this function call. @endparblock
-			@returns @ref ::Eldritch2::Errors::NONE if the dependency was registered successfully, or an @ref ErrorCode describing why a failure occurred.
+			@returns @ref ::Eldritch2::Error::NONE if the dependency was registered successfully, or an @ref ErrorCode describing why a failure occurred.
 			@remarks Not thread-safe.
 			*/
 		virtual ::Eldritch2::ErrorCode	AddDependency( const ::Eldritch2::UTF8Char* const dependencyName ) abstract;

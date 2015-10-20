@@ -25,24 +25,32 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	class ETPureAbstractHint AsynchronousFileReader : public Utility::Noncopyable {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
 		struct BlockingResult {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this BlockingResult instance.
-			ETInlineHint BlockingResult( const BlockingResult& itemTemplate );
-			// Constructs this BlockingResult instance.
+			//!	Constructs this @ref BlockingResult instance.
+			/*!	@param[in] readResult a ResultCode describing the ultimate result of the read operation, optionally containing information on why a failure occurred.
+				@param[in] successfullyReadAmountInBytes Amount of source data successfully read from backing storage before a failure occurred.
+				*/
 			ETInlineHint BlockingResult( ::Eldritch2::ErrorCode	readResult, size_t successfullyReadAmountInBytes );
+			//!	Constructs this @ref BlockingResult instance.
+			/*!	@param[in] itemTemplate the template @ref BlockingResult that will be copied.
+				*/
+			ETInlineHint BlockingResult( const BlockingResult& itemTemplate ) = default;
+
+		// ---------------------------------------------------
 
 			ETForceInlineHint operator bool() const;
 
 		// - DATA MEMBERS ------------------------------------
 
-			// The final state of the read operation.
+			//!	The final state of the read operation.
 			::Eldritch2::ErrorCode	result;
 
-			// Amount of data successfully read before a failure case, or the original
-			// size of the write request in the event no errors were encountered.
+			//!	Amount of data successfully read before a failure case, or the original size of the write request in the event no errors were encountered.
 			size_t					readAmountInBytes;
 		};
 
@@ -51,7 +59,7 @@ namespace FileSystem {
 		// Begins an (optionally) asynchronous read of a block of data starting at the file offset passed in through the third parameter and continuing for
 		// (at most) the specified number of bytes. The buffer itself must persist at least until the next call to FinishRead() returns.
 		// Not thread-safe, though it is likely that independent read strategies can safely access the same file.
-		virtual ::Eldritch2::ErrorCode	BeginRead( void* destinationBuffer, ::Eldritch2::uint64 fileOffsetInBytes, size_t lengthToReadInBytes ) abstract;
+		virtual ::Eldritch2::ErrorCode	BeginRead( void* const destinationBuffer, const ::Eldritch2::uint64 fileOffsetInBytes, const size_t lengthToReadInBytes ) abstract;
 
 		// Tests to see whether the previous asynchronous read started by a call to BeginRead() has completed.
 		// Thread-safe.
@@ -71,34 +79,31 @@ namespace FileSystem {
 		// Thread-safe.
 		virtual ::Eldritch2::uint64			GetSizeInBytes() const abstract;
 
-		// Calculates the total on-disk size of the file/pseudofile being accessed, rounded up to the nearest multiple of the
-		// media sector size.
+		// Calculates the total on-disk size of the file/pseudofile being accessed, rounded up to the nearest multiple of the media sector size.
 		// Thread-safe.
 		ETInlineHint ::Eldritch2::uint64	GetRoundedSizeInBytes() const;
 
 		// Calculates the actual/'physical' read size that should be passed to BeginRead() and similar given a 'logical' read size specified in bytes.
 		// Thread-safe.
-		ETInlineHint size_t					GetRoundedReadSizeInBytes( size_t logicalReadSizeInBytes ) const;
+		ETInlineHint size_t					GetRoundedReadSizeInBytes( const size_t logicalReadSizeInBytes ) const;
 
-		// Given a desired offset into the file, calculates the actual offset that should be passed to BeginRead() in such a way that access boundaries
-		// will be correctly preserved.
+		// Given a desired offset into the file, calculates the actual offset that should be passed to BeginRead() in such a way that access boundaries will be correctly preserved.
 		// Thread-safe.
-		ETInlineHint ::Eldritch2::uint64	GetOffsetForRead( ::Eldritch2::uint64 logicalOffsetInBytes ) const;
+		ETInlineHint ::Eldritch2::uint64	GetOffsetForRead( const ::Eldritch2::uint64 logicalOffsetInBytes ) const;
 
-		// Retrieves the physical media sector size for this file/pseudofile. All destination buffers must be minimally aligned to
-		// this value, and all reads must be an even multiple of this.
+		// Retrieves the physical media sector size for this file/pseudofile. All destination buffers must be minimally aligned to this value, and all reads must be an even multiple of this.
 		// Thread-safe.
 		virtual size_t						GetMediaSectorSizeInBytes() const abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this AsynchronousFileReader instance.
-		AsynchronousFileReader();
+		//!	Constructs this @ref AsynchronousFileReader instance.
+		AsynchronousFileReader() = default;
 
 	public:
-		// Destroys this AsynchronousFileReader instance.
-		virtual ~AsynchronousFileReader();
+		//!	Destroys this @ref AsynchronousFileReader instance.
+		virtual ~AsynchronousFileReader() = default;
 	};
 
 }	// namespace FileSystem

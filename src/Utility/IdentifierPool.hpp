@@ -25,10 +25,35 @@ namespace Utility {
 
 	template <typename Identifier, class Allocator = ::Eldritch2::ChildAllocator>
 	class IdentifierPool : public Utility::Noncopyable {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
-		typedef Allocator		AllocatorType;
-		typedef Identifier		IdentifierType;
-		typedef IdentifierType	DifferenceType;
+		using AllocatorType		= Allocator;
+		using IdentifierType	= Identifier;
+		using DifferenceType	= IdentifierType;
+
+	// ---
+
+		struct AvailableRange {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+			//!	Constructs this @ref AvailableRange instance.
+			ETForceInlineHint AvailableRange( IdentifierType initialElement, IdentifierType endElement );
+			//!	Constructs this @ref AvailableRange instance.
+			ETForceInlineHint AvailableRange() = default;
+
+			//!	Destroys this @ref AvailableRange instance.
+			ETForceInlineHint ~AvailableRange() = default;
+
+		// ---------------------------------------------------
+
+			ETForceInlineHint bool	ContainsElements() const;
+
+		// - DATA MEMBERS ------------------------------------
+
+			IdentifierType	begin;
+			IdentifierType	end;
+		};
 
 	// ---
 
@@ -39,12 +64,11 @@ namespace Utility {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this IdentifierPool instance.
-		template <typename... AllocatorConstructorArguments>
-		ETInlineHint IdentifierPool( IdentifierType maximumIdentifier, AllocatorConstructorArguments&&... allocatorConstructorArguments );
+		//!	Constructs this @ref IdentifierPool instance.
+		ETInlineHint IdentifierPool( IdentifierType maximumIdentifier, AllocatorType&& allocator = AllocatorType() );
 
-		// Destroys this IdentifierPool instance.
-		~IdentifierPool();
+		//!	Destroys this @ref IdentifierPool instance.
+		~IdentifierPool() = default;
 
 	// ---------------------------------------------------
 
@@ -63,32 +87,10 @@ namespace Utility {
 		template <typename Predicate>
 		Predicate		ForEachAvailableIdentifierRange( Predicate predicate ) const;
 
-	// ---------------------------------------------------
-
-	private:
-		struct AvailableRange {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			// Constructs this AvailableRange instance.
-			ETForceInlineHint AvailableRange( IdentifierType initialElement, IdentifierType endElement );
-			// Constructs this AvailableRange instance.
-			ETForceInlineHint AvailableRange();
-
-		// ---------------------------------------------------
-
-			ETForceInlineHint bool	ContainsElements() const;
-
-		// - DATA MEMBERS ------------------------------------
-
-			IdentifierType	begin;
-			IdentifierType	end;
-		};
-
-		typedef ::Eldritch2::ResizableArray<AvailableRange, AllocatorType>	AvailableRangeCollection;
-
 	// - DATA MEMBERS ------------------------------------
 
-		AvailableRangeCollection	_availableRanges;
+	private:
+		::Eldritch2::ResizableArray<AvailableRange, AllocatorType>	_availableRanges;
 	};
 
 }	// namespace Utility

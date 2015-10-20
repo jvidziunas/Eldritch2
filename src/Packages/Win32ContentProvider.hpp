@@ -15,9 +15,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/AsynchronousFileReader.hpp>
+#include <Utility/AsynchronousFileWriter.hpp>
+#include <Utility/SynchronousFileReader.hpp>
+#include <Utility/SynchronousFileWriter.hpp>
 #include <Packages/ContentProvider.hpp>
 //------------------------------------------------------------------//
 #include <Windows.h>
+//------------------------------------------------------------------//
+#include <atomic>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -41,40 +47,145 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	class Win32ContentProvider : public FileSystem::ContentProvider {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		class SynchronousFileAccessor : public FileSystem::SynchronousFileReader, public FileSystem::SynchronousFileWriter {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//! Constructs this @ref SynchronousFileAccessor instance.
+			SynchronousFileAccessor( const ::HANDLE fileHandle, const size_t mediaSectorSizeInBytes );
+
+			//! Destroys this @ref SynchronousFileAccessor instance.
+			~SynchronousFileAccessor();
+
+		// ---------------------------------------------------
+
+			SynchronousFileReader::BlockingResult	Read( void* const destinationBuffer, const size_t lengthToReadInBytes ) override sealed;
+			SynchronousFileReader::BlockingResult	Read( void* const destinationBuffer, const size_t lengthToReadInBytes, const ::Eldritch2::uint64 fileOffsetInBytes ) override sealed;
+
+		// ---------------------------------------------------
+
+			SynchronousFileWriter::BlockingResult	Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes ) override sealed;
+			SynchronousFileWriter::BlockingResult	Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes, const ::Eldritch2::uint64 fileOffsetInBytes ) override sealed;
+
+		// ---------------------------------------------------
+
+			void	AdvanceToEnd() override sealed;
+
+		// ---------------------------------------------------
+
+			void	SetFileSize( const ::Eldritch2::uint64 fileSizeInBytes ) override sealed;
+
+		// ---------------------------------------------------
+
+			uint64	GetFileCursorInBytes() const override sealed;
+
+			uint64	GetSizeInBytes() const override sealed;
+
+		// ---------------------------------------------------
+
+			size_t	GetPhysicalMediaSectorSizeInBytes() const override sealed;
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			const ::HANDLE	_fileHandle;
+			const size_t	_mediaSectorSizeInBytes;
+		};
+
+	// ---
+
+		class AsynchronousFileAccessor : public FileSystem::AsynchronousFileReader, public FileSystem::AsynchronousFileWriter {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//! Constructs this @ref AsynchronousFileAccessor instance.
+			AsynchronousFileAccessor( const ::HANDLE fileHandle, const size_t mediaSectorSizeInBytes );
+
+			//! Destroys this @ref Win32AsynchronousFileAccessor instance.
+			~AsynchronousFileAccessor();
+
+		// ---------------------------------------------------
+
+			::Eldritch2::ErrorCode	BeginRead( void* const destinationBuffer, const size_t lengthToReadInBytes, const ::Eldritch2::uint64 fileOffsetInBytes ) override sealed;
+
+		// ---------------------------------------------------
+
+			::Eldritch2::ErrorCode	BeginWrite( const void* const sourceBuffer, const size_t lengthToWriteInBytes, const ::Eldritch2::uint64 fileOffsetInBytes ) override sealed;
+
+		// ---------------------------------------------------
+
+			bool	IsReadComplete() override sealed;
+
+			bool	IsWriteComplete() override sealed;
+
+		// ---------------------------------------------------
+
+			AsynchronousFileReader::BlockingResult	BlockUntilReadComplete() override sealed;
+
+			AsynchronousFileWriter::BlockingResult	BlockUntilWriteComplete() override sealed;
+
+		// ---------------------------------------------------
+
+			void	CancelRead() override sealed;
+
+			void	CancelWrite() override sealed;
+
+		// ---------------------------------------------------
+
+			::Eldritch2::uint64 GetSizeInBytes() const override sealed;
+
+			size_t				GetMediaSectorSizeInBytes() const override sealed;
+
+		// ---------------------------------------------------
+
+			void	AdvanceToEnd() override sealed;
+
+		// ---------------------------------------------------
+
+			void	SetFileSize( const ::Eldritch2::uint64 fileSizeInBytes ) override sealed;
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			const ::HANDLE						_fileHandle;
+			const size_t						_mediaSectorSizeInBytes;
+#	if( ETIsPlatform64Bit() )
+			union {
+				size_t							_additionalReadBytes;
+				size_t							_additionalWrittenBytes;
+			};
+			::std::atomic<::Eldritch2::uint32>	_cancellationFlag;
+#	endif
+			::OVERLAPPED						_overlapped;
+		};
+
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		//!	Constructs this @ref Win32ContentProvider instance.
 		Win32ContentProvider( const Foundation::Win32SystemInterface& systemInterface );
 
 		//!	Destroys this @ref Win32ContentProvider instance.
-		~Win32ContentProvider();
+		~Win32ContentProvider() = default;
 
 	// - FILE READ ACCESS --------------------------------
 
-		// Creates an asynchronous file reader object that can be used to access the contents of a file/stream in such a way that other tasks can (optionally)
-		// complete while waiting for the backing device to finish the request.
 		using ContentProvider::CreateAsynchronousFileReader;
 		Utility::Result<FileSystem::AsynchronousFileReader>		CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
-		// Creates an synchronous file reader object that can be used to access the contents of a file/stream without requiring that the calling thread be able to
-		// complete additional work while the underlying device operates.
 		using ContentProvider::CreateSynchronousFileReader;
 		Utility::Result<FileSystem::SynchronousFileReader>		CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
-		// Creates a memory-mapped file object that can be read from (but not written to).
 		using ContentProvider::CreateReadableMemoryMappedFile;
 		Utility::Result<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 	// - FILE WRITE ACCESS -------------------------------
 
-		// Creates an asynchronous file writer object that can be used to access the contents of a file/stream in such a way that other tasks can (optionally)
-		// complete while waiting for the backing device to finish the request.
 		using ContentProvider::CreateAsynchronousFileWriter;
 		Utility::Result<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
 
-		// Creates an synchronous file writer object that can be used to access the contents of a file/stream without requiring that the calling thread be able to
-		// complete additional work while the underlying device operates.
 		using ContentProvider::CreateSynchronousFileWriter;
 		Utility::Result<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ContentProvider::KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
 

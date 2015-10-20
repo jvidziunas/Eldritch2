@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ETInlineHint AsynchronousFileReader::BlockingResult::BlockingResult( const BlockingResult& itemTemplate ) : result( itemTemplate.result ), readAmountInBytes( itemTemplate.readAmountInBytes ) {}
-
-// ---------------------------------------------------
-
 	ETInlineHint AsynchronousFileReader::BlockingResult::BlockingResult( ::Eldritch2::ErrorCode	readResult, size_t successfullyReadAmountInBytes ) : result( readResult ), readAmountInBytes( successfullyReadAmountInBytes ) {}
 
 // ---------------------------------------------------
@@ -32,7 +28,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint const void* AsynchronousFileReader::FixupReadPointer( const void* const rawReadPointer, ::Eldritch2::uint64 desiredFileOffsetInBytes ) {
+	ETForceInlineHint const void* AsynchronousFileReader::FixupReadPointer( const void* const rawReadPointer, const ::Eldritch2::uint64 desiredFileOffsetInBytes ) {
 		return static_cast<const char*>(rawReadPointer) + (desiredFileOffsetInBytes % this->GetMediaSectorSizeInBytes());
 	}
 
@@ -44,13 +40,13 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint size_t AsynchronousFileReader::GetRoundedReadSizeInBytes( size_t logicalReadSizeInBytes ) const {
+	ETInlineHint size_t AsynchronousFileReader::GetRoundedReadSizeInBytes( const size_t logicalReadSizeInBytes ) const {
 		return ( logicalReadSizeInBytes - 1u ) / this->GetMediaSectorSizeInBytes() + 1u;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ::Eldritch2::uint64 AsynchronousFileReader::GetOffsetForRead( ::Eldritch2::uint64 logicalOffsetInBytes ) const {
+	ETInlineHint ::Eldritch2::uint64 AsynchronousFileReader::GetOffsetForRead( const ::Eldritch2::uint64 logicalOffsetInBytes ) const {
 		return logicalOffsetInBytes / this->GetMediaSectorSizeInBytes();
 	}
 

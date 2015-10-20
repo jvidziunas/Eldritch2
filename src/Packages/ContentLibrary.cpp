@@ -178,7 +178,7 @@ namespace FileSystem {
 			if( beginLoadResult ) {
 				_contentPackageCollection.Insert( { package->GetName(), package.get() } );
 				// This is the first external reference to the package, so we want the passthrough reference counting semantics.
-				return { { package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics } };
+				return { ObjectHandle<ContentPackage>( package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics ) };
 			}
 
 			return { beginLoadResult };
@@ -228,7 +228,7 @@ namespace FileSystem {
 	// ---
 
 		if( auto* const	newPackage = new(_allocator, AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) ) {
-			return { { newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics } };
+			return { ObjectHandle<ContentPackage>( newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics ) };
 		}
 
 		return { Error::OUT_OF_MEMORY };

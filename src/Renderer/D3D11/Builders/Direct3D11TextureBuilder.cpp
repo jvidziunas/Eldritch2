@@ -13,10 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
+#include <Renderer/Textures/ShaderResourceHeader.hpp>
 #include <Renderer/D3D11/D3D11FormatHelpers.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
-#include <Renderer/Textures/Texture.hpp>
 #include <Utility/Memory/Allocator.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -31,6 +31,7 @@ ET_LINK_LIBRARY( "DXGUID.lib" )
 using namespace ::Eldritch2::Renderer;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
+using namespace ::std;
 
 namespace {
 
@@ -44,78 +45,19 @@ namespace {
 namespace Eldritch2 {
 namespace Renderer {
 
-	Direct3D11TextureBuilder::Direct3D11TextureBuilder( const Texture& texture, const UTF8Char* const textureName ) {
-		switch( texture.GetType() ) {
-			case TextureType::TEXTURE_1D: {
-				SetTexture1D( texture.GetWidthInTexels() );
-				break;
-			}
-			case TextureType::TEXTURE_2D: {
-				SetTexture2D( texture.GetWidthInTexels(), texture.GetHeightInTexels(), texture.GetArraySize() );
-				break;
-			}
-			case TextureType::TEXTURE_3D: {
-				SetTexture3D( texture.GetWidthInTexels(), texture.GetHeightInTexels(), texture.GetDepthInTexels() );
-				break;
-			}
-			case TextureType::CUBEMAP: {
-				SetCubemap( texture.GetWidthInTexels(), texture.GetHeightInTexels(), texture.GetArraySize() );
-				break;
-			}
-		};
+	Direct3D11TextureBuilder::Direct3D11TextureBuilder( const COMPointer<::ID3D11Device>& device ) : _device( device ),
+																									 _depthInTexels( 1u ),
+																									 _mipLevels( 1u ),
+																									 _format( ::DXGI_FORMAT_UNKNOWN ),
+																									 _usage( ::D3D11_USAGE_DEFAULT ),
+																									 _bindFlags( 0u ),
+																									 _accessFlags( 0u ),
+																									 _miscFlags( 0u ),
+																									 _debugName( nullptr ) {
+		SetTexture2D( 1u, 1u, 1u );
 
-		SetMIPMapCount( texture.GetTotalMIPCount() ).SetFormat( BuildDXGIFormat( texture.GetSamplingDescriptor() ) );
-		SetInitialData( texture.GetData(), texture.GetPresentMIPOffset() ).SetNeedsShaderResourceView( true );
-
-		// Disk-loaded textures are never MSAA.
 		_sampleDesc.Count	= 1u;
 		_sampleDesc.Quality	= 0u;
-
-		if( texture.ContainsCompleteMIPChain() ) {
-			SetIsStaticResource();
-		} else {
-			SetIsStreamingResource();
-		}
-
-		SetDebugName( textureName );
-	}
-
-// ---------------------------------------------------
-
-	Direct3D11TextureBuilder::Direct3D11TextureBuilder() : _widthInTexels( 1u ),
-														   _heightInTexels( 1u ),
-														   _depthInTexels( 1u ),
-														   _mipLevels( 1u ),
-														   _arraySize( 1u ),
-														   _format( ::DXGI_FORMAT_UNKNOWN ),
-														   _usage( ::D3D11_USAGE_DEFAULT ),
-														   _bindFlags( 0u ),
-														   _accessFlags( 0u ),
-														   _miscFlags( 0u ),
-														   _initialData( nullptr ),
-														   _initialDataStartMIP( 0u ),
-														   _debugName( nullptr ) {
-		_sampleDesc.Count	= 1u;
-		_sampleDesc.Quality	= 0u;
-	}
-
-// ---------------------------------------------------
-
-	Direct3D11TextureBuilder::~Direct3D11TextureBuilder() {}
-
-// ---------------------------------------------------
-
-	Direct3D11TextureBuilder& Direct3D11TextureBuilder::SetTexture1D( uint32 widthInTexels, uint32 arraySlices ) {
-		_type	= ::D3D11_RESOURCE_DIMENSION_TEXTURE1D;
-
-		_widthInTexels	= Max( widthInTexels,	1u );
-		_heightInTexels	= 1u;
-		_arraySize		= Max( arraySlices,		1u );
-
-		// We're not a cubemap. Clear the flag in case it was set previously.
-		UpdateFlag( _miscFlags, ::D3D11_RESOURCE_MISC_TEXTURECUBE, false );
-
-		return *this;
 	}
 
 // ---------------------------------------------------
@@ -286,15 +228,6 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	Direct3D11TextureBuilder& Direct3D11TextureBuilder::SetInitialData( const void* data, uint32 startMIP ) {
-		_initialData			= data;
-		_initialDataStartMIP	= startMIP;
-
-		return *this;
-	}
-
-// ---------------------------------------------------
-
 	Direct3D11TextureBuilder& Direct3D11TextureBuilder::SetDebugName( const char* name ) {
 		_debugName = name;
 
@@ -303,26 +236,7 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	ErrorCode Direct3D11TextureBuilder::Compile( Allocator& temporaryAllocator, const COMPointer<::ID3D11Device>& device ) {
-		return Compile( temporaryAllocator, device.GetUnadornedPointer() );
-	}
-
-// ---------------------------------------------------
-
-	ErrorCode Direct3D11TextureBuilder::Compile( Allocator& temporaryAllocator, ::ID3D11Device* const device ) {
-		struct Texture1DDescriptor : public ::D3D11_TEXTURE1D_DESC {
-			ETForceInlineHint Texture1DDescriptor( const Direct3D11TextureBuilder& builder ) {
-				Width			= builder._widthInTexels;
-				MipLevels		= builder._mipLevels;
-				ArraySize		= builder._arraySize;
-				Format			= builder._format;
-				Usage			= builder._usage;
-				BindFlags		= builder._bindFlags;
-				CPUAccessFlags	= builder._accessFlags;
-				MiscFlags		= builder._miscFlags;
-			}
-		};
-
+	COMPointer<::ID3D11Resource> Direct3D11TextureBuilder::Compile() {
 		struct Texture2DDescriptor : public ::D3D11_TEXTURE2D_DESC {
 			ETForceInlineHint Texture2DDescriptor( const Direct3D11TextureBuilder& builder ) {
 				Width			= builder._widthInTexels;
@@ -354,106 +268,45 @@ namespace Renderer {
 
 	// ---
 
-		::D3D11_SUBRESOURCE_DATA*	resourceInitialData( nullptr );
-		::HRESULT					result;
-
-		if( _initialData ) {
-			::D3D11_SUBRESOURCE_DATA* const	ETRestrictPtrHint	initializationData( AllocateTemporaryArray<::D3D11_SUBRESOURCE_DATA>( temporaryAllocator, _mipLevels * _arraySize ) );
-			const ::UINT										initialDataStartMIP( _initialDataStartMIP );
-			const ::UINT										mipLevelsInResource( _mipLevels );
-			const char*											initialDataSourcePointer( static_cast<const char*>( _initialData ) );
-
-			for( ::UINT arraySlice( 0u ), endSlice( _arraySize ); arraySlice < endSlice; ++arraySlice ) {
-				for( ::UINT mipLevel( 0u ); mipLevel < initialDataStartMIP; ++mipLevel ) {
-					::D3D11_SUBRESOURCE_DATA&	subresourceData( initializationData[::D3D11CalcSubresource( mipLevel, arraySlice, mipLevelsInResource )] );
-					// Zero out any MIP levels the caller has specified are not present yet.
-					subresourceData.pSysMem				= nullptr;
-					subresourceData.SysMemPitch			= 0u;
-					subresourceData.SysMemSlicePitch	= 0u;
-				}
-
-				::UINT	currentWidth( Max( _widthInTexels >> initialDataStartMIP, 1u ) );
-				::UINT	currentHeight( Max( _heightInTexels >> initialDataStartMIP, 1u ) );
-				::UINT	currentDepth( Max( _depthInTexels >> initialDataStartMIP, 1u ) );
-
-				for( ::UINT mipLevel( initialDataStartMIP ); mipLevel < mipLevelsInResource; ++mipLevel ) {
-					::D3D11_SUBRESOURCE_DATA&	subresourceData( initializationData[::D3D11CalcSubresource( mipLevel, arraySlice, mipLevelsInResource )] );
-					uint32						sliceTotalBytes;
-					uint32						rowBytes;
-					uint32						rowCount;
-
-					GetSurfaceInfo( currentWidth, currentHeight, _format, sliceTotalBytes, rowBytes, rowCount );
-
-					subresourceData.pSysMem				= initialDataSourcePointer;
-					subresourceData.SysMemPitch			= rowBytes;
-					subresourceData.SysMemSlicePitch	= sliceTotalBytes;
-
-					initialDataSourcePointer += sliceTotalBytes * currentDepth;
-
-					currentWidth	= Max( currentWidth / 2u,	1u );
-					currentHeight	= Max( currentHeight / 2u,	1u );
-					currentDepth	= Max( currentDepth / 2u,	1u );
-				}
-			}
-
-			resourceInitialData = initializationData;
-		}
+		COMPointer<::ID3D11Resource>	result;
 
 		switch( _type ) {
-			case ::D3D11_RESOURCE_DIMENSION_TEXTURE1D: {
-				COMPointer<::ID3D11Texture1D>	resource;
-				const Texture1DDescriptor		descriptor( *this );
-
-				result = device->CreateTexture1D( &descriptor, resourceInitialData, resource.GetInterfacePointer() );
-				_resource.Acquire( resource.GetUnadornedPointer() );
-				break;
-			}	// case D3D11_RESOURCE_DIMENSION_TEXTURE1D
-
-		// ---
-
 			case ::D3D11_RESOURCE_DIMENSION_TEXTURE2D: {
-				COMPointer<::ID3D11Texture2D>	resource;
-				const Texture2DDescriptor		descriptor( *this );
+				const Texture2DDescriptor	descriptor( *this );
+				::ID3D11Texture2D*			resource;
 
-				result = device->CreateTexture2D( &descriptor, resourceInitialData, resource.GetInterfacePointer() );
-				_resource.Acquire( resource.GetUnadornedPointer() );
+				if( SUCCEEDED( _device->CreateTexture2D( &descriptor, nullptr, &resource ) ) ) {
+					result = resource;
+				}
+				
 				break;
 			}	// case D3D11_RESOURCE_DIMENSION_TEXTURE2D
 
 		// ---
 
 			case ::D3D11_RESOURCE_DIMENSION_TEXTURE3D: {
-				COMPointer<::ID3D11Texture3D>	resource;
-				const Texture3DDescriptor		descriptor( *this );
+				const Texture3DDescriptor	descriptor( *this );
+				::ID3D11Texture3D*			resource;
 
-				result = device->CreateTexture3D( &descriptor, resourceInitialData, resource.GetInterfacePointer() );
-				_resource.Acquire( resource.GetUnadornedPointer() );
+				if( SUCCEEDED( _device->CreateTexture3D( &descriptor, nullptr, &resource ) ) ) {
+					result = resource;
+				}
+				
 				break;
 			}	// case D3D11_RESOURCE_DIMENSION_TEXTURE2D
 
 		// ---
 
 			default: {
-				result = E_FAIL;
-				break;
+				ETNoDefaultCaseHint;
 			}
-		};
+		};	// switch( _type )
 
-		if( _debugName && _resource ) {
-			_resource->SetPrivateData( ::WKPDID_D3DDebugObjectName, static_cast<::UINT>( StringLength( _debugName ) ), _debugName );
+		if( _debugName && result ) {
+			result->SetPrivateData( ::WKPDID_D3DDebugObjectName, static_cast<::UINT>(StringLength( _debugName )), _debugName );
 		}
 
-		if( resourceInitialData ) {
-			DeleteTemporaryArray( temporaryAllocator, resourceInitialData );
-		}
-
-		return SUCCEEDED( result ) ? Error::NONE : Error::INVALID_OBJECT_STATE;
-	}
-
-// ---------------------------------------------------
-
-	const COMPointer<::ID3D11Resource>& Direct3D11TextureBuilder::GetTexture() const {
-		return _resource;
+		return move( result );
 	}
 
 }	// namespace Renderer

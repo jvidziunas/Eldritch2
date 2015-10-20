@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -25,11 +25,6 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename Identifier, class Allocator>
-	ETForceInlineHint IdentifierPool<Identifier, Allocator>::AvailableRange::AvailableRange() {}
-
-// ---------------------------------------------------
-
-	template <typename Identifier, class Allocator>
 	ETForceInlineHint bool IdentifierPool<Identifier, Allocator>::AvailableRange::ContainsElements() const {
 		return begin <= end;
 	}
@@ -37,16 +32,10 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <typename Identifier, class Allocator>
-	template <typename... AllocatorConstructorArguments>
-	IdentifierPool<Identifier, Allocator>::IdentifierPool( IdentifierType maximumIdentifier, AllocatorConstructorArguments&&... allocatorConstructorArguments ) : _availableRanges( 0u, ::std::forward<AllocatorConstructorArguments>(allocatorConstructorArguments)... ) {
+	IdentifierPool<Identifier, Allocator>::IdentifierPool( IdentifierType maximumIdentifier, AllocatorType&& allocator ) : _availableRanges( ::std::move( allocator ) ) {
 		_availableRanges.Reserve( 16u );
-		_availableRanges.EmplaceBack( AvailableRange( static_cast<IdentifierType>(0), maximumIdentifier ) );
+		_availableRanges.PushBack( { static_cast<IdentifierType>(0), maximumIdentifier } );
 	}
-
-// ---------------------------------------------------
-
-	template <typename Identifier, class Allocator>
-	IdentifierPool<Identifier, Allocator>::~IdentifierPool() {}
 
 // ---------------------------------------------------
 
@@ -91,13 +80,13 @@ namespace Utility {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			const typename IdentifierPool<Identifier, Allocator>::DifferenceType	_rangeSizeInElements;
+			const DifferenceType	_rangeSizeInElements;
 		};
 
 	// ---
 
-		typename IdentifierPool<Identifier, Allocator>::AllocationResult	result = { 0u, true };
-		const auto															range( Find( _availableRanges.Begin(), _availableRanges.End(), FindAppropriateRangePredicate( rangeSizeInElements ) ) );
+		AllocationResult	result { 0u, true };
+		const auto			range( Find( _availableRanges.Begin(), _availableRanges.End(), FindAppropriateRangePredicate( rangeSizeInElements ) ) );
 
 		if( _availableRanges.End() != range ) {
 			result.identifier = range->begin;
@@ -198,30 +187,17 @@ namespace Utility {
 
 	template <typename Identifier, class Allocator>
 	typename IdentifierPool<Identifier, Allocator>::DifferenceType IdentifierPool<Identifier, Allocator>::GetLargestAvailableBlockLengthInElements() const {
-		class FindLargestRangePredicate {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		DifferenceType	largestRangeSizeInElements( 0 );
 
-		public:
-			ETForceInlineHint FindLargestRangePredicate() : largestRangeSizeInElements( static_cast<IdentifierPool<Identifier, Allocator>::DifferenceType>( 0u ) ) {}
+		ForEachAvailableIdentifierRange( [&largestRangeSizeInElements] ( const AvailableRange& range ) {
+			const auto	rangeLength( range.end - range.begin );
 
-		// ---------------------------------------------------
-
-			ETForceInlineHint void	operator()( typename const IdentifierPool<Identifier, Allocator>::AvailableRange& range ) {
-				const auto	rangeLength( range.end - range.begin );
-
-				if( largestRangeSizeInElements < rangeLength ) {
-					largestRangeSizeInElements = rangeLength;
-				}
+			if( largestRangeSizeInElements < rangeLength ) {
+				largestRangeSizeInElements = rangeLength;
 			}
-
-		// - DATA MEMBERS ------------------------------------
-
-			typename IdentifierPool<Identifier, Allocator>::DifferenceType	largestRangeSizeInElements;
-		};
-
-	// ---
-
-		return this->ForEachAvailableIdentifierRange( FindLargestRangePredicate() ).largestRangeSizeInElements;
+		} );
+			
+		return largestRangeSizeInElements;
 	}
 
 // ---------------------------------------------------

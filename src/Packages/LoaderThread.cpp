@@ -63,14 +63,20 @@ namespace FileSystem {
 	// ---
 
 		if( PackageDeserializationContext* context { new(_allocator, AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( { package } ) } ) {
-			_initializationQueue.PushBack( *context );
+			const auto	openFileResult( context->OpenFile() );
+			
+			if( openFileResult ) {
+				_initializationQueue.PushBack( *context );
 
-			// Mark the semaphore so the thread knows to wake up.
-			if( _loadSemaphore ) {
-				_loadSemaphore->IncreaseCount();
+				// Mark the semaphore so the thread knows to wake up.
+				if( _loadSemaphore ) {
+					_loadSemaphore->IncreaseCount();
+				}
+
+				return Error::NONE;
 			}
 
-			return Error::NONE;
+			return openFileResult;
 		}
 
 		return Error::OUT_OF_MEMORY;
@@ -98,7 +104,7 @@ namespace FileSystem {
 
 		while( (_loadSemaphore->Acquire(), ExecutionBehavior::CONTINUE == _executionBehavior.load( memory_order_acquire )) ) {
 			// Initialize any new deserialization, and add to the 
-			_initializationQueue.PopAndDisposeFront( [&threadAllocator, &loadList] ( PackageDeserializationContext& context ) {
+			_initializationQueue.PopFrontAndDispose( [&threadAllocator, &loadList] ( PackageDeserializationContext& context ) {
 				if( context.DeserializeDependencies() ) {
 					loadList.PushFront( context );
 				} else {

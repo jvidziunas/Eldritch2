@@ -14,8 +14,9 @@
 //==================================================================//
 #include <Packages/PackageDeserializationContext.hpp>
 #include <Utility/ReadableMemoryMappedFile.hpp>
-#include <Utility/DisposingResult.hpp>
+#include <Utility/MessagePackReader.hpp>
 #include <Packages/ContentProvider.hpp>
+#include <Utility/DisposingResult.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Utility/Result.hpp>
@@ -30,6 +31,10 @@ using namespace ::std;
 
 namespace {
 
+	using ResidencyState = ContentPackage::ResidencyState;
+
+// ---
+
 	Range<const char*> GetFileContents( ReadableMemoryMappedFile* const file ) {
 		return file ? file->TryGetStructureArrayAtOffset<const char>( 0u, file->GetAccessibleRegionSizeInBytes() ) : Range<const char*>::EmptySet();
 	}
@@ -41,13 +46,30 @@ namespace FileSystem {
 
 	PackageDeserializationContext::PackageDeserializationContext( ObjectHandle<ContentPackage>&& package ) : _packageReference( move( package ) ),
 																											 _allocator( UTF8L("Deserialization Context File Allocator") ),
-																											 _file( GetBoundPackage().CreateBackingFile( _allocator, UTF8L(".eldritch2package") ).object ),
-																											 _reader( GetFileContents( _file ) ) {}
+																											 _file( nullptr ) {}
 
 // ---------------------------------------------------
 
 	PackageDeserializationContext::~PackageDeserializationContext() {
 		_allocator.Delete( _file );
+	}
+
+// ---------------------------------------------------
+
+	ErrorCode PackageDeserializationContext::OpenFile() {
+		if( _file ) {
+			return Error::NONE;
+		}
+
+		const auto	createFileResult( GetBoundPackage().CreateBackingFile( _allocator, UTF8L(".eldritch2package") ) );
+
+		if( createFileResult ) {
+			_file = createFileResult.object;
+		} else {
+			GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+		}
+
+		return createFileResult.resultCode;
 	}
 
 // ---------------------------------------------------
@@ -76,19 +98,19 @@ namespace FileSystem {
 
 	// ---
 
-		using ResidencyState = ContentPackage::ResidencyState;
+		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
+		ETRuntimeAssert( nullptr != _file );
 
-	// ---
-
+		MessagePackReader			reader( _file->TryGetStructureArrayAtOffset<char>( 0u, _file->GetAccessibleRegionSizeInBytes() ) );
 		FixedStackAllocator<128u>	dependencyAllocator( UTF8L("PackageDeserializationContext::DeserializeDependencies() Temporary Allocator") );
 		MessagePackReader::Array	header;
 		ErrorCode					result( Error::NONE );
 
-		if( _reader( header ) ) {
+		if( reader( header ) ) {
 			const auto	checkpoint( dependencyAllocator.CreateCheckpoint() );
 
 			for( ; 0u != header.sizeInElements; --header.sizeInElements ) {
-				if( !_reader( ImportRecord( dependencyAllocator, GetBoundPackage() ) ) ) {
+				if( !reader( ImportRecord( dependencyAllocator, GetBoundPackage() ) ) ) {
 					result = Error::INVALID_PARAMETER;
 					break;
 				}
@@ -128,17 +150,17 @@ namespace FileSystem {
 
 	// ---
 
-		using ResidencyState = ContentPackage::ResidencyState;
+		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
+		ETRuntimeAssert( nullptr != _file );
 
-	// ---
-
+		MessagePackReader			reader( _file->TryGetStructureArrayAtOffset<char>( 0u, _file->GetAccessibleRegionSizeInBytes() ) );
 		MessagePackReader::Array	header;
 		ErrorCode					result( Error::NONE );
 
-		if( _reader( header ) ) {
+		if( reader( header ) ) {
 			// Keep assembling import records from the data stream
 			for( ExportRecord exportRecord; 0u != header.sizeInElements; --header.sizeInElements ) {
-				result = _reader( exportRecord ) ? GetBoundPackage().AddContent( exportRecord ) : Error::INVALID_PARAMETER;
+				result = reader( exportRecord ) ? GetBoundPackage().AddContent( exportRecord ) : Error::INVALID_PARAMETER;
 
 				if( !result ) {
 					break;

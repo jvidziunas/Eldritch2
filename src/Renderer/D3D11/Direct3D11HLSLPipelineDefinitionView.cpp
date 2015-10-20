@@ -13,6 +13,8 @@ Purpose:
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/Direct3D11HLSLPipelineDefinitionView.hpp>
+#include <Utility/MessagePackReader.hpp>
+#include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #include <D3D11.h>
 //------------------------------------------------------------------//
@@ -31,16 +33,6 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Renderer {
 
-	Direct3D11HLSLPipelineDefinitionView::Direct3D11HLSLPipelineDefinitionView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _usages( { allocator, UTF8L("Direct3D11 Pipeline Definition Usage Directory Allocator") } ) {}
-
-// ---------------------------------------------------
-
-	ETNoAliasHint const UTF8Char* const Direct3D11HLSLPipelineDefinitionView::GetSerializedDataTag() {
-		return UTF8L("HLSLPipelineDefinition");
-	}
-
-// ---------------------------------------------------
-
 	void Direct3D11HLSLPipelineDefinitionView::UsageDefinition::PrepareContext( ::ID3D11DeviceContext* const deviceContext ) const {
 		deviceContext->VSSetShader( vertexShader.GetUnadornedPointer(), nullptr, 0u );
 		deviceContext->HSSetShader( hullShader.GetUnadornedPointer(), nullptr, 0u );
@@ -49,6 +41,22 @@ namespace Renderer {
 		deviceContext->PSSetShader( pixelShader.GetUnadornedPointer(), nullptr, 0u );
 		deviceContext->OMSetDepthStencilState( depthStencilState.GetUnadornedPointer(), 0u );
 		deviceContext->RSSetState( rasterizerState.GetUnadornedPointer() );
+	}
+
+// ---------------------------------------------------
+
+	Direct3D11HLSLPipelineDefinitionView::Direct3D11HLSLPipelineDefinitionView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _usages( { allocator, UTF8L("Direct3D11 Pipeline Definition Usage Directory Allocator") } ) {}
+
+// ---------------------------------------------------
+
+	ErrorCode Direct3D11HLSLPipelineDefinitionView::InstantiateFromByteArray( const Range<const char*>& /*sourceBytes*/, const COMPointer<::ID3D11Device>& /*device*/ ) {
+		return Error::NONE;
+	}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint const UTF8Char* const Direct3D11HLSLPipelineDefinitionView::GetSerializedDataTag() {
+		return UTF8L("HLSLPipelineDefinition");
 	}
 
 // ---------------------------------------------------

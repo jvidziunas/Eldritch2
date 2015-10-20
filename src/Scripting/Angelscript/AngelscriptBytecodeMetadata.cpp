@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodePackage.cpp
+  AngelscriptBytecodeMetadata.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,11 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptBytecodePackage.hpp>
-#include <Utility/Memory/StandardLibrary.hpp>
+#include <Scripting/Angelscript/AngelscriptBytecodeMetadata.hpp>
 #include <Utility/Memory/NullAllocator.hpp>
-#include <Utility/MessagePackReader.hpp>
-#include <Utility/MessagePackWriter.hpp>
+//------------------------------------------------------------------//
+#include <angelscript.h>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scripting;
@@ -27,39 +26,28 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Scripting {
 
-	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( { allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") } ),
+	AngelscriptBytecodeMetadata::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( { allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") } ),
 																					 _propertyMetadata( { allocator, UTF8L("Angelscript Type Metadata Property Metadata Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	AngelscriptBytecodePackage::TypeMetadata::TypeMetadata() : TypeMetadata( NullAllocator::GetInstance() ) {}
+	AngelscriptBytecodeMetadata::TypeMetadata::TypeMetadata() : TypeMetadata( NullAllocator::GetInstance() ) {}
 
 // ---------------------------------------------------
 
-	AngelscriptBytecodePackage::AngelscriptBytecodePackage( unique_ptr<::asIScriptModule>&& ownedModule, Allocator& allocator ) : _module( move( ownedModule ) ),
-																																  _rootAllocator( { allocator, UTF8L("Angelscript Bytecode Package Metadata Root Allocator") } ),
-																																  _typeMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") } ),
-																																  _functionMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") } ) {
-		_module->SetUserData( this );
-	}
+	AngelscriptBytecodeMetadata::AngelscriptBytecodeMetadata( Allocator& allocator ) : _rootAllocator( { allocator, UTF8L("Angelscript Bytecode Package Metadata Root Allocator") } ),
+																					   _typeMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") } ),
+																					   _functionMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint const UTF8Char* const AngelscriptBytecodePackage::GetSerializedDataTag() {
-		return UTF8L("AngelscriptBytecodePackage");
-	}
-
-// ---------------------------------------------------
-
-	bool AngelscriptBytecodePackage::SerializeAndBindToModule( MessagePackReader&& reader ) {
-		if( !Serialize( reader ) ) {
-			return false;
-		}
+	bool AngelscriptBytecodeMetadata::BindToModule( ::asIScriptModule& module ) {
+		module.SetUserData( this );
 
 		// Bind the deserialized metadata to the user data pointers in the native Angelscript type/function objects.
 		for( auto& metadata : _typeMetadata ) {
 			// Locate the object type in the module collection...
-			if( ::asIObjectType* const type = _module->GetObjectTypeByIndex( metadata.first ) ) {
+			if( ::asIObjectType* const type = module.GetObjectTypeByIndex( metadata.first ) ) {
 				// ... and set the corresponding user data.
 				type->SetUserData( &metadata.second );
 			} else {
@@ -69,7 +57,7 @@ namespace Scripting {
 
 		for( auto& metadata : _functionMetadata ) {
 			// Locate the function in the module collection...
-			if( ::asIScriptFunction* const function = _module->GetFunctionByIndex( metadata.first ) ) {
+			if( ::asIScriptFunction* const function = module.GetFunctionByIndex( metadata.first ) ) {
 				// ... and set the corresponding user data.
 				function->SetUserData( &metadata.second );
 			} else {

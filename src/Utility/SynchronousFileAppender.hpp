@@ -34,12 +34,12 @@ namespace FileSystem {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this SynchronousFileAppender instance.
-		SynchronousFileAppender();
+		//!	Constructs this @ref SynchronousFileAppender instance.
+		SynchronousFileAppender() = default;
 
 	public:
-		// Destroys this SynchronousFileAppender instance.
-		virtual ~SynchronousFileAppender();
+		//!	Destroys this @ref SynchronousFileAppender instance.
+		virtual ~SynchronousFileAppender() = default;
 	};
 
 }	// namespace Foundation

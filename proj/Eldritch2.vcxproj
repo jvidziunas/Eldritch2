@@ -68,7 +68,7 @@
       <PreprocessorDefinitions>NOMINMAX;AS_NO_COMPILER;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
@@ -167,6 +167,8 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp" />
     <ClCompile Include="..\src\Packages\LoaderThread.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
+    <ClCompile Include="..\src\Packages\Win32ContentProvider.AsynchronousFileAccessor.cpp" />
+    <ClCompile Include="..\src\Packages\Win32ContentProvider.SynchronousFileAccessor.cpp" />
     <ClCompile Include="..\src\Physics\BulletEngine.cpp" />
     <ClCompile Include="..\src\Physics\Bullet\btHeightfieldTerrainShapeEx.cpp" />
     <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.cpp" />
@@ -180,9 +182,10 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.cpp" />
     <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.MeshComponent.cpp" />
     <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.SceneCameraComponent.cpp" />
+    <ClCompile Include="..\src\renderer\textures\ShaderResourceHeader.Direct3D11Helpers.cpp" />
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp" />
     <ClCompile Include="..\src\Scheduler\Win32Scheduler.WorkerThread.cpp" />
-    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackage.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.cpp" />
@@ -215,7 +218,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11SwapChainBuilder.cpp" />
     <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp" />
-    <ClCompile Include="..\src\renderer\textures\Texture.cpp" />
+    <ClCompile Include="..\src\renderer\textures\ShaderResourceHeader.cpp" />
     <ClCompile Include="..\src\Renderer\OpenGLRenderer.cpp" />
     <ClCompile Include="..\src\Scheduler\Thread.cpp" />
     <ClCompile Include="..\src\Scheduler\Task.cpp" />
@@ -258,12 +261,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp" />
     <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp" />
-    <ClCompile Include="..\src\Utility\AsynchronousFileReader.cpp" />
-    <ClCompile Include="..\src\Utility\AsynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Utility\ReadableMemoryMappedFile.cpp" />
-    <ClCompile Include="..\src\Utility\SynchronousFileAppender.cpp" />
-    <ClCompile Include="..\src\Utility\SynchronousFileReader.cpp" />
-    <ClCompile Include="..\src\Utility\SynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp" />
     <ClCompile Include="..\src\Animation\Armature.cpp" />
   </ItemGroup>
@@ -297,7 +295,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Renderer\D3D11\Direct3D11SwapChain.hpp" />
     <ClInclude Include="..\src\Renderer\D3D11\Direct3D11WorldView.hpp" />
     <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp" />
-    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackage.hpp" />
+    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.hpp" />
@@ -395,7 +393,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.hpp" />
     <ClInclude Include="..\src\renderer\D3D11\Direct3D11ResourceCommon.hpp" />
     <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp" />
-    <ClInclude Include="..\src\renderer\textures\Texture.hpp" />
+    <ClInclude Include="..\src\renderer\textures\ShaderResourceHeader.hpp" />
     <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp" />
     <ClInclude Include="..\src\Renderer\OpenGLRenderer.hpp" />
     <ClInclude Include="..\src\Scheduler\Thread.hpp" />

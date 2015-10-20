@@ -336,9 +336,6 @@
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp">
       <Filter>Source Files\Engine\Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\textures\Texture.cpp">
-      <Filter>Source Files\Engine\Renderer\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Renderer\OpenGLRenderer.cpp">
       <Filter>Source Files\Engine\Renderer\OpenGL</Filter>
     </ClCompile>
@@ -414,22 +411,7 @@
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp">
       <Filter>Source Files\Engine\Utility\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\AsynchronousFileReader.cpp">
-      <Filter>Source Files\Engine\Utility\File Access</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\AsynchronousFileWriter.cpp">
-      <Filter>Source Files\Engine\Utility\File Access</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\ReadableMemoryMappedFile.cpp">
-      <Filter>Source Files\Engine\Utility\File Access</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\SynchronousFileAppender.cpp">
-      <Filter>Source Files\Engine\Utility\File Access</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\SynchronousFileReader.cpp">
-      <Filter>Source Files\Engine\Utility\File Access</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\SynchronousFileWriter.cpp">
       <Filter>Source Files\Engine\Utility\File Access</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp">
@@ -621,9 +603,6 @@
     <ClCompile Include="..\src\Utility\MessagePackReader.cpp">
       <Filter>Source Files\Engine\Utility\MessagePack</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackage.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript\Resource Management</Filter>
     </ClCompile>
@@ -650,6 +629,21 @@
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
       <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Packages\Win32ContentProvider.SynchronousFileAccessor.cpp">
+      <Filter>Source Files\Engine\Packages\Content Provider Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Packages\Win32ContentProvider.AsynchronousFileAccessor.cpp">
+      <Filter>Source Files\Engine\Packages\Content Provider Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\textures\ShaderResourceHeader.cpp">
+      <Filter>Source Files\Engine\Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\textures\ShaderResourceHeader.Direct3D11Helpers.cpp">
+      <Filter>Source Files\Engine\Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -825,9 +819,6 @@
       <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp">
-      <Filter>Header Files\Engine\Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\textures\Texture.hpp">
       <Filter>Header Files\Engine\Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp">
@@ -1097,9 +1088,6 @@
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript\Resource Management</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackage.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp">
       <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
     </ClInclude>
@@ -1135,6 +1123,12 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\DisposingResult.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\textures\ShaderResourceHeader.hpp">
+      <Filter>Header Files\Engine\Renderer\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

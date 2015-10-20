@@ -12,9 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Foundation/WorldViewFactoryPublishingInitializationVisitor.hpp>
+#include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
+#include <Foundation/WorldViewFactoryPublishingInitializationVisitor.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Physics/Bullet/BulletWorldView.hpp>
 #include <Physics/BulletEngine.hpp>
 //------------------------------------------------------------------//
@@ -23,8 +25,10 @@ using namespace ::Eldritch2::Configuration;
 using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Foundation;
 using namespace ::Eldritch2::Scripting;
+using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2::Physics;
 using namespace ::Eldritch2;
+using namespace ::std;
 
 namespace Eldritch2 {
 namespace Physics {
@@ -35,30 +39,44 @@ namespace Physics {
 
 // ---------------------------------------------------
 
+	ErrorCode BulletCollisionShapeView::InstantiateFromByteArray( const Range<const char*>& /*sourceBytes*/ ) {
+		return Error::NONE;
+	}
+
+// ---------------------------------------------------
+
 	ETNoAliasHint const UTF8Char* const BulletCollisionShapeView::GetSerializedDataTag() {
 		return UTF8L("CollisionShape");
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode BulletCollisionShapeView::DeserializeFromPackageExport( Allocator& allocator, const Initializer& initializer, BulletEngine& /*physicsEngine*/ ) {
-		if( auto* const view = new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) BulletCollisionShapeView( initializer, allocator ) ) {
-			return Error::NONE;
-		}
-
-		return Error::OUT_OF_MEMORY;
-	}
-
-// ---------------------------------------------------
-
-	BulletEngine::BulletEngine( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-															 _persistentManifoldPoolSizeInElements( 4096u ),
-															 _collisionAlgorithmPoolSizeInElements( 4096u ) {}
+	BulletEngine::BulletEngine( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _persistentManifoldPoolSizeInElements( 4096u ), _collisionAlgorithmPoolSizeInElements( 4096u ) {}
 
 // ---------------------------------------------------
 
 	const UTF8Char* const BulletEngine::GetName() const {
 		return UTF8L("Bullet Dynamics Engine");
+	}
+
+// ---------------------------------------------------
+
+	void BulletEngine::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
+		using AllocationOption	= Allocator::AllocationOption;
+		using Initializer		= ResourceView::Initializer;
+
+	// ---
+
+		// Collision shape view.
+		visitor.PublishFactory( BulletCollisionShapeView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*engine*/ ) -> Result<ResourceView> {
+			unique_ptr<BulletCollisionShapeView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) BulletCollisionShapeView( initializer, allocator ), { allocator } );
+
+			if( view && view->InstantiateFromByteArray( initializer.serializedAsset ) ) {
+				return { *view.release() };
+			}
+
+			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
+		} );
 	}
 
 // ---------------------------------------------------

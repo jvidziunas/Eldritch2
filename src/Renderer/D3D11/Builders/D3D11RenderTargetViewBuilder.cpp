@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/Builders/D3D11RenderTargetViewBuilder.hpp>
-#include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -31,17 +30,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Renderer {
 
-	D3D11RenderTargetViewBuilder::D3D11RenderTargetViewBuilder( Direct3D11TextureBuilder& textureBuilder ) : _textureBuilder( textureBuilder ),
-																											 _format( ::DXGI_FORMAT_UNKNOWN ),
-																											 _initialSlice( 0u ),
-																											 _sizeInSlices( 0u ),
-																											 _mipIndex( 0u ) {
-		textureBuilder.SetNeedsRenderTargetView( true );
-	}
-
-// ---------------------------------------------------
-
-	D3D11RenderTargetViewBuilder::~D3D11RenderTargetViewBuilder() {}
+	D3D11RenderTargetViewBuilder::D3D11RenderTargetViewBuilder() : _formatOverride( ::DXGI_FORMAT_UNKNOWN ), _initialSlice( 0u ), _sizeInSlices( static_cast<::UINT>(-1) ), _mipIndex( 0u ) {}
 
 // ---------------------------------------------------
 
@@ -72,7 +61,7 @@ namespace Renderer {
 // ---------------------------------------------------
 
 	D3D11RenderTargetViewBuilder& D3D11RenderTargetViewBuilder::OverrideFormat( ::DXGI_FORMAT format ) {
-		_format = format;
+		_formatOverride = format;
 
 		return *this;
 	}
@@ -87,128 +76,86 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	ErrorCode D3D11RenderTargetViewBuilder::Compile( ::ID3D11Device* const device ) {
-		struct Texture1DDescriptor : public ::D3D11_TEX1D_RTV {
-			ETInlineHint Texture1DDescriptor( const D3D11RenderTargetViewBuilder& builder ) {
-				MipSlice	= builder._mipIndex;
-			}
-		};
+	COMPointer<::ID3D11RenderTargetView> D3D11RenderTargetViewBuilder::Compile( const COMPointer<::ID3D11Resource>& targetResource ) {
+		return Compile( targetResource.GetUnadornedPointer() );
+	}
 
-	// ---------------------------------------------------
+// ---------------------------------------------------
 
-		struct Texture1DArrayDescriptor : public ::D3D11_TEX1D_ARRAY_RTV {
-			ETInlineHint Texture1DArrayDescriptor( const D3D11RenderTargetViewBuilder& builder ) {
-				MipSlice			= builder._mipIndex;
-				FirstArraySlice		= builder._initialSlice;
-				ArraySize			= builder._sizeInSlices;
-			}
-		};
+	COMPointer<::ID3D11RenderTargetView> D3D11RenderTargetViewBuilder::Compile( ::ID3D11Resource* const targetResource ) {
+		::D3D11_RESOURCE_DIMENSION	dimension;
 
-	// ---------------------------------------------------
+		targetResource->GetType( &dimension );
 
-		struct Texture2DDescriptor : public ::D3D11_TEX2D_RTV {
-			ETInlineHint Texture2DDescriptor( const D3D11RenderTargetViewBuilder& builder ) {
-				MipSlice	= builder._mipIndex;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		struct Texture2DArrayDescriptor : public ::D3D11_TEX2D_ARRAY_RTV {
-			ETInlineHint Texture2DArrayDescriptor( const D3D11RenderTargetViewBuilder& builder ) {
-				MipSlice		= builder._mipIndex;
-				FirstArraySlice	= builder._initialSlice;
-				ArraySize		= builder._sizeInSlices;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		struct MSAATexture2DArrayDescriptor : public ::D3D11_TEX2DMS_ARRAY_RTV {
-			ETInlineHint MSAATexture2DArrayDescriptor( const D3D11RenderTargetViewBuilder& builder ) {
-				FirstArraySlice	= builder._initialSlice;
-				ArraySize		= builder._sizeInSlices;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		struct Texture3DDescriptor : public ::D3D11_TEX3D_RTV {
-			ETInlineHint Texture3DDescriptor( const D3D11RenderTargetViewBuilder& builder ) {
-				MipSlice	= builder._mipIndex;
-				FirstWSlice	= builder._initialSlice;
-				WSize		= builder._sizeInSlices;
-			}
-		};
-
-	// ---
-
-		::D3D11_RENDER_TARGET_VIEW_DESC	viewDescriptor;
-		const bool						isArrayResource( _textureBuilder._arraySize != 1u );
-		const bool						isMSAAResource( _textureBuilder._sampleDesc.Count != 1u );
-
-		viewDescriptor.Format = _format;
-
-		switch( _textureBuilder._type ) {
-			case ::D3D11_RESOURCE_DIMENSION_TEXTURE1D: {
-				if( isArrayResource ) {
-					viewDescriptor.ViewDimension	= ::D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
-					viewDescriptor.Texture1DArray	= Texture1DArrayDescriptor( *this );
-				} else {	// if( isArrayResource )
-					viewDescriptor.ViewDimension	= ::D3D11_RTV_DIMENSION_TEXTURE1D;
-					viewDescriptor.Texture1D		= Texture1DDescriptor( *this );
-				}
-				break;
-			}	// case ::D3D11_RESOURCE_DIMENSION_TEXTURE1D
+		switch( dimension ) {
 			case ::D3D11_RESOURCE_DIMENSION_TEXTURE2D: {
-				if( isArrayResource ) {
-					if( isMSAAResource ) {
-						viewDescriptor.ViewDimension	= ::D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
-						viewDescriptor.Texture2DMSArray	= MSAATexture2DArrayDescriptor( *this );
-					} else {	// if( isMSAAResource )
-						viewDescriptor.ViewDimension	= ::D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-						viewDescriptor.Texture2DArray	= Texture2DArrayDescriptor( *this );
-					}
-				} else {	// if( isArrayResource )
-					if( isMSAAResource ) {
-						viewDescriptor.ViewDimension	= ::D3D11_RTV_DIMENSION_TEXTURE2DMS;
-						// No configurable parameters for MSAA textures.
-					} else {	// if( isMSAAResource )
-						viewDescriptor.ViewDimension	= ::D3D11_RTV_DIMENSION_TEXTURE2D;
-						viewDescriptor.Texture2D		= Texture2DDescriptor( *this );
-					}
-				}
-				break;
-			}	// case ::D3D11_RESOURCE_DIMENSION_TEXTURE2D
-			case ::D3D11_RESOURCE_DIMENSION_TEXTURE3D: {
-				viewDescriptor.ViewDimension	= ::D3D11_RTV_DIMENSION_TEXTURE3D;
-				viewDescriptor.Texture3D		= Texture3DDescriptor( *this );
-				break;
-			}	// case ::D3D11_RESOURCE_DIMENSION_TEXTURE3D
-			default: {
-				ETNoDefaultCaseHint;
+				return Compile( static_cast<::ID3D11Texture2D*>(targetResource) );
 			}
-		};
 
-		::HRESULT	nativeResult( device->CreateRenderTargetView( _textureBuilder.GetTexture().GetUnadornedPointer(), &viewDescriptor, _view.GetInterfacePointer() ) );
+		// ---
+			case ::D3D11_RESOURCE_DIMENSION_TEXTURE3D: {
+				return Compile( static_cast<::ID3D11Texture3D*>(targetResource) );
+			}
 
-		if( _debugName && _view ) {
-			_view->SetPrivateData( ::WKPDID_D3DDebugObjectName, static_cast<::UINT>( StringLength( _debugName ) ), _debugName );
+		// ---
+
+			default: {
+				return nullptr;
+			}
+		}	// switch( dimension )
+	}
+
+// ---------------------------------------------------
+
+	COMPointer<::ID3D11RenderTargetView> D3D11RenderTargetViewBuilder::Compile( const COMPointer<::ID3D11Texture2D>& targetResource ) {
+		return Compile( targetResource.GetUnadornedPointer() );
+	}
+
+// ---------------------------------------------------
+
+	COMPointer<::ID3D11RenderTargetView> D3D11RenderTargetViewBuilder::Compile( ::ID3D11Texture2D* const targetResource ) {
+		const ::D3D11_RTV_DIMENSION			dimension( _sizeInSlices == 1u ? ::D3D11_RTV_DIMENSION_TEXTURE2D : ::D3D11_RTV_DIMENSION_TEXTURE2DARRAY );
+		::CD3D11_RENDER_TARGET_VIEW_DESC	descriptor( targetResource, dimension, _formatOverride, _mipIndex, _initialSlice, _sizeInSlices );
+		COMPointer<::ID3D11Device>			device;
+		::ID3D11RenderTargetView*			view( nullptr );
+
+		targetResource->GetDevice( device.GetInterfacePointer() );
+
+		if( FAILED( device->CreateRenderTargetView( targetResource, &descriptor, &view ) ) ) {
+			return nullptr;
 		}
 
-		return SUCCEEDED( nativeResult ) ? Error::NONE : Error::UNSPECIFIED;
+		if( _debugName ) {
+			view->SetPrivateData( ::WKPDID_D3DDebugObjectName, static_cast<::UINT>(StringLength( _debugName )), _debugName );
+		}
+
+		return { view, ::Eldritch2::PassthroughReferenceCountingSemantics };
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode D3D11RenderTargetViewBuilder::Compile( const COMPointer<ID3D11Device>& device ) {
-		return this->Compile( device.GetUnadornedPointer() );
+	COMPointer<::ID3D11RenderTargetView> D3D11RenderTargetViewBuilder::Compile( const COMPointer<::ID3D11Texture3D>& targetResource ) {
+		return Compile( targetResource.GetUnadornedPointer() );
 	}
 
 // ---------------------------------------------------
 
-	const COMPointer<::ID3D11RenderTargetView>& D3D11RenderTargetViewBuilder::GetView() const {
-		return _view;
+	COMPointer<::ID3D11RenderTargetView> D3D11RenderTargetViewBuilder::Compile( ::ID3D11Texture3D* const targetResource ) {
+		::CD3D11_RENDER_TARGET_VIEW_DESC	descriptor( targetResource, _formatOverride, _mipIndex, _initialSlice, _sizeInSlices );
+		COMPointer<::ID3D11Device>			device;
+		::ID3D11RenderTargetView*			view( nullptr );
+
+		targetResource->GetDevice( device.GetInterfacePointer() );
+
+		if( FAILED( device->CreateRenderTargetView( targetResource, &descriptor, &view ) ) ) {
+			return nullptr;
+		}
+
+		if( _debugName ) {
+			view->SetPrivateData( ::WKPDID_D3DDebugObjectName, static_cast<::UINT>(StringLength( _debugName )), _debugName );
+		}
+
+		return { view, ::Eldritch2::PassthroughReferenceCountingSemantics };
 	}
 
 }	// namespace Renderer

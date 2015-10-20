@@ -50,11 +50,11 @@ namespace Physics {
 
 	// ---------------------------------------------------
 
-		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
+		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes );
 
 	// ---------------------------------------------------
 
-		static ::Eldritch2::ErrorCode DeserializeFromPackageExport( ::Eldritch2::Allocator& allocator, const Initializer& initializer, Physics::BulletEngine& physicsEngine );
+		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -88,6 +88,7 @@ namespace Physics {
 	// ---------------------------------------------------
 
 	protected:
+		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Foundation::WorldViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;

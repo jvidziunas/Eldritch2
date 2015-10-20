@@ -20,6 +20,7 @@
 #include <Utility/Win32ApplicationHelpers.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Packages/Win32ContentProvider.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <System/Win32SystemInterface.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
@@ -127,12 +128,6 @@ namespace {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint static bool	IsFatalErrorCondition( const ::DWORD errorCode ) {
-		return !( ( NO_ERROR == errorCode ) | ( ERROR_IO_PENDING == errorCode ) );
-	}
-
-// ---------------------------------------------------
-
 	ETForceInlineHint ETNoAliasHint static uint64	GetFileSizeInBytes( const ::HANDLE fileHandle ) {
 		::LARGE_INTEGER	result;
 
@@ -236,9 +231,6 @@ namespace {
 
 }	// anonymous namespace
 
-#include <Packages/Win32/Win32SynchronousFileAccessor.cpp>
-#include <Packages/Win32/Win32AsynchronousFileAccessor.cpp>
-
 namespace Eldritch2 {
 namespace FileSystem {
 
@@ -265,10 +257,6 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	Win32ContentProvider::~Win32ContentProvider() {}
-
-// ---------------------------------------------------
-
 	Result<AsynchronousFileReader> Win32ContentProvider::CreateAsynchronousFileReader( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
 		wchar_t			filePath[DIR_LENGTH];
 		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
@@ -281,7 +269,7 @@ namespace FileSystem {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32AsynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
 				return { *accessor };
 			}
 		}
@@ -306,7 +294,7 @@ namespace FileSystem {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto * const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+			if( auto * const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
 				return { *accessor };
 			}
 		}
@@ -431,7 +419,7 @@ namespace FileSystem {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32AsynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
 				return { *accessor };
 			}
 		}
@@ -456,7 +444,7 @@ namespace FileSystem {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
+			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileAccessor( file, diskSectorSizeInBytes ) ) {
 				return { *accessor };
 			}
 		}

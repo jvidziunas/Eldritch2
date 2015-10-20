@@ -344,9 +344,9 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void GameEngine::ManagementService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const WorldTickTaskVisitor ) {
-		for( World& currentWorld : _owningEngine._attachedWorlds ) {
-			currentWorld.QueueUpdateTasks( subtaskAllocator, executingContext, visitingTask );
-		}
+		_owningEngine._tickingWorlds.ClearAndDispose( [&subtaskAllocator, &visitingTask, &executingContext] ( World& tickingWorld ) {
+			tickingWorld.QueueUpdateTasks( subtaskAllocator, executingContext, visitingTask );
+		} );
 	}
 
 // ---------------------------------------------------

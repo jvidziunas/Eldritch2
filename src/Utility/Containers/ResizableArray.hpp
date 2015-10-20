@@ -80,7 +80,7 @@ namespace Eldritch2 {
 		template <class AlternateAllocator>
 		ETInlineHint ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = Allocator() );
 
-		//! Destroys this ResizableArray instance.
+		//! Destroys this @ref ResizableArray instance.
 		ETInlineHint ~ResizableArray() = default;
 
 	// - ALGORITHMS --------------------------------------

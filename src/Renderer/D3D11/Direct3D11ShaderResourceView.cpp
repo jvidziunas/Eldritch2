@@ -14,7 +14,10 @@
 //==================================================================//
 #include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
 #include <Renderer/D3D11/Direct3D11ShaderResourceView.hpp>
-#include <Utility/Assert.hpp>
+#include <Renderer/Textures/ShaderResourceHeader.hpp>
+#include <Utility/Memory/ArenaAllocator.hpp>
+#include <Utility/MessagePackReader.hpp>
+#include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -31,10 +34,27 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Renderer {
 
-	Direct3D11ShaderResourceView::Direct3D11ShaderResourceView( COMPointer<::ID3D11ShaderResourceView>&& shaderView, const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ),
-																																											  _shaderView( ::std::move( shaderView ) ),
-																																											  _minLoadedLOD( ::std::numeric_limits<decltype(_minLoadedLOD)>::max() ) {
-		ETRuntimeAssert( _shaderView );
+	Direct3D11ShaderResourceView::Direct3D11ShaderResourceView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _minLoadedLOD( ::std::numeric_limits<decltype(_minLoadedLOD)>::max() ) {}
+
+// ---------------------------------------------------
+
+	ErrorCode Direct3D11ShaderResourceView::InstantiateFromByteArray( const Range<const char*>& sourceBytes, const COMPointer<::ID3D11Device>& device ) {
+		ShaderResourceHeader	header;
+
+		if( MessagePackReader( sourceBytes )( header ) ) {
+			Direct3D11TextureBuilder	builder( device );
+			
+			// Set shared state
+			builder.SetDebugName( GetName().GetCharacterArray() ).SetNeedsShaderResourceView();
+
+			header.ConfigureResourceBuilder( builder );
+
+			auto	resource = builder.Compile();
+
+			return Error::NONE;
+		}
+
+		return Error::INVALID_PARAMETER;
 	}
 
 // ---------------------------------------------------

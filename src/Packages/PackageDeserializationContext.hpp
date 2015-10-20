@@ -14,7 +14,6 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
-#include <Utility/MessagePackReader.hpp>
 #include <Scripting/ObjectHandle.hpp>
 //------------------------------------------------------------------//
 
@@ -56,14 +55,18 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
+		::Eldritch2::ErrorCode	OpenFile();
+
 		//! Informs the @ref PackageDeserializationContext that it should initiate load requests for all the external content packages the contained resources depend on.
 		/*!	@see @ref DeserializeDependencies(), @ref LoaderThread::Run()
+			@pre The backing file for the package should have been created via a previous call to @ref PackageDeserializationContext::OpenFile(). This will be checked in debug mode.
 			@remarks Not thread-safe.
 			*/
 		::Eldritch2::ErrorCode	DeserializeDependencies();
 
 		//! Wrapper around @ref DeserializeDependencies() designed to be called from within @ref LoaderThread::Run().
-		/*!	@see @ref DeserializeDependencies(), @ref LoaderThread::Run()
+		/*!	@pre The backing file for the package should have been created via a previous call to @ref PackageDeserializationContext::OpenFile(). This will be checked in debug mode.
+			@see @ref DeserializeDependencies(), @ref LoaderThread::Run()
 			@remarks Not thread-safe.
 			*/
 		::Eldritch2::ErrorCode	DeserializeContent();
@@ -84,8 +87,8 @@ namespace FileSystem {
 		ETInlineHint FileSystem::ContentPackage&		GetBoundPackage();
 
 		//!	Gets the @ref ContentLibrary the @ref PackageDeserializationContext is publishing content to.
-		/*!	<Detailed Description>
-			@returns <Return Value Description>
+		/*!	@returns The @ref ContentLibrary the @ref PackageDeserializationContext is publishing content to.
+			@remarks Thread-safe.
 			*/
 		FileSystem::ContentLibrary&						GetContentLibrary() const;
 
@@ -96,7 +99,6 @@ namespace FileSystem {
 		Scripting::ObjectHandle<FileSystem::ContentPackage>	_packageReference;
 		::Eldritch2::FixedStackAllocator<64u>				_allocator;
 		FileSystem::ReadableMemoryMappedFile*				_file;
-		Utility::MessagePackReader							_reader;
 	};
 
 }	// namespace FileSystem

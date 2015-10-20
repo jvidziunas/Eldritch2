@@ -24,11 +24,11 @@ namespace Utility {
 
 	template <typename ResultObject>
 	struct Result {
-		template <typename DerivedResultObject>
-		ETForceInlineHint Result( const Utility::Result<DerivedResultObject>& result );
+		template <typename CompatibleResultObject>
+		ETForceInlineHint Result( const Utility::Result<CompatibleResultObject>& result );
+		template <typename CompatibleResultObject>
+		ETForceInlineHint Result( CompatibleResultObject& object );
 		ETForceInlineHint Result( const ::Eldritch2::ErrorCode error );
-		ETForceInlineHint Result( ResultObject& object );
-		
 
 		ETForceInlineHint operator ::Eldritch2::ErrorCode&();
 		ETForceInlineHint operator const ::Eldritch2::ErrorCode&() const;
