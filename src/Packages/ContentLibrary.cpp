@@ -164,21 +164,30 @@ namespace FileSystem {
 
 	// ---
 
-		ScopedLock	packageTableLock( *_contentPackageCollectionMutex );
-		const auto	candidate( _contentPackageCollection.Find( packageName ) );
+		// Oddball positioning here, but the scoping gymnastics are necessary to prevent lock re-entrancy in the content package destructor.
+		unique_ptr<DeserializedContentPackage, InstanceDeleter>	createdPackage( nullptr, { _allocator } );
 
-		if( candidate != _contentPackageCollection.End() ) {
-			// Yes, we already have loaded this package. Increment the reference count and return it.
-			return { ObjectHandle<ContentPackage>( *candidate->second ) };
+		{	ScopedLock	packageTableLock( *_contentPackageCollectionMutex );
+			const auto	candidate( _contentPackageCollection.Find( packageName ) );
+		
+			if( candidate != _contentPackageCollection.End() ) {
+				// Yes, we already have loaded this package. Increment the reference count and return it.
+				return { ObjectHandle<ContentPackage>( *candidate->second ) };
+			}
+
+			createdPackage.reset( new(_allocator, AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator ) );
+
+			if( createdPackage ) {
+				_contentPackageCollection.Insert( { createdPackage->GetName(), createdPackage.get() } );
+			}
 		}
 
-		if( unique_ptr<ContentPackage, InstanceDeleter> package { new(_allocator, AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator ), { _allocator } } ) {
-			auto	beginLoadResult( _loaderThread->BeginLoad( *package ) );
+		if( createdPackage ) {
+			auto	beginLoadResult( _loaderThread->BeginLoad( *createdPackage ) );
 
 			if( beginLoadResult ) {
-				_contentPackageCollection.Insert( { package->GetName(), package.get() } );
 				// This is the first external reference to the package, so we want the passthrough reference counting semantics.
-				return { ObjectHandle<ContentPackage>( package.release(), ::Eldritch2::PassthroughReferenceCountingSemantics ) };
+				return { ObjectHandle<ContentPackage>( createdPackage.release(), ::Eldritch2::PassthroughReferenceCountingSemantics ) };
 			}
 
 			return { beginLoadResult };

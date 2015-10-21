@@ -58,16 +58,19 @@ namespace Foundation {
 
 		if( createWorldPackageResult ) {
 			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( move( createWorldPackageResult.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
-				if( world->GetLastError() ) {
+				if( const auto error = world->GetLastError() ) {
 					// Transfer ownership of the world to the result object and thus to outer code.
 					return { move( world ) };
 				} else {
-					return { world->GetLastError() };
+					GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, error.ToUTF8String() );
+					return { error };
 				}
 			}
 
 			return { Error::OUT_OF_MEMORY };
 		}
+
+		GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, createWorldPackageResult.resultCode.ToUTF8String() );
 
 		return { createWorldPackageResult.resultCode };
 	}

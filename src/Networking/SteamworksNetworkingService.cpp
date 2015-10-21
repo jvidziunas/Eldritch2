@@ -262,7 +262,7 @@ namespace Networking {
 		const auto	candidate( _playerDirectory.Find( networkID ) );
 
 		if( candidate == _playerDirectory.End() ) {
-			GetLogger()( UTF8L("Player %ull connected (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
+			GetLogger()( UTF8L("Player {%llu:%i} connected.") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
 
 			if( auto* const player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
 				_playerDirectory.Insert( { networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) } );
@@ -272,7 +272,8 @@ namespace Networking {
 
 			return { Error::OUT_OF_MEMORY };
 		} else {
-			GetLogger( LogMessageType::WARNING )( UTF8L("Received duplicate player join notification for player %ull (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
+			GetLogger( LogMessageType::WARNING )( UTF8L("Received duplicate player join notification for player {%llu:%i}!)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
+			
 			return { *candidate->second };
 		}
 	}
@@ -356,7 +357,7 @@ namespace Networking {
 			UTF8L( ": Connection timeout/blocked" )
 		};
 		
-		GetLogger( LogMessageType::ERROR )( UTF8L("Dropped connection to client %ull%s.") ET_UTF8_NEWLINE_LITERAL, failedConnection->m_steamIDRemote.ConvertToUint64(), disconnectionReasonStrings[failedConnection->m_eP2PSessionError] );
+		GetLogger( LogMessageType::ERROR )( UTF8L("Dropped connection to client %llu%s.") ET_UTF8_NEWLINE_LITERAL, failedConnection->m_steamIDRemote.ConvertToUint64(), disconnectionReasonStrings[failedConnection->m_eP2PSessionError] );
 
 		AcknowledgeClientDisconnection( failedConnection->m_steamIDRemote );
 	}
