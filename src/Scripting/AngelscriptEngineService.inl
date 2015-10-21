@@ -1,11 +1,11 @@
 /*==================================================================*\
-  AngelscriptEngine.inl
+  AngelscriptEngineService.inl
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -22,7 +22,7 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	ETInlineHint ::asIScriptEngine& AngelscriptEngine::GetScriptEngine() const {
+	ETInlineHint ::asIScriptEngine& AngelscriptEngineService::GetScriptEngine() const {
 		return *_scriptEngine;
 	}
 

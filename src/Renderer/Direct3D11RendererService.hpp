@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Direct3D11Renderer.hpp
+  Direct3D11RendererService.hpp
   ------------------------------------------------------------------
   Purpose:
   Central context object used to centralize all simulation, effects
@@ -42,15 +42,15 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	class Direct3D11Renderer : public Foundation::GameEngineService {
+	class Direct3D11RendererService : public Foundation::GameEngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Initializes this @ref Direct3D11Renderer instance.
-		Direct3D11Renderer( Foundation::GameEngine& owningEngine );
+		//! Initializes this @ref Direct3D11RendererService instance.
+		Direct3D11RendererService( Foundation::GameEngine& owningEngine );
 
-		//! Destroys this @ref Direct3D11Renderer instance.
-		~Direct3D11Renderer() = default;
+		//! Destroys this @ref Direct3D11RendererService instance.
+		~Direct3D11RendererService() = default;
 
 	// ---------------------------------------------------
 
@@ -106,5 +106,5 @@ namespace Renderer {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Renderer/Direct3D11Renderer.inl>
+#include <Renderer/Direct3D11RendererService.inl>
 //------------------------------------------------------------------//

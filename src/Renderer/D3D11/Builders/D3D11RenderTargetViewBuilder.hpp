@@ -12,16 +12,18 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
 #include <Renderer/D3D11/D3D11ForwardDeclarations.hpp>
-#include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/IntTypes.hpp>
-#include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Renderer {
 		class	Direct3D11TextureBuilder;
+	}
+
+	namespace Utility {
+		template <class Interface>
+		class	COMPointer;
 	}
 
 	class	ErrorCode;
@@ -35,7 +37,7 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	class D3D11RenderTargetViewBuilder : private Utility::Noncopyable {
+	class D3D11RenderTargetViewBuilder {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -45,7 +47,7 @@ namespace Renderer {
 		//!	Destroys this @ref D3D11RenderTargetViewBuilder instance.
 		~D3D11RenderTargetViewBuilder() = default;
 
-	// - MULTISAMPLING CONTROL ---------------------------
+	// ---------------------------------------------------
 
 		Renderer::D3D11RenderTargetViewBuilder&	SetDesiredSlices( ::Eldritch2::uint32 initialArraySlice, ::Eldritch2::uint32 arraySizeInSlices );
 

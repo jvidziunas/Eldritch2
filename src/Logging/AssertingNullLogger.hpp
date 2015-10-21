@@ -1,5 +1,5 @@
 /*==================================================================*\
-  NullLogger.hpp
+  AssertingNullLogger.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -22,19 +22,19 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	class NullLogger : public Foundation::Logger {
+	class AssertingNullLogger : public Foundation::Logger {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this NullLogger instance.
-		NullLogger();
+		// Constructs this @ref AssertingNullLogger instance.
+		AssertingNullLogger() = default;
 
-		// Destroys this NullLogger instance.
-		~NullLogger();
+		// Destroys this @ref AssertingNullLogger instance.
+		~AssertingNullLogger() = default;
 
 	// ---------------------------------------------------
 
-		void	WriteString( const ::Eldritch2::UTF8Char* const string, const size_t length ) override sealed;
+		void	Write( const ::Eldritch2::UTF8Char* const string, const size_t length ) override sealed;
 	};
 
 }	// namespace Foundation

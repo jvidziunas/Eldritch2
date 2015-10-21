@@ -14,7 +14,10 @@
 //==================================================================//
 #include <Renderer/D3D11/Builders/D3D11RenderTargetViewBuilder.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/COMPointer.hpp>
 #include <Utility/ErrorCode.hpp>
+//------------------------------------------------------------------//
+#include <D3D11.h>
 //------------------------------------------------------------------//
 
 //==================================================================//

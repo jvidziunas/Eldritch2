@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/D3D11/Builders/Direct3D11TextureBuilder.hpp>
-#include <Renderer/Textures/ShaderResourceHeader.hpp>
 #include <Renderer/D3D11/D3D11FormatHelpers.hpp>
+#include <Renderer/Textures/TextureHeader.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/Memory/Allocator.hpp>
@@ -58,6 +58,40 @@ namespace Renderer {
 
 		_sampleDesc.Count	= 1u;
 		_sampleDesc.Quality	= 0u;
+	}
+
+// ---------------------------------------------------
+
+	Direct3D11TextureBuilder& Direct3D11TextureBuilder::ConfigureFromHeader( const TextureHeader& baseHeader ) {
+		using HeaderClass = TextureHeader::Class;
+
+	// ---
+
+		{	const auto&	samplingDescriptor( baseHeader.samplingDescriptor );
+			SetFormat( BuildDXGIFormat( samplingDescriptor.layout, samplingDescriptor.storageFormat, samplingDescriptor.filteringFlags ) );
+		}
+
+		switch( baseHeader.headerClass ) {
+			case HeaderClass::TEXTURE_2D: {
+				const auto&	header( baseHeader.headers.as2D );
+				SetTexture2D( header.topLevelWidthInPixels, header.topLevelHeightInPixels, header.arraySizeInSlices );
+				break;
+			}	// case HeaderClass::TEXTURE_2D
+
+			case HeaderClass::TEXTURE_3D: {
+				const auto&	header( baseHeader.headers.as3D );
+				SetTexture2D( header.topLevelWidthInPixels, header.topLevelHeightInPixels, header.topLevelHeightInPixels );
+				break;
+			}	// case HeaderClass::TEXTURE_3D
+
+			case HeaderClass::CUBEMAP: {
+				const auto&	header( baseHeader.headers.asCubemap );
+				SetCubemap( header.edgeSizeInPixels, header.edgeSizeInPixels, header.arraySizeInCubemaps );
+				break;
+			}	// case HeaderClass::CUBEMAP
+		}
+		
+		return SetMSAAProperties( 1u, 0u ).SetNeedsShaderResourceView();
 	}
 
 // ---------------------------------------------------

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Direct3D11Renderer.inl
+  BulletEngineService.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -16,13 +16,21 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Renderer {
+namespace Physics {
 
-	ETInlineHint const Utility::COMPointer<::ID3D11Device>&	Direct3D11Renderer::GetDevice() const {
-		return _device;
+	namespace Physics		= ::Eldritch2::Physics;
+	
+// ---------------------------------------------------
+
+	ETInlineHint size_t	BulletEngineService::GetWorldPersistentManifoldPoolSizeInElements() const {
+		return _persistentManifoldPoolSizeInElements;
 	}
 
-}	// namespace Renderer
+// ---------------------------------------------------
+
+	ETInlineHint size_t	BulletEngineService::GetWorldCollisionAlgorithmPoolSizeInElements() const {
+		return _collisionAlgorithmPoolSizeInElements;
+	}
+
+}	// namespace Physics
 }	// namespace Eldritch2
-
-

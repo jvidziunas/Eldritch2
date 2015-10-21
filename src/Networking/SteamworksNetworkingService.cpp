@@ -145,7 +145,7 @@ namespace Networking {
 // ---------------------------------------------------
 
 	void SteamworksNetworkingService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( this, sizeof( SteamworksWorldView ), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
+		visitor.PublishFactory( this, sizeof(SteamworksWorldView), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
 			auto&	networkingService( *static_cast<SteamworksNetworkingService*>(parameter) );
 			auto	networkID( networkingService._worldIDCounter.fetch_add( 1u, memory_order_acquire ) );
 
@@ -156,12 +156,11 @@ namespace Networking {
 // ---------------------------------------------------
 
 	void SteamworksNetworkingService::AcceptInitializationVisitor( const PostInitializationVisitor ) {
-		const NetworkID	localPlayerID( ::SteamUser()->GetSteamID(), 0u );
+		auto	createPlayerResult( AcknowledgePlayerConnection( NetworkID( ::SteamUser()->GetSteamID(), 0u ) ) );
+		auto	createLobbyWorldResult( _lobbyWorldName ? CreateWorld( _lobbyWorldName.GetCharacterArray() ) : CreateEditorWorld() );
 
-		if( auto createLobbyWorldResult = (_lobbyWorldName ? CreateWorld( _lobbyWorldName.GetCharacterArray() ) : CreateEditorWorld()) ) {
-			if( const auto createPlayerResult = AcknowledgePlayerConnection( localPlayerID ) ) {
-				_lobbyWorld = ::std::move( createLobbyWorldResult.object );
-			}
+		if( createPlayerResult && createLobbyWorldResult ) {
+			_lobbyWorld = move( createLobbyWorldResult.object );
 		}
 	}
 
@@ -239,7 +238,7 @@ namespace Networking {
 // ---------------------------------------------------
 
 	void SteamworksNetworkingService::InitiateSteamConnection() {
-		FormatAndLogString( UTF8L("Connecting to Steam instance.") ET_UTF8_NEWLINE_LITERAL );
+		GetLogger()( UTF8L("Connecting to Steam instance.") ET_UTF8_NEWLINE_LITERAL );
 
 		const ::EServerMode	serverMode( _useVACAuthentication ? ::eServerModeAuthenticationAndSecure : ::eServerModeAuthentication );
 		const uint32		serverAddress( 0u ); // INADDR_ANY
@@ -251,9 +250,9 @@ namespace Networking {
 				::SteamGameServer()->SetGameDescription( UTF8_PROJECT_NAME );
 			}
 
-			FormatAndLogString( UTF8L("Initial Steam connection established.") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger()( UTF8L("Initial Steam connection established.") ET_UTF8_NEWLINE_LITERAL );
 		} else {
-			FormatAndLogError( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 
@@ -263,17 +262,17 @@ namespace Networking {
 		const auto	candidate( _playerDirectory.Find( networkID ) );
 
 		if( candidate == _playerDirectory.End() ) {
-			FormatAndLogString( UTF8L("Player %ull connected (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
+			GetLogger()( UTF8L("Player %ull connected (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
 
 			if( auto* const player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
-				_playerDirectory.Insert( ::rde::make_pair( networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) ) );
+				_playerDirectory.Insert( { networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) } );
 				
 				return { *player };
 			}
 
 			return { Error::OUT_OF_MEMORY };
 		} else {
-			FormatAndLogWarning( UTF8L("Received duplicate player join notification for player %ull (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
+			GetLogger( LogMessageType::WARNING )( UTF8L("Received duplicate player join notification for player %ull (local ID: %u)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
 			return { *candidate->second };
 		}
 	}
@@ -323,7 +322,7 @@ namespace Networking {
 // ---------------------------------------------------
 
 	void SteamworksNetworkingService::OnSteamServersConnected( ::SteamServersConnected_t* /*connectionParameters*/ ) {
-		FormatAndLogString( UTF8L("Steam connection re-established.") ET_UTF8_NEWLINE_LITERAL );
+		GetLogger()( UTF8L("Steam connection re-established.") ET_UTF8_NEWLINE_LITERAL );
 	}
 
 // ---------------------------------------------------
@@ -333,7 +332,7 @@ namespace Networking {
 // ---------------------------------------------------
 
 	void SteamworksNetworkingService::OnSteamServersDisconnected( ::SteamServersDisconnected_t* /*disconnectionParameters*/ ) {
-		FormatAndLogError( UTF8L("Disconnected from Steam servers!") ET_UTF8_NEWLINE_LITERAL );
+		GetLogger( LogMessageType::ERROR )( UTF8L("Disconnected from Steam servers!") ET_UTF8_NEWLINE_LITERAL );
 	}
 
 // ---------------------------------------------------
@@ -357,7 +356,7 @@ namespace Networking {
 			UTF8L( ": Connection timeout/blocked" )
 		};
 		
-		FormatAndLogWarning( UTF8L("Dropped connection to client %ull%s.") ET_UTF8_NEWLINE_LITERAL, failedConnection->m_steamIDRemote.ConvertToUint64(), disconnectionReasonStrings[failedConnection->m_eP2PSessionError] );
+		GetLogger( LogMessageType::ERROR )( UTF8L("Dropped connection to client %ull%s.") ET_UTF8_NEWLINE_LITERAL, failedConnection->m_steamIDRemote.ConvertToUint64(), disconnectionReasonStrings[failedConnection->m_eP2PSessionError] );
 
 		AcknowledgeClientDisconnection( failedConnection->m_steamIDRemote );
 	}

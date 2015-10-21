@@ -61,7 +61,7 @@ namespace Foundation {
 	Logger&	GameEngine::GetLoggerForMessageType( const LogMessageType type ) {
 		class NullLogger : public Logger {
 		public:
-			void	WriteString( const UTF8Char* const /*string*/, const size_t /*lengthInOctets*/ ) override sealed {}
+			void	Write( const UTF8Char* const /*string*/, const size_t /*lengthInOctets*/ ) override sealed {}
 		};
 
 	// ---
@@ -101,7 +101,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void GameEngine::Dispose() {
-		GetLoggerForMessageType( LogMessageType::MESSAGE ).WriteString( UTF8L("Terminating execution.") ET_UTF8_NEWLINE_LITERAL );
+		GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Terminating execution.") ET_UTF8_NEWLINE_LITERAL );
 		_scheduler.FlagForShutdown();
 	}
 

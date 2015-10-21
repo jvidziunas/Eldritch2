@@ -1,11 +1,11 @@
 /*==================================================================*\
-  BulletEngine.inl
+  Direct3D11RendererService.inl
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -16,21 +16,13 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Physics {
+namespace Renderer {
 
-	namespace Physics		= ::Eldritch2::Physics;
-	
-// ---------------------------------------------------
-
-	ETInlineHint size_t	BulletEngine::GetWorldPersistentManifoldPoolSizeInElements() const {
-		return _persistentManifoldPoolSizeInElements;
+	ETInlineHint const Utility::COMPointer<::ID3D11Device>&	Direct3D11RendererService::GetDevice() const {
+		return _device;
 	}
 
-// ---------------------------------------------------
-
-	ETInlineHint size_t	BulletEngine::GetWorldCollisionAlgorithmPoolSizeInElements() const {
-		return _collisionAlgorithmPoolSizeInElements;
-	}
-
-}	// namespace Physics
+}	// namespace Renderer
 }	// namespace Eldritch2
+
+

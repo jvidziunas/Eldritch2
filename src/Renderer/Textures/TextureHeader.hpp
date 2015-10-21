@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ShaderResourceHeader.hpp
+  TextureHeader.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,35 +12,29 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/Noncopyable.hpp>
 #include <Renderer/GPUFormats.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-	namespace Renderer {
-		class	Direct3D11TextureBuilder;
-	}
-
-	class	Allocator;
-}
 
 namespace Eldritch2 {
 namespace Renderer {
 
 	namespace Renderer	= ::Eldritch2::Renderer;
-	namespace Utility	= ::Eldritch2::Utility;
 
 // ---------------------------------------------------
 
-	class ShaderResourceHeader : public Utility::Noncopyable {
+	struct TextureHeader {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		enum Class : ::Eldritch2::uint8 {
+			TEXTURE_2D,
+			TEXTURE_3D,
+			CUBEMAP
+		};
+
+	// ---
+
 		struct SamplingDescriptor {
-			void	ConfigureResourceBuilder( Renderer::Direct3D11TextureBuilder& builder );
-
-		// ---------------------------------------------------
-
 			template <typename Archive>
 			bool	Serialize( Archive& archive );
 
@@ -54,10 +48,6 @@ namespace Renderer {
 	// ---
 
 		struct Header2D {
-			void	ConfigureResourceBuilder( Renderer::Direct3D11TextureBuilder& builder );
-
-		// ---------------------------------------------------
-
 			template <typename Archive>
 			bool	Serialize( Archive& archive );
 
@@ -71,10 +61,6 @@ namespace Renderer {
 	// ---
 
 		struct Header3D {
-			void	ConfigureResourceBuilder( Renderer::Direct3D11TextureBuilder& builder );
-
-		// ---------------------------------------------------
-
 			template <typename Archive>
 			bool	Serialize( Archive& archive );
 
@@ -88,36 +74,29 @@ namespace Renderer {
 	// ---
 
 		struct HeaderCubemap {
-			void	ConfigureResourceBuilder( Renderer::Direct3D11TextureBuilder& builder );
-
-		// ---------------------------------------------------
-
 			template <typename Archive>
 			bool	Serialize( Archive& archive );
 
 		// - DATA MEMBERS ------------------------------------
 
 			::Eldritch2::uint32		edgeSizeInPixels;
-			::Eldritch2::uint32		arraySizeInSlices;
+			::Eldritch2::uint32		arraySizeInCubemaps;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref ShaderResourceHeader instance.
-		ShaderResourceHeader( const SamplingDescriptor& samplingDescriptor, const Header2D& header );
-		//!	Constructs this @ref ShaderResourceHeader instance.
-		ShaderResourceHeader( const SamplingDescriptor& samplingDescriptor, const Header3D& header );
-		//!	Constructs this @ref ShaderResourceHeader instance.
-		ShaderResourceHeader( const SamplingDescriptor& samplingDescriptor, const HeaderCubemap& header );
-		ShaderResourceHeader() = default;
+		//!	Constructs this @ref TextureHeader instance.
+		TextureHeader( const SamplingDescriptor& samplingDescriptor, const Header2D& header );
+		//!	Constructs this @ref TextureHeader instance.
+		TextureHeader( const SamplingDescriptor& samplingDescriptor, const Header3D& header );
+		//!	Constructs this @ref TextureHeader instance.
+		TextureHeader( const SamplingDescriptor& samplingDescriptor, const HeaderCubemap& header );
+		//!	Constructs this @ref TextureHeader instance.
+		TextureHeader() = default;
 
 	public:
-		//!	Destroys this @ref ShaderResourceHeader instance.
-		~ShaderResourceHeader() = default;
-
-	// ---------------------------------------------------
-
-		ETInlineHint Renderer::Direct3D11TextureBuilder&	ConfigureResourceBuilder( Renderer::Direct3D11TextureBuilder& builder );
+		//!	Destroys this @ref TextureHeader instance.
+		~TextureHeader() = default;
 
 	// ---------------------------------------------------
 
@@ -126,25 +105,13 @@ namespace Renderer {
 
 	// ---------------------------------------------------
 		
-	private:
-		enum Class : ::Eldritch2::uint8 {
-			TEXTURE_2D,
-			TEXTURE_3D,
-			CUBEMAP
-		};
-
-	// ---
-
-		SamplingDescriptor		_samplingDescriptor;
-		Class					_class;
+		SamplingDescriptor	samplingDescriptor;
+		Class				headerClass;
 		union {
-			Header2D			header2D;
-			Header3D			header3D;
-			HeaderCubemap		headerCubemap;
-		}						_headers;
-
-		template <typename Archive>
-		friend bool	Serialize( Class& resourceClass, Archive& archive );
+			Header2D		as2D;
+			Header3D		as3D;
+			HeaderCubemap	asCubemap;
+		}					headers;
 	};
 
 }	// namespace Renderer
@@ -153,5 +120,5 @@ namespace Renderer {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Renderer/Textures/ShaderResourceHeader.inl>
+#include <Renderer/Textures/TextureHeader.inl>
 //------------------------------------------------------------------//

@@ -22,8 +22,15 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Foundation {
 
-	void Logger::WriteString( const UTF8Char* string ) {
-		this->WriteString( string, StringLength( string ) );
+	void Logger::operator()( ETFormatStringHint( const UTF8Char* formatString ), ... ) {
+		UTF8Char	submittedString[256u];
+		va_list		args;
+
+		va_start( args, formatString );
+			PrintFormatted( submittedString, formatString, args );
+		va_end( args );
+
+		this->Write( submittedString, StringLength( submittedString ) );
 	}
 
 }	// namespace Foundation

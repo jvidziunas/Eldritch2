@@ -13,19 +13,19 @@
 // INCLUDES
 //==================================================================//
 #include <Networking/SteamworksNetworkingService.hpp>
+#include <Scripting/AngelscriptEngineService.hpp>
+#include <Renderer/Direct3D11RendererService.hpp>
 #include <Configuration/ConfigurationService.hpp>
 #include <Utility/Memory/Win32HeapAllocator.hpp>
 #include <Utility/Win32ApplicationHelpers.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Packages/Win32ContentProvider.hpp>
-#include <Scripting/AngelscriptEngine.hpp>
+#include <Physics/BulletEngineService.hpp>
 #include <System/Win32SystemInterface.hpp>
-#include <Renderer/Direct3D11Renderer.hpp>
 #include <Sound/XAudio2AudioRenderer.hpp>
 #include <Scheduler/Win32Scheduler.hpp>
 #include <Input/Win32InputService.hpp>
 #include <Foundation/GameEngine.hpp>
-#include <Physics/BulletEngine.hpp>
 #include <Input/XInputService.hpp>
 #include <Utility/Assert.hpp>
 #include <Build.hpp>
@@ -109,9 +109,9 @@ namespace {
 		XInputService				_controllerInputService;
 		Win32InputService			_inputService;
 		SteamworksNetworkingService	_networkingService;
-		AngelscriptEngine			_scriptEngine;
-		BulletEngine				_physicsEngine;
-		Direct3D11Renderer			_renderer;
+		AngelscriptEngineService	_scriptEngine;
+		BulletEngineService			_physicsEngine;
+		Direct3D11RendererService	_renderer;
 		XAudio2AudioRenderer		_audioRenderer;
 	};
 

@@ -312,9 +312,6 @@
     <ClCompile Include="..\src\logging\Logger.cpp">
       <Filter>Source Files\Engine\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Logging\NullLogger.cpp">
-      <Filter>Source Files\Engine\Logging</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\packages\ContentProvider.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
     </ClCompile>
@@ -350,9 +347,6 @@
     </ClCompile>
     <ClCompile Include="..\src\scheduler\Win32Scheduler.cpp">
       <Filter>Source Files\Engine\Scheduler\Scheduler Implementations</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripting\AngelscriptEngine.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\scripting\Angelscript\AngelscriptWorldView.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
@@ -441,9 +435,6 @@
     <ClCompile Include="..\examples\Win32EntryPoint.cpp">
       <Filter>Source Files\Games</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\Direct3D11Renderer.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\configuration\ConfigurationService.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
     </ClCompile>
@@ -530,9 +521,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.cpp">
       <Filter>Source Files\Engine\Physics\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletEngine.cpp">
-      <Filter>Source Files\Engine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Networking\SteamworksNetworkingService.Player.cpp">
       <Filter>Source Files\Engine\Networking</Filter>
@@ -636,14 +624,26 @@
     <ClCompile Include="..\src\Packages\Win32ContentProvider.AsynchronousFileAccessor.cpp">
       <Filter>Source Files\Engine\Packages\Content Provider Implementations</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\textures\ShaderResourceHeader.cpp">
-      <Filter>Source Files\Engine\Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\textures\ShaderResourceHeader.Direct3D11Helpers.cpp">
-      <Filter>Source Files\Engine\Renderer\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\D3D11\Builders\Direct3D11TextureShaderResourceViewBuilder.cpp">
+      <Filter>Source Files\Engine\Renderer\D3D11\Resource Builders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\Direct3D11RendererService.cpp">
+      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp">
+      <Filter>Source Files\Engine\Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletEngineService.cpp">
+      <Filter>Source Files\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scripting\AngelscriptEngineService.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Logging\AssertingNullLogger.cpp">
+      <Filter>Source Files\Engine\Logging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -839,9 +839,6 @@
     <ClInclude Include="..\src\scheduler\Win32Scheduler.hpp">
       <Filter>Header Files\Engine\Scheduler\Scheduler Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\scripting\AngelscriptEngine.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\scripting\Angelscript\AngelscriptWorldView.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
     </ClInclude>
@@ -893,9 +890,6 @@
     <ClInclude Include="..\src\logging\Logger.hpp">
       <Filter>Header Files\Engine\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Logging\NullLogger.hpp">
-      <Filter>Header Files\Engine\Logging</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Animation\AnimationTypes.hpp">
       <Filter>Header Files\Engine\Animation</Filter>
     </ClInclude>
@@ -919,9 +913,6 @@
     </ClInclude>
     <ClInclude Include="..\src\packages\Win32ContentProvider.hpp">
       <Filter>Header Files\Engine\Packages\Content Provider Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\Direct3D11Renderer.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
       <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
@@ -1043,9 +1034,6 @@
     <ClInclude Include="..\src\Physics\Bullet\BulletWorldView.hpp">
       <Filter>Header Files\Engine\Physics\Bullet</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Physics\BulletEngine.hpp">
-      <Filter>Header Files\Engine\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Physics\Bullet\btHeightfieldTerrainShapeEx.hpp">
       <Filter>Header Files\Engine\Physics\Bullet\Extensions</Filter>
     </ClInclude>
@@ -1124,11 +1112,26 @@
     <ClInclude Include="..\src\Utility\DisposingResult.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\textures\ShaderResourceHeader.hpp">
-      <Filter>Header Files\Engine\Renderer\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\D3D11\Builders\Direct3D11TextureShaderResourceViewBuilder.hpp">
+      <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\Direct3D11RendererService.hpp">
+      <Filter>Header Files\Engine\Renderer\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp">
+      <Filter>Header Files\Engine\Renderer\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletEngineService.hpp">
+      <Filter>Header Files\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scripting\AngelscriptEngineService.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Logging\AssertingNullLogger.hpp">
+      <Filter>Header Files\Engine\Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

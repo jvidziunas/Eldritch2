@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletEngine.cpp
+  BulletEngineService.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -18,7 +18,7 @@
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Physics/Bullet/BulletWorldView.hpp>
-#include <Physics/BulletEngine.hpp>
+#include <Physics/BulletEngineService.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
@@ -51,17 +51,17 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	BulletEngine::BulletEngine( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _persistentManifoldPoolSizeInElements( 4096u ), _collisionAlgorithmPoolSizeInElements( 4096u ) {}
+	BulletEngineService::BulletEngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _persistentManifoldPoolSizeInElements( 4096u ), _collisionAlgorithmPoolSizeInElements( 4096u ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const BulletEngine::GetName() const {
+	const UTF8Char* const BulletEngineService::GetName() const {
 		return UTF8L("Bullet Dynamics Engine");
 	}
 
 // ---------------------------------------------------
 
-	void BulletEngine::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
+	void BulletEngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
 		using Initializer		= ResourceView::Initializer;
 
@@ -81,7 +81,7 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	void BulletEngine::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
+	void BulletEngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
 		visitor.PushSection( UTF8L("BulletDynamics") );
 
 		visitor.Register( UTF8L("WorldPersistentManifoldPoolSizeInElements"), _persistentManifoldPoolSizeInElements );
@@ -90,18 +90,18 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	void BulletEngine::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void BulletEngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
 		BulletWorldView::ExposeScriptAPI( visitor );
 	}
 
 // ---------------------------------------------------
 
-	void BulletEngine::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
+	void BulletEngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
 		// Reserve a little extra slack here for the aligned allocation.
 		visitor.PublishFactory( this, sizeof(BulletWorldView) + (alignof(BulletWorldView) - 1u), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
 			// Important to use aligned allocation. Visual Studio uses a movaps instruction for the compiler-generated btVector3::operator=() method, and it's quite common for
 			// one of the vectors to end up on an unaligned boundary.
-			return new(allocator, alignof(BulletWorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) BulletWorldView( world, *static_cast<BulletEngine*>(parameter) ) ? Error::NONE : Error::OUT_OF_MEMORY;
+			return new(allocator, alignof(BulletWorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) BulletWorldView( world, *static_cast<BulletEngineService*>(parameter) ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 

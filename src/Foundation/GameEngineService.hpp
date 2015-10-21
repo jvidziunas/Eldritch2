@@ -15,6 +15,7 @@
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/CharTypes.hpp>
+#include <Logging/Logger.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -195,17 +196,7 @@ namespace Foundation {
 
 	// - LOGGING -----------------------------------------
 
-		//! Emits a status update to all attached logging services.
-		void	FormatAndLogString( ETFormatStringHint( const ::Eldritch2::UTF8Char* str ), ... ) const;
-
-		//! Emits a warning message to all attached logging services.
-		void	FormatAndLogWarning( ETFormatStringHint( const ::Eldritch2::UTF8Char* str ), ... ) const;
-
-		//! Emits a verbose/minor warning to all attached logging services.
-		void	FormatAndLogVerboseWarning( ETFormatStringHint( const ::Eldritch2::UTF8Char* str ), ... ) const;
-
-		//! Emits a fatal error message to all attached logging services.
-		void	FormatAndLogError( ETFormatStringHint( const ::Eldritch2::UTF8Char* str ), ... ) const;
+		Foundation::Logger&	GetLogger( const Foundation::LogMessageType type = Foundation::LogMessageType::MESSAGE ) const;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

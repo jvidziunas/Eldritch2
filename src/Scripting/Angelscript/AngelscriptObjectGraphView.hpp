@@ -18,12 +18,9 @@
 namespace Eldritch2 {
 	namespace Scripting {
 		class	AngelscriptWorldView;
-		class	AngelscriptEngine;
 	}
 
 	class	ErrorCode;
-	template <typename Iterator>
-	class	Range;
 }
 
 namespace Eldritch2 {

@@ -236,7 +236,8 @@ namespace Foundation {
 				GetManagementService().BroadcastInitializationVisitor( GameEngineService::PostInitializationVisitor() );
 
 				// Log a successful initialization and begin the frame loop.
-				GetManagementService().FormatAndLogString( UTF8L("Engine initialization complete!") ET_UTF8_NEWLINE_LITERAL );
+				GetManagementService().GetLogger()( UTF8L("Engine initialization complete!") ET_UTF8_NEWLINE_LITERAL );
+
 				if( !_engineReference.IsSoleReferenceToObject() ) {
 					new(engineAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) TickFrameTask( GetManagementService(), executingContext );
 				}

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptEngine.cpp
+  AngelscriptEngineService.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -20,9 +20,9 @@
 #include <Scripting/Angelscript/AngelscriptNativeBindings.hpp>
 #include <Scripting/Angelscript/AngelscriptWorldView.hpp>
 #include <Configuration/ConfigurationDatabase.hpp>
+#include <Scripting/AngelscriptEngineService.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
-#include <Scripting/AngelscriptEngine.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -59,37 +59,37 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Scripting {
 
-	void AngelscriptEngine::EngineDeleter::operator()( ::asIScriptEngine* const scriptEngine ) {
+	void AngelscriptEngineService::EngineDeleter::operator()( ::asIScriptEngine* const scriptEngine ) {
 		scriptEngine->ShutDownAndRelease();
 	}
 
 // ---------------------------------------------------
 
-	AngelscriptEngine::AngelscriptEngine( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ), _scriptEngine( nullptr ) {}
+	AngelscriptEngineService::AngelscriptEngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ), _scriptEngine( nullptr ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const AngelscriptEngine::GetName() const {
+	const UTF8Char* const AngelscriptEngineService::GetName() const {
 		return UTF8L("Angelscript Virtual Machine");
 	}
 
 // ---------------------------------------------------
 
-	void AngelscriptEngine::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
+	void AngelscriptEngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
 		visitor.PublishFactory( this, sizeof( AngelscriptWorldView ), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) AngelscriptWorldView( world, static_cast<AngelscriptEngine*>(parameter)->GetScriptEngine() ) ? Error::NONE : Error::OUT_OF_MEMORY;
+			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) AngelscriptWorldView( world, static_cast<AngelscriptEngineService*>(parameter)->GetScriptEngine() ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 
 // ---------------------------------------------------
 
-	void AngelscriptEngine::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void AngelscriptEngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
 		AngelscriptWorldView::ExposeScriptAPI( visitor );
 	}
 
 // ---------------------------------------------------
 
-	void AngelscriptEngine::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
+	void AngelscriptEngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
 		using Initializer		= ResourceView::Initializer;
 
@@ -100,7 +100,7 @@ namespace Scripting {
 			unique_ptr<AngelscriptBytecodePackageView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) AngelscriptBytecodePackageView( initializer, allocator ), { allocator } );
 					
 			// Try to load from the source asset data.
-			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<AngelscriptEngine*>(parameter)->GetScriptEngine() ) ) {
+			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<AngelscriptEngineService*>(parameter)->GetScriptEngine() ) ) {
 				return { *view.release() };
 			}
 
@@ -119,13 +119,13 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	void AngelscriptEngine::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const InitializeEngineTaskVisitor ) {
+	void AngelscriptEngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const InitializeEngineTaskVisitor ) {
 		class ExposeScriptAPITask : public CRTPTransientTask<ExposeScriptAPITask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Constructs this @ref ExposeScriptAPITask instance.
-			ETInlineHint ExposeScriptAPITask( AngelscriptEngine& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<ExposeScriptAPITask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
+			ETInlineHint ExposeScriptAPITask( AngelscriptEngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<ExposeScriptAPITask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -148,7 +148,7 @@ namespace Scripting {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			AngelscriptEngine&	_host;
+			AngelscriptEngineService&	_host;
 		};
 
 	// ---
@@ -158,13 +158,13 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	void AngelscriptEngine::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const ServiceTickTaskVisitor ) {
+	void AngelscriptEngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const ServiceTickTaskVisitor ) {
 		class CollectScriptGarbageTask : public CRTPTransientTask<CollectScriptGarbageTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Constructs this @ref CollectScriptGarbageTask instance.
-			ETInlineHint CollectScriptGarbageTask( AngelscriptEngine& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<CollectScriptGarbageTask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
+			ETInlineHint CollectScriptGarbageTask( AngelscriptEngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<CollectScriptGarbageTask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -182,7 +182,7 @@ namespace Scripting {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			AngelscriptEngine&	_host;
+			AngelscriptEngineService&	_host;
 		};
 
 	// ---
@@ -192,36 +192,39 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	StringMarshal AngelscriptEngine::MarshalStringLiteral( const unsigned int literalLengthInOctets, const UTF8Char* const stringLiteral ) {
+	StringMarshal AngelscriptEngineService::MarshalStringLiteral( const unsigned int literalLengthInOctets, const UTF8Char* const stringLiteral ) {
 		return StringMarshal( stringLiteral, literalLengthInOctets, _allocator );
 	}
 
 // ---------------------------------------------------
 
-	void AngelscriptEngine::MessageCallback( const ::asSMessageInfo* messageInfo ) {
+	void AngelscriptEngineService::MessageCallback( const ::asSMessageInfo* messageInfo ) {
+		LogMessageType	messageType( LogMessageType::MESSAGE );
+		const char*		description( UTF8L("message") );
+		
 		switch( messageInfo->type ) {
 			case asMSGTYPE_ERROR: {
-				FormatAndLogError( UTF8L("Angelscript error in '%s'[%i, %i]: %s!") ET_UTF8_NEWLINE_LITERAL, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
+				messageType = LogMessageType::ERROR;
+				description = "error";
 				break;
 			}
 			case asMSGTYPE_WARNING: {
-				FormatAndLogWarning( UTF8L("Angelscript warning in '%s'[%i, %i]: %s.") ET_UTF8_NEWLINE_LITERAL, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
-				break;
-			}
-			case asMSGTYPE_INFORMATION: {
-				FormatAndLogString( UTF8L("Angelscript message in '%s'[%i, %i]: %s.") ET_UTF8_NEWLINE_LITERAL, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
+				messageType = LogMessageType::WARNING;
+				description = "warning";
 				break;
 			}
 		}
+
+		GetLogger( messageType )( UTF8L("Angelscript %s in '%s'[%i, %i]: %s.") ET_UTF8_NEWLINE_LITERAL, description, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
 	}
 
 // ---------------------------------------------------
 
-	void AngelscriptEngine::CreateScriptAPI() {
-		FormatAndLogString( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
+	void AngelscriptEngineService::CreateScriptAPI() {
+		GetLogger()( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
 
-		if( decltype(_scriptEngine) scriptEngine { ::asCreateScriptEngine( ANGELSCRIPT_VERSION ) } ) {
-			scriptEngine->SetMessageCallback( ::asMETHOD( AngelscriptEngine, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
+		if( decltype(_scriptEngine) scriptEngine { ::asCreateScriptEngine() } ) {
+			scriptEngine->SetMessageCallback( ::asMETHOD( AngelscriptEngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
 
 			{
 				ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
@@ -236,15 +239,15 @@ namespace Scripting {
 
 			RegisterCMathLibrary( scriptEngine.get() );
 			RegisterAlgorithmLibrary( scriptEngine.get() );
-			scriptEngine->RegisterStringFactory( StringMarshal::scriptTypeName, ::asMETHOD( AngelscriptEngine, MarshalStringLiteral ), ::asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
+			scriptEngine->RegisterStringFactory( StringMarshal::scriptTypeName, ::asMETHOD( AngelscriptEngineService, MarshalStringLiteral ), ::asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
 			// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
 
-			FormatAndLogString( UTF8L( "Script API registered successfully." ) ET_UTF8_NEWLINE_LITERAL );
+			GetLogger()( UTF8L("Script API registered successfully.") ET_UTF8_NEWLINE_LITERAL );
 
 			// Transfer ownership to the main engine.
 			_scriptEngine = move( scriptEngine );
 		} else {
-			FormatAndLogError( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 

@@ -12,8 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Logging/Logger.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
+#include <Logging/Logger.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -35,16 +35,15 @@ namespace Foundation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this FileAppendingLogger instance.
+		//!	Constructs this @ref FileAppendingLogger instance.
 		FileAppendingLogger( FileSystem::ContentProvider& contentProvider, const ::Eldritch2::UTF8Char* const logName );
 
-		// Destroys this FileAppendingLogger instance.
+		//!	Destroys this @ref FileAppendingLogger instance.
 		~FileAppendingLogger();
 
 	// ---------------------------------------------------
 
-		using Foundation::Logger::WriteString;
-		void	WriteString( const ::Eldritch2::UTF8Char* const string, const size_t lengthInOctets ) override sealed;
+		void	Write( const ::Eldritch2::UTF8Char* const string, const size_t lengthInOctets ) override sealed;
 
 	// - DATA MEMBERS ------------------------------------
 

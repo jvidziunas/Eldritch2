@@ -32,6 +32,10 @@ using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2::Input;
 using namespace ::Eldritch2;
 
+#ifdef ERROR
+#	undef ERROR
+#endif
+
 namespace {
 
 	static ::LRESULT CALLBACK WinKeyEatHook( int nCode, ::WPARAM wParam, ::LPARAM lParam ) {
@@ -124,12 +128,12 @@ namespace Input {
 			}
 
 			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.FormatAndLogString( UTF8L("Initializing input service.") ET_UTF8_NEWLINE_LITERAL );
+				_host.GetLogger()( UTF8L("Initializing input service.") ET_UTF8_NEWLINE_LITERAL );
 
 				if( const auto result = _host.LaunchThread( _host._pollingThread ) ) {
-					_host.FormatAndLogString( UTF8L("Initialized event polling thread.") ET_UTF8_NEWLINE_LITERAL );
+					_host.GetLogger()( UTF8L("Initialized event polling thread.") ET_UTF8_NEWLINE_LITERAL );
 				} else {
-					_host.FormatAndLogError( UTF8L("Error initializing input service: %s!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
+					_host.GetLogger( LogMessageType::ERROR )( UTF8L("Error initializing input service: %s!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
 				}
 
 				return nullptr;
@@ -161,7 +165,7 @@ namespace Input {
 			// Allocate a temporary array to hold all the enumerated devices.
 			::RAWINPUTDEVICELIST* const	deviceList( static_cast<::RAWINPUTDEVICELIST*>(_alloca( deviceCount * sizeof(::RAWINPUTDEVICELIST) )) );
 
-			FormatAndLogString( UTF8L("Input service: Enumerated %u raw input devices.") ET_UTF8_NEWLINE_LITERAL, deviceCount );
+			GetLogger()( UTF8L("Input service: Enumerated %u raw input devices.") ET_UTF8_NEWLINE_LITERAL, deviceCount );
 			_deviceDirectory.Reserve( deviceCount );
 
 			// Fill a temporary array with more detailed information about each device, including its type and an internal handle.
@@ -170,11 +174,11 @@ namespace Input {
 					HandleDeviceAttach( device.hDevice );
 				}
 			} else {
-				FormatAndLogError( UTF8L("Input service: Failed to associate input devices!") ET_UTF8_NEWLINE_LITERAL );
+				GetLogger( LogMessageType::ERROR )( UTF8L("Input service: Failed to associate input devices!") ET_UTF8_NEWLINE_LITERAL );
 			}
 
 		} else {
-			FormatAndLogError( UTF8L("Input service: Failed to enumerate raw input devices!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::ERROR )( UTF8L("Input service: Failed to enumerate raw input devices!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 
@@ -214,7 +218,7 @@ namespace Input {
 
 		switch( deviceInfo.dwType ) {
 			case RIM_TYPEMOUSE: {
-				FormatAndLogString( UTF8L("Attached mouse (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
+				GetLogger()( UTF8L("Attached mouse (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
 				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Win32InputService::Mouse( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEMOUSE
@@ -222,7 +226,7 @@ namespace Input {
 		// ---
 
 			case RIM_TYPEKEYBOARD: {
-				FormatAndLogString( UTF8L("Attached keyboard (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
+				GetLogger()( UTF8L("Attached keyboard (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle));
 				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Win32InputService::Keyboard( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEKEYBOARD
@@ -230,7 +234,7 @@ namespace Input {
 		// ---
 
 			default: {
-				FormatAndLogWarning( UTF8L("Received device attach notification for unknown HID type! (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
+				GetLogger( LogMessageType::ERROR )( UTF8L("Received device attach notification for unknown HID type! (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
 				break;
 			}	// default
 		};	// switch( deviceInfo.dwType )

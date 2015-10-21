@@ -1,5 +1,5 @@
 /*==================================================================*\
-  NullLogger.cpp
+  AssertingNullLogger.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Logging/NullLogger.hpp>
+#include <Logging/AssertingNullLogger.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 
@@ -29,16 +29,8 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Foundation {
 
-	NullLogger::NullLogger() {}
-
-// ---------------------------------------------------
-
-	NullLogger::~NullLogger() {}
-
-// ---------------------------------------------------
-
-	void NullLogger::WriteString( const UTF8Char* const /*string*/, const size_t /*length*/ ) {
-		ETRuntimeVerificationWithMsg( 0, UTF8L( "Attempted to use null logger object!" ) );
+	void AssertingNullLogger::Write( const UTF8Char* const /*string*/, const size_t /*length*/ ) {
+		ETRuntimeVerificationWithMsg( 0, UTF8L("Attempted to use null logger object!") );
 	}
 
 }	// namespace Foundation

@@ -25,6 +25,10 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+	namespace Renderer {
+		struct	TextureHeader;
+	}
+
 	class	ErrorCode;
 }
 
@@ -45,6 +49,10 @@ namespace Renderer {
 
 		//!	Destroys this @ref Direct3D11TextureBuilder instance.
 		~Direct3D11TextureBuilder() = default;
+
+	// ---------------------------------------------------
+
+		Renderer::Direct3D11TextureBuilder&	ConfigureFromHeader( const Renderer::TextureHeader& header );
 
 	// - BASE TEXTURE LAYOUT CONTROL ---------------------
 

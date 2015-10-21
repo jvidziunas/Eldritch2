@@ -45,15 +45,6 @@ namespace Eldritch2 {
 	class	Range;
 }
 
-#ifdef ERROR
-#	if( ET_COMPILER_IS_MSVC )
-	// Good old fashioned poor decisions from our friends in Redmond. Somebody thought defining ERROR as a macro was a great idea!
-#		pragma push_macro( "ERROR" )
-#	endif
-#	undef ERROR
-#	define CLEANUP_ERROR
-#endif
-
 namespace Eldritch2 {
 namespace Foundation {
 
@@ -67,18 +58,9 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	class GameEngine : public Scripting::ReferenceTypeBase {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		enum LogMessageType : ::Eldritch2::uint32 {
-			VERBOSE_WARNING = 0u,
-			WARNING,
-			ERROR,
-			MESSAGE
-		};
-
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+	public:
 		//! Constructs this @ref GameEngine instance.
 		GameEngine( Foundation::SystemInterface& systemInterface, Scheduler::TaskScheduler& scheduler, FileSystem::ContentProvider& contentProvider, ::Eldritch2::Allocator& allocator );
 
@@ -91,7 +73,7 @@ namespace Foundation {
 
 	// - LOGGING -----------------------------------------
 
-		Foundation::Logger&	GetLoggerForMessageType( const LogMessageType type );
+		Foundation::Logger&	GetLoggerForMessageType( const Foundation::LogMessageType type );
 
 	// ---------------------------------------------------
 
@@ -183,13 +165,6 @@ namespace Foundation {
 
 }	// namespace Foundation
 }	// namespace Eldritch2
-
-#ifdef CLEANUP_ERROR
-#	if( ET_COMPILER_IS_MSVC )
-#		pragma pop_macro( "ERROR" )
-#	endif
-#	undef CLEANUP_ERROR
-#endif
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

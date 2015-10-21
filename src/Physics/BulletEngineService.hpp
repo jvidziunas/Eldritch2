@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletEngine.hpp
+  BulletEngineService.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -21,7 +21,7 @@
 
 namespace Eldritch2 {
 	namespace Physics {
-		class	BulletEngine;
+		class	BulletEngineService;
 	}
 }
 
@@ -65,15 +65,15 @@ namespace Physics {
 
 // ---
 
-	class BulletEngine : public Foundation::GameEngineService {
+	class BulletEngineService : public Foundation::GameEngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref BulletEngine instance.
-		BulletEngine( Foundation::GameEngine& owningEngine );
+		//! Constructs this @ref BulletEngineService instance.
+		BulletEngineService( Foundation::GameEngine& owningEngine );
 
-		//! Destroys this @ref BulletEngine instance.
-		~BulletEngine() = default;
+		//! Destroys this @ref BulletEngineService instance.
+		~BulletEngineService() = default;
 
 	// ---------------------------------------------------
 
@@ -106,5 +106,5 @@ namespace Physics {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Physics/BulletEngine.inl>
+#include <Physics/BulletEngineService.inl>
 //------------------------------------------------------------------//

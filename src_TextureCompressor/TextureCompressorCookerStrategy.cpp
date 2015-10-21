@@ -14,7 +14,7 @@
 //==================================================================//
 #include <TextureCompressorCookerStrategy.hpp>
 #include <NVTTStandardOutputHandler.hpp>
-#include <Renderer/Textures/ShaderResourceHeader.hpp>
+#include <Renderer/Textures/TextureHeader.hpp>
 #include <Tools/FileWriteStrategyFactory.hpp>
 #include <Tools/FileReadStrategyFactory.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>

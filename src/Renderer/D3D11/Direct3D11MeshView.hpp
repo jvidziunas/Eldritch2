@@ -23,7 +23,7 @@
 namespace Eldritch2 {
 	namespace Renderer {
 		class	Direct3D11HLSLPipelineDefinitionView;
-		class	Direct3D11Renderer;
+		class	Direct3D11RendererService;
 	}
 
 	class	ErrorCode;

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptEngine.hpp
+  AngelscriptEngineService.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -19,7 +19,7 @@
 namespace Eldritch2 {
 	namespace Scripting {
 		class	AngelscriptWorldView;
-		class	AngelscriptEngine;
+		class	AngelscriptEngineService;
 		class	StringMarshal;
 	}
 }
@@ -36,15 +36,15 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class AngelscriptEngine : public Foundation::GameEngineService {
+	class AngelscriptEngineService : public Foundation::GameEngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref AngelscriptEngine instance.
-		AngelscriptEngine( Foundation::GameEngine& owningEngine );
+		//! Constructs this @ref AngelscriptEngineService instance.
+		AngelscriptEngineService( Foundation::GameEngine& owningEngine );
 
-		//! Destroys this @ref AngelscriptEngine instance.
-		~AngelscriptEngine() = default;
+		//! Destroys this @ref AngelscriptEngineService instance.
+		~AngelscriptEngineService() = default;
 
 	// ---------------------------------------------------
 
@@ -91,5 +91,5 @@ namespace Scripting {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Scripting/AngelscriptEngine.inl>
+#include <Scripting/AngelscriptEngineService.inl>
 //------------------------------------------------------------------//

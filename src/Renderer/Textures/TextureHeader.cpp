@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Texture.cpp
+  TextureHeader.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,30 +12,29 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Renderer/Textures/ShaderResourceHeader.hpp>
+#include <Renderer/Textures/TextureHeader.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Renderer;
-using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Renderer {
 
-	ShaderResourceHeader::ShaderResourceHeader( const SamplingDescriptor& samplingDescriptor, const Header2D& header ) : _samplingDescriptor( samplingDescriptor ), _class( Class::TEXTURE_2D ) {
-		_headers.header2D = header;
+	TextureHeader::TextureHeader( const SamplingDescriptor& samplingDescriptor, const Header2D& header ) : samplingDescriptor( samplingDescriptor ), headerClass( Class::TEXTURE_2D ) {
+		headers.as2D = header;
 	}
 
 // ---------------------------------------------------
 
-	ShaderResourceHeader::ShaderResourceHeader( const SamplingDescriptor& samplingDescriptor, const Header3D& header ) : _samplingDescriptor( samplingDescriptor ), _class( Class::TEXTURE_3D ) {
-		_headers.header3D = header;
+	TextureHeader::TextureHeader( const SamplingDescriptor& samplingDescriptor, const Header3D& header ) : samplingDescriptor( samplingDescriptor ), headerClass( Class::TEXTURE_3D ) {
+		headers.as3D = header;
 	}
 
 // ---------------------------------------------------
 
-	ShaderResourceHeader::ShaderResourceHeader( const SamplingDescriptor& samplingDescriptor, const HeaderCubemap& header ) : _samplingDescriptor( samplingDescriptor ), _class( Class::CUBEMAP ) {
-		_headers.headerCubemap = header;
+	TextureHeader::TextureHeader( const SamplingDescriptor& samplingDescriptor, const HeaderCubemap& header ) : samplingDescriptor( samplingDescriptor ), headerClass( Class::CUBEMAP ) {
+		headers.asCubemap = header;
 	}
 
 }	// namespace Renderer

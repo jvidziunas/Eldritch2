@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <DXGIFormat.h>
 //------------------------------------------------------------------//
 
 struct	ID3D11Asynchronous;
@@ -62,3 +62,5 @@ struct	D3D11_DEPTH_STENCIL_VIEW_DESC;
 struct	D3D11_RASTERIZER_DESC;
 struct	D3D11_BLEND_DESC;
 struct	D3D11_DEPTH_STENCIL_DESC;
+
+using UINT	= unsigned int;

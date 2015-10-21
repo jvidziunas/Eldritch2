@@ -38,6 +38,10 @@ using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2::Sound;
 using namespace ::Eldritch2;
 
+#ifdef ERROR
+#	undef ERROR	
+#endif
+
 namespace Eldritch2 {
 namespace Sound {
 	
@@ -109,7 +113,7 @@ namespace Sound {
 		if( _audioGlitchCount != performanceData.GlitchesSinceEngineStarted ) {
 			_audioGlitchCount = performanceData.GlitchesSinceEngineStarted;
 
-			FormatAndLogWarning( UTF8L( "XAudio reported audio processing stall since last invocation of IXAudio2::GetPerformanceData()!" ) ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::ERROR )( UTF8L("XAudio reported audio processing stall since last invocation of IXAudio2::GetPerformanceData()!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 
@@ -131,14 +135,14 @@ namespace Sound {
 	ErrorCode XAudio2AudioRenderer::InitializeXAudio() {
 		COMPointer<::IXAudio2>	audio;
 
-		FormatAndLogString( UTF8L( "Creating XAudio2 instance." ) ET_UTF8_NEWLINE_LITERAL );
+		GetLogger()( UTF8L("Creating XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
 
 		if( SUCCEEDED( ::XAudio2Create( audio.GetInterfacePointer(), (ETIsDebugModeEnabled() ? XAUDIO2_DEBUG_ENGINE : 0), ::XAUDIO2_DEFAULT_PROCESSOR ) ) && SUCCEEDED( audio->StartEngine() ) ) {
-			FormatAndLogString( UTF8L("Created XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger()( UTF8L("Created XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
 
 			_audio = audio;			
 		} else {
-			FormatAndLogError( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
 		}
 
 		return audio ? Error::NONE : Error::UNSPECIFIED;
@@ -155,7 +159,7 @@ namespace Sound {
 // ---------------------------------------------------
 
 	void XAudio2AudioRenderer::OnCriticalError( ::HRESULT /*error*/ ) {
-		FormatAndLogError( UTF8L("Critical error in XAudio!") );
+		GetLogger( LogMessageType::ERROR )( UTF8L("Critical error in XAudio!") );
 	}
 
 }	// namespace Sound

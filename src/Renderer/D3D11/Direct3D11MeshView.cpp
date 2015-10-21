@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Renderer/D3D11/Direct3D11HLSLPipelineDefinitionView.hpp>
 #include <Renderer/D3D11/Direct3D11MeshView.hpp>
-#include <Renderer/Direct3D11Renderer.hpp>
+#include <Renderer/Direct3D11RendererService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//

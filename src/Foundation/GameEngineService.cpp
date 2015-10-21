@@ -173,54 +173,8 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void GameEngineService::FormatAndLogString( ETFormatStringHint( const UTF8Char* str ), ... ) const {
-		UTF8Char	errorString[MESSAGE_BUFFER_SIZE];
-		va_list		args;
-
-		va_start( args, str );
-			PrintFormatted( errorString, str, args );
-		va_end( args );
-
-		_owningEngine.GetLoggerForMessageType( GameEngine::LogMessageType::VERBOSE_WARNING ).WriteString( errorString );
-	}
-
-// ---------------------------------------------------
-
-	void GameEngineService::FormatAndLogWarning( ETFormatStringHint( const UTF8Char* str ), ... ) const {
-		UTF8Char	errorString[MESSAGE_BUFFER_SIZE];
-		va_list		args;
-
-		va_start( args, str );
-			PrintFormatted( errorString, str, args );
-		va_end( args );
-
-		_owningEngine.GetLoggerForMessageType( GameEngine::LogMessageType::WARNING ).WriteString( errorString );
-	}
-
-// ---------------------------------------------------
-
-	void GameEngineService::FormatAndLogVerboseWarning( ETFormatStringHint( const UTF8Char* str ), ... ) const {
-		UTF8Char	errorString[MESSAGE_BUFFER_SIZE];
-		va_list		args;
-
-		va_start( args, str );
-			PrintFormatted( errorString, str, args );
-		va_end( args );
-
-		_owningEngine.GetLoggerForMessageType( GameEngine::LogMessageType::VERBOSE_WARNING ).WriteString( errorString );
-	}
-
-// ---------------------------------------------------
-
-	void GameEngineService::FormatAndLogError( ETFormatStringHint( const UTF8Char* str ), ... ) const {
-		UTF8Char	errorString[MESSAGE_BUFFER_SIZE];
-		va_list		args;
-
-		va_start( args, str );
-			PrintFormatted( errorString, str, args );
-		va_end( args );
-
-		_owningEngine.GetLoggerForMessageType( GameEngine::LogMessageType::ERROR ).WriteString( errorString );
+	Logger& GameEngineService::GetLogger( const LogMessageType type ) const {
+		return _owningEngine.GetLoggerForMessageType( type );
 	}
 
 }	// namespace Foundation

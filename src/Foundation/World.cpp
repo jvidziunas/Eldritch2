@@ -35,25 +35,19 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Foundation {
 
-	World::World( ObjectHandle<ContentPackage>&& package, GameEngine& owningEngine ) : _allocator( owningEngine._allocator, UTF8L( "World Allocator" ) ),
+	World::World( ObjectHandle<ContentPackage>&& package, GameEngine& owningEngine ) : _allocator( owningEngine._allocator, UTF8L("World Allocator") ),
 																					   _viewAllocator( _allocator, owningEngine._worldViewAllocationHintInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World View Allocator") ),
 																					   _owningEngine( owningEngine ),
 																					   _package( move( package ) ),
 																					   _isPaused( 1u ),
 																					   _isLoaded( 0u ),
 																					   _lastError( Error::NONE ) {
-		using LogMessageType = GameEngine::LogMessageType;
-
-	// ---
-
-		UTF8Char	logString[128u];
-
 		owningEngine._tickingWorlds.PushBack( *this );
 
 		if( const auto instantiateViewsResult = owningEngine.InstantiateViewsForWorld( _viewAllocator, *this ) ) {
-			owningEngine.GetLoggerForMessageType( LogMessageType::MESSAGE ).WriteString( PrintFormatted( logString, UTF8L("Loading world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) ) );
+			owningEngine.GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Loading world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) );
 		} else {
-			owningEngine.GetLoggerForMessageType( LogMessageType::ERROR ).WriteString( PrintFormatted( logString, UTF8L("Error instantiating view objects for world '%p': %s.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), instantiateViewsResult.ToUTF8String() ) );
+			owningEngine.GetLoggerForMessageType( LogMessageType::ERROR )( UTF8L("Error instantiating view objects for world '%p': %s.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), instantiateViewsResult.ToUTF8String() );
 			_lastError = instantiateViewsResult;
 		}
 	}
@@ -61,9 +55,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	World::~World() {
-		UTF8Char	logString[128u];
-
-		_owningEngine->GetLoggerForMessageType( GameEngine::LogMessageType::MESSAGE ).WriteString( PrintFormatted( logString, UTF8L("Destroying world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) ) );
+		_owningEngine->GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Destroying world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) );
 		DeleteViews();
 	}
 

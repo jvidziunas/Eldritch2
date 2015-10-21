@@ -12,7 +12,6 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Renderer/D3D11/D3D11ForwardDeclarations.hpp>
 #include <Packages/ResourceView.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 #include <Utility/COMPointer.hpp>

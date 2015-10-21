@@ -47,16 +47,16 @@ namespace Foundation {
 }	// namespace Eldritch2
 
 template <typename Traits>
-::std::basic_istream<char, Traits>&	operator >>( ::std::basic_istream<char, Traits>& stream, ::Eldritch2::Foundation::GameEngine::LogMessageType& threshold ) {
-	static const char* const				nameTable[] = { "VerboseWarning", "Warning", "Error", "Never" };
-	char									value[16u];
-	::Eldritch2::uint32						result { 0 };
+::std::basic_istream<char, Traits>&	operator >>( ::std::basic_istream<char, Traits>& stream, ::Eldritch2::Foundation::LogMessageType& threshold ) {
+	static const char* const	nameTable[] = { "VerboseWarning", "Warning", "Error", "Never" };
+	::Eldritch2::uint32			result { 0 };
+	char						value[16u];
 
 	stream.get( value, _countof(value) );
 
 	for( const char* const name : nameTable ) {
 		if( ::Eldritch2::EqualityCompareStringCaseInsensitive( name, value ) ) {
-			threshold = static_cast<::Eldritch2::Foundation::GameEngine::LogMessageType>(result);
+			threshold = static_cast<::Eldritch2::Foundation::LogMessageType>(result);
 			break;
 		}
 
@@ -69,7 +69,7 @@ template <typename Traits>
 // ---------------------------------------------------
 
 template <typename Traits>
-::std::basic_ostream<char, Traits>&	operator <<( ::std::basic_ostream<char, Traits>& stream, const ::Eldritch2::Foundation::GameEngine::LogMessageType threshold ) {
+::std::basic_ostream<char, Traits>&	operator <<( ::std::basic_ostream<char, Traits>& stream, const ::Eldritch2::Foundation::LogMessageType threshold ) {
 	static const char* const	nameTable[] = { "VerboseWarning", "Warning", "Error", "Never" };
 
 	return stream << nameTable[static_cast<size_t>(threshold)];

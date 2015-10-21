@@ -99,9 +99,7 @@ namespace Configuration {
 				}
 
 				Task* Execute( WorkerContext& executingContext ) override sealed {
-					ConfigurationService::PreConfigurationLoadedTaskVisitor	visitor;
-
-					GetHost().BroadcastTaskVisitor( _subtaskAllocator, *this, executingContext, visitor );
+					GetHost().BroadcastTaskVisitor( _subtaskAllocator, *this, executingContext, ConfigurationService::PreConfigurationLoadedTaskVisitor() );
 					return nullptr;
 				}
 
@@ -126,9 +124,7 @@ namespace Configuration {
 			}
 
 			Task* Execute( WorkerContext& executingContext ) override sealed {
-				ConfigurationService::PostConfigurationLoadedTaskVisitor	visitor;
-
-				_preConfigurationLoadedTask.GetHost().BroadcastTaskVisitor( _preConfigurationLoadedTask.GetSubtaskAllocator(), *this, executingContext, visitor );
+				_preConfigurationLoadedTask.GetHost().BroadcastTaskVisitor( _preConfigurationLoadedTask.GetSubtaskAllocator(), *this, executingContext, ConfigurationService::PostConfigurationLoadedTaskVisitor() );
 				return nullptr;
 			}
 
@@ -206,12 +202,12 @@ namespace Configuration {
 	void ConfigurationService::BroadcastConfigurationToEngine() {
 		FixedStackAllocator<64u>	tempAllocator( UTF8L("ConfigurationService::BroadcastConfigurationToEngine() Temporary Allocator") );
 
-		FormatAndLogString( UTF8L("Loading configuration from file '%s'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
+		GetLogger()( UTF8L("Loading configuration from file '%s'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
 
 		if( const auto getMappedFileResult = _contentProvider.CreateReadableMemoryMappedFile( tempAllocator, ContentProvider::KnownContentLocation::USER_DOCUMENTS, configurationFileName ) ) {
-			ConfigurationDatabase&			database( *this );
+			ConfigurationDatabase&							database( *this );
 			ConfigurationPublishingInitializationVisitor	visitor( database );
-			ReadableMemoryMappedFile&		mappedFile( *getMappedFileResult.object );
+			ReadableMemoryMappedFile&						mappedFile( *getMappedFileResult.object );
 
 			// Haul the whole file into memory.
 			mappedFile.PrefetchRangeForRead( 0u, mappedFile.GetAccessibleRegionSizeInBytes() );
@@ -222,11 +218,11 @@ namespace Configuration {
 				database.SetValue( section, name, value );
 			} );
 
-			FormatAndLogString( UTF8L("Configuration loaded successfully.") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger()( UTF8L("Configuration loaded successfully.") ET_UTF8_NEWLINE_LITERAL );
 
 			tempAllocator.Delete( *getMappedFileResult.object );
 		} else {
-			FormatAndLogError( UTF8L("Error reading configuration file: %s"), getMappedFileResult.resultCode.ToUTF8String() );
+			GetLogger( LogMessageType::ERROR )( UTF8L("Error reading configuration file: %s"), getMappedFileResult.resultCode.ToUTF8String() );
 		}
 	}
 

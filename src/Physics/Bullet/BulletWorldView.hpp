@@ -35,7 +35,7 @@ namespace Eldritch2 {
 	}
 
 	namespace Physics {
-		class	BulletEngine;
+		class	BulletEngineService;
 	}
 }
 
@@ -62,7 +62,7 @@ namespace Physics {
 
 	// ---
 
-		enum FilterBehaviors : unsigned short {
+		enum FilterBehaviors : short {
 			DEFAULT_FILTER			= 1,
 			STATIC_FILTER			= 2,
 			KINEMATIC_FILTER		= 4,
@@ -80,7 +80,7 @@ namespace Physics {
 
 	public:
 		//!	Constructs this @ref BulletWorldView instance.
-		BulletWorldView( Foundation::World& owningWorld, const Physics::BulletEngine& hostingEngine );
+		BulletWorldView( Foundation::World& owningWorld, const Physics::BulletEngineService& hostingEngine );
 
 		//!	Destroys this @ref BulletWorldView instance.
 		~BulletWorldView();

@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/SynchronousFileAppender.hpp>
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Logging/FileAppendingLogger.hpp>
 #include <Packages/ContentProvider.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -49,15 +50,18 @@ namespace {
 namespace Eldritch2 {
 namespace Foundation {
 
-	FileAppendingLogger::FileAppendingLogger( ContentProvider& contentProvider, const UTF8Char* const logName ) : _allocator( UTF8L("Logger Allocator") ),
-																												  _appender( CreateFileAppender( _allocator, contentProvider, logName ) ) {
-		WriteString( UTF8L( "- BEGINNING LOG OF APPLICATION RUN -" ) ET_UTF8_NEWLINE_LITERAL );
+	FileAppendingLogger::FileAppendingLogger( ContentProvider& contentProvider, const UTF8Char* const logName ) : _allocator( UTF8L("Logger Allocator") ), _appender( CreateFileAppender( _allocator, contentProvider, logName ) ) {
+		static const UTF8Char	initializationString[]	= UTF8L("- BEGINNING LOG OF APPLICATION RUN -") ET_UTF8_NEWLINE_LITERAL;
+		
+		Write( initializationString, StringLength( initializationString ) );
 	}
 
 // ---------------------------------------------------
 
 	FileAppendingLogger::~FileAppendingLogger() {
-		WriteString( UTF8L( "- TERMINATING LOG -" ) ET_UTF8_NEWLINE_LITERAL ET_UTF8_NEWLINE_LITERAL );
+		static const UTF8Char	terminationString[]	= UTF8L("- TERMINATING LOG -") ET_UTF8_NEWLINE_LITERAL ET_UTF8_NEWLINE_LITERAL;
+
+		Write( terminationString, StringLength( terminationString ) );
 
 		if( &_appender != &nullAppender ) {
 			_allocator.Delete( _appender );
@@ -66,7 +70,7 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void FileAppendingLogger::WriteString( const UTF8Char* const string, const size_t lengthInOctets ) {
+	void FileAppendingLogger::Write( const UTF8Char* const string, const size_t lengthInOctets ) {
 		_appender.Append( string, lengthInOctets );
 	}
 

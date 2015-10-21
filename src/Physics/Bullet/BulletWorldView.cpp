@@ -15,7 +15,7 @@
 #include <Physics/Bullet/BulletWorldView.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Physics/BulletEngine.hpp>
+#include <Physics/BulletEngineService.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
@@ -79,7 +79,7 @@ namespace {
 namespace Eldritch2 {
 namespace Physics {
 
-	BulletWorldView::BulletWorldView( World& owningWorld, const BulletEngine& hostingEngine ) : WorldView( owningWorld ),
+	BulletWorldView::BulletWorldView( World& owningWorld, const BulletEngineService& hostingEngine ) : WorldView( owningWorld ),
 																								_persistentManifoldPool( 32u, hostingEngine.GetWorldPersistentManifoldPoolSizeInElements() ),
 																								_collisionAlgorithmPool( 16u, hostingEngine.GetWorldCollisionAlgorithmPoolSizeInElements() ),
 																								_softBodySolver(),
