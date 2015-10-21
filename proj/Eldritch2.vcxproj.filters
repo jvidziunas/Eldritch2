@@ -642,9 +642,6 @@
     <ClCompile Include="..\src\scripting\AngelscriptEngineService.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Logging\AssertingNullLogger.cpp">
-      <Filter>Source Files\Engine\Logging</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Build.hpp">
@@ -1129,9 +1126,6 @@
     </ClInclude>
     <ClInclude Include="..\src\scripting\AngelscriptEngineService.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Logging\AssertingNullLogger.hpp">
-      <Filter>Header Files\Engine\Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

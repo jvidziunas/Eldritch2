@@ -33,6 +33,8 @@ namespace Utility {
 		//! Constructs this @ref DisposingResult instance.
 		template <typename CompatibleResultObject>
 		ETInlineHint DisposingResult( Utility::DisposingResult<CompatibleResultObject>&& rhs );
+		//! Constructs this @ref DisposingResult instance.
+		ETInlineHint explicit DisposingResult( const Utility::DisposingResult<ResultObject>& ) = default;
 		//!	Constructs this @ref DisposingResult instance.
 		ETInlineHint DisposingResult( const ::Eldritch2::ErrorCode errorCode );
 

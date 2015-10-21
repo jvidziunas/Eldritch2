@@ -217,7 +217,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\input\Win32InputService.cpp" />
     <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp" />
     <ClCompile Include="..\src\logging\Logger.cpp" />
-    <ClCompile Include="..\src\Logging\AssertingNullLogger.cpp" />
     <ClCompile Include="..\src\packages\ContentProvider.cpp" />
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp" />
     <ClCompile Include="..\src\Packages\ContentPackage.cpp" />
@@ -439,7 +438,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\input\Win32InputService.hpp" />
     <ClInclude Include="..\src\Logging\FileAppendingLogger.hpp" />
     <ClInclude Include="..\src\logging\Logger.hpp" />
-    <ClInclude Include="..\src\Logging\AssertingNullLogger.hpp" />
     <ClInclude Include="..\src\Animation\AnimationTypes.hpp" />
     <ClInclude Include="..\src\Animation\Armature.hpp" />
     <ClInclude Include="..\resources\Eldritch2.Resources.h" />

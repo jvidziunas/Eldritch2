@@ -62,11 +62,11 @@ namespace FileSystem {
 
 	// ---
 
-		if( PackageDeserializationContext* context { new(_allocator, AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( { package } ) } ) {
+		if( unique_ptr<PackageDeserializationContext, InstanceDeleter> context { new(_allocator, AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( { package } ), { _allocator } } ) {
 			const auto	openFileResult( context->OpenFile() );
 			
 			if( openFileResult ) {
-				_initializationQueue.PushBack( *context );
+				_initializationQueue.PushBack( *context.release() );
 
 				// Mark the semaphore so the thread knows to wake up.
 				if( _loadSemaphore ) {

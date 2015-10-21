@@ -32,7 +32,7 @@ namespace Utility {
 		ETInlineHint COMPointer( CompatibleInterfaceType* const pointer, const PassthroughReferenceCountingSemantics );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
-		ETInlineHint COMPointer( CompatibleInterfaceType* const pointer );
+		ETInlineHint explicit COMPointer( CompatibleInterfaceType* const pointer );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
 		ETInlineHint COMPointer( CompatibleInterfaceType& reference, const PassthroughReferenceCountingSemantics );
@@ -41,7 +41,7 @@ namespace Utility {
 		ETInlineHint explicit COMPointer( CompatibleInterfaceType& reference );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
-		ETInlineHint COMPointer( const Utility::COMPointer<CompatibleInterfaceType>& handle );
+		ETInlineHint explicit COMPointer( const Utility::COMPointer<CompatibleInterfaceType>& handle );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
 		ETInlineHint COMPointer( Utility::COMPointer<CompatibleInterfaceType>&& handle );
