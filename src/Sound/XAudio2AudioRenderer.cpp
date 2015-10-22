@@ -37,6 +37,7 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2::Sound;
 using namespace ::Eldritch2;
+using namespace ::std;
 
 #ifdef ERROR
 #	undef ERROR	
@@ -133,19 +134,21 @@ namespace Sound {
 // ---------------------------------------------------
 
 	ErrorCode XAudio2AudioRenderer::InitializeXAudio() {
-		COMPointer<::IXAudio2>	audio;
+		decltype(_audio)	audio;
 
 		GetLogger()( UTF8L("Creating XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
 
-		if( SUCCEEDED( ::XAudio2Create( audio.GetInterfacePointer(), (ETIsDebugModeEnabled() ? XAUDIO2_DEBUG_ENGINE : 0), ::XAUDIO2_DEFAULT_PROCESSOR ) ) && SUCCEEDED( audio->StartEngine() ) ) {
-			GetLogger()( UTF8L("Created XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
-
-			_audio = audio;			
-		} else {
+		if( FAILED( ::XAudio2Create( audio.GetInterfacePointer(), (ETIsDebugModeEnabled() ? XAUDIO2_DEBUG_ENGINE : 0), ::XAUDIO2_DEFAULT_PROCESSOR ) ) || FAILED( audio->StartEngine() ) ) {
 			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
+
+			return Error::UNSPECIFIED;
 		}
 
-		return audio ? Error::NONE : Error::UNSPECIFIED;
+		GetLogger()( UTF8L("Created XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
+
+		_audio = move( audio );
+
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------

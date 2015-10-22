@@ -246,7 +246,7 @@ namespace Eldritch2 {
 	template <typename Disposer>
 	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::EraseAndDispose( const Iterator position, Disposer disposer ) {
 		auto&	element( *position );
-		auto	result( Erase( position ) );
+		auto	result( _container.erase( position ) );
 
 		disposer( element );
 

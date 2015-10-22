@@ -47,10 +47,11 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	Result<ReadableMemoryMappedFile> ContentPackage::CreateBackingFile( Allocator& allocator, const UTF8Char* const suffix ) const {
-		using KnownContentLocation	= ContentProvider::KnownContentLocation;
 		enum : ExternalArenaAllocator::SizeType {
 			STRING_SIZE_IN_BYTES = 128u
 		};
+
+		using KnownContentLocation	= ContentProvider::KnownContentLocation;
 
 	// ---
 

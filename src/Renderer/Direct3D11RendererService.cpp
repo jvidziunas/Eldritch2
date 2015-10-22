@@ -19,15 +19,13 @@
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Renderer/D3D11/Builders/Direct3D11DeviceBuilder.hpp>
 #include <Renderer/D3D11/Direct3D11ResourceCommon.hpp>
+#include <Renderer/Direct3D11RendererService.hpp>
 #include <Renderer/D3D11/Direct3D11WorldView.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
-#include <Renderer/Direct3D11RendererService.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
-//------------------------------------------------------------------//
-#include <TChar.h>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -63,7 +61,6 @@ namespace Eldritch2 {
 namespace Renderer {
 
 	Direct3D11RendererService::Direct3D11RendererService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-																					   _defaultMeshName( UTF8L("_default"), GetEngineAllocator() ),
 																					   _MSAACount( 1u ),
 																					   _MSAAQuality( 0u ),
 																					   _adaptiveResolutionMaxAreaFraction( 1.0f ),
@@ -212,14 +209,12 @@ namespace Renderer {
 		deviceBuilder.SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled().SetDriverThreadingOptimizationsEnabled( _allowDriverThreadingOptimizations );
 		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.GetCharacterArray() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
 
-		if( const auto createDeviceResult = deviceBuilder.Build() ) {
-			_immediateContext	= deviceBuilder.GetImmediateContext();
-			_factory			= deviceBuilder.GetFactory();
-			_device				= deviceBuilder.GetDevice();
+		if( auto device = deviceBuilder.Build() ) {
+			GetLogger()( UTF8L("Constructed Direct3D device successfully.") ET_UTF8_NEWLINE_LITERAL );
 
-			GetLogger()( UTF8L("Constructed Direct3D11 device successfully.") ET_UTF8_NEWLINE_LITERAL );
+			_device	= move( device );
 		} else {
-			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to instantiate Direct3D: %s.") ET_UTF8_NEWLINE_LITERAL, createDeviceResult.ToUTF8String() );
+			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to instantiate Direct3D!.") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 

@@ -138,6 +138,7 @@ namespace Foundation {
 		::Eldritch2::ChildAllocator											_allocator;
 
 		Foundation::FileAppendingLogger										_logger;
+		FileSystem::ContentLibrary											_contentLibrary;
 
 		Foundation::SystemInterface&										_systemInterface;
 		Scheduler::TaskScheduler&											_scheduler;
@@ -145,8 +146,6 @@ namespace Foundation {
 		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>	_attachedServices;
 		::Eldritch2::ResizableArray<WorldViewFactory>						_worldViewFactories;
 		size_t																_worldViewAllocationHintInBytes;
-
-		FileSystem::ContentLibrary											_contentLibrary;
 
 		Configuration::ConfigurablePODVariable<LogMessageType>				_logEchoThreshold;
 		Configuration::ConfigurablePODVariable<size_t>						_taskArenaPerThreadAllocationSizeInBytes;

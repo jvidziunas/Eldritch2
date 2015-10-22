@@ -46,7 +46,11 @@ namespace {
 namespace Eldritch2 {
 namespace Renderer {
 
-	Direct3D11DeviceBuilder::Direct3D11DeviceBuilder() : _adapterName( nullptr ), _deviceFlags( ::D3D11_CREATE_DEVICE_SINGLETHREADED ), _maximumFramesToRenderAhead( 1u ) {}
+	Direct3D11DeviceBuilder::Direct3D11DeviceBuilder( const COMPointer<::IDXGIFactory1>& factory ) : _factory( factory ), _adapterName( nullptr ), _deviceFlags( ::D3D11_CREATE_DEVICE_SINGLETHREADED ), _maximumFramesToRenderAhead( 1u ) {
+		if( !_factory ) {
+			::CreateDXGIFactory1( __uuidof(::IDXGIFactory1), reinterpret_cast<void**>(_factory.GetInterfacePointer()) );
+		}
+	}
 
 // ---------------------------------------------------
 
@@ -85,26 +89,20 @@ namespace Renderer {
 
 // ---------------------------------------------------
 
-	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetMaximumFramesToRenderAhead( ::UINT frameCap ) {
+	Direct3D11DeviceBuilder& Direct3D11DeviceBuilder::SetMaximumFramesToRenderAhead( const ::UINT frameCap ) {
 		_maximumFramesToRenderAhead = frameCap;
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode Direct3D11DeviceBuilder::Build() {
-		static const ::D3D_FEATURE_LEVEL	attemptedFeatureLevels[] = {
+	COMPointer<::ID3D11Device> Direct3D11DeviceBuilder::Build() {
+		static const ::D3D_FEATURE_LEVEL	featureLevels[] = {
 			::D3D_FEATURE_LEVEL_11_0,
 		};
 
 		COMPointer<::IDXGIAdapter1>	adapter;
-		::HRESULT					nativeResult;
-		ErrorCode					result( Error::NONE );
-
-		if( FAILED( ::CreateDXGIFactory1( __uuidof(::IDXGIFactory1), reinterpret_cast<void**>(_factory.GetInterfacePointer()) ) ) ) {
-			result = Error::UNSPECIFIED;
-			goto End;
-		}
+		::ID3D11Device*				device( nullptr );
 
 		if( (nullptr != _adapterName) && !EqualityCompareString( _adapterName, UTF8L("") ) ) {
 			COMPointer<::IDXGIAdapter1>	temporaryAdapter;
@@ -118,57 +116,18 @@ namespace Renderer {
 			}
 		}
 
-		nativeResult = ::D3D11CreateDevice( adapter.GetUnadornedPointer(),
-											::D3D_DRIVER_TYPE_HARDWARE,
-											nullptr,
-											_deviceFlags,
-											attemptedFeatureLevels,
-											_countof(attemptedFeatureLevels),
-											D3D11_SDK_VERSION,
-											_device.GetInterfacePointer(),
-											nullptr,
-											_immediateContext.GetInterfacePointer() );
-
-		if( FAILED( nativeResult ) ) {
-			result = Error::UNSPECIFIED;
-			goto End;
-		}
-
-		{ // If the device supports the command, attempt to cap the render-ahead to the previously-specified amount.
+		if( SUCCEEDED( ::D3D11CreateDevice( adapter.GetUnadornedPointer(), ::D3D_DRIVER_TYPE_HARDWARE, nullptr, _deviceFlags, featureLevels, _countof(featureLevels), D3D11_SDK_VERSION, &device, nullptr, nullptr ) ) ) {
 			COMPointer<::IDXGIDevice1>	infrastructureDevice;
-			_device->QueryInterface( __uuidof(::IDXGIDevice1), reinterpret_cast<void**>(infrastructureDevice.GetInterfacePointer()) );
+
+			// If the device supports the command, attempt to cap the render-ahead to the previously-specified amount.
+			device->QueryInterface( __uuidof(::IDXGIDevice1), reinterpret_cast<void**>(infrastructureDevice.GetInterfacePointer()) );
 
 			if( infrastructureDevice ) {
 				infrastructureDevice->SetMaximumFrameLatency( _maximumFramesToRenderAhead );
 			}
 		}
-		
-	End:
-		if( !result ) {
-			_immediateContext.Reset();
-			_device.Reset();
-			_factory.Reset();
-		}
 
-		return result;
-	}
-
-// ---------------------------------------------------
-
-	const COMPointer<::ID3D11Device>& Direct3D11DeviceBuilder::GetDevice() const {
-		return _device;
-	}
-
-// ---------------------------------------------------
-
-	const COMPointer<::IDXGIFactory1>& Direct3D11DeviceBuilder::GetFactory() const {
-		return _factory;
-	}
-
-// ---------------------------------------------------
-
-	const COMPointer<::ID3D11DeviceContext>& Direct3D11DeviceBuilder::GetImmediateContext() const {
-		return _immediateContext;
+		return { device, ::Eldritch2::PassthroughReferenceCountingSemantics };
 	}
 
 }	// namespace Renderer

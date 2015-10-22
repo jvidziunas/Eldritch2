@@ -81,17 +81,11 @@ using namespace ::std;
 
 namespace {
 
-	namespace FileSystemInformationClass {
-
-		enum FsInformationClass : ::DWORD {
-			FileFsSizeInformation = 3,
-			FileFsSectorSizeInformation = 11,
-			FileStorageInfo = 16
-		};
-
-	}	// namespace FileSystemInformationClass
-
-	typedef FileSystemInformationClass::FsInformationClass	FsInformationClass;
+	enum FsInformationClass : ::DWORD {
+		FileFsSizeInformation = 3,
+		FileFsSectorSizeInformation = 11,
+		FileStorageInfo = 16
+	};
 
 // ---------------------------------------------------
 
@@ -114,7 +108,7 @@ namespace {
 
 // ---------------------------------------------------
 
-	typedef size_t (*GetSectorSizeFromHandleFunction)( const ::HANDLE );
+	using GetSectorSizeFromHandleFunction	=  size_t (*)( const ::HANDLE );
 
 // ---------------------------------------------------
 
@@ -155,7 +149,7 @@ namespace {
 // ---------------------------------------------------
 
 	static ETNoAliasHint GetSectorSizeFromHandleFunction GetSectorSizeQueryAPI( const Win32SystemInterface& systemInterface ) {
-		typedef ::LONG	NtStatus;
+		using NtStatus	= ::LONG;
 
 	// ---
 
@@ -185,48 +179,31 @@ namespace {
 
 	// ---------------------------------------------------
 
-		struct FunctionContainer {
 #if defined( _WIN32_WINNT_WIN8 ) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-			static size_t GetSectorSizeFromHandleWindows8( const ::HANDLE fileHandle ) {
+		if( systemInterface.IsWindows8OrNewer() ) {
+			return [] ( const ::HANDLE fileHandle ) -> size_t {
 				::FILE_ALIGNMENT_INFO	fileAlignmentInfo;
 				return 0 != ::GetFileInformationByHandleEx( fileHandle, ::FileAlignmentInfo, &fileAlignmentInfo, sizeof(FileAlignmentInfo) ) ? Max<size_t>( fileAlignmentInfo.AlignmentRequirement, 1u ) : 0u;
 			}
-#endif
-
-		// ---------------------------------------------------
-
-			static size_t GetSectorSizeFromHandleWindows7( const ::HANDLE fileHandle ) {
-				FileFSSizeInformation	sizeInformation;
-				IOStatusBlock			statusBlock;
-
-				if( INVALID_HANDLE_VALUE == fileHandle || (0 > queryVolumeInformationFile( fileHandle, &statusBlock, &sizeInformation, sizeof(sizeInformation), FileSystemInformationClass::FileFsSizeInformation )) ) {
-					sizeInformation.BytesPerSector = 0u;
-				}
-
-				return static_cast<size_t>(sizeInformation.BytesPerSector);
-			}
-
-		// ---------------------------------------------------
-
-			static size_t GetSectorSizeFromHandleNull( const ::HANDLE /*fileHandle*/ ) {
-				return 0u;
-			}
-		};
-
-	// ---
-
-#if defined( _WIN32_WINNT_WIN8 ) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-		if( systemInterface.IsWindows8OrNewer() ) {
-			return &FunctionContainer::GetSectorSizeFromHandleWindows8;
 		}
 #endif
 
 		if( auto* const queryFunction = reinterpret_cast<decltype(queryVolumeInformationFile)>(::GetProcAddress( GetModuleHandle( SL("ntdll.dll") ), "NtQueryVolumeInformationFile" )) ) {
 			queryVolumeInformationFile = queryFunction;
-			return &FunctionContainer::GetSectorSizeFromHandleWindows7;
+
+			return [] ( const ::HANDLE fileHandle ) -> size_t {
+				FileFSSizeInformation	sizeInformation;
+				IOStatusBlock			statusBlock;
+
+				if( INVALID_HANDLE_VALUE == fileHandle || (0 > queryVolumeInformationFile( fileHandle, &statusBlock, &sizeInformation, sizeof( sizeInformation ), FileSystemInformationClass::FileFsSizeInformation )) ) {
+					sizeInformation.BytesPerSector = 0u;
+				}
+
+				return static_cast<size_t>(sizeInformation.BytesPerSector);
+			};
 		}
 
-		return &FunctionContainer::GetSectorSizeFromHandleNull;
+		return [] ( const ::HANDLE /*fileHandle*/ ) -> size_t { return 0u; };
 	}
 
 }	// anonymous namespace

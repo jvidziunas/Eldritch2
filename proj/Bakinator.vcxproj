@@ -10,6 +10,23 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Utility\MessagePackBase.cpp" />
+    <ClCompile Include="..\src\Utility\MessagePackWriter.cpp" />
+    <ClCompile Include="..\src\Utility\ReadableMemoryMappedFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
+    <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
+    <ClInclude Include="..\src\Utility\MPL\Alignof.hpp" />
+    <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
+    <ClInclude Include="..\src\Utility\MPL\Compiler.hpp" />
+    <ClInclude Include="..\src\Utility\MPL\FloatTypes.hpp" />
+    <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp" />
+    <ClInclude Include="..\src\Utility\MPL\Platform.hpp" />
+    <ClInclude Include="..\src\Utility\ReadableMemoryMappedFile.hpp" />
+    <ClInclude Include="..\src\Utility\SynchronousFileWriter.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FDDD442B-008C-4F86-B0C1-CC6DBE1F7068}</ProjectGuid>
     <RootNamespace>bakinator</RootNamespace>
@@ -112,60 +129,6 @@ XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\Utility\Assert.cpp" />
-    <ClCompile Include="..\src_bakinator\Bakinator.cpp" />
-    <ClCompile Include="..\src_bakinator\BakinatorCookerStrategy.cpp" />
-    <ClCompile Include="..\src\Tools\ContentCooker.cpp" />
-    <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
-    <ClCompile Include="..\src\Utility\FourCCGenerator.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
-    <ClCompile Include="..\src\Utility\FileReadAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Tools\FileStrategyFactory.cpp" />
-    <ClCompile Include="..\src\Utility\FileWriteAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Utility\Win32FileReadAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Tools\Win32FileStrategyFactory.cpp" />
-    <ClCompile Include="..\src\Utility\Win32FileWriteAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\Win32DiskSectorAllocator.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
-    <ClCompile Include="..\src\Packages\PackageCommon.cpp" />
-    <ClCompile Include="..\src\Packages\PackageHeader.cpp" />
-    <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
-    <ClCompile Include="..\src\Packages\DataCompressor.cpp" />
-    <ClCompile Include="..\src\Packages\Compressors\LZMA2Compressor.cpp" />
-    <ClCompile Include="..\src\Packages\Compressors\PassthroughCompressor.cpp" />
-    <ClCompile Include="..\src\Packages\CodecFactory.cpp" />
-    <ClCompile Include="..\src\Packages\CodecFactories\LZMA2CodecFactory.cpp" />
-    <ClCompile Include="..\src\Packages\CodecFactories\PassthroughCodecFactory.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\Utility\Assert.hpp" />
-    <ClInclude Include="..\src_bakinator\BakinatorCookerStrategy.hpp" />
-    <ClInclude Include="..\src\Tools\ContentCooker.hpp" />
-    <ClInclude Include="..\src\Tools\CookerStrategy.hpp" />
-    <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
-    <ClInclude Include="..\src\Utility\FourCCGenerator.hpp" />
-    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp" />
-    <ClInclude Include="..\src\Utility\FileReadAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Tools\FileStrategyFactory.hpp" />
-    <ClInclude Include="..\src\Tools\FileStrategyIterator.hpp" />
-    <ClInclude Include="..\src\Utility\FileWriteAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Utility\Win32FileReadAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Tools\Win32FileStrategyFactory.hpp" />
-    <ClInclude Include="..\src\Utility\Win32FileWriteAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\Win32DiskSectorAllocator.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
-    <ClInclude Include="..\src\Packages\PackageHeader.hpp" />
-    <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp" />
-    <ClInclude Include="..\src\Packages\DataCompressor.hpp" />
-    <ClInclude Include="..\src\Packages\Compressors\LZMA2Compressor.hpp" />
-    <ClInclude Include="..\src\Packages\Compressors\PassthroughCompressor.hpp" />
-    <ClInclude Include="..\src\Packages\CodecFactory.hpp" />
-    <ClInclude Include="..\src\Packages\CodecFactories\LZMA2CodecFactory.hpp" />
-    <ClInclude Include="..\src\Packages\CodecFactories\PassthroughCodecFactory.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

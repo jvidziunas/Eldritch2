@@ -79,16 +79,11 @@ namespace Renderer {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		Utility::COMPointer<::IDXGIFactory1>						_factory;
 		Utility::COMPointer<::ID3D11Device>							_device;
-		Utility::COMPointer<::ID3D11DeviceContext>					_immediateContext;
 
-		Configuration::ConfigurableUTF8String						_defaultMeshName;
-
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_VSyncMode;
 		Configuration::ConfigurableUTF8String						_preferredAdapterName;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_VSyncMode;
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_maximumFramesToRenderAhead;
-
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_MSAACount;
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_MSAAQuality;
 		Configuration::ConfigurablePODVariable<float>				_adaptiveResolutionMaxAreaFraction;

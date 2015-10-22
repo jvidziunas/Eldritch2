@@ -323,7 +323,7 @@ namespace Scheduler {
 	// ---
 
 		if( const auto eventHandle = ::CreateEventW( nullptr, FALSE, (EventInitialState::UNSIGNALED == initialState ? FALSE : TRUE), nullptr ) ) {
-			if( auto* const event = new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) ) {
+			if( auto* const event = new(allocator, _systemCacheLineSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) ) {
 				return { *event };
 			}
 
@@ -372,7 +372,7 @@ namespace Scheduler {
 	// ---
 
 		if( const auto semaphoreHandle = ::CreateSemaphore( nullptr, static_cast<::LONG>(initialCount), static_cast<::LONG>(maximumCount), nullptr ) ) {
-			 if( auto* const semaphore = new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
+			if( auto* const semaphore = new(allocator, _systemCacheLineSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
 				return { *semaphore };
 			}
 

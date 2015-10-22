@@ -70,8 +70,9 @@ namespace Scheduler {
 						auto* const	continuation( task->_continuationTask );
 						auto* const codependent( task->_codependentTask );
 
-						task->Finalize( activeWorkerContext );
 						task->_state.store( ExecutionState::DONE, memory_order_release );
+
+						task->Finalize( activeWorkerContext );
 
 						// Start the tasks if they become ready
 						if( continuation ) {

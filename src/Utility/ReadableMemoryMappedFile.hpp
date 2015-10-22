@@ -33,18 +33,18 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		void			PrefetchRangeForRead( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const;
 		virtual void	PrefetchRangeForRead( const ::Eldritch2::Range<const char*> memoryRange ) const abstract;
+		void			PrefetchRangeForRead( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const;
 
 	// ---------------------------------------------------
 
-		virtual const void*									GetAddressForFileByteOffset( const size_t rawFileOffsetInBytes ) const abstract;
+		template <typename Structure>
+		ETInlineHint ::Eldritch2::Range<const Structure*>	TryGetStructureArrayAtOffset( const size_t rawFileOffsetInBytes, const size_t arraySizeInElements ) const;
 
 		template <typename Structure>
 		ETInlineHint const Structure*						TryGetStructureAtOffset( const size_t rawFileOffsetInBytes ) const;
 
-		template <typename Structure>
-		ETInlineHint ::Eldritch2::Range<const Structure*>	TryGetStructureArrayAtOffset( const size_t rawFileOffsetInBytes, const size_t arraySizeInElements ) const;
+		virtual const void*									GetAddressForFileByteOffset( const size_t rawFileOffsetInBytes ) const abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

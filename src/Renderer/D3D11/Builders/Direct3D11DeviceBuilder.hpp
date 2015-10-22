@@ -38,7 +38,7 @@ namespace Renderer {
 
 	public:
 		//!	Constructs this @ref Direct3D11DeviceBuilder instance.
-		Direct3D11DeviceBuilder();
+		Direct3D11DeviceBuilder( const Utility::COMPointer<::IDXGIFactory1>& factory = nullptr );
 
 		//!	Constructs this @ref Direct3D11DeviceBuilder instance.
 		~Direct3D11DeviceBuilder() = default;
@@ -55,29 +55,20 @@ namespace Renderer {
 
 		Renderer::Direct3D11DeviceBuilder&	SetFreeThreadedModeEnabled( bool enabled = true );
 
-		Renderer::Direct3D11DeviceBuilder&	SetMaximumFramesToRenderAhead( ::UINT frameCap );
+		Renderer::Direct3D11DeviceBuilder& SetMaximumFramesToRenderAhead( const ::UINT frameCap );
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	Build();
-
-	// ---------------------------------------------------
-
-		const Utility::COMPointer<::ID3D11Device>&			GetDevice() const;
-
-		const Utility::COMPointer<::IDXGIFactory1>&			GetFactory() const;
-
-		const Utility::COMPointer<::ID3D11DeviceContext>&	GetImmediateContext() const;
+		Utility::COMPointer<::ID3D11Device>	Build();
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		const ::Eldritch2::UTF8Char*				_adapterName;
-		::UINT										_deviceFlags;
-		::UINT										_maximumFramesToRenderAhead;
-		Utility::COMPointer<::ID3D11Device>			_device;
-		Utility::COMPointer<::IDXGIFactory1>		_factory;
-		Utility::COMPointer<::ID3D11DeviceContext>	_immediateContext;
+		Utility::COMPointer<::IDXGIFactory1>	_factory;
+
+		const ::Eldritch2::UTF8Char*			_adapterName;
+		::UINT									_deviceFlags;
+		::UINT									_maximumFramesToRenderAhead;
 	};
 
 }	// namespace Renderer
