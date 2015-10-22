@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletWorldView.CharacterArmatureComponent.cpp
+  WorldView.CharacterArmatureComponent.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Physics/Bullet/BulletWorldView.hpp>
+#include <Physics/BulletDynamics/WorldView.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
@@ -28,23 +28,20 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Physics {
+namespace BulletDynamics {
 
-	const char* const BulletWorldView::CharacterArmatureComponent::scriptTypeName = UTF8L("CharacterArmature");
+	const char* const WorldView::CharacterArmatureComponent::scriptTypeName = UTF8L("CharacterArmature");
 
 // ---------------------------------------------------
 
-	BulletWorldView::CharacterArmatureComponent::CharacterArmatureComponent( BulletWorldView& owningWorldView ) : _ghostObject(), _controller( &_ghostObject, nullptr, 0.1f ) {
+	WorldView::CharacterArmatureComponent::CharacterArmatureComponent( WorldView& owningWorldView ) : _ghostObject(), _controller( &_ghostObject, nullptr, 0.1f ) {
 		owningWorldView._dynamicsWorld.addCollisionObject( &_ghostObject, COLLISION_FILTER_GROUP, COLLISION_FILTER_MASK );
 		owningWorldView._dynamicsWorld.addAction( &_controller );
 	}
 
 // ---------------------------------------------------
 
-	BulletWorldView::CharacterArmatureComponent::~CharacterArmatureComponent() {}
-
-// ---------------------------------------------------
-
-	void ETNoAliasHint BulletWorldView::CharacterArmatureComponent::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	void ETNoAliasHint WorldView::CharacterArmatureComponent::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static CharacterArmatureComponent* ETScriptAPICall Factory0( const StringMarshal& /*resourceName*/ ) {
 				auto&	worldView( GetActiveWorldView() );
@@ -59,7 +56,7 @@ namespace Physics {
 
 	// ---
 
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("BulletWorldView::CharacterArmatureComponent::ExposeScriptAPI() Temporary Allocator") );
+		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("WorldView::CharacterArmatureComponent::ExposeScriptAPI() Temporary Allocator") );
 
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<CharacterArmatureComponent>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );
@@ -74,12 +71,13 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	void BulletWorldView::CharacterArmatureComponent::Dispose() {
+	void WorldView::CharacterArmatureComponent::Dispose() {
 		auto&	worldView( GetActiveWorldView() );
 
 		worldView._dynamicsWorld.removeAction( &_controller );
 		worldView.GetWorldAllocator().Delete( *this );
 	}
 
+}	// namespace BulletDynamics
 }	// namespace Physics
 }	// namespace Eldritch2

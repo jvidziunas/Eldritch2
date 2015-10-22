@@ -94,6 +94,7 @@ namespace Eldritch2 {
 		ETInlineHint void			Erase( const Iterator begin, const Iterator end );
 
 		using UnderlyingContainer::Clear;
+		using UnderlyingContainer::ClearAndDispose;
 
 	// - CONTENT QUERY -----------------------------------
 

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletWorldView.hpp
+  WorldView.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,10 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/Bullet/BulletWorldView.hpp>
+#include <Physics/BulletDynamics/EngineService.hpp>
+#include <Physics/BulletDynamics/WorldView.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Physics/BulletEngineService.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
@@ -30,21 +30,21 @@ using namespace ::Eldritch2;
 // LIBRARIES
 //==================================================================//
 #if( ET_DEBUG_MODE_ENABLED )
-ET_LINK_LIBRARY( "BulletCollision_DEBUG.lib" )
-ET_LINK_LIBRARY( "BulletDynamics_DEBUG.lib" )
-ET_LINK_LIBRARY( "BulletSoftBody_DEBUG.lib" )
-ET_LINK_LIBRARY( "LinearMath_DEBUG.lib")
+	ET_LINK_LIBRARY( "BulletCollision_DEBUG.lib" )
+	ET_LINK_LIBRARY( "BulletDynamics_DEBUG.lib" )
+	ET_LINK_LIBRARY( "BulletSoftBody_DEBUG.lib" )
+	ET_LINK_LIBRARY( "LinearMath_DEBUG.lib")
 #else
-ET_LINK_LIBRARY( "BulletCollision.lib" )
-ET_LINK_LIBRARY( "BulletDynamics.lib" )
-ET_LINK_LIBRARY( "BulletSoftBody.lib" )
-ET_LINK_LIBRARY( "LinearMath.lib" )
+	ET_LINK_LIBRARY( "BulletCollision.lib" )
+	ET_LINK_LIBRARY( "BulletDynamics.lib" )
+	ET_LINK_LIBRARY( "BulletSoftBody.lib" )
+	ET_LINK_LIBRARY( "LinearMath.lib" )
 #endif
 //------------------------------------------------------------------//
 
 namespace {
 
-	static ETThreadLocal BulletWorldView*	activeScriptWorldViewForThread;
+	static ETThreadLocal BulletDynamics::WorldView*	activeScriptWorldViewForThread = nullptr;
 
 // ---------------------------------------------------
 
@@ -78,53 +78,49 @@ namespace {
 
 namespace Eldritch2 {
 namespace Physics {
+namespace BulletDynamics {
 
-	BulletWorldView::BulletWorldView( World& owningWorld, const BulletEngineService& hostingEngine ) : WorldView( owningWorld ),
-																								_persistentManifoldPool( 32u, hostingEngine.GetWorldPersistentManifoldPoolSizeInElements() ),
-																								_collisionAlgorithmPool( 16u, hostingEngine.GetWorldCollisionAlgorithmPoolSizeInElements() ),
-																								_softBodySolver(),
-																								_collisionConfiguration( CreateCollisionConfigurationConstructionInfo( _persistentManifoldPool, _collisionAlgorithmPool ) ),
-																								_dispatcher( &_collisionConfiguration ),
-																								_pairCache(),
-																								_broadphaseInterface( DetermineAABBMinimaForWorld( owningWorld ), DetermineAABBMaximaForWorld( owningWorld ), DetermineMaxHandleCountForWorld( owningWorld ), &_pairCache ),
-																								_constraintSolver(),
-																								_dynamicsWorld( &_softBodySolver, &_dispatcher, &_broadphaseInterface, &_constraintSolver, &_collisionConfiguration ),
-																								_ghostPairCallback() {
+	WorldView::WorldView( World& owningWorld, const EngineService& hostingEngine ) : Foundation::WorldView( owningWorld ),
+																					 _persistentManifoldPool( 32u, hostingEngine.GetWorldPersistentManifoldPoolSizeInElements() ),
+																					 _collisionAlgorithmPool( 16u, hostingEngine.GetWorldCollisionAlgorithmPoolSizeInElements() ),
+																					 _softBodySolver(),
+																					 _collisionConfiguration( CreateCollisionConfigurationConstructionInfo( _persistentManifoldPool, _collisionAlgorithmPool ) ),
+																					 _dispatcher( &_collisionConfiguration ),
+																					 _pairCache(),
+																					 _broadphaseInterface( DetermineAABBMinimaForWorld( owningWorld ), DetermineAABBMaximaForWorld( owningWorld ), DetermineMaxHandleCountForWorld( owningWorld ), &_pairCache ),
+																					 _constraintSolver(),
+																					 _dynamicsWorld( &_softBodySolver, &_dispatcher, &_broadphaseInterface, &_constraintSolver, &_collisionConfiguration ),
+																					 _ghostPairCallback() {
 		_dynamicsWorld.getPairCache()->setInternalGhostPairCallback( &_ghostPairCallback );
 	}
 
 // ---------------------------------------------------
 
-	BulletWorldView::~BulletWorldView() {}
-
-// ---------------------------------------------------
-
-	void BulletWorldView::AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) {
+	void WorldView::AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) {
 		activeScriptWorldViewForThread = this;
 	}
 
 // ---------------------------------------------------
 
-	void BulletWorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {
+	void WorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {
 		// Dispatch collision notifications
 	}
 
 // ---------------------------------------------------
 
-	void BulletWorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PreScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PreScriptTickTaskVisitor ) {
 		// Do pathfinding?
 	}
 
 // ---------------------------------------------------
 
-	void BulletWorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PostScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PostScriptTickTaskVisitor ) {
 		class SimulateWorldTask : public CRTPTransientTask<SimulateWorldTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//! Constructs this @ref SimulateWorldTask instance.
-			ETInlineHint SimulateWorldTask( BulletWorldView& owner, WorkerContext& executingContext, Task& postScriptTickTask ) : CRTPTransientTask<SimulateWorldTask>( postScriptTickTask, Scheduler::CodependentTaskSemantics ),
-																																  _owner( owner ) {
+			ETInlineHint SimulateWorldTask( WorldView& owner, WorkerContext& executingContext, Task& postScriptTickTask ) : CRTPTransientTask<SimulateWorldTask>( postScriptTickTask, Scheduler::CodependentTaskSemantics ), _owner( owner ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -143,7 +139,7 @@ namespace Physics {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			BulletWorldView&	_owner;
+			WorldView&	_owner;
 		};
 
 	// ---
@@ -153,20 +149,23 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	BulletWorldView& BulletWorldView::GetActiveWorldView() {
+	WorldView& WorldView::GetActiveWorldView() {
 		ETRuntimeAssert( nullptr != activeScriptWorldViewForThread );
+
+	// ---
 
 		return *activeScriptWorldViewForThread;
 	}
 
 // ---------------------------------------------------
 
-	void BulletWorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void WorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& visitor ) {
 		CharacterArmatureComponent::ExposeScriptAPI( visitor );
 		TerrainColliderComponent::ExposeScriptAPI( visitor );
 		TriggerVolumeComponent::ExposeScriptAPI( visitor );
 		// PhysicalSoftBodyComponent::ExposeScriptAPI( visitor );
 	}
 
+}	// namespace BulletDynamics
 }	// namespace Physics
 }	// namespace Eldritch2

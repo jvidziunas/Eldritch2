@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletEngineService.inl
+  EngineService.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -17,20 +17,18 @@
 
 namespace Eldritch2 {
 namespace Physics {
+namespace BulletDynamics {
 
-	namespace Physics		= ::Eldritch2::Physics;
-	
-// ---------------------------------------------------
-
-	ETInlineHint size_t	BulletEngineService::GetWorldPersistentManifoldPoolSizeInElements() const {
+	ETInlineHint size_t	EngineService::GetWorldPersistentManifoldPoolSizeInElements() const {
 		return _persistentManifoldPoolSizeInElements;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint size_t	BulletEngineService::GetWorldCollisionAlgorithmPoolSizeInElements() const {
+	ETInlineHint size_t	EngineService::GetWorldCollisionAlgorithmPoolSizeInElements() const {
 		return _collisionAlgorithmPoolSizeInElements;
 	}
 
+}	// namespace BulletDynamics
 }	// namespace Physics
 }	// namespace Eldritch2

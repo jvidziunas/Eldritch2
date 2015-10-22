@@ -53,7 +53,6 @@ btSoftBodyWorldMixin<BaseType>::CollisionConfiguration::CollisionConfiguration( 
 	//replace pool by a new one, with potential larger size
 
 	if( m_ownsCollisionAlgorithmPool && m_collisionAlgorithmPool ) {
-		
 		///calculate maximum element size, big enough to fit any collision algorithm in the memory pool
 		int	collisionAlgorithmMaxElementSize( ::btMax( ::btMax( sizeof(::btSoftSoftCollisionAlgorithm), sizeof(::btSoftRigidCollisionAlgorithm) ), sizeof(::btSoftBodyConcaveCollisionAlgorithm) ) );
 		int curElemSize( m_collisionAlgorithmPool->getElementSize() );

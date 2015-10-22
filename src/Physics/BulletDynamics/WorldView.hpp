@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletWorldView.hpp
+  WorldView.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,9 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/Bullet/btDiscreteDynamicsMixinWrapper.hpp>
-#include <Physics/Bullet/btHeightfieldTerrainShapeEx.hpp>
-#include <Physics/Bullet/btSoftBodyWorldMixin.hpp>
+#include <Physics/BulletDynamics/btDiscreteDynamicsMixinWrapper.hpp>
+#include <Physics/BulletDynamics/btHeightfieldTerrainShapeEx.hpp>
+#include <Physics/BulletDynamics/btSoftBodyWorldMixin.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
 #include <Scripting/ReferenceTypeBase.hpp>
 #include <Foundation/WorldView.hpp>
@@ -35,7 +35,9 @@ namespace Eldritch2 {
 	}
 
 	namespace Physics {
-		class	BulletEngineService;
+		namespace BulletDynamics {
+			class	EngineService;
+		}
 	}
 }
 
@@ -48,7 +50,9 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	class ET16ByteAligned BulletWorldView : public Foundation::WorldView {
+namespace BulletDynamics {
+
+	class ET16ByteAligned WorldView : public Foundation::WorldView {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -79,11 +83,11 @@ namespace Physics {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref BulletWorldView instance.
-		BulletWorldView( Foundation::World& owningWorld, const Physics::BulletEngineService& hostingEngine );
+		//!	Constructs this @ref WorldView instance.
+		WorldView( Foundation::World& owningWorld, const BulletDynamics::EngineService& hostingEngine );
 
-		//!	Destroys this @ref BulletWorldView instance.
-		~BulletWorldView();
+		//!	Destroys this @ref WorldView instance.
+		~WorldView() = default;
 
 	// ---------------------------------------------------
 
@@ -92,7 +96,7 @@ namespace Physics {
 	// ---------------------------------------------------
 
 	protected:
-		static BulletWorldView&	GetActiveWorldView();
+		static WorldView&	GetActiveWorldView();
 
 	// ---------------------------------------------------
 
@@ -118,10 +122,10 @@ namespace Physics {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//! Constructs this @ref CharacterArmatureComponent instance.
-			CharacterArmatureComponent( Physics::BulletWorldView& owningWorldView = GetActiveWorldView() );
+			CharacterArmatureComponent( WorldView& owningWorldView = GetActiveWorldView() );
 
 			//!	Destroys this @ref CharacterArmatureComponent instance.
-			~CharacterArmatureComponent();
+			~CharacterArmatureComponent() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
@@ -154,10 +158,10 @@ namespace Physics {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//! Constructs this @ref TerrainColliderComponent.
-			TerrainColliderComponent( Physics::BulletWorldView& owningView = GetActiveWorldView() );
+			TerrainColliderComponent( WorldView& owningView = GetActiveWorldView() );
 
 			//! Constructs this @ref TerrainColliderComponent.
-			~TerrainColliderComponent();
+			~TerrainColliderComponent() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
@@ -193,10 +197,10 @@ namespace Physics {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//!	Constructs this @ref TriggerVolumeComponent.
-			TriggerVolumeComponent( Physics::BulletWorldView& owningView = GetActiveWorldView() );
+			TriggerVolumeComponent( WorldView& owningView = GetActiveWorldView() );
 
 			//!	Constructs this @ref TriggerVolumeComponent.
-			~TriggerVolumeComponent();
+			~TriggerVolumeComponent() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
@@ -231,10 +235,10 @@ namespace Physics {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//!	Constructs this @ref PhysicalSoftBodyComponent.
-			PhysicalSoftBodyComponent( Physics::BulletWorldView& owningView = GetActiveWorldView() );
+			PhysicalSoftBodyComponent( WorldView& owningView = GetActiveWorldView() );
 
 			//!	Constructs this @ref PhysicalSoftBodyComponent.
-			~PhysicalSoftBodyComponent();
+			~PhysicalSoftBodyComponent() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
@@ -258,17 +262,18 @@ namespace Physics {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::btPoolAllocator				_persistentManifoldPool;
-		::btPoolAllocator				_collisionAlgorithmPool;
-		SoftBodySolver					_softBodySolver;
-		CollisionConfiguration			_collisionConfiguration;
-		CollisionDispatcher				_dispatcher;
-		OverlappingPairCache			_pairCache;
-		BroadphaseInterface				_broadphaseInterface;
-		ConstraintSolver				_constraintSolver;
-		BulletWorld						_dynamicsWorld;
-		::btGhostPairCallback			_ghostPairCallback;
+		::btPoolAllocator		_persistentManifoldPool;
+		::btPoolAllocator		_collisionAlgorithmPool;
+		SoftBodySolver			_softBodySolver;
+		CollisionConfiguration	_collisionConfiguration;
+		CollisionDispatcher		_dispatcher;
+		OverlappingPairCache	_pairCache;
+		BroadphaseInterface		_broadphaseInterface;
+		ConstraintSolver		_constraintSolver;
+		BulletWorld				_dynamicsWorld;
+		::btGhostPairCallback	_ghostPairCallback;
 	};
 
+}	// namespace BulletDynamics
 }	// namespace Physics
 }	// namespace Eldritch2

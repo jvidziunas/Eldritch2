@@ -1,18 +1,18 @@
 /*==================================================================*\
-btHeightfieldTerrainShapeEx.cpp
-------------------------------------------------------------------
-Purpose:
-
-
-------------------------------------------------------------------
-©2010-2015 Eldritch Entertainment, LLC.
+  btHeightfieldTerrainShapeEx.cpp
+  ------------------------------------------------------------------
+  Purpose:
+  
+  
+  ------------------------------------------------------------------
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/Bullet/btHeightfieldTerrainShapeEx.hpp>
+#include <Physics/BulletDynamics/btHeightfieldTerrainShapeEx.hpp>
 //------------------------------------------------------------------//
 
 
@@ -20,15 +20,15 @@ btHeightfieldTerrainShapeEx::btHeightfieldTerrainShapeEx( int heightStickWidth, 
 														  const void* heightfieldData, btScalar heightScale,
 														  btScalar minHeight, btScalar maxHeight,
 														  int upAxis, PHY_ScalarType heightDataType,
-														  bool flipQuadEdges ) : btHeightfieldTerrainShape( heightStickWidth, heightStickLength,
-																											heightfieldData, heightScale,
-																											minHeight, maxHeight,
-																											upAxis, heightDataType,
-																											flipQuadEdges ) {
+														  bool flipQuadEdges ) : ::btHeightfieldTerrainShape( heightStickWidth, heightStickLength,
+																											  heightfieldData, heightScale,
+																											  minHeight, maxHeight,
+																											  upAxis, heightDataType,
+																											  flipQuadEdges ) {
 
 }
 
-btHeightfieldTerrainShapeEx::~btHeightfieldTerrainShapeEx() {}
+// ---------------------------------------------------
 
 void btHeightfieldTerrainShapeEx::processAllTriangles( btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax ) const {
 	// scale down the input aabb's so they are in local (non-scaled) coordinates

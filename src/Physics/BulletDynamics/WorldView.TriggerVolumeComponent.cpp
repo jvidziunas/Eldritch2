@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletWorldView.TriggerVolumeComponent.cpp
+  WorldView.TriggerVolumeComponent.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Physics/Bullet/BulletWorldView.hpp>
+#include <Physics/BulletDynamics/WorldView.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 //------------------------------------------------------------------//
 
@@ -24,22 +24,19 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Physics {
+namespace BulletDynamics {
 
-	const char* const BulletWorldView::TriggerVolumeComponent::scriptTypeName = UTF8L("TriggerVolume");
+	const char* const WorldView::TriggerVolumeComponent::scriptTypeName = UTF8L("TriggerVolume");
 
 // ---------------------------------------------------
 
-	BulletWorldView::TriggerVolumeComponent::TriggerVolumeComponent( BulletWorldView& owningWorldView ) : _ghostObject() {
+	WorldView::TriggerVolumeComponent::TriggerVolumeComponent( WorldView& owningWorldView ) : _ghostObject() {
 		owningWorldView._dynamicsWorld.addCollisionObject( &_ghostObject, COLLISION_FILTER_GROUP, COLLISION_FILTER_MASK );
 	}
 
 // ---------------------------------------------------
 
-	BulletWorldView::TriggerVolumeComponent::~TriggerVolumeComponent() {}
-
-// ---------------------------------------------------
-
-	void ETNoAliasHint BulletWorldView::TriggerVolumeComponent::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	void ETNoAliasHint WorldView::TriggerVolumeComponent::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static TriggerVolumeComponent* Factory0() {
 				auto&	worldView( GetActiveWorldView() );
@@ -56,7 +53,7 @@ namespace Physics {
 
 	// ---
 
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L( "BulletWorldView::TriggerVolumeComponent::ExposeScriptAPI() Temporary Allocator" ) );
+		FixedStackAllocator<16u>	temporaryAllocator( UTF8L( "WorldView::TriggerVolumeComponent::ExposeScriptAPI() Temporary Allocator" ) );
 
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<TriggerVolumeComponent>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );
@@ -70,12 +67,13 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	void BulletWorldView::TriggerVolumeComponent::Dispose() {
+	void WorldView::TriggerVolumeComponent::Dispose() {
 		auto&	worldView( GetActiveWorldView() );
 
 		worldView._dynamicsWorld.removeCollisionObject( &_ghostObject );
 		worldView.GetWorldAllocator().Delete( *this );
 	}
 
+}	// namespace BulletDynamics
 }	// namespace Physics
 }	// namespace Eldritch2

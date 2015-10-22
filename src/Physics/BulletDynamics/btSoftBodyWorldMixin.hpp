@@ -135,5 +135,5 @@ private:
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Physics/Bullet/btSoftBodyWorldMixin.inl>
+#include <Physics/BulletDynamics/btSoftBodyWorldMixin.inl>
 //------------------------------------------------------------------//

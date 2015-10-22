@@ -17,8 +17,3 @@
 
 template <class BasicCollisionConfiguration, class BasicConstraintSolver>
 btDiscreteDynamicsMixinWrapper<BasicCollisionConfiguration, BasicConstraintSolver>::btDiscreteDynamicsMixinWrapper( ::btDispatcher* dispatcher, ::btBroadphaseInterface* pairCache, ConstraintSolver* constraintSolver, CollisionConfiguration* collisionConfiguration ) : ::btDiscreteDynamicsWorld( dispatcher, pairCache, constraintSolver, collisionConfiguration ) {}
-
-// ---------------------------------------------------
-
-template <class BasicCollisionConfiguration, class BasicConstraintSolver>
-btDiscreteDynamicsMixinWrapper<BasicCollisionConfiguration, BasicConstraintSolver>::~btDiscreteDynamicsMixinWrapper() {}

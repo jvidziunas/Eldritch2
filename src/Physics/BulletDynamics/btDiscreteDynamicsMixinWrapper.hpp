@@ -29,11 +29,11 @@ public:
 
 	btDiscreteDynamicsMixinWrapper( btDispatcher* dispatcher, btBroadphaseInterface* pairCache, ConstraintSolver* constraintSolver, CollisionConfiguration* collisionConfiguration );
 
-	virtual ~btDiscreteDynamicsMixinWrapper();
+	virtual ~btDiscreteDynamicsMixinWrapper() = default;
 };
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Physics/Bullet/btDiscreteDynamicsMixinWrapper.inl>
+#include <Physics/BulletDynamics/btDiscreteDynamicsMixinWrapper.inl>
 //------------------------------------------------------------------//

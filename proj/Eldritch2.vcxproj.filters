@@ -214,15 +214,6 @@
     <Filter Include="Header Files\Engine\Scripting\Angelscript\Resource Management">
       <UniqueIdentifier>{8a9bb447-81bb-4b48-8157-25c5713ade8c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Physics\Bullet">
-      <UniqueIdentifier>{c2fa27eb-fcfd-44f2-8a55-8034049e55aa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Physics\Bullet">
-      <UniqueIdentifier>{b4e7f63c-54c9-4e09-a4f7-ff8a87502859}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Physics\Bullet\Extensions">
-      <UniqueIdentifier>{34c5fc7a-7b45-4d7e-86ec-fbb20d0fbef4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Utility\MessagePack">
       <UniqueIdentifier>{d81f1466-4c94-43fb-ad30-54fa9f2b13d5}</UniqueIdentifier>
     </Filter>
@@ -276,6 +267,18 @@
     </Filter>
     <Filter Include="Source Files\Engine\Renderer\Direct3D11\Builders">
       <UniqueIdentifier>{3b621e47-dd77-435b-9da9-fa7bc4ebcb27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Physics\Bullet Dynamics">
+      <UniqueIdentifier>{c2fa27eb-fcfd-44f2-8a55-8034049e55aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Physics\Bullet Dynamics\Extensions">
+      <UniqueIdentifier>{34c5fc7a-7b45-4d7e-86ec-fbb20d0fbef4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Physics\Bullet Dynamics">
+      <UniqueIdentifier>{b4e7f63c-54c9-4e09-a4f7-ff8a87502859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Physics\Bullet Dynamics\Extensions">
+      <UniqueIdentifier>{279c035e-049d-4a55-b834-a440205a5a2a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -456,9 +459,6 @@
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript\Resource Management</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Networking\SteamworksNetworkingService.Player.cpp">
       <Filter>Source Files\Engine\Networking</Filter>
     </ClCompile>
@@ -467,18 +467,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Input\XInputService.Controller.cpp">
       <Filter>Source Files\Engine\Input\XInput</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\Bullet\btHeightfieldTerrainShapeEx.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.TerrainColliderComponent.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.CharacterArmatureComponent.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.TriggerVolumeComponent.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Win32InputService.RawInputPollingThread.cpp">
       <Filter>Source Files\Engine\Input\Win32</Filter>
@@ -548,9 +536,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletEngineService.cpp">
-      <Filter>Source Files\Engine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\scripting\AngelscriptEngineService.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
@@ -635,6 +620,27 @@
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.cpp">
       <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.cpp">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.cpp">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterArmatureComponent.cpp">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.cpp">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -941,21 +947,6 @@
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript\Resource Management</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Physics\Bullet\BulletWorldView.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Physics\Bullet\btHeightfieldTerrainShapeEx.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Physics\Bullet\btDiscreteDynamicsMixinWrapper.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Physics\Bullet\btMultiBodyWorldMixin.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Physics\Bullet\btSoftBodyWorldMixin.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet\Extensions</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
@@ -1024,9 +1015,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Physics\BulletEngineService.hpp">
-      <Filter>Header Files\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\scripting\AngelscriptEngineService.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
@@ -1126,6 +1114,27 @@
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.hpp">
       <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\EngineService.hpp">
+      <Filter>Header Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\WorldView.hpp">
+      <Filter>Header Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.hpp">
+      <Filter>Header Files\Engine\Physics\Bullet Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.hpp">
+      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.hpp">
+      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.hpp">
+      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.hpp">
+      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

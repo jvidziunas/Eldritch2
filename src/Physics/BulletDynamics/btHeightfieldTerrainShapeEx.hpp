@@ -15,10 +15,11 @@
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 //------------------------------------------------------------------//
 
-ATTRIBUTE_ALIGNED16(class) btHeightfieldTerrainShapeEx : public btHeightfieldTerrainShape {
+ATTRIBUTE_ALIGNED16(class) btHeightfieldTerrainShapeEx : public ::btHeightfieldTerrainShape {
 public:
-
 	BT_DECLARE_ALIGNED_ALLOCATOR();
+
+// ---------------------------------------------------
 
 	/// preferred constructor
 	/**
@@ -32,7 +33,9 @@ public:
 								 int upAxis, PHY_ScalarType heightDataType,
 								 bool flipQuadEdges );
 
-	virtual ~btHeightfieldTerrainShapeEx();
+	virtual ~btHeightfieldTerrainShapeEx() = default;
+
+// ---------------------------------------------------
 
 	virtual void	processAllTriangles( btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax ) const;
 };

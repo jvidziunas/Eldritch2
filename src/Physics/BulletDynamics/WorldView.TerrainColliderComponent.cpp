@@ -1,5 +1,5 @@
 /*==================================================================*\
-  BulletWorldView.TerrainColliderComponent.cpp
+  WorldView.TerrainColliderComponent.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -13,9 +13,9 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Physics/Bullet/BulletWorldView.hpp>
-#include <Scripting/ScriptMarshalTypes.hpp>
+#include <Physics/BulletDynamics/WorldView.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
+#include <Scripting/ScriptMarshalTypes.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -26,23 +26,20 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Physics {
+namespace BulletDynamics {
 
-	const char* const BulletWorldView::TerrainColliderComponent::scriptTypeName = UTF8L("TerrainCollider");
+	const char* const WorldView::TerrainColliderComponent::scriptTypeName = UTF8L("TerrainCollider");
 
 // ---------------------------------------------------
 
-	BulletWorldView::TerrainColliderComponent::TerrainColliderComponent( BulletWorldView& owningView ) : _collisionShape( 0, 0, nullptr, 0.0f, 0.0f, 0.0f, 0, PHY_FLOAT, false ),
-																										 _body( ::btRigidBody::btRigidBodyConstructionInfo( 0.0f, nullptr, &_collisionShape ) ) {
+	WorldView::TerrainColliderComponent::TerrainColliderComponent( WorldView& owningView ) : _collisionShape( 0, 0, nullptr, 0.0f, 0.0f, 0.0f, 0, PHY_FLOAT, false ),
+																							 _body( ::btRigidBody::btRigidBodyConstructionInfo( 0.0f, nullptr, &_collisionShape ) ) {
 		owningView._dynamicsWorld.addCollisionObject( &_body, COLLISION_FILTER_GROUP, COLLISION_FILTER_MASK );
 	}
 
 // ---------------------------------------------------
 
-	BulletWorldView::TerrainColliderComponent::~TerrainColliderComponent() {}
-
-// ---------------------------------------------------
-
-	void ETNoAliasHint BulletWorldView::TerrainColliderComponent::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	void ETNoAliasHint WorldView::TerrainColliderComponent::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static TerrainColliderComponent* ETScriptAPICall Factory0( const StringMarshal& /*resourceName*/ ) {
 				auto&	worldView( GetActiveWorldView() );
@@ -59,7 +56,7 @@ namespace Physics {
 
 	// ---
 
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("BulletWorldView::TerrainColliderComponent::ExposeScriptAPI() Temporary Allocator") );
+		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("WorldView::TerrainColliderComponent::ExposeScriptAPI() Temporary Allocator") );
 
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<TerrainColliderComponent>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );
@@ -73,12 +70,13 @@ namespace Physics {
 
 // ---------------------------------------------------
 
-	void BulletWorldView::TerrainColliderComponent::Dispose() {
+	void WorldView::TerrainColliderComponent::Dispose() {
 		auto&	worldView( GetActiveWorldView() );
 
 		worldView._dynamicsWorld.removeCollisionObject( &_body );
 		worldView.GetWorldAllocator().Delete( *this, ::Eldritch2::AlignedDeallocationSemantics );
 	}
 
+}	// namespace BulletDynamics
 }	// namespace Physics
 }	// namespace Eldritch2
