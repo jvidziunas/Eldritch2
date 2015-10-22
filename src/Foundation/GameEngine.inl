@@ -24,6 +24,7 @@ namespace Foundation {
 
 	namespace Foundation	= ::Eldritch2::Foundation;
 	namespace FileSystem	= ::Eldritch2::FileSystem;
+	namespace System		= ::Eldritch2::System;
 
 // ---------------------------------------------------
 
@@ -39,7 +40,7 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	ETInlineHint const Foundation::SystemInterface& GameEngine::GetSystemInterface() const {
+	ETInlineHint const System::SystemInterface& GameEngine::GetSystemInterface() const {
 		return _systemInterface;
 	}
 

@@ -17,29 +17,16 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+namespace System {
 
-	namespace Scheduler {
-		class	TaskScheduler;
-	}
-
-	namespace Utility {
-		template <typename ResultObject>
-		struct	Result;
-	}
-
-	class	Allocator;
-}
-
-namespace Eldritch2 {
-namespace Foundation {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scheduler		= ::Eldritch2::Scheduler;
-	namespace Utility		= ::Eldritch2::Utility;
+	namespace Utility	= ::Eldritch2::Utility;
+	namespace System	= ::Eldritch2::System;
 
 // ---------------------------------------------------
 
 	class ETPureAbstractHint SystemInterface : private Utility::Noncopyable {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
 		enum class SystemMemoryState {
 			LOW_USAGE,
@@ -54,21 +41,21 @@ namespace Foundation {
 
 	// - MEMORY STATISTICS -------------------------------
 
+		virtual size_t	GetVirtualMemoryAllocationGranularityInBytes() const abstract;
+
+		virtual size_t	GetMaximumWorkingSetInBytes() const abstract;
+
 		virtual size_t	GetCurrentWorkingSetInBytes() const abstract;
 
 		virtual	size_t	GetPeakWorkingSetInBytes() const abstract;
 
-		virtual size_t	GetMaximumWorkingSetInBytes() const abstract;
-
-		virtual size_t	GetVirtualMemoryAllocationGranularityInBytes() const abstract;
-
 	// - PROCESSOR STATISTICS ----------------------------
+
+		virtual ::Eldritch2::uint64	GetL0CacheLineSizeInBytes() const abstract;
 
 		virtual ::Eldritch2::uint64	GetThreadCount() const abstract;
 
 		virtual ::Eldritch2::uint64	GetCoreCount() const abstract;
-
-		virtual ::Eldritch2::uint64	GetL0CacheLineSizeInBytes() const abstract;
 
 	// - TIMING DATA -------------------------------------
 
@@ -84,5 +71,5 @@ namespace Foundation {
 		~SystemInterface() = default;
 	};
 
-}	// namespace Foundation
+}	// namespace System
 }	// namespace Eldritch2

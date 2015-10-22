@@ -27,7 +27,6 @@
 
 namespace Eldritch2 {
 	namespace Foundation {
-		class	SystemInterface;
 		class	GameEngine;
 	}
 
@@ -38,6 +37,10 @@ namespace Eldritch2 {
 	namespace Utility {
 		template <typename ResultObjectType>
 		struct	Result;
+	}
+
+	namespace System {
+		class	SystemInterface;
 	}
 
 	class	ErrorCode;
@@ -54,6 +57,7 @@ namespace Foundation {
 	namespace Scripting		= ::Eldritch2::Scripting;
 	namespace Scheduler		= ::Eldritch2::Scheduler;
 	namespace Utility		= ::Eldritch2::Utility;
+	namespace System		= ::Eldritch2::System;
 
 // ---------------------------------------------------
 
@@ -62,7 +66,7 @@ namespace Foundation {
 
 	public:
 		//! Constructs this @ref GameEngine instance.
-		GameEngine( Foundation::SystemInterface& systemInterface, Scheduler::TaskScheduler& scheduler, FileSystem::ContentProvider& contentProvider, ::Eldritch2::Allocator& allocator );
+		GameEngine( System::SystemInterface& systemInterface, Scheduler::TaskScheduler& scheduler, FileSystem::ContentProvider& contentProvider, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref GameEngine instance.
 		~GameEngine() = default;
@@ -77,13 +81,15 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-		//! Retrieves a read-only view the @ref SystemInterface describing the hardware this @ref GameEngine instance is executing on.
-		ETInlineHint const Foundation::SystemInterface&	GetSystemInterface() const;
-
 		//! Retrieves a read-only view of the @ref TaskScheduler instance this @ref GameEngine runs threads on.
 		ETInlineHint const Scheduler::TaskScheduler&	GetTaskScheduler() const;
 		//! Retrieves a view of the @ref TaskScheduler instance this @ref GameEngine runs threads on.
 		ETInlineHint Scheduler::TaskScheduler&			GetTaskScheduler();
+
+	// ---------------------------------------------------
+
+		//! Retrieves a read-only view the @ref SystemInterface describing the hardware this @ref GameEngine instance is executing on.
+		ETInlineHint const System::SystemInterface&	GetSystemInterface() const;
 
 	// ---------------------------------------------------
 
@@ -140,7 +146,7 @@ namespace Foundation {
 		Foundation::FileAppendingLogger										_logger;
 		FileSystem::ContentLibrary											_contentLibrary;
 
-		Foundation::SystemInterface&										_systemInterface;
+		System::SystemInterface&											_systemInterface;
 		Scheduler::TaskScheduler&											_scheduler;
 
 		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>	_attachedServices;

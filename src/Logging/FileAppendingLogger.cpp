@@ -12,10 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/SynchronousFileAppender.hpp>
+#include <FileSystem/SynchronousFileAppender.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Logging/FileAppendingLogger.hpp>
-#include <Packages/ContentProvider.hpp>
+#include <FileSystem/ContentProvider.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//

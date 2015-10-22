@@ -100,11 +100,11 @@ namespace Foundation {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this @ref WorldView instance.
+		//!	Constructs this @ref WorldView instance.
 		WorldView( Foundation::World& owningWorld );
 
 	public:
-		// Destroys this @ref WorldView instance.
+		//!	Destroys this @ref WorldView instance.
 		virtual ~WorldView() = default;
 	
 	// - DATA MEMBERS ------------------------------------

@@ -13,17 +13,17 @@
 // INCLUDES
 //==================================================================//
 #include <Networking/SteamworksNetworkingService.hpp>
+#include <Renderer/Direct3D11/RendererService.hpp>
 #include <Scripting/AngelscriptEngineService.hpp>
-#include <Renderer/Direct3D11RendererService.hpp>
 #include <Configuration/ConfigurationService.hpp>
 #include <Utility/Memory/Win32HeapAllocator.hpp>
+#include <FileSystem/Win32/ContentProvider.hpp>
 #include <Utility/Win32ApplicationHelpers.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
-#include <Packages/Win32ContentProvider.hpp>
+#include <Scheduler/Win32/TaskScheduler.hpp>
+#include <System/Win32/SystemInterface.hpp>
 #include <Physics/BulletEngineService.hpp>
-#include <System/Win32SystemInterface.hpp>
 #include <Sound/XAudio2AudioRenderer.hpp>
-#include <Scheduler/Win32Scheduler.hpp>
 #include <Input/Win32InputService.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Input/XInputService.hpp>
@@ -38,6 +38,8 @@
 #include <dbghelp.h>
 #include <shlobj.h>
 #include <TCHAR.h>
+//------------------------------------------------------------------//
+#include <memory>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -56,6 +58,7 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Renderer;
 using namespace ::Eldritch2::Physics;
 using namespace ::Eldritch2::Utility;
+using namespace ::Eldritch2::System;
 using namespace ::Eldritch2::Sound;
 using namespace ::Eldritch2::Input;
 using namespace ::Eldritch2;
@@ -64,21 +67,27 @@ using namespace ::Eldritch2;
 
 namespace {
 
-	class Win32Application : public Win32SystemInterface, public Win32Scheduler, public Win32ContentProvider, public GameEngine {
+	using GlobalAllocator	= Win32GlobalHeapAllocator;
+
+	class Win32Application : public GlobalAllocator,
+							 public ::Eldritch2::System::Win32::SystemInterface,
+							 public ::Eldritch2::Scheduler::Win32::TaskScheduler,
+							 public ::Eldritch2::FileSystem::Win32::ContentProvider,
+							 public GameEngine {
 	public:
 		//!	Constructs this @ref Win32Application instance.
-		Win32Application( Allocator& allocator ) : Win32SystemInterface(),
-												   Win32Scheduler( GetSystemInterface(), allocator ),
-												   Win32ContentProvider( GetSystemInterface() ),
-												   GameEngine( GetSystemInterface(), GetScheduler(), GetContentProvider(), allocator ),
-												   _configurationService( GetGameEngine(), GetContentProvider() ),
-												   _controllerInputService( GetGameEngine() ),
-												   _inputService( GetGameEngine() ),
-												   _networkingService( GetGameEngine() ),
-												   _scriptEngine( GetGameEngine() ),
-												   _physicsEngine( GetGameEngine() ),
-												   _renderer( GetGameEngine() ),
-												   _audioRenderer( GetGameEngine() ) {}
+		Win32Application() : GlobalAllocator( UTF8L("Root Allocator") ),
+							 ::Eldritch2::Scheduler::Win32::TaskScheduler( GetSystemInterface(), GetGlobalAllocator() ),
+							 ::Eldritch2::FileSystem::Win32::ContentProvider( GetSystemInterface() ),
+							 GameEngine( GetSystemInterface(), GetScheduler(), GetContentProvider(), GetGlobalAllocator() ),
+							 _configurationService( GetGameEngine(), GetContentProvider() ),
+							 _controllerInputService( GetGameEngine() ),
+							 _inputService( GetGameEngine() ),
+							 _networkingService( GetGameEngine() ),
+							 _scriptService( GetGameEngine() ),
+							 _physicsService( GetGameEngine() ),
+							 _direct3DRendererService( GetGameEngine() ),
+							 _audioRendererService( GetGameEngine() ) {}
 
 		//!	Destroys this @ref Win32Application instance.
 		~Win32Application() {
@@ -87,16 +96,20 @@ namespace {
 
 	// ---------------------------------------------------
 
-		ETInlineHint Win32SystemInterface& GetSystemInterface() {
-			return static_cast<Win32SystemInterface&>(*this);
+		ETForceInlineHint GlobalAllocator& GetGlobalAllocator() {
+			return static_cast<GlobalAllocator&>(*this);
 		}
 
-		ETInlineHint Win32Scheduler& GetScheduler() {
-			return static_cast<Win32Scheduler&>(*this);
+		ETInlineHint ::Eldritch2::System::Win32::SystemInterface& GetSystemInterface() {
+			return static_cast<::Eldritch2::System::Win32::SystemInterface&>(*this);
 		}
 
-		ETInlineHint Win32ContentProvider& GetContentProvider() {
-			return static_cast<Win32ContentProvider&>(*this);
+		ETInlineHint ::Eldritch2::Scheduler::Win32::TaskScheduler& GetScheduler() {
+			return static_cast<::Eldritch2::Scheduler::Win32::TaskScheduler&>(*this);
+		}
+
+		ETInlineHint ::Eldritch2::FileSystem::Win32::ContentProvider& GetContentProvider() {
+			return static_cast<::Eldritch2::FileSystem::Win32::ContentProvider&>(*this);
 		}
 
 		ETInlineHint GameEngine& GetGameEngine() {
@@ -109,28 +122,15 @@ namespace {
 		XInputService				_controllerInputService;
 		Win32InputService			_inputService;
 		SteamworksNetworkingService	_networkingService;
-		AngelscriptEngineService	_scriptEngine;
-		BulletEngineService			_physicsEngine;
-		Direct3D11RendererService	_renderer;
-		XAudio2AudioRenderer		_audioRenderer;
+		AngelscriptEngineService	_scriptService;
+		BulletEngineService			_physicsService;
+		Direct3D11::RendererService	_direct3DRendererService;
+		XAudio2AudioRenderer		_audioRendererService;
 	};
 
 // ---------------------------------------------------
 
-	struct Globals {
-		ET16ByteAligned char	globalAllocatorMemory[sizeof(Win32GlobalHeapAllocator)];
-		ET16ByteAligned char	applicationObjectMemory[sizeof(Win32Application)];
-
-		ETForceInlineHint Win32Application&	GetApplicationObject() {
-			return *reinterpret_cast<Win32Application*>(applicationObjectMemory);
-		}
-
-	// ---------------------------------------------------
-
-		ETForceInlineHint Win32GlobalHeapAllocator& GetGlobalAllocator() {
-			return *reinterpret_cast<Win32GlobalHeapAllocator*>(globalAllocatorMemory);
-		}
-	};
+	ET16ByteAligned char	applicationObjectMemory[sizeof(Win32Application)];
 	
 // ---------------------------------------------------
 
@@ -153,8 +153,8 @@ namespace {
 												 localTime.wYear, localTime.wMonth, localTime.wDay, 
 												 localTime.wHour, localTime.wMinute, localTime.wSecond, 
 												 ::GetCurrentProcessId(), ::GetCurrentThreadId() ),
-								 ( GENERIC_READ | GENERIC_WRITE ),
-								 ( FILE_SHARE_WRITE | FILE_SHARE_READ ),
+								 (GENERIC_READ | GENERIC_WRITE),
+								 (FILE_SHARE_WRITE | FILE_SHARE_READ),
 								 0,
 								 CREATE_ALWAYS,
 								 0,
@@ -169,31 +169,14 @@ namespace {
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
 
-// ---------------------------------------------------
-
-	static Globals	globals;
-
 }	// anonymous namespace
 
  int WINAPI wWinMain( __in ::HINSTANCE hInstance, __in_opt ::HINSTANCE /*hPrevInstance*/, __in ::LPWSTR /*lpCmdLine*/, __in int nCmdShow ) {
-	int	returnValue( -1 );
+	StoreMainArguments( hInstance, nCmdShow );
 
-#if( ET_ENABLE_EXCEPTION_HANDLER && ET_DEBUG_MODE_ENABLED )
-	__try {
-#endif
-		StoreMainArguments( hInstance, nCmdShow );
+	const int	returnValue( (new(applicationObjectMemory) Win32Application())->GetGameEngine().ApplicationEntryPoint() );
 
-		returnValue = (new(&globals.GetApplicationObject()) Win32Application( *new(&globals.GetGlobalAllocator()) Win32GlobalHeapAllocator( UTF8L("Root Allocator") ) ))->GetGameEngine().ApplicationEntryPoint();
-
-		globals.GetApplicationObject().~Win32Application();
-		globals.GetGlobalAllocator().~Win32GlobalHeapAllocator();
-
-#if( ET_ENABLE_EXCEPTION_HANDLER && ET_DEBUG_MODE_ENABLED )
-	}  __except( GenerateDump( GetExceptionInformation() ) ) {
-		_resetstkoflw();
-		returnValue = -1;
-	}
-#endif
+	reinterpret_cast<Win32Application*>(applicationObjectMemory)->~Win32Application();
 	
 	return returnValue;
 }

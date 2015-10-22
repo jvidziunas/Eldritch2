@@ -13,9 +13,9 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/PackageDeserializationContext.hpp>
-#include <Utility/ReadableMemoryMappedFile.hpp>
+#include <FileSystem/ReadableMemoryMappedFile.hpp>
+#include <FileSystem/ContentProvider.hpp>
 #include <Utility/MessagePackReader.hpp>
-#include <Packages/ContentProvider.hpp>
 #include <Utility/DisposingResult.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Packages/ContentPackage.hpp>

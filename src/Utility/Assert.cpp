@@ -14,9 +14,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Assert.hpp>
-#include <cstdio>
 #include <cstdarg>
+#include <cstdio>
 #if( ET_PLATFORM_WINDOWS )
 #	ifndef NOMINMAX
 #		define NOMINMAX
@@ -31,27 +32,20 @@
 using namespace ::Eldritch2;
 using namespace ::std;
 
-namespace
-{
-	ENUM_CLASS( size_t ) {
-		ASSERT_BUFFER_SIZE	= 512u,
-		HANDLER_BUFFER_SIZE	= 1024u
-	};
+namespace {
 
-// ---------------------------------------------------
-
-	AssertionFailure DefaultHandler( const char* condition, const char* file, uint32 line, const char* msg ) {
-		char	messageBuffer[HANDLER_BUFFER_SIZE];
-		size_t	remainingChars( _countof(messageBuffer) );
-		char*	writePtr( messageBuffer );
-		int		writeAdjust( sprintf_s( messageBuffer, remainingChars, "%s(%d): Assert Failure: ", file, line ) );
+	AssertionFailure DefaultHandler( const char* condition, const char* file, uint32 line, const char* message ) {
+		char	debugOutputString[1024u];
+		size_t	remainingChars( _countof(debugOutputString) );
+		char*	writePtr( debugOutputString );
+		int		writeAdjust( sprintf_s( debugOutputString, remainingChars, "%s(%u): Assert Failure: ", file, line ) );
 
 		if( condition && writeAdjust ) {
 			writeAdjust = ( writePtr += writeAdjust, remainingChars -= writeAdjust, sprintf_s( writePtr, remainingChars, "'%s' ", condition ) );
 		}
 
-		if( msg && writeAdjust ) {
-			writeAdjust = ( writePtr += writeAdjust, remainingChars -= writeAdjust, sprintf_s( writePtr, remainingChars, "%s", msg ) );
+		if( message && writeAdjust ) {
+			writeAdjust = ( writePtr += writeAdjust, remainingChars -= writeAdjust, sprintf_s( writePtr, remainingChars, "%s", message ) );
 		}
 
 		if( writeAdjust ) {
@@ -59,7 +53,7 @@ namespace
 		}
 
 #		if( ET_PLATFORM_WINDOWS )
-		OutputDebugStringA( messageBuffer );
+		::OutputDebugStringA( debugOutputString );
 #		endif
 
 		return AssertionFailures::FATAL;
@@ -78,28 +72,23 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
     void InstallHandler( AssertionHandler newHandler ) {
-		if( nullptr == newHandler ) {
-			newHandler = &DefaultHandler;
-		}
-
-		assertHandler = newHandler;
+		assertHandler = (nullptr != newHandler) ? newHandler : &DefaultHandler;
 	}
 
 // ---------------------------------------------------
 	
-	AssertionFailure ReportFailure( const char* condition, const char* file, uint32 line, const char* msg, ... ) {
-		char messageBuffer[ASSERT_BUFFER_SIZE];
+	AssertionFailure ReportFailure( const char* condition, const char* file, uint32 line, const char* message, ... ) {
+		char formattedMessage[512u];
 
-		if( msg ) {
-			{
-				va_list	args;
-				va_start( args, msg );
-				_vsnprintf_s( messageBuffer, ASSERT_BUFFER_SIZE, ASSERT_BUFFER_SIZE, msg, args );
-				va_end( args );
-			}
+		if( message ) {
+			va_list	args;
+
+			va_start( args, message );
+				::Eldritch2::PrintFormatted( formattedMessage, message, args );
+			va_end( args );
 		}
 
-		return assertHandler( condition, file, line, msg ? messageBuffer : NULL );
+		return assertHandler( condition, file, line, (message ? formattedMessage : nullptr) );
 	}
 
 }	// namespace Eldritch2

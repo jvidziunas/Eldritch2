@@ -81,6 +81,7 @@
       <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -131,6 +132,7 @@
       <OpenMPSupport>false</OpenMPSupport>
       <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
       <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -167,6 +169,12 @@ call "deploy.x64.bat"
     <ClCompile Include="..\examples\Win32EntryPoint.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurablePODVariable.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp" />
+    <ClCompile Include="..\src\Filesystem\ContentProvider.cpp" />
+    <ClCompile Include="..\src\Filesystem\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\ContentProvider.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileAccessor.cpp" />
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp" />
     <ClCompile Include="..\src\Foundation\WorldView.cpp" />
     <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp" />
@@ -181,27 +189,34 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Networking\SteamworksNetworkingService.cpp" />
     <ClCompile Include="..\src\Networking\SteamworksNetworkingService.Player.cpp" />
     <ClCompile Include="..\src\Networking\Steamworks\SteamworksWorldView.cpp" />
+    <ClCompile Include="..\src\Packages\ContentPackage.cpp" />
     <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp" />
     <ClCompile Include="..\src\Packages\LoaderThread.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
-    <ClCompile Include="..\src\Packages\Win32ContentProvider.AsynchronousFileAccessor.cpp" />
-    <ClCompile Include="..\src\Packages\Win32ContentProvider.SynchronousFileAccessor.cpp" />
     <ClCompile Include="..\src\Physics\BulletEngineService.cpp" />
     <ClCompile Include="..\src\Physics\Bullet\btHeightfieldTerrainShapeEx.cpp" />
     <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.cpp" />
     <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.CharacterArmatureComponent.cpp" />
     <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.TerrainColliderComponent.cpp" />
     <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.TriggerVolumeComponent.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Builders\Direct3D11TextureShaderResourceViewBuilder.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11MeshView.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11HLSLPipelineDefinitionView.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11ShaderResourceView.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11SwapChain.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.MeshComponent.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.SceneCameraComponent.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\SwapChainBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\RendererService.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\MeshResourceView.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\SwapChain.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshComponent.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCameraComponent.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp" />
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp" />
-    <ClCompile Include="..\src\Scheduler\Win32Scheduler.WorkerThread.cpp" />
+    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.cpp" />
+    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.WorkerThread.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.cpp" />
@@ -214,39 +229,27 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\configuration\ConfigurationService.cpp" />
     <ClCompile Include="..\src\foundation\Window.cpp" />
     <ClCompile Include="..\src\foundation\Player.cpp" />
-    <ClCompile Include="..\src\system\Win32SystemInterface.cpp" />
     <ClCompile Include="..\src\Foundation\World.cpp" />
     <ClCompile Include="..\src\input\Win32InputService.cpp" />
     <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp" />
     <ClCompile Include="..\src\logging\Logger.cpp" />
-    <ClCompile Include="..\src\packages\ContentProvider.cpp" />
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp" />
-    <ClCompile Include="..\src\Packages\ContentPackage.cpp" />
     <ClCompile Include="..\src\Packages\ResourceView.cpp" />
-    <ClCompile Include="..\src\packages\Win32ContentProvider.cpp" />
     <ClCompile Include="..\src\physics\PhysicalMaterial.cpp" />
     <ClCompile Include="..\src\renderer\Camera.cpp" />
-    <ClCompile Include="..\src\renderer\D3D11\D3D11FormatHelpers.cpp" />
-    <ClCompile Include="..\src\renderer\Direct3D11RendererService.cpp" />
-    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11BufferBuilder.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Builders\Direct3D11DeviceBuilder.cpp" />
-    <ClCompile Include="..\src\Renderer\D3D11\Builders\D3D11RenderTargetViewBuilder.cpp" />
-    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11SwapChainBuilder.cpp" />
-    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp" />
     <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp" />
-    <ClCompile Include="..\src\Renderer\OpenGLRenderer.cpp" />
     <ClCompile Include="..\src\Scheduler\Thread.cpp" />
     <ClCompile Include="..\src\Scheduler\Task.cpp" />
     <ClCompile Include="..\src\scheduler\TaskScheduler.cpp" />
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp" />
-    <ClCompile Include="..\src\scheduler\Win32Scheduler.cpp" />
     <ClCompile Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.cpp" />
     <ClCompile Include="..\src\scripting\AngelscriptEngineService.cpp" />
     <ClCompile Include="..\src\scripting\Angelscript\AngelscriptWorldView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptNativeBindings.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp" />
     <ClCompile Include="..\src\Sound\XAudio2AudioRenderer.cpp" />
+    <ClCompile Include="..\src\System\Win32\SystemInterface.cpp" />
     <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src\Utility\Concurrency\UserSemaphore.cpp" />
     <ClCompile Include="..\src\Utility\Concurrency\WaitableUserEvent.cpp" />
@@ -277,7 +280,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp" />
     <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp" />
-    <ClCompile Include="..\src\Utility\ReadableMemoryMappedFile.cpp" />
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp" />
     <ClCompile Include="..\src\Animation\Armature.cpp" />
   </ItemGroup>
@@ -289,6 +291,17 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Configuration\INIParser.hpp" />
     <ClInclude Include="..\src\Configuration\SimpleConfigurableVariableWithStorage.hpp" />
     <ClInclude Include="..\src\Configuration\ConfigurablePODVariable.hpp" />
+    <ClInclude Include="..\src\Filesystem\AsynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\Filesystem\AsynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\Filesystem\ContentProvider.hpp" />
+    <ClInclude Include="..\src\Filesystem\ReadableMemoryMappedFile.hpp" />
+    <ClInclude Include="..\src\Filesystem\SynchronousFileAppender.hpp" />
+    <ClInclude Include="..\src\Filesystem\SynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\Filesystem\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\ContentProvider.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileAccessor.hpp" />
     <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Input\Keyboard.hpp" />
     <ClInclude Include="..\src\Input\Mouse.hpp" />
@@ -305,25 +318,34 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Physics\Bullet\btMultiBodyWorldMixin.hpp" />
     <ClInclude Include="..\src\Physics\Bullet\btSoftBodyWorldMixin.hpp" />
     <ClInclude Include="..\src\Physics\Bullet\BulletWorldView.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Builders\Direct3D11TextureShaderResourceViewBuilder.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11MeshView.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11HLSLPipelineDefinitionView.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11ShaderResourceView.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11SwapChain.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11WorldView.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\SwapChainBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\TextureBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\RendererService.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\ForwardDeclarations.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\MeshResourceView.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\ResourceCommon.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\SwapChain.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\WorldView.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp" />
     <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp" />
+    <ClInclude Include="..\src\Scheduler\Win32\TaskScheduler.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.hpp" />
     <ClInclude Include="..\src\Scripting\ReferenceTypeBase.hpp" />
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp" />
-    <ClInclude Include="..\src\packages\ContentProvider.hpp" />
     <ClInclude Include="..\src\packages\ContentLibrary.hpp" />
     <ClInclude Include="..\src\Packages\ContentPackage.hpp" />
     <ClInclude Include="..\src\Packages\ResourceView.hpp" />
-    <ClInclude Include="..\src\packages\Win32ContentProvider.hpp" />
     <ClInclude Include="..\src\Scripting\ObjectHandle.hpp" />
+    <ClInclude Include="..\src\System\Win32\SystemInterface.hpp" />
     <ClInclude Include="..\src\Utility\Algorithms.hpp" />
     <ClInclude Include="..\src\Utility\Assert.hpp" />
     <ClInclude Include="..\src\Utility\COMPointer.hpp" />
@@ -391,33 +413,16 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp" />
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp" />
     <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp" />
-    <ClInclude Include="..\src\Utility\AsynchronousFileReader.hpp" />
-    <ClInclude Include="..\src\Utility\AsynchronousFileWriter.hpp" />
-    <ClInclude Include="..\src\Utility\ReadableMemoryMappedFile.hpp" />
-    <ClInclude Include="..\src\Utility\SynchronousFileAppender.hpp" />
-    <ClInclude Include="..\src\Utility\SynchronousFileReader.hpp" />
-    <ClInclude Include="..\src\Utility\SynchronousFileWriter.hpp" />
     <ClInclude Include="..\src\physics\PhysicalMaterial.hpp" />
     <ClInclude Include="..\src\renderer\Camera.hpp" />
     <ClInclude Include="..\src\Renderer\GPUFormats.hpp" />
-    <ClInclude Include="..\src\renderer\D3D11\D3D11FormatHelpers.hpp" />
-    <ClInclude Include="..\src\renderer\D3D11\D3D11ForwardDeclarations.hpp" />
-    <ClInclude Include="..\src\renderer\Direct3D11RendererService.hpp" />
-    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11BufferBuilder.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Builders\Direct3D11DeviceBuilder.hpp" />
-    <ClInclude Include="..\src\Renderer\D3D11\Builders\D3D11RenderTargetViewBuilder.hpp" />
-    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11SwapChainBuilder.hpp" />
-    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.hpp" />
-    <ClInclude Include="..\src\renderer\D3D11\Direct3D11ResourceCommon.hpp" />
     <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp" />
     <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp" />
     <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp" />
-    <ClInclude Include="..\src\Renderer\OpenGLRenderer.hpp" />
     <ClInclude Include="..\src\Scheduler\Thread.hpp" />
     <ClInclude Include="..\src\Scheduler\Task.hpp" />
     <ClInclude Include="..\src\scheduler\TaskScheduler.hpp" />
     <ClInclude Include="..\src\Scheduler\WorkerContext.hpp" />
-    <ClInclude Include="..\src\scheduler\Win32Scheduler.hpp" />
     <ClInclude Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.hpp" />
     <ClInclude Include="..\src\scripting\AngelscriptEngineService.hpp" />
     <ClInclude Include="..\src\scripting\Angelscript\AngelscriptWorldView.hpp" />
@@ -434,7 +439,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\foundation\Player.hpp" />
     <ClInclude Include="..\src\foundation\PlayerCommon.hpp" />
     <ClInclude Include="..\src\system\SystemInterface.hpp" />
-    <ClInclude Include="..\src\system\Win32SystemInterface.hpp" />
     <ClInclude Include="..\src\foundation\World.hpp" />
     <ClInclude Include="..\src\Foundation\WorldView.hpp" />
     <ClInclude Include="..\src\input\Win32InputService.hpp" />

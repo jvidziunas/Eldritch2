@@ -26,9 +26,6 @@
     <Filter Include="Source Files\Engine\Foundation\Players">
       <UniqueIdentifier>{fce761ae-f237-4574-9882-7eb25fe075cc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Foundation\System">
-      <UniqueIdentifier>{89d6f9a0-fd42-4c54-99aa-af2474b6ccca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine\Foundation\Worlds">
       <UniqueIdentifier>{78805c57-8567-4704-b07e-cb348d117683}</UniqueIdentifier>
     </Filter>
@@ -41,32 +38,14 @@
     <Filter Include="Source Files\Engine\Packages">
       <UniqueIdentifier>{3ed92532-2874-4609-a1d9-8d44060a44eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Packages\Content Provider Implementations">
-      <UniqueIdentifier>{15df36f5-94f8-46da-85a9-e0ae1ef22754}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine\Physics">
       <UniqueIdentifier>{07d55408-4e61-4602-8e31-a7f1efabcff6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Engine\Renderer">
       <UniqueIdentifier>{c4240366-799b-49e9-aeef-7024b306df9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Renderer\D3D11">
-      <UniqueIdentifier>{2f94b043-76d6-45ed-bd7b-4eccb5be1bed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer\D3D11\Resource Builders">
-      <UniqueIdentifier>{772c49ae-4e78-42ba-9924-c1b327cf0243}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer\Resources">
-      <UniqueIdentifier>{b453f4ec-9981-463a-b6a2-558319b64ba3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer\OpenGL">
-      <UniqueIdentifier>{129b4283-8f0b-449b-b108-54ffc23fb6a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine\Scheduler">
       <UniqueIdentifier>{d92ded9a-a640-4f60-bf5f-c3b104256590}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Scheduler\Scheduler Implementations">
-      <UniqueIdentifier>{5686966e-08f6-4b86-a9fb-6546dc8fc1c6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Engine\Scripting">
       <UniqueIdentifier>{4561e1ed-4ad2-4991-894d-bdacd366d321}</UniqueIdentifier>
@@ -98,9 +77,6 @@
     <Filter Include="Source Files\Engine\Utility\Containers">
       <UniqueIdentifier>{44f5ec5f-58cd-49a7-8378-feca26d53e58}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Utility\File Access">
-      <UniqueIdentifier>{73fd4929-6461-41cf-bc2c-73ba999fe029}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine\Utility\Math">
       <UniqueIdentifier>{1ed0deb4-1ed8-4561-b048-486239e2caf3}</UniqueIdentifier>
     </Filter>
@@ -119,9 +95,6 @@
     </Filter>
     <Filter Include="Header Files\Engine\Packages">
       <UniqueIdentifier>{6fa9d8e5-022e-41b9-ad51-97a93706a3fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Packages\Content Provider Implementations">
-      <UniqueIdentifier>{7678c74f-a8ff-4258-8f1e-b93c42429345}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Engine\Utility">
       <UniqueIdentifier>{cd1a12b1-becb-4a18-892b-75ac715f59e3}</UniqueIdentifier>
@@ -156,32 +129,14 @@
     <Filter Include="Header Files\Engine\Utility\Math">
       <UniqueIdentifier>{c03f0771-ed6b-4727-84bd-4033c56e8386}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Utility\File Access">
-      <UniqueIdentifier>{a847598d-c938-40c9-9176-5d2ffdeaebb2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Physics">
       <UniqueIdentifier>{298cb508-f8f8-44d3-82f7-0a8fd9a268c3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Engine\Renderer">
       <UniqueIdentifier>{328e5b69-7123-49f1-987b-afaa5134357b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Renderer\D3D11">
-      <UniqueIdentifier>{2a0c8bbf-6f99-4648-a906-511db0b118de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Renderer\D3D11\Resource Builders">
-      <UniqueIdentifier>{a5b45133-8e79-4445-9597-15642e784280}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Renderer\Resources">
-      <UniqueIdentifier>{9b1af31e-e634-45d4-b5c5-29b436321e3f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Renderer\OpenGL">
-      <UniqueIdentifier>{ee13de07-6989-41f7-b502-f11f659021eb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Scheduler">
       <UniqueIdentifier>{6f2b2183-4bc7-40d0-9213-de8847c62707}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Scheduler\Scheduler Implementations">
-      <UniqueIdentifier>{1cb689c1-1492-4bb3-ae24-4b839cecf331}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Engine\Scripting">
       <UniqueIdentifier>{5e66b86e-bd39-4ea9-b45f-e0136e907b81}</UniqueIdentifier>
@@ -209,9 +164,6 @@
     </Filter>
     <Filter Include="Header Files\Engine\Foundation\Players">
       <UniqueIdentifier>{cac9df09-6e99-4824-a65e-06679363b838}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Foundation\System">
-      <UniqueIdentifier>{5f759602-82e9-4355-a394-c523aeddab75}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Engine\Foundation\Worlds">
       <UniqueIdentifier>{f2593f2e-2c72-432b-924c-b2ff05196953}</UniqueIdentifier>
@@ -259,12 +211,6 @@
     <Filter Include="Source Files\Engine\Scripting\Angelscript\Resource Management">
       <UniqueIdentifier>{085fe605-3f55-401c-b1b9-63dcee04798a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Renderer\D3D11\Resource Management">
-      <UniqueIdentifier>{096efe98-78dc-43e7-be5c-cd7694658fad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer\D3D11\Resource Management">
-      <UniqueIdentifier>{5933717b-8dba-4792-99de-2cd1dc3106f9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Scripting\Angelscript\Resource Management">
       <UniqueIdentifier>{8a9bb447-81bb-4b48-8157-25c5713ade8c}</UniqueIdentifier>
     </Filter>
@@ -283,6 +229,54 @@
     <Filter Include="Source Files\Engine\Utility\MessagePack">
       <UniqueIdentifier>{bb55056e-8b8b-410c-8259-26df5de6afd6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engine\Filesystem">
+      <UniqueIdentifier>{bed06d8f-3adf-4793-8e46-44b48a656509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Filesystem">
+      <UniqueIdentifier>{db5f578b-bced-4711-ab48-3e7129dda398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Filesystem\Win32">
+      <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Filesystem\Win32">
+      <UniqueIdentifier>{5e994b2a-3702-430f-afcc-637ae8f6fbde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\System">
+      <UniqueIdentifier>{dbe697c5-6d86-48c1-95cb-2438b9b4fa6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\System">
+      <UniqueIdentifier>{14fc370a-7da5-4239-b163-4ac64ab622d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\System\Win32">
+      <UniqueIdentifier>{a98591c8-ca46-4b0f-882d-2734bd0f5a44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\System\Win32">
+      <UniqueIdentifier>{2fe8694e-ece4-44a3-8e86-b88931f47934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Scheduler\Win32">
+      <UniqueIdentifier>{d6322ca6-4065-4584-b115-d03dfa7fea68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Scheduler\Win32">
+      <UniqueIdentifier>{0e86bd9d-8e85-4568-a429-cf68622a7450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Renderer\Direct3D">
+      <UniqueIdentifier>{c242046a-5770-4e49-9e58-6fd28ef36ac3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Renderer\Direct3D">
+      <UniqueIdentifier>{00f7cf0b-64b8-4119-95fe-da7e6e99afcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Renderer\Direct3D11">
+      <UniqueIdentifier>{2a0c8bbf-6f99-4648-a906-511db0b118de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Renderer\Direct3D11">
+      <UniqueIdentifier>{2f94b043-76d6-45ed-bd7b-4eccb5be1bed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Renderer\Direct3D11\Builders">
+      <UniqueIdentifier>{c460263d-8ea6-495b-9b59-6c3bee7a5844}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Renderer\Direct3D11\Builders">
+      <UniqueIdentifier>{3b621e47-dd77-435b-9da9-fa7bc4ebcb27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Build.cpp">
@@ -300,9 +294,6 @@
     <ClCompile Include="..\src\foundation\Player.cpp">
       <Filter>Source Files\Engine\Foundation\Players</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\system\Win32SystemInterface.cpp">
-      <Filter>Source Files\Engine\Foundation\System</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Foundation\World.cpp">
       <Filter>Source Files\Engine\Foundation\Worlds</Filter>
     </ClCompile>
@@ -311,9 +302,6 @@
     </ClCompile>
     <ClCompile Include="..\src\logging\Logger.cpp">
       <Filter>Source Files\Engine\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\packages\ContentProvider.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\ResourceView.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
@@ -324,18 +312,6 @@
     <ClCompile Include="..\src\renderer\Camera.cpp">
       <Filter>Source Files\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\D3D11\D3D11FormatHelpers.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Builders\D3D11RenderTargetViewBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Builders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp">
-      <Filter>Source Files\Engine\Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\OpenGLRenderer.cpp">
-      <Filter>Source Files\Engine\Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scheduler\Task.cpp">
       <Filter>Source Files\Engine\Scheduler</Filter>
     </ClCompile>
@@ -344,9 +320,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp">
       <Filter>Source Files\Engine\Scheduler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scheduler\Win32Scheduler.cpp">
-      <Filter>Source Files\Engine\Scheduler\Scheduler Implementations</Filter>
     </ClCompile>
     <ClCompile Include="..\src\scripting\Angelscript\AngelscriptWorldView.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
@@ -405,9 +378,6 @@
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp">
       <Filter>Source Files\Engine\Utility\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\ReadableMemoryMappedFile.cpp">
-      <Filter>Source Files\Engine\Utility\File Access</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp">
       <Filter>Source Files\Engine\Utility\Math</Filter>
     </ClCompile>
@@ -420,17 +390,11 @@
     <ClCompile Include="..\src\Foundation\WorldView.cpp">
       <Filter>Source Files\Engine\Foundation\Worlds</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp">
       <Filter>Source Files\Engine\Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\packages\Win32ContentProvider.cpp">
-      <Filter>Source Files\Engine\Packages\Content Provider Implementations</Filter>
     </ClCompile>
     <ClCompile Include="..\examples\Win32EntryPoint.cpp">
       <Filter>Source Files\Games</Filter>
@@ -438,20 +402,8 @@
     <ClCompile Include="..\src\configuration\ConfigurationService.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Builders\Direct3D11DeviceBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Builders</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Packages\ContentPackage.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11BufferBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Builders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Keyboard.cpp">
       <Filter>Source Files\Engine\Input</Filter>
@@ -476,12 +428,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11SwapChain.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\D3D11\builders\Direct3D11SwapChainBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp">
       <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
@@ -510,15 +456,6 @@
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript\Resource Management</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11HLSLPipelineDefinitionView.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Management</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11MeshView.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Management</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11ShaderResourceView.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Management</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Physics\Bullet\BulletWorldView.cpp">
       <Filter>Source Files\Engine\Physics\Bullet</Filter>
     </ClCompile>
@@ -527,12 +464,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp">
       <Filter>Source Files\Engine\Foundation\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.SceneCameraComponent.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Direct3D11WorldView.MeshComponent.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\XInputService.Controller.cpp">
       <Filter>Source Files\Engine\Input\XInput</Filter>
@@ -563,9 +494,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp">
       <Filter>Source Files\Engine\Scheduler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scheduler\Win32Scheduler.WorkerThread.cpp">
-      <Filter>Source Files\Engine\Scheduler\Scheduler Implementations</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\memory\InstanceNew.cpp">
       <Filter>Source Files\Engine\Utility\Memory</Filter>
@@ -618,23 +546,8 @@
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
       <Filter>Source Files\Engine\Utility\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Packages\Win32ContentProvider.SynchronousFileAccessor.cpp">
-      <Filter>Source Files\Engine\Packages\Content Provider Implementations</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Packages\Win32ContentProvider.AsynchronousFileAccessor.cpp">
-      <Filter>Source Files\Engine\Packages\Content Provider Implementations</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\D3D11\Builders\Direct3D11TextureShaderResourceViewBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11\Resource Builders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\Direct3D11RendererService.cpp">
-      <Filter>Source Files\Engine\Renderer\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp">
-      <Filter>Source Files\Engine\Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletEngineService.cpp">
       <Filter>Source Files\Engine\Physics</Filter>
@@ -642,13 +555,91 @@
     <ClCompile Include="..\src\scripting\AngelscriptEngineService.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Packages\ContentPackage.cpp">
+      <Filter>Source Files\Engine\Packages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Filesystem\ContentProvider.cpp">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.cpp">
+      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\ContentProvider.cpp">
+      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileAccessor.cpp">
+      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Filesystem\ReadableMemoryMappedFile.cpp">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp">
+      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\System\Win32\SystemInterface.cpp">
+      <Filter>Source Files\Engine\System\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.cpp">
+      <Filter>Source Files\Engine\Scheduler\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.WorkerThread.cpp">
+      <Filter>Source Files\Engine\Scheduler\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp">
+      <Filter>Source Files\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp">
+      <Filter>Source Files\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\MeshResourceView.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\SwapChain.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshComponent.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCameraComponent.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\RendererService.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\SwapChainBuilder.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureBuilder.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Build.hpp">
       <Filter>Header Files\Games</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\packages\ContentProvider.hpp">
-      <Filter>Header Files\Engine\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
@@ -779,24 +770,6 @@
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp">
       <Filter>Header Files\Engine\Utility\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\AsynchronousFileReader.hpp">
-      <Filter>Header Files\Engine\Utility\File Access</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\AsynchronousFileWriter.hpp">
-      <Filter>Header Files\Engine\Utility\File Access</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\ReadableMemoryMappedFile.hpp">
-      <Filter>Header Files\Engine\Utility\File Access</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\SynchronousFileAppender.hpp">
-      <Filter>Header Files\Engine\Utility\File Access</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\SynchronousFileReader.hpp">
-      <Filter>Header Files\Engine\Utility\File Access</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\SynchronousFileWriter.hpp">
-      <Filter>Header Files\Engine\Utility\File Access</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\physics\PhysicalMaterial.hpp">
       <Filter>Header Files\Engine\Physics</Filter>
     </ClInclude>
@@ -806,24 +779,6 @@
     <ClInclude Include="..\src\Renderer\GPUFormats.hpp">
       <Filter>Header Files\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\D3D11\D3D11FormatHelpers.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\D3D11\D3D11ForwardDeclarations.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Builders\D3D11RenderTargetViewBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp">
-      <Filter>Header Files\Engine\Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp">
-      <Filter>Header Files\Engine\Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\OpenGLRenderer.hpp">
-      <Filter>Header Files\Engine\Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scheduler\Task.hpp">
       <Filter>Header Files\Engine\Scheduler</Filter>
     </ClInclude>
@@ -832,9 +787,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\WorkerContext.hpp">
       <Filter>Header Files\Engine\Scheduler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\scheduler\Win32Scheduler.hpp">
-      <Filter>Header Files\Engine\Scheduler\Scheduler Implementations</Filter>
     </ClInclude>
     <ClInclude Include="..\src\scripting\Angelscript\AngelscriptWorldView.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
@@ -869,12 +821,6 @@
     <ClInclude Include="..\src\foundation\PlayerCommon.hpp">
       <Filter>Header Files\Engine\Foundation\Players</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\system\SystemInterface.hpp">
-      <Filter>Header Files\Engine\Foundation\System</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\system\Win32SystemInterface.hpp">
-      <Filter>Header Files\Engine\Foundation\System</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\foundation\World.hpp">
       <Filter>Header Files\Engine\Foundation\Worlds</Filter>
     </ClInclude>
@@ -899,35 +845,20 @@
     <ClInclude Include="..\src\Networking\Steamworks\SteamworksWorldView.hpp">
       <Filter>Header Files\Engine\Networking\Steamworks</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11WorldView.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp">
       <Filter>Header Files\Engine\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\packages\Win32ContentProvider.hpp">
-      <Filter>Header Files\Engine\Packages\Content Provider Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
       <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Builders\Direct3D11DeviceBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\packages\ContentLibrary.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Packages\ContentPackage.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11BufferBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11TextureBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp">
       <Filter>Header Files\Engine\Scheduler</Filter>
@@ -964,12 +895,6 @@
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurableUTF8String.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11SwapChain.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\D3D11\builders\Direct3D11SwapChainBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ObjectHandle.hpp">
       <Filter>Header Files\Engine\Scripting</Filter>
@@ -1012,18 +937,6 @@
     </ClInclude>
     <ClInclude Include="..\src\foundation\Window.hpp">
       <Filter>Header Files\Engine\Foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11HLSLPipelineDefinitionView.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Management</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11MeshView.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Management</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Direct3D11ShaderResourceView.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Management</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\D3D11\Direct3D11ResourceCommon.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Management</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript\Resource Management</Filter>
@@ -1112,20 +1025,107 @@
     <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\D3D11\Builders\Direct3D11TextureShaderResourceViewBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11\Resource Builders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\Direct3D11RendererService.hpp">
-      <Filter>Header Files\Engine\Renderer\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp">
-      <Filter>Header Files\Engine\Renderer\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Physics\BulletEngineService.hpp">
       <Filter>Header Files\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\scripting\AngelscriptEngineService.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Filesystem\ContentProvider.hpp">
+      <Filter>Header Files\Engine\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\ContentProvider.hpp">
+      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.hpp">
+      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileAccessor.hpp">
+      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Filesystem\AsynchronousFileReader.hpp">
+      <Filter>Header Files\Engine\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Filesystem\AsynchronousFileWriter.hpp">
+      <Filter>Header Files\Engine\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Filesystem\ReadableMemoryMappedFile.hpp">
+      <Filter>Header Files\Engine\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Filesystem\SynchronousFileAppender.hpp">
+      <Filter>Header Files\Engine\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Filesystem\SynchronousFileReader.hpp">
+      <Filter>Header Files\Engine\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Filesystem\SynchronousFileWriter.hpp">
+      <Filter>Header Files\Engine\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp">
+      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\system\SystemInterface.hpp">
+      <Filter>Header Files\Engine\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\System\Win32\SystemInterface.hpp">
+      <Filter>Header Files\Engine\System\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scheduler\Win32\TaskScheduler.hpp">
+      <Filter>Header Files\Engine\Scheduler\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp">
+      <Filter>Header Files\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp">
+      <Filter>Header Files\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp">
+      <Filter>Header Files\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\ForwardDeclarations.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\MeshResourceView.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\ResourceCommon.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\SwapChain.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\WorldView.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\RendererService.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\SwapChainBuilder.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\TextureBuilder.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
