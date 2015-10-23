@@ -1,5 +1,5 @@
 /*==================================================================*\
-  XAudio2AudioRenderer.hpp
+  RendererService.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -19,9 +19,9 @@
 #include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-#include <XAudio2.h>
+#	include <XAudio2.h>
 #else
-#include <C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include/XAudio2.h>
+#	include <C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include/XAudio2.h>
 #endif
 //------------------------------------------------------------------//
 
@@ -36,15 +36,17 @@ namespace Sound {
 
 // ---------------------------------------------------
 	
-	class XAudio2AudioRenderer : public Foundation::GameEngineService, public ::IXAudio2EngineCallback {
+namespace XAudio2 {
+
+	class RendererService : public Foundation::GameEngineService, public ::IXAudio2EngineCallback {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this XAudio2AudioRenderer instance.
-		XAudio2AudioRenderer( Foundation::GameEngine& owningEngine );
+		//! Constructs this @ref RendererService instance.
+		RendererService( Foundation::GameEngine& owningEngine );
 
-		// Destroys this XAudio2AudioRenderer instance.
-		~XAudio2AudioRenderer();
+		//! Destroys this @ref RendererService instance.
+		~RendererService();
 
 	// ---------------------------------------------------
 
@@ -84,5 +86,6 @@ namespace Sound {
 		Utility::COMPointer<::IXAudio2>								_audio;
 	};
 
+}	// namespace XAudio2
 }	// namespace Sound
 }	// namespace Eldritch2

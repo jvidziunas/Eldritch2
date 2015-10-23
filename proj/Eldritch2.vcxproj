@@ -248,7 +248,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\scripting\Angelscript\WorldView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\NativeBindings.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp" />
-    <ClCompile Include="..\src\Sound\XAudio2AudioRenderer.cpp" />
+    <ClCompile Include="..\src\Sound\XAudio2\RendererService.cpp" />
     <ClCompile Include="..\src\System\Win32\SystemInterface.cpp" />
     <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src\Utility\Concurrency\UserSemaphore.cpp" />
@@ -347,6 +347,8 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Packages\ContentPackage.hpp" />
     <ClInclude Include="..\src\Packages\ResourceView.hpp" />
     <ClInclude Include="..\src\Scripting\ObjectHandle.hpp" />
+    <ClInclude Include="..\src\Sound\XAudio2\ForwardDeclarations.hpp" />
+    <ClInclude Include="..\src\Sound\XAudio2\RendererService.hpp" />
     <ClInclude Include="..\src\System\Win32\SystemInterface.hpp" />
     <ClInclude Include="..\src\Utility\Algorithms.hpp" />
     <ClInclude Include="..\src\Utility\Assert.hpp" />
@@ -429,7 +431,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\scripting\Angelscript\WorldView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\NativeBindings.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.hpp" />
-    <ClInclude Include="..\src\Sound\XAudio2AudioRenderer.hpp" />
     <ClInclude Include="..\src\configuration\ConfigurableUTF8String.hpp" />
     <ClInclude Include="..\src\configuration\ConfigurableVariable.hpp" />
     <ClInclude Include="..\src\configuration\ConfigurationDatabase.hpp" />

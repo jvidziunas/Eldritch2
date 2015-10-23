@@ -1,5 +1,5 @@
 /*==================================================================*\
-  XAudio2AudioRenderer.cpp
+  RendererService.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
+#include <Sound/XAudio2/RendererService.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
-#include <Sound/XAudio2AudioRenderer.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Foundation/Application.hpp>
 #include <Foundation/GameEngine.hpp>
@@ -24,9 +24,9 @@
 // LIBRARIES
 //==================================================================//
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-ET_LINK_LIBRARY( "XAudio2.lib" )
+	ET_LINK_LIBRARY( "XAudio2.lib" )
 #else
-ET_LINK_LIBRARY( "ole32.lib" )
+	ET_LINK_LIBRARY( "ole32.lib" )
 #endif
 //------------------------------------------------------------------//
 
@@ -45,17 +45,18 @@ using namespace ::std;
 
 namespace Eldritch2 {
 namespace Sound {
+namespace XAudio2 {
 	
-	XAudio2AudioRenderer::XAudio2AudioRenderer( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-																			 _allocator( GetEngineAllocator(), UTF8L("XAudio2 Audio Renderer Allocator") ),
-																			 _forcedSpeakerCount( 0u ),
-																			 _processorAffinityMask( ::XAUDIO2_DEFAULT_PROCESSOR ),
-																			 _deviceName( "", GetEngineAllocator() ),
-																			 _audioGlitchCount( 0u ) {}
+	RendererService::RendererService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
+																   _allocator( GetEngineAllocator(), UTF8L("XAudio2 Audio Renderer Allocator") ),
+																   _forcedSpeakerCount( 0u ),
+																   _processorAffinityMask( ::XAUDIO2_DEFAULT_PROCESSOR ),
+																   _deviceName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
+																   _audioGlitchCount( 0u ) {}
 
 // ---------------------------------------------------
 
-	XAudio2AudioRenderer::~XAudio2AudioRenderer() {
+	RendererService::~RendererService() {
 		if( _audio ) {
 			_audio->StopEngine();
 		}
@@ -63,19 +64,19 @@ namespace Sound {
 
 // ---------------------------------------------------
 
-	const UTF8Char* const XAudio2AudioRenderer::GetName() const {
+	const UTF8Char* const RendererService::GetName() const {
 		return UTF8L("XAudio2 Audio Renderer");
 	}
 
 // ---------------------------------------------------
 
-	void XAudio2AudioRenderer::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
+	void RendererService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
 		class InitalizeXAudioTask : public CRTPTransientTask<InitalizeXAudioTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			// Constructs this InitializeXAudioTask instance.
-			ETInlineHint InitalizeXAudioTask( XAudio2AudioRenderer& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitalizeXAudioTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
+			ETInlineHint InitalizeXAudioTask( RendererService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitalizeXAudioTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
 																																  _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
@@ -96,7 +97,7 @@ namespace Sound {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			XAudio2AudioRenderer&	_host;
+			RendererService&	_host;
 		};
 
 	// ---
@@ -106,7 +107,7 @@ namespace Sound {
 
 // ---------------------------------------------------
 
-	void XAudio2AudioRenderer::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const ServiceTickTaskVisitor ) {
+	void RendererService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const ServiceTickTaskVisitor ) {
 		::XAUDIO2_PERFORMANCE_DATA	performanceData;
 
 		_audio->GetPerformanceData( &performanceData );
@@ -120,7 +121,7 @@ namespace Sound {
 
 // ---------------------------------------------------
 
-	void XAudio2AudioRenderer::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
+	void RendererService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
 		visitor.PushSection( UTF8L("XAudio2") );
 
 		visitor.Register( UTF8L("ForcedSpeakerCount"), _forcedSpeakerCount ).Register( UTF8L("AudioProcessingThreadAffinityMask"), _processorAffinityMask );
@@ -129,11 +130,11 @@ namespace Sound {
 
 // ---------------------------------------------------
 
-	void XAudio2AudioRenderer::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
+	void RendererService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode XAudio2AudioRenderer::InitializeXAudio() {
+	ErrorCode RendererService::InitializeXAudio() {
 		decltype(_audio)	audio;
 
 		GetLogger()( UTF8L("Creating XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
@@ -153,17 +154,18 @@ namespace Sound {
 
 // ---------------------------------------------------
 
-	void XAudio2AudioRenderer::OnProcessingPassStart() {}
+	void RendererService::OnProcessingPassStart() {}
 
 // ---------------------------------------------------
 
-	void XAudio2AudioRenderer::OnProcessingPassEnd() {}
+	void RendererService::OnProcessingPassEnd() {}
 
 // ---------------------------------------------------
 
-	void XAudio2AudioRenderer::OnCriticalError( ::HRESULT /*error*/ ) {
+	void RendererService::OnCriticalError( ::HRESULT /*error*/ ) {
 		GetLogger( LogMessageType::ERROR )( UTF8L("Critical error in XAudio!") );
 	}
 
+}	// namespace XAudio2
 }	// namespace Sound
 }	// namespace Eldritch2

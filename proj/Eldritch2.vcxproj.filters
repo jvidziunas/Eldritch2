@@ -321,9 +321,6 @@
     <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Sound\XAudio2AudioRenderer.cpp">
-      <Filter>Source Files\Engine\Sound\XAudio2</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Assert.cpp">
       <Filter>Source Files\Engine\Utility</Filter>
     </ClCompile>
@@ -633,6 +630,9 @@
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Sound\XAudio2\RendererService.cpp">
+      <Filter>Source Files\Engine\Sound\XAudio2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Build.hpp">
@@ -787,9 +787,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Sound\XAudio2AudioRenderer.hpp">
-      <Filter>Header Files\Engine\Sound\XAudio2</Filter>
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurableVariable.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
@@ -1126,6 +1123,12 @@
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\NativeBindings.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sound\XAudio2\ForwardDeclarations.hpp">
+      <Filter>Header Files\Engine\Sound\XAudio2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sound\XAudio2\RendererService.hpp">
+      <Filter>Header Files\Engine\Sound\XAudio2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

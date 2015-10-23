@@ -22,8 +22,8 @@
 #include <Utility/Win32ApplicationHelpers.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Scheduler/Win32/TaskScheduler.hpp>
+#include <Sound/XAudio2/RendererService.hpp>
 #include <System/Win32/SystemInterface.hpp>
-#include <Sound/XAudio2AudioRenderer.hpp>
 #include <Input/Win32InputService.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Input/XInputService.hpp>
@@ -118,14 +118,14 @@ namespace {
 
 	// ---------------------------------------------------
 
-		ConfigurationService			_configurationService;
-		XInputService					_controllerInputService;
-		Win32InputService				_inputService;
-		SteamworksNetworkingService		_networkingService;
-		AngelScript::EngineService		_scriptService;
-		BulletDynamics::EngineService	_physicsService;
-		Direct3D11::RendererService		_direct3DRendererService;
-		XAudio2AudioRenderer			_audioRendererService;
+		ConfigurationService				_configurationService;
+		XInputService						_controllerInputService;
+		Win32InputService					_inputService;
+		SteamworksNetworkingService			_networkingService;
+		AngelScript::EngineService			_scriptService;
+		BulletDynamics::EngineService		_physicsService;
+		Direct3D11::RendererService			_direct3DRendererService;
+		Sound::XAudio2::RendererService		_audioRendererService;
 	};
 
 // ---------------------------------------------------
