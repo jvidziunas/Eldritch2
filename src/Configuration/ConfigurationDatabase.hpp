@@ -26,10 +26,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Configuration {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-
-// ---------------------------------------------------
-
 	class ConfigurationDatabase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -77,7 +73,7 @@ namespace Configuration {
 
 	// - FRIEND CLASS DECLARATION ------------------------
 
-		friend class ::Eldritch2::Configuration::ConfigurationPublishingInitializationVisitor;
+		friend class ConfigurationPublishingInitializationVisitor;
 	};
 
 }	// namespace Configuration

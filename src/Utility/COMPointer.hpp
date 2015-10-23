@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <class InterfaceType>
 	class COMPointer : public ::Eldritch2::IntrusivePointerBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

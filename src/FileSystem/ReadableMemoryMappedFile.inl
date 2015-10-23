@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-
-// ---------------------------------------------------
-
 	template <typename Structure>
 	ETInlineHint const Structure* ReadableMemoryMappedFile::TryGetStructureAtOffset( const size_t rawFileOffsetInBytes ) const {
 		return this->GetAddressForFileByteOffset( rawFileOffsetInBytes + sizeof(Structure) ) ? static_cast<const Structure*>(this->GetAddressForFileByteOffset( rawFileOffsetInBytes )) : nullptr;

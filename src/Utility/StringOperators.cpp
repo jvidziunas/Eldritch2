@@ -30,7 +30,9 @@ namespace {
 
 }	// anonymous namespace
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Utility {
+namespace Detail {
 
 	uint64 FastHash( const void* bufferToHash, const size_t lengthInBytes, const uint64 seed ) {
 		const uint64			m( 0x880355f21e6d1965ULL );
@@ -74,4 +76,6 @@ namespace Eldritch2Detail {
 		return static_cast<uint32>(h - (h >> 32));
 	}
 
-}	// namespace Eldritch2Detail
+}	// namespace Detail
+}	// namespace Utility
+}	// namespace Eldritch2

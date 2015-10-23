@@ -112,10 +112,6 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	Float4Marshal::~Float4Marshal() {}
-
-// ---------------------------------------------------
-
 	ETNoAliasHint void Float4Marshal::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static void ETScriptAPICall Constructor0( void* const thisPointer, float32 x, float32 y ) {
@@ -247,10 +243,6 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	OrientationMarshal::OrientationMarshal( const ::Eldritch2::Quaternion initializer ) : Quaternion( initializer ) {}
-
-// ---------------------------------------------------
-
-	OrientationMarshal::~OrientationMarshal() {}
 
 // ---------------------------------------------------
 

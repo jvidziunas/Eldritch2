@@ -21,10 +21,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename Container>
 	MessagePackWriter::ArrayAdapter<Container>::ArrayAdapter( Container& container ) : MessagePackBase::Array( container.Size() ), _container( container ) {}
 

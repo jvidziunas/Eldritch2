@@ -18,11 +18,6 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	namespace Scripting = ::Eldritch2::Scripting;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename... Arguments>
 	ETInlineHint ScriptAPIRegistrationInitializationVisitor::ScriptAPIRegistrationInitializationVisitor( Arguments&&... arguments ) : UnderlyingTypeRegistrar( ::std::forward<Arguments>( arguments )... ) {}
 

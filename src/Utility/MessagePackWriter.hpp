@@ -24,10 +24,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class MessagePackWriter : public Utility::MessagePackBase {
 	// - TYPE PUBLISHING ---------------------------------
 

@@ -25,11 +25,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Configuration {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-	namespace Foundation	= ::Eldritch2::Foundation;
-
-// ---------------------------------------------------
-
 	class EngineService : public Foundation::GameEngineService, private Configuration::ConfigurationDatabase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

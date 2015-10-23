@@ -32,7 +32,8 @@ namespace {
 
 }	// anonymous namespace
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
 	IntrusiveVyukovMPSCQueueBase::IntrusiveVyukovMPSCQueueBase() : _head( &_stub ), _tail( &_stub ) {
 		_stub.next = nullptr;
@@ -81,7 +82,5 @@ namespace Eldritch2Detail {
 		AtomicStore( _head.exchange( &object, memory_order_release )->next, &object, memory_order_release ); 
 	}
 
-}	// namespace Eldritch2Detail
-
-
-
+}	// namespace Detail
+}	// namespace Eldritch2

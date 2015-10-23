@@ -18,8 +18,6 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	WorldView;
-		class	EngineService;
 		class	StringMarshal;
 	}
 }
@@ -29,13 +27,6 @@ struct	asSMessageInfo;
 
 namespace Eldritch2 {
 namespace Scripting {
-
-	namespace Configuration	= ::Eldritch2::Configuration;
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
 namespace AngelScript {
 
 	class EngineService : public Foundation::GameEngineService {

@@ -31,10 +31,6 @@
 
 namespace Eldritch2 {
 
-	ETForceInlineHint RadianMeasure::RadianMeasure() {}
-
-// ---------------------------------------------------
-
 	ETForceInlineHint RadianMeasure::RadianMeasure( ::Eldritch2::float32 value ) : _measure( value ) {}
 
 // ---------------------------------------------------
@@ -44,10 +40,6 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	ETForceInlineHint RadianMeasure::RadianMeasure( const Eldritch2::RadianMeasure& value ) : _measure( value._measure ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint RadianMeasure::~RadianMeasure() {}
 
 // ---------------------------------------------------
 
@@ -90,10 +82,6 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint DegreeMeasure::DegreeMeasure() {}
-
-// ---------------------------------------------------
-
 	ETForceInlineHint DegreeMeasure::DegreeMeasure( ::Eldritch2::float32 value ) : _measure( value ) {}
 
 // ---------------------------------------------------
@@ -103,10 +91,6 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	ETForceInlineHint DegreeMeasure::DegreeMeasure( const ::Eldritch2::RadianMeasure& value ) : _measure( RAD2DEG( static_cast<::Eldritch2::float32>( value ) ) ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint DegreeMeasure::~DegreeMeasure() {}
 
 // ---------------------------------------------------
 

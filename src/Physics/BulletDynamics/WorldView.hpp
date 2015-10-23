@@ -43,13 +43,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Physics {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Physics		= ::Eldritch2::Physics;
-
-// ---------------------------------------------------
-
 namespace BulletDynamics {
 
 	class ET16ByteAligned WorldView : public Foundation::WorldView {

@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename ResultObject>
 	struct Result {
 		template <typename CompatibleResultObject>

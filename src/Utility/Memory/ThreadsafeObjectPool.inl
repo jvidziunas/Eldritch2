@@ -15,21 +15,11 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2
-{
-
-namespace Utility
-{
-
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
+namespace Eldritch2 {
+namespace Utility {
 
 	template <typename Allocator>
-	ThreadsafeObjectPool<Allocator>::ThreadsafeObjectPool( SizeType elementSizeInBytes, SizeType objectsPerPage, const AllocatorType& allocatorTemplate ) : _pool( elementSizeInBytes,
-																																								   objectsPerPage,
-																																								   allocatorTemplate ),
-																																							_lock( nullptr ) {}
+	ThreadsafeObjectPool<Allocator>::ThreadsafeObjectPool( SizeType elementSizeInBytes, SizeType objectsPerPage, const AllocatorType& allocatorTemplate ) : _pool( elementSizeInBytes, objectsPerPage, allocatorTemplate ), _lock( nullptr ) {}
 
 // ---------------------------------------------------
 
@@ -189,5 +179,4 @@ namespace Utility
 	}
 
 }	// namespace Utility
-
 }	// namespace Eldritch2

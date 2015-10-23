@@ -251,8 +251,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Sound\XAudio2\EngineService.cpp" />
     <ClCompile Include="..\src\System\Win32\SystemInterface.cpp" />
     <ClCompile Include="..\src\Utility\Assert.cpp" />
-    <ClCompile Include="..\src\Utility\Concurrency\UserSemaphore.cpp" />
-    <ClCompile Include="..\src\Utility\Concurrency\WaitableUserEvent.cpp" />
     <ClCompile Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.cpp" />
     <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp" />
     <ClCompile Include="..\src\Utility\DebugController.cpp" />
@@ -440,7 +438,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\foundation\GameEngine.hpp" />
     <ClInclude Include="..\src\foundation\GameEngineService.hpp" />
     <ClInclude Include="..\src\foundation\Player.hpp" />
-    <ClInclude Include="..\src\foundation\PlayerCommon.hpp" />
     <ClInclude Include="..\src\system\SystemInterface.hpp" />
     <ClInclude Include="..\src\foundation\World.hpp" />
     <ClInclude Include="..\src\Foundation\WorldView.hpp" />

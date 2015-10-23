@@ -19,29 +19,18 @@
 #include <cstdlib>
 //------------------------------------------------------------------//
 
-#if( !ET_COMPILER_SUPPORTS_CPP11 )
-#	define ETCompileTimeAssert( cond )             { struct CompileTimeError { char compile_time_assert_failed:(cond); }; }
-#	define ETCompileTimeAssertMessage( cond, msg ) { struct CompileTimeError { char msg:(cond); }; }
-#else
-#	error TODO: Update MPL compile-time assert library to use the standard C++ static_assert.
-#endif
-
 namespace Eldritch2 {
 
-	namespace AssertionFailures {
+	enum AssertionFailure : ::Eldritch2::uint8 {
+		FATAL		= 0,
+		NONFATAL	= 1
+	};
 
-		STRONG_ENUM_CLASS( AssertionFailure, ::Eldritch2::uint8 ) {
-			FATAL		= 0,
-			NONFATAL	= 1
-		};
+// ---
 
-	}	// namespace AssertionFailures
-
-	typedef AssertionFailures::AssertionFailure	AssertionFailure;
+	using AssertionHandler	= AssertionFailure (*)( const char*, const char*, uint32, const char* );
 
 // ---------------------------------------------------
-
-	typedef AssertionFailure (*AssertionHandler)( const char*, const char*, uint32, const char* );
 
 	AssertionHandler	GetAssertHandler();
 

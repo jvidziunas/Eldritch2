@@ -18,11 +18,6 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	namespace Scripting	= ::Eldritch2::Scripting;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ScriptAPIRegistrationInitializationVisitor : public Scripting::AngelScript::UserDefinedTypeRegistrar {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

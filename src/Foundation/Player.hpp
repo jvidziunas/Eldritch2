@@ -14,37 +14,52 @@
 //==================================================================//
 #include <Scripting/ReferenceTypeBase.hpp>
 #include <Utility/MPL/CharTypes.hpp>
+#include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Foundation {
 
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint Player : public Scripting::ReferenceTypeBase {
-	// ---------------------------------------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		struct MachineAddress {
+			union {
+				::Eldritch2::uint64			version6Address[2];
+
+				struct {
+					union {
+						::Eldritch2::uint32	address;
+						::Eldritch2::uint8	addressBytes[4u];
+					};
+
+					::Eldritch2::uint16		port;
+				}							version4Address;
+			};
+
+			bool							isVersion6Address;
+		};
+
+	// ---
+
+		struct PlayerGUID {
+			::Eldritch2::uint8	bytes[16u];
+		};
+
+	// ---------------------------------------------------
+
 		virtual const ::Eldritch2::UTF8Char*	GetName() const abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this Player instance.
-		ETInlineHint Player();
+		//!	Constructs this @ref Player instance.
+		ETInlineHint Player() = default;
 
-		// Destroys this Player instance.
-		ETInlineHint ~Player();
+		//!	Destroys this @ref Player instance.
+		ETInlineHint ~Player() = default;
 	};
 
 }	// namespace Foundation
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Foundation/Player.inl>
-//------------------------------------------------------------------//

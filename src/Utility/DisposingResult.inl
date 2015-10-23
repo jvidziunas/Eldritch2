@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename ResultObject>
 	template <typename CompatibleResultObject>
 	ETInlineHint DisposingResult<ResultObject>::DisposingResult( Scripting::ObjectHandle<CompatibleResultObject>&& object ) : object( ::std::move( object ) ), resultCode( ::Eldritch2::Error::NONE ) {}

@@ -21,23 +21,22 @@
 #include <iterator>
 //------------------------------------------------------------------//
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
 	struct ResizableArrayBase {
 		struct	UnorderedSemantics {};
 		struct	ReleaseMemorySemantics {};
 	};
 
-}	// namespace Eldritch2Detail
-
-namespace Eldritch2 {
+}	// namespace Detail
 
 	template <typename StoredObject, typename Allocator = ::Eldritch2::ChildAllocator>
-	class ResizableArray : public ::Eldritch2Detail::ResizableArrayBase {
+	class ResizableArray : public Detail::ResizableArrayBase {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
 		using UnderlyingContainer	= ::rde::vector<StoredObject, PrivateAllocator>;
 
 	public:
@@ -268,8 +267,8 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	extern const ::Eldritch2Detail::ResizableArrayBase::UnorderedSemantics		UnorderedSemantics;
-	extern const ::Eldritch2Detail::ResizableArrayBase::ReleaseMemorySemantics	ReleaseMemorySemantics;
+	extern const Detail::ResizableArrayBase::UnorderedSemantics		UnorderedSemantics;
+	extern const Detail::ResizableArrayBase::ReleaseMemorySemantics	ReleaseMemorySemantics;
 
 }	// namespace Eldritch2
 

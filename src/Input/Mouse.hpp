@@ -27,12 +27,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Input {
 
-	namespace Scripting	= ::Eldritch2::Scripting;
-	namespace Utility	= ::Eldritch2::Utility;
-	namespace Input		= ::Eldritch2::Input;
-
-// ---------------------------------------------------
-
 	class Mouse : public Scripting::ReferenceTypeBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

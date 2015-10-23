@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Eldritch2 {
-namespace Dynamics {
+namespace Physics {
 
 	class PhysicalMaterial {
 	public:
@@ -9,5 +9,5 @@ namespace Dynamics {
 		~PhysicalMaterial();
 	};
 
-}	// namespace Dynamics
+}	// namespace Physics
 }	// namespace Eldritch2

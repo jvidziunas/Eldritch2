@@ -28,10 +28,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Scheduler {
 
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint Thread : private Utility::Noncopyable {
 	public:
 		//! Retrieves a pointer to a null-terminated character array containing the UTF8-encoded name of this thread.
@@ -74,10 +70,10 @@ namespace Scheduler {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this Thread instance.
+		//!	Constructs this @ref Thread instance.
 		Thread();
 
-		// Destroys this Thread instance.
+		//!	Destroys this @ref Thread instance.
 		~Thread();
 
 	// ---------------------------------------------------

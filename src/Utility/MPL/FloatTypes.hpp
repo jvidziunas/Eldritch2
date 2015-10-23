@@ -30,8 +30,8 @@
 
 namespace Eldritch2 {
 
-	typedef ::half_float::half	float16;
-	typedef float				float32;
-	typedef double				float64;
+	using float16	= ::half_float::half;
+	using float32	= float;
+	using float64	= double;
 
 }	// namespace Eldritch2

@@ -18,7 +18,8 @@
 
 typedef void*	HANDLE;
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
 	class Win32HeapAllocatorBase : public ::Eldritch2::Allocator {
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
@@ -53,12 +54,9 @@ namespace Eldritch2Detail {
 		const ::HANDLE	_heap;
 	};
 
-}	// namespace Eldritch2Detail
+}	// namespace Detail
 
-
-namespace Eldritch2 {
-
-	class Win32GlobalHeapAllocator : public ::Eldritch2Detail::Win32HeapAllocatorBase {
+	class Win32GlobalHeapAllocator : public Detail::Win32HeapAllocatorBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -71,7 +69,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	class Win32PrivateHeapAllocator : public ::Eldritch2Detail::Win32HeapAllocatorBase {
+	class Win32PrivateHeapAllocator : public Detail::Win32HeapAllocatorBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:

@@ -19,11 +19,6 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename KnownContentLocationIterator>
 	Utility::Result<FileSystem::AsynchronousFileReader> ContentProvider::CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName ) {
 		Utility::Result<FileSystem::AsynchronousFileReader>	result { ::Eldritch2::Error::BAD_FILE_NAME };

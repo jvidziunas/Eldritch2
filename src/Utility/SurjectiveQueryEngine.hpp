@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 #if 0
 	class SurjectveQueryEngine {
 	public:

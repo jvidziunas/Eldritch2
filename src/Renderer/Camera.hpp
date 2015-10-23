@@ -24,18 +24,14 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Renderer {
 
-	namespace Renderer	= ::Eldritch2::Renderer;
-
-// ---------------------------------------------------
-
 	class Camera {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Camera instance.
+		//!	Constructs this @ref Camera instance.
 		Camera();
 
-		// Destroys this Camera instance.
+		//!	Destroys this @ref Camera instance.
 		~Camera();
 
 	// ---------------------------------------------------

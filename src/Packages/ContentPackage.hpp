@@ -41,12 +41,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ContentPackage : public Scripting::ReferenceTypeBase, public Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 

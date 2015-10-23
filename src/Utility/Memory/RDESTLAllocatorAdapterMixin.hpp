@@ -15,25 +15,26 @@
 #include <Utility/MPL/Compiler.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
 	template <typename PublicAllocatorType>
 	class RDESTLAllocatorAdapterMixin : public PublicAllocatorType {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		typedef typename PublicAllocatorType	RealAllocatorType;
+		using RealAllocatorType	= typename PublicAllocatorType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref RDESTLAllocatorAdapterMixin instance.
 		/*!	@param[in] allocator Const @ref RDESTLAllocatorAdapterMixin reference from which resources will be copied.
 			*/
-		ETForceInlineHint RDESTLAllocatorAdapterMixin( const ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>& allocator ) = default;
+		ETForceInlineHint RDESTLAllocatorAdapterMixin( const Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>& allocator ) = default;
 		//! Constructs this @ref RDESTLAllocatorAdapterMixin instance.
 		/*!	@param[in] allocator Movable @ref RDESTLAllocatorAdapterMixin reference from which resources will be moved.
 			*/
-		ETForceInlineHint RDESTLAllocatorAdapterMixin( ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>&& allocator );
+		ETForceInlineHint RDESTLAllocatorAdapterMixin( Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>&& allocator );
 		//! Constructs this @ref RDESTLAllocatorAdapterMixin instance.
 		/*!	@param[in] allocator Movable @ref Allocator subclass instance from which resources will be moved.
 			*/
@@ -55,7 +56,8 @@ namespace Eldritch2Detail {
 		ETForceInlineHint const char*	get_name() const;
 	};
 
-}	// namespace Eldritch2Detail
+}	// namespace Detail
+}	// namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

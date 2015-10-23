@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint WaitableUserEvent : private Utility::Noncopyable {
 	public:
 		virtual void	BlockUntilSignaled() abstract;
@@ -33,11 +29,11 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this WaitableUserEvent instance.
-		WaitableUserEvent();
+		//!	Constructs this @ref WaitableUserEvent instance.
+		WaitableUserEvent() = default;
 
-		// Destroys this WaitableUserEvent instance.
-		~WaitableUserEvent();
+		//!	Destroys this @ref WaitableUserEvent instance.
+		~WaitableUserEvent() = default;
 	};
 
 }	// namespace Utility

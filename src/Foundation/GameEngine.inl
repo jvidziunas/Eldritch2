@@ -22,12 +22,6 @@
 namespace Eldritch2 {
 namespace Foundation {
 
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace System		= ::Eldritch2::System;
-
-// ---------------------------------------------------
-
 	ETInlineHint const Scheduler::TaskScheduler& GameEngine::GetTaskScheduler() const {
 		return _scheduler;
 	}

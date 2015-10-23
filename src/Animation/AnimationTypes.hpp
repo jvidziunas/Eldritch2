@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Animation {
 
-	namespace Animation	= ::Eldritch2::Animation;
-
-// ---------------------------------------------------
-
 	typedef ::Eldritch2::float16	KeyTime;
 
 // ---------------------------------------------------

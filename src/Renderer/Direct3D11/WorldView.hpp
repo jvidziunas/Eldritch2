@@ -40,14 +40,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Renderer {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Animation		= ::Eldritch2::Animation;
-	namespace Renderer		= ::Eldritch2::Renderer;
-
-// ---------------------------------------------------
-
 namespace Direct3D11 {
 
 	class WorldView : public Foundation::WorldView {

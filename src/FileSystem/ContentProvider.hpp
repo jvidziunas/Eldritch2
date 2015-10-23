@@ -45,12 +45,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint ContentProvider : private Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 

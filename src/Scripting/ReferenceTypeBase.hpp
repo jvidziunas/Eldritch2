@@ -20,10 +20,6 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	namespace Scripting	= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
 	class ReferenceTypeBase {
 	// - REFERENCE MANAGEMENT ----------------------------
 

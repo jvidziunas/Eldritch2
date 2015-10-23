@@ -5,7 +5,7 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -17,10 +17,6 @@
 
 namespace Eldritch2 {
 namespace Configuration {
-
-	namespace Configuration = ::Eldritch2::Configuration;
-
-// ---------------------------------------------------
 
 	ETInlineHint ConfigurationDatabase::Key::Key( const ::Eldritch2::UTF8Char* const section, const ::Eldritch2::UTF8Char* const name ) : section( section ), name( name ) {}
 

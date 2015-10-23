@@ -18,11 +18,6 @@
 
 namespace Eldritch2 {
 namespace FileSystem {
-
-	namespace FileSystem = ::Eldritch2::FileSystem;
-
-// ---------------------------------------------------
-
 namespace Win32 {
 
 	class ReadableMemoryMappedFile : public FileSystem::ReadableMemoryMappedFile {

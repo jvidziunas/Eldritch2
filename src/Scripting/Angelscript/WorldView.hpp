@@ -40,12 +40,6 @@ namespace std {
 
 namespace Eldritch2 {
 namespace Scripting {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
 namespace AngelScript {
 
 	class WorldView : public Foundation::WorldView {

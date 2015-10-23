@@ -26,11 +26,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Animation {
 
-	namespace Scripting = ::Eldritch2::Scripting;
-	namespace Animation = ::Eldritch2::Animation;
-
-// ---------------------------------------------------
-
 	class LocalSpaceAnimator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

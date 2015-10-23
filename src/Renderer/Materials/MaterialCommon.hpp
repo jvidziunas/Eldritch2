@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Renderer {
 
-	namespace Renderer	= ::Eldritch2::Renderer;
-
-// ---------------------------------------------------
-
 	namespace MaterialStageFlag {
 
 		ENUM_CLASS( ::Eldritch2::uint32 ) {

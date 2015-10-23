@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Scheduler {
 
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-
-// ---------------------------------------------------
-
 	class WorkerContext {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -29,7 +25,7 @@ namespace Scheduler {
 		struct WorkItem {
 		// - TYPE PUBLISHING ---------------------------------
 
-			typedef void (*CodePointer)(void*, WorkerContext&);
+			using CodePointer	= void (*)( void*, WorkerContext& );
 
 		// ---
 
@@ -44,10 +40,10 @@ namespace Scheduler {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//! Constructs this @ref WorkerContext instance.
+		//!	Constructs this @ref WorkerContext instance.
 		WorkerContext( const WorkItem& defaultWorkItem, ::Eldritch2::Allocator& allocator );
 
-		// Destroys this @ref WorkerContext instance.
+		//!	Destroys this @ref WorkerContext instance.
 		~WorkerContext() = default;
 
 	// ---------------------------------------------------

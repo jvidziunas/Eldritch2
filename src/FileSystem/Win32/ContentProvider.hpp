@@ -36,14 +36,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace FileSystem {
-
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scheduler		= ::Eldritch2::Scheduler;
-	namespace Utility		= ::Eldritch2::Utility;
-	namespace System		= ::Eldritch2::System;
-
-// ---------------------------------------------------
-
 namespace Win32 {
 
 	class ContentProvider : public FileSystem::ContentProvider {

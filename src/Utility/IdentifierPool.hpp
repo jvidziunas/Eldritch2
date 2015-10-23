@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename Identifier, class Allocator = ::Eldritch2::ChildAllocator>
 	class IdentifierPool : public Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------

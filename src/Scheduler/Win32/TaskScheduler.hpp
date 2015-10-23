@@ -30,12 +30,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Scheduler {
-
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-	namespace System	= ::Eldritch2::System;
-
-// ---------------------------------------------------
-
 namespace Win32 {
 
 	class TaskScheduler : public Scheduler::TaskScheduler {

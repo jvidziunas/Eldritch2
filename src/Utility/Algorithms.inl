@@ -6,7 +6,7 @@
   the STL algorithms header.
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -17,8 +17,9 @@
 #include <algorithm>
 //------------------------------------------------------------------//
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
 namespace Utility {
+namespace Detail {
 
 	template <typename InputIterator, typename OutputIterator, typename Predicate>
 	ETInlineHint OutputIterator RemoveCopyIf( InputIterator begin, InputIterator end, OutputIterator destination, Predicate predicate ) {
@@ -44,15 +45,7 @@ namespace Utility {
 		return destination;
 	}
 
-}	// namespace Utility
-}	// namespace Eldritch2Detail
-
-namespace Eldritch2 {
-namespace Utility {
-
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
+}	// namespace Detail
 
 	template <typename InputIterator, typename Predicate>
 	InputIterator Find( InputIterator begin, InputIterator end, Predicate predicate ) {
@@ -288,7 +281,7 @@ namespace Utility {
 		}
 
 		ForwardIterator	copyBegin( begin );
-		return ::Eldritch2Detail::Utility::RemoveCopyIf( ++copyBegin, end, begin, predicate );
+		return Detail::RemoveCopyIf( ++copyBegin, end, begin, predicate );
 	}
 
 // ---------------------------------------------------
@@ -303,7 +296,7 @@ namespace Utility {
 
 		// nonempty sequence, worth doing
 		ForwardIterator	copyBegin( begin );
-		return ::Eldritch2Detail::Utility::RemoveCopyIf( ++copyBegin, end, begin, extraArgument, predicate );
+		return Detail::RemoveCopyIf( ++copyBegin, end, begin, extraArgument, predicate );
 	}
 
 // ---------------------------------------------------

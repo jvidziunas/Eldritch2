@@ -3,6 +3,7 @@
   ------------------------------------------------------------------
   Purpose:
 
+
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
@@ -36,11 +37,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Scheduler {
-
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
 
 	typedef ::Eldritch2::uintptr	BackoffContext;
 
@@ -100,7 +96,7 @@ namespace Scheduler {
 
 		virtual void	SetThreadPriorityForCaller( const ThreadPriority priority );
 
-	// - SYNCHRONIZATION OBJECT ALLOCATION/DEALLOCATION --
+	// - SYNCHRONIZATION OBJECT ALLOCATION ---------------
 
 		//!	Instructs the @ref TaskScheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
 		virtual Utility::Result<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) abstract;

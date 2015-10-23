@@ -4,7 +4,7 @@
   Purpose:
   
   ------------------------------------------------------------------
-  ©2010-2012 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -16,12 +16,6 @@
 
 namespace Eldritch2 {
 namespace Foundation {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scheduler		= ::Eldritch2::Scheduler;
-
-// ---------------------------------------------------
 
 	ETInlineHint const FileSystem::ContentPackage& World::GetRootPackage() const {
 		return *static_cast<const FileSystem::ContentPackage*>(_package);

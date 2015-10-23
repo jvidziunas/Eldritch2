@@ -27,15 +27,6 @@
 
 namespace Eldritch2 {
 namespace Sound {
-
-	namespace Configuration = ::Eldritch2::Configuration;
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Utility		= ::Eldritch2::Utility;
-	namespace Sound			= ::Eldritch2::Sound;
-
-// ---------------------------------------------------
-	
 namespace XAudio2 {
 
 	class EngineService : public Foundation::GameEngineService, public ::IXAudio2EngineCallback {

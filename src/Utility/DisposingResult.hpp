@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename ResultObject>
 	struct DisposingResult {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

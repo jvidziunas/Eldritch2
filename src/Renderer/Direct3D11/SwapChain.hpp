@@ -33,14 +33,6 @@ struct	IDXGISwapChain;
 
 namespace Eldritch2 {
 namespace Renderer {
-
-	namespace Scheduler = ::Eldritch2::Scheduler;
-	namespace Scripting = ::Eldritch2::Scripting;
-	namespace Renderer	= ::Eldritch2::Renderer;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace Direct3D11 {
 
 	class SwapChain : public Scripting::ReferenceTypeBase, public Foundation::Window, public Scheduler::Thread {

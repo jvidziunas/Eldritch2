@@ -20,10 +20,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	struct ObjectPoolOrderedHint {};
 
 	extern const ObjectPoolOrderedHint	orderedPoolBehavior;
@@ -39,11 +35,11 @@ namespace Utility {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this ObjectPool instance.
+		//!	Constructs this @ref ObjectPool instance.
 		template <typename... AllocatorConstructorArguments>
 		ETInlineHint ObjectPool( SizeType elementSizeInBytes, SizeType objectsPerPage, AllocatorConstructorArguments... allocatorConstructorArguments );
 
-		// Destroys this ObjectPool instance.
+		//!	Destroys this @ref ObjectPool instance.
 		~ObjectPool();
 
 	// ---------------------------------------------------

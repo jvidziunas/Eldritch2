@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint UserMutex : private Utility::Noncopyable {
 	// ---------------------------------------------------
 

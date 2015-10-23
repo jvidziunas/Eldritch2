@@ -15,15 +15,11 @@
 #include <Utility/SurjectiveQueryEngine.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
 using namespace ::Eldritch2::Utility;
+using namespace ::Eldritch2;
 
-namespace Eldritch2
-{
+namespace Eldritch2 {
+namespace Utility {
 
-	namespace Utility
-	{
-
-	}	// namespace Utility
-
+}	// namespace Utility
 }	// namespace Eldritch2

@@ -22,10 +22,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class InstanceDeleter {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

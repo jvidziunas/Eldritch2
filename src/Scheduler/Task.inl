@@ -18,11 +18,6 @@
 namespace Eldritch2 {
 namespace Scheduler {
 
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	ETInlineHint bool Task::IsContinuedBy( const Scheduler::Task& task ) const {
 		return &task == _continuationTask;
 	}

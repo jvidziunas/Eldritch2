@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2011 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -17,11 +17,12 @@
 #include <emmintrin.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
 	template <size_t N>
 	struct BlockFetchSizeCalculator { 
-		ENUM_CLASS( size_t ) { 
+		enum : size_t { 
 			OFFSET = ( 64 * (N-1) )
 		};
 	};
@@ -78,36 +79,36 @@ namespace Eldritch2Detail {
 	template <>
 	ETForceInlineHint void BlockWriteHelper<0>( void* const, const void* ) {}
 
-}	// namespace Eldritch2Detail
-
-namespace Eldritch2 {
+}	// namespace Detail
 
 	template<typename T>
 	ETForceInlineHint void Level0Prefetch( const T& data ) {
-		::Eldritch2Detail::L0BlockFetchHelper<sizeof(T)/64>( static_cast<const void*>(&data) );
+		Detail::L0BlockFetchHelper<sizeof(T)/64>( static_cast<const void*>(&data) );
 	}
 
 // ---------------------------------------------------
 
 	template<typename T>
 	ETForceInlineHint void Level1Prefetch( const T& data ) {
-		::Eldritch2Detail::L1BlockFetchHelper<sizeof(T)/64>( static_cast<const void*>(&data) );
+		Detail::L1BlockFetchHelper<sizeof(T)/64>( static_cast<const void*>(&data) );
 	}
 
 // ---------------------------------------------------
 
 	template<typename T>
 	ETForceInlineHint void Level2Prefetch( const T& data ) {
-		::Eldritch2Detail::L2BlockFetchHelper<sizeof(T)/64>( static_cast<const void*>(&data) );
+		Detail::L2BlockFetchHelper<sizeof(T)/64>( static_cast<const void*>(&data) );
 	}
 
 // ---------------------------------------------------
 
 	template<typename T>
 	ETForceInlineHint void NonTemporalWrite( T& destination, const T& data ) {
-		ETCompileTimeAssert( 0 == (sizeof(T) % sizeof(int)) );
+		static_assert( 0 == (sizeof(T) % sizeof(int)) );
 
-		::Eldritch2Detail::BlockWriteHelper<sizeof(T)/sizeof(int)>( static_cast<void*>(&destination), static_cast<const void*>(&data) );
+	// ---
+
+		Detail::BlockWriteHelper<sizeof(T)/sizeof(int)>( static_cast<void*>(&destination), static_cast<const void*>(&data) );
 	}
 
 }	// namespace Eldritch2

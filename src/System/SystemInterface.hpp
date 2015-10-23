@@ -19,11 +19,6 @@
 namespace Eldritch2 {
 namespace System {
 
-	namespace Utility	= ::Eldritch2::Utility;
-	namespace System	= ::Eldritch2::System;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint SystemInterface : private Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 

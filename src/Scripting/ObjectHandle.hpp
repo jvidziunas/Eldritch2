@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	namespace Scripting	= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
 	template <class Object>
 	class ObjectHandle : public ::Eldritch2::IntrusivePointerBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

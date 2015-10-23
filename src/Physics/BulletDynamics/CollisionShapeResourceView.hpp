@@ -24,11 +24,6 @@ class	btCollisionShape;
 
 namespace Eldritch2 {
 namespace Physics {
-
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-
-// ---------------------------------------------------
-
 namespace BulletDynamics {
 
 	class CollisionShapeResourceView : public FileSystem::ResourceView {

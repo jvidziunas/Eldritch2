@@ -27,22 +27,16 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Scripting {
-
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scripting		= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
 namespace AngelScript {
 
 	class ObjectGraphResourceView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this @ref ObjectGraphResourceView instance.
+		//!	Constructs this @ref ObjectGraphResourceView instance.
 		ObjectGraphResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
 
-		// Destroys this @ref ObjectGraphResourceView instance.
+		//!	Destroys this @ref ObjectGraphResourceView instance.
 		~ObjectGraphResourceView() = default;
 
 	// ---------------------------------------------------

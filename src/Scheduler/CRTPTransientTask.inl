@@ -5,7 +5,7 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -17,11 +17,6 @@
 
 namespace Eldritch2 {
 namespace Scheduler {
-
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
 
 	template <typename ImplementingTask>
 	ETForceInlineHint CRTPTransientTask<ImplementingTask>::CRTPTransientTask() : Scheduler::Task() {}

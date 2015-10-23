@@ -20,7 +20,8 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace TypeTraits{
+namespace TypeTraits {
+
 	template<typename Type>
 	struct AlignmentOf {
 #if( !ET_COMPILER_SUPPORTS_CPP11 )

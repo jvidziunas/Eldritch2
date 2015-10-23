@@ -31,11 +31,15 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
+		//!	Constructs this @ref StringMarshal instance.
 		StringMarshal( const EmptyStringSemantics, ::Eldritch2::Allocator& allocator );
-		// Constructs this StringMarshal instance.
+		//!	Constructs this @ref StringMarshal instance.
 		StringMarshal( const ::Eldritch2::UTF8Char* const string, const size_t stringLengthInOctets, ::Eldritch2::Allocator& allocator );
-		// Constructs this StringMarshal instance.
+		//!	Constructs this @ref StringMarshal instance.
 		StringMarshal( const Scripting::StringMarshal& string, ::Eldritch2::Allocator& allocator );
+
+		//!	Destroys this @ref StringMarshal instance.
+		~StringMarshal() = default;
 
 	// ---------------------------------------------------
 
@@ -56,15 +60,15 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Float4Marshal instance.
+		//!	Constructs this @ref Float4Marshal instance.
 		Float4Marshal( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		// Constructs this Float4Marshal instance.
+		//!	Constructs this @ref Float4Marshal instance.
 		Float4Marshal( const Scripting::Float4Marshal& marshal );
-		// Constructs this Float4Marshal instance.
+		//!	Constructs this @ref Float4Marshal instance.
 		Float4Marshal( const ::Eldritch2::Float4 initializer );
 
-		// Destroys this Float4Marshal instance.
-		~Float4Marshal();
+		//!	Destroys this @ref Float4Marshal instance.
+		~Float4Marshal() = default;
 
 	// ---------------------------------------------------
 
@@ -81,15 +85,15 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this OrientationMarshal instance.
+		//!	Constructs this @ref OrientationMarshal instance.
 		OrientationMarshal( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		// Constructs this OrientationMarshal instance.
+		//!	Constructs this @ref OrientationMarshal instance.
 		OrientationMarshal( const Scripting::OrientationMarshal& initializer );
-		// Constructs this OrientationMarshal instance.
+		//!	Constructs this @ref OrientationMarshal instance.
 		OrientationMarshal( const ::Eldritch2::Quaternion initializer );
 
-		// Destroys this OrientationMarshal instance.
-		~OrientationMarshal();
+		//!	Destroys this @ref OrientationMarshal instance.
+		~OrientationMarshal() = default;
 
 	// ---------------------------------------------------
 

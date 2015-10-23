@@ -18,11 +18,6 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	ETInlineHint const ::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>& ContentPackage::GetReferencedPackageCollection() const {
 		return _referencedPackages;
 	}

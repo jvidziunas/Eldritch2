@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Renderer {
 
-	namespace Renderer	= ::Eldritch2::Renderer;
-
-// ---------------------------------------------------
-
 	struct TextureHeader {
 	// - TYPE PUBLISHING ---------------------------------
 

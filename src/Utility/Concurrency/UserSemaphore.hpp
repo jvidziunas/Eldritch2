@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint UserSemaphore : private Utility::Noncopyable {
 	public:
 		virtual size_t	IncreaseCount( const size_t count = 1u ) abstract;
@@ -31,12 +27,12 @@ namespace Utility {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this UserSemaphore instance.
-		UserSemaphore();
+		//!	Constructs this @ref UserSemaphore instance.
+		UserSemaphore() = default;
 
 	public:
-		// Destroys this UserSemaphore instance.
-		virtual ~UserSemaphore();
+		//!	Destroys this @ref UserSemaphore instance.
+		virtual ~UserSemaphore() = default;
 	};
 
 }	// namespace Utility

@@ -23,10 +23,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class MersenneTwisterRandomNumberGenerator : private ::MTRand {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

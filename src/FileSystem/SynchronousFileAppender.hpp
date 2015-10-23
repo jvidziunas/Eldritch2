@@ -22,10 +22,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint SynchronousFileAppender : public Utility::Noncopyable {
 	public:
 		virtual ::Eldritch2::ErrorCode	Append( const void* const sourceData, const size_t lengthToWriteInBytes ) abstract;

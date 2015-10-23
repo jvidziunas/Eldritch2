@@ -28,10 +28,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Foundation {
 
-	namespace Foundation = ::Eldritch2::Foundation;
-
-// ---------------------------------------------------
-
 	class WorldViewFactoryPublishingInitializationVisitor {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

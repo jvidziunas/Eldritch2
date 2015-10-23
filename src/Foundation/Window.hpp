@@ -20,11 +20,6 @@
 namespace Eldritch2 {
 namespace Foundation {
 
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint Window : public Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -52,11 +47,11 @@ namespace Foundation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this Window instance.
+		//!	Constructs this @ref Window instance.
 		Window();
 
 	public:
-		// Destroys this Window instance.
+		//!	Destroys this @ref Window instance.
 		virtual ~Window();
 	};
 

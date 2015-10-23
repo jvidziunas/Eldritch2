@@ -17,16 +17,10 @@
 
 class	asIScriptModule;
 
-using asUINT = unsigned int;
+using asUINT	= unsigned int;
 
 namespace Eldritch2 {
 namespace Scripting {
-
-	namespace Scripting = ::Eldritch2::Scripting;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace AngelScript {
 
 	class BytecodeMetadata {

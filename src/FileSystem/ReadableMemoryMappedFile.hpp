@@ -23,10 +23,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint ReadableMemoryMappedFile : public Utility::Noncopyable {
 	public:
 		virtual size_t	GetAccessibleRegionSizeInBytes() const abstract;

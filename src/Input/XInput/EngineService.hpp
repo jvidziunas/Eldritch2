@@ -24,12 +24,6 @@
 
 namespace Eldritch2 {
 namespace Input {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Input			= ::Eldritch2::Input;
-
-// ---------------------------------------------------
-
 namespace XInput {
 
 	class EngineService : public Foundation::GameEngineService {

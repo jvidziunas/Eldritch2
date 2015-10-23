@@ -40,13 +40,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Foundation {
 
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Scheduler		= ::Eldritch2::Scheduler;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint WorldView : public ::Eldritch2::IntrusiveForwardListBaseHook {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -86,16 +79,16 @@ namespace Foundation {
 
 	// - WORLD VIEW SANDBOX METHODS ----------------------
 
-		//!	Retrieves a read-only view of the hosting world. Useful for inspecting shared state.
+		//!	Retrieves a read-only view of the hosting @ref World. Useful for inspecting shared state.
 		ETInlineHint const Foundation::World&	GetOwningWorld() const;
 
-		//!	Retrieves the hosting game engine's content library.
+		//!	Retrieves the hosting game engine's @ref ContentLibrary.
 		const FileSystem::ContentLibrary&		GetEngineContentLibrary() const;
 
-		//!	Retrieves the hosting world's general-purpose memory allocator.
+		//!	Retrieves the hosting world's general-purpose @ref Allocator.
 		::Eldritch2::Allocator&					GetWorldAllocator();
 
-		//!	Notifies the world that a view is interested in pausing simulation.
+		//!	Notifies the @ref World that the view is interested in pausing simulation.
 		void									SetPaused( bool paused = true );
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

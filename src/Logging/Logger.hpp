@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Foundation {
 
-	namespace Foundation	= ::Eldritch2::Foundation;
-
-// ---------------------------------------------------
-
 #ifdef ERROR
 #	if( ET_COMPILER_IS_MSVC )
 	// Good old fashioned poor decisions from our friends in Redmond. Somebody thought defining ERROR as a macro was a great idea!

@@ -22,10 +22,6 @@ namespace Eldritch2 {
 namespace FileSystem {
 namespace Win32 {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-
-// ---------------------------------------------------
-
 	ETInlineHint const wchar_t* ContentProvider::PathFromKnownContentLocation( const KnownContentLocation location ) const {
 		ETRuntimeAssert( location < KnownContentLocation::COUNT );
 

@@ -16,7 +16,7 @@
 //------------------------------------------------------------------//
 
 struct HINSTANCE__;
-typedef HINSTANCE__*	HINSTANCE;
+using HINSTANCE	= HINSTANCE__*;
 
 #if defined( GetCommandLine )
 #	undef GetCommandLine
@@ -24,10 +24,6 @@ typedef HINSTANCE__*	HINSTANCE;
 
 namespace Eldritch2 {
 namespace Utility {
-
-	namespace Utility = ::Eldritch2::Utility;
-
-// ---------------------------------------------------
 
 	void ETNoThrowHint	StoreMainArguments( ::HINSTANCE hInstance, int nCmdShow );
 

@@ -33,16 +33,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Renderer {
-
-	namespace Configuration	= ::Eldritch2::Configuration;
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Renderer		= ::Eldritch2::Renderer;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace Direct3D11 {
 
 	class EngineService : public Foundation::GameEngineService {

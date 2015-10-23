@@ -25,14 +25,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Networking {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Networking	= ::Eldritch2::Networking;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace Steamworks {
 
 	class WorldView : public Foundation::WorldView {

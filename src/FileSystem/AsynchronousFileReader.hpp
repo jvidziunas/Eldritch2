@@ -19,11 +19,6 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint AsynchronousFileReader : public Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 

@@ -16,4 +16,4 @@
 #include <Utility/Memory/ChildAllocator.hpp>
 //------------------------------------------------------------------//
 
-template class ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<::Eldritch2::ChildAllocator>;
+template class ::Eldritch2::Detail::RDESTLAllocatorAdapterMixin<::Eldritch2::ChildAllocator>;

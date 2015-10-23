@@ -15,10 +15,11 @@
 #include <type_traits>
 //------------------------------------------------------------------//
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
 	template <typename PublicAllocatorType>
-	ETForceInlineHint RDESTLAllocatorAdapterMixin<PublicAllocatorType>::RDESTLAllocatorAdapterMixin( ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>&& allocator ) : RDESTLAllocatorAdapterMixin<PublicAllocatorType>( static_cast<PublicAllocatorType&&>( allocator ) ) {}
+	ETForceInlineHint RDESTLAllocatorAdapterMixin<PublicAllocatorType>::RDESTLAllocatorAdapterMixin( Detail::RDESTLAllocatorAdapterMixin<PublicAllocatorType>&& allocator ) : RDESTLAllocatorAdapterMixin<PublicAllocatorType>( static_cast<PublicAllocatorType&&>( allocator ) ) {}
 
 // ---------------------------------------------------
 
@@ -53,4 +54,5 @@ namespace Eldritch2Detail {
 		return this->GetName();
 	}
 
-}	// namespace Eldritch2Detail
+}	// namespace Detail
+}	// namespace Eldritch2

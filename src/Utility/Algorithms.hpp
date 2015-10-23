@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class InvokeDestructor {
 	public:
 		template <typename ObjectType>

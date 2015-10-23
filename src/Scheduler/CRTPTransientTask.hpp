@@ -18,11 +18,6 @@
 namespace Eldritch2 {
 namespace Scheduler {
 
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename ImplementingTask>
 	class CRTPTransientTask : public Scheduler::Task {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

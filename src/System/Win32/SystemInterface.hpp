@@ -17,11 +17,6 @@
 
 namespace Eldritch2 {
 namespace System {
-
-	namespace System	= ::Eldritch2::System;
-
-// ---------------------------------------------------
-
 namespace Win32 {
 
 	class SystemInterface : public System::SystemInterface {

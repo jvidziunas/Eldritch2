@@ -15,7 +15,6 @@
 
 //------------------------------------------------------------------//
 
-
 namespace Eldritch2 {
 
 	template <class StoredObject>

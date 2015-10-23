@@ -45,15 +45,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Networking {
-
-	namespace Configuration	= ::Eldritch2::Configuration;
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Networking	= ::Eldritch2::Networking;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace Steamworks {
 
 	class EngineService : public Foundation::GameEngineService {
@@ -92,7 +83,7 @@ namespace Steamworks {
 
 		private:
 			::Eldritch2::UTF8String<>	_name;
-			EngineService&			_networkingService;
+			EngineService&				_networkingService;
 			const NetworkID				_networkID;
 		};
 

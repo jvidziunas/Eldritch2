@@ -19,15 +19,6 @@
 
 namespace Eldritch2 {
 namespace Physics {
-
-	namespace Configuration	= ::Eldritch2::Configuration;
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Physics		= ::Eldritch2::Physics;
-
-// ---------------------------------------------------
-
 namespace BulletDynamics {
 
 	class EngineService : public Foundation::GameEngineService {

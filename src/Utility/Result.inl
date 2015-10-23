@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename ResultObject>
 	template <typename CompatibleResultObject>
 	ETForceInlineHint Result<ResultObject>::Result( const Utility::Result<CompatibleResultObject>& result ) : object( static_cast<ResultObject*>(result.object) ), resultCode( result.resultCode ) {

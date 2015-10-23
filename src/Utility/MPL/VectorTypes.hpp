@@ -19,6 +19,8 @@
 namespace Eldritch2 {
 
 	class Float4 {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
 		enum VectorSwizzleComponent {
 			X = 0,
@@ -29,16 +31,19 @@ namespace Eldritch2 {
 
 	// ---
 
-		typedef ::Eldritch2::float32	CoefficientSet[4];
+		using CoefficientSet	= ::Eldritch2::float32[4];
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this @ref Float4 instance.
-		ETForceInlineHint Float4();
-		// Constructs this @ref Float4 instance.
+		//!	Constructs this @ref Float4 instance.
+		ETForceInlineHint Float4() = default;
+		//!	Constructs this @ref Float4 instance.
 		ETForceInlineHint Float4( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		// Constructs this @ref Float4 instance.
+		//!	Constructs this @ref Float4 instance.
 		ETForceInlineHint Float4( const ::Eldritch2::float32* const values );
+
+		//!	Destroys this @ref Float4 instance.
+		ETForceInlineHint ~Float4() = default;
 
 	// ---------------------------------------------------
 
@@ -76,21 +81,28 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	class Quaternion {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
-		typedef ::Eldritch2::float32	CoefficientSet[4];
+		using CoefficientSet	= ::Eldritch2::float32[4];
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 		
-		// Constructs this @ref Quaternion instance.
-		ETForceInlineHint Quaternion();
-		// Constructs this @ref Quaternion instance.
+		//!	Constructs this @ref Quaternion instance.
+		ETForceInlineHint Quaternion() = default;
+		//!	Constructs this @ref Quaternion instance.
 		ETForceInlineHint Quaternion( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		// Constructs this @ref Quaternion instance.
+		//!	Constructs this @ref Quaternion instance.
 		ETForceInlineHint Quaternion( const ::Eldritch2::float32* const values );
+
+		//!	Destroys this @ref Quaternion instance.
+		ETForceInlineHint ~Quaternion() = default;
 
 	// ---------------------------------------------------
 
 		ETForceInlineHint ::Eldritch2::Quaternion&	Normalize();
+
+	// ---------------------------------------------------
 
 		ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion	Reverse() const;
 

@@ -22,10 +22,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint Noncopyable {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

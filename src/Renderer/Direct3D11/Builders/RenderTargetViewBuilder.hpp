@@ -25,12 +25,6 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Renderer {
-
-	namespace Renderer	= ::Eldritch2::Renderer;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace Direct3D11 {
 
 	class RenderTargetViewBuilder {

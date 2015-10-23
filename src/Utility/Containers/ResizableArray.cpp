@@ -19,7 +19,7 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 
-	const ::Eldritch2Detail::ResizableArrayBase::UnorderedSemantics		UnorderedSemantics;
-	const ::Eldritch2Detail::ResizableArrayBase::ReleaseMemorySemantics	ReleaseMemorySemantics;
+	const Detail::ResizableArrayBase::UnorderedSemantics		UnorderedSemantics;
+	const Detail::ResizableArrayBase::ReleaseMemorySemantics	ReleaseMemorySemantics;
 
 }	// namespace Eldritch2

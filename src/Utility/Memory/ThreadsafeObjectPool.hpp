@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename Allocator = Utility::ObjectPool<>::AllocatorType>
 	class ThreadsafeObjectPool {
 	public:

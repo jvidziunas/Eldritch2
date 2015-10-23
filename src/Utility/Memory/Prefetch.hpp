@@ -40,9 +40,5 @@ namespace Eldritch2 {
 #	include <Utility/Memory/Prefetch.Mac.inl>
 #elif( ET_PLATFORM_LINUX )
 #	include <Utility/Memory/Prefetch.Linux.inl>
-#elif( ET_PLATFORM_XENON )
-#	include <Utility/Memory/Prefetch.Xenon.inl>
-#elif( ET_PLATFORM_PLAYSTATION3 )
-#	include <Utility/Memory/Prefetch.PS3.inl>
 #endif
 //------------------------------------------------------------------//

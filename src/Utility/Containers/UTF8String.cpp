@@ -19,8 +19,8 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 
-	const ::Eldritch2Detail::StringBase::UTF32CodepointSemantics	UTF32CodepointSemantics;
-	const ::Eldritch2Detail::StringBase::ReturnEndOfNeedleSemantics	ReturnEndOfNeedleSemantics;
-	const ::Eldritch2Detail::StringBase::EmptyStringSemantics		EmptyStringSemantics;
+	const Detail::StringBase::UTF32CodepointSemantics		UTF32CodepointSemantics;
+	const Detail::StringBase::ReturnEndOfNeedleSemantics	ReturnEndOfNeedleSemantics;
+	const Detail::StringBase::EmptyStringSemantics			EmptyStringSemantics;
 
 }	// namespace Eldritch2

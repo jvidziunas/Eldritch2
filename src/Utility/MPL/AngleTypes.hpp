@@ -29,7 +29,7 @@ namespace Eldritch2 {
 
 	public:
 		//!	Constructs this @ref RadianMeasure instance.
-		ETForceInlineHint RadianMeasure();
+		ETForceInlineHint RadianMeasure() = default;
 		//!	Constructs this @ref RadianMeasure instance.
 		ETForceInlineHint explicit RadianMeasure( ::Eldritch2::float32 value );
 		//!	Constructs this @ref RadianMeasure instance.
@@ -38,7 +38,7 @@ namespace Eldritch2 {
 		ETForceInlineHint RadianMeasure( const ::Eldritch2::RadianMeasure& value );
 
 		//!	Destroys this @ref RadianMeasure instance.
-		ETForceInlineHint ~RadianMeasure();
+		ETForceInlineHint ~RadianMeasure() = default;
 
 	// ---------------------------------------------------
 
@@ -68,7 +68,7 @@ namespace Eldritch2 {
 
 	public:
 		//!	Constructs this @ref DegreeMeasure instance.
-		ETForceInlineHint DegreeMeasure();
+		ETForceInlineHint DegreeMeasure() = default;
 		//!	Constructs this @ref DegreeMeasure instance.
 		ETForceInlineHint explicit DegreeMeasure( ::Eldritch2::float32 value );
 		//!	Constructs this @ref DegreeMeasure instance.
@@ -77,7 +77,7 @@ namespace Eldritch2 {
 		ETForceInlineHint DegreeMeasure( const ::Eldritch2::RadianMeasure& value );
 
 		//!	Destroys this @ref DegreeMeasure instance.
-		ETForceInlineHint ~DegreeMeasure();
+		ETForceInlineHint ~DegreeMeasure() = default;
 
 	// ---------------------------------------------------
 

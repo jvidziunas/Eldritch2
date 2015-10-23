@@ -23,10 +23,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Configuration {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint ConfigurableVariable {
 	// - PUBLIC INTERFACE --------------------------------
 

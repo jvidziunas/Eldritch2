@@ -19,10 +19,6 @@
 namespace Eldritch2 {
 namespace Configuration {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-
-// ---------------------------------------------------
-
 	class ConfigurableUTF8String : public Configuration::ConfigurableVariable, public ::Eldritch2::UTF8String<> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

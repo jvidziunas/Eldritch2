@@ -20,10 +20,10 @@
 #include <iterator>
 //------------------------------------------------------------------//
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
-	class StringBase {
-	public:
+	struct StringBase {
 		struct UTF32CodepointSemantics {};
 		struct ReturnEndOfNeedleSemantics {};
 		struct EmptyStringSemantics {};
@@ -31,22 +31,21 @@ namespace Eldritch2Detail {
 		class UTF32CodepointIterator : public ::std::iterator<::std::input_iterator_tag, ::Eldritch2::UTF32Char> {};
 	};
 
-}	// namespace Eldritch2Detail
-
-namespace Eldritch2 {
+}	// namespace Detail
 
 	template <class Allocator = ::Eldritch2::ChildAllocator>
-	class UTF8String : public ::Eldritch2Detail::StringBase {
+	class UTF8String : public Detail::StringBase {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		typedef ::rde::basic_string<::Eldritch2::UTF8Char, ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>>	UnderlyingContainer;
+		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using UnderlyingContainer	= ::rde::basic_string<::Eldritch2::UTF8Char, PrivateAllocator>;
 
 	public:
-		typedef typename UnderlyingContainer::const_iterator	ConstIterator;
-		typedef typename UnderlyingContainer::size_type			SizeType;
-		typedef typename UnderlyingContainer::value_type		CharacterType;
-		typedef Allocator										AllocatorType;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using SizeType				= typename UnderlyingContainer::size_type;
+		using CharacterType			= typename UnderlyingContainer::value_type;
+		using AllocatorType			= Allocator;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -166,9 +165,9 @@ namespace Eldritch2 {
 
 // ---
 
-	extern const ::Eldritch2Detail::StringBase::UTF32CodepointSemantics		UTF32CodepointSemantics;
-	extern const ::Eldritch2Detail::StringBase::ReturnEndOfNeedleSemantics	ReturnEndOfNeedleSemantics;
-	extern const ::Eldritch2Detail::StringBase::EmptyStringSemantics		EmptyStringSemantics;
+	extern const Detail::StringBase::UTF32CodepointSemantics	UTF32CodepointSemantics;
+	extern const Detail::StringBase::ReturnEndOfNeedleSemantics	ReturnEndOfNeedleSemantics;
+	extern const Detail::StringBase::EmptyStringSemantics		EmptyStringSemantics;
 
 }	// namespace Eldritch2
 

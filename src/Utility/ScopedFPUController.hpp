@@ -20,18 +20,14 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ScopedFPUController : private Utility::Noncopyable {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ScopedFPUController instance.
+		//!	Constructs this @ref ScopedFPUController instance.
 		explicit ScopedFPUController();
 
-		// Destroys this ScopedFPUController instance.
+		//!	Destroys this @ref ScopedFPUController instance.
 		~ScopedFPUController();
 
 	// ---------------------------------------------------

@@ -25,10 +25,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Configuration {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-
-// ---------------------------------------------------
-
 	class ConfigurationPublishingInitializationVisitor {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

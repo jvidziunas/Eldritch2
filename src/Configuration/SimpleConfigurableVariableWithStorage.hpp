@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Configuration {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-
-// ---------------------------------------------------
-
 	template <typename UnderlyingStorage>
 	class SimpleConfigurableVariableWithStorage : public Configuration::ConfigurableVariable {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

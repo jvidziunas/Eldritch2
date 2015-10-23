@@ -30,11 +30,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Animation {
 
-	namespace Scripting	= ::Eldritch2::Scripting;
-	namespace Animation	= ::Eldritch2::Animation;
-
-// ---------------------------------------------------
-
 	class Armature : public Scripting::ReferenceTypeBase {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -108,12 +103,12 @@ namespace Animation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//! Constructs this Armature instance.
+		//! Constructs this @ref Armature instance.
 		Armature( const Animation::Armature& ) = delete;
-		//! Constructs this Armature instance.
+		//! Constructs this @ref Armature instance.
 		Armature() = default;
 
-		//! Destroys this Armature instance.
+		//! Destroys this @ref Armature instance.
 		~Armature() = default;
 
 	// - DATA MEMBERS ------------------------------------

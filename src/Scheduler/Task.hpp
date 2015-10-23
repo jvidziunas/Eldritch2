@@ -30,11 +30,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Scheduler {
 
-	namespace Scheduler	= ::Eldritch2::Scheduler;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint Task : public Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -43,7 +38,7 @@ namespace Scheduler {
 			UNSCHEDULED,	//!< The @ref Task has not been queued for execution on a @ref WorkerContext, nor have @ref Task::Execute() or @ref Task::Finalize() been invoked upon it.
 			SCHEDULED,		//!< The @ref Task has been queued for execution on a @ref WorkerContext, but neither @ref Task::Execute() nor @ref Task::Finalize() have been invoked upon it.
 			RUNNING,		//!< The @ref Task has been queued for execution on a @ref WorkerContext, and at least @ref Task::Execute() has been (initially) invoked upon it. 
-			DONE			//!< The @ref Task has been queued for execution on a @ref WorkerContext, and both @ref Task::Execute() and @ref Task::Finalize() have both been called and returned.
+			DONE			//!< The @ref Task has been queued for execution on a @ref WorkerContext, and @ref Task::Execute() has finished execution.
 		};
 
 		struct ContinuationTaskSemantics {};

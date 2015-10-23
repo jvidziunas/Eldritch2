@@ -21,11 +21,6 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	class ETPureAbstractHint ResourceView : public Utility::Noncopyable, public ::Eldritch2::IntrusiveForwardListBaseHook {
 	// - TYPE PUBLISHING ---------------------------------
 

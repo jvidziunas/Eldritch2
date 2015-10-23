@@ -24,7 +24,8 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using UnderlyingContainer	= ::rde::hash_map<Key, StoredObject, Hasher, loadFactor, KeyEqualityComparator, ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>>;
+		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using UnderlyingContainer	= ::rde::hash_map<Key, StoredObject, Hasher, loadFactor, KeyEqualityComparator, PrivateAllocator>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;

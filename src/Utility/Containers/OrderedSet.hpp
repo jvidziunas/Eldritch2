@@ -25,7 +25,7 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
 		using UnderlyingContainer	= ::rde::set<StoredObject, PrivateAllocator>;
 
 	public:

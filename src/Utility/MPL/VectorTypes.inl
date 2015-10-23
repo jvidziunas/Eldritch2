@@ -5,7 +5,7 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -16,10 +16,6 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-
-	ETForceInlineHint Float4::Float4() {}
-
-// ---------------------------------------------------
 
 	ETForceInlineHint Float4::Float4( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w ) {
 		::_mm_storeu_ps( this->coefficients, ::_mm_set_ps( z, y, x, w ) );
@@ -127,10 +123,6 @@ namespace Eldritch2 {
 	ETForceInlineHint Float4::operator Float4::CoefficientSet&() {
 		return coefficients;
 	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint Quaternion::Quaternion() {}
 
 // ---------------------------------------------------
 

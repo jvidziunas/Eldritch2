@@ -27,11 +27,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Animation {
 
-	namespace Scripting = ::Eldritch2::Scripting;
-	namespace Animation = ::Eldritch2::Animation;
-
-// ---------------------------------------------------
-
 	class BipedalLocomotionAnimationLayer : public Animation::Armature::ReplacementKeyframeAnimationLayer {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -51,12 +46,12 @@ namespace Animation {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this BipedalLocomotionAnimationLayer instance.
+		//!	Constructs this @ref BipedalLocomotionAnimationLayer instance.
 		BipedalLocomotionAnimationLayer( Animation::Armature& armature );
-		// Constructs this BipedalLocomotionAnimationLayer instance.
+		//!	Constructs this @ref BipedalLocomotionAnimationLayer instance.
 		BipedalLocomotionAnimationLayer( const Animation::BipedalLocomotionAnimationLayer& ) = delete;
 
-		// Destroys this BipedalLocomotionAnimationLayer instance.
+		//!	Destroys this @ref BipedalLocomotionAnimationLayer instance.
 		~BipedalLocomotionAnimationLayer() = default;
 
 	// ---------------------------------------------------

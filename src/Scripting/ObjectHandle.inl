@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	namespace Scripting = ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
 	template <class Object>
 	template <typename CompatibleObject>
 	ETInlineHint ObjectHandle<Object>::ObjectHandle( CompatibleObject* const pointer, const DefaultReferenceCountingSemantics ) : ObjectHandle( pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {

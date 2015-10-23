@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Renderer {
 
-	namespace Renderer	= ::Eldritch2::Renderer;
-
-// ---------------------------------------------------
-
 	enum class GPULayout : ::Eldritch2::uint8 {
 		_32_32_32_32	= 0,
 		_32_32_32		= 1,

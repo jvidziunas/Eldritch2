@@ -47,7 +47,8 @@ namespace {
 
 }	// anonymous namespace
 
-namespace Eldritch2Detail {
+namespace Eldritch2 {
+namespace Detail {
 
 	Win32HeapAllocatorBase::Win32HeapAllocatorBase( const ::HANDLE heapHandle, const UTF8Char* const name ) : Allocator( name ), _heap( heapHandle ) {
 		ETRuntimeAssert( nullptr != _heap );
@@ -111,15 +112,13 @@ namespace Eldritch2Detail {
 		return _heap;
 	}
 
-}	// namespace Eldritch2Detail
+}	// namespace Detail
 
-namespace Eldritch2 {
-
-	Win32GlobalHeapAllocator::Win32GlobalHeapAllocator( const ::Eldritch2::UTF8Char* const name ) : ::Eldritch2Detail::Win32HeapAllocatorBase( reinterpret_cast<::HANDLE>(::_get_heap_handle()), name ) {}
+	Win32GlobalHeapAllocator::Win32GlobalHeapAllocator( const ::Eldritch2::UTF8Char* const name ) : Detail::Win32HeapAllocatorBase( reinterpret_cast<::HANDLE>(::_get_heap_handle()), name ) {}
 
 // ---------------------------------------------------
 
-	Win32PrivateHeapAllocator::Win32PrivateHeapAllocator( const SizeType allocationLimit, const ::Eldritch2::UTF8Char* const name ) : ::Eldritch2Detail::Win32HeapAllocatorBase( ::HeapCreate( HEAP_INIT_FLAGS, static_cast<SIZE_T>(0u), static_cast<SIZE_T>(allocationLimit)), name ) {}
+	Win32PrivateHeapAllocator::Win32PrivateHeapAllocator( const SizeType allocationLimit, const ::Eldritch2::UTF8Char* const name ) : Detail::Win32HeapAllocatorBase( ::HeapCreate( HEAP_INIT_FLAGS, static_cast<SIZE_T>(0u), static_cast<SIZE_T>(allocationLimit)), name ) {}
 	
 // ---------------------------------------------------
 

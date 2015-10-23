@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -17,11 +17,6 @@
 
 namespace Eldritch2 {
 namespace Foundation {
-
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace Scheduler		= ::Eldritch2::Scheduler;
-
-// ---------------------------------------------------
 
 	template <typename TaskVisitor>
 	void WorldView::BroadcastTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, TaskVisitor&& visitor ) {

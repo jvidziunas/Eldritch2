@@ -51,16 +51,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Foundation {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-	namespace Foundation	= ::Eldritch2::Foundation;
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Scheduler		= ::Eldritch2::Scheduler;
-	namespace Utility		= ::Eldritch2::Utility;
-	namespace System		= ::Eldritch2::System;
-
-// ---------------------------------------------------
-
 	class GameEngine : public Scripting::ReferenceTypeBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

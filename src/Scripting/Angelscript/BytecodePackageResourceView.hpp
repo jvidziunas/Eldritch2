@@ -27,13 +27,6 @@ class	asIScriptModule;
 
 namespace Eldritch2 {
 namespace Scripting {
-
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scripting		= ::Eldritch2::Scripting;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace AngelScript {
 
 	class BytecodePackageResourceView : public FileSystem::ResourceView {

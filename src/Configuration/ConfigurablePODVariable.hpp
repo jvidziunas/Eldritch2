@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Configuration {
 
-	namespace Configuration	= ::Eldritch2::Configuration;
-
-// ---------------------------------------------------
-
 	template <typename ActualType>
 	class ConfigurablePODVariable : public Configuration::SimpleConfigurableVariableWithStorage<ActualType> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

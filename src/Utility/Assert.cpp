@@ -16,8 +16,7 @@
 //==================================================================//
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Assert.hpp>
-#include <cstdarg>
-#include <cstdio>
+//------------------------------------------------------------------//
 #if( ET_PLATFORM_WINDOWS )
 #	ifndef NOMINMAX
 #		define NOMINMAX
@@ -27,6 +26,9 @@
 #	endif
 #	include <Windows.h>
 #endif
+//------------------------------------------------------------------//
+#include <cstdarg>
+#include <cstdio>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2;
@@ -56,7 +58,7 @@ namespace {
 		::OutputDebugStringA( debugOutputString );
 #		endif
 
-		return AssertionFailures::FATAL;
+		return AssertionFailure::FATAL;
 	}
 
 	static AssertionHandler	assertHandler = &DefaultHandler;

@@ -20,10 +20,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename Allocator>
 	ETInlineHint bool ObjectPool<Allocator>::IsFrom( void* const chunk, char* const i, SizeType sizeof_i ) {
 		return( ::std:less_equal<void*>()( i, chunk ) && ::std::less<void*>()( chunk, i + sizeof_i ) );

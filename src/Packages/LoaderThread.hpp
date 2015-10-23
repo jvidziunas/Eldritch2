@@ -31,11 +31,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Scheduler		= ::Eldritch2::Scheduler;
-
-// ---------------------------------------------------
-
 	class LoaderThread : public Scheduler::Thread {
 	// - TYPE PUBLISHING ---------------------------------
 

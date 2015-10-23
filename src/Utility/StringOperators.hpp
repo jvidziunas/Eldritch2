@@ -18,10 +18,6 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	template <typename Character = char>
 	struct StringComparator {
 		ETNoAliasHint bool	operator()( const Character* left, const Character* right ) const;

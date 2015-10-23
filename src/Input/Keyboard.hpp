@@ -25,11 +25,6 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Input {
 
-	namespace Scripting	= ::Eldritch2::Scripting;
-	namespace Input		= ::Eldritch2::Input;
-
-// ---------------------------------------------------
-
 	class Keyboard : public Scripting::ReferenceTypeBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

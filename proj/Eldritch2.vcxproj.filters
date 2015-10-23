@@ -159,15 +159,6 @@
     <Filter Include="Header Files\Engine\Foundation">
       <UniqueIdentifier>{e5e9dea9-21e4-4515-ad1f-2017a9c608db}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Foundation\Engine">
-      <UniqueIdentifier>{1ed8791a-fd19-40df-941f-a81b2da3ca83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Foundation\Players">
-      <UniqueIdentifier>{cac9df09-6e99-4824-a65e-06679363b838}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Foundation\Worlds">
-      <UniqueIdentifier>{f2593f2e-2c72-432b-924c-b2ff05196953}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Input">
       <UniqueIdentifier>{a6bf8c02-bc7a-4176-bbbc-0463abfa80c6}</UniqueIdentifier>
     </Filter>
@@ -437,12 +428,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Concurrency\UserSemaphore.cpp">
-      <Filter>Source Files\Engine\Utility\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Concurrency\WaitableUserEvent.cpp">
-      <Filter>Source Files\Engine\Utility\Concurrency</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\MessagePackBase.cpp">
       <Filter>Source Files\Engine\Utility\MessagePack</Filter>
@@ -794,24 +779,6 @@
     <ClInclude Include="..\src\configuration\ConfigurationDatabase.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\foundation\GameEngine.hpp">
-      <Filter>Header Files\Engine\Foundation\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\foundation\GameEngineService.hpp">
-      <Filter>Header Files\Engine\Foundation\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\foundation\Player.hpp">
-      <Filter>Header Files\Engine\Foundation\Players</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\foundation\PlayerCommon.hpp">
-      <Filter>Header Files\Engine\Foundation\Players</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\foundation\World.hpp">
-      <Filter>Header Files\Engine\Foundation\Worlds</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Foundation\WorldView.hpp">
-      <Filter>Header Files\Engine\Foundation\Worlds</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Logging\FileAppendingLogger.hpp">
       <Filter>Header Files\Engine\Logging</Filter>
     </ClInclude>
@@ -937,9 +904,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp">
       <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp">
-      <Filter>Header Files\Engine\Foundation\Worlds</Filter>
     </ClInclude>
     <ClInclude Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
@@ -1129,6 +1093,24 @@
     </ClInclude>
     <ClInclude Include="..\src\Input\Win32\EngineService.hpp">
       <Filter>Header Files\Engine\Input\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\foundation\Player.hpp">
+      <Filter>Header Files\Engine\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\foundation\GameEngine.hpp">
+      <Filter>Header Files\Engine\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\foundation\GameEngineService.hpp">
+      <Filter>Header Files\Engine\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\foundation\World.hpp">
+      <Filter>Header Files\Engine\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Foundation\WorldView.hpp">
+      <Filter>Header Files\Engine\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp">
+      <Filter>Header Files\Engine\Foundation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

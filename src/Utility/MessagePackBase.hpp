@@ -30,76 +30,66 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
+namespace Detail {
+
+	template <class Class, typename FunctionSignature>
+	struct HasMemberSerializeFunction {
+		static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Second template parameter needs to be of function type." );
+	};
 
 // ---------------------------------------------------
 
-	namespace Detail {
+	template <class Class, typename DesiredReturn, typename... Arguments>
+	struct HasMemberSerializeFunction<Class, DesiredReturn( Arguments... )> {
+	private:
+		template <typename T>
+		static typename ::std::is_same<DesiredReturn, decltype(::std::declval<T>().Serialize( ::std::declval<Arguments>()... ))>::type Check( T* );
 
-		namespace Detail = ::Eldritch2::Utility::Detail;
+		template <typename>
+		static ::std::false_type Check( ... );
 
-	// ---------------------------------------------------
+	// ---
 
-		template <class Class, typename FunctionSignature>
-		struct HasMemberSerializeFunction {
-			static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Second template parameter needs to be of function type." );
-		};
+		using Type	= decltype(Check<Class>(nullptr));
 
-	// ---------------------------------------------------
-
-		template <class Class, typename DesiredReturn, typename... Arguments>
-		struct HasMemberSerializeFunction<Class, DesiredReturn( Arguments... )> {
-		private:
-			template <typename T>
-			static typename ::std::is_same<DesiredReturn, decltype(::std::declval<T>().Serialize( ::std::declval<Arguments>()... ))>::type Check( T* );
-
-			template <typename>
-			static ::std::false_type Check( ... );
-
-		// ---
-
-			using Type	= decltype(Check<Class>(nullptr));
-
-		public:
-			static const bool	value = Type::value;
-		};
-
-	// ---------------------------------------------------
-
-		template <class Class, typename FunctionSignature>
-		struct HasFreeSerializeFunction {
-			static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Second template parameter needs to be of function type." );
-		};
-
-	// ---------------------------------------------------
-
-		template <class Class, typename DesiredReturn, typename... Arguments>
-		struct HasFreeSerializeFunction<Class, DesiredReturn( Arguments... )> {
-		private:
-			template <typename T>
-			static typename ::std::is_same<DesiredReturn, decltype(Serialize( ::std::declval<T>(), ::std::declval<Arguments>()... ))>::type Check( T* );
-
-			template <typename>
-			static ::std::false_type Check( ... );
-
-		// ---
-
-			using Type = decltype(Check<Class>( nullptr ));
-
-		public:
-			static const bool	value = Type::value;
-		};
-
-	// ---------------------------------------------------
-
-		template <typename ContainerValue, typename Archive, bool typeHasMemberSerializeFunction = Detail::HasMemberSerializeFunction<ContainerValue, bool(Archive&)>::value>
-		struct SerializeDispatcher {
-			static bool Dispatch( ContainerValue& value, Archive& archive );
-		};
-
-	}	// namespace Detail
+	public:
+		static const bool	value = Type::value;
+	};
 
 // ---------------------------------------------------
+
+	template <class Class, typename FunctionSignature>
+	struct HasFreeSerializeFunction {
+		static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Second template parameter needs to be of function type." );
+	};
+
+// ---------------------------------------------------
+
+	template <class Class, typename DesiredReturn, typename... Arguments>
+	struct HasFreeSerializeFunction<Class, DesiredReturn( Arguments... )> {
+	private:
+		template <typename T>
+		static typename ::std::is_same<DesiredReturn, decltype(Serialize( ::std::declval<T>(), ::std::declval<Arguments>()... ))>::type Check( T* );
+
+		template <typename>
+		static ::std::false_type Check( ... );
+
+	// ---
+
+		using Type = decltype(Check<Class>( nullptr ));
+
+	public:
+		static const bool	value = Type::value;
+	};
+
+// ---------------------------------------------------
+
+	template <typename ContainerValue, typename Archive, bool typeHasMemberSerializeFunction = HasMemberSerializeFunction<ContainerValue, bool(Archive&)>::value>
+	struct SerializeDispatcher {
+		static bool Dispatch( ContainerValue& value, Archive& archive );
+	};
+
+}	// namespace Detail
 
 	class ETPureAbstractHint MessagePackBase : protected ::cmp_ctx_t {
 	// - TYPE PUBLISHING ---------------------------------

@@ -23,16 +23,10 @@ namespace Eldritch2 {
 	class	ErrorCode;
 }
 
-typedef unsigned int UINT;
+using UINT	= unsigned int;
 
 namespace Eldritch2 {
 namespace Renderer {
-
-	namespace Renderer	= ::Eldritch2::Renderer;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 namespace Direct3D11 {
 
 	class DeviceBuilder : public Utility::Noncopyable {

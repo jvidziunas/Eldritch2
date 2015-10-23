@@ -22,29 +22,19 @@
 namespace Eldritch2 {
 namespace Utility {
 
-	namespace Utility	= ::Eldritch2::Utility;
+	enum class FrustumPlane : ::Eldritch2::uint8 {
+		LEFT	= 0,
+		RIGHT	= 1,
+		TOP		= 2,
+		BOTTOM	= 3,
+		NEAR	= 4,
+		FAR		= 5
+	};
 
 // ---------------------------------------------------
 
-	namespace FrustumPlanes {
-
-		STRONG_ENUM_CLASS( FrustumPlane, ::Eldritch2::uint8 ) {
-			LEFT	= 0,
-			RIGHT	= 1,
-			TOP		= 2,
-			BOTTOM	= 3,
-			NEAR	= 4,
-			FAR		= 5
-		};
-
-	}	// namespace FrustumPlanes
-
-	typedef Utility::FrustumPlanes::FrustumPlane	FrustumPlane;
-
-// ---------------------------------------------------
-
-	typedef ::boost::array<::Eldritch2::Float4, 6>	FrustumPlaneCollection;
-	typedef ::boost::array<::Eldritch2::Float4, 8>	StructureOfArraysFrustumPlaneCollection;
+	using FrustumPlaneCollection					= ::boost::array<::Eldritch2::Float4, 6>;
+	using StructureOfArraysFrustumPlaneCollection	= ::boost::array<::Eldritch2::Float4, 8>;
 
 // ---------------------------------------------------
 
