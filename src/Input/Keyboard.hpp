@@ -34,15 +34,15 @@ namespace Input {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Keyboard instance.
+		//!	Constructs this @ref Keyboard instance.
 		Keyboard();
 
-		// Destroys this Keyboard instance.
+		//!	Destroys this @ref Keyboard instance.
 		~Keyboard();
 
 	// - SCRIPT API REFERENCE ----------------------------
 
-		// Registers all script-callable methods for the Keyboard type with the specified script type registrar.
+		//!	Registers all script-callable methods for the @ref Keyboard type with the specified script type registrar.
 		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
 
 	// - DATA MEMBERS ------------------------------------

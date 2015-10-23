@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Win32InputService.hpp
+  EngineService.hpp
   ------------------------------------------------------------------
   Purpose:
   Defines a Win32 application decorator object that invokes input
@@ -35,15 +35,17 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	class Win32InputService : public Foundation::GameEngineService {
+namespace Win32 {
+
+	class EngineService : public Foundation::GameEngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Win32InputService instance.
-		Win32InputService( Foundation::GameEngine& owningEngine );
+		//!	Constructs this @ref EngineService instance.
+		EngineService( Foundation::GameEngine& owningEngine );
 
-		// Destroys this Win32InputService instance.
-		~Win32InputService();
+		//!	Destroys this @ref EngineService instance.
+		~EngineService();
 
 	// ---------------------------------------------------
 
@@ -63,15 +65,14 @@ namespace Input {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this RawInputPollingThread instance.
-			RawInputPollingThread( Input::Win32InputService& hostingService );
+			//!	Constructs this @ref RawInputPollingThread instance.
+			RawInputPollingThread( EngineService& hostingService );
 
-			// Destroys this RawInputPollingThread instance.
-			~RawInputPollingThread();
+			//!	Destroys this @ref RawInputPollingThread instance.
+			~RawInputPollingThread() = default;
 
 		// ---------------------------------------------------
 
-			// Retrieves a pointer to a null-terminated character array containing the UTF8-encoded name of this thread.
 			const ::Eldritch2::UTF8Char* const	GetHumanReadableName() const override sealed;
 
 		// ---------------------------------------------------
@@ -83,19 +84,30 @@ namespace Input {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			Input::Win32InputService&	_hostingInputService;
-			::DWORD						_threadID;
+			EngineService&	_hostingInputService;
+			::DWORD			_threadID;
 		};
 
 	// ---
 
 		class ETPureAbstractHint RawInputSubscriber {
-		public:
-			virtual ~RawInputSubscriber() {}
-
 		// ---------------------------------------------------
 
+		public:
+			//!	Converts a generic Win32 raw input packet into HID-specific input events.
+			/*!	@param[in] inputPacket Packet to parse.
+				*/
 			virtual void	ReadInputPacket( const ::RAWINPUT& inputPacket ) abstract;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		protected:
+			//!	Constructs this @ref RawInputSubscriber instance.
+			RawInputSubscriber() = default;
+
+		public:
+			//!	Destroys this @ref RawInputSubscriber instance.
+			virtual ~RawInputSubscriber() = default;
 		};
 
 	// ---
@@ -104,8 +116,11 @@ namespace Input {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this Keyboard instance.
-			Keyboard( const ::HANDLE deviceHandle, Input::Win32InputService& owner );
+			//!	Constructs this @ref Keyboard instance.
+			Keyboard( const ::HANDLE deviceHandle, EngineService& owner );
+
+			//!	Destroys this @ref Keyboard instance.
+			~Keyboard() = default;
 
 		// ---------------------------------------------------
 
@@ -122,8 +137,11 @@ namespace Input {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this Mouse instance.
-			Mouse( const ::HANDLE deviceHandle, Input::Win32InputService& owner );
+			//!	Constructs this @ref Mouse instance.
+			Mouse( const ::HANDLE deviceHandle, EngineService& owner );
+
+			//!	Destroys this @ref Mouse instance.
+			~Mouse() = default;
 
 		// ---------------------------------------------------
 
@@ -151,5 +169,6 @@ namespace Input {
 		RawInputPollingThread										_pollingThread;
 	};
 
+}	// namespace Win32
 }	// namespace Input
 }	// namespace Eldritch2

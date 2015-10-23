@@ -1,5 +1,5 @@
 /*==================================================================*\
-  SteamworksWorldView.hpp
+  WorldView.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -17,7 +17,9 @@
 
 namespace Eldritch2 {
 	namespace Networking {
-		class	SteamworksNetworkingService;
+		namespace Steamworks {
+			class	EngineService;
+		}
 	}
 }
 
@@ -31,15 +33,17 @@ namespace Networking {
 
 // ---------------------------------------------------
 
-	class SteamworksWorldView : public Foundation::WorldView {
+namespace Steamworks {
+
+	class WorldView : public Foundation::WorldView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this SteamworksWorldView instance.
-		SteamworksWorldView( Networking::SteamworksNetworkingService& networkingService, const int replicationChannelID, Foundation::World& owningWorld );
+		//!	Constructs this @ref WorldView instance.
+		WorldView( Steamworks::EngineService& networkingService, const int replicationChannelID, Foundation::World& owningWorld );
 
-		// Destroys this SteamworksWorldView instance.
-		~SteamworksWorldView();
+		//!	Destroys this @ref WorldView instance.
+		~WorldView() = default;
 
 	// ---------------------------------------------------
 
@@ -54,9 +58,10 @@ namespace Networking {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		Networking::SteamworksNetworkingService&	_networkingService;
-		const int									_replicationChannelID;
+		Steamworks::EngineService&	_networkingService;
+		const int					_replicationChannelID;
 	};
 
+}	// namespace Steamworks
 }	// namespace Foundation
 }	// namespace Eldritch2

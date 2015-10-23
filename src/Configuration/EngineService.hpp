@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ConfigurationService.hpp
+  EngineService.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -30,15 +30,15 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	class ConfigurationService : public Foundation::GameEngineService, private Configuration::ConfigurationDatabase {
+	class EngineService : public Foundation::GameEngineService, private Configuration::ConfigurationDatabase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref ConfigurationService instance.
-		ConfigurationService( Foundation::GameEngine& owningEngine, FileSystem::ContentProvider& contentProvider );
+		//! Constructs this @ref EngineService instance.
+		EngineService( Foundation::GameEngine& owningEngine, FileSystem::ContentProvider& contentProvider );
 
-		//! Destroys this @ref ConfigurationService instance.
-		~ConfigurationService() = default;
+		//! Destroys this @ref EngineService instance.
+		~EngineService() = default;
 
 	// - DEBUG/LOGGING INFORMATION -----------------------
 

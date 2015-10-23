@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Win32InputService.RawInputPollingThread.cpp
+  EngineService.RawInputPollingThread.cpp
   ------------------------------------------------------------------
   Purpose:
   Defines a Win32 application decorator object that invokes input
@@ -14,7 +14,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Input/Win32InputService.hpp>
+#include <Input/Win32/EngineService.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 //------------------------------------------------------------------//
 #include <windowsx.h>
@@ -54,22 +54,19 @@ namespace {
 
 namespace Eldritch2 {
 namespace Input {
+namespace Win32 {
 
-	Win32InputService::RawInputPollingThread::RawInputPollingThread( Win32InputService& hostingService ) : _hostingInputService( hostingService ), _threadID( 0u ) {}
-
-// ---------------------------------------------------
-
-	Win32InputService::RawInputPollingThread::~RawInputPollingThread() {}
+	EngineService::RawInputPollingThread::RawInputPollingThread( EngineService& hostingService ) : _hostingInputService( hostingService ), _threadID( 0u ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const Win32InputService::RawInputPollingThread::GetHumanReadableName() const {
+	const UTF8Char* const EngineService::RawInputPollingThread::GetHumanReadableName() const {
 		return UTF8L("Win32 Input Service Polling Module");
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode Win32InputService::RawInputPollingThread::Run() {
+	ErrorCode EngineService::RawInputPollingThread::Run() {
 		class NullDevice : public RawInputSubscriber {
 		public:
 			void ReadInputPacket( const ::RAWINPUT& ) override sealed {}
@@ -117,11 +114,12 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	void Win32InputService::RawInputPollingThread::RequestGracefulShutdown() {
+	void EngineService::RawInputPollingThread::RequestGracefulShutdown() {
 		if( 0u != _threadID ) {
 			::PostThreadMessage( _threadID, WM_QUIT, 0, 0 );
 		}
 	}
 
+}	// namespace Win32
 }	// namespace Input
 }	// namespace Eldritch2

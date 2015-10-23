@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Win32InputService.Keyboard.cpp
+  EngineService.Keyboard.cpp
   ------------------------------------------------------------------
   Purpose:
   Defines a Win32 application decorator object that invokes input
@@ -15,7 +15,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Input/Win32InputService.hpp>
+#include <Input/Win32/EngineService.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Input;
@@ -23,22 +23,19 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Input {
+namespace Win32 {
 
-	Win32InputService::Keyboard::Keyboard( const ::HANDLE deviceHandle, Win32InputService& owner ) {
-		using DeviceDirectory = decltype(owner._deviceDirectory);
-
-	// ---
-
-		owner._deviceDirectory.Insert( DeviceDirectory::ValueType( deviceHandle, this ) );
+	EngineService::Keyboard::Keyboard( const ::HANDLE deviceHandle, EngineService& owner ) {
+		owner._deviceDirectory.Insert( { deviceHandle, this } );
 	}
 
 // ---------------------------------------------------
 
-	void Win32InputService::Keyboard::Dispose() {}
+	void EngineService::Keyboard::Dispose() {}
 
 // ---------------------------------------------------
 
-	void Win32InputService::Keyboard::ReadInputPacket( const ::RAWINPUT& inputPacket ) {
+	void EngineService::Keyboard::ReadInputPacket( const ::RAWINPUT& inputPacket ) {
 		const ::RAWKEYBOARD&	keyboard( inputPacket.data.keyboard );
 		const bool				isKeyUpEvent( !!(keyboard.Flags & RI_KEY_BREAK) );
 		UTF8Char				utf8String[16];
@@ -49,5 +46,6 @@ namespace Input {
 		}
 	}
 
+}	// namespace Win32
 }	// namespace Input
 }	// namespace Eldritch2

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  XInputService.cpp
+  EngineService.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Scheduler/CRTPTransientTask.hpp>
+#include <Input/XInput/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Input/XInputService.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 
@@ -26,34 +26,31 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Input {
+namespace XInput {
 
-	XInputService::XInputService( GameEngine& owningEngine ) : GameEngineService( owningEngine ) {}
-
-// ---------------------------------------------------
-
-	XInputService::~XInputService() {}
+	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const XInputService::GetName() const {
+	const UTF8Char* const EngineService::GetName() const {
 		return UTF8L("XInput Service");
 	}
 
 // ---------------------------------------------------
 
-	void XInputService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
 		Controller::ExposeScriptAPI( typeRegistrar );
 	}
 
 // ---------------------------------------------------
 
-	void XInputService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const ServiceTickTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const ServiceTickTaskVisitor ) {
 		class SampleXInputTask : public CRTPTransientTask<SampleXInputTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this SampleXInputTask instance.
-			ETInlineHint SampleXInputTask( XInputService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<SampleXInputTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
+			//!	Constructs this @ref SampleXInputTask instance.
+			ETInlineHint SampleXInputTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<SampleXInputTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
 																														_host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
@@ -75,7 +72,7 @@ namespace Input {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			XInputService&	_host;
+			EngineService&	_host;
 		};
 
 	// ---
@@ -83,5 +80,6 @@ namespace Input {
 		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SampleXInputTask( *this, visitingTask, executingContext );
 	}
 
+}	// namespace XInput
 }	// namespace Input
 }	// namespace Eldritch2

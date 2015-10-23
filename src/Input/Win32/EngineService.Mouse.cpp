@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Win32InputService.Mouse.cpp
+  EngineService.Mouse.cpp
   ------------------------------------------------------------------
   Purpose:
   Defines a Win32 application decorator object that invokes input
@@ -15,7 +15,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Input/Win32InputService.hpp>
+#include <Input/Win32/EngineService.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Input;
@@ -23,26 +23,24 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Input {
+namespace Win32 {
 
-	Win32InputService::Mouse::Mouse( const ::HANDLE deviceHandle, Win32InputService& owner ) {
-		using DeviceDirectory = decltype(owner._deviceDirectory);
-		
-	// ---
-
-		owner._deviceDirectory.Insert( DeviceDirectory::ValueType( deviceHandle, this ) );
+	EngineService::Mouse::Mouse( const ::HANDLE deviceHandle, EngineService& owner ) {
+		owner._deviceDirectory.Insert( { deviceHandle, this } );
 	}
 
 // ---------------------------------------------------
 
-	void Win32InputService::Mouse::Dispose() {}
+	void EngineService::Mouse::Dispose() {}
 
 // ---------------------------------------------------
 
-	void Win32InputService::Mouse::ReadInputPacket( const ::RAWINPUT& inputPacket ) {
-		const ::RAWMOUSE&	mouse( inputPacket.data.mouse );
+	void EngineService::Mouse::ReadInputPacket( const ::RAWINPUT& packet ) {
+		const ::RAWMOUSE&	mouse( packet.data.mouse );
 
-		if( mouse.usFlags & MOUSE_MOVE_ABSOLUTE ) {}
-		else {}
+		if( mouse.usFlags & MOUSE_MOVE_ABSOLUTE ) {
+		} else {
+		}
 
 		if( mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN ) {}
 
@@ -67,5 +65,6 @@ namespace Input {
 		if( mouse.usButtonFlags & RI_MOUSE_WHEEL ) {}
 	}
 
+}	// namespace Win32
 }	// namespace Input
 }	// namespace Eldritch2

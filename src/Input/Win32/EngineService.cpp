@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Win32InputService.cpp
+  EngineService.cpp
   ------------------------------------------------------------------
   Purpose:
   Defines a Win32 application decorator object that invokes input
@@ -17,8 +17,8 @@
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
+#include <Input/Win32/EngineService.hpp>
 #include <Scheduler/TaskScheduler.hpp>
-#include <Input/Win32InputService.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -70,19 +70,20 @@ namespace {
 
 namespace Eldritch2 {
 namespace Input {
+namespace Win32 {
 
-	Win32InputService::Win32InputService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-																	   _allocator( { GetEngineAllocator(), UTF8L("Win32 Input Service Allocator") } ),
-																	   _keyboardHook( ::SetWindowsHookEx( WH_KEYBOARD_LL, &WinKeyEatHook, ::GetModuleHandle( nullptr ), 0 ) ),
-																	   _deviceDirectoryMutex( GetEngineTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
-																	   _deviceDirectory( 0u, ::rde::less<::HANDLE>(), { _allocator, UTF8L("Win32 Raw Input Device Directory Allocator") } ),
-																	   _pollingThread( *this ) {
+	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
+															   _allocator( { GetEngineAllocator(), UTF8L("Win32 Input Service Allocator") } ),
+															   _keyboardHook( ::SetWindowsHookEx( WH_KEYBOARD_LL, &WinKeyEatHook, ::GetModuleHandle( nullptr ), 0 ) ),
+															   _deviceDirectoryMutex( GetEngineTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
+															   _deviceDirectory( 0u, ::rde::less<::HANDLE>(), { _allocator, UTF8L("Win32 Raw Input Device Directory Allocator") } ),
+															   _pollingThread( *this ) {
 		ETRuntimeAssert( nullptr != _deviceDirectoryMutex );
 	}
 
 // ---------------------------------------------------
 
-	Win32InputService::~Win32InputService() {
+	EngineService::~EngineService() {
 		_pollingThread.EnsureTerminated();
 
 		// Remove the hook that allowed us to selectively ignore Windows key press events.
@@ -97,26 +98,26 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	const UTF8Char* const Win32InputService::GetName() const {
+	const UTF8Char* const EngineService::GetName() const {
 		return UTF8L("Win32 Raw Input Manager");
 	}
 
 // ---------------------------------------------------
 
-	void Win32InputService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
-		Win32InputService::Mouse::ExposeScriptAPI( visitor );
-		Win32InputService::Keyboard::ExposeScriptAPI( visitor );
+	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+		EngineService::Mouse::ExposeScriptAPI( visitor );
+		EngineService::Keyboard::ExposeScriptAPI( visitor );
 	}
 
 // ---------------------------------------------------
 
-	void Win32InputService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor ) {
 		class InitializeRawInputTask : public CRTPTransientTask<InitializeRawInputTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			// Constructs this InitializeRawInputTask instance.
-			ETInlineHint InitializeRawInputTask( Win32InputService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeRawInputTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
+			ETInlineHint InitializeRawInputTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeRawInputTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
 																																  _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
@@ -142,7 +143,7 @@ namespace Input {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			Win32InputService&	_host;
+			EngineService&	_host;
 		};
 
 	// ---
@@ -152,11 +153,7 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	void Win32InputService::EnumerateAvailableRawInputDevices() {
-		using DeviceDirectory = decltype(_deviceDirectory);
-
-	// ---
-
+	void EngineService::EnumerateAvailableRawInputDevices() {
 		ScopedLock	_( *_deviceDirectoryMutex );
 		::UINT		deviceCount( 0u );
 
@@ -184,7 +181,7 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	void Win32InputService::HandleDeviceAttach( const ::HANDLE deviceHandle ) {
+	void EngineService::HandleDeviceAttach( const ::HANDLE deviceHandle ) {
 		struct RawInputDeviceInfo : public ::RID_DEVICE_INFO {
 		public:
 			ETInlineHint RawInputDeviceInfo( const ::HANDLE deviceHandle ) {
@@ -219,7 +216,7 @@ namespace Input {
 		switch( deviceInfo.dwType ) {
 			case RIM_TYPEMOUSE: {
 				GetLogger()( UTF8L("Attached mouse (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
-				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Win32InputService::Mouse( deviceHandle, *this );
+				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) EngineService::Mouse( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEMOUSE
 
@@ -227,7 +224,7 @@ namespace Input {
 
 			case RIM_TYPEKEYBOARD: {
 				GetLogger()( UTF8L("Attached keyboard (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle));
-				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Win32InputService::Keyboard( deviceHandle, *this );
+				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) EngineService::Keyboard( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEKEYBOARD
 
@@ -240,5 +237,6 @@ namespace Input {
 		};	// switch( deviceInfo.dwType )
 	}
 
+}	// namespace Win32
 }	// namespace Input
 }	// namespace Eldritch2

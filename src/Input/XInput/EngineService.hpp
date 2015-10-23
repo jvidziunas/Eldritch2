@@ -1,5 +1,5 @@
 /*==================================================================*\
-  XInputService.hpp
+  EngineService.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -30,7 +30,9 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	class XInputService : public Foundation::GameEngineService {
+namespace XInput {
+
+	class EngineService : public Foundation::GameEngineService {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -44,11 +46,11 @@ namespace Input {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this Controller instance.
+			//!	Constructs this @ref Controller instance.
 			Controller( const ::DWORD controllerIndex = Controller::INVALID_CONTROLLER_INDEX );
 
-			// Destroys this Controller instance.
-			~Controller();
+			//!	Destroys this @ref Controller instance.
+			~Controller() = default;
 
 		// ---------------------------------------------------
 
@@ -71,11 +73,11 @@ namespace Input {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this XInputService instance.
-		XInputService( Foundation::GameEngine& owningEngine );
+		//!	Constructs this @ref EngineService instance.
+		EngineService( Foundation::GameEngine& owningEngine );
 
-		// Destroys this XInputService instance.
-		~XInputService();
+		//!	Destroys this @ref EngineService instance.
+		~EngineService() = default;
 
 	// ---------------------------------------------------
 
@@ -94,5 +96,6 @@ namespace Input {
 		Controller	_controllers[XUSER_MAX_COUNT];
 	};
 
+}	// namespace XInput
 }	// namespace Input
 }	// namespace Eldritch2

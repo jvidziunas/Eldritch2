@@ -369,12 +369,6 @@
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp">
       <Filter>Source Files\Engine\Utility\Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Networking\SteamworksNetworkingService.cpp">
-      <Filter>Source Files\Engine\Networking</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Networking\Steamworks\SteamworksWorldView.cpp">
-      <Filter>Source Files\Engine\Networking\Steamworks</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Foundation\WorldView.cpp">
       <Filter>Source Files\Engine\Foundation\Worlds</Filter>
     </ClCompile>
@@ -383,9 +377,6 @@
     </ClCompile>
     <ClCompile Include="..\examples\Win32EntryPoint.cpp">
       <Filter>Source Files\Games</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\configuration\ConfigurationService.cpp">
-      <Filter>Source Files\Engine\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
@@ -398,12 +389,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Input\PlaystationController.cpp">
       <Filter>Source Files\Engine\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\input\Win32InputService.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Input\XInputService.cpp">
-      <Filter>Source Files\Engine\Input\XInput</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\StringOperators.cpp">
       <Filter>Source Files\Engine\Utility</Filter>
@@ -438,23 +423,8 @@
     <ClCompile Include="..\src\foundation\Window.cpp">
       <Filter>Source Files\Engine\Foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Networking\SteamworksNetworkingService.Player.cpp">
-      <Filter>Source Files\Engine\Networking</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp">
       <Filter>Source Files\Engine\Foundation\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Input\XInputService.Controller.cpp">
-      <Filter>Source Files\Engine\Input\XInput</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Input\Win32InputService.RawInputPollingThread.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Input\Win32InputService.Keyboard.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Input\Win32InputService.Mouse.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\IntrusivePointerBase.cpp">
       <Filter>Source Files\Engine\Utility</Filter>
@@ -567,9 +537,6 @@
     <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp">
       <Filter>Source Files\Engine\Renderer\Direct3D</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Direct3D11\RendererService.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp">
       <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
     </ClCompile>
@@ -630,8 +597,41 @@
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Sound\XAudio2\RendererService.cpp">
+    <ClCompile Include="..\src\configuration\EngineService.cpp">
+      <Filter>Source Files\Engine\Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Networking\Steamworks\WorldView.cpp">
+      <Filter>Source Files\Engine\Networking\Steamworks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.cpp">
+      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Sound\XAudio2\EngineService.cpp">
       <Filter>Source Files\Engine\Sound\XAudio2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Networking\Steamworks\EngineService.cpp">
+      <Filter>Source Files\Engine\Networking\Steamworks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Networking\Steamworks\EngineService.Player.cpp">
+      <Filter>Source Files\Engine\Networking\Steamworks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Input\XInput\EngineService.Controller.cpp">
+      <Filter>Source Files\Engine\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Input\XInput\EngineService.cpp">
+      <Filter>Source Files\Engine\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Input\Win32\EngineService.cpp">
+      <Filter>Source Files\Engine\Input\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Input\Win32\EngineService.Keyboard.cpp">
+      <Filter>Source Files\Engine\Input\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Input\Win32\EngineService.Mouse.cpp">
+      <Filter>Source Files\Engine\Input\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Input\Win32\EngineService.RawInputPollingThread.cpp">
+      <Filter>Source Files\Engine\Input\Win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -794,9 +794,6 @@
     <ClInclude Include="..\src\configuration\ConfigurationDatabase.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\configuration\ConfigurationService.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\foundation\GameEngine.hpp">
       <Filter>Header Files\Engine\Foundation\Engine</Filter>
     </ClInclude>
@@ -827,12 +824,6 @@
     <ClInclude Include="..\resources\Eldritch2.Resources.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Networking\SteamworksNetworkingService.hpp">
-      <Filter>Header Files\Engine\Networking</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Networking\Steamworks\SteamworksWorldView.hpp">
-      <Filter>Header Files\Engine\Networking\Steamworks</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp">
       <Filter>Header Files\Engine\Scripting</Filter>
     </ClInclude>
@@ -862,12 +853,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp">
       <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Input\XInputService.hpp">
-      <Filter>Header Files\Engine\Input\XInput</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\input\Win32InputService.hpp">
-      <Filter>Header Files\Engine\Input\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Configuration\ConfigurablePODVariable.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
@@ -1061,9 +1046,6 @@
     <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp">
       <Filter>Header Files\Engine\Renderer\Direct3D</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\Direct3D11\RendererService.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.hpp">
       <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
@@ -1127,8 +1109,26 @@
     <ClInclude Include="..\src\Sound\XAudio2\ForwardDeclarations.hpp">
       <Filter>Header Files\Engine\Sound\XAudio2</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Sound\XAudio2\RendererService.hpp">
+    <ClInclude Include="..\src\configuration\EngineService.hpp">
+      <Filter>Header Files\Engine\Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Networking\Steamworks\WorldView.hpp">
+      <Filter>Header Files\Engine\Networking\Steamworks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\EngineService.hpp">
+      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sound\XAudio2\EngineService.hpp">
       <Filter>Header Files\Engine\Sound\XAudio2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Networking\Steamworks\EngineService.hpp">
+      <Filter>Header Files\Engine\Networking\Steamworks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Input\XInput\EngineService.hpp">
+      <Filter>Header Files\Engine\Input\XInput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Input\Win32\EngineService.hpp">
+      <Filter>Header Files\Engine\Input\Win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

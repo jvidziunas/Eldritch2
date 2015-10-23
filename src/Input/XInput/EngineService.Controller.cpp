@@ -1,5 +1,5 @@
 /*==================================================================*\
-  XInputService.Controller.cpp
+  EngineService.Controller.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
-#include <Input/XInputService.hpp>
+#include <Input/XInput/EngineService.hpp>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -33,12 +33,13 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Input {
+namespace XInput {
 
-	const char* const XInputService::Controller::scriptTypeName = "XInputController";
+	const char* const EngineService::Controller::scriptTypeName = "XInputController";
 
 // ---------------------------------------------------
 
-	XInputService::Controller::Controller( const ::DWORD controllerIndex ) : _controllerIndex( controllerIndex ) {
+	EngineService::Controller::Controller( const ::DWORD controllerIndex ) : _controllerIndex( controllerIndex ) {
 		if( Controller::INVALID_CONTROLLER_INDEX != controllerIndex ) {
 			::XInputGetState( controllerIndex, &_state );
 		}
@@ -46,19 +47,15 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	XInputService::Controller::~Controller() {}
-
-// ---------------------------------------------------
-
-	void XInputService::Controller::ReadInput() {
-		if( Controller::INVALID_CONTROLLER_INDEX != _controllerIndex && ERROR_DEVICE_NOT_CONNECTED != ::XInputGetState( _controllerIndex, &_state ) ) {
+	void EngineService::Controller::ReadInput() {
+		if( (Controller::INVALID_CONTROLLER_INDEX != _controllerIndex) && (ERROR_DEVICE_NOT_CONNECTED != ::XInputGetState( _controllerIndex, &_state )) ) {
 		}
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint void XInputService::Controller::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L( "XInputService::Controller::ExposeScriptAPI() Temporary Allocator" ) );
+	ETNoAliasHint void EngineService::Controller::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+		FixedStackAllocator<16u>	temporaryAllocator( UTF8L( "EngineService::Controller::ExposeScriptAPI() Temporary Allocator" ) );
 
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<Controller>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );
@@ -69,7 +66,8 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	void XInputService::Controller::Dispose() {}
+	void EngineService::Controller::Dispose() {}
 
+}	// namespace XInput
 }	// namespace Input
 }	// namespace Eldritch2

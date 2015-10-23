@@ -1,5 +1,5 @@
 /*==================================================================*\
-  RendererService.hpp
+  EngineService.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -38,15 +38,15 @@ namespace Sound {
 	
 namespace XAudio2 {
 
-	class RendererService : public Foundation::GameEngineService, public ::IXAudio2EngineCallback {
+	class EngineService : public Foundation::GameEngineService, public ::IXAudio2EngineCallback {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref RendererService instance.
-		RendererService( Foundation::GameEngine& owningEngine );
+		//! Constructs this @ref EngineService instance.
+		EngineService( Foundation::GameEngine& owningEngine );
 
-		//! Destroys this @ref RendererService instance.
-		~RendererService();
+		//! Destroys this @ref EngineService instance.
+		~EngineService();
 
 	// ---------------------------------------------------
 

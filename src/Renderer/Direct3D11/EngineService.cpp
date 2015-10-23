@@ -1,5 +1,5 @@
 /*==================================================================*\
-  RendererService.cpp
+  EngineService.cpp
   ------------------------------------------------------------------
   Purpose:
   Central context object used to centralize all simulation, effects
@@ -18,8 +18,8 @@
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/Builders/DeviceBuilder.hpp>
-#include <Renderer/Direct3D11/RendererService.hpp>
 #include <Renderer/Direct3D11/ResourceCommon.hpp>
+#include <Renderer/Direct3D11/EngineService.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Renderer/Direct3D11/WorldView.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
@@ -48,8 +48,8 @@ using namespace ::std;
 
 namespace {
 
-	static ETThreadLocal Direct3D11::RendererService*	activeRenderer	= nullptr;
-	static const float32								colorClear[4] = { 0.176f, 0.196f, 0.667f, 0.0f };
+	static ETThreadLocal Direct3D11::EngineService*	activeRenderer	= nullptr;
+	static const float32							colorClear[4] = { 0.176f, 0.196f, 0.667f, 0.0f };
 
 }	// anonymous namespace
 
@@ -61,27 +61,27 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	RendererService::RendererService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-																					   _MSAACount( 1u ),
-																					   _MSAAQuality( 0u ),
-																					   _adaptiveResolutionMaxAreaFraction( 1.0f ),
-																					   _adaptiveResolutionMinAreaFraction( 0.25f ),
-									 												   _VSyncMode( 0u ),
-																					   _preferredAdapterName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
-																					   _forceDebugRuntime( false ),
-																					   _allowDriverThreadingOptimizations( true ),
-																					   _maximumFramesToRenderAhead( 3u ),
-																					   _defaultMeshView( nullptr ) {}
+	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
+															   _MSAACount( 1u ),
+															   _MSAAQuality( 0u ),
+															   _adaptiveResolutionMaxAreaFraction( 1.0f ),
+															   _adaptiveResolutionMinAreaFraction( 0.25f ),
+									 						   _VSyncMode( 0u ),
+															   _preferredAdapterName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
+															   _forceDebugRuntime( false ),
+															   _allowDriverThreadingOptimizations( true ),
+															   _maximumFramesToRenderAhead( 3u ),
+															   _defaultMeshView( nullptr ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const RendererService::GetName() const {
+	const UTF8Char* const EngineService::GetName() const {
 		return UTF8L("Direct3D11 Renderer");
 	}
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
 		struct FunctionHelper {
 			static SwapChain* ETScriptAPICall GetPrimarySwapChain() {
 				auto&	renderer( *activeRenderer );
@@ -105,7 +105,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
 		visitor.PushSection( UTF8L("Direct3D11") );
 
 		visitor.Register( UTF8L("VSyncMode"), _VSyncMode ).Register( UTF8L("PreferredAdapterName"), _preferredAdapterName ).Register( UTF8L("ForceDebugRuntime"), _forceDebugRuntime );
@@ -115,13 +115,13 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
 		class CreateDeviceTask : public CRTPTransientTask<CreateDeviceTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//! Constructs this @ref CreateDeviceTask instance.
-			ETInlineHint CreateDeviceTask( RendererService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<CreateDeviceTask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
+			ETInlineHint CreateDeviceTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<CreateDeviceTask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -143,7 +143,7 @@ namespace Direct3D11 {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			RendererService&	_host;
+			EngineService&	_host;
 		};
 
 	// ---
@@ -153,15 +153,15 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
 		visitor.PublishFactory( this, sizeof( WorldView ), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<RendererService*>(renderer)->_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
+			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(renderer)->_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
 		using Initializer		= ResourceView::Initializer;
 
@@ -181,7 +181,7 @@ namespace Direct3D11 {
 		.PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* renderer ) -> Result<ResourceView> {
 			unique_ptr<HLSLPipelineDefinitionView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) HLSLPipelineDefinitionView( initializer, allocator ), { allocator } );
 
-			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<RendererService*>(renderer)->_device ) ) {
+			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(renderer)->_device ) ) {
 				return { *view.release() };
 			}
 
@@ -191,7 +191,7 @@ namespace Direct3D11 {
 		.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* renderer ) -> Result<ResourceView> {
 			unique_ptr<ShaderResourceResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( initializer, allocator ), { allocator } );
 
-			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<RendererService*>(renderer)->_device ) ) {
+			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(renderer)->_device ) ) {
 				return { *view.release() };
 			}
 
@@ -201,7 +201,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void RendererService::InitializeDirect3D() {
+	void EngineService::InitializeDirect3D() {
 		DeviceBuilder	deviceBuilder;
 		const bool		useDebugLayer( (0 != ::IsDebuggerPresent()) | _forceDebugRuntime );
 

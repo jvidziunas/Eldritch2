@@ -1,5 +1,5 @@
 /*==================================================================*\
-  RendererService.hpp
+  EngineService.hpp
   ------------------------------------------------------------------
   Purpose:
   Central context object used to centralize all simulation, effects
@@ -45,15 +45,15 @@ namespace Renderer {
 
 namespace Direct3D11 {
 
-	class RendererService : public Foundation::GameEngineService {
+	class EngineService : public Foundation::GameEngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Initializes this @ref RendererService instance.
-		RendererService( Foundation::GameEngine& owningEngine );
+		//! Initializes this @ref EngineService instance.
+		EngineService( Foundation::GameEngine& owningEngine );
 
-		//! Destroys this @ref RendererService instance.
-		~RendererService() = default;
+		//! Destroys this @ref EngineService instance.
+		~EngineService() = default;
 
 	// ---------------------------------------------------
 

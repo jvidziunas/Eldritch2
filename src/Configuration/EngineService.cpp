@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ConfigurationService.cpp
+  EngineService.cpp
   ------------------------------------------------------------------
   Purpose:
   Lightweight wrapper over an INI file parser and query system.
@@ -17,9 +17,9 @@
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <FileSystem/ReadableMemoryMappedFile.hpp>
-#include <Configuration/ConfigurationService.hpp>
 #include <FileSystem/SynchronousFileWriter.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
+#include <Configuration/EngineService.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <FileSystem/ContentProvider.hpp>
@@ -51,23 +51,23 @@ namespace {
 namespace Eldritch2 {
 namespace Configuration {
 
-	ConfigurationService::ConfigurationService( GameEngine& owningEngine, ContentProvider& contentProvider ) : GameEngineService( owningEngine ), ConfigurationDatabase( GetEngineAllocator() ), _contentProvider( contentProvider ) {}
+	EngineService::EngineService( GameEngine& owningEngine, ContentProvider& contentProvider ) : GameEngineService( owningEngine ), ConfigurationDatabase( GetEngineAllocator() ), _contentProvider( contentProvider ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const ConfigurationService::GetName() const {
+	const UTF8Char* const EngineService::GetName() const {
 		return UTF8L("Configuration Service");
 	}
 
 // ---------------------------------------------------
 
-	void ConfigurationService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {
+	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {
 		// register DumpConfigurationToFile() here
 	}
 
 // ---------------------------------------------------
 
-	void ConfigurationService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& initializeEngineTask, WorkerContext& executingContext, const InitializeEngineTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& initializeEngineTask, WorkerContext& executingContext, const InitializeEngineTaskVisitor ) {
 		class PostConfigurationLoadedTask : public CRTPTransientTask<PostConfigurationLoadedTask> {
 		// - TYPE PUBLISHING ---------------------------------
 
@@ -76,7 +76,7 @@ namespace Configuration {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			public:
-				ETInlineHint PreConfigurationLoadedTask( ConfigurationService& host, PostConfigurationLoadedTask& parent, WorkerContext& executingContext, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
+				ETInlineHint PreConfigurationLoadedTask( EngineService& host, PostConfigurationLoadedTask& parent, WorkerContext& executingContext, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
 																																														   _host( host ),
 																																														   _subtaskAllocator( subtaskAllocator ) {
 					TrySchedulingOnContext( executingContext );
@@ -84,7 +84,7 @@ namespace Configuration {
 
 			// ---------------------------------------------------
 
-				ETInlineHint ConfigurationService& GetHost() {
+				ETInlineHint EngineService& GetHost() {
 					return _host;
 				}
 
@@ -99,20 +99,20 @@ namespace Configuration {
 				}
 
 				Task* Execute( WorkerContext& executingContext ) override sealed {
-					GetHost().BroadcastTaskVisitor( _subtaskAllocator, *this, executingContext, ConfigurationService::PreConfigurationLoadedTaskVisitor() );
+					GetHost().BroadcastTaskVisitor( _subtaskAllocator, *this, executingContext, EngineService::PreConfigurationLoadedTaskVisitor() );
 					return nullptr;
 				}
 
 			// - DATA MEMBERS ------------------------------------
 
 			private:
-				ConfigurationService&	_host;
+				EngineService&	_host;
 				Allocator&				_subtaskAllocator;
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			ETInlineHint PostConfigurationLoadedTask( ConfigurationService& host, Task& initializeEngineTask, WorkerContext& executingContext, Allocator& subtaskAllocator ) : CRTPTransientTask<PostConfigurationLoadedTask>( initializeEngineTask, Scheduler::CodependentTaskSemantics ),
+			ETInlineHint PostConfigurationLoadedTask( EngineService& host, Task& initializeEngineTask, WorkerContext& executingContext, Allocator& subtaskAllocator ) : CRTPTransientTask<PostConfigurationLoadedTask>( initializeEngineTask, Scheduler::CodependentTaskSemantics ),
 																																											   _preConfigurationLoadedTask( host, *this, executingContext, subtaskAllocator ) {
 				TrySchedulingOnContext( executingContext );
 			}
@@ -124,7 +124,7 @@ namespace Configuration {
 			}
 
 			Task* Execute( WorkerContext& executingContext ) override sealed {
-				_preConfigurationLoadedTask.GetHost().BroadcastTaskVisitor( _preConfigurationLoadedTask.GetSubtaskAllocator(), *this, executingContext, ConfigurationService::PostConfigurationLoadedTaskVisitor() );
+				_preConfigurationLoadedTask.GetHost().BroadcastTaskVisitor( _preConfigurationLoadedTask.GetSubtaskAllocator(), *this, executingContext, EngineService::PostConfigurationLoadedTaskVisitor() );
 				return nullptr;
 			}
 
@@ -141,13 +141,13 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	void ConfigurationService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& preConfigurationLoadInitializationTask, WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& preConfigurationLoadInitializationTask, WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor ) {
 		class LoadSerializedConfigurationTask : public CRTPTransientTask<LoadSerializedConfigurationTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			// Constructs this LoadSerializedConfigurationTask instance.
-			ETInlineHint LoadSerializedConfigurationTask( ConfigurationService& host, Task& preConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<LoadSerializedConfigurationTask>( preConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ),
+			ETInlineHint LoadSerializedConfigurationTask( EngineService& host, Task& preConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<LoadSerializedConfigurationTask>( preConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ),
 																																										_host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
@@ -166,7 +166,7 @@ namespace Configuration {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			ConfigurationService&	_host;
+			EngineService&	_host;
 		};
 
 	// ---
@@ -176,14 +176,14 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	void ConfigurationService::DumpConfigurationToFile() const {
+	void EngineService::DumpConfigurationToFile() const {
 		using FileOverwriteBehavior	= ContentProvider::FileOverwriteBehavior;
 		using KnownContentLocation	= ContentProvider::KnownContentLocation;
 
 	// ---
 
 		// Try to create a file writer for the temporary settings file.
-		FixedStackAllocator<64u>	temporaryAllocator( UTF8L("ConfigurationService::DumpConfigurationToFile() Temporary Allocator") );
+		FixedStackAllocator<64u>	temporaryAllocator( UTF8L("EngineService::DumpConfigurationToFile() Temporary Allocator") );
 
 		if( const auto getWriterResult = _contentProvider.CreateSynchronousFileWriter( temporaryAllocator, KnownContentLocation::USER_DOCUMENTS, tempConfigurationFileName, FileOverwriteBehavior::OVERWRITE_IF_FILE_EXISTS ) ) {
 			// Dump configuration
@@ -199,8 +199,8 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	void ConfigurationService::BroadcastConfigurationToEngine() {
-		FixedStackAllocator<64u>	tempAllocator( UTF8L("ConfigurationService::BroadcastConfigurationToEngine() Temporary Allocator") );
+	void EngineService::BroadcastConfigurationToEngine() {
+		FixedStackAllocator<64u>	tempAllocator( UTF8L("EngineService::BroadcastConfigurationToEngine() Temporary Allocator") );
 
 		GetLogger()( UTF8L("Loading configuration from file '%s'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
 

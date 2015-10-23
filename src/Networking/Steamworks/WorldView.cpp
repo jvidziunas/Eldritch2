@@ -1,5 +1,5 @@
 /*==================================================================*\
-  SteamworksWorldView.hpp
+  WorldView.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,8 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Networking/Steamworks/SteamworksWorldView.hpp>
-#include <Networking/SteamworksNetworkingService.hpp>
+#include <Networking/Steamworks/EngineService.hpp>
+#include <Networking/Steamworks/WorldView.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
@@ -29,22 +29,18 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Networking {
+namespace Steamworks {
 
-	SteamworksWorldView::SteamworksWorldView( SteamworksNetworkingService& networkingService, const int replicationChannelID, World& owningWorld ) : WorldView( owningWorld ), _networkingService( networkingService ), _replicationChannelID( replicationChannelID ) {}
-
-// ---------------------------------------------------
-
-	SteamworksWorldView::~SteamworksWorldView() {}
+	WorldView::WorldView( EngineService& networkingService, const int replicationChannelID, World& owningWorld ) : Foundation::WorldView( owningWorld ), _networkingService( networkingService ), _replicationChannelID( replicationChannelID ) {}
 
 // ---------------------------------------------------
 
-	void SteamworksWorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PreScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PreScriptTickTaskVisitor ) {
 		class ReceivePacketsTask : public CRTPTransientTask<ReceivePacketsTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			ETInlineHint ReceivePacketsTask( SteamworksWorldView& host, WorkerContext& executingContext, Task& preScriptTickTask ) : CRTPTransientTask<ReceivePacketsTask>( preScriptTickTask, Scheduler::CodependentTaskSemantics ),
-																																	 _host( host ) {
+			ETInlineHint ReceivePacketsTask( WorldView& host, WorkerContext& executingContext, Task& preScriptTickTask ) : CRTPTransientTask<ReceivePacketsTask>( preScriptTickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -56,7 +52,7 @@ namespace Networking {
 
 			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
 				::CSteamID	senderID;
-				char		tempBuffer[SteamworksNetworkingService::NETWORK_MTU_SIZE];
+				char		tempBuffer[EngineService::NETWORK_MTU_SIZE];
 
 				while( _host._networkingService.TryRecievePacket( _host._replicationChannelID, senderID, tempBuffer ) ) {
 
@@ -68,7 +64,7 @@ namespace Networking {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			SteamworksWorldView&	_host;
+			WorldView&	_host;
 		};
 
 	// ---
@@ -78,13 +74,12 @@ namespace Networking {
 
 // ---------------------------------------------------
 
-	void SteamworksWorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PostScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PostScriptTickTaskVisitor ) {
 		class BroadcastPacketsTask : public CRTPTransientTask<BroadcastPacketsTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			ETInlineHint BroadcastPacketsTask( SteamworksWorldView& host, WorkerContext& executingContext, Task& postScriptTickTask ) : CRTPTransientTask<BroadcastPacketsTask>( postScriptTickTask, Scheduler::CodependentTaskSemantics ),
-																																		_host( host ) {
+			ETInlineHint BroadcastPacketsTask( WorldView& host, WorkerContext& executingContext, Task& postScriptTickTask ) : CRTPTransientTask<BroadcastPacketsTask>( postScriptTickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -97,7 +92,7 @@ namespace Networking {
 			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
 				const auto	channelID( _host._replicationChannelID );
 				auto&		networkingService( _host._networkingService );
-				char		tempBuffer[SteamworksNetworkingService::NETWORK_MTU_SIZE];
+				char		tempBuffer[EngineService::NETWORK_MTU_SIZE];
 
 				return nullptr;
 			}
@@ -105,7 +100,7 @@ namespace Networking {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			SteamworksWorldView&	_host;
+			WorldView&	_host;
 		};
 
 	// ---
@@ -115,9 +110,10 @@ namespace Networking {
 
 // ---------------------------------------------------
 
-	void SteamworksWorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {
+	void WorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {
 		// Broadcast join/leave notifications, etc.
 	}
 
+}	// namespace Steamworks
 }	// namespace Networking
 }	// namespace Eldritch2

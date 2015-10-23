@@ -1,5 +1,5 @@
 /*==================================================================*\
-  RendererService.cpp
+  EngineService.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Sound/XAudio2/RendererService.hpp>
+#include <Sound/XAudio2/EngineService.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Foundation/Application.hpp>
@@ -47,16 +47,16 @@ namespace Eldritch2 {
 namespace Sound {
 namespace XAudio2 {
 	
-	RendererService::RendererService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-																   _allocator( GetEngineAllocator(), UTF8L("XAudio2 Audio Renderer Allocator") ),
-																   _forcedSpeakerCount( 0u ),
-																   _processorAffinityMask( ::XAUDIO2_DEFAULT_PROCESSOR ),
-																   _deviceName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
-																   _audioGlitchCount( 0u ) {}
+	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
+															   _allocator( GetEngineAllocator(), UTF8L("XAudio2 Audio Renderer Allocator") ),
+															   _forcedSpeakerCount( 0u ),
+															   _processorAffinityMask( ::XAUDIO2_DEFAULT_PROCESSOR ),
+															   _deviceName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
+															   _audioGlitchCount( 0u ) {}
 
 // ---------------------------------------------------
 
-	RendererService::~RendererService() {
+	EngineService::~EngineService() {
 		if( _audio ) {
 			_audio->StopEngine();
 		}
@@ -64,19 +64,19 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	const UTF8Char* const RendererService::GetName() const {
+	const UTF8Char* const EngineService::GetName() const {
 		return UTF8L("XAudio2 Audio Renderer");
 	}
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
 		class InitalizeXAudioTask : public CRTPTransientTask<InitalizeXAudioTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			// Constructs this InitializeXAudioTask instance.
-			ETInlineHint InitalizeXAudioTask( RendererService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitalizeXAudioTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
+			ETInlineHint InitalizeXAudioTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitalizeXAudioTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
 																																  _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
@@ -97,7 +97,7 @@ namespace XAudio2 {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			RendererService&	_host;
+			EngineService&	_host;
 		};
 
 	// ---
@@ -107,7 +107,7 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const ServiceTickTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const ServiceTickTaskVisitor ) {
 		::XAUDIO2_PERFORMANCE_DATA	performanceData;
 
 		_audio->GetPerformanceData( &performanceData );
@@ -121,7 +121,7 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
 		visitor.PushSection( UTF8L("XAudio2") );
 
 		visitor.Register( UTF8L("ForcedSpeakerCount"), _forcedSpeakerCount ).Register( UTF8L("AudioProcessingThreadAffinityMask"), _processorAffinityMask );
@@ -130,11 +130,11 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	void RendererService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
+	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode RendererService::InitializeXAudio() {
+	ErrorCode EngineService::InitializeXAudio() {
 		decltype(_audio)	audio;
 
 		GetLogger()( UTF8L("Creating XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
@@ -154,15 +154,15 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	void RendererService::OnProcessingPassStart() {}
+	void EngineService::OnProcessingPassStart() {}
 
 // ---------------------------------------------------
 
-	void RendererService::OnProcessingPassEnd() {}
+	void EngineService::OnProcessingPassEnd() {}
 
 // ---------------------------------------------------
 
-	void RendererService::OnCriticalError( ::HRESULT /*error*/ ) {
+	void EngineService::OnCriticalError( ::HRESULT /*error*/ ) {
 		GetLogger( LogMessageType::ERROR )( UTF8L("Critical error in XAudio!") );
 	}
 

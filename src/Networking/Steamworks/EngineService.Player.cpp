@@ -1,5 +1,5 @@
 /*==================================================================*\
-  SteamworksNetworkingService.Player.cpp
+  EngineService.Player.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Networking/SteamworksNetworkingService.hpp>
+#include <Networking/Steamworks/EngineService.hpp>
 #include <Foundation/World.hpp>
 //------------------------------------------------------------------//
 
@@ -22,26 +22,24 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Networking {
+namespace Steamworks {
 
-	SteamworksNetworkingService::Player::Player( const NetworkID& networkID, SteamworksNetworkingService& networkingService, Allocator& allocator ) : _name( ::Eldritch2::EmptyStringSemantics, { allocator, UTF8L("Player Name Allocator") } ),
-																																					  _networkingService( networkingService ),
-																																					  _networkID( networkID ) {}
-
-// ---------------------------------------------------
-
-	SteamworksNetworkingService::Player::~Player() {}
+	EngineService::Player::Player( const NetworkID& networkID, EngineService& networkingService, Allocator& allocator ) : _name( ::Eldritch2::EmptyStringSemantics, { allocator, UTF8L("Player Name Allocator") } ),
+																														  _networkingService( networkingService ),
+																														  _networkID( networkID ) {}
 
 // ---------------------------------------------------
 
-	void SteamworksNetworkingService::Player::Dispose() {
+	void EngineService::Player::Dispose() {
 		_networkingService._allocator.Delete( *this );
 	}
 
 // ---------------------------------------------------
 
-	const UTF8Char* SteamworksNetworkingService::Player::GetName() const {
+	const UTF8Char* EngineService::Player::GetName() const {
 		return _name.GetCharacterArray();
 	}
 
+}	// namespace Steamworks
 }	// namespace Networking
 }	// namespace Eldritch2

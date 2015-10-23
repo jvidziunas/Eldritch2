@@ -1,5 +1,5 @@
 /*==================================================================*\
-  SteamworksNetworkingService.hpp
+  EngineService.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -32,7 +32,7 @@
 
 namespace Eldritch2 {
 	namespace Networking {
-		class	SteamworksWorldView;
+		class	WorldView;
 	}
 
 	namespace Utility {
@@ -54,7 +54,9 @@ namespace Networking {
 
 // ---------------------------------------------------
 
-	class SteamworksNetworkingService : public Foundation::GameEngineService {
+namespace Steamworks {
+
+	class EngineService : public Foundation::GameEngineService {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -71,10 +73,10 @@ namespace Networking {
 
 		public:
 			//!	Constructs this @ref Player instance.
-			Player( const NetworkID& networkID, SteamworksNetworkingService& networkingService, ::Eldritch2::Allocator& allocator );
+			Player( const NetworkID& networkID, EngineService& networkingService, ::Eldritch2::Allocator& allocator );
 
 			//!	Destroys this @ref Player instance.
-			~Player();
+			~Player() = default;
 		
 		// ---------------------------------------------------
 
@@ -89,18 +91,18 @@ namespace Networking {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::Eldritch2::UTF8String<>		_name;
-			SteamworksNetworkingService&	_networkingService;
-			const NetworkID					_networkID;
+			::Eldritch2::UTF8String<>	_name;
+			EngineService&			_networkingService;
+			const NetworkID				_networkID;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref SteamworksNetworkingService instance.
-		SteamworksNetworkingService( Foundation::GameEngine& owningEngine );
+		//! Constructs this @ref EngineService instance.
+		EngineService( Foundation::GameEngine& owningEngine );
 
-		//! Destroys this @ref SteamworksNetworkingService instance.
-		~SteamworksNetworkingService();
+		//! Destroys this @ref EngineService instance.
+		~EngineService();
 
 	// ---------------------------------------------------
 
@@ -140,18 +142,15 @@ namespace Networking {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		// Tells us when we have successfully connected to Steam
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService, OnSteamServersConnected,		::SteamServersConnected_t,		_steamServersConnected );
-		// Tells us when there was a failure to connect to Steam
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService, OnSteamServersConnectFailure,	::SteamServerConnectFailure_t,	_steamServersConnectFailure );
-		// Tells us when we have been logged out of Steam
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService, OnSteamServersDisconnected,		::SteamServersDisconnected_t,	_steamServersDisconnected );
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService, OnP2PSessionRequest,			::P2PSessionRequest_t,			_peerToPeerSessionRequest );
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService,	OnP2PSessionConnectionFail,		::P2PSessionConnectFail_t,		_peerToPeerSessionConnectFail );
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService,	OnPolicyResponse,				::GSPolicyResponse_t,			_policyResponse );
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService, OnValidateAuthTicketResponse,	::ValidateAuthTicketResponse_t, _gameServerAuthTicketResponse );
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService,	OnClientGameServerDeny,			::ClientGameServerDeny_t,		_clientGameServerDeny );
-		STEAM_GAMESERVER_CALLBACK( SteamworksNetworkingService, OnClientGameServerKick,			::GSClientKick_t,				_clientGameServerKick );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnSteamServersConnected,		::SteamServersConnected_t,		_steamServersConnected );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnSteamServersConnectFailure,	::SteamServerConnectFailure_t,	_steamServersConnectFailure );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnSteamServersDisconnected,	::SteamServersDisconnected_t,	_steamServersDisconnected );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnP2PSessionRequest,			::P2PSessionRequest_t,			_peerToPeerSessionRequest );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnP2PSessionConnectionFail,	::P2PSessionConnectFail_t,		_peerToPeerSessionConnectFail );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnPolicyResponse,				::GSPolicyResponse_t,			_policyResponse );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnValidateAuthTicketResponse,	::ValidateAuthTicketResponse_t, _gameServerAuthTicketResponse );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnClientGameServerDeny,		::ClientGameServerDeny_t,		_clientGameServerDeny );
+		STEAM_GAMESERVER_CALLBACK( EngineService, OnClientGameServerKick,		::GSClientKick_t,				_clientGameServerKick );
 
 		::Eldritch2::ChildAllocator												_allocator;
 
@@ -180,5 +179,6 @@ namespace Networking {
 		Scripting::ObjectHandle<Foundation::World>								_lobbyWorld;
 	};
 
+}	// namespace Steamworks
 }	// namespace Networking
 }	// namespace Eldritch2

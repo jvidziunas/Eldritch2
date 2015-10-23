@@ -37,15 +37,15 @@ namespace Input {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this Mouse instance.
+		//!	Constructs this @ref Mouse instance.
 		Mouse( ::Eldritch2::uint32 buttonBits = 0u );
 
-		// Destroys this Mouse instance.
+		//!	Destroys this @ref Mouse instance.
 		~Mouse();
 
 	// - SCRIPT API REFERENCE ----------------------------
 
-		// Registers all script-callable methods for the Mouse type with the specified script type registrar.
+		//! Registers all script-callable methods for the @ref Mouse type with the specified script type registrar.
 		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
 
 	// - DATA MEMBERS ------------------------------------
