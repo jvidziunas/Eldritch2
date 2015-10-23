@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptWorldView.hpp
+  WorldView.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -46,15 +46,17 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class AngelscriptWorldView : public Foundation::WorldView {
+namespace AngelScript {
+
+	class WorldView : public Foundation::WorldView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this AngelscriptWorldView instance.
-		AngelscriptWorldView( Foundation::World& owningWorld, ::asIScriptEngine& scriptEngine );
+		//!	Constructs this @ref WorldView instance.
+		WorldView( Foundation::World& owningWorld, ::asIScriptEngine& scriptEngine );
 
-		//! Destroys this AngelscriptWorldView instance.
-		~AngelscriptWorldView();
+		//!	Destroys this @ref WorldView instance.
+		~WorldView();
 
 	// ---------------------------------------------------
 
@@ -83,5 +85,6 @@ namespace Scripting {
 		::Eldritch2::UnorderedMap<::Eldritch2::uint64, ::std::unique_ptr<::asIScriptObject>>	_entityDispatchTable;
 	};
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

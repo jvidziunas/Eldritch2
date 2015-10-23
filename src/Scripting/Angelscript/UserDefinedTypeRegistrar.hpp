@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptUserDefinedTypeRegistrar.hpp
+  UserDefinedTypeRegistrar.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -28,7 +28,7 @@ namespace Eldritch2 {
 class	asIScriptEngine;
 struct	asSFuncPtr;
 
-#define SET_TYPE_SCRIPT_NAME( QualifiedTypeName, ScriptTypeNameString ) namespace Eldritch2 { namespace Scripting { template <> const char* const AngelscriptUserDefinedTypeRegistrar::TypeNameGenerator<QualifiedTypeName>::scriptTypeName = ScriptTypeNameString; } }
+#define SET_TYPE_SCRIPT_NAME( QualifiedTypeName, ScriptTypeNameString ) namespace Eldritch2 { namespace Scripting { namespace AngelScript { template <> const char* const UserDefinedTypeRegistrar::TypeNameGenerator<QualifiedTypeName>::scriptTypeName = ScriptTypeNameString; } } }
 #define ETScriptAPICall ETCDecl
 
 namespace Eldritch2 {
@@ -39,27 +39,33 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	enum class BinaryOperatorClass {
-		ADDITION,
-		SUBTRACTION,
-		MULTIPLICATION,
-		DIVISION,
+namespace AngelScript {
 
-		ASSIGNMENT,
+	class UserDefinedTypeRegistrar {
+	// - TYPE PUBLISHING ---------------------------------
 
-		ADDITION_ASSIGNMENT,
-		SUBTRACTION_ASSIGNMENT,
-		MULTIPLICATION_ASSIGNMENT,
-		DIVISION_ASSIGNMENT,
-
-		OPERATOR_COUNT
-	};
-
-// ---------------------------------------------------
-
-	class AngelscriptUserDefinedTypeRegistrar {
 	public:
-		typedef AngelscriptUserDefinedTypeRegistrar	UnderlyingTypeRegistrar;
+		using UnderlyingTypeRegistrar	= ::Eldritch2::Scripting::AngelScript::UserDefinedTypeRegistrar;
+
+	// ---
+
+		enum class BinaryOperatorClass {
+			ADDITION,
+			SUBTRACTION,
+			MULTIPLICATION,
+			DIVISION,
+
+			ASSIGNMENT,
+
+			ADDITION_ASSIGNMENT,
+			SUBTRACTION_ASSIGNMENT,
+			MULTIPLICATION_ASSIGNMENT,
+			DIVISION_ASSIGNMENT,
+
+			OPERATOR_COUNT
+		};
+
+	// ---
 
 		template <typename Native>
 		struct TypeStringGenerator {
@@ -75,13 +81,19 @@ namespace Scripting {
 	// ---------------------------------------------------
 
 		template <typename Enum>
-		class UserDefinedEnumBuilder {
+		class EnumTypeBuilder {
+		// - TYPE PUBLISHING ---------------------------------
+
 		public:
-			typedef Enum	NativeType;
+			using NativeType	= Enum;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			ETInlineHint UserDefinedEnumBuilder( ::asIScriptEngine& scriptEngine );
+			//!	Constructs this @ref EnumTypeBuilder instance.
+			ETInlineHint EnumTypeBuilder( ::asIScriptEngine& scriptEngine );
+
+			//!	Destroys this @ref EnumTypeBuilder instance.
+			~EnumTypeBuilder() = default;
 
 		// ---------------------------------------------------
 
@@ -97,21 +109,30 @@ namespace Scripting {
 
 		template <typename Native, typename ImplementingType>
 		class TypeBuilderCRTPBase {
+		// - TYPE PUBLISHING ---------------------------------
+
 		public:
-			typedef Native	NativeType;
+			using NativeType	= Native;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			// Constructs this TypeBuilderCRTPBase instance.
+			//!	Constructs this @ref TypeBuilderCRTPBase instance.
 			ETInlineHint TypeBuilderCRTPBase( ::asIScriptEngine& scriptEngine );
+
+			//!	Destroys this @ref TypeBuilderCRTPBase instance.
+			~TypeBuilderCRTPBase() = default;
 
 		// ---------------------------------------------------
 
 			template <typename ResultObjectType>
 			ImplementingType&	ExposeValueCastTo();
 
+		// ---------------------------------------------------
+
 			template <typename Property>
 			ImplementingType&	ExposeProperty( const char* const propertyName, Property Native::* propertyPointer );
+
+		// ---------------------------------------------------
 
 			template <typename Property>
 			ImplementingType&	ExposeVirtualProperty( const char* const propertyName, Property (Native::*getterFunction)() );
@@ -126,6 +147,8 @@ namespace Scripting {
 			template <typename Property>
 			ImplementingType&	ExposeVirtualProperty( const char* const propertyName, void (ETScriptAPICall* setterFunction)( Native*, Property ) );
 
+		// ---------------------------------------------------
+
 			template <typename Return, typename... Arguments>
 			ImplementingType&	ExposeMethod( const char* const methodName, Return (Native::*method)( Arguments... ) );
 			template <typename Return, typename... Arguments>
@@ -134,6 +157,8 @@ namespace Scripting {
 			ImplementingType&	ExposeMethod( const char* const methodName, Return (ETScriptAPICall* method)( Native*, Arguments... ) );
 			template <typename Return, typename... Arguments>
 			ImplementingType&	ExposeMethod( const char* const methodName, Return (ETScriptAPICall* method)( const Native*, Arguments... ) );
+
+		// ---------------------------------------------------
 
 			template <typename Return, typename RightHandOperandType>
 			ImplementingType&	ExposeBinaryOperator( BinaryOperatorClass operatorClass, Return (Native::*operatorMethod)(RightHandOperandType) );
@@ -162,8 +187,11 @@ namespace Scripting {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this ValueTypeBuilder instance.
+			//!	Constructs this @ref ValueTypeBuilder instance.
 			ETInlineHint ValueTypeBuilder( ::asIScriptEngine& scriptEngine );
+
+			//!	Destroys this @ref ValueTypeBuilder instance.
+			~ValueTypeBuilder() = default;
 
 		// ---------------------------------------------------
 
@@ -178,8 +206,11 @@ namespace Scripting {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this ReferenceTypeBuilder instance.
+			//!	Constructs this @ref ReferenceTypeBuilder instance.
 			ETInlineHint ReferenceTypeBuilder( ::asIScriptEngine& scriptEngine );
+
+			//!	Destroys this @ref ReferenceTypeBuilder instance.
+			~ReferenceTypeBuilder() = default;
 
 		// ---------------------------------------------------
 
@@ -194,11 +225,11 @@ namespace Scripting {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this AngelscriptUserDefinedTypeRegistrar instance.
-		AngelscriptUserDefinedTypeRegistrar( ::asIScriptEngine& scriptEngine );
+		//!	Constructs this @ref UserDefinedTypeRegistrar instance.
+		UserDefinedTypeRegistrar( ::asIScriptEngine& scriptEngine );
 
-		// Destroys this AngelscriptUserDefinedTypeRegistrar instance.
-		~AngelscriptUserDefinedTypeRegistrar();
+		//!	Destroys this @ref UserDefinedTypeRegistrar instance.
+		~UserDefinedTypeRegistrar() = default;
 
 	// ---------------------------------------------------
 
@@ -209,25 +240,29 @@ namespace Scripting {
 		Utility::Result<ValueTypeBuilder<Native>>		RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator );
 
 		template <typename Enum>
-		Utility::Result<UserDefinedEnumBuilder<Enum>>	RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator );
+		Utility::Result<EnumTypeBuilder<Enum>>			RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator );
+
+	// ---------------------------------------------------
 
 		template <typename Native>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&	EnsureReferenceTypeDeclared();
+		UserDefinedTypeRegistrar&	EnsureReferenceTypeDeclared();
 
 		template <typename Native>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&	EnsureValueTypeDeclared();
+		UserDefinedTypeRegistrar&	EnsureValueTypeDeclared();
 
 		template <typename Enum>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&	EnsureEnumDeclared();
+		UserDefinedTypeRegistrar&	EnsureEnumTypeDeclared();
+
+	// ---------------------------------------------------
 
 		template <typename Return, typename... Arguments>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&	ExposeFunction( const char* const functionName, Return (ETScriptAPICall* method)( Arguments... ) );
+		UserDefinedTypeRegistrar&	ExposeFunction( const char* const functionName, Return (ETScriptAPICall* method)( Arguments... ) );
 
 		template <typename Property>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&	ExposeVirtualProperty( const char* const propertyName, Property (ETScriptAPICall* getterFunction)() );
+		UserDefinedTypeRegistrar&	ExposeVirtualProperty( const char* const propertyName, Property (ETScriptAPICall* getterFunction)() );
 
 		template <typename Property>
-		Scripting::AngelscriptUserDefinedTypeRegistrar&	ExposeVirtualProperty( const char* const propertyName, void (ETScriptAPICall* setterFunction)( Property ) );
+		UserDefinedTypeRegistrar&	ExposeVirtualProperty( const char* const propertyName, void (ETScriptAPICall* setterFunction)( Property ) );
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -235,11 +270,12 @@ namespace Scripting {
 		::asIScriptEngine&	_scriptEngine;
 	};
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptUserDefinedTypeRegistrar.inl>
+#include <Scripting/Angelscript/UserDefinedTypeRegistrar.inl>
 //------------------------------------------------------------------//

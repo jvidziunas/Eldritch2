@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodePackageView.hpp
+  BytecodePackageResourceView.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptBytecodeMetadata.hpp>
+#include <Scripting/Angelscript/BytecodeMetadata.hpp>
 #include <Packages/ResourceView.hpp>
 //------------------------------------------------------------------//
 #include <memory>
@@ -34,15 +34,17 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class AngelscriptBytecodePackageView : public FileSystem::ResourceView {
+namespace AngelScript {
+
+	class BytecodePackageResourceView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref AngelscriptBytecodePackageView instance.
-		AngelscriptBytecodePackageView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		//! Constructs this @ref BytecodePackageResourceView instance.
+		BytecodePackageResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
 
-		//! Destroys this @ref AngelscriptBytecodePackageView instance.
-		~AngelscriptBytecodePackageView() = default;
+		//! Destroys this @ref BytecodePackageResourceView instance.
+		~BytecodePackageResourceView() = default;
 
 	// ---------------------------------------------------
 
@@ -60,8 +62,9 @@ namespace Scripting {
 		};
 
 		::std::unique_ptr<::asIScriptModule, ModuleDeleter>	_module;
-		Scripting::AngelscriptBytecodeMetadata				_metadata;
+		AngelScript::BytecodeMetadata						_metadata;
 	};
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

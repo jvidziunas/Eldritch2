@@ -39,11 +39,11 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		// Constructs this ReferenceTypeBase instance.
+		//!	Constructs this @ref ReferenceTypeBase instance.
 		ETInlineHint ReferenceTypeBase( const size_t initialReferenceCount = 1u );
 
-		// Destroys this ReferenceTypeBase instance.
-		ETInlineHint ~ReferenceTypeBase();
+		//!	Destroys this @ref ReferenceTypeBase instance.
+		ETInlineHint ~ReferenceTypeBase() = default;
 
 	// - DATA MEMBERS ------------------------------------
 

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptObjectGraphView.hpp>
+#include <Scripting/Angelscript/ObjectGraphResourceView.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #include <angelscript.h>
@@ -24,20 +24,22 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Scripting {
+namespace AngelScript {
 
-	AngelscriptObjectGraphView::AngelscriptObjectGraphView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ) {}
+	ObjectGraphResourceView::ObjectGraphResourceView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode AngelscriptObjectGraphView::DeserializeIntoWorldView( AngelscriptWorldView& /*worldView*/ ) const {
+	ErrorCode ObjectGraphResourceView::DeserializeIntoWorldView( WorldView& /*worldView*/ ) const {
 		return Error::NONE;
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint const UTF8Char* const AngelscriptObjectGraphView::GetSerializedDataTag() {
+	ETNoAliasHint const UTF8Char* const ObjectGraphResourceView::GetSerializedDataTag() {
 		return UTF8L("AngelscriptObjectGraph");
 	}
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

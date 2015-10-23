@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodePackageView.cpp
+  BytecodePackageResourceView.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptBytecodePackageView.hpp>
+#include <Scripting/Angelscript/BytecodePackageResourceView.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/MessagePackReader.hpp>
@@ -31,24 +31,25 @@ using namespace ::std;
 
 namespace Eldritch2 {
 namespace Scripting {
+namespace AngelScript {
 
-	void AngelscriptBytecodePackageView::ModuleDeleter::operator()( ::asIScriptModule* const module ) {
+	void BytecodePackageResourceView::ModuleDeleter::operator()( ::asIScriptModule* const module ) {
 		module->Discard();
 	}
 
 // ---------------------------------------------------
 
-	AngelscriptBytecodePackageView::AngelscriptBytecodePackageView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _metadata( allocator ) {}
+	BytecodePackageResourceView::BytecodePackageResourceView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _metadata( allocator ) {}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint const UTF8Char* const AngelscriptBytecodePackageView::GetSerializedDataTag() {
+	ETNoAliasHint const UTF8Char* const BytecodePackageResourceView::GetSerializedDataTag() {
 		return UTF8L("AngelscriptBytecodePackage");
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode AngelscriptBytecodePackageView::InstantiateFromByteArray( const Range<const char*>& sourceBytes, ::asIScriptEngine& engine ) {
+	ErrorCode BytecodePackageResourceView::InstantiateFromByteArray( const Range<const char*>& sourceBytes, ::asIScriptEngine& engine ) {
 		struct Reader : public ::asIBinaryStream {
 			ETInlineHint Reader( const Range<const char*>& sourceData ) : remainingData( sourceData ) {}
 
@@ -80,5 +81,6 @@ namespace Scripting {
 		return Error::INVALID_PARAMETER;
 	}
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptNativeBindings.hpp
+  NativeBindings.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -19,14 +19,12 @@ class	asIScriptEngine;
 
 namespace Eldritch2 {
 namespace Scripting {
-
-	namespace Scripting	= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
+namespace AngelScript {
 
 	void	RegisterCMathLibrary( ::asIScriptEngine* const engine );
 
 	void	RegisterAlgorithmLibrary( ::asIScriptEngine* const engine );
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

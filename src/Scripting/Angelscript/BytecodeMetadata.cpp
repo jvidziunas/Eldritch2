@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodeMetadata.cpp
+  BytecodeMetadata.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptBytecodeMetadata.hpp>
+#include <Scripting/Angelscript/BytecodeMetadata.hpp>
 #include <Utility/Memory/NullAllocator.hpp>
 //------------------------------------------------------------------//
 #include <angelscript.h>
@@ -25,23 +25,23 @@ using namespace ::std;
 
 namespace Eldritch2 {
 namespace Scripting {
+namespace AngelScript {
 
-	AngelscriptBytecodeMetadata::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( { allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") } ),
-																					 _propertyMetadata( { allocator, UTF8L("Angelscript Type Metadata Property Metadata Allocator") } ) {}
-
-// ---------------------------------------------------
-
-	AngelscriptBytecodeMetadata::TypeMetadata::TypeMetadata() : TypeMetadata( NullAllocator::GetInstance() ) {}
+	BytecodeMetadata::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( { allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") } ), _propertyMetadata( { allocator, UTF8L("Angelscript Type Metadata Property Metadata Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	AngelscriptBytecodeMetadata::AngelscriptBytecodeMetadata( Allocator& allocator ) : _rootAllocator( { allocator, UTF8L("Angelscript Bytecode Package Metadata Root Allocator") } ),
-																					   _typeMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") } ),
-																					   _functionMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") } ) {}
+	BytecodeMetadata::TypeMetadata::TypeMetadata() : TypeMetadata( NullAllocator::GetInstance() ) {}
 
 // ---------------------------------------------------
 
-	bool AngelscriptBytecodeMetadata::BindToModule( ::asIScriptModule& module ) {
+	BytecodeMetadata::BytecodeMetadata( Allocator& allocator ) : _rootAllocator( { allocator, UTF8L("Angelscript Bytecode Package Metadata Root Allocator") } ),
+																 _typeMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") } ),
+																 _functionMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") } ) {}
+
+// ---------------------------------------------------
+
+	bool BytecodeMetadata::BindToModule( ::asIScriptModule& module ) {
 		module.SetUserData( this );
 
 		// Bind the deserialized metadata to the user data pointers in the native Angelscript type/function objects.
@@ -68,5 +68,6 @@ namespace Scripting {
 		return true;
 	}
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

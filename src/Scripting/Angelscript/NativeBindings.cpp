@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptNativeBindings.cpp
+  NativeBindings.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptNativeBindings.hpp>
+#include <Scripting/Angelscript/NativeBindings.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
@@ -31,6 +31,7 @@ namespace {
 
 namespace Eldritch2 {
 namespace Scripting {
+namespace AngelScript {
 
 	void RegisterCMathLibrary( asIScriptEngine* const engine ) {
 		// --- TRIG FUNCTIONS ---
@@ -169,5 +170,6 @@ namespace Scripting {
 		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Saturate( double )", asFUNCTIONPR( Saturate, (float64), float64 ), asCALL_CDECL ) );
 	}
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

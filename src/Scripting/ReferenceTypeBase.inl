@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -39,10 +39,6 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	ETInlineHint ReferenceTypeBase::ReferenceTypeBase( const size_t initialReferenceCount ) : _referenceCount( initialReferenceCount ) {}
-
-// ---------------------------------------------------
-
-	ETInlineHint ReferenceTypeBase::~ReferenceTypeBase() {}
 
 }	// namespace Scripting
 }	// namespace Eldritch2

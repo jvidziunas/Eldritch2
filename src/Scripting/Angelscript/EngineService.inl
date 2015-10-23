@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptEngineService.inl
+  EngineService.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -17,14 +17,12 @@
 
 namespace Eldritch2 {
 namespace Scripting {
+namespace AngelScript {
 
-	namespace Scripting		= ::Eldritch2::Scripting;
-
-// ---------------------------------------------------
-
-	ETInlineHint ::asIScriptEngine& AngelscriptEngineService::GetScriptEngine() const {
+	ETInlineHint ::asIScriptEngine& EngineService::GetScriptEngine() const {
 		return *_scriptEngine;
 	}
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

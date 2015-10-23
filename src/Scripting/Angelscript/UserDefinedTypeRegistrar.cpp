@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptUserDefinedTypeRegistrar.hpp
+  UserDefinedTypeRegistrar.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptUserDefinedTypeRegistrar.hpp>
+#include <Scripting/Angelscript/UserDefinedTypeRegistrar.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scripting;
@@ -20,12 +20,10 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Scripting {
+namespace AngelScript {
 
-	AngelscriptUserDefinedTypeRegistrar::AngelscriptUserDefinedTypeRegistrar( ::asIScriptEngine& scriptEngine ) : _scriptEngine( scriptEngine ) {}
+	UserDefinedTypeRegistrar::UserDefinedTypeRegistrar( ::asIScriptEngine& scriptEngine ) : _scriptEngine( scriptEngine ) {}
 
-// ---------------------------------------------------
-
-	AngelscriptUserDefinedTypeRegistrar::~AngelscriptUserDefinedTypeRegistrar() {}
-
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

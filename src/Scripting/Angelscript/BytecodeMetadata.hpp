@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodeMetadata.hpp
+  BytecodeMetadata.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -27,8 +27,11 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class AngelscriptBytecodeMetadata {
+namespace AngelScript {
+
+	class BytecodeMetadata {
 	// - TYPE PUBLISHING ---------------------------------
+	
 	public:
 		class FunctionMetadata {
 		public:
@@ -86,13 +89,13 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref AngelscriptBytecodeMetadata instance.
-		/*! @param[in] allocator @ref Allocator instance this @ref AngelscriptBytecodeMetadata should use to perform internal allocations.
+		//! Constructs this @ref BytecodeMetadata instance.
+		/*! @param[in] allocator @ref Allocator instance this @ref BytecodeMetadata should use to perform internal allocations.
 			*/
-		AngelscriptBytecodeMetadata( ::Eldritch2::Allocator& allocator );
+		BytecodeMetadata( ::Eldritch2::Allocator& allocator );
 
-		//! Destroys this @ref AngelscriptBytecodeMetadata instance.
-		~AngelscriptBytecodeMetadata() = default;
+		//! Destroys this @ref BytecodeMetadata instance.
+		~BytecodeMetadata() = default;
 
 	// ---------------------------------------------------
 
@@ -109,11 +112,12 @@ namespace Scripting {
 		::Eldritch2::UnorderedMap<::asUINT, FunctionMetadata>	_functionMetadata;
 	};
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptBytecodeMetadata.inl>
+#include <Scripting/AngelScript/BytecodeMetadata.inl>
 //------------------------------------------------------------------//

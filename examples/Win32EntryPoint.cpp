@@ -15,7 +15,7 @@
 #include <Networking/SteamworksNetworkingService.hpp>
 #include <Physics/BulletDynamics/EngineService.hpp>
 #include <Renderer/Direct3D11/RendererService.hpp>
-#include <Scripting/AngelscriptEngineService.hpp>
+#include <Scripting/Angelscript/EngineService.hpp>
 #include <Configuration/ConfigurationService.hpp>
 #include <Utility/Memory/Win32HeapAllocator.hpp>
 #include <FileSystem/Win32/ContentProvider.hpp>
@@ -122,7 +122,7 @@ namespace {
 		XInputService					_controllerInputService;
 		Win32InputService				_inputService;
 		SteamworksNetworkingService		_networkingService;
-		AngelscriptEngineService		_scriptService;
+		AngelScript::EngineService		_scriptService;
 		BulletDynamics::EngineService	_physicsService;
 		Direct3D11::RendererService		_direct3DRendererService;
 		XAudio2AudioRenderer			_audioRendererService;

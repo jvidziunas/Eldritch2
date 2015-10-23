@@ -71,6 +71,8 @@ namespace Scripting {
 			}
 		};
 
+		using BinaryOperatorClass	= ScriptAPIRegistrationInitializationVisitor::BinaryOperatorClass;
+
 	// ---
 
 		FixedStackAllocator<16u>	temporaryAllocator( UTF8L( "StringMarshal::ExposeScriptAPI() Temporary Allocator" ) );
@@ -202,9 +204,12 @@ namespace Scripting {
 			}
 		};
 
+		using BinaryOperatorClass	= ScriptAPIRegistrationInitializationVisitor::BinaryOperatorClass;
+
 	// ---
 
 		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("Float4Marshal::ExposeScriptAPI() Temporary Allocator") );
+
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedValueType<Float4Marshal>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );
 

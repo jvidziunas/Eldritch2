@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptObjectGraphView.hpp
+  ObjectGraphResourceView.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -17,7 +17,9 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	AngelscriptWorldView;
+		namespace AngelScript {
+			class	WorldView;
+		}
 	}
 
 	class	ErrorCode;
@@ -31,19 +33,21 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class AngelscriptObjectGraphView : public FileSystem::ResourceView {
+namespace AngelScript {
+
+	class ObjectGraphResourceView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this @ref AngelscriptObjectGraphView instance.
-		AngelscriptObjectGraphView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		// Constructs this @ref ObjectGraphResourceView instance.
+		ObjectGraphResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
 
-		// Destroys this @ref AngelscriptObjectGraphView instance.
-		~AngelscriptObjectGraphView() = default;
+		// Destroys this @ref ObjectGraphResourceView instance.
+		~ObjectGraphResourceView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	DeserializeIntoWorldView( Scripting::AngelscriptWorldView& worldView ) const;
+		::Eldritch2::ErrorCode	DeserializeIntoWorldView( AngelScript::WorldView& worldView ) const;
 
 	// ---------------------------------------------------
 
@@ -54,5 +58,6 @@ namespace Scripting {
 	private:
 	};
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

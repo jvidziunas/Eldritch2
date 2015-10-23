@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptBytecodeMetadata.hpp
+  BytecodeMetadata.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -17,35 +17,31 @@
 
 namespace Eldritch2 {
 namespace Scripting {
-
-	namespace Scripting	= ::Eldritch2::Scripting;
-	namespace Utility	= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
+namespace AngelScript {
 
 	template <class Archive>
-	bool AngelscriptBytecodeMetadata::FunctionMetadata::Serialize( Archive& /*archive*/ ) {
+	bool BytecodeMetadata::FunctionMetadata::Serialize( Archive& /*archive*/ ) {
 		return true;
 	}
 
 // ---------------------------------------------------
 
 	template <class Archive>
-	bool AngelscriptBytecodeMetadata::TypeMetadata::PropertyMetadata::Serialize( Archive& /*archive*/ ) {
+	bool BytecodeMetadata::TypeMetadata::PropertyMetadata::Serialize( Archive& /*archive*/ ) {
 		return true;
 	}
 
 // ---------------------------------------------------
 
 	template <class Archive>
-	bool AngelscriptBytecodeMetadata::TypeMetadata::Serialize( Archive& archive ) {
+	bool BytecodeMetadata::TypeMetadata::Serialize( Archive& archive ) {
 		return archive( Archive::AdaptMap( _methodMetadata ), Archive::AdaptMap( _propertyMetadata ) );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Archive>
-	bool AngelscriptBytecodeMetadata::Serialize( Archive& archive ) {
+	bool BytecodeMetadata::Serialize( Archive& archive ) {
 		using TypeMetadataCollection = decltype(_typeMetadata);
 
 	// ---
@@ -56,5 +52,6 @@ namespace Scripting {
 						Archive::AdaptMap( _functionMetadata ) );
 	}
 
+}	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/AngelscriptUserDefinedTypeRegistrar.hpp>
+#include <Scripting/Angelscript/UserDefinedTypeRegistrar.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -23,16 +23,16 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	class ScriptAPIRegistrationInitializationVisitor : public Scripting::AngelscriptUserDefinedTypeRegistrar {
+	class ScriptAPIRegistrationInitializationVisitor : public Scripting::AngelScript::UserDefinedTypeRegistrar {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ScriptAPIRegistrationInitializationVisitor instance.
+		//!	Constructs this @ref ScriptAPIRegistrationInitializationVisitor instance.
 		template <typename... Arguments>
 		ETInlineHint ScriptAPIRegistrationInitializationVisitor( Arguments&&... arguments );
 
-		// Destroys this ScriptAPIRegistrationInitializationVisitor instance.
-		~ScriptAPIRegistrationInitializationVisitor();
+		//!	Destroys this @ref ScriptAPIRegistrationInitializationVisitor instance.
+		~ScriptAPIRegistrationInitializationVisitor() = default;
 	};
 
 }	// namespace Scripting

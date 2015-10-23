@@ -208,12 +208,6 @@
     <Filter Include="Header Files\Engine\Input\XInput">
       <UniqueIdentifier>{2b1b12e8-02dd-4c42-9479-21f2d2ad0495}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Scripting\Angelscript\Resource Management">
-      <UniqueIdentifier>{085fe605-3f55-401c-b1b9-63dcee04798a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Scripting\Angelscript\Resource Management">
-      <UniqueIdentifier>{8a9bb447-81bb-4b48-8157-25c5713ade8c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Utility\MessagePack">
       <UniqueIdentifier>{d81f1466-4c94-43fb-ad30-54fa9f2b13d5}</UniqueIdentifier>
     </Filter>
@@ -324,12 +318,6 @@
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp">
       <Filter>Source Files\Engine\Scheduler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\scripting\Angelscript\AngelscriptWorldView.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptNativeBindings.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp">
       <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
     </ClCompile>
@@ -393,9 +381,6 @@
     <ClCompile Include="..\src\Foundation\WorldView.cpp">
       <Filter>Source Files\Engine\Foundation\Worlds</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp">
       <Filter>Source Files\Engine\Scripting</Filter>
     </ClCompile>
@@ -456,9 +441,6 @@
     <ClCompile Include="..\src\foundation\Window.cpp">
       <Filter>Source Files\Engine\Foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript\Resource Management</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Networking\SteamworksNetworkingService.Player.cpp">
       <Filter>Source Files\Engine\Networking</Filter>
     </ClCompile>
@@ -489,9 +471,6 @@
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.cpp">
-      <Filter>Source Files\Engine\Scripting</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Concurrency\UserSemaphore.cpp">
       <Filter>Source Files\Engine\Utility\Concurrency</Filter>
     </ClCompile>
@@ -506,9 +485,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Utility\MessagePackReader.cpp">
       <Filter>Source Files\Engine\Utility\MessagePack</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript\Resource Management</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp">
       <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
@@ -533,12 +509,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
       <Filter>Source Files\Engine\Utility\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripting\AngelscriptEngineService.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\ContentPackage.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
@@ -641,6 +611,27 @@
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.cpp">
       <Filter>Source Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scripting\Angelscript\WorldView.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\NativeBindings.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\EngineService.cpp">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -794,12 +785,6 @@
     <ClInclude Include="..\src\Scheduler\WorkerContext.hpp">
       <Filter>Header Files\Engine\Scheduler</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\scripting\Angelscript\AngelscriptWorldView.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptNativeBindings.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.hpp">
       <Filter>Header Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
     </ClInclude>
@@ -850,9 +835,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Networking\Steamworks\SteamworksWorldView.hpp">
       <Filter>Header Files\Engine\Networking\Steamworks</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptUserDefinedTypeRegistrar.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp">
       <Filter>Header Files\Engine\Scripting</Filter>
@@ -944,9 +926,6 @@
     <ClInclude Include="..\src\foundation\Window.hpp">
       <Filter>Header Files\Engine\Foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptObjectGraphView.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript\Resource Management</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
@@ -973,9 +952,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\MessagePackWriter.hpp">
       <Filter>Header Files\Engine\Utility\MessagePack</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodePackageView.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript\Resource Management</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp">
       <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
@@ -1012,12 +988,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\DisposingResult.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\Angelscript\AngelscriptBytecodeMetadata.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\scripting\AngelscriptEngineService.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\ContentProvider.hpp">
       <Filter>Header Files\Engine\Filesystem</Filter>
@@ -1135,6 +1105,27 @@
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.hpp">
       <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Angelscript\EngineService.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Angelscript\BytecodeMetadata.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scripting\Angelscript\WorldView.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Angelscript\NativeBindings.hpp">
+      <Filter>Header Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
