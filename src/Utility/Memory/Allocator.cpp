@@ -45,14 +45,11 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	ETRestrictHint void* Allocator::Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) {
-		const SizeType	allocationSize( this->EstimateActualAllocationSizeInBytes( sizeInBytes, alignmentInBytes ) );
-		void* const		allocation( this->Allocate( allocationSize, options ) );
-		
-		if( nullptr != allocation ) {
-			size_t	remainingSpace;
+		SizeType	allocationSize( EstimateActualAllocationSizeInBytes( sizeInBytes, alignmentInBytes ) );
+		if( void* const allocation = Allocate( allocationSize, options ) ) {
 			void*	userPointer( static_cast<void**>(allocation) + 1 );
 
-			if( ::std::align( alignmentInBytes, allocationSize, userPointer, remainingSpace ) ) {
+			if( ::std::align( alignmentInBytes, sizeInBytes, userPointer, allocationSize ) ) {
 				// Store the 'real' pointer that will be internally fed back to the allocator just before what the user sees.
 				static_cast<void**>(userPointer)[-1] = allocation;
 				ETRuntimeAssert( GetAllocationPointerFromAlignedUserPointer( userPointer ) == allocation );
