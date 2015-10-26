@@ -19,6 +19,7 @@
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Packages/ResourceView.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
@@ -31,8 +32,6 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		class	ScopedLock;
-		template <typename ResultObjectType>
-		struct	Result;
 	}
 
 	class	ErrorCode;
@@ -93,7 +92,7 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		Utility::Result<FileSystem::ReadableMemoryMappedFile>	CreateBackingFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const suffix ) const;
+		::Eldritch2::Result<FileSystem::ReadableMemoryMappedFile>	CreateBackingFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const suffix ) const;
 
 	// ---------------------------------------------------
 

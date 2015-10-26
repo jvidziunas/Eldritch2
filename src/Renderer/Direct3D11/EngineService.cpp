@@ -172,7 +172,7 @@ namespace Direct3D11 {
 			unique_ptr<MeshResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) MeshResourceView( initializer, allocator ), { allocator } );
 
 			if( view ) {
-				return { *view.release() };
+				return { view.release() };
 			}
 
 			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
@@ -182,7 +182,7 @@ namespace Direct3D11 {
 			unique_ptr<HLSLPipelineDefinitionView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) HLSLPipelineDefinitionView( initializer, allocator ), { allocator } );
 
 			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(renderer)->_device ) ) {
-				return { *view.release() };
+				return { view.release() };
 			}
 
 			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
@@ -192,7 +192,7 @@ namespace Direct3D11 {
 			unique_ptr<ShaderResourceResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( initializer, allocator ), { allocator } );
 
 			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(renderer)->_device ) ) {
-				return { *view.release() };
+				return { view.release() };
 			}
 
 			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };

@@ -23,10 +23,10 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this MallocAllocator instance.
+		//!	Constructs this MallocAllocator instance.
 		MallocAllocator( const ::Eldritch2::UTF8Char* name );
 
-		// Destroys this MallocAllocator instance.
+		//!	Destroys this MallocAllocator instance.
 		~MallocAllocator();
 
 	// ---------------------------------------------------

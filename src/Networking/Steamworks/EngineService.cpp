@@ -265,17 +265,17 @@ namespace Steamworks {
 		if( candidate == _playerDirectory.End() ) {
 			GetLogger()( UTF8L("Player {%llu:%i} connected.") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
 
-			if( auto* const player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
+			if( auto* player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
 				_playerDirectory.Insert( { networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) } );
 				
-				return { *player };
+				return { move( player ) };
 			}
 
 			return { Error::OUT_OF_MEMORY };
 		} else {
 			GetLogger( LogMessageType::WARNING )( UTF8L("Received duplicate player join notification for player {%llu:%i}!)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
 			
-			return { *candidate->second };
+			return { candidate->second };
 		}
 	}
 

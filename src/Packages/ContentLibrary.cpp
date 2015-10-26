@@ -203,7 +203,7 @@ namespace FileSystem {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this @ref EditorPackage instance.
+			//!	Constructs this @ref EditorPackage instance.
 			ETInlineHint EditorPackage( ContentLibrary& owningLibrary, Allocator& allocator ) : ContentPackage( UTF8L("<Editor Package>"), owningLibrary, allocator ) {
 				// No content to load, so just skip directly to the published state.
 				UpdateResidencyStateOnLoaderThread( ResidencyState::PUBLISHED );

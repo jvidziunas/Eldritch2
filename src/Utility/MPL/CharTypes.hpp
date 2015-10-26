@@ -7,7 +7,7 @@
   parameter, return and field type data.
 
   ------------------------------------------------------------------
-  ©2010-2011 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -24,14 +24,14 @@
 
 namespace Eldritch2 {
 
-	typedef char		UTF8Char;
-	typedef char16_t	UTF16Char;
-	typedef char32_t	UTF32Char;
+	using UTF8Char	= char;
+	using UTF16Char	= char16_t;
+	using UTF32Char	= char32_t;
 
 #if( ET_BUILD_UNICODE )
-	typedef wchar_t		SystemChar;
+	using SystemChar	= wchar_t;
 #else
-	typedef char		SystemChar;
+	using SystemChar	= char;
 #endif
 
 }	// namespace Eldritch2

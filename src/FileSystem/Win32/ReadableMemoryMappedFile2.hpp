@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ReadableMemoryMappedFile.hpp
+  ReadableMemoryMappedFile2.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,40 +12,26 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <FileSystem/ReadableMemoryMappedFile.hpp>
-#include <Utility/Containers/Range.hpp>
+#include <FileSystem/Win32/ReadableMemoryMappedFile.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace FileSystem {
 namespace Win32 {
 
-	class ReadableMemoryMappedFile : public FileSystem::ReadableMemoryMappedFile {
+	class ReadableMemoryMappedFile2 : public ReadableMemoryMappedFile {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref ReadableMemoryMappedFile instance.
-		ReadableMemoryMappedFile( const ::Eldritch2::Range<const char*> mappedRegion );
+		//!	Constructs this @ref ReadableMemoryMappedFile2 instance.
+		ReadableMemoryMappedFile2( const ::Eldritch2::Range<const char*> mappedRegion );
 
-		//!	Destroys this @ref ReadableMemoryMappedFile instance.
-		~ReadableMemoryMappedFile();
-
-	// ---------------------------------------------------
-
-		size_t	GetAccessibleRegionSizeInBytes() const override;
+		//!	Destroys this @ref ReadableMemoryMappedFile2 instance.
+		~ReadableMemoryMappedFile2() = default;
 
 	// ---------------------------------------------------
 
 		void	PrefetchRangeForRead( const ::Eldritch2::Range<const char*> memoryRange ) const override;
-
-	// ---------------------------------------------------
-
-		const void*	GetAddressForFileByteOffset( const size_t rawFileOffsetInBytes ) const override;
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		const ::Eldritch2::Range<const char*>	_region;
 	};
 
 }	// namespace Win32

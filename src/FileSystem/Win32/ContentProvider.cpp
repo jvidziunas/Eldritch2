@@ -49,36 +49,6 @@ using namespace ::utf8::unchecked;
 using namespace ::utf8;
 using namespace ::std;
 
-#ifdef ZeroMemory
-#	if( ET_COMPILER_IS_MSVC )
-#		define POP_ZeroMemory 1
-		COMPILERMESSAGEGENERIC( "Cleaning up ZeroMemory macro for use in the Windows content provider." )
-#		pragma push_macro( "ZeroMemory" )
-#		undef ZeroMemory
-#	else
-#		error ZeroMemory macro creates symbol/name resolution errors, replace me with cleanup code!
-#	endif
-#endif
-#ifdef StrCat
-#	if( ET_COMPILER_IS_MSVC )
-#		define POP_StrCat 1
-		COMPILERMESSAGEGENERIC( "Cleaning up StrCmp macro for use in the Windows content provider." )
-#		pragma push_macro( "StrCat" )
-#		undef StrCat
-#	else
-#		error StrCat macro creates symbol/name resolution errors, replace me with cleanup code!
-#	endif
-#endif
-
-#if defined( _WIN32_WINNT_WIN8 ) && ( _WIN32_WINNT >= _WIN32_WINNT_WIN8 )
-#	define WIN8_MEMORY_MAPPED_FILE_AVAILABLE 0
-#else
-#	if( ET_COMPILER_IS_MSVC )
-#	define WIN8_MEMORY_MAPPED_FILE_AVAILABLE 0
-	COMPILERMESSAGEGENERIC( "Windows 8 PrefetchVirtualMemory-optimized file mapping object unavailable, use the Windows 8 SDK or newer to enable" )
-#	endif
-#endif
-
 namespace {
 
 	enum FsInformationClass : ::DWORD {
@@ -181,7 +151,7 @@ namespace {
 		}
 #endif
 
-		if( auto* const queryFunction = ::GetProcAddress( GetModuleHandle( SL("ntdll.dll") ), "NtQueryVolumeInformationFile" ) ) {
+		if( auto queryFunction = ::GetProcAddress( ::GetModuleHandle( SL("ntdll.dll") ), "NtQueryVolumeInformationFile" ) ) {
 			queryVolumeInformationFile = reinterpret_cast<decltype(queryVolumeInformationFile)>(queryFunction);
 
 			return [] ( const ::HANDLE fileHandle ) -> size_t {
@@ -241,8 +211,8 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileReader( file, diskSectorSizeInBytes ) ) {
-				return { *accessor };
+			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileReader( file, diskSectorSizeInBytes ) ) {
+				return { move( accessor ) };
 			}
 		}
 
@@ -266,8 +236,8 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto * const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileReader( file, diskSectorSizeInBytes ) ) {
-				return { *accessor };
+			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileReader( file, diskSectorSizeInBytes ) ) {
+				return { move( accessor ) };
 			}
 		}
 
@@ -280,27 +250,6 @@ namespace Win32 {
 // ---------------------------------------------------
 
 	Result<FileSystem::ReadableMemoryMappedFile> ContentProvider::CreateReadableMemoryMappedFile( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
-#if( WIN8_MEMORY_MAPPED_FILE_AVAILABLE )
-		class Windows8ReadableMemoryMappedFile : public Win32ReadableMemoryMappedFile {
-		public:
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			// Constructs this Windows8ReadableMemoryMappedFile instance.
-			Windows8ReadableMemoryMappedFile( const Range<const char*> mappedRegion ) : Win32ReadableMemoryMappedFile( mappedRegion ) {}
-
-			// Destroys this Windows8ReadableMemoryMappedFile instance.
-			~Windows8ReadableMemoryMappedFile() {}
-
-		// ---------------------------------------------------
-
-			void PrefetchRangeForRead( const Range<const char*> memoryRange ) const override {
-				::WIN32_MEMORY_RANGE_ENTRY	ranges[] = { { const_cast<char*>(memoryRange.first), memoryRange.Size() } };
-
-				::PrefetchVirtualMemory( ::GetCurrentProcess(), _countof( ranges ), ranges, 0 );
-			}
-		};
-#endif
-
 		using AllocationOption	= Allocator::AllocationOption;
 
 	// ---
@@ -316,8 +265,8 @@ namespace Win32 {
 
 		if( const ::HANDLE fileMapping { ::CreateFileMapping( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) } ) {
 			if( const void* const mappedView = ::MapViewOfFile( fileMapping, FILE_MAP_READ, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), static_cast<::SIZE_T>(0u) ) ) {
-				if( auto* const resultObject = new(allocator, AllocationOption::TEMPORARY_ALLOCATION) Win32::ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) ) ) {
-					return { *resultObject };
+				if( auto* resultObject = new(allocator, AllocationOption::TEMPORARY_ALLOCATION) ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) ) ) {
+					return { move( resultObject ) };
 				}
 			}
 
@@ -343,8 +292,8 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
-				return { *accessor };
+			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
+				return { move( accessor ) };
 			}
 		}
 
@@ -368,8 +317,8 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* const accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
-				return { *accessor };
+			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
+				return { move( accessor ) };
 			}
 		}
 
@@ -420,8 +369,8 @@ namespace Win32 {
 											 nullptr ) );
 
 		if( INVALID_HANDLE_VALUE != file ) {
-			if( auto* const appender = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAppender( file ) ) {
-				return { *appender };
+			if( auto* appender = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAppender( file ) ) {
+				return { move( appender ) };
 			}
 
 			return { Error::OUT_OF_MEMORY };
@@ -457,16 +406,3 @@ namespace Win32 {
 }	// namespace Win32
 }	// namespace Foundation
 }	// namespace Eldritch2
-
-#if( ET_COMPILER_IS_MSVC )
-#	ifdef POP_ZeroMemory
-		COMPILERMESSAGEGENERIC( "Reinstating ZeroMemory macro." )
-#		pragma pop_macro( "ZeroMemory" )
-#		undef POP_ZeroMemory
-#	endif
-#	ifdef POP_StrCat
-		COMPILERMESSAGEGENERIC( "Reinstating StrCat macro." )
-#		pragma pop_macro( "StrCat" )
-#		undef POP_StrCat
-#	endif
-#endif

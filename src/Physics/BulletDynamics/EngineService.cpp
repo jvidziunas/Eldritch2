@@ -56,7 +56,7 @@ namespace BulletDynamics {
 			unique_ptr<CollisionShapeResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) CollisionShapeResourceView( initializer, allocator ), { allocator } );
 
 			if( view && view->InstantiateFromByteArray( initializer.serializedAsset ) ) {
-				return { *view.release() };
+				return { view.release() };
 			}
 
 			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };

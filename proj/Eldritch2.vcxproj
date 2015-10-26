@@ -252,6 +252,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\ContentProvider.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileAccessor.cpp" />
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp" />
     <ClCompile Include="..\src\Foundation\WorldView.cpp" />
@@ -377,6 +378,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\ContentProvider.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileAccessor.hpp" />
     <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Input\Keyboard.hpp" />
@@ -444,6 +446,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackReader.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
+    <ClInclude Include="..\src\Utility\ResultBase.hpp" />
     <ClInclude Include="..\src\Utility\StringOperators.hpp" />
     <ClInclude Include="..\src\Utility\DebugController.hpp" />
     <ClInclude Include="..\src\Utility\ErrorCode.hpp" />

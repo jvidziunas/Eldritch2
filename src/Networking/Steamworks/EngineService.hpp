@@ -22,6 +22,7 @@
 #include <Utility/IdentifierPool.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/Player.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 #include <isteamclient.h>
 #include <isteamnetworking.h>
@@ -34,13 +35,6 @@ namespace Eldritch2 {
 	namespace Networking {
 		class	WorldView;
 	}
-
-	namespace Utility {
-		template <typename ResultObject>
-		struct	DisposingResult;
-		template <typename ResultObject>
-		struct	Result;
-	}
 }
 
 namespace Eldritch2 {
@@ -51,11 +45,13 @@ namespace Steamworks {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		typedef ::std::pair<::CSteamID, int>	NetworkID;
-
 		enum : size_t {
-			NETWORK_MTU_SIZE	= 1200u
+			NETWORK_MTU_SIZE = 1200u
 		};
+
+	// ---
+
+		using NetworkID	= ::std::pair<::CSteamID, int>;
 
 	// ---
 
@@ -120,15 +116,15 @@ namespace Steamworks {
 
 	// ---------------------------------------------------
 
-		Utility::Result<Player>	AcknowledgePlayerConnection( const NetworkID& networkID );
+		::Eldritch2::Result<Player>	AcknowledgePlayerConnection( const NetworkID& networkID );
 
-		::Eldritch2::ErrorCode	ProcessAndDispatchCallbacks();
+		::Eldritch2::ErrorCode		ProcessAndDispatchCallbacks();
 
-		void					InitiateSteamConnection();
+		void						InitiateSteamConnection();
 
-		void					AcknowledgePlayerDisconnection( const NetworkID& networkID );
+		void						AcknowledgePlayerDisconnection( const NetworkID& networkID );
 
-		void					AcknowledgeClientDisconnection( const ::CSteamID clientID );
+		void						AcknowledgeClientDisconnection( const ::CSteamID clientID );
 
 	// - DATA MEMBERS ------------------------------------
 

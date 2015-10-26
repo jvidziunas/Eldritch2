@@ -24,7 +24,6 @@
 #include <Utility/Memory/InstanceNew.hpp>
 #include <FileSystem/ContentProvider.hpp>
 #include <Configuration/INIParser.hpp>
-#include <Foundation/Application.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Build.hpp>
@@ -146,7 +145,7 @@ namespace Configuration {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this LoadSerializedConfigurationTask instance.
+			//!	Constructs this @ref LoadSerializedConfigurationTask instance.
 			ETInlineHint LoadSerializedConfigurationTask( EngineService& host, Task& preConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<LoadSerializedConfigurationTask>( preConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ),
 																																										_host( host ) {
 				TrySchedulingOnContext( executingContext );

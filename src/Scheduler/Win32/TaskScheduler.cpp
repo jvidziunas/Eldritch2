@@ -281,8 +281,8 @@ namespace Win32 {
 
 	// ---
 
-		if( auto* const	mutex = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) UserMutex ) {
-			return { *mutex };
+		if( auto* mutex = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) UserMutex ) {
+			return { move( mutex ) };
 		}
 
 		return { Error::OUT_OF_MEMORY };
@@ -326,8 +326,8 @@ namespace Win32 {
 	// ---
 
 		if( const auto eventHandle = ::CreateEventW( nullptr, FALSE, (EventInitialState::UNSIGNALED == initialState ? FALSE : TRUE), nullptr ) ) {
-			if( auto* const event = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) ) {
-				return { *event };
+			if( auto* event = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) ) {
+				return { move( event ) };
 			}
 
 			::CloseHandle( eventHandle );
@@ -375,8 +375,8 @@ namespace Win32 {
 	// ---
 
 		if( const auto semaphoreHandle = ::CreateSemaphore( nullptr, static_cast<::LONG>(initialCount), static_cast<::LONG>(maximumCount), nullptr ) ) {
-			if( auto* const semaphore = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
-				return { *semaphore };
+			if( auto* semaphore = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
+				return { move( semaphore ) };
 			}
 
 			::CloseHandle( semaphoreHandle );

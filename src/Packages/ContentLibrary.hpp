@@ -14,9 +14,11 @@
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/DisposingResult.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/StringOperators.hpp>
 #include <Packages/ResourceView.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 #include <typeinfo>
 //------------------------------------------------------------------//
@@ -36,10 +38,6 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		class	ReaderWriterUserMutex;
-		template <typename ResultObjectType>
-		struct	DisposingResult;
-		template <typename ResultObjectType>
-		struct	Result;
 	}
 
 	class	ErrorCode;
@@ -72,9 +70,9 @@ namespace FileSystem {
 			@remarks Thread-safe.
 			@see @ref ContentPackage, @ref CreatePackageForEditorWorld()
 			*/
-		Utility::DisposingResult<FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
+		::Eldritch2::DisposingResult<FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
 
-		Utility::DisposingResult<FileSystem::ContentPackage>	CreatePackageForEditorWorld();
+		::Eldritch2::DisposingResult<FileSystem::ContentPackage>	CreatePackageForEditorWorld();
 
 	// ---------------------------------------------------
 
@@ -164,7 +162,7 @@ namespace FileSystem {
 	// ---
 
 		struct ResourceViewFactory {
-			Utility::Result<ResourceView> (*factoryFunction)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* );
+			::Eldritch2::Result<ResourceView> (*factoryFunction)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* );
 			void*	parameter;
 		};
 

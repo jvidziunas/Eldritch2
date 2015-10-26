@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ContentProvider.cpp
+  Tool.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,20 +12,12 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <FileSystem/ContentProvider.hpp>
-#include <Utility/ErrorCode.hpp>
+#include <Tools/Tool.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Configuration;
-using namespace ::Eldritch2::FileSystem;
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
-namespace FileSystem {
+namespace Tools {
 
-	ErrorCode ContentProvider::RegisterConfigurableVariables( ConfigurationDatabase& /*database*/ ) {
-		return Error::NONE;
-	}
-
-}	// namespace Foundation
+}	// namespace Tools
 }	// namespace Eldritch2
+

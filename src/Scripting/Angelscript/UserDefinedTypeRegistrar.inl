@@ -745,7 +745,7 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	template <typename Native>
-	Utility::Result<UserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>> UserDefinedTypeRegistrar::RegisterUserDefinedReferenceType( Allocator& builderAllocator ) {
+	::Eldritch2::Result<UserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>> UserDefinedTypeRegistrar::RegisterUserDefinedReferenceType( Allocator& builderAllocator ) {
 		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
 		using BuilderType		= UserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>;
 
@@ -758,8 +758,8 @@ namespace AngelScript {
 		result = _scriptEngine.RegisterObjectBehaviour( UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_RELEASE, "void f()", ::asMETHOD( Native, ReleaseReference ), ::asCALL_THISCALL );
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		if( auto* const	builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
-			return { *builder };
+		if( auto* builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
+			return { ::std::move( builder ) };
 		}
 
 		return { Error::OUT_OF_MEMORY };
@@ -768,7 +768,7 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	template <typename Native>
-	Utility::Result<UserDefinedTypeRegistrar::ValueTypeBuilder<Native>> UserDefinedTypeRegistrar::RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator ) {
+	::Eldritch2::Result<UserDefinedTypeRegistrar::ValueTypeBuilder<Native>> UserDefinedTypeRegistrar::RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator ) {
 		struct DestructorWrapper {
 			static void ETCDecl	Invoke( void* const object ) {
 				static_cast<Native*>(object)->~Native();
@@ -786,8 +786,8 @@ namespace AngelScript {
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		if( auto* const	builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
-			return { *builder };
+		if( auto* builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
+			return { ::std::move( builder ) };
 		}
 
 		return { Error::OUT_OF_MEMORY };
@@ -796,7 +796,7 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	template <typename Enum>
-	Utility::Result<UserDefinedTypeRegistrar::EnumTypeBuilder<Enum>> UserDefinedTypeRegistrar::RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator ) {
+	::Eldritch2::Result<UserDefinedTypeRegistrar::EnumTypeBuilder<Enum>> UserDefinedTypeRegistrar::RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator ) {
 		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
 		using Builder			= UserDefinedTypeRegistrar::EnumTypeBuilder<Enum>;
 
@@ -804,8 +804,8 @@ namespace AngelScript {
 
 		EnsureEnumTypeDeclared<Enum>();
 
-		if( auto* const	builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) Builder( _scriptEngine ) ) {
-			return { *builder };
+		if( auto* builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) Builder( _scriptEngine ) ) {
+			return { ::std::move( builder ) };
 		}
 
 		return { Error::OUT_OF_MEMORY };

@@ -53,9 +53,12 @@ namespace Eldritch2 {
 
 	ETRestrictHint void* ArenaAllocatorBase::Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) {
 		SizeType	allocationSize( ArenaAllocatorBase::EstimateActualAllocationSizeInBytes( sizeInBytes, alignmentInBytes ) );
-		void*		allocation( this->Allocate( allocationSize, options ) );
 
-		return allocation ? ::std::align( alignmentInBytes, allocationSize, allocation, allocationSize ) : nullptr;
+		if( void* allocation = Allocate( allocationSize, options ) ) {
+			return ::std::align( alignmentInBytes, sizeInBytes, allocation, allocationSize );
+		}
+
+		return nullptr;
 	}
 
 // ---------------------------------------------------

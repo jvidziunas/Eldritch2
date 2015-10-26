@@ -127,13 +127,13 @@ namespace Win32 {
 
 	// - SYNCHRONIZATION OBJECT ALLOCATION ---------------
 
-		Utility::Result<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) override sealed;
+		::Eldritch2::Result<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) override sealed;
 
-		Utility::Result<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) override sealed;
+		::Eldritch2::Result<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) override sealed;
 
-		Utility::Result<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) override sealed;
+		::Eldritch2::Result<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) override sealed;
 
-		Utility::Result<Utility::UserMutex>				AllocateUserMutex( ::Eldritch2::Allocator& allocator ) override sealed;
+		::Eldritch2::Result<Utility::UserMutex>				AllocateUserMutex( ::Eldritch2::Allocator& allocator ) override sealed;
 
 	// ---------------------------------------------------
 

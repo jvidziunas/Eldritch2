@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/ResourceView.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -49,7 +50,7 @@ namespace FileSystem {
 			@param[in] factory Factory function. This should attempt to allocate a new instance of a @ref ResourceView subclass and return it in the Result for the function.
 			@returns A reference to *this for method chaining.
 			*/
-		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, Utility::Result<FileSystem::ResourceView> (*factory)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* ) );
+		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, ::Eldritch2::Result<FileSystem::ResourceView> (*factory)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* ) );
 		
 	// - DATA MEMBERS ------------------------------------
 

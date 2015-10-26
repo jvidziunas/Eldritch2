@@ -102,7 +102,7 @@ namespace AngelScript {
 					
 			// Try to load from the source asset data.
 			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(parameter)->GetScriptEngine() ) ) {
-				return { *view.release() };
+				return { view.release() };
 			}
 
 			// If we were able to allocate a view, then something was wrong with the source data. If we didn't get that far, the allocator ran out of resources.
@@ -110,8 +110,8 @@ namespace AngelScript {
 		} )
 		// Object graph
 		.PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*parameter*/ ) -> Result<ResourceView> {
-			if( auto* const	view = new(allocator, AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( initializer, allocator ) ) {
-				return { *view };
+			if( auto* view = new(allocator, AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( initializer, allocator ) ) {
+				return { move( view ) };
 			}
 
 			return { Error::OUT_OF_MEMORY };

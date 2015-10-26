@@ -15,6 +15,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <FileSystem/Win32/ReadableMemoryMappedFile2.hpp>
 #include <FileSystem/Win32/AsynchronousFileAccessor.hpp>
 #include <FileSystem/Win32/SynchronousFileAccessor.hpp>
 #include <FileSystem/ContentProvider.hpp>
@@ -46,6 +47,8 @@ namespace Win32 {
 		using AsynchronousFileWriter	= FileSystem::Win32::AsynchronousFileAccessor;
 		using SynchronousFileReader		= FileSystem::Win32::SynchronousFileAccessor;
 		using SynchronousFileWriter		= FileSystem::Win32::SynchronousFileAccessor;
+		using ReadableMemoryMappedFile	= FileSystem::Win32::ReadableMemoryMappedFile;
+		using ReadableMemoryMappedFile2 = FileSystem::Win32::ReadableMemoryMappedFile2;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -58,26 +61,26 @@ namespace Win32 {
 	// - FILE READ ACCESS --------------------------------
 
 		using FileSystem::ContentProvider::CreateAsynchronousFileReader;
-		Utility::Result<FileSystem::AsynchronousFileReader>		CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		::Eldritch2::Result<FileSystem::AsynchronousFileReader>		CreateAsynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 		using FileSystem::ContentProvider::CreateSynchronousFileReader;
-		Utility::Result<FileSystem::SynchronousFileReader>		CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		::Eldritch2::Result<FileSystem::SynchronousFileReader>		CreateSynchronousFileReader( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 		using FileSystem::ContentProvider::CreateReadableMemoryMappedFile;
-		Utility::Result<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		::Eldritch2::Result<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 	// - FILE WRITE ACCESS -------------------------------
 
 		using FileSystem::ContentProvider::CreateAsynchronousFileWriter;
-		Utility::Result<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
+		::Eldritch2::Result<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
 
 		using FileSystem::ContentProvider::CreateSynchronousFileWriter;
-		Utility::Result<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
+		::Eldritch2::Result<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) override;
 
 	// - FILE APPEND ACCESS ------------------------------
 
 		using FileSystem::ContentProvider::CreateSynchronousFileAppender;
-		Utility::Result<FileSystem::SynchronousFileAppender>	CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
+		::Eldritch2::Result<FileSystem::SynchronousFileAppender>	CreateSynchronousFileAppender( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) override;
 
 	// - FREE (UNPACKAGED) FILE MANIPULATION -------------
 

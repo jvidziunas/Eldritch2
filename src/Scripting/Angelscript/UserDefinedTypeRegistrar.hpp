@@ -13,14 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/MPL/Compiler.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Utility {
-		template <typename ResultObjectType>
-		struct	Result;
-	}
-
 	class	ErrorCode;
 	class	Allocator;
 }
@@ -228,13 +224,13 @@ namespace AngelScript {
 	// ---------------------------------------------------
 
 		template <typename Native>
-		Utility::Result<ReferenceTypeBuilder<Native>>	RegisterUserDefinedReferenceType( ::Eldritch2::Allocator& builderAllocator );
+		::Eldritch2::Result<ReferenceTypeBuilder<Native>>	RegisterUserDefinedReferenceType( ::Eldritch2::Allocator& builderAllocator );
 
 		template <typename Native>
-		Utility::Result<ValueTypeBuilder<Native>>		RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator );
+		::Eldritch2::Result<ValueTypeBuilder<Native>>		RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator );
 
 		template <typename Enum>
-		Utility::Result<EnumTypeBuilder<Enum>>			RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator );
+		::Eldritch2::Result<EnumTypeBuilder<Enum>>			RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator );
 
 	// ---------------------------------------------------
 

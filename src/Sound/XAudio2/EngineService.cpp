@@ -16,7 +16,6 @@
 #include <Sound/XAudio2/EngineService.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Foundation/Application.hpp>
 #include <Foundation/GameEngine.hpp>
 //------------------------------------------------------------------//
 

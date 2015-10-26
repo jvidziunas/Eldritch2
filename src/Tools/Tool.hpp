@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ContentProvider.cpp
+  Tool.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -7,25 +7,25 @@
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
+#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <FileSystem/ContentProvider.hpp>
-#include <Utility/ErrorCode.hpp>
+#include <Utility/MPL/CharTypes.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Configuration;
-using namespace ::Eldritch2::FileSystem;
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
-namespace FileSystem {
+namespace Tools {
 
-	ErrorCode ContentProvider::RegisterConfigurableVariables( ConfigurationDatabase& /*database*/ ) {
-		return Error::NONE;
-	}
+	class Tool {
 
-}	// namespace Foundation
+	};
+
+	template <typename Tool, class Allocator>
+	int	ExecuteTool( Allocator&& allocator, int argc, SystemChar** argv );
+
+}	// namespace Tools
 }	// namespace Eldritch2
+
+#include <Tools/Tool.inl>

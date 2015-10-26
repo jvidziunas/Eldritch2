@@ -15,11 +15,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\FileSystem\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src\Tools\Tool.cpp" />
     <ClCompile Include="..\src\Utility\MessagePackBase.cpp" />
     <ClCompile Include="..\src\Utility\MessagePackWriter.cpp" />
-    <ClCompile Include="..\src\Utility\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src_Bakinator\Bakinator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\FileSystem\ReadableMemoryMappedFile.hpp" />
+    <ClInclude Include="..\src\Tools\Tool.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Alignof.hpp" />
@@ -28,8 +32,6 @@
     <ClInclude Include="..\src\Utility\MPL\FloatTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Platform.hpp" />
-    <ClInclude Include="..\src\Utility\ReadableMemoryMappedFile.hpp" />
-    <ClInclude Include="..\src\Utility\SynchronousFileWriter.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FDDD442B-008C-4F86-B0C1-CC6DBE1F7068}</ProjectGuid>
@@ -89,8 +91,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
-      <Command>XCOPY "$(SolutionDir)extern\assimp-sdk\lib\assimp_$(Configuration)-dll_x64\*.lib" "$(SolutionDir)extern\lib\x64\$(Configuration)\" /Y
-XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll" "$(SolutionDir)bin\x64\$(Configuration)\" /Y
+      <Command>
 </Command>
     </PreBuildEvent>
     <Midl>
@@ -117,8 +118,7 @@ XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
-      <Command>XCOPY "$(SolutionDir)extern\assimp-sdk\lib\assimp_$(Configuration)-dll_x64\*.lib" "$(SolutionDir)extern\lib\x64\$(Configuration)\" /Y
-XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll" "$(SolutionDir)bin\x64\$(Configuration)\" /Y
+      <Command>
 </Command>
     </PreBuildEvent>
     <Midl>
@@ -150,8 +150,7 @@ XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
     <PreBuildEvent>
-      <Command>XCOPY "$(SolutionDir)extern\assimp-sdk\lib\assimp_$(Configuration)-dll_x64\*.lib" "$(SolutionDir)extern\lib\x64\$(Configuration)\" /Y
-XCOPY "$(SolutionDir)extern\assimp-sdk\bin\assimp_$(Configuration)-dll_x64\*.dll" "$(SolutionDir)bin\x64\$(Configuration)\" /Y
+      <Command>
 </Command>
     </PreBuildEvent>
     <Midl>

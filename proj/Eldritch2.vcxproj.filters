@@ -618,6 +618,9 @@
     <ClCompile Include="..\src\Input\Win32\EngineService.RawInputPollingThread.cpp">
       <Filter>Source Files\Engine\Input\Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.cpp">
+      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Build.hpp">
@@ -1111,6 +1114,12 @@
     </ClInclude>
     <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp">
       <Filter>Header Files\Engine\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.hpp">
+      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\ResultBase.hpp">
+      <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

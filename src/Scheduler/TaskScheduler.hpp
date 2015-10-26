@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/IntTypes.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -27,8 +28,6 @@ namespace Eldritch2 {
 		class	WaitableUserEvent;
 		class	UserSemaphore;
 		class	UserMutex;
-		template <typename ResultObjectType>
-		struct	Result;
 	}
 
 	class	Allocator;
@@ -70,9 +69,9 @@ namespace Scheduler {
 
 	// - WORK SCHEDULING ---------------------------------
 
-		// Attempts to assign exclusive ownership of the denoted Module instance to this @ref TaskScheduler.
-		// If the operation succeeds, the associated code for the Module will be executed continually
-		// on a unique operating system thread until it is either dequeued from the Scheduler or
+		// Attempts to assign exclusive ownership of the denoted @ref Module instance to this @ref TaskScheduler.
+		// If the operation succeeds, the associated code for the @ref Module will be executed continually
+		// on a unique operating system thread until it is either dequeued from the @ref TaskScheduler or
 		// manually told to cease execution.
 		virtual ::Eldritch2::ErrorCode	Enqueue( Scheduler::Thread& thread ) abstract;
 
@@ -99,15 +98,15 @@ namespace Scheduler {
 	// - SYNCHRONIZATION OBJECT ALLOCATION ---------------
 
 		//!	Instructs the @ref TaskScheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
-		virtual Utility::Result<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
+		virtual ::Eldritch2::Result<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
 
-		virtual Utility::Result<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) abstract;
+		virtual ::Eldritch2::Result<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) abstract;
 
 		//!	Instructs the @ref TaskScheduler to allocate a semaphore object useful for limiting the degree of concurrent access to a shared resource.
-		virtual Utility::Result<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) abstract;
+		virtual ::Eldritch2::Result<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) abstract;
 
 		//!	Instructs the @ref TaskScheduler to allocate a basic mutually-exclusive lock.
-		virtual Utility::Result<Utility::UserMutex>				AllocateUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
+		virtual ::Eldritch2::Result<Utility::UserMutex>				AllocateUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
