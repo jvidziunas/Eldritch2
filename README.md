@@ -10,9 +10,10 @@ If you'd like to get a copy of the executable, (currently tested/running under 6
 * [Angelscript](http://www.angelcode.com/angelscript/)
 * [Microprofile](https://bitbucket.org/jonasmeyer/microprofile) (with Arseny Kapoulkine's extensions)
 * [Recast Navigation/Detour](https://github.com/memononen/recastnavigation)
+* [Boost](http://www.boost.org/) (version 1.59)
 
 ## Project Structure
-At a high level, project directories are arranged in a hierarchy. Shared or engine-related files live in the '/src/' subdirectory, and the current set of planned tools each have their own special sibling folder named according to the pattern `/src_<Tool name>/`.
+At a high level, project directories are arranged in a hierarchy. Shared or engine-related files live in the `/src/` subdirectory, and the current set of planned tools each have their own special sibling folder named according to the pattern `/src_<Tool Name>/`.
 Style conventions dictate that while tools may include files from the main project, tools should not include files from other tools; this is enforced to a limited degree by project include path settings and VS property sheet inheritance mechanisms.
 Additionally, I'm in the process of having the C++ namespaces reflect the project directory structure, but that's not 100% complete.
 
