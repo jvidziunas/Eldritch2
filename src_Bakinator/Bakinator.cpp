@@ -22,13 +22,12 @@ namespace {
 	using namespace ::Eldritch2::Tools;
 	using namespace ::Eldritch2;
 
-	class BakinatorTool : public Win32GlobalHeapAllocator, public Tool {
+	class BakinatorTool : public Win32GlobalHeapAllocator, public ToolCRTPBase<BakinatorTool> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref BakinatorTool instance.
-		BakinatorTool() : Win32GlobalHeapAllocator( UTF8L("Root Allocator") ),
-						  Tool( GetGlobalAllocator() ) {}
+		BakinatorTool() : Win32GlobalHeapAllocator( UTF8L("Root Allocator") ), ToolCRTPBase<BakinatorTool>( GetGlobalAllocator() ) {}
 
 		//!	Destroys this @ref BakinatorTool instance.
 		~BakinatorTool() = default;

@@ -84,18 +84,18 @@ namespace AngelScript {
 
 	// ---------------------------------------------------
 
-		//!	Extracts metadata for an Angelscript function, if any has been previously associated.
-		/*!	@param[in] function The Angelscript function to inspect.
+		//!	Extracts metadata for an AngelScript function, if any has been previously associated.
+		/*!	@param[in] function The AngelScript function to inspect.
 			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the function.
 			*/
 		static const FunctionMetadata*	GetMetadata( const ::asIScriptFunction& function );
-		//!	Extracts metadata for an Angelscript module, if any has been previously associated.
-		/*!	@param[in] module The Angelscript module to inspect.
+		//!	Extracts metadata for an AngelScript module, if any has been previously associated.
+		/*!	@param[in] module The AngelScript module to inspect.
 			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the module.
 			*/
 		static const ModuleMetadata*	GetMetadata( const ::asIScriptModule& module );
-		//!	Extracts metadata for an Angelscript type, if any has been previously associated.
-		/*!	@param[in] type The Angelscript type to inspect.
+		//!	Extracts metadata for an AngelScript type, if any has been previously associated.
+		/*!	@param[in] type The AngelScript type to inspect.
 			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the type.
 			*/
 		static const TypeMetadata*		GetMetadata( const ::asIObjectType& type );

@@ -143,13 +143,35 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp" />
+    <ClCompile Include="..\src\Tools\Tool.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
+    <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h" />
+    <ClInclude Include="..\src\Tools\Tool.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Compiler.hpp" />
     <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Platform.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\src\Scripting\AngelScript\BytecodeMetadata.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
+    </CustomBuild>
+    <None Include="..\src\Tools\Tool.inl" />
+    <None Include="..\src\Utility\Containers\Range.inl" />
+    <None Include="..\src\Utility\Memory\Allocator.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

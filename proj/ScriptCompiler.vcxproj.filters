@@ -5,25 +5,13 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\Angelscript">
-      <UniqueIdentifier>{d5440433-32fa-4ce7-85d7-46200e0aa3bc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\Angelscript">
-      <UniqueIdentifier>{faae1eb6-11f7-421e-a985-a0b0196bd4b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
-    </Filter>
-    <Filter Include="Header Files\FileSystem">
-      <UniqueIdentifier>{db9afb83-085f-4000-936f-09670be46076}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\FileSystem">
-      <UniqueIdentifier>{0f5b2e9e-6c8f-469c-8524-929aaab3bd9d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Utility">
       <UniqueIdentifier>{c2ed2d49-1fe2-4f2f-9fa1-76e977c33432}</UniqueIdentifier>
@@ -31,15 +19,57 @@
     <Filter Include="Header Files\Utility\MPL">
       <UniqueIdentifier>{001ca217-54c2-4301-bcbc-ee3794f3164f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utility\Memory">
+      <UniqueIdentifier>{9b6acb22-814d-4f0c-8e44-bd62dc2736b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{360d5f99-a595-4e37-85f3-b41d6560722d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility\Memory">
+      <UniqueIdentifier>{6eaadb52-5710-49ca-9d2e-428e662da90f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{301715b0-3aff-467c-b5fd-6da7b776b220}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{05c5fbec-02f8-4d6f-8451-068a424076e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Containers">
+      <UniqueIdentifier>{9eba3f2f-7227-4dd9-b87a-6e02dc6b5597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility\Containers">
+      <UniqueIdentifier>{9101d3f6-9bbd-41b7-aebc-73e77a4ba4a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AngelScript">
+      <UniqueIdentifier>{faae1eb6-11f7-421e-a985-a0b0196bd4b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AngelScript">
+      <UniqueIdentifier>{d5440433-32fa-4ce7-85d7-46200e0aa3bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IDL Files">
+      <UniqueIdentifier>{edc72de7-8d9c-4594-bc57-7f2768ddf48b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp">
-      <Filter>Source Files\Angelscript</Filter>
+      <Filter>Source Files\AngelScript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Tools\Tool.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h">
-      <Filter>Header Files\Angelscript</Filter>
+      <Filter>Header Files\AngelScript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp">
       <Filter>Header Files\Utility\MPL</Filter>
@@ -53,5 +83,33 @@
     <ClInclude Include="..\src\Utility\MPL\Platform.hpp">
       <Filter>Header Files\Utility\MPL</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp">
+      <Filter>Header Files\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
+      <Filter>Header Files\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Tools\Tool.hpp">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\Range.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\Utility\Memory\Allocator.inl">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\Range.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Tools\Tool.inl">
+      <Filter>Source Files\Tools</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\src\Scripting\AngelScript\BytecodeMetadata.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

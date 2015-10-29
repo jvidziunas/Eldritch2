@@ -40,6 +40,9 @@
     <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Platform.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\Tools\Tool.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FDDD442B-008C-4F86-B0C1-CC6DBE1F7068}</ProjectGuid>
     <RootNamespace>bakinator</RootNamespace>

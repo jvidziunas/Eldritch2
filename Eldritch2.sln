@@ -19,8 +19,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bakinator", "proj\Bakinator
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextureCompressor", "proj\TextureCompressor.vcxproj", "{12DDB58D-BF15-4807-B66E-94B3858C5B93}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lzhamdecomp", "extern\lzham_codec\lzhamdecomp\lzhamdecomp.vcxproj", "{8DA0CD32-701D-48D7-AE92-728338501500}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F6360FC-1495-47D5-8820-535240C23C2F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "angelscript", "extern\angelscript\sdk\angelscript\projects\msvc2013\angelscript.vcxproj", "{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}"
@@ -194,35 +192,6 @@ Global
 		{12DDB58D-BF15-4807-B66E-94B3858C5B93}.ReleaseWithDebugInfo|Mixed Platforms.Build.0 = ReleaseWithDebugInfo|x64
 		{12DDB58D-BF15-4807-B66E-94B3858C5B93}.ReleaseWithDebugInfo|Win64.ActiveCfg = ReleaseWithDebugInfo|x64
 		{12DDB58D-BF15-4807-B66E-94B3858C5B93}.ReleaseWithDebugInfo|Win64.Build.0 = ReleaseWithDebugInfo|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.checked|Any CPU.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.checked|ARM.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.checked|Mixed Platforms.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.checked|Mixed Platforms.Build.0 = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.checked|Win64.ActiveCfg = Release|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Debug|ARM.ActiveCfg = Debug|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Debug|Win64.ActiveCfg = Debug|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Debug|Win64.Build.0 = Debug|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.profile|Any CPU.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.profile|ARM.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.profile|Mixed Platforms.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.profile|Mixed Platforms.Build.0 = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.profile|Win64.ActiveCfg = Release|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Release|Any CPU.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Release|ARM.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Release|Win64.ActiveCfg = Release|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.Release|Win64.Build.0 = Release|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.ReleaseWithDebugInfo|Any CPU.ActiveCfg = ReleaseWithDebugInfo|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.ReleaseWithDebugInfo|Any CPU.Build.0 = ReleaseWithDebugInfo|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.ReleaseWithDebugInfo|ARM.ActiveCfg = ReleaseWithDebugInfo|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.ReleaseWithDebugInfo|Mixed Platforms.ActiveCfg = ReleaseWithDebugInfo|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.ReleaseWithDebugInfo|Mixed Platforms.Build.0 = ReleaseWithDebugInfo|Win32
-		{8DA0CD32-701D-48D7-AE92-728338501500}.ReleaseWithDebugInfo|Win64.ActiveCfg = ReleaseWithDebugInfo|x64
-		{8DA0CD32-701D-48D7-AE92-728338501500}.ReleaseWithDebugInfo|Win64.Build.0 = ReleaseWithDebugInfo|x64
 		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.checked|Any CPU.ActiveCfg = Release|Win32
 		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.checked|ARM.ActiveCfg = Release|ARM
 		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.checked|ARM.Build.0 = Release|ARM
