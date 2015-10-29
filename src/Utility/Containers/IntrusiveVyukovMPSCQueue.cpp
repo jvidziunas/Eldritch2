@@ -42,8 +42,8 @@ namespace Detail {
 // ---------------------------------------------------
 
 	intrusive_slist_node* IntrusiveVyukovMPSCQueueBase::PopFront() {
-		auto*	tail( _tail.load( memory_order_acquire ) );
-		auto*	next( AtomicLoad( tail->next, memory_order_consume ) );
+		auto	tail( _tail.load( memory_order_acquire ) );
+		auto	next( AtomicLoad( tail->next, memory_order_consume ) );
 		
 		if( tail == &_stub ) {
 			if( next == nullptr ) {

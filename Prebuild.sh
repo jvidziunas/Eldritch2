@@ -1,4 +1,4 @@
 #!/bin/bash
 
-touch ./src/Build.hpp
-./CompileSchemas.sh
+# Touch the main build file to update timestamps, etc.
+touch ./src/Build.cpp

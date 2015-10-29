@@ -211,7 +211,7 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileReader( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileReader( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -236,7 +236,7 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileReader( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileReader( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -265,7 +265,7 @@ namespace Win32 {
 
 		if( const ::HANDLE fileMapping { ::CreateFileMapping( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) } ) {
 			if( const void* const mappedView = ::MapViewOfFile( fileMapping, FILE_MAP_READ, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), static_cast<::SIZE_T>(0u) ) ) {
-				if( auto* resultObject = new(allocator, AllocationOption::TEMPORARY_ALLOCATION) ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) ) ) {
+				if( auto resultObject = new(allocator, AllocationOption::TEMPORARY_ALLOCATION) ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) ) ) {
 					return { move( resultObject ) };
 				}
 			}
@@ -292,7 +292,7 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -317,7 +317,7 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto* accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -369,7 +369,7 @@ namespace Win32 {
 											 nullptr ) );
 
 		if( INVALID_HANDLE_VALUE != file ) {
-			if( auto* appender = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAppender( file ) ) {
+			if( auto appender = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAppender( file ) ) {
 				return { move( appender ) };
 			}
 

@@ -29,7 +29,7 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	class BytecodePackageResourceView : public FileSystem::ResourceView {
+	class BytecodePackageResourceView : public FileSystem::ResourceView, private AngelScript::BytecodeMetadata {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -54,8 +54,9 @@ namespace AngelScript {
 			void	operator()( ::asIScriptModule* const module );
 		};
 
+	// - DATA MEMBERS ------------------------------------
+
 		::std::unique_ptr<::asIScriptModule, ModuleDeleter>	_module;
-		AngelScript::BytecodeMetadata						_metadata;
 	};
 
 }	// namespace AngelScript

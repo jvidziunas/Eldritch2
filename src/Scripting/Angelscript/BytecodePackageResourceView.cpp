@@ -15,8 +15,8 @@
 #include <Scripting/Angelscript/BytecodePackageResourceView.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
-#include <Utility/MessagePackReader.hpp>
 #include <Utility/ErrorCode.hpp>
+#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #include <angelscript.h>
 //------------------------------------------------------------------//
@@ -40,8 +40,8 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	BytecodePackageResourceView::BytecodePackageResourceView( ::asIScriptEngine& engine, const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ),
-																																			  _module( engine.GetModule( GetName().GetCharacterArray(), ::asGM_CREATE_IF_NOT_EXISTS ) ),
-																																			  _metadata( allocator ) {}
+																																			  BytecodeMetadata( allocator ),
+																																			  _module( engine.GetModule( GetName().GetCharacterArray(), ::asGM_CREATE_IF_NOT_EXISTS ) ) {}
 
 // ---------------------------------------------------
 
@@ -74,7 +74,7 @@ namespace AngelScript {
 
 		Reader	reader( bytes );
 
-		return _module->LoadByteCode( &reader ) && MessagePackReader( reader.remainingData )(_metadata) && _metadata.BindToModule( *_module ) ? Error::NONE : Error::INVALID_PARAMETER;
+		return (::asSUCCESS == _module->LoadByteCode( &reader )) ? BindToModule( *_module, reader.remainingData ) : Error::INVALID_PARAMETER;
 	}
 
 }	// namespace AngelScript

@@ -12,10 +12,17 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Containers/ResizableArray.hpp>
+#include <Utility/Containers/FlatOrderedMap.hpp>
 //------------------------------------------------------------------//
 
+namespace Eldritch2 {
+	class	ErrorCode;
+}
+
+class	asIScriptFunction;
 class	asIScriptModule;
+class	asIObjectType;
 
 using asUINT	= unsigned int;
 
@@ -27,33 +34,22 @@ namespace AngelScript {
 	// - TYPE PUBLISHING ---------------------------------
 	
 	public:
+		using ModuleMetadata	= AngelScript::BytecodeMetadata;
+
 		class FunctionMetadata {
-		public:
-			//! Shared (input/output) serialization entry point.
-			/*! @param[in, out] archive The archive to serialize into/from.
-				@returns _true_ if serialization was successful, _false_ if serialization was not successful.
-				*/
-			template <class Archive>
-			bool	Serialize( Archive& archive );
+		};
+
+	// ---
+
+		class PropertyMetadata {
 		};
 
 	// ---
 
 		class TypeMetadata {
-		// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			struct PropertyMetadata {
-			//! Shared (input/output) serialization entry point.
-			/*! @param[in, out] archive The archive to serialize into/from.
-				@returns _true_ if serialization was successful, _false_ if serialization was not successful.
-				*/
-				template <class Archive>
-				bool	Serialize( Archive& archive );
-			};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+		public:
 			//! Constructs this @ref TypeMetadata instance.
 			/*! @param[in] allocator @ref Allocator the @ref TypeMetadata instance should use to perform allocations.
 				*/
@@ -66,18 +62,13 @@ namespace AngelScript {
 
 		// ---------------------------------------------------
 
-			//! Shared (input/output) serialization entry point.
-			/*! @param[in, out] archive The archive to serialize into/from.
-				@returns _true_ if serialization was successful, _false_ if serialization was not successful.
-				*/
-			template <class Archive>
-			bool	Serialize( Archive& archive );
+			const PropertyMetadata*	GetPropertyMetadata( const ::asUINT propertyIndex ) const;
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::Eldritch2::UnorderedMap<::asUINT, FunctionMetadata>	_methodMetadata;
-			::Eldritch2::UnorderedMap<::asUINT, PropertyMetadata>	_propertyMetadata;
+			::Eldritch2::ResizableArray<FunctionMetadata>			_methodMetadata;
+			::Eldritch2::FlatOrderedMap<::asUINT, PropertyMetadata>	_propertyMetadata;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -93,25 +84,48 @@ namespace AngelScript {
 
 	// ---------------------------------------------------
 
-		bool	BindToModule( ::asIScriptModule& module );
+		//!	Extracts metadata for an Angelscript function, if any has been previously associated.
+		/*!	@param[in] function The Angelscript function to inspect.
+			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the function.
+			*/
+		static const FunctionMetadata*	GetMetadata( const ::asIScriptFunction& function );
+		//!	Extracts metadata for an Angelscript module, if any has been previously associated.
+		/*!	@param[in] module The Angelscript module to inspect.
+			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the module.
+			*/
+		static const ModuleMetadata*	GetMetadata( const ::asIScriptModule& module );
+		//!	Extracts metadata for an Angelscript type, if any has been previously associated.
+		/*!	@param[in] type The Angelscript type to inspect.
+			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the type.
+			*/
+		static const TypeMetadata*		GetMetadata( const ::asIObjectType& type );
 
-		template <typename Archive>
-		bool	Serialize( Archive& archive );
+		static const PropertyMetadata*	GetPropertyMetadata( const ::asIObjectType& objectType, const ::asUINT propertyIndex );
+		static const PropertyMetadata*	GetPropertyMetadata( const ::asIScriptModule& module, const void* propertyAddress );
+
+	// ---------------------------------------------------
+
+	protected:
+		static void	SetMetadata( ::asIScriptFunction& function, const FunctionMetadata& metadata );
+		static void	SetMetadata( ::asIScriptModule& module, const ModuleMetadata& metadata );
+		static void	SetMetadata( ::asIObjectType& objectType, const TypeMetadata& metadata );
+
+	// ---------------------------------------------------
+
+		::Eldritch2::ErrorCode	BindToModule( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
+		::Eldritch2::ErrorCode	LoadTypeMetadata( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
+		::Eldritch2::ErrorCode	LoadFunctionMetadata( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
+		::Eldritch2::ErrorCode	LoadPropertyMetadata( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator								_rootAllocator;
-		::Eldritch2::UnorderedMap<::asUINT, TypeMetadata>		_typeMetadata;
-		::Eldritch2::UnorderedMap<::asUINT, FunctionMetadata>	_functionMetadata;
+		::Eldritch2::ChildAllocator									_rootAllocator;
+		::Eldritch2::ResizableArray<TypeMetadata>					_typeMetadata;
+		::Eldritch2::ResizableArray<FunctionMetadata>				_functionMetadata;
+		::Eldritch2::FlatOrderedMap<const void*, PropertyMetadata>	_propertyMetadata;
 	};
 
 }	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Scripting/AngelScript/BytecodeMetadata.inl>
-//------------------------------------------------------------------//

@@ -70,7 +70,7 @@ namespace FileSystem {
 		ETRuntimeAssert( _contentPackageCollection.Empty() );
 		ETRuntimeAssert( _resourceViewCollection.Empty() );
 
-		if( auto* const thread = _loaderThread ) {
+		if( auto thread = _loaderThread ) {
 			thread->EnsureTerminated();
 			_allocator.Delete( *thread );
 		}
@@ -241,7 +241,7 @@ namespace FileSystem {
 
 	// ---
 
-		if( auto* const	newPackage = new(_allocator, AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) ) {
+		if( auto newPackage = new(_allocator, AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) ) {
 			return { ObjectHandle<ContentPackage>( newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics ) };
 		}
 

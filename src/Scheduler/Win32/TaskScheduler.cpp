@@ -137,7 +137,7 @@ namespace Win32 {
 		totalWorkerCount = Max<size_t>( totalWorkerCount, 1u );
 
 		// Allocate a big array of worker thread objects.
-		if( auto* const workerThreadMemory = _allocator.Allocate( totalWorkerCount * sizeof(WorkerThread), _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION ) ) {
+		if( auto workerThreadMemory = ::operator new( totalWorkerCount * sizeof(WorkerThread), _allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION ) ) {
 			_workerThreads = Range<WorkerThread*>( static_cast<WorkerThread*>(workerThreadMemory), totalWorkerCount );
 
 			for( WorkerThread& workerThread : _workerThreads ) {
@@ -281,7 +281,7 @@ namespace Win32 {
 
 	// ---
 
-		if( auto* mutex = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) UserMutex ) {
+		if( auto mutex = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) UserMutex ) {
 			return { move( mutex ) };
 		}
 
@@ -326,7 +326,7 @@ namespace Win32 {
 	// ---
 
 		if( const auto eventHandle = ::CreateEventW( nullptr, FALSE, (EventInitialState::UNSIGNALED == initialState ? FALSE : TRUE), nullptr ) ) {
-			if( auto* event = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) ) {
+			if( auto event = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Event( eventHandle ) ) {
 				return { move( event ) };
 			}
 
@@ -375,7 +375,7 @@ namespace Win32 {
 	// ---
 
 		if( const auto semaphoreHandle = ::CreateSemaphore( nullptr, static_cast<::LONG>(initialCount), static_cast<::LONG>(maximumCount), nullptr ) ) {
-			if( auto* semaphore = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
+			if( auto semaphore = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
 				return { move( semaphore ) };
 			}
 

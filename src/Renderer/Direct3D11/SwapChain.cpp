@@ -209,13 +209,13 @@ namespace Direct3D11 {
 			static_cast<::UINT>(0),
 			[] ( ::HWND windowHandle, ::UINT messageID, ::WPARAM wParam, ::LPARAM lParam ) -> ::LRESULT {
 				if( ETBranchLikelyHint( WM_NCCREATE == messageID ) ) {
-					auto* const	swapChain( static_cast<SwapChain*>(reinterpret_cast<::LPCREATESTRUCT>(lParam)->lpCreateParams) );
+					auto	swapChain( static_cast<SwapChain*>(reinterpret_cast<::LPCREATESTRUCT>(lParam)->lpCreateParams) );
 
 					swapChain->_windowHandle.store( windowHandle, memory_order_release );
 					::SetWindowLongPtr( windowHandle, GWLP_USERDATA, reinterpret_cast<::LONG_PTR>(swapChain) );
 				}
 
-				if( auto* const swapChain = reinterpret_cast<SwapChain*>(::GetWindowLongPtr( windowHandle, GWLP_USERDATA )) ) {
+				if( auto swapChain = reinterpret_cast<SwapChain*>(::GetWindowLongPtr( windowHandle, GWLP_USERDATA )) ) {
 					// We've successfully attached, skip the branch for all subsequent messages
 					::SetWindowLongPtr( windowHandle, GWLP_WNDPROC, reinterpret_cast<::LONG_PTR>(static_cast<::WNDPROC>([] ( ::HWND windowHandle, ::UINT messageID, ::WPARAM wParam, ::LPARAM lParam ) -> ::LRESULT {
 						return reinterpret_cast<SwapChain*>(::GetWindowLongPtr( windowHandle, GWLP_USERDATA ))->MessageProc( messageID, wParam, lParam );

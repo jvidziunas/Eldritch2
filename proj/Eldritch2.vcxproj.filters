@@ -238,6 +238,9 @@
     <Filter Include="Source Files\Engine\Physics\Bullet Dynamics\Extensions">
       <UniqueIdentifier>{279c035e-049d-4a55-b834-a440205a5a2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IDL Files">
+      <UniqueIdentifier>{abc7007a-dce7-4dec-82fc-e5f832c26bdf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Build.cpp">
@@ -1322,5 +1325,13 @@
     <ResourceCompile Include="..\resources\Eldritch2.Resources.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\src\Packages\PackageHeader.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Scripting\Angelscript\BytecodeMetadata.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

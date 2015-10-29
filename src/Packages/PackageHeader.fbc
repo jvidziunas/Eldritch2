@@ -1,5 +1,7 @@
-namespace Eldritch2.FlatBuffers.Package;
-file_identifier "ECRF";
+file_identifier	"ECRF";
+file_extension	"PackageHeader";
+
+namespace Eldritch2.FileSystem.FlatBuffers;
 
 struct BlockDescriptor {
 	offset	: uint;
@@ -12,9 +14,9 @@ table Export {
 	block	: BlockDescriptor (required);
 }
 
-table PackageDefinition {
+table Header {
 	imports : [string];
 	exports : [Export];
 }
 
-root_type PackageDefinition;
+root_type Header;

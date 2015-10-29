@@ -19,11 +19,6 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	namespace FileSystem	= ::Eldritch2::FileSystem;
-	namespace Utility		= ::Eldritch2::Utility;
-
-// ---------------------------------------------------
-
 	ETInlineHint ContentLibrary::ResourceViewFactoryKey::ResourceViewFactoryKey( const ::Eldritch2::UTF8Char* const begin, const ::Eldritch2::UTF8Char* const end ) : ::std::pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*>( begin, end ) {}
 
 // ---------------------------------------------------

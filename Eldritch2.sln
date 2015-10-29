@@ -11,6 +11,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderCompiler", "proj\ShaderCompiler.vcxproj", "{98EA248F-16AA-4AF4-AB1B-5AF55FA228BB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptCompiler", "proj\ScriptCompiler.vcxproj", "{C60851E1-A99C-430D-B141-14729DBE5791}"
+	ProjectSection(ProjectDependencies) = postProject
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD} = {39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bakinator", "proj\Bakinator.vcxproj", "{FDDD442B-008C-4F86-B0C1-CC6DBE1F7068}"
 EndProject

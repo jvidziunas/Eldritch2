@@ -551,6 +551,15 @@ call "deploy.x64.bat"
     <None Include="..\src\Packages\ContentLibrary.inl" />
     <None Include="..\src\Packages\ContentPackage.inl" />
     <None Include="..\src\Packages\PackageDeserializationContext.inl" />
+    <CustomBuild Include="..\src\Packages\PackageHeader.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+    </CustomBuild>
     <None Include="..\src\Packages\ResourceView.inl" />
     <None Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.inl" />
     <None Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.inl" />
@@ -559,6 +568,15 @@ call "deploy.x64.bat"
     <None Include="..\src\Scheduler\CRTPTransientTask.inl" />
     <None Include="..\src\Scheduler\Task.inl" />
     <None Include="..\src\Scheduler\WorkerContext.inl" />
+    <CustomBuild Include="..\src\Scripting\Angelscript\BytecodeMetadata.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+	  <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+	  <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+    </CustomBuild>
     <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl" />
     <None Include="..\src\Scripting\AngelScript\EngineService.inl" />
     <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl" />

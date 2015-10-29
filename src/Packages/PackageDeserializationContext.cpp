@@ -21,6 +21,8 @@
 #include <Utility/Result.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
+#include <Packages/PackageHeader_generated.h>
+//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Scripting;
@@ -77,14 +79,27 @@ namespace FileSystem {
 		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
 		ETRuntimeAssert( nullptr != _file );
 
+	// ---
+
 		ErrorCode	result( Error::NONE );
 		
+		if( auto data = _file->GetAddressForFileByteOffset( 0u ) ) {
+			if( auto imports = FlatBuffers::HeaderBufferHasIdentifier( data ) ? FlatBuffers::GetHeader( data )->imports() : nullptr ) {
+				for( auto import : *imports ) {
+					result = GetBoundPackage().AddDependency( import->c_str() );
 
-		// Publish load failure in the event something went wrong.
-		if( !result ) {
+					if( !result ) {
+						break;
+					}
+				}
+			}
+		} else {
+			// Publish load failure.
 			GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+
+			result = Error::INVALID_PARAMETER;
 		}
-		
+
 		return result;
 	}
 
@@ -94,7 +109,19 @@ namespace FileSystem {
 		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
 		ETRuntimeAssert( nullptr != _file );
 
+	// ---
+
 		ErrorCode	result( Error::NONE );
+
+		if( auto exports = FlatBuffers::GetHeader( _file->GetAddressForFileByteOffset( 0u ) )->exports() ) {
+			for( auto definition : *exports ) {
+				result = GetBoundPackage().AddContent( definition->name()->c_str(), definition->type()->c_str(), Range<const char*>::EmptySet() );
+
+				if( !result ) {
+					break;
+				}
+			}
+		}
 
 		// Broadcast the new residency state (either published or failed) depending on whether or not the load was successful.
 		GetBoundPackage().UpdateResidencyStateOnLoaderThread( result ? ResidencyState::PUBLISHED : ResidencyState::FAILED );

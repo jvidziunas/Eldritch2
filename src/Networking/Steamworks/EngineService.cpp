@@ -265,7 +265,7 @@ namespace Steamworks {
 		if( candidate == _playerDirectory.End() ) {
 			GetLogger()( UTF8L("Player {%llu:%i} connected.") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
 
-			if( auto* player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
+			if( auto player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
 				_playerDirectory.Insert( { networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) } );
 				
 				return { move( player ) };

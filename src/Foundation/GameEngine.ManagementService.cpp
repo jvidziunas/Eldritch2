@@ -256,7 +256,7 @@ namespace Foundation {
 
 	// ---
 
-		if( auto* const initializeEngineTask = new(GetEngineAllocator(), Allocator::AllocationOption::TEMPORARY_ALLOCATION) InitializeEngineTask( *this ) ) {
+		if( auto initializeEngineTask = new(GetEngineAllocator(), Allocator::AllocationOption::TEMPORARY_ALLOCATION) InitializeEngineTask( *this ) ) {
 			GetEngineTaskScheduler().Bootstrap( *initializeEngineTask, threadCount ).ToInt();
 		}
 	}

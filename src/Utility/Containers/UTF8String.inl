@@ -46,21 +46,21 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint typename UTF8String<Allocator>::ConstIterator UTF8String<Allocator>::IteratorToFirstInstance( const CharacterType character ) const {
-		return ::Eldritch2::FindFirstInstance( this->GetCharacterArray(), character );
+		return ::Eldritch2::FindFirstInstance( GetCharacterArray(), character );
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint typename UTF8String<Allocator>::ConstIterator UTF8String<Allocator>::IteratorToFirstInstance( const CharacterType* const needle ) const {
-		return ::Eldritch2::FindFirstInstance( this->GetCharacterArray(), needle );
+		return ::Eldritch2::FindFirstInstance( GetCharacterArray(), needle );
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint typename UTF8String<Allocator>::ConstIterator UTF8String<Allocator>::IteratorToFirstInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const {
-		auto* const	position( this->IteratorToFirstInstance( needle ) );
+		auto	position( IteratorToFirstInstance( needle ) );
 
 		return position ? position + ::Eldritch2::StringLength( needle ) : nullptr;
 	}
@@ -69,21 +69,21 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint typename UTF8String<Allocator>::ConstIterator UTF8String<Allocator>::IteratorToLastInstance( const CharacterType character ) const {
-		return ::Eldritch2::FindLastInstance( this->GetCharacterArray(), character );
+		return ::Eldritch2::FindLastInstance( GetCharacterArray(), character );
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint typename UTF8String<Allocator>::ConstIterator UTF8String<Allocator>::IteratorToLastInstance( const CharacterType* const needle ) const {
-		return ::Eldritch2::FindLastInstance( this->GetCharacterArray(), needle );
+		return ::Eldritch2::FindLastInstance( GetCharacterArray(), needle );
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint typename UTF8String<Allocator>::ConstIterator UTF8String<Allocator>::IteratorToLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const {
-		auto* const	position( this->IteratorToFirstInstance( needle ) );
+		auto	position( IteratorToFirstInstance( needle ) );
 
 		return position ? position + ::Eldritch2::StringLength( needle ) : nullptr;
 	}
@@ -92,14 +92,14 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint bool UTF8String<Allocator>::Contains( const CharacterType character ) const {
-		return this->End() != this->IteratorToFirstInstance( character );
+		return End() != IteratorToFirstInstance( character );
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint bool UTF8String<Allocator>::Contains( const CharacterType* const needle ) const {
-		return this->End() != this->IteratorToFirstInstance( needle );
+		return End() != tIteratorToFirstInstance( needle );
 	}
 
 // ---------------------------------------------------
@@ -129,14 +129,14 @@ namespace Eldritch2 {
 	ETInlineHint bool UTF8String<Allocator>::BeginsWith( const CharacterType* const needle ) const {
 		const auto needleLength( ::Eldritch2::StringLength( needle ) );
 
-		return (needleLength <= this->Length()) ? ::Eldritch2::EqualityCompareString( this->GetCharacterArray(), needle, needleLength ) : false;
+		return (needleLength <= Length()) ? ::Eldritch2::EqualityCompareString( GetCharacterArray(), needle, needleLength ) : false;
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint bool UTF8String<Allocator>::EndsWith( const CharacterType character ) const {
-		return (*this) ? this->End()[-1] == character : false;
+		return (*this) ? End()[-1] == character : false;
 	}
 
 // ---------------------------------------------------
@@ -145,7 +145,7 @@ namespace Eldritch2 {
 	ETInlineHint bool UTF8String<Allocator>::EndsWith( const CharacterType* const needle ) const {
 		const auto needleLength( ::Eldritch2::StringLength( needle ) );
 
-		return (needleLength <= this->Length()) ? ::Eldritch2::EqualityCompareString( this->End() - needleLength, needle, needleLength ) : false;
+		return (needleLength <= Length()) ? ::Eldritch2::EqualityCompareString( End() - needleLength, needle, needleLength ) : false;
 	}
 
 // ---------------------------------------------------
@@ -167,14 +167,14 @@ namespace Eldritch2 {
 	template <class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint ::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::operator=( const ::Eldritch2::UTF8String<AlternateAllocator>& rhs ) {
-		return this->Assign( rhs.Begin(), rhs.LengthInBytes() );
+		return Assign( rhs.Begin(), rhs.LengthInBytes() );
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint ::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::operator=( const CharacterType* const string ) {
-		return this->Assign( string );
+		return Assign( string );
 	}
 
 // ---------------------------------------------------
@@ -190,7 +190,7 @@ namespace Eldritch2 {
 	template <class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint ::Eldritch2::UTF8String<AlternateAllocator> UTF8String<Allocator>::Substring( AlternateAllocator& allocator, const ConstIterator begin ) {
-		return this->Substring( allocator, begin, this->End() );
+		return Substring( allocator, begin, this->End() );
 	}
 
 // ---------------------------------------------------
@@ -224,7 +224,7 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint ::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::Append( const CharacterType* const string ) {
-		return this->Append( string, static_cast<SizeType>(::Eldritch2::StringLength( string )) );
+		return Append( string, static_cast<SizeType>(::Eldritch2::StringLength( string )) );
 	}
 
 // ---------------------------------------------------
@@ -241,15 +241,15 @@ namespace Eldritch2 {
 	template <class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::Append( const ::Eldritch2::UTF8String<AlternateAllocator>& string ) {
-		return this->Append( string.Begin(), string.Length() );
+		return Append( string.Begin(), string.Length() );
 	}
 
 // ---------------------------------------------------
 
 	template <class Allocator>
 	ETInlineHint ::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::EnsureEndsWith( const CharacterType character ) {
-		if( !this->EndsWith( character ) ) {
-			this->Append( character );
+		if( !EndsWith( character ) ) {
+			Append( character );
 		}
 	}
 
@@ -257,8 +257,8 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint ::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::EnsureEndsWith( const CharacterType* const string ) {
-		if( !this->EndsWith( string ) ) {
-			this->Append( string );
+		if( !EndsWith( string ) ) {
+			Append( string );
 		}
 	}
 
@@ -267,7 +267,7 @@ namespace Eldritch2 {
 	template <class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint ::Eldritch2::UTF8String<Allocator>& UTF8String<Allocator>::operator+=( const ::Eldritch2::UTF8String<AlternateAllocator>& rhs ) {
-		return this->Append( rhs );
+		return Append( rhs );
 	}
 
 // ---------------------------------------------------
@@ -288,7 +288,7 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint int UTF8String<Allocator>::Compare( const CharacterType* const string ) const {
-		return ::Eldritch2::CompareString( this->GetCharacterArray(), string );
+		return ::Eldritch2::CompareString( GetCharacterArray(), string );
 	}
 
 // ---------------------------------------------------
@@ -296,7 +296,7 @@ namespace Eldritch2 {
 	template <class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint int UTF8String<Allocator>::Compare( const ::Eldritch2::UTF8String<AlternateAllocator>& rhs ) const {
-		return ::Eldritch2::CompareString( this->GetCharacterArray(), rhs.GetCharacterArray() );
+		return ::Eldritch2::CompareString( GetCharacterArray(), rhs.GetCharacterArray() );
 	}
 
 // ---------------------------------------------------
@@ -338,7 +338,7 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint UTF8String<Allocator>::operator bool() {
-		return !this->Empty();
+		return !Empty();
 	}
 
 // ---------------------------------------------------

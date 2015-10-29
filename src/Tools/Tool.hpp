@@ -33,6 +33,7 @@ namespace Tools {
 			*/
 		Tool( ::Eldritch2::Allocator& allocator );
 
+		//!	Destroys this @ref Tool instance.
 		~Tool() = default;
 
 	// ---------------------------------------------------

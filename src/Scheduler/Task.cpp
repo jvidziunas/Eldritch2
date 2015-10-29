@@ -67,8 +67,8 @@ namespace Scheduler {
 				do {
 					if( 1u == task->_endCount.fetch_sub( 1u, memory_order_release ) ) {
 						// Store these here in case the task deletes itself.
-						auto* const	continuation( task->_continuationTask );
-						auto* const codependent( task->_codependentTask );
+						auto	continuation( task->_continuationTask );
+						auto	codependent( task->_codependentTask );
 
 						task->_state.store( ExecutionState::DONE, memory_order_release );
 

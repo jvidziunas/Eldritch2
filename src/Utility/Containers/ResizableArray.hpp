@@ -170,6 +170,7 @@ namespace Detail {
 
 		ETInlineHint void	PushBack( ConstReference itemTemplate );
 		ETInlineHint void	PushBack( ValueType&& itemTemplate );
+		ETInlineHint void	PushBack();
 
 		template <typename... ElementConstructorArguments>
 		ETInlineHint void	EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments );

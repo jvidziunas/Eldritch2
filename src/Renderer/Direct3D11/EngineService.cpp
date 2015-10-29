@@ -173,7 +173,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( this, sizeof( WorldView ), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
+		visitor.PublishFactory( this, sizeof(WorldView), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
 			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(renderer)->_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}

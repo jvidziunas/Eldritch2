@@ -378,7 +378,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( StringLength( propertyName ) + 5u )), "get_%s", propertyName ) );
 
-		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(getterFunction) );
+		return RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(getterFunction) );
 	}
 
 // ---------------------------------------------------
@@ -398,7 +398,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "get_%s", propertyName ), true );
 
-		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(getterFunction) );
+		return RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(getterFunction) );
 	}
 
 // ---------------------------------------------------
@@ -418,7 +418,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "get_%s", propertyName ) );
 
-		return this->RegisterFunction( signature, ::asFunctionPtr( getterFunction ) );
+		return RegisterFunction( signature, ::asFunctionPtr( getterFunction ) );
 	}
 
 // ---------------------------------------------------
@@ -438,7 +438,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "get_%s", propertyName ), true );
 
-		return this->RegisterFunction( signature, ::asFunctionPtr( getterFunction ) );
+		return RegisterFunction( signature, ::asFunctionPtr( getterFunction ) );
 	}
 
 // ---------------------------------------------------
@@ -458,7 +458,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<void, Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "set_%s", propertyName ) );
 
-		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(setterFunction) );
+		return RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(setterFunction) );
 	}
 
 // ---------------------------------------------------
@@ -478,7 +478,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<void, Property>::Format( stream, PrintFormatted( static_cast<char*>(_alloca( nameBufferSize )), nameBufferSize, "set_%s", propertyName ) );
 
-		return this->RegisterFunction( signature, ::asFunctionPtr( setterFunction ) );
+		return RegisterFunction( signature, ::asFunctionPtr( setterFunction ) );
 	}
 
 // ---------------------------------------------------
@@ -496,7 +496,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName );
 
-		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(method) );
+		return RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(method) );
 	}
 
 // ---------------------------------------------------
@@ -514,7 +514,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName, true );
 
-		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(method) );
+		return RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(method) );
 	}
 
 // ---------------------------------------------------
@@ -532,7 +532,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName );
 
-		return this->RegisterFunction( signature, ::asFunctionPtr( method ) );
+		return RegisterFunction( signature, ::asFunctionPtr( method ) );
 	}
 
 // ---------------------------------------------------
@@ -550,7 +550,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, Arguments...>::Format( stream, methodName, true );
 
-		return this->RegisterFunction( signature, ::asFunctionPtr( method ) );
+		return RegisterFunction( signature, ::asFunctionPtr( method ) );
 	}
 
 // ---------------------------------------------------
@@ -570,7 +570,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, angelscriptOperatorNameTable[operatorClass] );
 
-		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(operatorMethod) );
+		return RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(operatorMethod) );
 	}
 
 // ---------------------------------------------------
@@ -590,7 +590,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, angelscriptOperatorNameTable[operatorClass], true );
 
-		return this->RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(operatorMethod) );
+		return RegisterFunction( signature, reinterpret_cast<void (Native::*)()>(operatorMethod) );
 	}
 
 // ---------------------------------------------------
@@ -610,7 +610,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, Detail::operatorNameTable[static_cast<size_t>(operatorClass)] );
 
-		return this->RegisterFunction( signature, ::asFunctionPtr( operatorMethod ) );
+		return RegisterFunction( signature, ::asFunctionPtr( operatorMethod ) );
 	}
 
 // ---------------------------------------------------
@@ -630,7 +630,7 @@ namespace AngelScript {
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, Detail::operatorNameTable[static_cast<size_t>(operatorClass)] );
 
-		return this->RegisterFunction( signature, ::asFunctionPtr( operatorMethod ) );
+		return RegisterFunction( signature, ::asFunctionPtr( operatorMethod ) );
 	}
 
 // ---------------------------------------------------
@@ -706,7 +706,7 @@ namespace AngelScript {
 			stream<decltype(sink)>	stream( sink );
 
 			Detail::FunctionDeclarationFormatter<ResultObject*>::Format( stream, "opCast" );
-			this->RegisterFunction( signature, ::asFunctionPtr( static_cast<CastFunction>([] ( Native* const thisPointer ) { return static_cast<ResultObject*>(thisPointer); }) ) );
+			RegisterFunction( signature, ::asFunctionPtr( static_cast<CastFunction>([] ( Native* const thisPointer ) { return static_cast<ResultObject*>(thisPointer); }) ) );
 		}
 
 		{
@@ -714,7 +714,7 @@ namespace AngelScript {
 			stream<decltype(sink)>	stream( sink );
 
 			Detail::FunctionDeclarationFormatter<ResultObject*>::Format( stream, "opCast", true );
-			this->RegisterFunction( signature, ::asFunctionPtr( static_cast<ConstCastFunction>([] ( const Native* const thisPointer ) { return static_cast<const ResultObject*>(thisPointer); }) ) );
+			RegisterFunction( signature, ::asFunctionPtr( static_cast<ConstCastFunction>([] ( const Native* const thisPointer ) { return static_cast<const ResultObject*>(thisPointer); }) ) );
 		}
 		
 		return *this;
@@ -758,7 +758,7 @@ namespace AngelScript {
 		result = _scriptEngine.RegisterObjectBehaviour( UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_RELEASE, "void f()", ::asMETHOD( Native, ReleaseReference ), ::asCALL_THISCALL );
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		if( auto* builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
+		if( auto builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
 			return { ::std::move( builder ) };
 		}
 
@@ -786,7 +786,7 @@ namespace AngelScript {
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		if( auto* builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
+		if( auto builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
 			return { ::std::move( builder ) };
 		}
 
@@ -804,7 +804,7 @@ namespace AngelScript {
 
 		EnsureEnumTypeDeclared<Enum>();
 
-		if( auto* builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) Builder( _scriptEngine ) ) {
+		if( auto builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) Builder( _scriptEngine ) ) {
 			return { ::std::move( builder ) };
 		}
 
