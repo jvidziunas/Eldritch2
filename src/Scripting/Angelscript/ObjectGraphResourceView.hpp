@@ -34,12 +34,14 @@ namespace AngelScript {
 
 	public:
 		//!	Constructs this @ref ObjectGraphResourceView instance.
-		ObjectGraphResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		ObjectGraphResourceView( const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
 		//!	Destroys this @ref ObjectGraphResourceView instance.
 		~ObjectGraphResourceView() = default;
 
 	// ---------------------------------------------------
+
+		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
 
 		::Eldritch2::ErrorCode	DeserializeIntoWorldView( AngelScript::WorldView& worldView ) const;
 

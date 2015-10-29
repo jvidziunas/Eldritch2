@@ -20,15 +20,6 @@
     <Filter Include="Source Files\Engine\Foundation">
       <UniqueIdentifier>{7d7626b4-7058-4838-ae74-72c943989843}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Foundation\Engine">
-      <UniqueIdentifier>{41ba6fc2-71d9-458b-aba3-bfcd30b4e7dc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Foundation\Players">
-      <UniqueIdentifier>{fce761ae-f237-4574-9882-7eb25fe075cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Foundation\Worlds">
-      <UniqueIdentifier>{78805c57-8567-4704-b07e-cb348d117683}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine\Input">
       <UniqueIdentifier>{44216863-2550-4f0e-b941-68de784c23c6}</UniqueIdentifier>
     </Filter>
@@ -71,9 +62,6 @@
     <Filter Include="Source Files\Engine\Utility\Memory">
       <UniqueIdentifier>{8cf6c7b3-18a8-4736-a0d0-b3150f89c1a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Utility\Memory\Allocators">
-      <UniqueIdentifier>{5a429dff-4513-4c0a-bb01-530e544d7d61}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine\Utility\Containers">
       <UniqueIdentifier>{44f5ec5f-58cd-49a7-8378-feca26d53e58}</UniqueIdentifier>
     </Filter>
@@ -105,9 +93,6 @@
     <Filter Include="Header Files\Engine\Utility\Memory">
       <UniqueIdentifier>{a5750cf4-4045-41f5-b71f-bf44324316e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Utility\Memory\Allocators">
-      <UniqueIdentifier>{1ffbd0a1-a537-4789-b57f-e30c9ccb091d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Utility\Metaprogramming">
       <UniqueIdentifier>{15957b9e-cb4c-42e5-9e30-43988752a3c1}</UniqueIdentifier>
     </Filter>
@@ -119,12 +104,6 @@
     </Filter>
     <Filter Include="Header Files\Engine\Utility\Containers">
       <UniqueIdentifier>{2d439bc5-b6a7-4ab0-a394-3affae718fb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Containers\Linked Lists">
-      <UniqueIdentifier>{82fc656c-469f-46d6-a68d-c33be85cace3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Containers\Associative Containers">
-      <UniqueIdentifier>{f22ab27b-5367-4215-b4b3-0bba2e17f0d2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Engine\Utility\Math">
       <UniqueIdentifier>{c03f0771-ed6b-4727-84bd-4033c56e8386}</UniqueIdentifier>
@@ -199,12 +178,6 @@
     <Filter Include="Header Files\Engine\Input\XInput">
       <UniqueIdentifier>{2b1b12e8-02dd-4c42-9479-21f2d2ad0495}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Utility\MessagePack">
-      <UniqueIdentifier>{d81f1466-4c94-43fb-ad30-54fa9f2b13d5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Utility\MessagePack">
-      <UniqueIdentifier>{bb55056e-8b8b-410c-8259-26df5de6afd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Filesystem">
       <UniqueIdentifier>{bed06d8f-3adf-4793-8e46-44b48a656509}</UniqueIdentifier>
     </Filter>
@@ -273,18 +246,6 @@
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\foundation\GameEngine.cpp">
-      <Filter>Source Files\Engine\Foundation\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\foundation\GameEngineService.cpp">
-      <Filter>Source Files\Engine\Foundation\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\foundation\Player.cpp">
-      <Filter>Source Files\Engine\Foundation\Players</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Foundation\World.cpp">
-      <Filter>Source Files\Engine\Foundation\Worlds</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp">
       <Filter>Source Files\Engine\Logging</Filter>
     </ClCompile>
@@ -342,26 +303,11 @@
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
       <Filter>Source Files\Engine\Utility\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\memory\Allocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\memory\ArenaAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp">
       <Filter>Source Files\Engine\Utility\Containers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp">
       <Filter>Source Files\Engine\Utility\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Foundation\WorldView.cpp">
-      <Filter>Source Files\Engine\Foundation\Worlds</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp">
       <Filter>Source Files\Engine\Scripting</Filter>
@@ -390,9 +336,6 @@
     <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp">
       <Filter>Source Files\Engine\Utility</Filter>
     </ClCompile>
@@ -414,9 +357,6 @@
     <ClCompile Include="..\src\foundation\Window.cpp">
       <Filter>Source Files\Engine\Foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp">
-      <Filter>Source Files\Engine\Foundation\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\IntrusivePointerBase.cpp">
       <Filter>Source Files\Engine\Utility</Filter>
     </ClCompile>
@@ -429,23 +369,8 @@
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp">
       <Filter>Source Files\Engine\Configuration</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\MessagePackBase.cpp">
-      <Filter>Source Files\Engine\Utility\MessagePack</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\MessagePackWriter.cpp">
-      <Filter>Source Files\Engine\Utility\MessagePack</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\MessagePackReader.cpp">
-      <Filter>Source Files\Engine\Utility\MessagePack</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp">
-      <Filter>Source Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Packages\LoaderThread.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp">
-      <Filter>Source Files\Engine\Foundation\Worlds</Filter>
     </ClCompile>
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp">
       <Filter>Source Files\Engine\Packages</Filter>
@@ -621,6 +546,54 @@
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.cpp">
       <Filter>Source Files\Engine\Filesystem\Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Foundation\World.cpp">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Foundation\WorldView.cpp">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\foundation\Player.cpp">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\foundation\GameEngine.cpp">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\foundation\GameEngineService.cpp">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\memory\Allocator.cpp">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\memory\ArenaAllocator.cpp">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\MessagePackBase.cpp">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\MessagePackReader.cpp">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\MessagePackWriter.cpp">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Build.hpp">
@@ -674,15 +647,6 @@
     <ClInclude Include="..\src\Utility\Memory\ThreadsafeObjectPool.hpp">
       <Filter>Header Files\Engine\Utility\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\Allocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\ArenaAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Alignof.hpp">
       <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
     </ClInclude>
@@ -731,27 +695,6 @@
     <ClInclude Include="..\src\Utility\Containers\ResizableArray.hpp">
       <Filter>Header Files\Engine\Utility\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardListHook.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Linked Lists</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveList.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Linked Lists</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\List.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Linked Lists</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\FlatOrderedMap.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\OrderedMap.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\OrderedSet.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp">
       <Filter>Header Files\Engine\Utility\Math</Filter>
     </ClInclude>
@@ -797,9 +740,6 @@
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp">
       <Filter>Header Files\Engine\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\packages\ContentLibrary.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
     </ClInclude>
@@ -809,9 +749,6 @@
     <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp">
       <Filter>Header Files\Engine\Scheduler</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Linked Lists</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Input\Keyboard.hpp">
       <Filter>Header Files\Engine\Input</Filter>
     </ClInclude>
@@ -820,9 +757,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Input\PlaystationController.hpp">
       <Filter>Header Files\Engine\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Configuration\ConfigurablePODVariable.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
@@ -839,17 +773,8 @@
     <ClInclude Include="..\src\Scripting\ObjectHandle.hpp">
       <Filter>Header Files\Engine\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scheduler\Thread.hpp">
       <Filter>Header Files\Engine\Scheduler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Associative Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Configuration\SimpleConfigurableVariableWithStorage.hpp">
       <Filter>Header Files\Engine\Configuration</Filter>
@@ -896,23 +821,8 @@
     <ClInclude Include="..\src\Utility\Concurrency\WaitableUserEvent.hpp">
       <Filter>Header Files\Engine\Utility\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\MessagePackReader.hpp">
-      <Filter>Header Files\Engine\Utility\MessagePack</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\MessagePackBase.hpp">
-      <Filter>Header Files\Engine\Utility\MessagePack</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\MessagePackWriter.hpp">
-      <Filter>Header Files\Engine\Utility\MessagePack</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.hpp">
-      <Filter>Header Files\Engine\Utility\Containers\Linked Lists</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Packages\LoaderThread.hpp">
       <Filter>Header Files\Engine\Packages</Filter>
@@ -922,9 +832,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\InstanceDeleters.hpp">
       <Filter>Header Files\Engine\Utility\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapterMixin.hpp">
-      <Filter>Header Files\Engine\Utility\Memory\Allocators</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp">
       <Filter>Header Files\Engine\Utility\Math</Filter>
@@ -1121,6 +1028,72 @@
     <ClInclude Include="..\src\Utility\ResultBase.hpp">
       <Filter>Header Files\Engine\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\FlatOrderedMap.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\OrderedMap.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\OrderedSet.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardListHook.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveList.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\List.hpp">
+      <Filter>Header Files\Engine\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\Allocator.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\ArenaAllocator.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapterMixin.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
+      <Filter>Header Files\Engine\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\MessagePackBase.hpp">
+      <Filter>Header Files\Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\MessagePackReader.hpp">
+      <Filter>Header Files\Engine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\MessagePackWriter.hpp">
+      <Filter>Header Files\Engine\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1130,6 +1103,219 @@
   <ItemGroup>
     <None Include="..\resources\Eldritch2.resources.aps">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\Animation\Armature.inl">
+      <Filter>Source Files\Engine\Animation</Filter>
+    </None>
+    <None Include="..\src\Configuration\ConfigurablePODVariable.inl">
+      <Filter>Source Files\Engine\Configuration</Filter>
+    </None>
+    <None Include="..\src\Configuration\ConfigurationDatabase.inl">
+      <Filter>Source Files\Engine\Configuration</Filter>
+    </None>
+    <None Include="..\src\Configuration\INIParser.inl">
+      <Filter>Source Files\Engine\Configuration</Filter>
+    </None>
+    <None Include="..\src\Configuration\SimpleConfigurableVariableWithStorage.inl">
+      <Filter>Source Files\Engine\Configuration</Filter>
+    </None>
+    <None Include="..\src\FileSystem\AsynchronousFileReader.inl">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </None>
+    <None Include="..\src\FileSystem\AsynchronousFileWriter.inl">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </None>
+    <None Include="..\src\FileSystem\ContentProvider.inl">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </None>
+    <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </None>
+    <None Include="..\src\FileSystem\SynchronousFileReader.inl">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </None>
+    <None Include="..\src\FileSystem\SynchronousFileWriter.inl">
+      <Filter>Source Files\Engine\Filesystem</Filter>
+    </None>
+    <None Include="..\src\FileSystem\Win32\ContentProvider.inl">
+      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+    </None>
+    <None Include="..\src\Foundation\GameEngine.inl">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </None>
+    <None Include="..\src\Foundation\GameEngineService.inl">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </None>
+    <None Include="..\src\Foundation\World.inl">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </None>
+    <None Include="..\src\Foundation\WorldView.inl">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </None>
+    <None Include="..\src\Foundation\WorldViewFactoryPublishingInitializationVisitor.inl">
+      <Filter>Source Files\Engine\Foundation</Filter>
+    </None>
+    <None Include="..\src\Packages\ContentLibrary.inl">
+      <Filter>Source Files\Engine\Packages</Filter>
+    </None>
+    <None Include="..\src\Packages\ContentPackage.inl">
+      <Filter>Source Files\Engine\Packages</Filter>
+    </None>
+    <None Include="..\src\Packages\PackageDeserializationContext.inl">
+      <Filter>Source Files\Engine\Packages</Filter>
+    </None>
+    <None Include="..\src\Packages\ResourceView.inl">
+      <Filter>Source Files\Engine\Packages</Filter>
+    </None>
+    <None Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.inl">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </None>
+    <None Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.inl">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </None>
+    <None Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.inl">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </None>
+    <None Include="..\src\Physics\BulletDynamics\EngineService.inl">
+      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+    </None>
+    <None Include="..\src\Scheduler\CRTPTransientTask.inl">
+      <Filter>Source Files\Engine\Scheduler</Filter>
+    </None>
+    <None Include="..\src\Scheduler\Task.inl">
+      <Filter>Source Files\Engine\Scheduler</Filter>
+    </None>
+    <None Include="..\src\Scheduler\WorkerContext.inl">
+      <Filter>Source Files\Engine\Scheduler</Filter>
+    </None>
+    <None Include="..\src\Scripting\ObjectHandle.inl">
+      <Filter>Source Files\Engine\Scripting</Filter>
+    </None>
+    <None Include="..\src\Scripting\ReferenceTypeBase.inl">
+      <Filter>Source Files\Engine\Scripting</Filter>
+    </None>
+    <None Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.inl">
+      <Filter>Source Files\Engine\Scripting</Filter>
+    </None>
+    <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </None>
+    <None Include="..\src\Scripting\AngelScript\EngineService.inl">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </None>
+    <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl">
+      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+    </None>
+    <None Include="..\src\Scripting\AngelScript\Utilities\AngelscriptObjectFactory.inl">
+      <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+    </None>
+    <None Include="..\src\Utility\Algorithms.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\COMPointer.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Counter.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\DisposingResult.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\ErrorCode.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\IdentifierPool.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\MessagePackBase.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\MessagePackReader.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\MessagePackWriter.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Result.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\ResultBase.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\StringOperators.inl">
+      <Filter>Source Files\Engine\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\FlatOrderedMap.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\FlatOrderedSet.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\IntrusiveForwardList.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\IntrusiveList.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\IntrusiveUnorderedSet.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\List.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\OrderedMap.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\OrderedSet.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\Range.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\ResizableArray.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\SpatialHash.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\UnorderedMap.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\UTF8String.inl">
+      <Filter>Source Files\Engine\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Math\StandardLibrary.inl">
+      <Filter>Source Files\Engine\Utility\Math</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\Allocator.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\ArenaAllocator.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\ChildAllocator.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\InstanceDeleters.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\ObjectPool.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\ObjectPoolAllocator.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\StdAllocatorAdapterMixin.inl">
+      <Filter>Source Files\Engine\Utility\Memory</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

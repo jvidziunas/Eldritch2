@@ -17,10 +17,10 @@
 #include <Utility/DisposingResult.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/StringOperators.hpp>
-#include <Packages/ResourceView.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 #include <typeinfo>
+#include <memory>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -30,6 +30,7 @@ namespace Eldritch2 {
 		class	ContentProvider;
 		class	ContentPackage;
 		class	LoaderThread;
+		class	ResourceView;
 	}
 
 	namespace Scheduler {
@@ -38,6 +39,7 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		class	ReaderWriterUserMutex;
+		class	InstanceDeleter;
 	}
 
 	class	ErrorCode;
@@ -162,34 +164,36 @@ namespace FileSystem {
 	// ---
 
 		struct ResourceViewFactory {
-			::Eldritch2::Result<ResourceView> (*factoryFunction)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* );
-			void*	parameter;
+			using FactoryFunctionPointer	= ::std::unique_ptr<FileSystem::ResourceView, Utility::InstanceDeleter> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
+
+			FactoryFunctionPointer	factoryFunction;
+			void*					parameter;
 		};
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator																	_allocator;
-		::Eldritch2::ChildAllocator																	_deserializationContextAllocator;
-		FileSystem::ContentProvider&																_contentProvider;
+		::Eldritch2::ChildAllocator															_allocator;
+		::Eldritch2::ChildAllocator															_deserializationContextAllocator;
+		FileSystem::ContentProvider&														_contentProvider;
 		
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		Utility::ReaderWriterUserMutex*																_contentPackageCollectionMutex;
+		Utility::ReaderWriterUserMutex*														_contentPackageCollectionMutex;
 
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		Utility::ReaderWriterUserMutex*																_resourceViewCollectionMutex;		
+		Utility::ReaderWriterUserMutex*														_resourceViewCollectionMutex;		
 
 		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*,
 								  Utility::StringHash,
-								  Utility::StringEqualComparator<>>									_contentPackageCollection;
+								  Utility::StringEqualComparator<>>							_contentPackageCollection;
 
 		//! The value type is left as a void* to prevent slicing for resource views that use multiple inheritance.
-		::Eldritch2::UnorderedMap<ResourceViewKey, const void*, ResourceViewKey::Hash>				_resourceViewCollection;
+		::Eldritch2::UnorderedMap<ResourceViewKey, const void*, ResourceViewKey::Hash>		_resourceViewCollection;
 
 		::Eldritch2::UnorderedMap<ResourceViewFactoryKey,
 								  ::Eldritch2::ResizableArray<ResourceViewFactory>,
-								  ResourceViewFactoryKey::Hash>										_resourceViewFactoryCollection;
+								  ResourceViewFactoryKey::Hash>								_resourceViewFactoryCollection;
 
-		FileSystem::LoaderThread*																	_loaderThread;
+		FileSystem::LoaderThread*															_loaderThread;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

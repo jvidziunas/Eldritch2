@@ -28,14 +28,14 @@ namespace Direct3D11 {
 
 	public:
 		//! Constructs this @ref ShaderResourceResourceView instance.
-		ShaderResourceResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		ShaderResourceResourceView( const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref ShaderResourceResourceView instance.
 		~ShaderResourceResourceView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes, const Utility::COMPointer<::ID3D11Device>& device );
+		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
 
 	// ---------------------------------------------------
 

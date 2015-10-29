@@ -34,16 +34,12 @@ namespace Eldritch2 {
 		class	TaskScheduler;
 	}
 
-	namespace Utility {
-		template <typename ResultObjectType>
-		struct	Result;
-	}
-
 	namespace System {
 		class	SystemInterface;
 	}
 
 	class	ErrorCode;
+	class	Allocator;
 	template <typename Iterator>
 	class	Range;
 }
@@ -125,8 +121,12 @@ namespace Foundation {
 	// ---
 
 		struct WorldViewFactory {
-			::Eldritch2::ErrorCode (*factoryFunction)( ::Eldritch2::Allocator&, Foundation::World&, void* );
-			void*	userParameter;
+			using FactoryFunctionPointer	= ::Eldritch2::ErrorCode (*)( ::Eldritch2::Allocator&, Foundation::World&, void* );
+
+		// ---------------------------------------------------
+
+			FactoryFunctionPointer	factoryFunction;
+			void*					userParameter;
 		};
 
 	// - DATA MEMBERS ------------------------------------

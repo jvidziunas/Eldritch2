@@ -135,58 +135,6 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
-    <ClCompile Include="..\src\Utility\Assert.cpp" />
-    <ClCompile Include="..\src_shadercompiler\Eldritch2ShaderCompilerInclude.cpp" />
-    <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp" />
-    <ClCompile Include="..\src_shadercompiler\ShaderCompiler.cpp" />
-    <ClCompile Include="..\src\System\SystemInterface.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\Win32DiskSectorAllocator.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
-    <ClCompile Include="..\src\system\Win32SystemInterface.cpp" />
-    <ClCompile Include="..\src\Tools\ContentCooker.cpp" />
-    <ClCompile Include="..\src\Tools\ContentCookerStrategy.cpp" />
-    <ClCompile Include="..\src\Tools\CookerOption.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\OperatorNewOverride.cpp" />
-    <ClCompile Include="..\src_shadercompiler\ShaderCompilerCookerStrategy.cpp" />
-    <ClCompile Include="..\src\Utility\FileReadAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Tools\FileReadStrategyFactory.cpp" />
-    <ClCompile Include="..\src\Utility\FileWriteAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Tools\FileWriteStrategyFactory.cpp" />
-    <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
-    <ClCompile Include="..\src\Utility\Win32FileReadAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Tools\Win32FileStrategyFactory.cpp" />
-    <ClCompile Include="..\src\Utility\Win32FileWriteAccessStrategy.cpp" />
-    <ClCompile Include="..\src\Utility\GBSON\GBSONCommon.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
-    <ClInclude Include="..\src\Utility\Assert.hpp" />
-    <ClInclude Include="..\src_shadercompiler\Eldritch2ShaderCompilerInclude.hpp" />
-    <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
-    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp" />
-    <ClInclude Include="..\src\System\SystemInterface.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\Win32DiskSectorAllocator.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
-    <ClInclude Include="..\src\system\Win32SystemInterface.hpp" />
-    <ClInclude Include="..\src\Tools\ContentCooker.hpp" />
-    <ClInclude Include="..\src\Tools\ContentCookerStrategy.hpp" />
-    <ClInclude Include="..\src\Tools\CookerOption.hpp" />
-    <ClInclude Include="..\src_shadercompiler\ShaderCompilerCookerStrategy.hpp" />
-    <ClInclude Include="..\src\Utility\FileReadAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Tools\FileReadStrategyFactory.hpp" />
-    <ClInclude Include="..\src\Utility\FileWriteAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Tools\FileWriteStrategyFactory.hpp" />
-    <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp" />
-    <ClInclude Include="..\src\Utility\Win32FileReadAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Tools\Win32FileStrategyFactory.hpp" />
-    <ClInclude Include="..\src\Utility\Win32FileWriteAccessStrategy.hpp" />
-    <ClInclude Include="..\src\Utility\GBSON\GBSONCommon.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

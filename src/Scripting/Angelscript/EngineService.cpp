@@ -92,29 +92,17 @@ namespace AngelScript {
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
-		using Initializer		= ResourceView::Initializer;
+		using FactoryResult		= ResourceViewFactoryPublishingInitializationVisitor::FactoryResult;
 
 	// ---
 
 		// Bytecode package
-		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* parameter ) -> Result<ResourceView> {
-			unique_ptr<BytecodePackageResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) BytecodePackageResourceView( initializer, allocator ), { allocator } );
-					
-			// Try to load from the source asset data.
-			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(parameter)->GetScriptEngine() ) ) {
-				return { view.release() };
-			}
-
-			// If we were able to allocate a view, then something was wrong with the source data. If we didn't get that far, the allocator ran out of resources.
-			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
+		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* parameter ) -> FactoryResult {
+			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) BytecodePackageResourceView( static_cast<EngineService*>(parameter)->GetScriptEngine(), name, allocator ), { allocator } };
 		} )
 		// Object graph
-		.PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*parameter*/ ) -> Result<ResourceView> {
-			if( auto* view = new(allocator, AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( initializer, allocator ) ) {
-				return { move( view ) };
-			}
-
-			return { Error::OUT_OF_MEMORY };
+		.PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*parameter*/ ) -> FactoryResult {
+			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( name, allocator ), { allocator } };
 		} );
 	}
 

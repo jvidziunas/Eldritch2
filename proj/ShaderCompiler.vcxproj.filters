@@ -5,179 +5,19 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\Tools Framework">
-      <UniqueIdentifier>{cefc2dd5-5c5e-4a3c-9bda-ef359f130c3d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools Framework\Filesystem">
-      <UniqueIdentifier>{b4712075-517f-4214-99ec-cc79c029bff2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\GBSON">
-      <UniqueIdentifier>{dba69cbe-5b0a-431e-b366-decffb6764f1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Header Files\Tools Framework">
-      <UniqueIdentifier>{5aa0298f-4287-4451-ab06-db369a03e5bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Tools Framework\Filesystem">
-      <UniqueIdentifier>{4c31bedf-08ee-4d74-8e20-fceb6f3059de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\GBSON">
-      <UniqueIdentifier>{1b491804-a1be-4952-8317-1b2b47e5be1a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Assert.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src_shadercompiler\Eldritch2ShaderCompilerInclude.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\ErrorCode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src_shadercompiler\ShaderCompiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\System\SystemInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Win32DiskSectorAllocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\system\Win32SystemInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\ContentCooker.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\ContentCookerStrategy.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\CookerOption.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\OperatorNewOverride.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src_shadercompiler\ShaderCompilerCookerStrategy.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\FileReadAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\FileReadStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\FileWriteAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\FileWriteStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32FileReadAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\Win32FileStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32FileWriteAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\GBSON\GBSONCommon.cpp">
-      <Filter>Source Files\GBSON</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Assert.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src_shadercompiler\Eldritch2ShaderCompilerInclude.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\ErrorCode.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\System\SystemInterface.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Win32DiskSectorAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\system\Win32SystemInterface.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\ContentCooker.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\ContentCookerStrategy.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\CookerOption.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src_shadercompiler\ShaderCompilerCookerStrategy.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\FileReadAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\FileReadStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\FileWriteAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\FileWriteStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32FileReadAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\Win32FileStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32FileWriteAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\GBSON\GBSONCommon.hpp">
-      <Filter>Header Files\GBSON</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <Filter Include="Header Files\FileSystem">
+      <UniqueIdentifier>{e493977c-c3f2-4bee-be76-d433f7cf0cf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{6e4dc903-1bee-4980-868f-c9f165c55543}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

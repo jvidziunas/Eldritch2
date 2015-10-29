@@ -16,16 +16,29 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+	class	Allocator;
+	template <typename Iterator>
+	class	Range;
+}
+
+namespace Eldritch2 {
 namespace Tools {
 
 	class Tool {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+	public:
+		//!	Constructs this @ref Tool instance.
+		/*!	@param[in] allocator @ref Allocator the new @ref Tool should use to perform internal allocations.
+			*/
+		Tool( ::Eldritch2::Allocator& allocator );
+
+		~Tool() = default;
+
+	// ---------------------------------------------------
+	
+		int	Run( ::Eldritch2::Range<::Eldritch2::SystemChar**> arguments );
 	};
-
-	template <typename Tool, class Allocator>
-	int	ExecuteTool( Allocator&& allocator, int argc, SystemChar** argv );
 
 }	// namespace Tools
 }	// namespace Eldritch2
-
-#include <Tools/Tool.inl>

@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Angelscript/ObjectGraphResourceView.hpp>
+#include <Utility/Containers/Range.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #include <angelscript.h>
@@ -26,7 +27,7 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	ObjectGraphResourceView::ObjectGraphResourceView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ) {}
+	ObjectGraphResourceView::ObjectGraphResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ) {}
 
 // ---------------------------------------------------
 
@@ -38,6 +39,12 @@ namespace AngelScript {
 
 	ETNoAliasHint const UTF8Char* const ObjectGraphResourceView::GetSerializedDataTag() {
 		return UTF8L("AngelscriptObjectGraph");
+	}
+
+// ---------------------------------------------------
+
+	ErrorCode ObjectGraphResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
+		return Error::NONE;
 	}
 
 }	// namespace AngelScript

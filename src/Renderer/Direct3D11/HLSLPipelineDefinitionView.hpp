@@ -32,22 +32,18 @@ namespace Direct3D11 {
 
 	public:
 		//! Constructs this @ref HLSLPipelineDefinitionView instance.
-		HLSLPipelineDefinitionView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		HLSLPipelineDefinitionView( const Utility::COMPointer<::ID3D11Device>& device, const::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref HLSLPipelineDefinitionView instance.
 		~HLSLPipelineDefinitionView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes, const Utility::COMPointer<::ID3D11Device>& device );
+		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
 
 	// ---------------------------------------------------
 
 		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
-
-	// ---------------------------------------------------
-
-		bool	PrepareContext( ::ID3D11DeviceContext* const deviceContext, const ::Eldritch2::UTF8Char* const usageName ) const;
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -68,7 +64,7 @@ namespace Direct3D11 {
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, UsageDefinition, Utility::StringHash, Utility::StringEqualComparator<>>	_usages;
+		Utility::COMPointer<::ID3D11Device>	_device;
 	};
 
 }	// namespace Direct3D11

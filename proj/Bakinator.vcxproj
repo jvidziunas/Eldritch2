@@ -17,6 +17,9 @@
   <ItemGroup>
     <ClCompile Include="..\src\FileSystem\ReadableMemoryMappedFile.cpp" />
     <ClCompile Include="..\src\Tools\Tool.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="..\src\Utility\MessagePackBase.cpp" />
     <ClCompile Include="..\src\Utility\MessagePackWriter.cpp" />
     <ClCompile Include="..\src_Bakinator\Bakinator.cpp" />
@@ -24,6 +27,10 @@
   <ItemGroup>
     <ClInclude Include="..\src\FileSystem\ReadableMemoryMappedFile.hpp" />
     <ClInclude Include="..\src\Tools\Tool.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\InstanceDeleters.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
     <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Alignof.hpp" />
@@ -92,7 +99,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
       <Command>
-</Command>
+      </Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -119,7 +126,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
       <Command>
-</Command>
+      </Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -151,7 +158,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
     <PreBuildEvent>
       <Command>
-</Command>
+      </Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>

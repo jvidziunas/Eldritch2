@@ -22,9 +22,9 @@ namespace Eldritch2 {
 namespace Physics {
 namespace BulletDynamics {
 
-	CollisionShapeResourceView::CollisionShapeResourceView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ),
-																													 _shapeAllocator( allocator, UTF8L("Bullet Collision Shape Allocator") ),
-																													 _shapes( { allocator, UTF8L("Bullet Collision Shape View Subshape Collection Allocator") } ) {}
+	CollisionShapeResourceView::CollisionShapeResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ),
+																												 _shapeAllocator( allocator, UTF8L("Bullet Collision Shape Allocator") ),
+																												 _shapes( { allocator, UTF8L("Bullet Collision Shape View Subshape Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -42,7 +42,7 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	ErrorCode CollisionShapeResourceView::InstantiateFromByteArray( const Range<const char*>& /*sourceBytes*/ ) {
+	ErrorCode CollisionShapeResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
 		return Error::NONE;
 	}
 

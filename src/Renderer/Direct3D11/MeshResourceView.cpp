@@ -35,7 +35,13 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	MeshResourceView::MeshResourceView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _submeshes( { allocator, UTF8L("Direct3D11 Mesh View Submesh Allocator") } ) {}
+	MeshResourceView::MeshResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ), _submeshes( { allocator, UTF8L("Direct3D11 Mesh View Submesh Allocator") } ) {}
+
+// ---------------------------------------------------
+
+	ErrorCode MeshResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
+		return Error::OPERATION_NOT_SUPPORTED;
+	}
 
 // ---------------------------------------------------
 

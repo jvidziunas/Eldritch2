@@ -47,19 +47,13 @@ namespace BulletDynamics {
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
-		using Initializer		= ResourceView::Initializer;
+		using FactoryResult		= ResourceViewFactoryPublishingInitializationVisitor::FactoryResult;
 
 	// ---
 
 		// Collision shape view.
-		visitor.PublishFactory( CollisionShapeResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*engine*/ ) -> Result<ResourceView> {
-			unique_ptr<CollisionShapeResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) CollisionShapeResourceView( initializer, allocator ), { allocator } );
-
-			if( view && view->InstantiateFromByteArray( initializer.serializedAsset ) ) {
-				return { view.release() };
-			}
-
-			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
+		visitor.PublishFactory( CollisionShapeResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*engine*/ ) -> FactoryResult {
+			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) CollisionShapeResourceView( name, allocator ), { allocator } };
 		} );
 	}
 
@@ -82,10 +76,10 @@ namespace BulletDynamics {
 
 	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
 		// Reserve a little extra slack here for the aligned allocation.
-		visitor.PublishFactory( this, sizeof(WorldView) + (alignof(WorldView) - 1u), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
+		visitor.PublishFactory( this, sizeof(WorldView) + (alignof(WorldView) - 1u), [] ( Allocator& allocator, World& world, void* engine ) -> ErrorCode {
 			// Important to use aligned allocation. Visual Studio uses a movaps instruction for the compiler-generated btVector3::operator=() method, and it's quite common for
 			// one of the vectors to end up on an unaligned boundary.
-			return new(allocator, alignof(WorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(parameter) ) ? Error::NONE : Error::OUT_OF_MEMORY;
+			return new(allocator, alignof(WorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(engine) ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 

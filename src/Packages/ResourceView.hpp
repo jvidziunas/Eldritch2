@@ -14,22 +14,23 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
 #include <Utility/Containers/UTF8String.hpp>
-#include <Utility/Containers/Range.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 {
+	class	ErrorCode;
+	template <typename Iterator>
+	class	Range;
+}
 
 namespace Eldritch2 {
 namespace FileSystem {
 
 	class ETPureAbstractHint ResourceView : public Utility::Noncopyable, public ::Eldritch2::IntrusiveForwardListBaseHook {
-	// - TYPE PUBLISHING ---------------------------------
+	// ---------------------------------------------------
 
 	public:
-		struct Initializer {
-			::Eldritch2::Range<const ::Eldritch2::UTF8Char*>	name;
-			::Eldritch2::Range<const ::Eldritch2::UTF8Char*>	typeName;
-			::Eldritch2::Range<const char*>						serializedAsset;
-		};
+		virtual ::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) abstract;
 
 	// ---------------------------------------------------
 
@@ -44,11 +45,11 @@ namespace FileSystem {
 
 	protected:
 		//! Constructs this @ref ResourceView instance.
-		/*! @param[in] initializer @ref Initializer instance the @ResourceView should use to construct its members.
+		/*! @param[in] name Null-terminated C string containing the name of the resource the @ref ResourceView will be describing.
 			@param[in] nameAllocator The @ref Allocator that the @ref ResourceView should use to allocate memory for the internal name copy.
 			@remarks Designed to be called only from subclasses.
 			*/
-		ResourceView( const Initializer& initializer, ::Eldritch2::Allocator& nameAllocator );
+		ResourceView( const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& nameAllocator );
 
 	public:
 		//! Destroys this @ref ResourceView instance.

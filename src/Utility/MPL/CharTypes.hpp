@@ -24,9 +24,9 @@
 
 namespace Eldritch2 {
 
-	using UTF8Char	= char;
-	using UTF16Char	= char16_t;
-	using UTF32Char	= char32_t;
+	using UTF8Char		= char;
+	using UTF16Char		= char16_t;
+	using UTF32Char		= char32_t;
 
 #if( ET_BUILD_UNICODE )
 	using SystemChar	= wchar_t;

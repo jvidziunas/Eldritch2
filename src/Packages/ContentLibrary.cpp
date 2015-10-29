@@ -20,6 +20,7 @@
 #include <Scheduler/TaskScheduler.hpp>
 #include <Utility/DisposingResult.hpp>
 #include <Packages/LoaderThread.hpp>
+#include <Packages/ResourceView.hpp>
 #include <Utility/Result.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
@@ -126,25 +127,29 @@ namespace FileSystem {
 				return dereferenceResult.resultCode;
 			}
 
-			ErrorCode AddContent( const ResourceView::Initializer& sourceAssetData ) override sealed {
+			ErrorCode AddContent( const UTF8Char* const name, const UTF8Char* const typeName, const Range<const char*> data ) override sealed {
 				auto&		factoryLibrary( GetLibrary()._resourceViewFactoryCollection );
-				const auto	findFactoriesResult( factoryLibrary.Find( { sourceAssetData.name.first, sourceAssetData.name.onePastLast } ) );
+				const auto	findFactoriesResult( factoryLibrary.Find( { typeName, FindEndOfString( typeName ) } ) );
 				ErrorCode	result( Error::NONE );
 
 				if( findFactoriesResult != factoryLibrary.End() ) {
-					// Caching these.
 					auto&	viewCollection( GetLibrary()._resourceViewCollection );
 					auto&	viewMutex( *GetLibrary()._resourceViewCollectionMutex );
 					auto&	resourceAllocator( GetAllocator() );
 
 					// Loop through all the resource view factories...
 					for( const auto& factory : findFactoriesResult->second ) {
-						// ... attempting to 
-						if( const auto createResourceResult = factory.factoryFunction( resourceAllocator, sourceAssetData, factory.parameter ) ) {
+						// ... attempting to create their respective resources...
+						auto	createResourceResult( factory.factoryFunction( resourceAllocator, name, factory.parameter ) );
+
+						if( createResourceResult && createResourceResult->UpdateFromByteStream( data ) ) {
+							// ... and publishing them to the content library.
 							ScopedLock	_( viewMutex );
-							viewCollection.Insert( { { *createResourceResult.object }, createResourceResult.object } );
+							auto&		resource( *createResourceResult.release() );
+
+							viewCollection.Insert( { { resource }, &resource } );
 						} else {
-							result = createResourceResult.resultCode;
+							result = Error::INVALID_PARAMETER;
 							break;
 						}
 					}
@@ -223,7 +228,7 @@ namespace FileSystem {
 				return dereferenceResult.resultCode;
 			}
 
-			ErrorCode AddContent( const ResourceView::Initializer& /*sourceAssetData*/ ) override sealed {
+			ErrorCode AddContent( const UTF8Char* const /*name*/, const UTF8Char* const /*typeName*/, const Range<const char*> /*data*/ ) override sealed {
 				return Error::OPERATION_NOT_SUPPORTED;
 			}
 

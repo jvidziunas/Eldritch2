@@ -5,194 +5,53 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\Metadata">
-      <UniqueIdentifier>{62bff116-e8d4-4e1d-bbe3-69f565e1d1dd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Angelscript">
       <UniqueIdentifier>{d5440433-32fa-4ce7-85d7-46200e0aa3bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools Framework">
-      <UniqueIdentifier>{519ea65e-adcb-453a-b67f-435d328595f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools Framework\Filesystem">
-      <UniqueIdentifier>{37ea8fe8-9e80-4676-855f-e089f1217e44}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\Metadata">
-      <UniqueIdentifier>{f8012113-c8f4-4ece-b31e-1f8b661b3bc3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Angelscript">
       <UniqueIdentifier>{faae1eb6-11f7-421e-a985-a0b0196bd4b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Tools Framework">
-      <UniqueIdentifier>{12c0d499-85a9-4994-b204-51c47f9d283c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Tools Framework\Filesystem">
-      <UniqueIdentifier>{891cab54-4d0b-418d-9ffb-b983f5b07825}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Header Files\FileSystem">
+      <UniqueIdentifier>{db9afb83-085f-4000-936f-09670be46076}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileSystem">
+      <UniqueIdentifier>{0f5b2e9e-6c8f-469c-8524-929aaab3bd9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{c2ed2d49-1fe2-4f2f-9fa1-76e977c33432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\MPL">
+      <UniqueIdentifier>{001ca217-54c2-4301-bcbc-ee3794f3164f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Utility\Assert.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src_scriptcompiler\ScriptCompiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\ScriptClassMetadata.cpp">
-      <Filter>Source Files\Metadata</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\ScriptMethodMetadata.cpp">
-      <Filter>Source Files\Metadata</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\ScriptModuleMetadata.cpp">
-      <Filter>Source Files\Metadata</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scripting\ScriptPropertyMetadata.cpp">
-      <Filter>Source Files\Metadata</Filter>
-    </ClCompile>
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp">
       <Filter>Source Files\Angelscript</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\ContentCooker.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\ContentCookerStrategy.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\OperatorNewOverride.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src_scriptcompiler\ScriptCompilerCookerStrategy.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\System\SystemInterface.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Win32DiskSectorAllocator.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\system\Win32SystemInterface.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\FileReadAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\FileReadStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\FileWriteAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\FileWriteStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32FileReadAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\Win32FileStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32FileWriteAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Utility\Assert.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\ScriptClassMetadata.hpp">
-      <Filter>Header Files\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\ScriptMethodMetadata.hpp">
-      <Filter>Header Files\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\ScriptModuleMetadata.hpp">
-      <Filter>Header Files\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\ScriptPropertyMetadata.hpp">
-      <Filter>Header Files\Metadata</Filter>
-    </ClInclude>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h">
       <Filter>Header Files\Angelscript</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
+    <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp">
+      <Filter>Header Files\Utility\MPL</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Tools\ContentCooker.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
+    <ClInclude Include="..\src\Utility\MPL\Compiler.hpp">
+      <Filter>Header Files\Utility\MPL</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Tools\ContentCookerStrategy.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
+    <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp">
+      <Filter>Header Files\Utility\MPL</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\ErrorCode.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src_scriptcompiler\ScriptCompilerCookerStrategy.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\System\SystemInterface.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Win32DiskSectorAllocator.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\system\Win32SystemInterface.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\FileReadAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\FileReadStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\FileWriteAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\FileWriteStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32FileReadAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\Win32FileStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32FileWriteAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
+    <ClInclude Include="..\src\Utility\MPL\Platform.hpp">
+      <Filter>Header Files\Utility\MPL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

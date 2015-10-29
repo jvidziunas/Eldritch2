@@ -50,6 +50,7 @@ ET_LINK_LIBRARY( "dbghelp.lib" )
 //------------------------------------------------------------------//
 
 namespace {
+
 	using namespace ::Eldritch2;
 
 	class Application : public Win32GlobalHeapAllocator,
@@ -57,6 +58,8 @@ namespace {
 						public Scheduler::Win32::TaskScheduler,
 						public FileSystem::Win32::ContentProvider,
 						public Foundation::GameEngine {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 	public:
 		//!	Constructs this @ref Application instance.
 		Application() : Win32GlobalHeapAllocator( UTF8L("Root Allocator") ),
@@ -99,8 +102,9 @@ namespace {
 			return static_cast<Foundation::GameEngine&>(*this);
 		}
 
-	// ---------------------------------------------------
+	// - DATA MEMBERS ------------------------------------
 
+	private:
 		Configuration::EngineService			_configurationService;
 		Input::XInput::EngineService			_XInputService;
 		Input::Win32::EngineService				_inputService;

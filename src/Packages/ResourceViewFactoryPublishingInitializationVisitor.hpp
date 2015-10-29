@@ -12,18 +12,16 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/memory/InstanceDeleters.hpp>
 #include <Packages/ResourceView.hpp>
 #include <Utility/Result.hpp>
+//------------------------------------------------------------------//
+#include <memory>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace FileSystem {
 		class	ContentLibrary;
-	}
-
-	namespace Utility {
-		template <typename ResultObjectType>
-		struct	Result;
 	}
 }
 
@@ -31,9 +29,12 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	class ResourceViewFactoryPublishingInitializationVisitor {
+	public:
+		using FactoryResult				= ::std::unique_ptr<FileSystem::ResourceView, Utility::InstanceDeleter>;
+		using FactoryFunctionPointer	= FactoryResult (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
 		//!	Constructs this @ref ResourceViewFactoryPublishingInitializationVisitor instance.
 		/*!	@param[in] contentLibrary The @ref ContentLibrary to which resource view factories will be registered.
 			*/
@@ -50,7 +51,7 @@ namespace FileSystem {
 			@param[in] factory Factory function. This should attempt to allocate a new instance of a @ref ResourceView subclass and return it in the Result for the function.
 			@returns A reference to *this for method chaining.
 			*/
-		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, ::Eldritch2::Result<FileSystem::ResourceView> (*factory)( ::Eldritch2::Allocator&, const FileSystem::ResourceView::Initializer&, void* ) );
+		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, FactoryFunctionPointer factory );
 		
 	// - DATA MEMBERS ------------------------------------
 

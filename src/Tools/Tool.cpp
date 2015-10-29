@@ -12,11 +12,22 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/Range.hpp>
 #include <Tools/Tool.hpp>
 //------------------------------------------------------------------//
 
+using namespace ::Eldritch2;
+
 namespace Eldritch2 {
 namespace Tools {
+
+	Tool::Tool( Allocator& /*allocator*/ ) {}
+
+// ---------------------------------------------------
+
+	int Tool::Run( ::Eldritch2::Range<SystemChar**> /*arguments*/ ) {
+		return 0;
+	}
 
 }	// namespace Tools
 }	// namespace Eldritch2

@@ -12,30 +12,12 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#define BOOST_ERROR_CODE_HEADER_ONLY
-#include <boost/system/error_code.hpp>
-#include <TextureCompressorCookerStrategy.hpp>
-#include <Tools/Win32FileStrategyFactory.hpp>
-#include <Tools/ContentCooker.hpp>
-#include <Utility/Memory/Win32DiskSectorAllocator.hpp>
-#include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <Utility/ErrorCode.hpp>
-#include <tchar.h>
+
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
 using namespace ::Eldritch2::Tools;
+using namespace ::Eldritch2;
 
-int _tmain( int argc, TCHAR* argv[] )
-{
-	Win32DiskSectorAllocator	fileAllocator;
-	Win32HeapAllocator			allocator;
-	Win32FileStrategyFactory	fileStrategyFactory( allocator, fileAllocator );
+int _tmain( int argc, TCHAR* argv[] ) {
 
-	InstallGlobalAllocator(	allocator );
-
-	return ContentCooker<TextureCompressorCookerStrategy>().BeginCook( argv,
-																	   argv + argc,
-																	   fileStrategyFactory,
-																	   fileStrategyFactory ).ToInt();
 }

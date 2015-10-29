@@ -31,14 +31,14 @@ namespace BulletDynamics {
 
 	public:
 		//! Constructs this @ref CollisionShapeResourceView instance.
-		CollisionShapeResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		CollisionShapeResourceView( const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref CollisionShapeResourceView instance.
 		~CollisionShapeResourceView();
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes );
+		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
 
 	// ---------------------------------------------------
 

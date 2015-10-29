@@ -5,27 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\Tools Framework">
-      <UniqueIdentifier>{ff7dc658-2aba-41bf-a603-27849d0435b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools Framework\Filesystem">
-      <UniqueIdentifier>{c2fa3f52-1036-407c-969b-b9ae49c85254}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools Framework\Memory Allocation">
-      <UniqueIdentifier>{af169dcb-3b9b-48d7-9925-993c8ccb578d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Header Files\Tools Framework">
-      <UniqueIdentifier>{a9bd2df9-cf92-46b7-a943-236e1829a72d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Tools Framework\Filesystem">
-      <UniqueIdentifier>{3fd4200e-2452-43bc-a266-5c3e98d6e035}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Tools Framework\Memory Allocation">
-      <UniqueIdentifier>{987b93d8-756f-4d69-a4c4-c960290f6b34}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
@@ -33,136 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src_texturecompressor\NVTTStandardOutputHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src_texturecompressor\TextureCompressor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Assert.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\ContentCooker.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\ContentCookerStrategy.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\ErrorCode.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\System\SystemInterface.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src_texturecompressor\TextureCompressorCookerStrategy.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\system\Win32SystemInterface.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\FileReadAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\FileReadStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\FileWriteAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\FileWriteStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32FileReadAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Tools\Win32FileStrategyFactory.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Win32FileWriteAccessStrategy.cpp">
-      <Filter>Source Files\Tools Framework\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Allocator.cpp">
-      <Filter>Source Files\Tools Framework\Memory Allocation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
-      <Filter>Source Files\Tools Framework\Memory Allocation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Win32DiskSectorAllocator.cpp">
-      <Filter>Source Files\Tools Framework\Memory Allocation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp">
-      <Filter>Source Files\Tools Framework\Memory Allocation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
-      <Filter>Source Files\Tools Framework</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src_texturecompressor\NVTTStandardOutputHandler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Assert.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\ContentCooker.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\ContentCookerStrategy.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\ErrorCode.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\System\SystemInterface.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src_texturecompressor\TextureCompressorCookerStrategy.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\system\Win32SystemInterface.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\FileReadAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\FileReadStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\FileWriteAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\FileWriteStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32FileReadAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\Win32FileStrategyFactory.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Win32FileWriteAccessStrategy.hpp">
-      <Filter>Header Files\Tools Framework\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Allocator.hpp">
-      <Filter>Header Files\Tools Framework\Memory Allocation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\ObjectPool.hpp">
-      <Filter>Header Files\Tools Framework\Memory Allocation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Win32DiskSectorAllocator.hpp">
-      <Filter>Header Files\Tools Framework\Memory Allocation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
-      <Filter>Header Files\Tools Framework\Memory Allocation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\memory\StandardLibrary.hpp">
-      <Filter>Header Files\Tools Framework</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

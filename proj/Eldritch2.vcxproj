@@ -76,7 +76,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
-      <Command>call "$(SolutionDir)Prebuild.bat"</Command>
+      <Command>call "$(SolutionDir)Prebuild.bat" "$(SolutionDir)"</Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -126,8 +126,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>call "$(SolutionDir)Prebuild.bat" "$(SolutionDir)"</Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -184,8 +183,7 @@ call "deploy.x64.bat"
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>call "$(SolutionDir)Prebuild.bat" "$(SolutionDir)"</Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -533,6 +531,77 @@ call "deploy.x64.bat"
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\Eldritch2.resources.aps" />
+    <None Include="..\src\Animation\Armature.inl" />
+    <None Include="..\src\Configuration\ConfigurablePODVariable.inl" />
+    <None Include="..\src\Configuration\ConfigurationDatabase.inl" />
+    <None Include="..\src\Configuration\INIParser.inl" />
+    <None Include="..\src\Configuration\SimpleConfigurableVariableWithStorage.inl" />
+    <None Include="..\src\FileSystem\AsynchronousFileReader.inl" />
+    <None Include="..\src\FileSystem\AsynchronousFileWriter.inl" />
+    <None Include="..\src\FileSystem\ContentProvider.inl" />
+    <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl" />
+    <None Include="..\src\FileSystem\SynchronousFileReader.inl" />
+    <None Include="..\src\FileSystem\SynchronousFileWriter.inl" />
+    <None Include="..\src\FileSystem\Win32\ContentProvider.inl" />
+    <None Include="..\src\Foundation\GameEngine.inl" />
+    <None Include="..\src\Foundation\GameEngineService.inl" />
+    <None Include="..\src\Foundation\World.inl" />
+    <None Include="..\src\Foundation\WorldView.inl" />
+    <None Include="..\src\Foundation\WorldViewFactoryPublishingInitializationVisitor.inl" />
+    <None Include="..\src\Packages\ContentLibrary.inl" />
+    <None Include="..\src\Packages\ContentPackage.inl" />
+    <None Include="..\src\Packages\PackageDeserializationContext.inl" />
+    <None Include="..\src\Packages\ResourceView.inl" />
+    <None Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.inl" />
+    <None Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.inl" />
+    <None Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.inl" />
+    <None Include="..\src\Physics\BulletDynamics\EngineService.inl" />
+    <None Include="..\src\Scheduler\CRTPTransientTask.inl" />
+    <None Include="..\src\Scheduler\Task.inl" />
+    <None Include="..\src\Scheduler\WorkerContext.inl" />
+    <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl" />
+    <None Include="..\src\Scripting\AngelScript\EngineService.inl" />
+    <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl" />
+    <None Include="..\src\Scripting\AngelScript\Utilities\AngelscriptObjectFactory.inl" />
+    <None Include="..\src\Scripting\ObjectHandle.inl" />
+    <None Include="..\src\Scripting\ReferenceTypeBase.inl" />
+    <None Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.inl" />
+    <None Include="..\src\Utility\Algorithms.inl" />
+    <None Include="..\src\Utility\COMPointer.inl" />
+    <None Include="..\src\Utility\Containers\FlatOrderedMap.inl" />
+    <None Include="..\src\Utility\Containers\FlatOrderedSet.inl" />
+    <None Include="..\src\Utility\Containers\IntrusiveForwardList.inl" />
+    <None Include="..\src\Utility\Containers\IntrusiveList.inl" />
+    <None Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.inl" />
+    <None Include="..\src\Utility\Containers\IntrusiveUnorderedSet.inl" />
+    <None Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.inl" />
+    <None Include="..\src\Utility\Containers\List.inl" />
+    <None Include="..\src\Utility\Containers\OrderedMap.inl" />
+    <None Include="..\src\Utility\Containers\OrderedSet.inl" />
+    <None Include="..\src\Utility\Containers\Range.inl" />
+    <None Include="..\src\Utility\Containers\ResizableArray.inl" />
+    <None Include="..\src\Utility\Containers\SpatialHash.inl" />
+    <None Include="..\src\Utility\Containers\UnorderedMap.inl" />
+    <None Include="..\src\Utility\Containers\UTF8String.inl" />
+    <None Include="..\src\Utility\Counter.inl" />
+    <None Include="..\src\Utility\DisposingResult.inl" />
+    <None Include="..\src\Utility\ErrorCode.inl" />
+    <None Include="..\src\Utility\IdentifierPool.inl" />
+    <None Include="..\src\Utility\Math\StandardLibrary.inl" />
+    <None Include="..\src\Utility\Memory\Allocator.inl" />
+    <None Include="..\src\Utility\Memory\ArenaAllocator.inl" />
+    <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
+    <None Include="..\src\Utility\Memory\InstanceDeleters.inl" />
+    <None Include="..\src\Utility\Memory\ObjectPool.inl" />
+    <None Include="..\src\Utility\Memory\ObjectPoolAllocator.inl" />
+    <None Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.inl" />
+    <None Include="..\src\Utility\Memory\StdAllocatorAdapterMixin.inl" />
+    <None Include="..\src\Utility\MessagePackBase.inl" />
+    <None Include="..\src\Utility\MessagePackReader.inl" />
+    <None Include="..\src\Utility\MessagePackWriter.inl" />
+    <None Include="..\src\Utility\Result.inl" />
+    <None Include="..\src\Utility\ResultBase.inl" />
+    <None Include="..\src\Utility\StringOperators.inl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\resources\Eldritch2.Resources.rc" />

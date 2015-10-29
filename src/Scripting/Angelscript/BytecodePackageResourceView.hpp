@@ -34,14 +34,14 @@ namespace AngelScript {
 
 	public:
 		//! Constructs this @ref BytecodePackageResourceView instance.
-		BytecodePackageResourceView( const Initializer& initializer, ::Eldritch2::Allocator& allocator );
+		BytecodePackageResourceView( ::asIScriptEngine& engine, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref BytecodePackageResourceView instance.
 		~BytecodePackageResourceView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	InstantiateFromByteArray( const ::Eldritch2::Range<const char*>& sourceBytes, ::asIScriptEngine& engine );
+		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
 
 	// ---------------------------------------------------
 

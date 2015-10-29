@@ -52,7 +52,7 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		//!	Adds the specified package to the list 
+		//!	Adds the specified package to the list of additional content the @ref ContentPackage needs to be resident.
 		/*!	@param[in] dependencyName @parblock Null-terminated C string containing the name of the package file to add to this @ref ContentPackage instance's dependencies.
 				There are no lifetime restrictions on the pointer/memory past this function call. @endparblock
 			@returns @ref ::Eldritch2::Error::NONE if the dependency was registered successfully, or an @ref ErrorCode describing why a failure occurred.
@@ -60,7 +60,7 @@ namespace FileSystem {
 			*/
 		virtual ::Eldritch2::ErrorCode	AddDependency( const ::Eldritch2::UTF8Char* const dependencyName ) abstract;
 
-		virtual ::Eldritch2::ErrorCode	AddContent( const FileSystem::ResourceView::Initializer& sourceAssetData ) abstract;
+		virtual ::Eldritch2::ErrorCode	AddContent( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const typeName, const ::Eldritch2::Range<const char*> data ) abstract;
 
 	// ---------------------------------------------------
 

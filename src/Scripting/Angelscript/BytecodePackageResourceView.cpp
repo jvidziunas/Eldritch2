@@ -39,7 +39,9 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	BytecodePackageResourceView::BytecodePackageResourceView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _metadata( allocator ) {}
+	BytecodePackageResourceView::BytecodePackageResourceView( ::asIScriptEngine& engine, const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ),
+																																			  _module( engine.GetModule( GetName().GetCharacterArray(), ::asGM_CREATE_IF_NOT_EXISTS ) ),
+																																			  _metadata( allocator ) {}
 
 // ---------------------------------------------------
 
@@ -49,7 +51,7 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	ErrorCode BytecodePackageResourceView::InstantiateFromByteArray( const Range<const char*>& sourceBytes, ::asIScriptEngine& engine ) {
+	ErrorCode BytecodePackageResourceView::UpdateFromByteStream( const Range<const char*> bytes ) {
 		struct Reader : public ::asIBinaryStream {
 			ETInlineHint Reader( const Range<const char*>& sourceData ) : remainingData( sourceData ) {}
 
@@ -70,15 +72,9 @@ namespace AngelScript {
 
 	// ---
 
-		decltype(_module)	newModule( engine.GetModule( GetName().GetCharacterArray(), ::asGM_CREATE_IF_NOT_EXISTS ) );
-		Reader				reader( sourceBytes );
+		Reader	reader( bytes );
 
-		if( newModule && newModule->LoadByteCode( &reader ) && MessagePackReader( reader.remainingData )( _metadata ) && _metadata.BindToModule( *newModule ) ) {
-			_module = move( newModule );
-			return Error::NONE;
-		}
-
-		return Error::INVALID_PARAMETER;
+		return _module->LoadByteCode( &reader ) && MessagePackReader( reader.remainingData )(_metadata) && _metadata.BindToModule( *_module ) ? Error::NONE : Error::INVALID_PARAMETER;
 	}
 
 }	// namespace AngelScript

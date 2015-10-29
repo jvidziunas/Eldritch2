@@ -46,31 +46,19 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	HLSLPipelineDefinitionView::HLSLPipelineDefinitionView( const Initializer& initializer, Allocator& allocator ) : ResourceView( initializer, allocator ), _usages( { allocator, UTF8L("Direct3D11 Pipeline Definition Usage Directory Allocator") } ) {}
+	HLSLPipelineDefinitionView::HLSLPipelineDefinitionView( const COMPointer<::ID3D11Device>& device, const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ),
+																																						   _device( device ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode HLSLPipelineDefinitionView::InstantiateFromByteArray( const Range<const char*>& /*sourceBytes*/, const COMPointer<::ID3D11Device>& /*device*/ ) {
-		return Error::NONE;
+	ErrorCode HLSLPipelineDefinitionView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
+		return Error::OPERATION_NOT_SUPPORTED;
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint const UTF8Char* const HLSLPipelineDefinitionView::GetSerializedDataTag() {
 		return UTF8L("HLSLPipelineDefinition");
-	}
-
-// ---------------------------------------------------
-
-	bool HLSLPipelineDefinitionView::PrepareContext( ::ID3D11DeviceContext* const deviceContext, const UTF8Char* const usageName ) const {
-		const auto	usageCandidate( _usages.Find( usageName ) );
-
-		if( usageCandidate != _usages.End() ) {
-			usageCandidate->second.PrepareContext( deviceContext );
-			return true;
-		}
-
-		return false;
 	}
 
 }	// namespace Direct3D11

@@ -153,49 +153,28 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( this, sizeof( WorldView ), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(renderer)->_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
+	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
+		using AllocationOption	= Allocator::AllocationOption;
+		using FactoryResult		= ResourceViewFactoryPublishingInitializationVisitor::FactoryResult;
+
+	// ---
+
+		visitor.PublishFactory( MeshResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) -> FactoryResult {
+			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) MeshResourceView( name, allocator ), { allocator } };
+		} )
+		.PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* renderer ) -> FactoryResult {
+			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) HLSLPipelineDefinitionView( static_cast<EngineService*>(renderer)->_device, name, allocator ), { allocator } };
+		} )
+		.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) -> FactoryResult {
+			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( name, allocator ), { allocator } };
 		} );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		using AllocationOption	= Allocator::AllocationOption;
-		using Initializer		= ResourceView::Initializer;
-
-	// ---
-
-		// Mesh view.
-		visitor.PublishFactory( MeshResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* /*renderer*/ ) -> Result<ResourceView> {
-			unique_ptr<MeshResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) MeshResourceView( initializer, allocator ), { allocator } );
-
-			if( view ) {
-				return { view.release() };
-			}
-
-			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
-		} )
-		// HLSL Pipeline Definition view.
-		.PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* renderer ) -> Result<ResourceView> {
-			unique_ptr<HLSLPipelineDefinitionView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) HLSLPipelineDefinitionView( initializer, allocator ), { allocator } );
-
-			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(renderer)->_device ) ) {
-				return { view.release() };
-			}
-
-			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
-		} )
-		// Shader resource view.
-		.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const Initializer& initializer, void* renderer ) -> Result<ResourceView> {
-			unique_ptr<ShaderResourceResourceView, InstanceDeleter>	view( new(allocator, AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( initializer, allocator ), { allocator } );
-
-			if( view && view->InstantiateFromByteArray( initializer.serializedAsset, static_cast<EngineService*>(renderer)->_device ) ) {
-				return { view.release() };
-			}
-
-			return { view ? Error::INVALID_PARAMETER : Error::OUT_OF_MEMORY };
+	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
+		visitor.PublishFactory( this, sizeof( WorldView ), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
+			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(renderer)->_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
 		} );
 	}
 
