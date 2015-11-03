@@ -20,6 +20,16 @@
 #include <angelscript/sdk/add_on/scriptbuilder/scriptbuilder.h>
 //------------------------------------------------------------------//
 
+//==================================================================//
+// LIBRARIES
+//==================================================================//
+#if( ET_DEBUG_MODE_ENABLED && ET_PLATFORM_X86 && ET_PLATFORM_64BIT )
+	ET_LINK_LIBRARY( "angelscript64d.lib" )
+#elif( ET_PLATFORM_X86 && ET_PLATFORM_64BIT )
+	ET_LINK_LIBRARY( "angelscript64.lib" )
+#endif
+//------------------------------------------------------------------//
+
 namespace {
 
 	using namespace ::Eldritch2::Tools;
@@ -33,7 +43,15 @@ namespace {
 		ScriptCompilerTool() : Win32GlobalHeapAllocator( UTF8L("Root Allocator") ), ToolCRTPBase<ScriptCompilerTool>( static_cast<Win32GlobalHeapAllocator&>(*this) ) {}
 
 		//!	Destroys this @ref ScriptCompilerTool instance.
-		~ScriptCompilerTool() = default;
+		~ScriptCompilerTool() {
+			if( auto scriptModule = GetModule() ) {
+				scriptModule->Discard();
+			}
+
+			if( engine ) {
+				engine->ShutDownAndRelease();
+			}
+		}
 
 	// ---------------------------------------------------
 
@@ -114,7 +132,9 @@ namespace {
 
 			NullStream	stream;
 
-			// StartNewModule( asIScriptEngine *engine, const char *moduleName );
+			if( ::asSUCCESS != StartNewModule( ::asCreateScriptEngine(), "asdf" ) ) {
+				return -1;
+			}
 
 			for( const SystemChar* fileName : inputFiles ) {
 				// AddSectionFromMemory();

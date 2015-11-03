@@ -171,6 +171,7 @@ namespace AngelScript {
 		for( auto metadata( sourceData.types()->begin() ), end( sourceData.types()->end() ); metadata != end; ++metadata ) {
 			auto	scriptType( module.GetObjectTypeByIndex( metadata->index() ) );
 
+			// Ensure the index is legal and we have a valid script type.
 			if( !scriptType ) {
 				return Error::INVALID_PARAMETER;
 			}
@@ -196,6 +197,7 @@ namespace AngelScript {
 		for( auto metadata( sourceData.functions()->begin() ), end( sourceData.functions()->end() ); metadata != end; ++metadata ) {
 			auto	scriptFunction( module.GetFunctionByIndex( metadata->index() ) );
 
+			// Ensure the index is legal and we have a valid script function.
 			if( !scriptFunction ) {
 				return Error::INVALID_PARAMETER;
 			}
@@ -215,16 +217,18 @@ namespace AngelScript {
 			return Error::NONE;
 		}
 
+		// Minimize repeated allocations.
 		_propertyMetadata.SetCapacity( sourceData.properties()->size() );
 
-		for( auto propertyMetadata( sourceData.properties()->begin() ), end( sourceData.properties()->end() ); propertyMetadata != end; ++propertyMetadata ) {
-			auto	scriptProperty( module.GetAddressOfGlobalVar( propertyMetadata->index() ) );
+		for( auto metadata( sourceData.properties()->begin() ), end( sourceData.properties()->end() ); metadata != end; ++metadata ) {
+			auto	scriptProperty( module.GetAddressOfGlobalVar( metadata->index() ) );
 
+			// Ensure the index is legal and we have a valid property.
 			if( !scriptProperty ) {
 				return Error::INVALID_PARAMETER;
 			}
 
-			_propertyMetadata.Insert( { scriptProperty, PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
+			_propertyMetadata.Insert( { scriptProperty, PropertyMetadata() } ).first->second.Bind( **metadata );
 		}
 
 		return Error::NONE;

@@ -11,6 +11,7 @@ If you'd like to get a copy of the executable, (currently tested/running under 6
 * [Microprofile](https://bitbucket.org/jonasmeyer/microprofile) (with Arseny Kapoulkine's extensions)
 * [Recast Navigation/Detour](https://github.com/memononen/recastnavigation)
 * [Boost](http://www.boost.org/) (version 1.59)
+* [Steamworks](https://partner.steamgames.com/)
 
 ## Project Structure
 At a high level, project directories are arranged in a hierarchy. Shared or engine-related files live in the `/src/` subdirectory, and the current set of planned tools each have their own special sibling folder named according to the pattern `/src_<Tool Name>/`.
@@ -20,4 +21,4 @@ Additionally, I'm in the process of having the C++ namespaces reflect the projec
 ## Program Structure
 
 ### Engine
-The `main()` method for the engine lives in `<Project Root>/<Platform>EntryPoint.cpp`.
+The `main()` method for the engine lives in `/src/<Platform>EntryPoint.cpp`.

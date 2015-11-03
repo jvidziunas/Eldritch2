@@ -28,8 +28,12 @@ namespace Eldritch2 {
 	using UTF16Char		= char16_t;
 	using UTF32Char		= char32_t;
 
-#if( ET_BUILD_UNICODE )
+#if( ET_PLATFORM_WINDOWS )
+#	if( ET_BUILD_UNICODE )
 	using SystemChar	= wchar_t;
+#	else
+	using SystemChar	= char;
+#	endif
 #else
 	using SystemChar	= char;
 #endif

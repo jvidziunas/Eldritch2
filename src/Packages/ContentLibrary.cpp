@@ -23,8 +23,6 @@
 #include <Utility/Result.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
-#include <memory>
-//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Scheduler;

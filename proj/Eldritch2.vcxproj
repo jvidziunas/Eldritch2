@@ -84,7 +84,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)src_Hero;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -136,7 +136,7 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src_Hero;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -161,7 +161,7 @@
     </ProjectReference>
     <Link>
       <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
@@ -193,7 +193,7 @@ call "deploy.x64.bat"
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src_Hero;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -335,9 +335,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\IntrusivePointerBase.cpp" />
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp" />
-    <ClCompile Include="..\src\Utility\MessagePackBase.cpp" />
-    <ClCompile Include="..\src\Utility\MessagePackReader.cpp" />
-    <ClCompile Include="..\src\Utility\MessagePackWriter.cpp" />
     <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp" />
     <ClCompile Include="..\src\Utility\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\src\Utility\ScopedFPUController.cpp" />
@@ -441,9 +438,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />
-    <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
-    <ClInclude Include="..\src\Utility\MessagePackReader.hpp" />
-    <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
+    <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
     <ClInclude Include="..\src\Utility\ResultBase.hpp" />
     <ClInclude Include="..\src\Utility\StringOperators.hpp" />
     <ClInclude Include="..\src\Utility\DebugController.hpp" />
@@ -479,9 +474,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\mpl\Platform.hpp" />
     <ClInclude Include="..\src\Utility\mpl\Platform.Linux.hpp" />
     <ClInclude Include="..\src\Utility\mpl\Platform.MacOS.hpp" />
-    <ClInclude Include="..\src\Utility\mpl\Platform.PS3.hpp" />
     <ClInclude Include="..\src\Utility\mpl\Platform.Win.hpp" />
-    <ClInclude Include="..\src\Utility\mpl\Platform.Xenon.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
     <ClInclude Include="..\src\Utility\Containers\ResizableArray.hpp" />
     <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp" />
@@ -614,9 +607,6 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\Memory\ObjectPoolAllocator.inl" />
     <None Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.inl" />
     <None Include="..\src\Utility\Memory\StdAllocatorAdapterMixin.inl" />
-    <None Include="..\src\Utility\MessagePackBase.inl" />
-    <None Include="..\src\Utility\MessagePackReader.inl" />
-    <None Include="..\src\Utility\MessagePackWriter.inl" />
     <None Include="..\src\Utility\Result.inl" />
     <None Include="..\src\Utility\ResultBase.inl" />
     <None Include="..\src\Utility\StringOperators.inl" />

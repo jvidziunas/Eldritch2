@@ -570,15 +570,6 @@
     <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp">
       <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\MessagePackBase.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\MessagePackReader.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\MessagePackWriter.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Build.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -668,13 +659,7 @@
     <ClInclude Include="..\src\Utility\mpl\Platform.MacOS.hpp">
       <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\mpl\Platform.PS3.hpp">
-      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Platform.Win.hpp">
-      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\mpl\Platform.Xenon.hpp">
       <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\Range.hpp">
@@ -1073,17 +1058,11 @@
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
       <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\MessagePackBase.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\MessagePackReader.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\MessagePackWriter.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Build.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp">
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1216,15 +1195,6 @@
       <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\IdentifierPool.inl">
-      <Filter>Source Files\Utility</Filter>
-    </None>
-    <None Include="..\src\Utility\MessagePackBase.inl">
-      <Filter>Source Files\Utility</Filter>
-    </None>
-    <None Include="..\src\Utility\MessagePackReader.inl">
-      <Filter>Source Files\Utility</Filter>
-    </None>
-    <None Include="..\src\Utility\MessagePackWriter.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\Result.inl">
