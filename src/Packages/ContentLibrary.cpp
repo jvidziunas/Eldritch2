@@ -166,7 +166,7 @@ namespace FileSystem {
 	// ---
 
 		// Oddball positioning here, but the scoping gymnastics are necessary to prevent lock re-entrancy in the content package destructor.
-		unique_ptr<DeserializedContentPackage, InstanceDeleter>	createdPackage( nullptr, { _allocator } );
+		InstancePointer<DeserializedContentPackage>	createdPackage( nullptr, { _allocator } );
 
 		{	ScopedLock	packageTableLock( *_contentPackageCollectionMutex );
 			const auto	candidate( _contentPackageCollection.Find( packageName ) );

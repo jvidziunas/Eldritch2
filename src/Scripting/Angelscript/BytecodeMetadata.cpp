@@ -161,7 +161,7 @@ namespace AngelScript {
 
 	ErrorCode BytecodeMetadata::LoadTypeMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
 		// Early out if there is no type metadata stored in the module.
-		if( !sourceData.functions() ) {
+		if( !sourceData.types() ) {
 			return Error::NONE;
 		}
 
