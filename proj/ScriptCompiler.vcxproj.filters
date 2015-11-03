@@ -66,6 +66,15 @@
     <ClCompile Include="..\src\Tools\Tool.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src_ScriptCompiler\FlatBufferMetadataBuilderVisitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h">
@@ -95,6 +104,15 @@
     <ClInclude Include="..\src\Utility\Containers\Range.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp">
+      <Filter>Header Files\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src_ScriptCompiler\FlatBufferMetadataBuilderVisitor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp">
+      <Filter>Header Files\Utility\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Utility\Memory\Allocator.inl">
@@ -105,6 +123,9 @@
     </None>
     <None Include="..\src\Tools\Tool.inl">
       <Filter>Source Files\Tools</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\ChildAllocator.inl">
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

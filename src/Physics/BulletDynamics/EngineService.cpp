@@ -47,13 +47,12 @@ namespace BulletDynamics {
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
-		using FactoryResult		= ResourceViewFactoryPublishingInitializationVisitor::FactoryResult;
 
 	// ---
 
 		// Collision shape view.
-		visitor.PublishFactory( CollisionShapeResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*engine*/ ) -> FactoryResult {
-			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) CollisionShapeResourceView( name, allocator ), { allocator } };
+		visitor.PublishFactory( CollisionShapeResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*engine*/ ) {
+			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) CollisionShapeResourceView( name, allocator ), { allocator } );
 		} );
 	}
 

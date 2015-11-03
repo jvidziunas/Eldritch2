@@ -17,6 +17,17 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+	namespace Scripting {
+		namespace AngelScript {
+			namespace FlatBuffers {
+				struct	FunctionMetadata;
+				struct	PropertyMetadata;
+				struct	ModuleMetadata;
+				struct	TypeMetadata;
+			}
+		}
+	}
+
 	class	ErrorCode;
 }
 
@@ -37,11 +48,15 @@ namespace AngelScript {
 		using ModuleMetadata	= AngelScript::BytecodeMetadata;
 
 		class FunctionMetadata {
+		public:
+			::Eldritch2::ErrorCode Bind( ::asIScriptFunction& function, const FlatBuffers::FunctionMetadata& metadata );
 		};
 
 	// ---
 
 		class PropertyMetadata {
+		public:
+			::Eldritch2::ErrorCode Bind( const FlatBuffers::PropertyMetadata& metadata );
 		};
 
 	// ---
@@ -62,6 +77,14 @@ namespace AngelScript {
 
 		// ---------------------------------------------------
 
+			::Eldritch2::ErrorCode	Bind( ::asIObjectType& scriptType, const FlatBuffers::TypeMetadata& metadata );
+
+		// ---------------------------------------------------
+
+			//!	Extracts metadata for an an object property, if any has been previously associated.
+			/*!	@param[in] propertyIndex Zero-based index identifying the property to be inspected.
+				@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the property.
+				*/
 			const PropertyMetadata*	GetPropertyMetadata( const ::asUINT propertyIndex ) const;
 
 		// - DATA MEMBERS ------------------------------------
@@ -100,6 +123,10 @@ namespace AngelScript {
 			*/
 		static const TypeMetadata*		GetMetadata( const ::asIObjectType& type );
 
+		//!	Extracts metadata for an an object property, if any has been previously associated.
+		/*!	@param[in] propertyIndex Zero-based index identifying the property to be inspected.
+			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the property.
+			*/
 		static const PropertyMetadata*	GetPropertyMetadata( const ::asIObjectType& objectType, const ::asUINT propertyIndex );
 		static const PropertyMetadata*	GetPropertyMetadata( const ::asIScriptModule& module, const void* propertyAddress );
 
@@ -113,13 +140,16 @@ namespace AngelScript {
 	// ---------------------------------------------------
 
 		::Eldritch2::ErrorCode	BindToModule( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
-		::Eldritch2::ErrorCode	LoadTypeMetadata( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
-		::Eldritch2::ErrorCode	LoadFunctionMetadata( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
-		::Eldritch2::ErrorCode	LoadPropertyMetadata( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
+
+	private:
+		::Eldritch2::ErrorCode	LoadTypeMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData );
+
+		::Eldritch2::ErrorCode	LoadFunctionMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData );
+
+		::Eldritch2::ErrorCode	LoadPropertyMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData );
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
 		::Eldritch2::ChildAllocator									_rootAllocator;
 		::Eldritch2::ResizableArray<TypeMetadata>					_typeMetadata;
 		::Eldritch2::ResizableArray<FunctionMetadata>				_functionMetadata;

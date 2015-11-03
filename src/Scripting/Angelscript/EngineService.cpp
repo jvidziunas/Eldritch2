@@ -92,17 +92,16 @@ namespace AngelScript {
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
-		using FactoryResult		= ResourceViewFactoryPublishingInitializationVisitor::FactoryResult;
 
 	// ---
 
 		// Bytecode package
-		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* parameter ) -> FactoryResult {
-			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) BytecodePackageResourceView( static_cast<EngineService*>(parameter)->GetScriptEngine(), name, allocator ), { allocator } };
+		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* parameter ) {
+			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) BytecodePackageResourceView( static_cast<EngineService*>(parameter)->GetScriptEngine(), name, allocator ), { allocator } );
 		} )
 		// Object graph
-		.PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*parameter*/ ) -> FactoryResult {
-			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( name, allocator ), { allocator } };
+		.PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*parameter*/ ) {
+			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( name, allocator ), { allocator } );
 		} );
 	}
 

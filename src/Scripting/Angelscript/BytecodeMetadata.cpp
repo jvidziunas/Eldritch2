@@ -30,12 +30,49 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
+
+	ErrorCode BytecodeMetadata::FunctionMetadata::Bind( ::asIScriptFunction& scriptFunction, const FlatBuffers::FunctionMetadata& /*metadata*/ ) {
+		SetMetadata( scriptFunction, *this );
+		return Error::NONE;
+	}
+
+// ---------------------------------------------------
+
+	ErrorCode BytecodeMetadata::PropertyMetadata::Bind( const FlatBuffers::PropertyMetadata& /*metadata*/ ) {
+		return Error::NONE;
+	}
+
+// ---------------------------------------------------
+
 	BytecodeMetadata::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( { allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") } ),
 																		   _propertyMetadata( { allocator, UTF8L("Angelscript Type Metadata Property Metadata Allocator") } ) {}
 
 // ---------------------------------------------------
 
 	BytecodeMetadata::TypeMetadata::TypeMetadata() : TypeMetadata( NullAllocator::GetInstance() ) {}
+
+// ---------------------------------------------------
+
+	ErrorCode BytecodeMetadata::TypeMetadata::Bind( ::asIObjectType& scriptType, const FlatBuffers::TypeMetadata& metadata ) {
+		for( auto methodMetadata( metadata.methods()->begin() ), end( metadata.methods()->end() ); methodMetadata != end; ++methodMetadata ) {
+			auto	scriptFunction( scriptType.GetMethodByIndex( methodMetadata->index() ) );
+
+			if( !scriptFunction ) {
+				return Error::INVALID_PARAMETER;
+			}
+
+			_methodMetadata.PushBack();
+			_methodMetadata.Back().Bind( *scriptFunction, **methodMetadata );
+		}
+
+		for( auto propertyMetadata( metadata.properties()->begin() ), end( metadata.properties()->end() ); propertyMetadata != end; ++propertyMetadata ) {
+			_propertyMetadata.Insert( { propertyMetadata->index(), PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
+		}
+
+		SetMetadata( scriptType, *this );
+
+		return Error::NONE;
+	}
 
 // ---------------------------------------------------
 
@@ -113,30 +150,33 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	ErrorCode BytecodeMetadata::BindToModule( ::asIScriptModule& module, Range<const char*> sourceBytes ) {
+		auto	metadata( FlatBuffers::GetModuleMetadata( sourceBytes.first ) );
+
 		SetMetadata( module, *this );
 
-		LoadTypeMetadata( module, sourceBytes );
-
-		return LoadFunctionMetadata( module, sourceBytes );
+		return LoadTypeMetadata( module, *metadata ) && LoadFunctionMetadata( module, *metadata ) && LoadPropertyMetadata( module, *metadata ) ? Error::NONE : Error::INVALID_PARAMETER;
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode BytecodeMetadata::LoadTypeMetadata( ::asIScriptModule& module, Range<const char*> sourceBytes ) {
-		if( auto metadataCollection = FlatBuffers::GetModuleMetadata( sourceBytes.first )->types() ) {
-			_typeMetadata.SetCapacity( metadataCollection->size() );
+	ErrorCode BytecodeMetadata::LoadTypeMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
+		// Early out if there is no type metadata stored in the module.
+		if( !sourceData.functions() ) {
+			return Error::NONE;
+		}
 
-			for( auto metadata( metadataCollection->begin() ), end( metadataCollection->end() ); metadata != end; ++metadata ) {
-				_typeMetadata.PushBack( { _rootAllocator } );
+		// Minimize repeated allocations.
+		_typeMetadata.SetCapacity( sourceData.types()->size() );
 
-				auto&	deserializedMetadata( _typeMetadata.Back() );
+		for( auto metadata( sourceData.types()->begin() ), end( sourceData.types()->end() ); metadata != end; ++metadata ) {
+			auto	scriptType( module.GetObjectTypeByIndex( metadata->index() ) );
 
-				if( auto type = module.GetObjectTypeByIndex( metadata->index() ) ) {
-					SetMetadata( *type, deserializedMetadata );
-				} else {
-					return Error::INVALID_PARAMETER;
-				}
+			if( !scriptType ) {
+				return Error::INVALID_PARAMETER;
 			}
+
+			_typeMetadata.PushBack( { _rootAllocator } );
+			_typeMetadata.Back().Bind( *scriptType, **metadata );
 		}
 
 		return Error::NONE;
@@ -144,21 +184,24 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	ErrorCode BytecodeMetadata::LoadFunctionMetadata( ::asIScriptModule& module, Range<const char*> sourceBytes ) {
-		if( auto metadataCollection = FlatBuffers::GetModuleMetadata( sourceBytes.first )->functions() ) {
-			_functionMetadata.SetCapacity( metadataCollection->size() );
+	ErrorCode BytecodeMetadata::LoadFunctionMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
+		// Early out if there is no free function metadata stored in the module.
+		if( !sourceData.functions() ) {
+			return Error::NONE;
+		}
 
-			for( auto metadata( metadataCollection->begin() ), end( metadataCollection->end() ); metadata != end; ++metadata ) {
-				_functionMetadata.PushBack();
+		// Minimize repeated allocations.
+		_functionMetadata.SetCapacity( sourceData.functions()->size() );
 
-				auto&	deserializedMetadata( _functionMetadata.Back() );
+		for( auto metadata( sourceData.functions()->begin() ), end( sourceData.functions()->end() ); metadata != end; ++metadata ) {
+			auto	scriptFunction( module.GetFunctionByIndex( metadata->index() ) );
 
-				if( auto function = module.GetFunctionByIndex( metadata->index() ) ) {
-					SetMetadata( *function, deserializedMetadata );
-				} else {
-					return Error::INVALID_PARAMETER;
-				}
+			if( !scriptFunction ) {
+				return Error::INVALID_PARAMETER;
 			}
+
+			_functionMetadata.PushBack();
+			_functionMetadata.Back().Bind( *scriptFunction, **metadata );
 		}
 
 		return Error::NONE;
@@ -166,18 +209,25 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	ErrorCode BytecodeMetadata::LoadPropertyMetadata( ::asIScriptModule& module, Range<const char*> sourceBytes ) {
-		#if 0
-if( auto metadataCollection = FlatBuffers::GetModuleMetadata( sourceBytes.first )->properties() ) {
-			_propertyMetadata.SetCapacity( metadataCollection->size() );
+	ErrorCode BytecodeMetadata::LoadPropertyMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
+		// Early out if there is no global property metadata stored in the module.
+		if( !sourceData.properties() ) {
+			return Error::NONE;
+		}
 
-			for( auto metadata( metadataCollection->begin() ), end( metadataCollection->end() ); metadata != end; ++metadata ) {
+		_propertyMetadata.SetCapacity( sourceData.properties()->size() );
+
+		for( auto propertyMetadata( sourceData.properties()->begin() ), end( sourceData.properties()->end() ); propertyMetadata != end; ++propertyMetadata ) {
+			auto	scriptProperty( module.GetAddressOfGlobalVar( propertyMetadata->index() ) );
+
+			if( !scriptProperty ) {
+				return Error::INVALID_PARAMETER;
 			}
+
+			_propertyMetadata.Insert( { scriptProperty, PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
 		}
 
 		return Error::NONE;
-#endif
-		return Error::OPERATION_NOT_SUPPORTED;
 	}
 
 }	// namespace AngelScript

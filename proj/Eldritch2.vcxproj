@@ -242,7 +242,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Animation\LocalSpaceAnimationLayer.cpp" />
     <ClCompile Include="..\src\Animation\LocomotionAnimationLayer.cpp" />
     <ClCompile Include="..\src\Build.cpp" />
-    <ClCompile Include="..\examples\Win32EntryPoint.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurablePODVariable.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Filesystem\ContentProvider.cpp" />
@@ -357,6 +356,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp" />
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp" />
     <ClCompile Include="..\src\Animation\Armature.cpp" />
+    <ClCompile Include="..\src\Win32EntryPoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Animation\LocalSpaceAnimationLayer.hpp" />
@@ -572,10 +572,10 @@ call "deploy.x64.bat"
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
-	  <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
-	  <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl" />
     <None Include="..\src\Scripting\AngelScript\EngineService.inl" />

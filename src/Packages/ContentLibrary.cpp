@@ -12,7 +12,6 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Packages/ContentLibrary.hpp>
@@ -52,8 +51,8 @@ namespace FileSystem {
 	ContentLibrary::ContentLibrary( ContentProvider& contentProvider, TaskScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Content Library Package Data Allocator") ),
 																														 _deserializationContextAllocator( allocator, UTF8L("Content Library Package Data Allocator") ),
 																														 _contentProvider( contentProvider ),
-																														 _contentPackageCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
-																														 _resourceViewCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object ),
+																														 _contentPackageCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
+																														 _resourceViewCollectionMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
 																														 _contentPackageCollection( 64u, {}, { allocator, UTF8L("Content Library Package Bucket Allocator") } ),
 																														 _resourceViewCollection( 128u, {}, { allocator, UTF8L("Content Library Resource View Bucket Allocator") } ),
 																														 _resourceViewFactoryCollection( 16u, {}, { allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") } ),
@@ -74,9 +73,6 @@ namespace FileSystem {
 			thread->EnsureTerminated();
 			_allocator.Delete( *thread );
 		}
-
-		_allocator.Delete( _contentPackageCollectionMutex, ::Eldritch2::AlignedDeallocationSemantics );
-		_allocator.Delete( _resourceViewCollectionMutex, ::Eldritch2::AlignedDeallocationSemantics );
 	}
 
 // ---------------------------------------------------

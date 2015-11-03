@@ -12,11 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/memory/InstanceDeleters.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Packages/ResourceView.hpp>
 #include <Utility/Result.hpp>
-//------------------------------------------------------------------//
-#include <memory>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -29,9 +27,10 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	class ResourceViewFactoryPublishingInitializationVisitor {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
-		using FactoryResult				= ::std::unique_ptr<FileSystem::ResourceView, Utility::InstanceDeleter>;
-		using FactoryFunctionPointer	= FactoryResult (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
+		using FactoryFunctionPointer	= ::Eldritch2::InstancePointer<FileSystem::ResourceView> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

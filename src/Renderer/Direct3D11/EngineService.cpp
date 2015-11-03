@@ -155,18 +155,17 @@ namespace Direct3D11 {
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		using AllocationOption	= Allocator::AllocationOption;
-		using FactoryResult		= ResourceViewFactoryPublishingInitializationVisitor::FactoryResult;
 
 	// ---
 
-		visitor.PublishFactory( MeshResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) -> FactoryResult {
-			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) MeshResourceView( name, allocator ), { allocator } };
+		visitor.PublishFactory( MeshResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) {
+			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) MeshResourceView( name, allocator ), { allocator } );
 		} )
-		.PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* renderer ) -> FactoryResult {
-			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) HLSLPipelineDefinitionView( static_cast<EngineService*>(renderer)->_device, name, allocator ), { allocator } };
+		.PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* renderer ) {
+			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) HLSLPipelineDefinitionView( static_cast<EngineService*>(renderer)->_device, name, allocator ), { allocator } );
 		} )
-		.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) -> FactoryResult {
-			return { new(allocator, AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( name, allocator ), { allocator } };
+		.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) {
+			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( name, allocator ), { allocator } );
 		} );
 	}
 

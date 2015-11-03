@@ -145,7 +145,10 @@
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp" />
     <ClCompile Include="..\src\Tools\Tool.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
+    <ClCompile Include="..\src_ScriptCompiler\FlatBufferMetadataBuilderVisitor.cpp" />
     <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -153,11 +156,14 @@
     <ClInclude Include="..\src\Tools\Tool.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Compiler.hpp" />
     <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Platform.hpp" />
+    <ClInclude Include="..\src_ScriptCompiler\FlatBufferMetadataBuilderVisitor.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\src\Scripting\AngelScript\BytecodeMetadata.fbc">
@@ -172,6 +178,7 @@
     <None Include="..\src\Tools\Tool.inl" />
     <None Include="..\src\Utility\Containers\Range.inl" />
     <None Include="..\src\Utility\Memory\Allocator.inl" />
+    <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

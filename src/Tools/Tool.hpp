@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/MPL/CharTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -36,12 +37,17 @@ namespace Detail {
 
 		//!	Destroys this @ref Tool instance.
 		~Tool() = default;
+
+	// ---------------------------------------------------
+
+	protected:
+		::Eldritch2::ResizableArray<const ::Eldritch2::SystemChar*>	_inputFiles;
 	};
 
 }	// namespace Detail
 
 	template <class ImplementingTool>
-	class ToolCRTPBase : public Detail::Tool {
+	class ToolCRTPBase : private Detail::Tool {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:

@@ -14,13 +14,13 @@
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/DisposingResult.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/StringOperators.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 #include <typeinfo>
-#include <memory>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -39,7 +39,6 @@ namespace Eldritch2 {
 
 	namespace Utility {
 		class	ReaderWriterUserMutex;
-		class	InstanceDeleter;
 	}
 
 	class	ErrorCode;
@@ -164,7 +163,7 @@ namespace FileSystem {
 	// ---
 
 		struct ResourceViewFactory {
-			using FactoryFunctionPointer	= ::std::unique_ptr<FileSystem::ResourceView, Utility::InstanceDeleter> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
+			using FactoryFunctionPointer	= ::Eldritch2::InstancePointer<FileSystem::ResourceView> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
 
 			FactoryFunctionPointer	factoryFunction;
 			void*					parameter;
@@ -177,10 +176,10 @@ namespace FileSystem {
 		FileSystem::ContentProvider&														_contentProvider;
 		
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		Utility::ReaderWriterUserMutex*														_contentPackageCollectionMutex;
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_contentPackageCollectionMutex;
 
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		Utility::ReaderWriterUserMutex*														_resourceViewCollectionMutex;		
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_resourceViewCollectionMutex;		
 
 		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*,
 								  Utility::StringHash,

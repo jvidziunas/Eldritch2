@@ -14,6 +14,8 @@
 //==================================================================//
 #include <Utility/MPL/Compiler.hpp>
 //------------------------------------------------------------------//
+#include <memory>
+//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	class	Allocator;
@@ -70,6 +72,13 @@ namespace Utility {
 	};
 
 }	// namespace Utility
+
+	template <typename Object>
+	using InstancePointer			= ::std::unique_ptr<Object, Utility::InstanceDeleter>;
+
+	template <typename Object>
+	using AlignedInstancePointer	= ::std::unique_ptr<Object, Utility::AlignedInstanceDeleter>;
+
 }	// namespace Eldritch2
 
 //==================================================================//

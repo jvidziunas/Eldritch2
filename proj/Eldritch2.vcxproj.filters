@@ -5,1097 +5,1085 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\Games">
-      <UniqueIdentifier>{8f01efd0-5a56-4312-b3a0-bfa7cc662354}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine">
-      <UniqueIdentifier>{0fc6e78c-3c3d-40eb-8dc7-8d6366daef8c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Configuration">
-      <UniqueIdentifier>{43c3eb69-c1d6-40e3-9573-cc400966712c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Networking">
-      <UniqueIdentifier>{b62807a8-8006-4d3c-9c34-10ca15d01416}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Foundation">
-      <UniqueIdentifier>{7d7626b4-7058-4838-ae74-72c943989843}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Input">
-      <UniqueIdentifier>{44216863-2550-4f0e-b941-68de784c23c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Logging">
-      <UniqueIdentifier>{5c43b2a7-da12-4430-93c5-6bffa6ee9612}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Packages">
-      <UniqueIdentifier>{3ed92532-2874-4609-a1d9-8d44060a44eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Physics">
-      <UniqueIdentifier>{07d55408-4e61-4602-8e31-a7f1efabcff6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer">
-      <UniqueIdentifier>{c4240366-799b-49e9-aeef-7024b306df9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Scheduler">
-      <UniqueIdentifier>{d92ded9a-a640-4f60-bf5f-c3b104256590}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Scripting">
-      <UniqueIdentifier>{4561e1ed-4ad2-4991-894d-bdacd366d321}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Scripting\Angelscript">
-      <UniqueIdentifier>{58eb81f1-b1d8-4c97-a42e-1c991e8815a7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Scripting\Angelscript\Script Utilities">
-      <UniqueIdentifier>{f9278449-8836-4cd1-9079-98849783c499}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Sound">
-      <UniqueIdentifier>{ec2bdcad-4ac7-4ac6-8cf1-3a27e6b82b5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Sound\XAudio2">
-      <UniqueIdentifier>{6c1c69ea-e54d-4ff0-a877-5ca7e382cecb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Utility">
-      <UniqueIdentifier>{2af14c43-dc78-4df0-975e-a402a791b684}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Utility\Concurrency">
-      <UniqueIdentifier>{1cc7c608-3480-4ff5-bd8c-c7f54a7cf5f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Utility\Memory">
-      <UniqueIdentifier>{8cf6c7b3-18a8-4736-a0d0-b3150f89c1a4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Utility\Containers">
-      <UniqueIdentifier>{44f5ec5f-58cd-49a7-8378-feca26d53e58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Utility\Math">
-      <UniqueIdentifier>{1ed0deb4-1ed8-4561-b048-486239e2caf3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Animation">
-      <UniqueIdentifier>{25bd3f99-1047-4b61-a5b0-62a8c9a8ca34}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Header Files\Games">
-      <UniqueIdentifier>{54dd7060-e05f-4976-b158-f0518b594c17}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine">
-      <UniqueIdentifier>{c08b2264-0f04-46af-ae5c-7bfed91108ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Packages">
-      <UniqueIdentifier>{6fa9d8e5-022e-41b9-ad51-97a93706a3fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility">
-      <UniqueIdentifier>{cd1a12b1-becb-4a18-892b-75ac715f59e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Concurrency">
-      <UniqueIdentifier>{6bd6515d-c6a9-4bfa-ab3f-a523db3dd555}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Memory">
-      <UniqueIdentifier>{a5750cf4-4045-41f5-b71f-bf44324316e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Metaprogramming">
-      <UniqueIdentifier>{15957b9e-cb4c-42e5-9e30-43988752a3c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Metaprogramming\Compiler">
-      <UniqueIdentifier>{e039cc69-473a-459c-b2c1-a9445a4e69ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Metaprogramming\Platform">
-      <UniqueIdentifier>{d9bc980d-1cef-4a71-ab92-a03e89d4afb7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Containers">
-      <UniqueIdentifier>{2d439bc5-b6a7-4ab0-a394-3affae718fb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Utility\Math">
-      <UniqueIdentifier>{c03f0771-ed6b-4727-84bd-4033c56e8386}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Physics">
-      <UniqueIdentifier>{298cb508-f8f8-44d3-82f7-0a8fd9a268c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Renderer">
-      <UniqueIdentifier>{328e5b69-7123-49f1-987b-afaa5134357b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Scheduler">
-      <UniqueIdentifier>{6f2b2183-4bc7-40d0-9213-de8847c62707}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Scripting">
-      <UniqueIdentifier>{5e66b86e-bd39-4ea9-b45f-e0136e907b81}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Scripting\Angelscript">
-      <UniqueIdentifier>{acb4101f-e449-4560-b7df-5623cd47f496}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Scripting\Angelscript\Script Utilities">
-      <UniqueIdentifier>{44bb42b8-7a1b-4c81-a10e-4f00b08a558c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Sound">
-      <UniqueIdentifier>{8779c609-51ec-4c86-a618-524a9ccf7ffa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Sound\XAudio2">
-      <UniqueIdentifier>{6a93a764-9410-4107-90a6-6f55b36f678c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Configuration">
-      <UniqueIdentifier>{b017f59a-b5f1-4b5a-b7cd-d690de2c7c32}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Foundation">
-      <UniqueIdentifier>{e5e9dea9-21e4-4515-ad1f-2017a9c608db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Input">
-      <UniqueIdentifier>{a6bf8c02-bc7a-4176-bbbc-0463abfa80c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Logging">
-      <UniqueIdentifier>{d1a9a9fd-fd2f-4777-a182-87408a62d750}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Networking">
-      <UniqueIdentifier>{c028f8ea-db62-4d2d-a511-1a932233a0cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Animation">
-      <UniqueIdentifier>{22a8a921-290a-4549-8c34-5cd2055a299b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-    <Filter Include="Header Files\Engine\Networking\Steamworks">
-      <UniqueIdentifier>{10765271-2071-47bc-86b7-50eda5f20c99}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Networking\Steamworks">
-      <UniqueIdentifier>{24d31d34-eaa7-4667-9fca-58cf2d998670}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Animation\Animators">
-      <UniqueIdentifier>{7bac1a07-2e0a-4da9-a6eb-36931195e3f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Animation\Animators">
-      <UniqueIdentifier>{3e59f5df-af8f-4e6f-a84e-12d02322f5ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Input\Win32">
-      <UniqueIdentifier>{f718ad56-5c29-4be1-96db-3c8b74c98a9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Input\Win32">
-      <UniqueIdentifier>{da465655-a753-40c9-a163-19e4e5c35cfb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Input\XInput">
-      <UniqueIdentifier>{8858ab31-2bef-49fb-9899-48100fc782ff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Input\XInput">
-      <UniqueIdentifier>{2b1b12e8-02dd-4c42-9479-21f2d2ad0495}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Filesystem">
-      <UniqueIdentifier>{bed06d8f-3adf-4793-8e46-44b48a656509}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Filesystem">
-      <UniqueIdentifier>{db5f578b-bced-4711-ab48-3e7129dda398}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Filesystem\Win32">
-      <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Filesystem\Win32">
-      <UniqueIdentifier>{5e994b2a-3702-430f-afcc-637ae8f6fbde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\System">
-      <UniqueIdentifier>{dbe697c5-6d86-48c1-95cb-2438b9b4fa6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\System">
-      <UniqueIdentifier>{14fc370a-7da5-4239-b163-4ac64ab622d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\System\Win32">
-      <UniqueIdentifier>{a98591c8-ca46-4b0f-882d-2734bd0f5a44}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\System\Win32">
-      <UniqueIdentifier>{2fe8694e-ece4-44a3-8e86-b88931f47934}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Scheduler\Win32">
-      <UniqueIdentifier>{d6322ca6-4065-4584-b115-d03dfa7fea68}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Scheduler\Win32">
-      <UniqueIdentifier>{0e86bd9d-8e85-4568-a429-cf68622a7450}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Renderer\Direct3D">
-      <UniqueIdentifier>{c242046a-5770-4e49-9e58-6fd28ef36ac3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer\Direct3D">
-      <UniqueIdentifier>{00f7cf0b-64b8-4119-95fe-da7e6e99afcc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Renderer\Direct3D11">
-      <UniqueIdentifier>{2a0c8bbf-6f99-4648-a906-511db0b118de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer\Direct3D11">
-      <UniqueIdentifier>{2f94b043-76d6-45ed-bd7b-4eccb5be1bed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Renderer\Direct3D11\Builders">
-      <UniqueIdentifier>{c460263d-8ea6-495b-9b59-6c3bee7a5844}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Renderer\Direct3D11\Builders">
-      <UniqueIdentifier>{3b621e47-dd77-435b-9da9-fa7bc4ebcb27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Physics\Bullet Dynamics">
-      <UniqueIdentifier>{c2fa27eb-fcfd-44f2-8a55-8034049e55aa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Engine\Physics\Bullet Dynamics\Extensions">
-      <UniqueIdentifier>{34c5fc7a-7b45-4d7e-86ec-fbb20d0fbef4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Physics\Bullet Dynamics">
-      <UniqueIdentifier>{b4e7f63c-54c9-4e09-a4f7-ff8a87502859}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Physics\Bullet Dynamics\Extensions">
-      <UniqueIdentifier>{279c035e-049d-4a55-b834-a440205a5a2a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="IDL Files">
       <UniqueIdentifier>{abc7007a-dce7-4dec-82fc-e5f832c26bdf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Animation">
+      <UniqueIdentifier>{25bd3f99-1047-4b61-a5b0-62a8c9a8ca34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Animation\Animators">
+      <UniqueIdentifier>{3e59f5df-af8f-4e6f-a84e-12d02322f5ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Configuration">
+      <UniqueIdentifier>{43c3eb69-c1d6-40e3-9573-cc400966712c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystem">
+      <UniqueIdentifier>{db5f578b-bced-4711-ab48-3e7129dda398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystem\Win32">
+      <UniqueIdentifier>{5e994b2a-3702-430f-afcc-637ae8f6fbde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Foundation">
+      <UniqueIdentifier>{7d7626b4-7058-4838-ae74-72c943989843}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{44216863-2550-4f0e-b941-68de784c23c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input\Win32">
+      <UniqueIdentifier>{f718ad56-5c29-4be1-96db-3c8b74c98a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input\XInput">
+      <UniqueIdentifier>{8858ab31-2bef-49fb-9899-48100fc782ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{5c43b2a7-da12-4430-93c5-6bffa6ee9612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{b62807a8-8006-4d3c-9c34-10ca15d01416}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking\Steamworks">
+      <UniqueIdentifier>{24d31d34-eaa7-4667-9fca-58cf2d998670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Packages">
+      <UniqueIdentifier>{3ed92532-2874-4609-a1d9-8d44060a44eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{07d55408-4e61-4602-8e31-a7f1efabcff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics\Bullet Dynamics">
+      <UniqueIdentifier>{b4e7f63c-54c9-4e09-a4f7-ff8a87502859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics\Bullet Dynamics\Extensions">
+      <UniqueIdentifier>{279c035e-049d-4a55-b834-a440205a5a2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer">
+      <UniqueIdentifier>{c4240366-799b-49e9-aeef-7024b306df9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\Direct3D">
+      <UniqueIdentifier>{00f7cf0b-64b8-4119-95fe-da7e6e99afcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\Direct3D11">
+      <UniqueIdentifier>{2f94b043-76d6-45ed-bd7b-4eccb5be1bed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\Direct3D11\Builders">
+      <UniqueIdentifier>{3b621e47-dd77-435b-9da9-fa7bc4ebcb27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scheduler">
+      <UniqueIdentifier>{d92ded9a-a640-4f60-bf5f-c3b104256590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scheduler\Win32">
+      <UniqueIdentifier>{d6322ca6-4065-4584-b115-d03dfa7fea68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting">
+      <UniqueIdentifier>{4561e1ed-4ad2-4991-894d-bdacd366d321}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting\Angelscript">
+      <UniqueIdentifier>{58eb81f1-b1d8-4c97-a42e-1c991e8815a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting\Angelscript\Script Utilities">
+      <UniqueIdentifier>{f9278449-8836-4cd1-9079-98849783c499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sound">
+      <UniqueIdentifier>{ec2bdcad-4ac7-4ac6-8cf1-3a27e6b82b5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sound\XAudio2">
+      <UniqueIdentifier>{6c1c69ea-e54d-4ff0-a877-5ca7e382cecb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{14fc370a-7da5-4239-b163-4ac64ab622d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System\Win32">
+      <UniqueIdentifier>{a98591c8-ca46-4b0f-882d-2734bd0f5a44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{2af14c43-dc78-4df0-975e-a402a791b684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility\Concurrency">
+      <UniqueIdentifier>{1cc7c608-3480-4ff5-bd8c-c7f54a7cf5f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility\Memory">
+      <UniqueIdentifier>{8cf6c7b3-18a8-4736-a0d0-b3150f89c1a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility\Containers">
+      <UniqueIdentifier>{44f5ec5f-58cd-49a7-8378-feca26d53e58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility\Math">
+      <UniqueIdentifier>{1ed0deb4-1ed8-4561-b048-486239e2caf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Animation">
+      <UniqueIdentifier>{22a8a921-290a-4549-8c34-5cd2055a299b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Animation\Animators">
+      <UniqueIdentifier>{7bac1a07-2e0a-4da9-a6eb-36931195e3f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Configuration">
+      <UniqueIdentifier>{b017f59a-b5f1-4b5a-b7cd-d690de2c7c32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Filesystem">
+      <UniqueIdentifier>{bed06d8f-3adf-4793-8e46-44b48a656509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Filesystem\Win32">
+      <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Foundation">
+      <UniqueIdentifier>{e5e9dea9-21e4-4515-ad1f-2017a9c608db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{a6bf8c02-bc7a-4176-bbbc-0463abfa80c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input\Win32">
+      <UniqueIdentifier>{da465655-a753-40c9-a163-19e4e5c35cfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input\XInput">
+      <UniqueIdentifier>{2b1b12e8-02dd-4c42-9479-21f2d2ad0495}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Logging">
+      <UniqueIdentifier>{d1a9a9fd-fd2f-4777-a182-87408a62d750}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Networking">
+      <UniqueIdentifier>{c028f8ea-db62-4d2d-a511-1a932233a0cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Networking\Steamworks">
+      <UniqueIdentifier>{10765271-2071-47bc-86b7-50eda5f20c99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Packages">
+      <UniqueIdentifier>{6fa9d8e5-022e-41b9-ad51-97a93706a3fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{298cb508-f8f8-44d3-82f7-0a8fd9a268c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics\Bullet Dynamics">
+      <UniqueIdentifier>{c2fa27eb-fcfd-44f2-8a55-8034049e55aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics\Bullet Dynamics\Extensions">
+      <UniqueIdentifier>{34c5fc7a-7b45-4d7e-86ec-fbb20d0fbef4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer">
+      <UniqueIdentifier>{328e5b69-7123-49f1-987b-afaa5134357b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer\Direct3D">
+      <UniqueIdentifier>{c242046a-5770-4e49-9e58-6fd28ef36ac3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer\Direct3D11">
+      <UniqueIdentifier>{2a0c8bbf-6f99-4648-a906-511db0b118de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer\Direct3D11\Builders">
+      <UniqueIdentifier>{c460263d-8ea6-495b-9b59-6c3bee7a5844}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scheduler">
+      <UniqueIdentifier>{6f2b2183-4bc7-40d0-9213-de8847c62707}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scheduler\Win32">
+      <UniqueIdentifier>{0e86bd9d-8e85-4568-a429-cf68622a7450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scripting">
+      <UniqueIdentifier>{5e66b86e-bd39-4ea9-b45f-e0136e907b81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scripting\Angelscript">
+      <UniqueIdentifier>{acb4101f-e449-4560-b7df-5623cd47f496}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scripting\Angelscript\Script Utilities">
+      <UniqueIdentifier>{44bb42b8-7a1b-4c81-a10e-4f00b08a558c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sound">
+      <UniqueIdentifier>{8779c609-51ec-4c86-a618-524a9ccf7ffa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sound\XAudio2">
+      <UniqueIdentifier>{6a93a764-9410-4107-90a6-6f55b36f678c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{dbe697c5-6d86-48c1-95cb-2438b9b4fa6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System\Win32">
+      <UniqueIdentifier>{2fe8694e-ece4-44a3-8e86-b88931f47934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{cd1a12b1-becb-4a18-892b-75ac715f59e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Concurrency">
+      <UniqueIdentifier>{6bd6515d-c6a9-4bfa-ab3f-a523db3dd555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Memory">
+      <UniqueIdentifier>{a5750cf4-4045-41f5-b71f-bf44324316e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Metaprogramming">
+      <UniqueIdentifier>{15957b9e-cb4c-42e5-9e30-43988752a3c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Metaprogramming\Compiler">
+      <UniqueIdentifier>{e039cc69-473a-459c-b2c1-a9445a4e69ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Metaprogramming\Platform">
+      <UniqueIdentifier>{d9bc980d-1cef-4a71-ab92-a03e89d4afb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Containers">
+      <UniqueIdentifier>{2d439bc5-b6a7-4ab0-a394-3affae718fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility\Math">
+      <UniqueIdentifier>{c03f0771-ed6b-4727-84bd-4033c56e8386}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Build.cpp">
-      <Filter>Source Files\Games</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp">
-      <Filter>Source Files\Engine\Logging</Filter>
+      <Filter>Source Files\Logging</Filter>
     </ClCompile>
     <ClCompile Include="..\src\logging\Logger.cpp">
-      <Filter>Source Files\Engine\Logging</Filter>
+      <Filter>Source Files\Logging</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\ResourceView.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\physics\PhysicalMaterial.cpp">
-      <Filter>Source Files\Engine\Physics</Filter>
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\Camera.cpp">
-      <Filter>Source Files\Engine\Renderer</Filter>
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\Task.cpp">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\scheduler\TaskScheduler.cpp">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+      <Filter>Source Files\Scripting\Angelscript\Script Utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Assert.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\DebugController.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\ErrorCode.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\FourCCGenerator.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\RandomNumberGenerator.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\ScopedFPUController.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\SurjectiveQueryEngine.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\concurrency\Lock.cpp">
-      <Filter>Source Files\Engine\Utility\Concurrency</Filter>
+      <Filter>Source Files\Utility\Concurrency</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\ObjectPool.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp">
-      <Filter>Source Files\Engine\Utility\Math</Filter>
+      <Filter>Source Files\Utility\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp">
-      <Filter>Source Files\Engine\Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\examples\Win32EntryPoint.cpp">
-      <Filter>Source Files\Games</Filter>
+      <Filter>Source Files\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Keyboard.cpp">
-      <Filter>Source Files\Engine\Input</Filter>
+      <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Mouse.cpp">
-      <Filter>Source Files\Engine\Input</Filter>
+      <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\PlaystationController.cpp">
-      <Filter>Source Files\Engine\Input</Filter>
+      <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\StringOperators.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\Thread.cpp">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Configuration\ConfigurablePODVariable.cpp">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Animation\Armature.cpp">
-      <Filter>Source Files\Engine\Animation</Filter>
+      <Filter>Source Files\Animation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Animation\LocalSpaceAnimationLayer.cpp">
-      <Filter>Source Files\Engine\Animation</Filter>
+      <Filter>Source Files\Animation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Animation\LocomotionAnimationLayer.cpp">
-      <Filter>Source Files\Engine\Animation</Filter>
+      <Filter>Source Files\Animation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\foundation\Window.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\IntrusivePointerBase.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\memory\InstanceNew.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\LoaderThread.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.cpp">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\ContentPackage.cpp">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Filesystem\ContentProvider.cpp">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.cpp">
-      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Source Files\Filesystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\ContentProvider.cpp">
-      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Source Files\Filesystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileAccessor.cpp">
-      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Source Files\Filesystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Filesystem\ReadableMemoryMappedFile.cpp">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp">
-      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Source Files\Filesystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\System\Win32\SystemInterface.cpp">
-      <Filter>Source Files\Engine\System\Win32</Filter>
+      <Filter>Source Files\System\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.cpp">
-      <Filter>Source Files\Engine\Scheduler\Win32</Filter>
+      <Filter>Source Files\Scheduler\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.WorkerThread.cpp">
-      <Filter>Source Files\Engine\Scheduler\Win32</Filter>
+      <Filter>Source Files\Scheduler\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp">
-      <Filter>Source Files\Engine\Renderer</Filter>
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp">
-      <Filter>Source Files\Engine\Renderer</Filter>
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\MeshResourceView.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\SwapChain.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshComponent.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCameraComponent.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D</Filter>
+      <Filter>Source Files\Renderer\Direct3D</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Source Files\Renderer\Direct3D11\Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Source Files\Renderer\Direct3D11\Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Source Files\Renderer\Direct3D11\Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\SwapChainBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Source Files\Renderer\Direct3D11\Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Source Files\Renderer\Direct3D11\Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Source Files\Renderer\Direct3D11\Builders</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterArmatureComponent.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.cpp">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\scripting\Angelscript\WorldView.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\NativeBindings.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+      <Filter>Source Files\Scripting\Angelscript\Script Utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.cpp">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
     <ClCompile Include="..\src\configuration\EngineService.cpp">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Networking\Steamworks\WorldView.cpp">
-      <Filter>Source Files\Engine\Networking\Steamworks</Filter>
+      <Filter>Source Files\Networking\Steamworks</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.cpp">
-      <Filter>Source Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Sound\XAudio2\EngineService.cpp">
-      <Filter>Source Files\Engine\Sound\XAudio2</Filter>
+      <Filter>Source Files\Sound\XAudio2</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Networking\Steamworks\EngineService.cpp">
-      <Filter>Source Files\Engine\Networking\Steamworks</Filter>
+      <Filter>Source Files\Networking\Steamworks</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Networking\Steamworks\EngineService.Player.cpp">
-      <Filter>Source Files\Engine\Networking\Steamworks</Filter>
+      <Filter>Source Files\Networking\Steamworks</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\XInput\EngineService.Controller.cpp">
-      <Filter>Source Files\Engine\Input\XInput</Filter>
+      <Filter>Source Files\Input\XInput</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\XInput\EngineService.cpp">
-      <Filter>Source Files\Engine\Input\XInput</Filter>
+      <Filter>Source Files\Input\XInput</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Win32\EngineService.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
+      <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Win32\EngineService.Keyboard.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
+      <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Win32\EngineService.Mouse.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
+      <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Input\Win32\EngineService.RawInputPollingThread.cpp">
-      <Filter>Source Files\Engine\Input\Win32</Filter>
+      <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.cpp">
-      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Source Files\Filesystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Foundation\World.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Foundation\WorldView.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\foundation\Player.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\foundation\GameEngine.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\foundation\GameEngineService.cpp">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\memory\Allocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\memory\ArenaAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\MessagePackBase.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\MessagePackReader.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\MessagePackWriter.cpp">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Build.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Win32EntryPoint.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Build.hpp">
-      <Filter>Header Files\Games</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
-      <Filter>Header Files\Engine\Packages</Filter>
+      <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Algorithms.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Assert.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\COMPointer.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\DebugController.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ErrorCode.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\FourCCGenerator.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\IdentifierPool.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\RandomNumberGenerator.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ScopedFPUController.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\SurjectiveQueryEngine.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\concurrency\Lock.hpp">
-      <Filter>Header Files\Engine\Utility\Concurrency</Filter>
+      <Filter>Header Files\Utility\Concurrency</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\ObjectPool.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\Prefetch.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\ThreadsafeObjectPool.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Alignof.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\AngleTypes.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\FloatTypes.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\IntTypes.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\MatrixTypes.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Noncopyable.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\VectorTypes.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming</Filter>
+      <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Compiler.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming\Compiler</Filter>
+      <Filter>Header Files\Utility\Metaprogramming\Compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Platform.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming\Platform</Filter>
+      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Platform.Linux.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming\Platform</Filter>
+      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Platform.MacOS.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming\Platform</Filter>
+      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Platform.PS3.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming\Platform</Filter>
+      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Platform.Win.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming\Platform</Filter>
+      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\mpl\Platform.Xenon.hpp">
-      <Filter>Header Files\Engine\Utility\Metaprogramming\Platform</Filter>
+      <Filter>Header Files\Utility\Metaprogramming\Platform</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\Range.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\ResizableArray.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp">
-      <Filter>Header Files\Engine\Utility\Math</Filter>
+      <Filter>Header Files\Utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\physics\PhysicalMaterial.hpp">
-      <Filter>Header Files\Engine\Physics</Filter>
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\Camera.hpp">
-      <Filter>Header Files\Engine\Renderer</Filter>
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\GPUFormats.hpp">
-      <Filter>Header Files\Engine\Renderer</Filter>
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\Task.hpp">
-      <Filter>Header Files\Engine\Scheduler</Filter>
+      <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\scheduler\TaskScheduler.hpp">
-      <Filter>Header Files\Engine\Scheduler</Filter>
+      <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\WorkerContext.hpp">
-      <Filter>Header Files\Engine\Scheduler</Filter>
+      <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+      <Filter>Header Files\Scripting\Angelscript\Script Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurableVariable.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurationDatabase.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Logging\FileAppendingLogger.hpp">
-      <Filter>Header Files\Engine\Logging</Filter>
+      <Filter>Header Files\Logging</Filter>
     </ClInclude>
     <ClInclude Include="..\src\logging\Logger.hpp">
-      <Filter>Header Files\Engine\Logging</Filter>
+      <Filter>Header Files\Logging</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Animation\AnimationTypes.hpp">
-      <Filter>Header Files\Engine\Animation</Filter>
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\resources\Eldritch2.Resources.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp">
-      <Filter>Header Files\Engine\Scripting</Filter>
+      <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\src\packages\ContentLibrary.hpp">
-      <Filter>Header Files\Engine\Packages</Filter>
+      <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Packages\ContentPackage.hpp">
-      <Filter>Header Files\Engine\Packages</Filter>
+      <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp">
-      <Filter>Header Files\Engine\Scheduler</Filter>
+      <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Input\Keyboard.hpp">
-      <Filter>Header Files\Engine\Input</Filter>
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Input\Mouse.hpp">
-      <Filter>Header Files\Engine\Input</Filter>
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Input\PlaystationController.hpp">
-      <Filter>Header Files\Engine\Input</Filter>
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Configuration\ConfigurablePODVariable.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\StringOperators.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurableUTF8String.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ObjectHandle.hpp">
-      <Filter>Header Files\Engine\Scripting</Filter>
+      <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\Thread.hpp">
-      <Filter>Header Files\Engine\Scheduler</Filter>
+      <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Configuration\SimpleConfigurableVariableWithStorage.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Configuration\INIParser.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ReferenceTypeBase.hpp">
-      <Filter>Header Files\Engine\Scripting</Filter>
+      <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Animation\Armature.hpp">
-      <Filter>Header Files\Engine\Animation</Filter>
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Animation\LocalSpaceAnimationLayer.hpp">
-      <Filter>Header Files\Engine\Animation</Filter>
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Animation\LocomotionAnimationLayer.hpp">
-      <Filter>Header Files\Engine\Animation</Filter>
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Concurrency\StripedLock.hpp">
-      <Filter>Header Files\Engine\Utility\Concurrency</Filter>
+      <Filter>Header Files\Utility\Concurrency</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Concurrency\StripedReaderWriterLock.hpp">
-      <Filter>Header Files\Engine\Utility\Concurrency</Filter>
+      <Filter>Header Files\Utility\Concurrency</Filter>
     </ClInclude>
     <ClInclude Include="..\src\foundation\Window.hpp">
-      <Filter>Header Files\Engine\Foundation</Filter>
+      <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\InstanceNew.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.hpp">
-      <Filter>Header Files\Engine\Scripting</Filter>
+      <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Concurrency\UserSemaphore.hpp">
-      <Filter>Header Files\Engine\Utility\Concurrency</Filter>
+      <Filter>Header Files\Utility\Concurrency</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Concurrency\WaitableUserEvent.hpp">
-      <Filter>Header Files\Engine\Utility\Concurrency</Filter>
+      <Filter>Header Files\Utility\Concurrency</Filter>
     </ClInclude>
     <ClInclude Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.hpp">
-      <Filter>Header Files\Engine\Packages</Filter>
+      <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Packages\LoaderThread.hpp">
-      <Filter>Header Files\Engine\Packages</Filter>
+      <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Packages\PackageDeserializationContext.hpp">
-      <Filter>Header Files\Engine\Packages</Filter>
+      <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\InstanceDeleters.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp">
-      <Filter>Header Files\Engine\Utility\Math</Filter>
+      <Filter>Header Files\Utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Result.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\DisposingResult.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\ContentProvider.hpp">
-      <Filter>Header Files\Engine\Filesystem</Filter>
+      <Filter>Header Files\Filesystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\ContentProvider.hpp">
-      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Header Files\Filesystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.hpp">
-      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Header Files\Filesystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileAccessor.hpp">
-      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Header Files\Filesystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\AsynchronousFileReader.hpp">
-      <Filter>Header Files\Engine\Filesystem</Filter>
+      <Filter>Header Files\Filesystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\AsynchronousFileWriter.hpp">
-      <Filter>Header Files\Engine\Filesystem</Filter>
+      <Filter>Header Files\Filesystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\ReadableMemoryMappedFile.hpp">
-      <Filter>Header Files\Engine\Filesystem</Filter>
+      <Filter>Header Files\Filesystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\SynchronousFileAppender.hpp">
-      <Filter>Header Files\Engine\Filesystem</Filter>
+      <Filter>Header Files\Filesystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\SynchronousFileReader.hpp">
-      <Filter>Header Files\Engine\Filesystem</Filter>
+      <Filter>Header Files\Filesystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\SynchronousFileWriter.hpp">
-      <Filter>Header Files\Engine\Filesystem</Filter>
+      <Filter>Header Files\Filesystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp">
-      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Header Files\Filesystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\system\SystemInterface.hpp">
-      <Filter>Header Files\Engine\System</Filter>
+      <Filter>Header Files\System</Filter>
     </ClInclude>
     <ClInclude Include="..\src\System\Win32\SystemInterface.hpp">
-      <Filter>Header Files\Engine\System\Win32</Filter>
+      <Filter>Header Files\System\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\Win32\TaskScheduler.hpp">
-      <Filter>Header Files\Engine\Scheduler\Win32</Filter>
+      <Filter>Header Files\Scheduler\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp">
-      <Filter>Header Files\Engine\Renderer</Filter>
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp">
-      <Filter>Header Files\Engine\Renderer</Filter>
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp">
-      <Filter>Header Files\Engine\Renderer</Filter>
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\ForwardDeclarations.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\MeshResourceView.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\ResourceCommon.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\SwapChain.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\WorldView.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D</Filter>
+      <Filter>Header Files\Renderer\Direct3D</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Header Files\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Header Files\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Header Files\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\SwapChainBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Header Files\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\TextureBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Header Files\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11\Builders</Filter>
+      <Filter>Header Files\Renderer\Direct3D11\Builders</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\EngineService.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Header Files\Physics\Bullet Dynamics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\WorldView.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Header Files\Physics\Bullet Dynamics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Header Files\Physics\Bullet Dynamics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+      <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+      <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+      <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.hpp">
-      <Filter>Header Files\Engine\Physics\Bullet Dynamics\Extensions</Filter>
+      <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\EngineService.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Header Files\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodeMetadata.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Header Files\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Header Files\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Header Files\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Header Files\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\scripting\Angelscript\WorldView.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Header Files\Scripting\Angelscript</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Scripting\Angelscript\NativeBindings.hpp">
-      <Filter>Header Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+      <Filter>Header Files\Scripting\Angelscript\Script Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Sound\XAudio2\ForwardDeclarations.hpp">
-      <Filter>Header Files\Engine\Sound\XAudio2</Filter>
+      <Filter>Header Files\Sound\XAudio2</Filter>
     </ClInclude>
     <ClInclude Include="..\src\configuration\EngineService.hpp">
-      <Filter>Header Files\Engine\Configuration</Filter>
+      <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Networking\Steamworks\WorldView.hpp">
-      <Filter>Header Files\Engine\Networking\Steamworks</Filter>
+      <Filter>Header Files\Networking\Steamworks</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\EngineService.hpp">
-      <Filter>Header Files\Engine\Renderer\Direct3D11</Filter>
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Sound\XAudio2\EngineService.hpp">
-      <Filter>Header Files\Engine\Sound\XAudio2</Filter>
+      <Filter>Header Files\Sound\XAudio2</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Networking\Steamworks\EngineService.hpp">
-      <Filter>Header Files\Engine\Networking\Steamworks</Filter>
+      <Filter>Header Files\Networking\Steamworks</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Input\XInput\EngineService.hpp">
-      <Filter>Header Files\Engine\Input\XInput</Filter>
+      <Filter>Header Files\Input\XInput</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Input\Win32\EngineService.hpp">
-      <Filter>Header Files\Engine\Input\Win32</Filter>
+      <Filter>Header Files\Input\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\foundation\Player.hpp">
-      <Filter>Header Files\Engine\Foundation</Filter>
+      <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\foundation\GameEngine.hpp">
-      <Filter>Header Files\Engine\Foundation</Filter>
+      <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\foundation\GameEngineService.hpp">
-      <Filter>Header Files\Engine\Foundation</Filter>
+      <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\foundation\World.hpp">
-      <Filter>Header Files\Engine\Foundation</Filter>
+      <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Foundation\WorldView.hpp">
-      <Filter>Header Files\Engine\Foundation</Filter>
+      <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp">
-      <Filter>Header Files\Engine\Foundation</Filter>
+      <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.hpp">
-      <Filter>Header Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Header Files\Filesystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ResultBase.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\FlatOrderedMap.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\OrderedMap.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\OrderedSet.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardListHook.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\IntrusiveList.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\List.hpp">
-      <Filter>Header Files\Engine\Utility\Containers</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\Allocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\ArenaAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\StdAllocatorAdapterMixin.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
-      <Filter>Header Files\Engine\Utility\Memory</Filter>
+      <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\MessagePackBase.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\MessagePackReader.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\MessagePackWriter.hpp">
-      <Filter>Header Files\Engine\Utility</Filter>
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Build.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1108,217 +1096,217 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\src\Animation\Armature.inl">
-      <Filter>Source Files\Engine\Animation</Filter>
+      <Filter>Source Files\Animation</Filter>
     </None>
     <None Include="..\src\Configuration\ConfigurablePODVariable.inl">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </None>
     <None Include="..\src\Configuration\ConfigurationDatabase.inl">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </None>
     <None Include="..\src\Configuration\INIParser.inl">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </None>
     <None Include="..\src\Configuration\SimpleConfigurableVariableWithStorage.inl">
-      <Filter>Source Files\Engine\Configuration</Filter>
+      <Filter>Source Files\Configuration</Filter>
     </None>
     <None Include="..\src\FileSystem\AsynchronousFileReader.inl">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </None>
     <None Include="..\src\FileSystem\AsynchronousFileWriter.inl">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </None>
     <None Include="..\src\FileSystem\ContentProvider.inl">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </None>
     <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </None>
     <None Include="..\src\FileSystem\SynchronousFileReader.inl">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </None>
     <None Include="..\src\FileSystem\SynchronousFileWriter.inl">
-      <Filter>Source Files\Engine\Filesystem</Filter>
+      <Filter>Source Files\Filesystem</Filter>
     </None>
     <None Include="..\src\FileSystem\Win32\ContentProvider.inl">
-      <Filter>Source Files\Engine\Filesystem\Win32</Filter>
+      <Filter>Source Files\Filesystem\Win32</Filter>
     </None>
     <None Include="..\src\Foundation\GameEngine.inl">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Foundation\GameEngineService.inl">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Foundation\World.inl">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Foundation\WorldView.inl">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Foundation\WorldViewFactoryPublishingInitializationVisitor.inl">
-      <Filter>Source Files\Engine\Foundation</Filter>
+      <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Packages\ContentLibrary.inl">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </None>
     <None Include="..\src\Packages\ContentPackage.inl">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </None>
     <None Include="..\src\Packages\PackageDeserializationContext.inl">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </None>
     <None Include="..\src\Packages\ResourceView.inl">
-      <Filter>Source Files\Engine\Packages</Filter>
+      <Filter>Source Files\Packages</Filter>
     </None>
     <None Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.inl">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </None>
     <None Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.inl">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </None>
     <None Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.inl">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </None>
     <None Include="..\src\Physics\BulletDynamics\EngineService.inl">
-      <Filter>Source Files\Engine\Physics\Bullet Dynamics</Filter>
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </None>
     <None Include="..\src\Scheduler\CRTPTransientTask.inl">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </None>
     <None Include="..\src\Scheduler\Task.inl">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </None>
     <None Include="..\src\Scheduler\WorkerContext.inl">
-      <Filter>Source Files\Engine\Scheduler</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </None>
     <None Include="..\src\Scripting\ObjectHandle.inl">
-      <Filter>Source Files\Engine\Scripting</Filter>
+      <Filter>Source Files\Scripting</Filter>
     </None>
     <None Include="..\src\Scripting\ReferenceTypeBase.inl">
-      <Filter>Source Files\Engine\Scripting</Filter>
+      <Filter>Source Files\Scripting</Filter>
     </None>
     <None Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.inl">
-      <Filter>Source Files\Engine\Scripting</Filter>
+      <Filter>Source Files\Scripting</Filter>
     </None>
     <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </None>
     <None Include="..\src\Scripting\AngelScript\EngineService.inl">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </None>
     <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl">
-      <Filter>Source Files\Engine\Scripting\Angelscript</Filter>
+      <Filter>Source Files\Scripting\Angelscript</Filter>
     </None>
     <None Include="..\src\Scripting\AngelScript\Utilities\AngelscriptObjectFactory.inl">
-      <Filter>Source Files\Engine\Scripting\Angelscript\Script Utilities</Filter>
+      <Filter>Source Files\Scripting\Angelscript\Script Utilities</Filter>
     </None>
     <None Include="..\src\Utility\Algorithms.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\COMPointer.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\Counter.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\DisposingResult.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\ErrorCode.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\IdentifierPool.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\MessagePackBase.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\MessagePackReader.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\MessagePackWriter.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\Result.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\ResultBase.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\StringOperators.inl">
-      <Filter>Source Files\Engine\Utility</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\Containers\FlatOrderedMap.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\FlatOrderedSet.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\IntrusiveForwardList.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\IntrusiveList.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\IntrusiveUnorderedSet.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\List.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\OrderedMap.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\OrderedSet.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\Range.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\ResizableArray.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\SpatialHash.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\UnorderedMap.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\UTF8String.inl">
-      <Filter>Source Files\Engine\Utility\Containers</Filter>
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Math\StandardLibrary.inl">
-      <Filter>Source Files\Engine\Utility\Math</Filter>
+      <Filter>Source Files\Utility\Math</Filter>
     </None>
     <None Include="..\src\Utility\Memory\Allocator.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Memory\ArenaAllocator.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Memory\ChildAllocator.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Memory\InstanceDeleters.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Memory\ObjectPool.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Memory\ObjectPoolAllocator.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Memory\StdAllocatorAdapterMixin.inl">
-      <Filter>Source Files\Engine\Utility\Memory</Filter>
+      <Filter>Source Files\Utility\Memory</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

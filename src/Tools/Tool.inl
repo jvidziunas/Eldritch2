@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Tool.cpp
+  Tool.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -7,23 +7,27 @@
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
+#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Tools/Tool.hpp>
+#include <Utility/Containers/Range.hpp>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Tools {
-namespace Detail {
 
-	Tool::Tool( Allocator& allocator ) : _inputFiles( { allocator, UTF8L("Tool Input File Name Allocator") } ) {}
+	template <class ImplementingTool>
+	ToolCRTPBase<ImplementingTool>::ToolCRTPBase( ::Eldritch2::Allocator& allocator ) : Detail::Tool( allocator ) {}
 
-}	// namespace Detail
+// ---------------------------------------------------
+
+	template <class ImplementingTool>
+	int	ToolCRTPBase<ImplementingTool>::Run( ::Eldritch2::Range<::Eldritch2::SystemChar**> /*arguments*/ ) {
+		return static_cast<ImplementingTool*>(this)->ProcessInputFiles( ::Eldritch2::Range<const ::Eldritch2::SystemChar**>( _inputFiles.Begin(), _inputFiles.End() ) );
+	}
+
 }	// namespace Tools
 }	// namespace Eldritch2
 

@@ -43,8 +43,8 @@ namespace Scheduler {
 
 	class ETPureAbstractHint TaskScheduler : private Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
-	public:
 
+	public:
 		//!	Execution priority for a thread. 
 		enum class ThreadPriority {
 			BELOW_NORMAL,
@@ -65,7 +65,7 @@ namespace Scheduler {
 	// ---
 
 		//!	Minimal state used for incremental backoff.
-		typedef Scheduler::BackoffContext	BackoffContext;
+		using BackoffContext	= Scheduler::BackoffContext;
 
 	// - WORK SCHEDULING ---------------------------------
 
