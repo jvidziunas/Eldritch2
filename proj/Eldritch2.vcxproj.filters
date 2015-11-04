@@ -25,12 +25,6 @@
     <Filter Include="Source Files\Configuration">
       <UniqueIdentifier>{43c3eb69-c1d6-40e3-9573-cc400966712c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Filesystem">
-      <UniqueIdentifier>{db5f578b-bced-4711-ab48-3e7129dda398}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Filesystem\Win32">
-      <UniqueIdentifier>{5e994b2a-3702-430f-afcc-637ae8f6fbde}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Foundation">
       <UniqueIdentifier>{7d7626b4-7058-4838-ae74-72c943989843}</UniqueIdentifier>
     </Filter>
@@ -127,12 +121,6 @@
     <Filter Include="Header Files\Configuration">
       <UniqueIdentifier>{b017f59a-b5f1-4b5a-b7cd-d690de2c7c32}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Filesystem">
-      <UniqueIdentifier>{bed06d8f-3adf-4793-8e46-44b48a656509}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Filesystem\Win32">
-      <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Foundation">
       <UniqueIdentifier>{e5e9dea9-21e4-4515-ad1f-2017a9c608db}</UniqueIdentifier>
     </Filter>
@@ -228,6 +216,18 @@
     </Filter>
     <Filter Include="Header Files\Utility\Math">
       <UniqueIdentifier>{c03f0771-ed6b-4727-84bd-4033c56e8386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileSystem">
+      <UniqueIdentifier>{db5f578b-bced-4711-ab48-3e7129dda398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileSystem\Win32">
+      <UniqueIdentifier>{5e994b2a-3702-430f-afcc-637ae8f6fbde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileSystem">
+      <UniqueIdentifier>{bed06d8f-3adf-4793-8e46-44b48a656509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileSystem\Win32">
+      <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -376,22 +376,16 @@
       <Filter>Source Files\Packages</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Filesystem\ContentProvider.cpp">
-      <Filter>Source Files\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.cpp">
-      <Filter>Source Files\Filesystem\Win32</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\ContentProvider.cpp">
-      <Filter>Source Files\Filesystem\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileAccessor.cpp">
-      <Filter>Source Files\Filesystem\Win32</Filter>
+      <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Filesystem\ReadableMemoryMappedFile.cpp">
-      <Filter>Source Files\Filesystem</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp">
-      <Filter>Source Files\Filesystem\Win32</Filter>
+      <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\System\Win32\SystemInterface.cpp">
       <Filter>Source Files\System\Win32</Filter>
@@ -529,7 +523,7 @@
       <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.cpp">
-      <Filter>Source Files\Filesystem\Win32</Filter>
+      <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Foundation\World.cpp">
       <Filter>Source Files\Foundation</Filter>
@@ -570,11 +564,23 @@
     <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp">
       <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp">
+      <Filter>Source Files\FileSystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp">
+      <Filter>Source Files\FileSystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Eldritch2.Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileWriter.cpp">
+      <Filter>Source Files\FileSystem\Win32</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\Build.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Win32EntryPoint.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileReader.cpp">
+      <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -819,37 +825,31 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\ContentProvider.hpp">
-      <Filter>Header Files\Filesystem</Filter>
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\ContentProvider.hpp">
-      <Filter>Header Files\Filesystem\Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.hpp">
-      <Filter>Header Files\Filesystem\Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileAccessor.hpp">
-      <Filter>Header Files\Filesystem\Win32</Filter>
+      <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\AsynchronousFileReader.hpp">
-      <Filter>Header Files\Filesystem</Filter>
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\AsynchronousFileWriter.hpp">
-      <Filter>Header Files\Filesystem</Filter>
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\ReadableMemoryMappedFile.hpp">
-      <Filter>Header Files\Filesystem</Filter>
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\SynchronousFileAppender.hpp">
-      <Filter>Header Files\Filesystem</Filter>
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\SynchronousFileReader.hpp">
-      <Filter>Header Files\Filesystem</Filter>
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Filesystem\SynchronousFileWriter.hpp">
-      <Filter>Header Files\Filesystem</Filter>
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp">
-      <Filter>Header Files\Filesystem\Win32</Filter>
+      <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\system\SystemInterface.hpp">
       <Filter>Header Files\System</Filter>
@@ -996,7 +996,7 @@
       <Filter>Header Files\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.hpp">
-      <Filter>Header Files\Filesystem\Win32</Filter>
+      <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ResultBase.hpp">
       <Filter>Header Files\Utility</Filter>
@@ -1064,6 +1064,18 @@
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp">
       <Filter>Header Files\Utility\Metaprogramming</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp">
+      <Filter>Header Files\FileSystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp">
+      <Filter>Header Files\FileSystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileReader.hpp">
+      <Filter>Header Files\FileSystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileWriter.hpp">
+      <Filter>Header Files\FileSystem\Win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1090,25 +1102,25 @@
       <Filter>Source Files\Configuration</Filter>
     </None>
     <None Include="..\src\FileSystem\AsynchronousFileReader.inl">
-      <Filter>Source Files\Filesystem</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </None>
     <None Include="..\src\FileSystem\AsynchronousFileWriter.inl">
-      <Filter>Source Files\Filesystem</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </None>
     <None Include="..\src\FileSystem\ContentProvider.inl">
-      <Filter>Source Files\Filesystem</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </None>
     <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl">
-      <Filter>Source Files\Filesystem</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </None>
     <None Include="..\src\FileSystem\SynchronousFileReader.inl">
-      <Filter>Source Files\Filesystem</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </None>
     <None Include="..\src\FileSystem\SynchronousFileWriter.inl">
-      <Filter>Source Files\Filesystem</Filter>
+      <Filter>Source Files\FileSystem</Filter>
     </None>
     <None Include="..\src\FileSystem\Win32\ContentProvider.inl">
-      <Filter>Source Files\Filesystem\Win32</Filter>
+      <Filter>Source Files\FileSystem\Win32</Filter>
     </None>
     <None Include="..\src\Foundation\GameEngine.inl">
       <Filter>Source Files\Foundation</Filter>

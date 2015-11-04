@@ -49,6 +49,24 @@
     <Filter Include="IDL Files">
       <UniqueIdentifier>{edc72de7-8d9c-4594-bc57-7f2768ddf48b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Tools\Win32">
+      <UniqueIdentifier>{25ed5662-ce15-45fe-983d-dadb08faed18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Win32">
+      <UniqueIdentifier>{29143aca-24d1-4ff5-92d7-577cdc48c7ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileSystem">
+      <UniqueIdentifier>{861c2320-721d-4853-9b7f-628f1ae08c8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileSystem">
+      <UniqueIdentifier>{06dd4860-a84c-4faf-a23b-00e5b4813104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileSystem\Win32">
+      <UniqueIdentifier>{2e91a119-a046-41f8-8ac6-b3ac4585bd9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileSystem\Win32">
+      <UniqueIdentifier>{dddc3764-5a97-4d56-820d-04305e04c674}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp">
@@ -74,6 +92,24 @@
     </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp">
       <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Tools\Win32\FileAccessorFactory.cpp">
+      <Filter>Source Files\Tools\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Assert.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp">
+      <Filter>Source Files\FileSystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp">
+      <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +149,33 @@
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp">
       <Filter>Header Files\Utility\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Tools\FileAccessorFactory.hpp">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Tools\Win32\FileAccessorFactory.hpp">
+      <Filter>Header Files\Tools\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\SynchronousFileReader.hpp">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\SynchronousFileWriter.hpp">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp">
+      <Filter>Header Files\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Assert.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp">
+      <Filter>Header Files\Utility\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp">
+      <Filter>Header Files\FileSystem\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp">
+      <Filter>Header Files\FileSystem\Win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Utility\Memory\Allocator.inl">
@@ -125,6 +188,15 @@
       <Filter>Source Files\Tools</Filter>
     </None>
     <None Include="..\src\Utility\Memory\ChildAllocator.inl">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\FileSystem\SynchronousFileReader.inl">
+      <Filter>Source Files\FileSystem</Filter>
+    </None>
+    <None Include="..\src\FileSystem\SynchronousFileWriter.inl">
+      <Filter>Source Files\FileSystem</Filter>
+    </None>
+    <None Include="..\src\Utility\Memory\StandardLibrary.Win.inl">
       <Filter>Source Files\Utility\Memory</Filter>
     </None>
   </ItemGroup>

@@ -16,11 +16,11 @@
 // INCLUDES
 //==================================================================//
 #include <FileSystem/Win32/ReadableMemoryMappedFile2.hpp>
-#include <FileSystem/Win32/AsynchronousFileAccessor.hpp>
-#include <FileSystem/Win32/SynchronousFileAccessor.hpp>
+#include <FileSystem/Win32/AsynchronousFileReader.hpp>
+#include <FileSystem/Win32/AsynchronousFileWriter.hpp>
+#include <FileSystem/Win32/SynchronousFileReader.hpp>
+#include <FileSystem/Win32/SynchronousFileWriter.hpp>
 #include <FileSystem/ContentProvider.hpp>
-//------------------------------------------------------------------//
-#include <Windows.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -43,12 +43,12 @@ namespace Win32 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using AsynchronousFileReader	= FileSystem::Win32::AsynchronousFileAccessor;
-		using AsynchronousFileWriter	= FileSystem::Win32::AsynchronousFileAccessor;
-		using SynchronousFileReader		= FileSystem::Win32::SynchronousFileAccessor;
-		using SynchronousFileWriter		= FileSystem::Win32::SynchronousFileAccessor;
-		using ReadableMemoryMappedFile	= FileSystem::Win32::ReadableMemoryMappedFile;
 		using ReadableMemoryMappedFile2 = FileSystem::Win32::ReadableMemoryMappedFile2;
+		using ReadableMemoryMappedFile	= FileSystem::Win32::ReadableMemoryMappedFile;
+		using AsynchronousFileReader	= FileSystem::Win32::AsynchronousFileReader;
+		using AsynchronousFileWriter	= FileSystem::Win32::AsynchronousFileWriter;
+		using SynchronousFileReader		= FileSystem::Win32::SynchronousFileReader;
+		using SynchronousFileWriter		= FileSystem::Win32::SynchronousFileWriter;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

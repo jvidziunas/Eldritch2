@@ -55,7 +55,7 @@ namespace FileSystem {
 
 	// ---
 
-		UTF8String<ExternalArenaAllocator>	fileName( ::Eldritch2::EmptyStringSemantics, { _alloca( STRING_SIZE_IN_BYTES ), STRING_SIZE_IN_BYTES, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") } );
+		UTF8String<ExternalArenaAllocator>	fileName( { _alloca( STRING_SIZE_IN_BYTES ), STRING_SIZE_IN_BYTES, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") } );
 
 		fileName.Reserve( _name.Length() + StringLength( suffix ) );
 		fileName.Append( _name ).Append( suffix ? suffix : UTF8L("") );

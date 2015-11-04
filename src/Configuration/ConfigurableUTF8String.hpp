@@ -26,7 +26,7 @@ namespace Configuration {
 		//!	Constructs this @ref ConfigurableUTF8String instance.
 		ConfigurableUTF8String( const ::Eldritch2::UTF8Char* const value, ::Eldritch2::Allocator& allocator );
 		//!	Constructs this @ref ConfigurableUTF8String instance.
-		ConfigurableUTF8String( const EmptyStringSemantics, ::Eldritch2::Allocator& allocator );
+		ConfigurableUTF8String( ::Eldritch2::Allocator& allocator );
 
 		//!	Destroys this @ref ConfigurableUTF8String instance.
 		~ConfigurableUTF8String() = default;

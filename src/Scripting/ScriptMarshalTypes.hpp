@@ -32,7 +32,7 @@ namespace Scripting {
 
 	public:
 		//!	Constructs this @ref StringMarshal instance.
-		StringMarshal( const EmptyStringSemantics, ::Eldritch2::Allocator& allocator );
+		StringMarshal( ::Eldritch2::Allocator& allocator );
 		//!	Constructs this @ref StringMarshal instance.
 		StringMarshal( const ::Eldritch2::UTF8Char* const string, const size_t stringLengthInOctets, ::Eldritch2::Allocator& allocator );
 		//!	Constructs this @ref StringMarshal instance.

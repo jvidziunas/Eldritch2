@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Win32EntryPoint.cpp
+  Eldritch2.Win32.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -28,7 +28,6 @@
 #include <Input/Win32/EngineService.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/Assert.hpp>
-#include <Build.hpp>
 //------------------------------------------------------------------//
 #define BOOST_ERROR_CODE_HEADER_ONLY
 #include <boost/system/error_code.hpp>
@@ -37,9 +36,6 @@
 #include <Shlwapi.h>
 #include <dbghelp.h>
 #include <shlobj.h>
-#include <TCHAR.h>
-//------------------------------------------------------------------//
-#include <memory>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -118,43 +114,6 @@ namespace {
 // ---------------------------------------------------
 
 	ET16ByteAligned char	applicationObjectMemory[sizeof(Application)];
-	
-// ---------------------------------------------------
-
-	static int GenerateDump( EXCEPTION_POINTERS* const exceptionPointers ) {
-		::MINIDUMP_EXCEPTION_INFORMATION	exceptionInfo;
-		::SYSTEMTIME						localTime;
-		::HANDLE							dumpFile;
-		::TCHAR								fileName[MAX_PATH];
-		::TCHAR								path[MAX_PATH]; 
-		bool								dumpSuccessful;
-
-		::GetLocalTime( &localTime );
-		::GetTempPath( static_cast<::DWORD>(_countof(path)), path );
-
-		::PathCombine( fileName, path, PROJECT_NAME_LIT );
-		::CreateDirectory( fileName, nullptr );
-
-		dumpFile = ::CreateFile( ::Eldritch2::PrintFormatted( fileName, SL("%s%s\\%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp"), 
-															  path, PROJECT_NAME_LIT, VERSION_STRING_LIT, 
-															  localTime.wYear, localTime.wMonth, localTime.wDay, 
-															  localTime.wHour, localTime.wMinute, localTime.wSecond, 
-															  ::GetCurrentProcessId(), ::GetCurrentThreadId() ),
-								 (GENERIC_READ | GENERIC_WRITE),
-								 (FILE_SHARE_WRITE | FILE_SHARE_READ),
-								 0,
-								 CREATE_ALWAYS,
-								 0,
-								 0 );
-
-		exceptionInfo.ExceptionPointers	= exceptionPointers;
-		exceptionInfo.ClientPointers	= TRUE;
-		exceptionInfo.ThreadId			= ::GetCurrentThreadId();
-
-		dumpSuccessful = !!::MiniDumpWriteDump( ::GetCurrentProcess(), ::GetCurrentProcessId(), dumpFile, MiniDumpWithDataSegs, &exceptionInfo, nullptr, nullptr );
-
-		return EXCEPTION_EXECUTE_HANDLER;
-	}
 
 }	// anonymous namespace
 

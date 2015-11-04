@@ -21,6 +21,5 @@ namespace Eldritch2 {
 
 	const Detail::StringBase::UTF32CodepointSemantics		UTF32CodepointSemantics;
 	const Detail::StringBase::ReturnEndOfNeedleSemantics	ReturnEndOfNeedleSemantics;
-	const Detail::StringBase::EmptyStringSemantics			EmptyStringSemantics;
 
 }	// namespace Eldritch2

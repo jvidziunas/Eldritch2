@@ -51,21 +51,13 @@ using namespace ::std;
 
 namespace {
 
-	enum FsInformationClass : ::DWORD {
-		FileFsSizeInformation		= 3,
-		FileFsSectorSizeInformation	= 11,
-		FileStorageInfo				= 16
-	};
-
-// ---------------------------------------------------
-
 	enum : ::DWORD {
 		FILE_SHARE_NONE							= 0u,
 
 	// ---
 
 		AGGREGATE_SYNCHRONOUS_READ_ATTRIBUTES	= ( FILE_FLAG_POSIX_SEMANTICS | FILE_FLAG_SEQUENTIAL_SCAN ),
-		AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES	= ( FILE_FLAG_POSIX_SEMANTICS | FILE_FLAG_SEQUENTIAL_SCAN ),
+		AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES	= ( FILE_FLAG_POSIX_SEMANTICS ),
 		AGGREGATE_READ_ATTRIBUTES				= ( AGGREGATE_SYNCHRONOUS_READ_ATTRIBUTES  | FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED ),
 		AGGREGATE_WRITE_ATTRIBUTES				= ( AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES | FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED )
 	};
@@ -113,6 +105,14 @@ namespace {
 
 	static ETNoAliasHint GetSectorSizeFromHandleFunction GetSectorSizeQueryAPI( const System::Win32::SystemInterface& systemInterface ) {
 		using NtStatus	= ::LONG;
+
+	// ---
+
+		enum FsInformationClass : ::DWORD {
+			FileFsSizeInformation		= 3,
+			FileFsSectorSizeInformation	= 11,
+			FileStorageInfo				= 16
+		};
 
 	// ---
 
@@ -199,7 +199,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	Result<AsynchronousFileReader> ContentProvider::CreateAsynchronousFileReader( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
+	Result<FileSystem::AsynchronousFileReader> ContentProvider::CreateAsynchronousFileReader( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
 		WidePath		filePath;
 		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
 											 GENERIC_READ,
@@ -250,10 +250,6 @@ namespace Win32 {
 // ---------------------------------------------------
 
 	Result<FileSystem::ReadableMemoryMappedFile> ContentProvider::CreateReadableMemoryMappedFile( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName ) {
-		using AllocationOption	= Allocator::AllocationOption;
-
-	// ---
-
 		WidePath		filePath;
 		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
 											 GENERIC_READ,
@@ -265,7 +261,7 @@ namespace Win32 {
 
 		if( const ::HANDLE fileMapping { ::CreateFileMapping( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) } ) {
 			if( const void* const mappedView = ::MapViewOfFile( fileMapping, FILE_MAP_READ, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), static_cast<::SIZE_T>(0u) ) ) {
-				if( auto resultObject = new(allocator, AllocationOption::TEMPORARY_ALLOCATION) ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) ) ) {
+				if( auto resultObject = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ReadableMemoryMappedFile( Range<const char*>( static_cast<const char*>(mappedView), GetFileSizeInBytes( file ) ) ) ) {
 					return { move( resultObject ) };
 				}
 			}
@@ -280,7 +276,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	Result<AsynchronousFileWriter> ContentProvider::CreateAsynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
+	Result<FileSystem::AsynchronousFileWriter> ContentProvider::CreateAsynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
 		WidePath		filePath;
 		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
 											 GENERIC_WRITE,
@@ -305,7 +301,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	Result<SynchronousFileWriter> ContentProvider::CreateSynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
+	Result<FileSystem::SynchronousFileWriter> ContentProvider::CreateSynchronousFileWriter( Allocator& allocator, const KnownContentLocation contentLocation, const UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior ) {
 		WidePath		filePath;
 		const ::HANDLE	file( ::CreateFileW( UTF8FileNameToWidePath( filePath, PathFromKnownContentLocation( contentLocation ), fileName ),
 											 GENERIC_WRITE,

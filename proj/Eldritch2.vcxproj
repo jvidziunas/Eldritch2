@@ -246,11 +246,13 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Filesystem\ContentProvider.cpp" />
     <ClCompile Include="..\src\Filesystem\ReadableMemoryMappedFile.cpp" />
-    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileReader.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\ContentProvider.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.cpp" />
-    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileAccessor.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp" />
     <ClCompile Include="..\src\Foundation\WorldView.cpp" />
     <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp" />
@@ -353,7 +355,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp" />
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp" />
     <ClCompile Include="..\src\Animation\Armature.cpp" />
-    <ClCompile Include="..\src\Win32EntryPoint.cpp" />
+    <ClCompile Include="..\src\Eldritch2.Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Animation\LocalSpaceAnimationLayer.hpp" />
@@ -370,11 +372,13 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Filesystem\SynchronousFileAppender.hpp" />
     <ClInclude Include="..\src\Filesystem\SynchronousFileReader.hpp" />
     <ClInclude Include="..\src\Filesystem\SynchronousFileWriter.hpp" />
-    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileAccessor.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileWriter.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\ContentProvider.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.hpp" />
-    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileAccessor.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp" />
     <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Input\Keyboard.hpp" />
     <ClInclude Include="..\src\Input\Mouse.hpp" />

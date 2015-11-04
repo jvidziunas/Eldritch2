@@ -22,19 +22,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -77,8 +77,8 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)src_scriptcompiler\;$(ExternSrcDir)eigen;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir);$(MainSrcDir);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ET_SCRIPT_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src_scriptcompiler\;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir);$(MainSrcDir);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -100,8 +100,8 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src_scriptcompiler\;$(ExternSrcDir)eigen;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir);$(MainSrcDir);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ET_SCRIPT_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src_scriptcompiler\;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir);$(MainSrcDir);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -125,8 +125,8 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src_scriptcompiler\;$(ExternSrcDir)eigen;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir);$(MainSrcDir);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ET_SCRIPT_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src_scriptcompiler\;$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir);$(MainSrcDir);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -143,21 +143,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Tools\Tool.cpp" />
+    <ClCompile Include="..\src\Tools\Win32\FileAccessorFactory.cpp" />
+    <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp" />
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="..\src_ScriptCompiler\FlatBufferMetadataBuilderVisitor.cpp" />
     <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h" />
+    <ClInclude Include="..\src\FileSystem\SynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\FileSystem\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\Tools\FileAccessorFactory.hpp" />
     <ClInclude Include="..\src\Tools\Tool.hpp" />
+    <ClInclude Include="..\src\Tools\Win32\FileAccessorFactory.hpp" />
+    <ClInclude Include="..\src\Utility\Assert.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Compiler.hpp" />
@@ -175,10 +190,13 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
     </CustomBuild>
+    <None Include="..\src\FileSystem\SynchronousFileReader.inl" />
+    <None Include="..\src\FileSystem\SynchronousFileWriter.inl" />
     <None Include="..\src\Tools\Tool.inl" />
     <None Include="..\src\Utility\Containers\Range.inl" />
     <None Include="..\src\Utility\Memory\Allocator.inl" />
     <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
+    <None Include="..\src\Utility\Memory\StandardLibrary.Win.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

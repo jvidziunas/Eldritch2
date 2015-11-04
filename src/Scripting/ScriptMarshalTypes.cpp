@@ -32,7 +32,7 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( const EmptyStringSemantics emptyStringSemantics, Allocator& allocator ) : UTF8String<>( emptyStringSemantics, { allocator, UTF8L("String Allocator") } ) {}
+	StringMarshal::StringMarshal( Allocator& allocator ) : UTF8String<>( { allocator, UTF8L("String Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -47,7 +47,7 @@ namespace Scripting {
 	ETNoAliasHint void StringMarshal::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static void ETScriptAPICall Constructor0( void* const thisPointer ) {
-				new(thisPointer) StringMarshal( ::Eldritch2::EmptyStringSemantics, *stringAllocator );
+				new(thisPointer) StringMarshal( *stringAllocator );
 			}
 
 			static void ETScriptAPICall Constructor1( void* const thisPointer, const StringMarshal& string ) {

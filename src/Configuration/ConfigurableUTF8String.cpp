@@ -35,7 +35,7 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	ConfigurableUTF8String::ConfigurableUTF8String( const EmptyStringSemantics semantics, Allocator& allocator ) : UTF8String<>( semantics, { allocator, configurableStringAllocatorName } ) {}
+	ConfigurableUTF8String::ConfigurableUTF8String( Allocator& allocator ) : UTF8String<>( { allocator, configurableStringAllocatorName } ) {}
 
 // ---------------------------------------------------
 	

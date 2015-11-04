@@ -1,5 +1,5 @@
 /*==================================================================*\
-  SynchronousFileAccessor.hpp
+  SynchronousFileWriter.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -22,20 +22,15 @@ namespace Eldritch2 {
 namespace FileSystem {
 namespace Win32 {
 
-	class SynchronousFileAccessor : public FileSystem::SynchronousFileReader, public FileSystem::SynchronousFileWriter {
+	class SynchronousFileWriter : public FileSystem::SynchronousFileWriter {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref SynchronousFileAccessor instance.
-		SynchronousFileAccessor( const ::HANDLE fileHandle, const size_t mediaSectorSizeInBytes );
+		//! Constructs this @ref SynchronousFileWriter instance.
+		SynchronousFileWriter( const ::HANDLE fileHandle, const size_t mediaSectorSizeInBytes );
 
-		//! Destroys this @ref SynchronousFileAccessor instance.
-		~SynchronousFileAccessor();
-
-	// ---------------------------------------------------
-
-		SynchronousFileReader::BlockingResult	Read( void* const destinationBuffer, const size_t lengthToReadInBytes ) override sealed;
-		SynchronousFileReader::BlockingResult	Read( void* const destinationBuffer, const size_t lengthToReadInBytes, const ::Eldritch2::uint64 fileOffsetInBytes ) override sealed;
+		//! Destroys this @ref SynchronousFileWriter instance.
+		~SynchronousFileWriter();
 
 	// ---------------------------------------------------
 
@@ -53,8 +48,6 @@ namespace Win32 {
 	// ---------------------------------------------------
 
 		uint64	GetFileCursorInBytes() const override sealed;
-
-		uint64	GetSizeInBytes() const override sealed;
 
 	// ---------------------------------------------------
 

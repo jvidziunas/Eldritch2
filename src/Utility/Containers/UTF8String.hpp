@@ -26,7 +26,6 @@ namespace Detail {
 	struct StringBase {
 		struct UTF32CodepointSemantics {};
 		struct ReturnEndOfNeedleSemantics {};
-		struct EmptyStringSemantics {};
 
 		class UTF32CodepointIterator : public ::std::iterator<::std::input_iterator_tag, ::Eldritch2::UTF32Char> {};
 	};
@@ -50,7 +49,7 @@ namespace Detail {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint UTF8String( const EmptyStringSemantics, AllocatorType&& allocator = AllocatorType() );
+		ETInlineHint UTF8String( AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
 		ETInlineHint UTF8String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
@@ -59,6 +58,8 @@ namespace Detail {
 		//!	Constructs this @ref UTF8String instance.
 		template <class AlternateAllocator>
 		ETInlineHint UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref UTF8String instance.
+		ETInlineHint UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString );
 
 		//!	Destroys this @ref UTF8String instance.
 		ETInlineHint ~UTF8String() = default;
@@ -167,7 +168,6 @@ namespace Detail {
 
 	extern const Detail::StringBase::UTF32CodepointSemantics	UTF32CodepointSemantics;
 	extern const Detail::StringBase::ReturnEndOfNeedleSemantics	ReturnEndOfNeedleSemantics;
-	extern const Detail::StringBase::EmptyStringSemantics		EmptyStringSemantics;
 
 }	// namespace Eldritch2
 

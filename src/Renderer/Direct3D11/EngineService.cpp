@@ -67,7 +67,7 @@ namespace Direct3D11 {
 															   _adaptiveResolutionMaxAreaFraction( 1.0f ),
 															   _adaptiveResolutionMinAreaFraction( 0.25f ),
 									 						   _VSyncMode( 0u ),
-															   _preferredAdapterName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
+															   _preferredAdapterName( GetEngineAllocator() ),
 															   _forceDebugRuntime( false ),
 															   _allowDriverThreadingOptimizations( true ),
 															   _maximumFramesToRenderAhead( 3u ),

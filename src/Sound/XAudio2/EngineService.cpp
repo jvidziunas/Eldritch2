@@ -50,7 +50,7 @@ namespace XAudio2 {
 															   _allocator( GetEngineAllocator(), UTF8L("XAudio2 Audio Renderer Allocator") ),
 															   _forcedSpeakerCount( 0u ),
 															   _processorAffinityMask( ::XAUDIO2_DEFAULT_PROCESSOR ),
-															   _deviceName( ::Eldritch2::EmptyStringSemantics, GetEngineAllocator() ),
+															   _deviceName( GetEngineAllocator() ),
 															   _audioGlitchCount( 0u ) {}
 
 // ---------------------------------------------------

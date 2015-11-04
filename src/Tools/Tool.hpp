@@ -27,6 +27,8 @@ namespace Tools {
 namespace Detail {
 
 	class Tool {
+	public:
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:

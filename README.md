@@ -20,5 +20,4 @@ Additionally, I'm in the process of having the C++ namespaces reflect the projec
 
 ## Program Structure
 
-### Engine
-The `main()` method for the engine lives in `/src/<Platform>EntryPoint.cpp`.
+The `main()` method for the any given project lives in `/<Project Source Directory>/<Project Name>.<Platform>.cpp`.

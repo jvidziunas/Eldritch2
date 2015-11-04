@@ -1,5 +1,5 @@
 /*==================================================================*\
-  SynchronousFileAccessor.cpp
+  SynchronousFileWriter.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,71 +12,27 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <FileSystem/Win32/SynchronousFileAccessor.hpp>
+#include <FileSystem/Win32/SynchronousFileWriter.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::FileSystem;
-using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace FileSystem {
 namespace Win32 {
 
-	SynchronousFileAccessor::SynchronousFileAccessor( const ::HANDLE fileHandle, const size_t mediaSectorSizeInBytes ) : _fileHandle( fileHandle ), _mediaSectorSizeInBytes( mediaSectorSizeInBytes ) {}
+	SynchronousFileWriter::SynchronousFileWriter( const ::HANDLE fileHandle, const size_t mediaSectorSizeInBytes ) : _fileHandle( fileHandle ), _mediaSectorSizeInBytes( mediaSectorSizeInBytes ) {}
 
 // ---------------------------------------------------
 
-	SynchronousFileAccessor::~SynchronousFileAccessor() {
+	SynchronousFileWriter::~SynchronousFileWriter() {
 		::CloseHandle( _fileHandle );
 	}
 
 // ---------------------------------------------------
 
-	SynchronousFileReader::BlockingResult SynchronousFileAccessor::Read( void* const destinationBuffer, const size_t lengthToReadInBytes )  {
-		enum : size_t {
-			// Maximum size of an atomic read operation, specified in bytes.
-			MAXIMUM_READ_SIZE_IN_BYTES = static_cast<::DWORD>(-1)
-		};
-
-	// ---
-
-		char*	writePointer( static_cast<char*>(destinationBuffer) );
-		::BOOL	readResult( TRUE );
-
-		// Since Windows can only work with reads representable with a DWORD, we need to loop to accommodate (potential) values held in a 64-bit size_t
-		while( (FALSE != readResult) & (static_cast<size_t>(writePointer - static_cast<char*>(destinationBuffer)) < lengthToReadInBytes) ) {
-			// Cap the read at the maximum representable value held in a DWORD. Remember to round *after* the comparison!
-			const ::DWORD	numberOfBytesToRead( static_cast<::DWORD>(Min<size_t>( lengthToReadInBytes, MAXIMUM_READ_SIZE_IN_BYTES )) );
-			::DWORD			numberOfBytesReadThisIteration;
-
-			readResult = ::ReadFile( _fileHandle, writePointer, numberOfBytesToRead, &numberOfBytesReadThisIteration, nullptr );
-
-			writePointer += numberOfBytesReadThisIteration;
-		}
-
-		return { FALSE != readResult ? Error::NONE : Error::UNSPECIFIED, static_cast<size_t>(writePointer - static_cast<char*>(destinationBuffer)) };
-	}
-
-// ---------------------------------------------------
-
-	SynchronousFileReader::BlockingResult SynchronousFileAccessor::Read( void* const destinationBuffer, const size_t lengthToReadInBytes, const uint64 fileOffsetInBytes ) {
-		::LARGE_INTEGER	fileOffsetHelper;
-		::LARGE_INTEGER	tempOffset;
-
-		fileOffsetHelper.QuadPart = fileOffsetInBytes;
-
-		// Update the file pointer to reference the desired offset...
-		::SetFilePointerEx( _fileHandle, fileOffsetHelper, &tempOffset, FILE_BEGIN );
-
-		// ... then take the traditional write path.
-		return Read( destinationBuffer, lengthToReadInBytes );
-	}
-
-// ---------------------------------------------------
-
-	SynchronousFileWriter::BlockingResult SynchronousFileAccessor::Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes ) {
+	SynchronousFileWriter::BlockingResult SynchronousFileWriter::Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes ) {
 		enum : size_t {
 			// Maximum size of an atomic write operation, specified in bytes.
 			MAXIMUM_WRITE_SIZE_IN_BYTES = static_cast<size_t>(static_cast<::DWORD>(-1))
@@ -103,7 +59,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	SynchronousFileWriter::BlockingResult SynchronousFileAccessor::Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes, const uint64 fileOffsetInBytes ) {
+	SynchronousFileWriter::BlockingResult SynchronousFileWriter::Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes, const uint64 fileOffsetInBytes ) {
 		::LARGE_INTEGER	fileOffsetHelper;
 		::LARGE_INTEGER	tempOffset;
 
@@ -118,7 +74,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void SynchronousFileAccessor::AdvanceToEnd() {
+	void SynchronousFileWriter::AdvanceToEnd() {
 		::LARGE_INTEGER	fileOffsetHelper;
 		::LARGE_INTEGER	tempOffset;
 
@@ -129,7 +85,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void SynchronousFileAccessor::SetFileSize( const uint64 fileSizeInBytes ) {
+	void SynchronousFileWriter::SetFileSize( const uint64 fileSizeInBytes ) {
 		::LARGE_INTEGER	fileOffsetHelper;
 		::LARGE_INTEGER	tempOffset;
 
@@ -142,7 +98,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	uint64 SynchronousFileAccessor::GetFileCursorInBytes() const {
+	uint64 SynchronousFileWriter::GetFileCursorInBytes() const {
 		::LARGE_INTEGER	offsetHelper;
 		::LARGE_INTEGER	cursor;
 
@@ -153,15 +109,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	uint64 SynchronousFileAccessor::GetSizeInBytes() const {
-		::LARGE_INTEGER	result;
-
-		return(!!::GetFileSizeEx( static_cast<::HANDLE>(_fileHandle), &result ) ? static_cast<uint64>(result.QuadPart) : 0u);
-	}
-
-// ---------------------------------------------------
-
-	size_t SynchronousFileAccessor::GetPhysicalMediaSectorSizeInBytes() const {
+	size_t SynchronousFileWriter::GetPhysicalMediaSectorSizeInBytes() const {
 		return _mediaSectorSizeInBytes;
 	}
 

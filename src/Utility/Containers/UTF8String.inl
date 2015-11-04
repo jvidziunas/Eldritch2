@@ -20,12 +20,12 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-
+	
 	template <class Allocator>
-	ETInlineHint UTF8String<Allocator>::UTF8String( const EmptyStringSemantics, AllocatorType&& allocator ) : UTF8String<Allocator>( "", ::std::move( allocator ) ) {}
+	ETInlineHint UTF8String<Allocator>::UTF8String( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
-	
+
 	template <class Allocator>
 	ETInlineHint UTF8String<Allocator>::UTF8String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator ) : _underlyingContainer( string, static_cast<SizeType>(stringEnd - string), ::std::move( allocator ) ) {}
 
@@ -41,6 +41,11 @@ namespace Eldritch2 {
 	template <class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint UTF8String<Allocator>::UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorType&& allocator ) : UTF8String<Allocator>( string.Begin(), string.End(), ::std::move( allocator ) ) {}
+
+// ---------------------------------------------------
+
+	template <class Allocator>
+	ETInlineHint UTF8String<Allocator>::UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString ) : _underlyingContainer( ::std::move( sourceString ) ) {}
 
 // ---------------------------------------------------
 

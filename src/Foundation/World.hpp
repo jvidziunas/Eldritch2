@@ -17,6 +17,7 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Containers/UTF8String.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ReferenceTypeBase.hpp>
@@ -55,6 +56,12 @@ namespace Foundation {
 		//! Destroys this @ref World instance.
 		~World();
 
+	// ---------------------------------------------------
+
+		::Eldritch2::UTF8String<>	GetValueForKey( ::Eldritch2::Allocator& resultAllocator, const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* defaultValue = UTF8L("") );
+
+		void						SetKeyValuePair( const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const value );
+
 	// - WORLD SIMULATION --------------------------------
 
 		void	QueueUpdateTasks( ::Eldritch2::Allocator& frameTaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& worldUpdatesCompleteTask );
@@ -85,6 +92,8 @@ namespace Foundation {
 		::Eldritch2::ArenaChildAllocator							_viewAllocator;
 		Scripting::ObjectHandle<Foundation::GameEngine>				_owningEngine;
 		Scripting::ObjectHandle<FileSystem::ContentPackage>			_package;
+		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>,
+								  ::Eldritch2::UTF8String<>>		_keyValuePairs;
 		::Eldritch2::uint32											_isPaused	: 1;
 		::Eldritch2::uint32											_isLoaded	: 1;
 		::Eldritch2::IntrusiveForwardList<Foundation::WorldView>	_attachedViews;

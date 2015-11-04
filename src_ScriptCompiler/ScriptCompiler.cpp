@@ -13,7 +13,11 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/Win32HeapAllocator.hpp>
+#include <FileSystem/SynchronousFileWriter.hpp>
 #include <FlatBufferMetadataBuilderVisitor.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
+#include <Tools/Win32/FileAccessorFactory.hpp>
+#include <Utility/Containers/UTF8String.hpp>
 #include <Utility/Containers/Range.hpp>
 #include <Tools/Tool.hpp>
 //------------------------------------------------------------------//
@@ -30,12 +34,15 @@
 #endif
 //------------------------------------------------------------------//
 
+using namespace ::Eldritch2;
+
 namespace {
 
-	using namespace ::Eldritch2::Tools;
-	using namespace ::Eldritch2;
+	class ScriptCompilerTool : public Win32GlobalHeapAllocator,
+							   public Tools::ToolCRTPBase<ScriptCompilerTool>,
+							   public Tools::Win32::FileAccessorFactory,
+							   public ::CScriptBuilder {
 
-	class ScriptCompilerTool : public Win32GlobalHeapAllocator, public ToolCRTPBase<ScriptCompilerTool>, public ::CScriptBuilder {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -122,34 +129,55 @@ namespace {
 	// ---------------------------------------------------
 
 		int ProcessInputFiles( Range<const SystemChar**> inputFiles ) {
-			class NullStream : public ::asIBinaryStream {
+			class Stream : public ::asIBinaryStream {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 			public:
-				void	Read( void* /*destination*/, ::asUINT /*sizeInBytes*/ ) override {}
-				void	Write( const void* /*source*/, ::asUINT /*sizeInBytes*/ ) override {}
+				ETInlineHint Stream( InstancePointer<FileSystem::SynchronousFileWriter>&& writer ) : _writer( move( writer ) ) {}
+
+			// ---------------------------------------------------
+
+				void Read( void* /*destination*/, ::asUINT /*sizeInBytes*/ ) override {}
+
+				void Write( const void* source, ::asUINT sizeInBytes ) override {
+					_writer->Write( source, sizeInBytes );
+				}
+
+			// - DATA MEMBERS ------------------------------------
+
+			private:
+				InstancePointer<FileSystem::SynchronousFileWriter>	_writer;
 			};
 
 		// ---
 
-			NullStream	stream;
+			 if( auto createOutputFileResult = CreateWriter( *this, SL("asdf") ) ) {
+				if( ::asSUCCESS != StartNewModule( ::asCreateScriptEngine(), "asdf" ) ) {
+					return -1;
+				}
 
-			if( ::asSUCCESS != StartNewModule( ::asCreateScriptEngine(), "asdf" ) ) {
-				return -1;
-			}
+				for( const SystemChar* fileName : inputFiles ) {
+					// AddSectionFromMemory();
+				}
 
-			for( const SystemChar* fileName : inputFiles ) {
-				// AddSectionFromMemory();
-			}
+				if( ::asSUCCESS == BuildModule() ) {
+					Stream	stream( move( createOutputFileResult ) );
 
-			if( (::asSUCCESS == BuildModule()) && (::asSUCCESS == GetModule()->SaveByteCode( &stream )) ) {
-				return AcceptMetadataVisitor( FlatBufferMetadataBuilderVisitor( stream, *this ) );
+					return (::asSUCCESS == GetModule()->SaveByteCode( &stream )) ? AcceptMetadataVisitor( Tools::FlatBufferMetadataBuilderVisitor( stream, *this ) ) : -1;
+				}
 			}
 
 			return -1;
 		}
+
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		::Eldritch2::UTF8String<>	_outputModuleName;
 	};
 
 }	// anonymous namespace
 
 int main( int argc, SystemChar** argv ) {
-	return ScriptCompilerTool().Run( { argv, argv + argc } );
+	return ScriptCompilerTool().Run( { argv + 1, argv + argc } );
 }

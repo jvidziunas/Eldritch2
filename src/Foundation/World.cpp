@@ -39,6 +39,7 @@ namespace Foundation {
 																					   _viewAllocator( _allocator, owningEngine._worldViewAllocationHintInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World View Allocator") ),
 																					   _owningEngine( owningEngine ),
 																					   _package( move( package ) ),
+																					   _keyValuePairs( { _allocator, UTF8L( "World Key-Value Pair Table Allocator" ) } ),
 																					   _isPaused( 1u ),
 																					   _isLoaded( 0u ),
 																					   _lastError( Error::NONE ) {
@@ -57,6 +58,18 @@ namespace Foundation {
 	World::~World() {
 		_owningEngine->GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Destroying world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) );
 		DeleteViews();
+	}
+
+// ---------------------------------------------------
+
+	UTF8String<> World::GetValueForKey( Allocator& resultAllocator, const UTF8Char* const key, const UTF8Char* defaultValue ) {
+		return { defaultValue, FindEndOfString( defaultValue ), { resultAllocator, UTF8L("World Key-Value Pair Allocator") } };
+	}
+
+// ---------------------------------------------------
+
+	void World::SetKeyValuePair( const UTF8Char* const key, const UTF8Char* const value ) {
+
 	}
 
 // ---------------------------------------------------
