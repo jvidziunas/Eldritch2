@@ -43,10 +43,6 @@ namespace Steamworks {
 		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PreScriptTickTaskVisitor ) override sealed;
 		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PostScriptTickTaskVisitor ) override sealed;
 
-	// ---------------------------------------------------
-
-		void	AcceptViewVisitor( Scripting::ScriptMessageSink& messageSink );
-
 	// - DATA MEMBERS ------------------------------------
 
 	private:

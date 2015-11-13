@@ -28,99 +28,96 @@
 namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
+namespace Detail {
 
-	namespace Detail {
+	const char* const	operatorNameTable[static_cast<size_t>(AngelScript::UserDefinedTypeRegistrar::BinaryOperatorClass::OPERATOR_COUNT)] = {
+		"opAdd",
+		"opSub",
+		"opMul",
+		"opDiv",
 
-		const char* const	operatorNameTable[static_cast<size_t>(AngelScript::UserDefinedTypeRegistrar::BinaryOperatorClass::OPERATOR_COUNT)] = {
-			"opAdd",
-			"opSub",
-			"opMul",
-			"opDiv",
+		"opAssign",
 
-			"opAssign",
-
-			"opAddAssign",
-			"opSubAssign",
-			"opMulAssign",
-			"opDivAssign"
-		};
-
-	// ---------------------------------------------------
-
-		template <typename Type>
-		struct TypeDeclarationFormatter {
-			template <typename OutputStream>
-			static OutputStream& Format( OutputStream& outputStream ) {
-				outputStream << AngelScript::UserDefinedTypeRegistrar::TypeStringGenerator<Type>::GetPrefix() << AngelScript::UserDefinedTypeRegistrar::TypeStringGenerator<Type>::GetTypeName() << AngelScript::UserDefinedTypeRegistrar::TypeStringGenerator<Type>::GetSuffix();
-
-				return outputStream;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		template <typename Type>
-		struct PropertyDeclarationFormatter {
-			template <typename OutputStream>
-			static OutputStream& Format( OutputStream& outputStream, const char* propertyName ) {
-				Detail::TypeDeclarationFormatter<Type>::Format( outputStream ) << " " << propertyName << '\0';
-				return outputStream;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		template <typename... Arguments>
-		struct FunctionArgumentFormatter {
-			template <typename OutputStream>
-			static OutputStream& Format( OutputStream& outputStream ) {
-				Detail::TypeDeclarationFormatter<Type>::Format( outputStream ) << " " << propertyName;
-				return outputStream;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		template <>
-		struct FunctionArgumentFormatter<> {
-			template <typename OutputStream>
-			static OutputStream& Format( OutputStream& outputStream ) {
-				return outputStream;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		template <typename Argument, typename... AntecedentArguments>
-		struct FunctionArgumentFormatter<Argument, AntecedentArguments...> {
-			template <typename OutputStream>
-			static OutputStream& Format( OutputStream& outputStream ) {
-				Detail::TypeDeclarationFormatter<Argument>::Format( outputStream );
-				if( 0 != sizeof...(AntecedentArguments) ) {
-					outputStream << ", ";
-				}
-
-				Detail::FunctionArgumentFormatter<AntecedentArguments...>::Format( outputStream );
-
-				return outputStream;
-			}
-		};
-
-	// ---------------------------------------------------
-
-		template <typename Return, typename... Arguments>
-		struct FunctionDeclarationFormatter {
-			template <typename OutputStream>
-			static OutputStream& Format( OutputStream& outputStream, const char* const functionName, bool isConst = false ) {
-				Detail::TypeDeclarationFormatter<Return>::Format( outputStream ) << " " << functionName << "(";
-				Detail::FunctionArgumentFormatter<Arguments...>::Format( outputStream ) << (isConst ? ") const" : ")") << '\0';
-				return outputStream;
-			}
-		};
-
-	}	// namespace Detail
+		"opAddAssign",
+		"opSubAssign",
+		"opMulAssign",
+		"opDivAssign"
+	};
 
 // ---------------------------------------------------
+
+	template <typename Type>
+	struct TypeDeclarationFormatter {
+		template <typename OutputStream>
+		static OutputStream& Format( OutputStream& outputStream ) {
+			outputStream << AngelScript::UserDefinedTypeRegistrar::TypeStringGenerator<Type>::GetPrefix() << AngelScript::UserDefinedTypeRegistrar::TypeStringGenerator<Type>::GetTypeName() << AngelScript::UserDefinedTypeRegistrar::TypeStringGenerator<Type>::GetSuffix();
+
+			return outputStream;
+		}
+	};
+
+// ---------------------------------------------------
+
+	template <typename Type>
+	struct PropertyDeclarationFormatter {
+		template <typename OutputStream>
+		static OutputStream& Format( OutputStream& outputStream, const char* propertyName ) {
+			Detail::TypeDeclarationFormatter<Type>::Format( outputStream ) << " " << propertyName << '\0';
+			return outputStream;
+		}
+	};
+
+// ---------------------------------------------------
+
+	template <typename... Arguments>
+	struct FunctionArgumentFormatter {
+		template <typename OutputStream>
+		static OutputStream& Format( OutputStream& outputStream ) {
+			Detail::TypeDeclarationFormatter<Type>::Format( outputStream ) << " " << propertyName;
+			return outputStream;
+		}
+	};
+
+// ---------------------------------------------------
+
+	template <>
+	struct FunctionArgumentFormatter<> {
+		template <typename OutputStream>
+		static OutputStream& Format( OutputStream& outputStream ) {
+			return outputStream;
+		}
+	};
+
+// ---------------------------------------------------
+
+	template <typename Argument, typename... AntecedentArguments>
+	struct FunctionArgumentFormatter<Argument, AntecedentArguments...> {
+		template <typename OutputStream>
+		static OutputStream& Format( OutputStream& outputStream ) {
+			Detail::TypeDeclarationFormatter<Argument>::Format( outputStream );
+			if( 0 != sizeof...(AntecedentArguments) ) {
+				outputStream << ", ";
+			}
+
+			Detail::FunctionArgumentFormatter<AntecedentArguments...>::Format( outputStream );
+
+			return outputStream;
+		}
+	};
+
+// ---------------------------------------------------
+
+	template <typename Return, typename... Arguments>
+	struct FunctionDeclarationFormatter {
+		template <typename OutputStream>
+		static OutputStream& Format( OutputStream& outputStream, const char* const functionName, bool isConst = false ) {
+			Detail::TypeDeclarationFormatter<Return>::Format( outputStream ) << " " << functionName << "(";
+			Detail::FunctionArgumentFormatter<Arguments...>::Format( outputStream ) << (isConst ? ") const" : ")") << '\0';
+			return outputStream;
+		}
+	};
+
+}	// namespace Detail
 
 	template <typename Native>
 	const char* UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetPrefix() {
@@ -306,6 +303,33 @@ namespace AngelScript {
 			return "&in";
 		}
 	};
+
+// ---------------------------------------------------
+
+	template <class Message>
+	ETInlineHint UserDefinedTypeRegistrar::MessageTypeBuilder<Message>::MessageTypeBuilder( ::asIScriptEngine& scriptEngine ) : _scriptEngine( scriptEngine ) {}
+
+// ---------------------------------------------------
+
+	template <class Message>
+	template <typename Property>
+	UserDefinedTypeRegistrar::MessageTypeBuilder<Message>& UserDefinedTypeRegistrar::MessageTypeBuilder<Message>::ExposeProperty( const char* const propertyName, Property Message::* propertyPointer ) {
+		using namespace ::boost::iostreams;
+
+	// ---
+
+		char						signature[128];
+		basic_array_sink<char>		sink( signature );
+		stream<decltype(sink)>		stream( sink );
+
+		Detail::PropertyDeclarationFormatter<Property>::Format( stream, propertyName );
+
+		const int	result( _scriptEngine.RegisterObjectProperty( UserDefinedTypeRegistrar::TypeStringGenerator<Message>::GetTypeName(), signature, ::std::distance( reinterpret_cast<char*>(1), reinterpret_cast<char*>(&(reinterpret_cast<Message*>(1)->*propertyPointer)) ) ) );
+
+		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
+
+		return *this;
+	}
 
 // ---------------------------------------------------
 

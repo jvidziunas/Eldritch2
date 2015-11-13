@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptObjectFactory.cpp
+  Pair.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -7,18 +7,17 @@
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
+#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/Utilities/AngelscriptObjectFactory.hpp>
+#include <rdestl/pair.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
 
-	AngelscriptObjectFactory::AngelscriptObjectFactory( ::asIObjectType* const objectType, ::asIScriptContext* const scriptContext ) : _objectType( objectType ), _scriptContext( scriptContext ) {}
+	template <typename T1, typename T2>
+	using Pair = ::rde::pair<T1, T2>;
 
-}	// namespace Scripting
 }	// namespace Eldritch2

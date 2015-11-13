@@ -75,11 +75,15 @@ namespace Configuration {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			public:
+				//!	Constructs this @ref PreConfigurationLoadedTask instance.
 				ETInlineHint PreConfigurationLoadedTask( EngineService& host, PostConfigurationLoadedTask& parent, WorkerContext& executingContext, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
 																																														   _host( host ),
 																																														   _subtaskAllocator( subtaskAllocator ) {
 					TrySchedulingOnContext( executingContext );
 				}
+
+				//!	Destroys this @ref PreConfigurationLoadedTask instance.
+				~PreConfigurationLoadedTask() = default;
 
 			// ---------------------------------------------------
 
@@ -111,10 +115,14 @@ namespace Configuration {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+			//!	Constructs this @ref PostConfigurationLoadedTask instance.
 			ETInlineHint PostConfigurationLoadedTask( EngineService& host, Task& initializeEngineTask, WorkerContext& executingContext, Allocator& subtaskAllocator ) : CRTPTransientTask<PostConfigurationLoadedTask>( initializeEngineTask, Scheduler::CodependentTaskSemantics ),
-																																											   _preConfigurationLoadedTask( host, *this, executingContext, subtaskAllocator ) {
+																																										_preConfigurationLoadedTask( host, *this, executingContext, subtaskAllocator ) {
 				TrySchedulingOnContext( executingContext );
 			}
+
+			//!	Destroys this @ref PostConfigurationLoadedTask instance.
+			~PostConfigurationLoadedTask() = default;
 
 		// ---------------------------------------------------
 
@@ -150,6 +158,9 @@ namespace Configuration {
 																																										_host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
+
+			//!	Destroys this @ref LoadSerializedConfigurationTask instance.
+			~LoadSerializedConfigurationTask() = default;
 
 		// ---------------------------------------------------
 

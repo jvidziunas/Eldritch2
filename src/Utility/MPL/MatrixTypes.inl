@@ -56,6 +56,11 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( push )
+	// MSVC complains about writing to uninitialized memory... thus initializing it.
+#	pragma warning( disable : 6001 )
+#endif
 	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4x4 operator +( const ::Eldritch2::Float4x4 operand0, const ::Eldritch2::Float4x4 operand1 ) {
 		Float4x4	temp;
 
@@ -66,9 +71,17 @@ namespace Eldritch2 {
 
 		return temp;
 	}
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )	// 6001
+#endif
 
 // ---------------------------------------------------
 
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( push )
+	// MSVC complains about writing to uninitialized memory... thus initializing it.
+#	pragma warning( disable : 6001 )
+#endif
 	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4x4 operator -( const ::Eldritch2::Float4x4 operand0, const ::Eldritch2::Float4x4 operand1 ) {
 		Float4x4	temp;
 
@@ -79,9 +92,17 @@ namespace Eldritch2 {
 
 		return temp;
 	}
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )	// 6001
+#endif
 
 // ---------------------------------------------------
 
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( push )
+	// MSVC complains about writing to uninitialized memory... thus initializing it.
+#	pragma warning( disable : 6001 )
+#endif
 	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4x4 operator *( const ::Eldritch2::Float4x4 operand, const ::Eldritch2::float32 scalar ) {
 		const __m128	scaleVector( ::_mm_set_ps1( scalar ) );
 		Float4x4		temp;
@@ -93,6 +114,9 @@ namespace Eldritch2 {
 
 		return temp;
 	}
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )	// 6001
+#endif
 
 // ---------------------------------------------------
 
@@ -102,6 +126,11 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( push )
+	// MSVC complains about writing to uninitialized memory... thus initializing it.
+#	pragma warning( disable : 6001 )
+#endif
 	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4x4 operator *( const ::Eldritch2::Float4x4 operand0, const ::Eldritch2::Float4x4 operand1 ) {
 		enum : int {
 			ALL_SOURCE_COMPONENTS	= 0xF0,
@@ -151,6 +180,9 @@ namespace Eldritch2 {
 
 		return temp;
 	}
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )	// 6001
+#endif
 
 // ---------------------------------------------------
 

@@ -39,7 +39,7 @@ namespace Foundation {
 																					   _viewAllocator( _allocator, owningEngine._worldViewAllocationHintInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World View Allocator") ),
 																					   _owningEngine( owningEngine ),
 																					   _package( move( package ) ),
-																					   _keyValuePairs( { _allocator, UTF8L( "World Key-Value Pair Table Allocator" ) } ),
+																					   _keyValuePairs( { _allocator, UTF8L("World Key-Value Pair Table Allocator") } ),
 																					   _isPaused( 1u ),
 																					   _isLoaded( 0u ),
 																					   _lastError( Error::NONE ) {
@@ -62,14 +62,21 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	UTF8String<> World::GetValueForKey( Allocator& resultAllocator, const UTF8Char* const key, const UTF8Char* defaultValue ) {
+	World::Property World::GetPropertyByKey( Allocator& resultAllocator, const UTF8Char* const key, const UTF8Char* defaultValue ) const {
 		return { defaultValue, FindEndOfString( defaultValue ), { resultAllocator, UTF8L("World Key-Value Pair Allocator") } };
 	}
 
 // ---------------------------------------------------
 
-	void World::SetKeyValuePair( const UTF8Char* const key, const UTF8Char* const value ) {
+	void World::SetProperty( const UTF8Char* const rawKey, const UTF8Char* const rawValue ) {
+		UTF8String<>	keyString( rawKey, FindEndOfString( rawKey ), { _allocator, UTF8L("World Key String Allocator") } );
+		auto			pairCandidate( _keyValuePairs.Find( keyString ) );
 
+		if( pairCandidate != _keyValuePairs.End() ) {
+			pairCandidate->second.Assign( rawKey );
+		} else {
+			_keyValuePairs.Insert( { move( keyString ), { rawValue, FindEndOfString( rawValue ), { _allocator, UTF8L("World Value String Allocator") } } } );
+		}
 	}
 
 // ---------------------------------------------------

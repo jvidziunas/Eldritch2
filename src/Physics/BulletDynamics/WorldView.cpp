@@ -102,12 +102,6 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {
-		// Dispatch collision notifications
-	}
-
-// ---------------------------------------------------
-
 	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PreScriptTickTaskVisitor ) {
 		// Do pathfinding?
 	}

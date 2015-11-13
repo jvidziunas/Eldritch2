@@ -12,6 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <FileSystem/ReadableMemoryMappedFile.hpp>
+#include <FileSystem/SynchronousFileWriter.hpp>
+#include <FileSystem/SynchronousFileReader.hpp>
 #include <Tools/FileAccessorFactory.hpp>
 //------------------------------------------------------------------//
 
@@ -24,6 +27,8 @@ namespace Win32 {
 
 	public:
 		//!	Constructs this @ref FileAccessorFactory instance.
+		explicit FileAccessorFactory( const FileAccessorFactory& ) = delete;
+		//!	Constructs this @ref FileAccessorFactory instance.
 		FileAccessorFactory() = default;
 
 		//!	Destroys this @ref FileAccessorFactory instance.
@@ -31,9 +36,11 @@ namespace Win32 {
 
 	// ---------------------------------------------------
 
-		virtual ::Eldritch2::InstancePointer<FileSystem::SynchronousFileReader>	CreateReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
+		::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
 
-		virtual ::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>	CreateWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
+		::Eldritch2::InstancePointer<FileSystem::SynchronousFileReader>		CreateReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
+
+		::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>		CreateWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
 	};
 
 }	// namespace Win32

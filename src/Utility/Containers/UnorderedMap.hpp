@@ -13,13 +13,15 @@
 //==================================================================//
 #include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
+#include <Utility/Hash.hpp>
+#include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
 #include <rdestl/hash_map.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class Hasher = ::rde::hash<Key>, class KeyEqualityComparator = ::rde::equal_to<Key>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
+	template <typename Key, typename StoredObject, class Hasher = ::Eldritch2::Hash<Key>, class KeyEqualityComparator = ::rde::equal_to<Key>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
 	class UnorderedMap {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -35,7 +37,7 @@ namespace Eldritch2 {
 		using SizeType				= typename UnderlyingContainer::size_type;
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using InsertResult			= ::rde::pair<Iterator, bool>;
+		using InsertResult			= ::Eldritch2::Pair<Iterator, bool>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -49,7 +51,6 @@ namespace Eldritch2 {
 		//! Constructs this @ref UnorderedMap instance.
 		ETInlineHint UnorderedMap( ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource );
 
-		//! Destroys this @ref UnorderedMap instance.
 		ETInlineHint ~UnorderedMap() = default;
 
 	// - ALGORITHMS --------------------------------------
@@ -65,15 +66,15 @@ namespace Eldritch2 {
 
 	// - ELEMENT ITERATION -------------------------------
 
-		// Retrieves a @ref ConstIterator to the first element stored in this UnorderedMap.
+		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref UnorderedMap.
 		ETInlineHint ConstIterator	ConstBegin() const;
 
-		// Retrieves a const iterator to the first element stored in this UnorderedMap.
+		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref UnorderedMap.
 		ETInlineHint ConstIterator	Begin() const;
-		// Retrieves an iterator to the first element stored in this UnorderedMap.
+		//!	Retrieves an @ref Iterator to the first element stored in this @ref UnorderedMap.
 		ETInlineHint Iterator		Begin();
 
-		// Retrieves a const iterator to one past the end of all elements stored in this UnorderedMap.
+		//!	Retrieves a const iterator to one past the end of all elements stored in this UnorderedMap.
 		ETInlineHint ConstIterator	ConstEnd() const;
 
 		// Retrieves a const iterator to one past the end of all elements stored in this UnorderedMap.

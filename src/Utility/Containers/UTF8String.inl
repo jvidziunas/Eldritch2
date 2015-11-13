@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/StandardLibrary.hpp>
+#include <Utility/Hash.hpp>
 //------------------------------------------------------------------//
 #include <utfcpp/v2_0/source/utf8/unchecked.h>
 //------------------------------------------------------------------//
@@ -45,7 +46,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Allocator>
-	ETInlineHint UTF8String<Allocator>::UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString ) : _underlyingContainer( ::std::move( sourceString ) ) {}
+	ETInlineHint UTF8String<Allocator>::UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString ) : _underlyingContainer( ::std::move( sourceString._underlyingContainer ) ) {}
 
 // ---------------------------------------------------
 
@@ -366,5 +367,30 @@ namespace Eldritch2 {
 	ETInlineHint typename const UTF8String<Allocator>::AllocatorType& UTF8String<Allocator>::GetAllocator() const {
 		return _underlyingContainer.get_allocator();
 	}
+
+// ---------------------------------------------------
+
+	template <class StringAllocator0, class StringAllocator1>
+	ETNoAliasHint bool	operator==( const ::Eldritch2::UTF8String<StringAllocator0>& string0, const ::Eldritch2::UTF8String<StringAllocator1>& string1 ) {
+		return 0 == string0.Compare( string1 );
+	}
+
+// ---------------------------------------------------
+
+	template <class Allocator>
+	class Hash<::Eldritch2::UTF8String<Allocator>> : public ::Eldritch2::Hash<const ::Eldritch2::UTF8Char*> {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		Hash() = default;
+
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		ETNoAliasHint size_t operator()( const ::Eldritch2::UTF8String<Allocator>& string, size_t seed = static_cast<size_t>(0) ) const {
+			return Hash<const ::Eldritch2::UTF8Char*>::operator()( string.GetCharacterArray(), static_cast<size_t>(string.Length()), seed );
+		}
+	};
 
 }	// namespace Eldritch2

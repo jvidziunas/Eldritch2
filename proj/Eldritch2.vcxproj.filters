@@ -258,9 +258,6 @@
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp">
       <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp">
-      <Filter>Source Files\Scripting\Angelscript\Script Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Assert.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -311,9 +308,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Input\PlaystationController.cpp">
       <Filter>Source Files\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\StringOperators.cpp">
-      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp">
       <Filter>Source Files\Utility\Containers</Filter>
@@ -582,6 +576,12 @@
     <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileReader.cpp">
       <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageSink.cpp">
+      <Filter>Source Files\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Hash.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
@@ -694,9 +694,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Scheduler\WorkerContext.hpp">
       <Filter>Header Files\Scheduler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.hpp">
-      <Filter>Header Files\Scripting\Angelscript\Script Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurableVariable.hpp">
       <Filter>Header Files\Configuration</Filter>
@@ -1076,6 +1073,18 @@
     <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileWriter.hpp">
       <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Scripting\MessageSink.hpp">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\Message.hpp">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Pair.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Hash.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1188,9 +1197,6 @@
     <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl">
       <Filter>Source Files\Scripting\Angelscript</Filter>
     </None>
-    <None Include="..\src\Scripting\AngelScript\Utilities\AngelscriptObjectFactory.inl">
-      <Filter>Source Files\Scripting\Angelscript\Script Utilities</Filter>
-    </None>
     <None Include="..\src\Utility\Algorithms.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
@@ -1289,6 +1295,9 @@
     </None>
     <None Include="..\src\Utility\Memory\StdAllocatorAdapterMixin.inl">
       <Filter>Source Files\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src\Utility\Hash.inl">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

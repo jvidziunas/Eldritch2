@@ -108,12 +108,6 @@ namespace Steamworks {
 		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) BroadcastPacketsTask( *this, executingContext, visitingTask );
 	}
 
-// ---------------------------------------------------
-
-	void WorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {
-		// Broadcast join/leave notifications, etc.
-	}
-
 }	// namespace Steamworks
 }	// namespace Networking
 }	// namespace Eldritch2

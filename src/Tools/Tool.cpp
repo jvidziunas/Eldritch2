@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/Range.hpp>
 #include <Tools/Tool.hpp>
 //------------------------------------------------------------------//
 
@@ -21,9 +22,34 @@ namespace Eldritch2 {
 namespace Tools {
 namespace Detail {
 
-	Tool::Tool( Allocator& allocator ) : _inputFiles( { allocator, UTF8L("Tool Input File Name Allocator") } ) {}
+	int	OptionRegistrationVisitorBase::DispatchOptions( const ::Eldritch2::Range<const ::Eldritch2::SystemChar**> options ) const {
+		return 0;
+	}
 
 }	// namespace Detail
+
+	Tool::OptionRegistrationVisitor::OptionRegistrationVisitor( Allocator& allocator ) : Detail::OptionRegistrationVisitorBase( allocator ) {}
+
+// ---------------------------------------------------
+
+	int	Tool::Run( const Range<const SystemChar**> options ) {
+		const auto	positionalArgumentsBegin( Utility::RemoveIf( options.first, options.onePastLast, [] ( const SystemChar* const option ) {
+			return *option != SL('-');
+		} ) );
+
+		OptionRegistrationVisitor	visitor( allocator );
+
+		RegisterOptions( visitor );
+
+		return ProcessInputFiles( { positionalArgumentsBegin, options.onePastLast } );
+	}
+
+// ---------------------------------------------------
+
+	void Tool::RegisterOptions( OptionRegistrationVisitor& /*visitor*/ ) {
+		// Default implementation does nothing.
+	}
+
 }	// namespace Tools
 }	// namespace Eldritch2
 

@@ -97,17 +97,10 @@ namespace FileSystem {
 	// - TYPE PUBLISHING ---------------------------------
 	
 	private:
-		class ResourceViewFactoryKey : public ::std::pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*> {
-		// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			class Hash : public Utility::StringHash {
-			public:
-				ETInlineHint ETNoAliasHint size_t	operator()( const ResourceViewFactoryKey& key, const size_t seed = 0u ) const;
-			};
-
+		class ResourceViewFactoryKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+		public:
 			//! Constructs this @ref ResourceViewFactoryKey instance.
 			/*! @param[in] begin Pointer to the beginning of a C string containing the name of a resource type. Does not have to be null-terminated.
 				@param[in] end Pointer to one past the last character of the string headed by the _begin_ parameter. This does not necessarily have to (but may) point to a null character.
@@ -128,16 +121,10 @@ namespace FileSystem {
 
 	// ---
 
-		class ResourceViewKey : public ::std::pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*> {
-		public:
-			class Hash : public Utility::StringHash {
-			public:
-				ETInlineHint ETNoAliasHint size_t	operator()( const ResourceViewKey& key, const size_t seed = 0u ) const;
-			};
-
+		class ResourceViewKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-
+		public:
 			//!	Constructs this @ref ResourceViewKey instance.
 			/*!	@param[in] resourceName The name of the @ref ResourceView to find.
 				@param[in] resourceType The concrete polymorphic type of the @ref ResourceView
@@ -182,15 +169,14 @@ namespace FileSystem {
 		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_resourceViewCollectionMutex;		
 
 		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*,
-								  Utility::StringHash,
+								  ::Eldritch2::Hash<const ::Eldritch2::UTF8Char*>,
 								  Utility::StringEqualComparator<>>							_contentPackageCollection;
 
 		//! The value type is left as a void* to prevent slicing for resource views that use multiple inheritance.
-		::Eldritch2::UnorderedMap<ResourceViewKey, const void*, ResourceViewKey::Hash>		_resourceViewCollection;
+		::Eldritch2::UnorderedMap<ResourceViewKey, const void*>								_resourceViewCollection;
 
 		::Eldritch2::UnorderedMap<ResourceViewFactoryKey,
-								  ::Eldritch2::ResizableArray<ResourceViewFactory>,
-								  ResourceViewFactoryKey::Hash>								_resourceViewFactoryCollection;
+								  ::Eldritch2::ResizableArray<ResourceViewFactory>>			_resourceViewFactoryCollection;
 
 		FileSystem::LoaderThread*															_loaderThread;
 

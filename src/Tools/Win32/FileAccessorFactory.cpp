@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <FileSystem/Win32/ReadableMemoryMappedFile.hpp>
 #include <FileSystem/Win32/SynchronousFileReader.hpp>
 #include <FileSystem/Win32/SynchronousFileWriter.hpp>
 #include <Tools/Win32/FileAccessorFactory.hpp>
@@ -23,6 +24,12 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Tools {
 namespace Win32 {
+
+	InstancePointer<FileSystem::ReadableMemoryMappedFile> FileAccessorFactory::CreateReadableMemoryMappedFile( Allocator& allocator, const SystemChar* const fileName ) {
+		return { nullptr, { allocator } };
+	}
+
+// ---------------------------------------------------
 
 	InstancePointer<FileSystem::SynchronousFileReader> FileAccessorFactory::CreateReader( Allocator& allocator, const SystemChar* const fileName ) {
 		const ::HANDLE	file( ::CreateFile( fileName, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, nullptr ) );

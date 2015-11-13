@@ -83,6 +83,11 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( push )
+	// MSVC complains about writing to uninitialized memory... thus initializing it.
+#	pragma warning( disable : 6001 )
+#endif
 	ETNoAliasHint Float4x4 Float4x4::Zero() {
 		Float4x4	temp;
 
@@ -93,5 +98,8 @@ namespace Eldritch2 {
 
 		return temp;
 	}
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )	// 6001
+#endif
 
 }	// namespace Eldritch2

@@ -19,27 +19,11 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ETInlineHint ContentLibrary::ResourceViewFactoryKey::ResourceViewFactoryKey( const ::Eldritch2::UTF8Char* const begin, const ::Eldritch2::UTF8Char* const end ) : ::std::pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*>( begin, end ) {}
+	ETInlineHint ContentLibrary::ResourceViewFactoryKey::ResourceViewFactoryKey( const ::Eldritch2::UTF8Char* const begin, const ::Eldritch2::UTF8Char* const end ) : Pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*>( begin, end ) {}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint size_t ContentLibrary::ResourceViewFactoryKey::Hash::operator()( const ResourceViewFactoryKey& key, const size_t seed ) const {
-		return StringHash::operator()( key.first, key.second, seed );
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint ETNoAliasHint size_t ContentLibrary::ResourceViewKey::Hash::operator()( const ResourceViewKey& key, const size_t seed ) const {
-		using StringHash = Utility::StringHash;
-
-	// ---
-
-		return StringHash::operator()( key.first, StringHash::operator()( key.second->name(), seed ) );
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint ContentLibrary::ResourceViewKey::ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType ) : ::std::pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*>( resourceName, resourceType ) {}
+	ETInlineHint ContentLibrary::ResourceViewKey::ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType ) : Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*>( resourceName, resourceType ) {}
 
 // ---------------------------------------------------
 

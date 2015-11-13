@@ -24,9 +24,17 @@
 #include <Foundation/Player.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
+#if( ET_COMPILER_IS_MSVC )
+//	Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
+#	pragma warning( push )
+#	pragma warning( disable : 6340 )
+#endif
 #include <isteamclient.h>
 #include <isteamnetworking.h>
 #include <steam_gameserver.h>
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
 //------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//

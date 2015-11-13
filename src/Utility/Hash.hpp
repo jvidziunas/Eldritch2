@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ScriptAPIRegistrationInitializationVisitor.hpp
+  Hash.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,30 +12,45 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/UserDefinedTypeRegistrar.hpp>
+#include <Utility/MPL/Compiler.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
+namespace Detail {
 
-	class ScriptAPIRegistrationInitializationVisitor : public Scripting::AngelScript::UserDefinedTypeRegistrar {
+	class HashBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref ScriptAPIRegistrationInitializationVisitor instance.
-		/*!	@param[in] arguments Template parameter pack containing the arguments to be forwarded to the real type registrar constructor.
-			*/
-		template <typename... Arguments>
-		ETInlineHint ScriptAPIRegistrationInitializationVisitor( Arguments&&... arguments );
+		HashBase() = default;
 
-		~ScriptAPIRegistrationInitializationVisitor() = default;
+		~HashBase() = default;
+
+	// ---------------------------------------------------
+
+		ETNoAliasHint size_t	operator()( const void* sourceData, const size_t sourceDataSizeInBytes, const size_t seed = static_cast<size_t>(0) ) const;
 	};
 
-}	// namespace Scripting
+}	// namespace Detail
+
+	template <typename T>
+	class Hash : public Detail::HashBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		Hash() = default;
+
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		ETNoAliasHint size_t	operator()( const T& object, const size_t seed = static_cast<size_t>(0) ) const;
+	};
+
 }	// namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.inl>
+#include <Utility/Hash.inl>
 //------------------------------------------------------------------//

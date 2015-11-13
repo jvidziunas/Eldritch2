@@ -49,8 +49,7 @@ namespace Direct3D11 {
 		//! Constructs this @ref WorldView instance.
 		WorldView( Foundation::World& owningWorld, const Direct3D11::MeshResourceView& defaultMesh );
 
-		//! Destroys this @ref WorldView instance.
-		~WorldView();
+		~WorldView() = default;
 
 	// ---------------------------------------------------
 

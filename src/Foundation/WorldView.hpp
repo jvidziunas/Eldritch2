@@ -26,10 +26,6 @@ namespace Eldritch2 {
 		class	ContentLibrary;
 	}
 
-	namespace Scripting {
-		class	ScriptMessageSink;
-	}
-
 	namespace Scheduler {
 		class	WorkerContext;
 	}
@@ -64,7 +60,6 @@ namespace Foundation {
 	// ---------------------------------------------------
 
 		virtual void	AcceptViewVisitor( const ScriptExecutionPreparationVisitor );
-		virtual void	AcceptViewVisitor( Scripting::ScriptMessageSink& messageSink );
 		virtual void	AcceptViewVisitor( const DeletionPreparationVisitor );
 		virtual void	AcceptViewVisitor( const LoadFinalizationVisitor );
 
@@ -79,10 +74,14 @@ namespace Foundation {
 
 	// - WORLD VIEW SANDBOX METHODS ----------------------
 
-		//!	Retrieves a read-only view of the hosting @ref World. Useful for inspecting shared state.
+		//!	Retrieves a read-only view of the hosting @ref World.
+		/*!	 @returns A const reference to the owning @ref World.
+			*/
 		ETInlineHint const Foundation::World&	GetOwningWorld() const;
 
 		//!	Retrieves the hosting game engine's @ref ContentLibrary.
+		/*!	@returns A const reference to the @ref ContentLibrary used by the @ref GameEngine that owns *this.
+			*/
 		const FileSystem::ContentLibrary&		GetEngineContentLibrary() const;
 
 		//!	Retrieves the hosting world's general-purpose @ref Allocator.
@@ -94,6 +93,8 @@ namespace Foundation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref WorldView instance.
+		/*!	@param[in] owningWorld <Parameter Description>
+			*/
 		WorldView( Foundation::World& owningWorld );
 
 	public:

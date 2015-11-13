@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptObjectFactory.cpp
+  MessageSink.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -7,18 +7,33 @@
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
+#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/Utilities/AngelscriptObjectFactory.hpp>
+#include <Utility/Containers/IntrusiveVyukovMPSCQueue.hpp>
+#include <Scripting/Message.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Scripting {
 
-	AngelscriptObjectFactory::AngelscriptObjectFactory( ::asIObjectType* const objectType, ::asIScriptContext* const scriptContext ) : _objectType( objectType ), _scriptContext( scriptContext ) {}
+	class MessageSink {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	protected:
+		//!	Constructs this @ref MessageSink instance.
+		MessageSink() = default;
+
+		//!	Destroys this @ref MessageSink instance.
+		~MessageSink() = default;
+		
+	// - DATA MEMBERS ------------------------------------
+
+		::Eldritch2::IntrusiveVyukovMPSCQueue<Scripting::Message>	_pendingMessages;
+	};
 
 }	// namespace Scripting
 }	// namespace Eldritch2
+

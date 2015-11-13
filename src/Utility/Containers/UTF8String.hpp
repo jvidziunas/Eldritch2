@@ -49,7 +49,7 @@ namespace Detail {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint UTF8String( AllocatorType&& allocator = AllocatorType() );
+		ETInlineHint explicit UTF8String( AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
 		ETInlineHint UTF8String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
@@ -61,7 +61,6 @@ namespace Detail {
 		//!	Constructs this @ref UTF8String instance.
 		ETInlineHint UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString );
 
-		//!	Destroys this @ref UTF8String instance.
 		ETInlineHint ~UTF8String() = default;
 
 	// - ALGORITHMS --------------------------------------
@@ -107,13 +106,13 @@ namespace Detail {
 		template <class AlternateAllocator>
 		ETInlineHint ::Eldritch2::UTF8String<AlternateAllocator>	Substring( AlternateAllocator& allocator, const ConstIterator begin );
 
-		ETInlineHint::Eldritch2::UTF8String<Allocator>&	Assign( const CharacterType* const str );
-		ETInlineHint::Eldritch2::UTF8String<Allocator>&	Assign( const CharacterType* const str, const SizeType lengthInBytes );
+		ETInlineHint ::Eldritch2::UTF8String<Allocator>&	Assign( const CharacterType* const str );
+		ETInlineHint ::Eldritch2::UTF8String<Allocator>&	Assign( const CharacterType* const str, const SizeType lengthInBytes );
 
-		ETInlineHint::Eldritch2::UTF8String<Allocator>&		Append( const CharacterType character );
+		ETInlineHint ::Eldritch2::UTF8String<Allocator>&	Append( const CharacterType character );
 		
 		ETInlineHint ::Eldritch2::UTF8String<Allocator>&	Append( const CharacterType* const string );
-		ETInlineHint::Eldritch2::UTF8String<Allocator>&		Append( const CharacterType* const stringBegin, const SizeType lengthInBytes );
+		ETInlineHint ::Eldritch2::UTF8String<Allocator>&	Append( const CharacterType* const stringBegin, const SizeType lengthInBytes );
 		template <class AlternateAllocator>
 		ETInlineHint ::Eldritch2::UTF8String<Allocator>&	Append( const ::Eldritch2::UTF8String<AlternateAllocator>& string );
 
@@ -163,6 +162,11 @@ namespace Detail {
 	private:
 		UnderlyingContainer	_underlyingContainer;
 	};
+
+// ---
+
+	template <class StringAllocator0, class StringAllocator1 = StringAllocator0>
+	ETNoAliasHint bool	operator==( const ::Eldritch2::UTF8String<StringAllocator0>& string0, const ::Eldritch2::UTF8String<StringAllocator1>& string1 );
 
 // ---
 

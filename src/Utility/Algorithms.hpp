@@ -52,14 +52,8 @@ namespace Utility {
 	template <typename InputIterator, typename Predicate>
 	InputIterator	Find( InputIterator begin, InputIterator end, Predicate predicate );
 
-	template <typename InputIterator, typename ExtraArgument, typename Predicate>
-	InputIterator	Find( InputIterator begin, InputIterator end, ExtraArgument extraArgument, Predicate predicate );
-
 	template <typename InputIterator, typename Predicate>
 	InputIterator	FindInPlace( InputIterator begin, InputIterator end, Predicate& predicate );
-
-	template <typename InputIterator, typename ExtraArgument, typename Predicate>
-	InputIterator	FindInPlace( InputIterator begin, InputIterator end, ExtraArgument extraArgument, Predicate& predicate );
 
 	template <typename InputIterator>
 	InputIterator	FindElement( InputIterator begin, InputIterator end, decltype(*begin) element );
@@ -70,10 +64,6 @@ namespace Utility {
 	// Returns a copy of the predicate after all operations have been performed.
 	template <typename InputIterator, typename Predicate>
 	Predicate			ForEach( InputIterator begin, InputIterator end, Predicate predicate );
-	// Applies the operator() method of the specified predicate to each element in the specified range.
-	// Returns a copy of the predicate after all operations have been performed.
-	template <typename InputIterator, typename ExtraArgument, typename Predicate>
-	Predicate			ForEach( InputIterator begin, InputIterator end, ExtraArgument extraArgument, Predicate predicate );
 	// Applies the operator() method of the specified predicate to each element in the specified array.
 	// Returns a copy of the predicate after all operations have been performed.
 	template <typename ObjectType, size_t arraySize, typename Predicate>
@@ -88,15 +78,6 @@ namespace Utility {
 	// Note that operator() of the predicate object *must* be callable when the target object is const!
 	template <typename InputIterator, typename Predicate>
 	const Predicate&	ForEachInPlace( InputIterator begin, InputIterator end, const Predicate& predicate );
-	// Applies the operator() method of the specified predicate to each element in the specified range.
-	// Returns a reference to the passed-in predicate.
-	template <typename InputIterator, typename ExtraArgument, typename Predicate>
-	Predicate&			ForEachInPlace( InputIterator begin, InputIterator end, ExtraArgument extraArgument, Predicate& predicate );
-	// Applies the operator() method of the specified predicate to each element in the specified range.
-	// Returns a reference to the passed-in predicate.
-	// Note that operator() of the predicate object *must* be callable when the target object is const!
-	template <typename InputIterator, typename ExtraArgument, typename Predicate>
-	const Predicate&	ForEachInPlace( InputIterator begin, InputIterator end, ExtraArgument extraArgument, const Predicate& predicate );
 
 // ---------------------------------------------------
 
@@ -106,45 +87,24 @@ namespace Utility {
 	template <typename ObjectType, size_t arraySize, typename OutputIterator, typename Predicate>
 	OutputIterator	Transform( ObjectType (&range)[arraySize], OutputIterator outputBegin, Predicate predicate );
 
-	template <typename InputIterator, typename OutputIterator, typename ExtraArgument, typename Predicate>
-	OutputIterator	Transform( InputIterator begin, InputIterator end, OutputIterator outputBegin, ExtraArgument extraArgument, Predicate predicate );
-
-	template <typename ObjectType, size_t arraySize, typename OutputIterator, typename ExtraArgument, typename Predicate>
-	OutputIterator	Transform( ObjectType (&range)[arraySize], OutputIterator outputBegin, ExtraArgument extraArgument, Predicate predicate );
-
 	template <typename InputIterator, typename SecondaryInputIterator, typename OutputIterator, typename Predicate>
 	OutputIterator	Transform( InputIterator begin, InputIterator end, SecondaryInputIterator secondaryBegin, OutputIterator outputBegin, Predicate predicate );
 
 	template <typename ObjectType, size_t arraySize, typename SecondaryInputIterator, typename OutputIterator, typename Predicate>
 	OutputIterator	Transform( ObjectType (&range)[arraySize], SecondaryInputIterator secondaryBegin, OutputIterator outputBegin, Predicate predicate );
 
-	template <typename InputIterator, typename SecondaryInputIterator, typename OutputIterator, typename ExtraArgument, typename Predicate>
-	OutputIterator	Transform( InputIterator begin, InputIterator end, SecondaryInputIterator secondaryBegin, OutputIterator outputBegin, ExtraArgument extraArgument, Predicate predicate );
-
-	template <typename ObjectType, size_t arraySize, typename SecondaryInputIterator, typename OutputIterator, typename ExtraArgument, typename Predicate>
-	OutputIterator	Transform( ObjectType (&range)[arraySize], SecondaryInputIterator secondaryBegin, OutputIterator outputBegin, ExtraArgument extraArgument, Predicate predicate );
-
 // ---------------------------------------------------
 
 	template <typename OutputIterator, typename Generator>
 	OutputIterator	Generate( OutputIterator begin, OutputIterator end, Generator generator );
 
-	template <typename OutputIterator, typename ExtraArgument, typename Generator>
-	OutputIterator	Generate( OutputIterator begin, OutputIterator end, ExtraArgument extraArgument, Generator generator );
-
 	template <typename OutputIterator, typename Generator>
 	OutputIterator	Generate( OutputIterator begin, size_t count, Generator generator );
-
-	template <typename OutputIterator, typename ExtraArgument, typename Generator>
-	OutputIterator	Generate( OutputIterator begin, size_t count, ExtraArgument extraArgument, Generator generator );
 
 // ---------------------------------------------------
 
 	template <typename ForwardIterator, typename Predicate>
 	ForwardIterator	RemoveIf( ForwardIterator begin, ForwardIterator end, Predicate predicate );
-
-	template <typename ForwardIterator, typename ExtraArgument, typename Predicate>
-	ForwardIterator	RemoveIf( ForwardIterator begin, ForwardIterator end, ExtraArgument extraArgumentument, Predicate predicate );
 
 // ---------------------------------------------------
 

@@ -302,6 +302,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.cpp" />
+    <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageSink.cpp" />
     <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp" />
@@ -325,7 +326,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp" />
     <ClCompile Include="..\src\scripting\Angelscript\WorldView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\NativeBindings.cpp" />
-    <ClCompile Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.cpp" />
     <ClCompile Include="..\src\Sound\XAudio2\EngineService.cpp" />
     <ClCompile Include="..\src\System\Win32\SystemInterface.cpp" />
     <ClCompile Include="..\src\Utility\Assert.cpp" />
@@ -334,13 +334,13 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\DebugController.cpp" />
     <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
     <ClCompile Include="..\src\Utility\FourCCGenerator.cpp" />
+    <ClCompile Include="..\src\Utility\Hash.cpp" />
     <ClCompile Include="..\src\Utility\IntrusivePointerBase.cpp" />
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp" />
     <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp" />
     <ClCompile Include="..\src\Utility\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\src\Utility\ScopedFPUController.cpp" />
-    <ClCompile Include="..\src\Utility\StringOperators.cpp" />
     <ClCompile Include="..\src\Utility\SurjectiveQueryEngine.cpp" />
     <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
     <ClCompile Include="..\src\Utility\concurrency\Lock.cpp" />
@@ -419,6 +419,8 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\EngineService.hpp" />
+    <ClInclude Include="..\src\Scripting\Message.hpp" />
+    <ClInclude Include="..\src\Scripting\MessageSink.hpp" />
     <ClInclude Include="..\src\Scripting\ReferenceTypeBase.hpp" />
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp" />
     <ClInclude Include="..\src\packages\ContentLibrary.hpp" />
@@ -438,11 +440,13 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
     <ClInclude Include="..\src\Utility\DisposingResult.hpp" />
+    <ClInclude Include="..\src\Utility\Hash.hpp" />
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
+    <ClInclude Include="..\src\Utility\Pair.hpp" />
     <ClInclude Include="..\src\Utility\ResultBase.hpp" />
     <ClInclude Include="..\src\Utility\StringOperators.hpp" />
     <ClInclude Include="..\src\Utility\DebugController.hpp" />
@@ -505,7 +509,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.hpp" />
     <ClInclude Include="..\src\scripting\Angelscript\WorldView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\NativeBindings.hpp" />
-    <ClInclude Include="..\src\Scripting\Angelscript\Utilities\AngelscriptObjectFactory.hpp" />
     <ClInclude Include="..\src\configuration\ConfigurableUTF8String.hpp" />
     <ClInclude Include="..\src\configuration\ConfigurableVariable.hpp" />
     <ClInclude Include="..\src\configuration\ConfigurationDatabase.hpp" />
@@ -577,7 +580,6 @@ call "deploy.x64.bat"
     <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl" />
     <None Include="..\src\Scripting\AngelScript\EngineService.inl" />
     <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl" />
-    <None Include="..\src\Scripting\AngelScript\Utilities\AngelscriptObjectFactory.inl" />
     <None Include="..\src\Scripting\ObjectHandle.inl" />
     <None Include="..\src\Scripting\ReferenceTypeBase.inl" />
     <None Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.inl" />
@@ -601,6 +603,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\Counter.inl" />
     <None Include="..\src\Utility\DisposingResult.inl" />
     <None Include="..\src\Utility\ErrorCode.inl" />
+    <None Include="..\src\Utility\Hash.inl" />
     <None Include="..\src\Utility\IdentifierPool.inl" />
     <None Include="..\src\Utility\Math\StandardLibrary.inl" />
     <None Include="..\src\Utility\Memory\Allocator.inl" />

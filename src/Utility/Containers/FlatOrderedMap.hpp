@@ -14,15 +14,15 @@
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
+#include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
 #include <rdestl/functional.h>
-#include <rdestl/pair.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
 	template <typename Key, typename StoredObject, class OrderingPredicate = ::rde::less<Key>, class Allocator = ::Eldritch2::ChildAllocator>
-	class FlatOrderedMap : private ::Eldritch2::ResizableArray<::rde::pair<Key, StoredObject>, Allocator> {
+	class FlatOrderedMap : private ::Eldritch2::ResizableArray<::Eldritch2::Pair<Key, StoredObject>, Allocator> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
@@ -37,7 +37,7 @@ namespace Eldritch2 {
 		using UnderlyingContainer::Iterator;
 		using UnderlyingContainer::ConstIterator;
 		using UnderlyingContainer::SizeType;
-		using InsertResult							= ::rde::pair<Iterator, bool>;
+		using InsertResult							= ::Eldritch2::Pair<Iterator, bool>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -53,7 +53,6 @@ namespace Eldritch2 {
 		//! Constructs this @ref FlatOrderedMap instance.
 		ETInlineHint FlatOrderedMap( ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource );
 
-		//! Destroys this @ref FlatOrderedMap instance.
 		ETInlineHint ~FlatOrderedMap() = default;
 
 	// - ALGORITHMS --------------------------------------

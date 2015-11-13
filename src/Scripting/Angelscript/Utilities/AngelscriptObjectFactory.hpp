@@ -25,10 +25,6 @@
 
 class	asIObjectType;
 
-#ifndef ANGELSCRIPT_OBJECT_FACTORY_MAX_CONSTRUCTOR_PARAMS
-#	define ANGELSCRIPT_OBJECT_FACTORY_MAX_CONSTRUCTOR_PARAMS	5
-#endif
-
 namespace Eldritch2 {
 namespace Scripting {
 
@@ -42,34 +38,11 @@ namespace Scripting {
 
 	class AngelscriptObjectFactory {
 	public:
-		// Constructs this AngelscriptObjectFactory instance.
+		//!	Constructs this @ref AngelscriptObjectFactory instance.
 		AngelscriptObjectFactory( ::asIObjectType* const objectType, ::asIScriptContext* const scriptContext );
 
-		// Destroys thus AngelscriptObjectFactory instance.
-		~AngelscriptObjectFactory();
-
-	// ---------------------------------------------------
-
-		ETInlineHint void*	Construct() {
-			const char* const	objectTypeName = _objectType->GetName();
-			const char			formatString[]	= "%s@ %s()";
-			char				factoryString[256];
-
-			if( asIScriptFunction* const factory = _objectType->GetFactoryByDecl( PrintFormatted( factoryString, formatString, objectTypeName, objectTypeName ) ) ) {
-				if( ETBranchUnlikelyHint( 0 > _scriptContext->Prepare( factory ) ) ) {
-					return nullptr;
-				}
-
-				_scriptContext->Execute();
-
-				if( ETBranchLikelyHint( ::asEXECUTION_FINISHED == _scriptContext->GetState() ) ) {
-					_scriptContext->GetEngine()->AddRefScriptObject( _scriptContext->GetReturnAddress(), _objectType );
-					return _scriptContext->GetReturnAddress();
-				}
-			}
-
-			return nullptr;
-		}
+		//!	Destroys this @ref AngelscriptObjectFactory instance.
+		~AngelscriptObjectFactory() = default;
 
 #define PARAMETER_TOKEN( z, parameterCount, unused ) BOOST_PP_IF( parameterCount, ", ", " " ) "%s"
 #define ARGUMENT_ATTACH( z, parameterCount, unused ) ::Eldritch2::CopyMemory( _scriptContext->GetAddressOfArg( parameterCount ), &BOOST_PP_CAT( arg, parameterCount ), sizeof( BOOST_PP_CAT( ArgType, parameterCount ) ) )

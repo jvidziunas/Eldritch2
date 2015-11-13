@@ -45,31 +45,23 @@ namespace Configuration {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		struct Key {
-		// - TYPE PUBLISHING ---------------------------------
-
-			struct Hash : public Utility::StringHash {
-				ETInlineHint ETNoAliasHint size_t	operator()( const Key& key ) const;
-			};
-
+		struct Key : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+		public:
 			//! Constructs this @ref Key instance.
 			ETInlineHint Key( const ::Eldritch2::UTF8Char* const section = "", const ::Eldritch2::UTF8Char* const name = "" );
+
+			~Key() = default;
 
 		// ---------------------------------------------------
 
 			ETInlineHint ETNoAliasHint bool	operator==( const Key& right ) const;
-
-		// - DATA MEMBERS ------------------------------------
-
-			const ::Eldritch2::UTF8Char*	section;
-			const ::Eldritch2::UTF8Char*	name;
 		};
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::UnorderedMap<Key, Configuration::ConfigurableVariable*, Key::Hash>	_variableDirectory;
+		::Eldritch2::UnorderedMap<Key, Configuration::ConfigurableVariable*>	_variableDirectory;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

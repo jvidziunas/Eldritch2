@@ -94,7 +94,6 @@ namespace BulletDynamics {
 	// ---------------------------------------------------
 
 		void	AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) override sealed;
-		void	AcceptViewVisitor( Scripting::ScriptMessageSink& messageSink ) override sealed;
 
 	// ---------------------------------------------------
 

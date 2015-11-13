@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Scripting/Angelscript/ObjectGraphResourceView.hpp>
 #include <Scripting/Angelscript/WorldView.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
@@ -24,37 +25,42 @@
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Foundation;
-using namespace ::Eldritch2::FileSystem;
-using namespace ::Eldritch2::Scheduler;
-using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2;
+
+namespace {
+
+	static ETThreadLocal Scripting::AngelScript::WorldView*	activeScriptWorldView = nullptr;
+
+}	// anonymous namespace
 
 namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	WorldView::WorldView( World& owningWorld, ::asIScriptEngine& scriptEngine ) : Foundation::WorldView( owningWorld ),
-																				  _stringAllocator( { GetWorldAllocator(), UTF8L("World String Root Allocator") } ),
-																				  _scriptEngine( (scriptEngine.AddRef(), scriptEngine) ),
-																				  _entityDispatchTable( { GetWorldAllocator(), UTF8L("Angelscript World View Dispatch Table Allocator") } ),
-																				  _gameRulesEntity( nullptr ) {}
+	WorldView::WorldView( Foundation::World& owningWorld, ::asIScriptEngine& scriptEngine ) : Foundation::WorldView( owningWorld ),
+																							  _stringAllocator( { GetWorldAllocator(), UTF8L("World String Root Allocator") } ),
+																							  _scriptEngine( (scriptEngine.AddRef(), scriptEngine) ),
+																							  _entityDispatchTable( { GetWorldAllocator(), UTF8L("Angelscript World View Dispatch Table Allocator") } ),
+																							  _gameRulesEntity( nullptr ) {}
 
 // ---------------------------------------------------
 
 	WorldView::~WorldView() {
 		// Since scripts can create objects not directly owned by this WorldView, we need to make sure all shared resources have been released before we start destroying world views.
 		// This should have been done within WorldView::AcceptViewVisitor( const DeletionPreparationVisitor ).
-		ETRuntimeAssert( (nullptr == _gameRulesEntity) && _entityDispatchTable.Empty() );
+		ETRuntimeAssert( _gameRulesEntity == nullptr );
+		ETRuntimeAssert( _entityDispatchTable.Empty() );
+
+	// ---
 
 		_scriptEngine.Release();
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const FrameTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const FrameTickTaskVisitor ) {
 		// Holy nesting, Batman! The things we do to save making some copies of a pointer...
-		class CollectPostScriptTickTasksTask : public CRTPTransientTask<CollectPostScriptTickTasksTask> {
+		class CollectPostScriptTickTasksTask : public Scheduler::CRTPTransientTask<CollectPostScriptTickTasksTask> {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -67,11 +73,13 @@ namespace AngelScript {
 
 				public:
 					//!	Constructs this @ref CollectPreScriptTickTasksTask instance.
-					ETInlineHint CollectPreScriptTickTasksTask( WorldView& host, WorkerContext& executingContext, CollectScriptTickTasksTask& parent, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
-																																													  _host( host ),
-																																													  _subtaskAllocator( subtaskAllocator ) {
+					ETInlineHint CollectPreScriptTickTasksTask( WorldView& host, Scheduler::WorkerContext& executingContext, CollectScriptTickTasksTask& parent, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
+																																																 _host( host ),
+																																																 _subtaskAllocator( subtaskAllocator ) {
 						TrySchedulingOnContext( executingContext );
 					}
+
+					~CollectPreScriptTickTasksTask() = default;
 
 				// ---------------------------------------------------
 
@@ -89,7 +97,7 @@ namespace AngelScript {
 						return UTF8L("Angelscript Collect Pre-Script Tick Tasks Task");
 					}
 
-					Task* Execute( WorkerContext& executingContext ) override sealed {
+					Task* Execute( Scheduler::WorkerContext& executingContext ) override sealed {
 						GetHost().BroadcastTaskVisitor( GetSubtaskAllocator(), executingContext, *this, WorldView::PreScriptTickTaskVisitor() );
 
 						return nullptr;
@@ -99,16 +107,18 @@ namespace AngelScript {
 
 				private:
 					WorldView&	_host;
-					Allocator&				_subtaskAllocator;
+					Allocator&	_subtaskAllocator;
 				};
 
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 				//!	Constructs this @ref CollectScriptTickTasksTask instance.
-				ETInlineHint CollectScriptTickTasksTask( WorldView& host, WorkerContext& executingContext, CollectPostScriptTickTasksTask& parent, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
-																																												   _collectPreTickTasksTask( host, executingContext, *this, subtaskAllocator ) {
+				ETInlineHint CollectScriptTickTasksTask( WorldView& host, Scheduler::WorkerContext& executingContext, CollectPostScriptTickTasksTask& parent, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
+																																															  _collectPreTickTasksTask( host, executingContext, *this, subtaskAllocator ) {
 					TrySchedulingOnContext( executingContext );
 				}
+
+				~CollectScriptTickTasksTask() = default;
 
 			// ---------------------------------------------------
 
@@ -126,7 +136,7 @@ namespace AngelScript {
 					return UTF8L("Angelscript Collect Script Tick Tasks Task");
 				}
 
-				Task* Execute( WorkerContext& executingContext ) override sealed {
+				Task* Execute( Scheduler::WorkerContext& executingContext ) override sealed {
 					GetHost().BroadcastTaskVisitor( GetSubtaskAllocator(), executingContext, *this, WorldView::ScriptTickTaskVisitor() );
 
 					return nullptr;
@@ -141,10 +151,12 @@ namespace AngelScript {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//!	Constructs this @ref CollectPostScriptTickTasksTask instance.
-			ETInlineHint CollectPostScriptTickTasksTask( WorldView& host, WorkerContext& executingContext, Task& tickTask, Allocator& subtaskAllocator ) : CRTPTransientTask<CollectPostScriptTickTasksTask>( tickTask, Scheduler::CodependentTaskSemantics ),
-																																						   _collectScriptTickTasksTask( host, executingContext, *this, subtaskAllocator ) {
+			ETInlineHint CollectPostScriptTickTasksTask( WorldView& host, Scheduler::WorkerContext& executingContext, Task& tickTask, Allocator& subtaskAllocator ) : CRTPTransientTask<CollectPostScriptTickTasksTask>( tickTask, Scheduler::CodependentTaskSemantics ),
+																																									  _collectScriptTickTasksTask( host, executingContext, *this, subtaskAllocator ) {
 				TrySchedulingOnContext( executingContext );
 			}
+
+			~CollectPostScriptTickTasksTask() = default;
 			
 		// ---------------------------------------------------
 
@@ -152,7 +164,7 @@ namespace AngelScript {
 				return UTF8L("Angelscript Collect Post-Script Tick Tasks Task");
 			}
 
-			Task* Execute( WorkerContext& executingContext ) override sealed {
+			Task* Execute( Scheduler::WorkerContext& executingContext ) override sealed {
 				_collectScriptTickTasksTask.GetHost().BroadcastTaskVisitor( _collectScriptTickTasksTask.GetSubtaskAllocator(), executingContext, *this, WorldView::PostScriptTickTaskVisitor() );
 
 				return nullptr;
@@ -164,24 +176,24 @@ namespace AngelScript {
 			CollectScriptTickTasksTask	_collectScriptTickTasksTask;
 		};
 
-		using	AllocationOption = Allocator::AllocationOption;
-
 	// ---
 
-		new(subtaskAllocator, AllocationOption::TEMPORARY_ALLOCATION) CollectPostScriptTickTasksTask( *this, executingContext, visitingTask, subtaskAllocator );
+		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) CollectPostScriptTickTasksTask( *this, executingContext, visitingTask, subtaskAllocator );
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const ScriptTickTaskVisitor ) {
-		class TickScriptsTask : public CRTPTransientTask<TickScriptsTask> {
+	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const ScriptTickTaskVisitor ) {
+		class TickScriptsTask : public Scheduler::CRTPTransientTask<TickScriptsTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Constructs this @ref TickScriptsTask instance.
-			ETInlineHint TickScriptsTask( WorldView& host, WorkerContext& executingContext, Task& tickTask ) : CRTPTransientTask<TickScriptsTask>( tickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
+			ETInlineHint TickScriptsTask( WorldView& host, Scheduler::WorkerContext& executingContext, Task& tickTask ) : CRTPTransientTask<TickScriptsTask>( tickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
+
+			~TickScriptsTask() = default;
 			
 		// ---------------------------------------------------
 
@@ -189,9 +201,9 @@ namespace AngelScript {
 				return UTF8L("Angelscript Update World Scripts Task");
 			}
 
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				if( !_host.GetOwningWorld().IsPaused() ) {
-
+			Task* Execute( Scheduler::WorkerContext& /*executingContext*/ ) override sealed {
+				if( _host.GetOwningWorld().IsPaused() ) {
+					return nullptr;
 				}
 
 				return nullptr;
@@ -203,17 +215,20 @@ namespace AngelScript {
 			WorldView&	_host;
 		};
 
-		using	AllocationOption = Allocator::AllocationOption;
-
 	// ---
 
-		new(subtaskAllocator, AllocationOption::TEMPORARY_ALLOCATION) TickScriptsTask( *this, executingContext, visitingTask );
+		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) TickScriptsTask( *this, executingContext, visitingTask );
 	}
 
 // ---------------------------------------------------
 
 	void WorldView::AcceptViewVisitor( const LoadFinalizationVisitor ) {
-		GetEngineContentLibrary().ResolveViewByName( "asdf", *static_cast<ObjectGraphResourceView*>(nullptr) ).DeserializeIntoWorldView( *this );
+		FixedStackAllocator<96u>	tempAllocator( UTF8L("WorldView::AcceptViewVisitor() Temporary Allocator") );
+		const auto					resourceName( GetOwningWorld().GetPropertyByKey( tempAllocator, UTF8L("ResourceName") ) );
+
+		if( !resourceName.Empty() ) {
+			GetEngineContentLibrary().ResolveViewByName( resourceName.GetCharacterArray(), *static_cast<ObjectGraphResourceView*>(nullptr) ).DeserializeIntoWorldView( *this );
+		}
 	}
 
 // ---------------------------------------------------
@@ -224,11 +239,21 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {}
+	void WorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+		auto	Spawn( [] ( const StringMarshal& className ) {
+			auto&		scriptEngine( activeScriptWorldView->_scriptEngine );
+			const auto	objectType( scriptEngine.GetObjectTypeByName( className.GetCharacterArray() ) );
 
-// ---------------------------------------------------
+			if( !objectType ) {
+				::asGetActiveContext()->SetException( "Invalid class name for Spawn()!" );
+				return;
+			}
 
-	void WorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& /*visitor*/ ) {}
+			scriptEngine.CreateScriptObject( objectType );
+		} );
+
+		visitor.ExposeFunction( "Spawn", static_cast<void (ETScriptAPICall *)( const StringMarshal& )>(Spawn) );
+	}
 
 // ---------------------------------------------------
 
@@ -236,8 +261,8 @@ namespace AngelScript {
 		// Prepare for script execution (this will take place within the various release methods called implicitly below)
 		BroadcastViewVisitor( ScriptExecutionPreparationVisitor() );
 
+		_gameRulesEntity.reset();
 		_entityDispatchTable.Clear();
-		_gameRulesEntity = nullptr;
 	}
 
 }	// namespace AngelScript

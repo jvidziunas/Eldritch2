@@ -72,9 +72,6 @@
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp">
       <Filter>Source Files\AngelScript</Filter>
     </ClCompile>
-    <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp">
       <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
@@ -109,6 +106,15 @@
       <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp">
+      <Filter>Source Files\FileSystem\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\ReadableMemoryMappedFile.cpp">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp">
       <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
   </ItemGroup>
@@ -176,6 +182,15 @@
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp">
       <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\src_ScriptCompiler\ScriptCompiler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\ReadableMemoryMappedFile.hpp">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp">
+      <Filter>Header Files\FileSystem\Win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Utility\Memory\Allocator.inl">
@@ -198,6 +213,12 @@
     </None>
     <None Include="..\src\Utility\Memory\StandardLibrary.Win.inl">
       <Filter>Source Files\Utility\Memory</Filter>
+    </None>
+    <None Include="..\src_ScriptCompiler\ScriptCompiler.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl">
+      <Filter>Source Files\FileSystem</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

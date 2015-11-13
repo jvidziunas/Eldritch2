@@ -76,12 +76,6 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptViewVisitor( ScriptMessageSink& /*messageSink*/ ) {
-		// Default implementation should not do anything.
-	}
-
-// ---------------------------------------------------
-
 	void WorldView::AcceptViewVisitor( const LoadFinalizationVisitor ) {
 		// Default implementation should not do anything.
 	}

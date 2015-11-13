@@ -50,10 +50,6 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	WorldView::~WorldView() {}
-
-// ---------------------------------------------------
-
 	void WorldView::AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) {
 		activeScriptWorldViewForThread = this;
 	}
@@ -71,6 +67,8 @@ namespace Direct3D11 {
 																																				   _worldView( worldView ) {
 				TrySchedulingOnContext( executingContext );
 			}
+
+			~DrawViewsTask() = default;
 
 		// ---------------------------------------------------
 

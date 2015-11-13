@@ -139,7 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src_texturecompressor\TextureCompressor.cpp" />
+    <ClCompile Include="..\src_texturecompressor\TextureCompressor.Win32.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src_texturecompressor\TextureCompressor.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src_texturecompressor\TextureCompressor.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

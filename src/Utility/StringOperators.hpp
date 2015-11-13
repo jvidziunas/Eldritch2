@@ -30,13 +30,6 @@ namespace Utility {
 		ETNoAliasHint bool	operator()( const Character* left, const Character* right ) const;
 	};
 
-// ---------------------------------------------------
-
-	struct StringHash {
-		ETInlineHint ETNoAliasHint size_t	operator()( const ::Eldritch2::UTF8Char* string, const size_t seed = 0u ) const;
-		ETInlineHint ETNoAliasHint size_t	operator()( const ::Eldritch2::UTF8Char* string, const ::Eldritch2::UTF8Char* stringEnd, const size_t seed = 0u ) const;
-	};
-
 }	// namespace Utility
 }	// namespace Eldritch2
 

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  AngelscriptObjectFactory.cpp
+  ScriptCompiler.Win32.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,13 +12,18 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/Angelscript/Utilities/AngelscriptObjectFactory.hpp>
+#include <Utility/Memory/Win32HeapAllocator.hpp>
+#include <FlatBufferMetadataBuilderVisitor.hpp>
+#include <Tools/Win32/FileAccessorFactory.hpp>
+#include <ScriptCompiler.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Scripting {
+#if( ET_PLATFORM_WINDOWS )
+int main( int argc, const ::Eldritch2::SystemChar** argv ) {
+	using namespace ::Eldritch2;
 
-	AngelscriptObjectFactory::AngelscriptObjectFactory( ::asIObjectType* const objectType, ::asIScriptContext* const scriptContext ) : _objectType( objectType ), _scriptContext( scriptContext ) {}
+// ---
 
-}	// namespace Scripting
-}	// namespace Eldritch2
+	return Tools::ScriptCompilerTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory, Tools::FlatBufferMetadataBuilderVisitor>().Run( { argv + 1, argv + argc } );
+}
+#endif

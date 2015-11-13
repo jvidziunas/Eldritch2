@@ -21,6 +21,7 @@
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ReferenceTypeBase.hpp>
+#include <Utility/StringOperators.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -36,31 +37,32 @@ namespace Eldritch2 {
 	namespace FileSystem {
 		class	ContentPackage;
 	}
-
-	template <typename Iterator>
-	class	Range;
 }
 
 namespace Eldritch2 {
 namespace Foundation {
 
 	class World : public Scripting::ReferenceTypeBase, public ::Eldritch2::IntrusiveForwardListBaseHook {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		using PropertyKey	= ::Eldritch2::UTF8String<>;
+		using Property		= ::Eldritch2::UTF8String<>;
+
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		//! Constructs this @ref World instance.
 		World( Scripting::ObjectHandle<FileSystem::ContentPackage>&& package, Foundation::GameEngine& owningEngine );
 		//! Constructs this @ref World instance.
 		World( const Foundation::World& ) = delete;
 
-		//! Destroys this @ref World instance.
 		~World();
 
 	// ---------------------------------------------------
 
-		::Eldritch2::UTF8String<>	GetValueForKey( ::Eldritch2::Allocator& resultAllocator, const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* defaultValue = UTF8L("") );
+		Property	GetPropertyByKey( ::Eldritch2::Allocator& resultAllocator, const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* defaultValue = UTF8L("") ) const;
 
-		void						SetKeyValuePair( const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const value );
+		void		SetProperty( const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const value );
 
 	// - WORLD SIMULATION --------------------------------
 
@@ -88,16 +90,17 @@ namespace Foundation {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator									_allocator;
-		::Eldritch2::ArenaChildAllocator							_viewAllocator;
-		Scripting::ObjectHandle<Foundation::GameEngine>				_owningEngine;
-		Scripting::ObjectHandle<FileSystem::ContentPackage>			_package;
-		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>,
-								  ::Eldritch2::UTF8String<>>		_keyValuePairs;
-		::Eldritch2::uint32											_isPaused	: 1;
-		::Eldritch2::uint32											_isLoaded	: 1;
-		::Eldritch2::IntrusiveForwardList<Foundation::WorldView>	_attachedViews;
-		::Eldritch2::ErrorCode										_lastError;
+		::Eldritch2::ChildAllocator														_allocator;
+		::Eldritch2::ArenaChildAllocator												_viewAllocator;
+		Scripting::ObjectHandle<Foundation::GameEngine>									_owningEngine;
+		Scripting::ObjectHandle<FileSystem::ContentPackage>								_package;
+		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>, ::Eldritch2::UTF8String<>>	_keyValuePairs;
+
+		::Eldritch2::uint32																_isPaused : 1;
+		::Eldritch2::uint32																_isLoaded : 1;
+
+		::Eldritch2::IntrusiveForwardList<Foundation::WorldView>						_attachedViews;
+		::Eldritch2::ErrorCode															_lastError;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

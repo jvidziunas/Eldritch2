@@ -1,3 +1,4 @@
+#include "TextureCompressor.hpp"
 /*==================================================================*\
   TextureCompressor.cpp
   ------------------------------------------------------------------
@@ -12,12 +13,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Utility/Memory/Win32HeapAllocator.hpp>
+#include <Tools/Win32/FileAccessorFactory.hpp>
+#include <TextureCompressor.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Tools;
-using namespace ::Eldritch2;
+int main( int argc, ::Eldritch2::UTF8Char** argv ) {
+	using namespace ::Eldritch2;
 
-int _tmain( int argc, TCHAR* argv[] ) {
+// ---
 
+	return Tools::TextureCompressorTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv + 1, argv + argc } );
 }

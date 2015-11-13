@@ -33,7 +33,7 @@ namespace Eldritch2 {
 		using AllocatorType			= Allocator;
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using InsertResult			= ::rde::pair<Iterator, bool>;
+		using InsertResult			= ::Eldritch2::Pair<Iterator, bool>;
 		using SizeType				= typename AllocatorType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -49,7 +49,6 @@ namespace Eldritch2 {
 		//!	Constructs this @ref OrderedSet instance.
 		ETInlineHint OrderedSet( ::Eldritch2::OrderedSet<StoredObject, Allocator>&& moveSource );
 
-		//!	Destroys this @ref OrderedSet instance.
 		ETInlineHint ~OrderedSet() = default;
 
 	// - ALGORITHMS --------------------------------------

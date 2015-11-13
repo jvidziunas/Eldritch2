@@ -35,10 +35,6 @@ namespace AngelScript {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using UnderlyingTypeRegistrar	= ::Eldritch2::Scripting::AngelScript::UserDefinedTypeRegistrar;
-
-	// ---
-
 		enum class BinaryOperatorClass {
 			ADDITION,
 			SUBTRACTION,
@@ -66,10 +62,6 @@ namespace AngelScript {
 
 	// ---------------------------------------------------
 
-		static ::Eldritch2::ErrorCode	ErrorCodeFromAngelscriptResult( int angelscriptReturnCode );
-
-	// ---------------------------------------------------
-
 		template <typename Enum>
 		class EnumTypeBuilder {
 		// - TYPE PUBLISHING ---------------------------------
@@ -80,14 +72,44 @@ namespace AngelScript {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//!	Constructs this @ref EnumTypeBuilder instance.
+			/*!	@param[in] scriptEngine The AngelScript engine that the new type will be published to.
+				*/
 			ETInlineHint EnumTypeBuilder( ::asIScriptEngine& scriptEngine );
 
-			//!	Destroys this @ref EnumTypeBuilder instance.
 			~EnumTypeBuilder() = default;
 
 		// ---------------------------------------------------
 
 			::Eldritch2::ErrorCode	ExposeValue( const char* const valueName, NativeType value );
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			::asIScriptEngine&	_scriptEngine;
+		};
+
+	// ---------------------------------------------------
+
+		template <class Message>
+		class MessageTypeBuilder {
+		// - TYPE PUBLISHING ---------------------------------
+
+		public:
+			using MessageType	= Message;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+			//!	Constructs this @ref MessageTypeBuilder instance.
+			/*!	@param[in] scriptEngine The AngelScript engine that the new type will be published to.
+				*/
+			ETInlineHint MessageTypeBuilder( ::asIScriptEngine& scriptEngine );
+
+			~MessageTypeBuilder() = default;
+
+		// ---------------------------------------------------
+
+			template <typename Property>
+			MessageTypeBuilder&	ExposeProperty( const char* const propertyName, Property Message::* propertyPointer );
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -107,9 +129,10 @@ namespace AngelScript {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//!	Constructs this @ref TypeBuilderCRTPBase instance.
+			/*!	@param[in] scriptEngine The AngelScript engine that the new type will be published to.
+				*/
 			ETInlineHint TypeBuilderCRTPBase( ::asIScriptEngine& scriptEngine );
 
-			//!	Destroys this @ref TypeBuilderCRTPBase instance.
 			~TypeBuilderCRTPBase() = default;
 
 		// ---------------------------------------------------
@@ -178,9 +201,10 @@ namespace AngelScript {
 
 		public:
 			//!	Constructs this @ref ValueTypeBuilder instance.
+			/*!	@param[in] scriptEngine The AngelScript engine that the new type will be published to.
+				*/
 			ETInlineHint ValueTypeBuilder( ::asIScriptEngine& scriptEngine );
 
-			//!	Destroys this @ref ValueTypeBuilder instance.
 			~ValueTypeBuilder() = default;
 
 		// ---------------------------------------------------
@@ -197,9 +221,10 @@ namespace AngelScript {
 
 		public:
 			//!	Constructs this @ref ReferenceTypeBuilder instance.
+			/*!	@param[in] scriptEngine The AngelScript engine that the new type will be published to.
+				*/
 			ETInlineHint ReferenceTypeBuilder( ::asIScriptEngine& scriptEngine );
 
-			//!	Destroys this @ref ReferenceTypeBuilder instance.
 			~ReferenceTypeBuilder() = default;
 
 		// ---------------------------------------------------
@@ -213,12 +238,15 @@ namespace AngelScript {
 			ReferenceTypeBuilder<Native>&	ExposeFactory( Native* (ETScriptAPICall *function)( ArgumentTypes... ) );
 		};
 
+	// ---
+
+		using UnderlyingTypeRegistrar = ::Eldritch2::Scripting::AngelScript::UserDefinedTypeRegistrar;
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref UserDefinedTypeRegistrar instance.
 		UserDefinedTypeRegistrar( ::asIScriptEngine& scriptEngine );
 
-		//!	Destroys this @ref UserDefinedTypeRegistrar instance.
 		~UserDefinedTypeRegistrar() = default;
 
 	// ---------------------------------------------------

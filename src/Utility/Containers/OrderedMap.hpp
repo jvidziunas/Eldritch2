@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
+#include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
 #include <rdestl/map.h>
 //------------------------------------------------------------------//
@@ -36,7 +37,7 @@ namespace Eldritch2 {
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
 		using SizeType				= typename UnderlyingContainer::size_type;
-		using InsertResult			= ::rde::pair<Iterator, bool>;
+		using InsertResult			= ::Eldritch2::Pair<Iterator, bool>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -51,7 +52,6 @@ namespace Eldritch2 {
 		//!	Constructs this @ref OrderedMap instance.
 		ETInlineHint OrderedMap( ::Eldritch2::OrderedMap<Key, StoredObject, Allocator>&& moveSource );
 
-		//!	Destroys this @ref OrderedMap instance.
 		ETInlineHint ~OrderedMap() = default;
 
 	// - ALGORITHMS --------------------------------------

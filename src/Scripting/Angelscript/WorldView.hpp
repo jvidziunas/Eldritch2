@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Utility/Containers/UnorderedMap.hpp>
 #include <Scripting/ObjectHandle.hpp>
+#include <Scripting/MessageSink.hpp>
 #include <Foundation/WorldView.hpp>
 //------------------------------------------------------------------//
 #include <angelscript.h>
@@ -27,29 +28,49 @@ namespace Eldritch2 {
 	}
 }
 
-namespace std {
-
-	template<>
-	struct default_delete<::asIScriptObject> {
-		ETInlineHint void operator()( ::asIScriptObject* const object ) {
-			object->GetEngine()->ReleaseScriptObject( object, object->GetObjectType() );
-		}
-	};
-
-}	// namespace std
-
 namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
 	class WorldView : public Foundation::WorldView {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		//!	Deleter for C++ smart pointer objects.
+		struct ScriptObjectDeleter {
+			void	operator()( ::asIScriptObject* const object );
+		};
+
+	// ---
+
+		class MessageSink : public Scripting::MessageSink {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref MessageSink instance.
+			MessageSink() = default;
+
+			~MessageSink() = default;
+
+		// ---------------------------------------------------
+
+			//!	Pops all script messages currently stored in the queue, calling handler functions on the specified script object.
+			/*!	@param[in] scriptObject AngelScript object to execute handler functions on.
+				@param[in] scriptContext AngelScript execution context that will run script code.
+				@remarks Not thread-safe.
+				*/
+			void	Drain( ::asIScriptObject& scriptObject, ::asIScriptContext& scriptContext );
+		};
+
+	// ---
+
+		using ScriptObjectHandle = ::std::unique_ptr<::asIScriptObject, ScriptObjectDeleter>;
+
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		//!	Constructs this @ref WorldView instance.
 		WorldView( Foundation::World& owningWorld, ::asIScriptEngine& scriptEngine );
 
-		//!	Destroys this @ref WorldView instance.
 		~WorldView();
 
 	// ---------------------------------------------------
@@ -65,18 +86,18 @@ namespace AngelScript {
 	// ---------------------------------------------------
 
 		void	AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) override sealed;
-		void	AcceptViewVisitor( Scripting::ScriptMessageSink& messageSink ) override sealed;
 		void	AcceptViewVisitor( const DeletionPreparationVisitor ) override sealed;
 		void	AcceptViewVisitor( const LoadFinalizationVisitor ) override sealed;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator																_stringAllocator;
-		::asIScriptEngine&																		_scriptEngine;
+		::Eldritch2::ChildAllocator						_stringAllocator;
+		::asIScriptEngine&								_scriptEngine;
 		
-		::std::unique_ptr<::asIScriptObject>													_gameRulesEntity;
-		::Eldritch2::UnorderedMap<::Eldritch2::uint64, ::std::unique_ptr<::asIScriptObject>>	_entityDispatchTable;
+		ScriptObjectHandle								_gameRulesEntity;
+		::Eldritch2::UnorderedMap<::Eldritch2::uint64,
+								  ScriptObjectHandle>	_entityDispatchTable;
 	};
 
 }	// namespace AngelScript

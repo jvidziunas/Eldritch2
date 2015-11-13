@@ -84,6 +84,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -107,6 +108,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -132,6 +134,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -143,6 +146,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp" />
+    <ClCompile Include="..\src\FileSystem\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Tools\Tool.cpp" />
@@ -155,12 +160,14 @@
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="..\src_ScriptCompiler\FlatBufferMetadataBuilderVisitor.cpp" />
-    <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.cpp" />
+    <ClCompile Include="..\src_ScriptCompiler\ScriptCompiler.Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h" />
+    <ClInclude Include="..\src\FileSystem\ReadableMemoryMappedFile.hpp" />
     <ClInclude Include="..\src\FileSystem\SynchronousFileReader.hpp" />
     <ClInclude Include="..\src\FileSystem\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp" />
     <ClInclude Include="..\src\Tools\FileAccessorFactory.hpp" />
@@ -179,6 +186,7 @@
     <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Platform.hpp" />
     <ClInclude Include="..\src_ScriptCompiler\FlatBufferMetadataBuilderVisitor.hpp" />
+    <ClInclude Include="..\src_ScriptCompiler\ScriptCompiler.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\src\Scripting\AngelScript\BytecodeMetadata.fbc">
@@ -190,6 +198,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
     </CustomBuild>
+    <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl" />
     <None Include="..\src\FileSystem\SynchronousFileReader.inl" />
     <None Include="..\src\FileSystem\SynchronousFileWriter.inl" />
     <None Include="..\src\Tools\Tool.inl" />
@@ -197,6 +206,7 @@
     <None Include="..\src\Utility\Memory\Allocator.inl" />
     <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
     <None Include="..\src\Utility\Memory\StandardLibrary.Win.inl" />
+    <None Include="..\src_ScriptCompiler\ScriptCompiler.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
