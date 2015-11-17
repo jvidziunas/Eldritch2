@@ -59,7 +59,7 @@ namespace Detail {
 		template <class AlternateAllocator>
 		ETInlineHint UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString );
+		ETInlineHint explicit UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString );
 
 		ETInlineHint ~UTF8String() = default;
 
@@ -84,6 +84,9 @@ namespace Detail {
 
 		ETInlineHint bool	EndsWith( const CharacterType character ) const;
 		ETInlineHint bool	EndsWith( const CharacterType* const needle ) const;
+
+		template <typename Value>
+		bool	ParseInto( Value&& value ) const;
 
 	// - ELEMENT ITERATION -------------------------------
 

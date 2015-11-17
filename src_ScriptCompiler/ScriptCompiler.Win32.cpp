@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <FlatBufferMetadataBuilderVisitor.hpp>
 #include <Tools/Win32/FileAccessorFactory.hpp>
 #include <ScriptCompiler.hpp>
 //------------------------------------------------------------------//
@@ -24,6 +23,6 @@ int main( int argc, const ::Eldritch2::SystemChar** argv ) {
 
 // ---
 
-	return Tools::ScriptCompilerTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory, Tools::FlatBufferMetadataBuilderVisitor>().Run( { argv + 1, argv + argc } );
+	return Tools::ScriptCompilerTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv + 1, argv + argc } );
 }
 #endif

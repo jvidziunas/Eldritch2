@@ -15,7 +15,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/IntrusiveVyukovMPSCQueue.hpp>
 #include <Utility/Containers/IntrusiveForwardList.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
 #include <Utility/Containers/UTF8String.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
@@ -25,6 +27,7 @@
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
 #include <Utility/ErrorCode.hpp>
+#include <Scripting/Message.hpp>
 //------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
@@ -37,6 +40,10 @@ namespace Eldritch2 {
 	namespace FileSystem {
 		class	ContentPackage;
 	}
+
+	namespace Utility {
+		class	ReaderWriterUserMutex;
+	}
 }
 
 namespace Eldritch2 {
@@ -46,8 +53,7 @@ namespace Foundation {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using PropertyKey	= ::Eldritch2::UTF8String<>;
-		using Property		= ::Eldritch2::UTF8String<>;
+		using Property	= ::Eldritch2::UTF8String<>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -60,7 +66,7 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-		Property	GetPropertyByKey( ::Eldritch2::Allocator& resultAllocator, const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* defaultValue = UTF8L("") ) const;
+		Property	GetPropertyByKey( ::Eldritch2::Allocator& resultAllocator, const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const defaultValue = UTF8L("") ) const;
 
 		void		SetProperty( const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const value );
 
@@ -92,9 +98,12 @@ namespace Foundation {
 	private:
 		::Eldritch2::ChildAllocator														_allocator;
 		::Eldritch2::ArenaChildAllocator												_viewAllocator;
+
 		Scripting::ObjectHandle<Foundation::GameEngine>									_owningEngine;
 		Scripting::ObjectHandle<FileSystem::ContentPackage>								_package;
-		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>, ::Eldritch2::UTF8String<>>	_keyValuePairs;
+
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>				_propertyMutex;
+		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>, ::Eldritch2::UTF8String<>>	_properties;
 
 		::Eldritch2::uint32																_isPaused : 1;
 		::Eldritch2::uint32																_isLoaded : 1;

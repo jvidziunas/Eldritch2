@@ -16,6 +16,8 @@
 //==================================================================//
 #include <cstdarg>
 #include <cstring>
+#include <cwctype>
+#include <cctype>
 #include <cstdio>
 #include <cwchar>
 //------------------------------------------------------------------//
@@ -298,11 +300,12 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	// MSVC yells at us for using the insecure string functions here.
-	// Hush it up, as we try to be as secure as possible w/ the template mechanism.
+
 #if( ET_COMPILER_IS_MSVC )
+//	MSVC yells at us for using the insecure string functions here.
+//	Hush it up, as we try to be as secure as possible w/ the template mechanism.
 #	pragma warning( push )
-#		pragma warning( disable : 4996 )
+#	pragma warning( disable : 4996 )
 #endif
 
 	ETForceInlineHint ETNoAliasHint char* CopyString( char* destinationString, const char* sourceString, const size_t maxLengthInCharacters ) {
@@ -507,6 +510,46 @@ namespace Eldritch2 {
 
 	ETForceInlineHint ETNoAliasHint const wchar_t* FindEndOfString( const wchar_t* string ) {
 		return string + ::Eldritch2::StringLength( string );
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint const char* StripLeadingWhitespace( const char* string, const char* const stringEnd ) {
+		for( ; string != stringEnd && (0 != ::std::isspace( static_cast<int>(*string) )); ++string ) {}
+
+		return string;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint const wchar_t* StripLeadingWhitespace( const wchar_t* string, const wchar_t* const stringEnd ) {
+		for( ; string != stringEnd && (0 != ::std::iswspace( static_cast<::wint_t>(*string) )); ++string ) {}
+
+		return string;
+	}
+
+// ---------------------------------------------------
+
+#if( ET_COMPILER_IS_MSVC )
+//	MSVC complains needlessly about a harmless type promotion for ::std::isspace().
+#	pragma warning( push )
+#	pragma warning( disable : 6330 )
+#endif
+	ETForceInlineHint ETNoAliasHint const char* StripTrailingWhitespace( const char* const string, const char* stringEnd ) {
+		for( ; string != stringEnd && ::std::isspace( stringEnd[-1] ); --stringEnd ) {}
+
+		return stringEnd;
+	}
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint const wchar_t* StripTrailingWhitespace( const wchar_t* const string, const wchar_t* stringEnd ) {
+		for( ; string != stringEnd && ::std::iswspace( stringEnd[-1] ); --stringEnd ) {}
+
+		return stringEnd;
 	}
 
 // ---------------------------------------------------

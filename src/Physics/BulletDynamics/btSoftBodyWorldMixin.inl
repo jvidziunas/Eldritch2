@@ -171,8 +171,8 @@ btSoftBodyWorldMixin<BaseType>::~btSoftBodyWorldMixin() {
 template <typename BaseType>
 void btSoftBodyWorldMixin<BaseType>::predictUnconstraintMotion( ::btScalar timeStep ) {
 	BaseType::predictUnconstraintMotion( timeStep );
-	{
-		BT_PROFILE( "predictUnconstraintMotionSoftBody" );
+
+	{	BT_PROFILE( "predictUnconstraintMotionSoftBody" );
 		m_softBodySolver->predictMotion( float( timeStep ) );
 	}
 }
@@ -344,6 +344,11 @@ const ::btAlignedObjectArray<::btSoftBody*>& btSoftBodyWorldMixin<BaseType>::get
 
 // ---------------------------------------------------
 
+#if( ET_COMPILER_IS_MSVC )
+//	MSVC static analysis doesn't correctly figure out that operator= is deleted for btSoftSingleRayCallback here and complains that it's been left empty.
+#	pragma warning( push )
+#	pragma warning( disable : 4822 )
+#endif
 template <typename BaseType>
 void btSoftBodyWorldMixin<BaseType>::rayTest( const ::btVector3& rayFromWorld, const ::btVector3& rayToWorld, ::btCollisionWorld::RayResultCallback& resultCallback ) const {
 	struct btSoftSingleRayCallback : public ::btBroadphaseRayCallback {
@@ -424,6 +429,9 @@ void btSoftBodyWorldMixin<BaseType>::rayTest( const ::btVector3& rayFromWorld, c
 	}
 #endif //USE_BRUTEFORCE_RAYBROADPHASE
 }
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
 
 // ---------------------------------------------------
 

@@ -52,5 +52,11 @@ namespace FileSystem {
 		return *this;
 	}
 
+// ---------------------------------------------------
+
+	ResourceViewFactoryPublishingInitializationVisitor&	ResourceViewFactoryPublishingInitializationVisitor::PublishFactory( const ::Eldritch2::UTF8Char* const className, FactoryFunctionPointer factory ) {
+		return PublishFactory( className, nullptr, factory );
+	}
+
 }	// namespace FileSystem
 }	// namespace Eldritch2

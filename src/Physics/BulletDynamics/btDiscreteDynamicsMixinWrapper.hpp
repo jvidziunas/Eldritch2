@@ -19,17 +19,27 @@
 
 template <class BasicCollisionConfiguration = ::btDefaultCollisionConfiguration, class BasicConstraintSolver = ::btSequentialImpulseConstraintSolver>
 class btDiscreteDynamicsMixinWrapper : public ::btDiscreteDynamicsWorld {
+// - TYPE PUBLISHING ---------------------------------
+
 public:
-	typedef typename BasicCollisionConfiguration	CollisionConfiguration;
-	typedef typename BasicConstraintSolver			ConstraintSolver;
+	using CollisionConfiguration	= typename BasicCollisionConfiguration;
+	using ConstraintSolver			= typename BasicConstraintSolver;
 
 // ---
 
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
-	btDiscreteDynamicsMixinWrapper( btDispatcher* dispatcher, btBroadphaseInterface* pairCache, ConstraintSolver* constraintSolver, CollisionConfiguration* collisionConfiguration );
+// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	btDiscreteDynamicsMixinWrapper( ::btDispatcher* dispatcher, ::btBroadphaseInterface* pairCache, ConstraintSolver* constraintSolver, CollisionConfiguration* collisionConfiguration );
 
 	virtual ~btDiscreteDynamicsMixinWrapper() = default;
+
+// ---------------------------------------------------
+
+	virtual int		stepSimulation2( ::btScalar timeStep, int maxSubSteps = 1, ::btScalar fixedTimeStep = ::btScalar(1.) / ::btScalar(60.) );
+
+	virtual void	internalSingleStepSimulation2( ::btScalar timeStep );
 };
 
 //==================================================================//

@@ -323,6 +323,14 @@ namespace Eldritch2 {
 	// an unterminated string may result in a buffer read overrun.
 	ETForceInlineHint ETNoAliasHint const wchar_t*	FindEndOfString( const wchar_t* string );
 
+	ETForceInlineHint ETNoAliasHint const char*		StripLeadingWhitespace( const char* string, const char* const stringEnd );
+	ETForceInlineHint ETNoAliasHint const wchar_t*	StripLeadingWhitespace( const wchar_t* string, const wchar_t* const stringEnd );
+
+	ETForceInlineHint ETNoAliasHint const char*		StripTrailingWhitespace( const char* string, const char* const stringEnd );
+	ETForceInlineHint ETNoAliasHint const wchar_t*	StripTrailingWhitespace( const wchar_t* string, const wchar_t* const stringEnd );
+
+// ---------------------------------------------------
+
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
 	ETNoAliasHint char*							PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, ... );

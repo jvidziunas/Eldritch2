@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Tools/Tool.hpp>
+#include <Tools/ToolCRTPBase.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -24,27 +24,24 @@ namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	class TextureCompressorTool : GlobalAllocator, FileAccessorFactory, public Tools::ToolCRTPBase<TextureCompressorTool<GlobalAllocator, FileAccessorFactory> {
+	class TextureCompressor : GlobalAllocator, FileAccessorFactory, public Tools::ToolCRTPBase<TextureCompressor<GlobalAllocator, FileAccessorFactory>> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		using	AllocatorType			= GlobalAllocator;
 		using	FileAccessorFactoryType = FileAccessorFactory;
-		using	BaseToolType			= Tools::ToolCRTPBase<TextureCompressorTool<Allocator, FileAccessorFactory, MetadataVisitor>>;
+		using	BaseToolType			= Tools::ToolCRTPBase<TextureCompressor<Allocator, FileAccessorFactory>>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref TextureCompressorTool instance.
-		TextureCompressorTool();
+		//!	Constructs this @ref TextureCompressor instance.
+		TextureCompressor();
 
-		//!	Destroys this @ref TextureCompressorTool instance.
-		~TextureCompressorTool() = default;
+		~TextureCompressor() = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint FileAccessorFactoryType&	GetFileAccessorFactory();
-
-		ETInlineHint AllocatorType&				GetAllocator();
+		ETInlineHint AllocatorType&	GetAllocator();
 
 	// ---------------------------------------------------
 

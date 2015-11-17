@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Physics/BulletDynamics/EngineService.hpp>
 #include <Physics/BulletDynamics/WorldView.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -45,17 +46,33 @@ using namespace ::Eldritch2;
 namespace {
 
 	static ETThreadLocal BulletDynamics::WorldView*	activeScriptWorldViewForThread = nullptr;
+	static const UTF8Char							extentPropertyName[]	= UTF8L("Extent");
+	static const UTF8Char							extentDefaultValue[]	= UTF8L("10000.0");
 
 // ---------------------------------------------------
 
-	static ETNoAliasHint ::btVector3 DetermineAABBMinimaForWorld( const World& /*world*/ ) {
-		return ::btVector3( -10000.0f, -10000.0f, -10000.0f );
+	static ETNoAliasHint ::btVector3 DetermineAABBMinimaForWorld( const World& world ) {
+		FixedStackAllocator<96u>	tempAllocator( UTF8L("DetermineAABBMinimaForWorld() Temporary Allocator") );
+		::btScalar					extent( 10000.0f );
+
+		world.GetPropertyByKey( tempAllocator, extentPropertyName, extentDefaultValue ).ParseInto( extent );
+
+		extent = -AbsoluteValue( extent );
+
+		return ::btVector3( extent, extent, extent );
 	}
 
 // ---------------------------------------------------
 
-	static ETNoAliasHint ::btVector3 DetermineAABBMaximaForWorld( const World& /*world*/ ) {
-		return ::btVector3( 10000.0f, 10000.0f, 10000.0f );
+	static ETNoAliasHint ::btVector3 DetermineAABBMaximaForWorld( const World& world ) {
+		FixedStackAllocator<96u>	tempAllocator( UTF8L("DetermineAABBMaximaForWorld() Temporary Allocator") );
+		::btScalar					extent( 10000.0f );
+
+		world.GetPropertyByKey( tempAllocator, extentPropertyName, extentDefaultValue ).ParseInto( extent );
+
+		extent = AbsoluteValue( extent );
+
+		return ::btVector3( extent, extent, extent );
 	}
 
 // ---------------------------------------------------
@@ -84,12 +101,20 @@ namespace BulletDynamics {
 																					 _persistentManifoldPool( 32u, hostingEngine.GetWorldPersistentManifoldPoolSizeInElements() ),
 																					 _collisionAlgorithmPool( 16u, hostingEngine.GetWorldCollisionAlgorithmPoolSizeInElements() ),
 																					 _softBodySolver(),
-																					 _collisionConfiguration( CreateCollisionConfigurationConstructionInfo( _persistentManifoldPool, _collisionAlgorithmPool ) ),
+																					 _collisionConfiguration( CreateCollisionConfigurationConstructionInfo( _persistentManifoldPool,
+																																							_collisionAlgorithmPool ) ),
 																					 _dispatcher( &_collisionConfiguration ),
 																					 _pairCache(),
-																					 _broadphaseInterface( DetermineAABBMinimaForWorld( owningWorld ), DetermineAABBMaximaForWorld( owningWorld ), DetermineMaxHandleCountForWorld( owningWorld ), &_pairCache ),
+																					 _broadphaseInterface( DetermineAABBMinimaForWorld( owningWorld ),
+																										   DetermineAABBMaximaForWorld( owningWorld ),
+																										   DetermineMaxHandleCountForWorld( owningWorld ),
+																										   &_pairCache ),
 																					 _constraintSolver(),
-																					 _dynamicsWorld( &_softBodySolver, &_dispatcher, &_broadphaseInterface, &_constraintSolver, &_collisionConfiguration ),
+																					 _dynamicsWorld( &_softBodySolver,
+																									 &_dispatcher,
+																									 &_broadphaseInterface,
+																									 &_constraintSolver,
+																									 &_collisionConfiguration ),
 																					 _ghostPairCallback() {
 		_dynamicsWorld.getPairCache()->setInternalGhostPairCallback( &_ghostPairCallback );
 	}
@@ -118,6 +143,8 @@ namespace BulletDynamics {
 				TrySchedulingOnContext( executingContext );
 			}
 
+			~SimulateWorldTask() = default;
+
 		// ---------------------------------------------------
 
 			const UTF8Char* const GetHumanReadableName() const override sealed {
@@ -125,7 +152,7 @@ namespace BulletDynamics {
 			}
 
 			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_owner._dynamicsWorld.stepSimulation( 1.0f / 60.0f );
+				_owner._dynamicsWorld.stepSimulation2( 1.0f / 60.0f );
 
 				return nullptr;
 			}

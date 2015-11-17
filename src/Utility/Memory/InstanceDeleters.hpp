@@ -33,7 +33,6 @@ namespace Utility {
 		//! Constructs this @ref InstanceDeleter instance.
 		ETInlineHint InstanceDeleter( const Utility::InstanceDeleter& source ) = default;
 
-		//!	Destroys this @ref InstanceDeleter instance.
 		ETInlineHint ~InstanceDeleter() = default;
 
 	// ---------------------------------------------------
@@ -60,7 +59,6 @@ namespace Utility {
 		//! Constructs this @ref AlignedInstanceDeleter instance.
 		ETInlineHint AlignedInstanceDeleter( const Utility::AlignedInstanceDeleter& source ) = default;
 
-		//!	Destroys this @ref AlignedInstanceDeleter instance.
 		ETInlineHint ~AlignedInstanceDeleter() = default;
 
 	// ---------------------------------------------------

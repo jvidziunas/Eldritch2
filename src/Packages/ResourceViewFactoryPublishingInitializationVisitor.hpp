@@ -39,8 +39,7 @@ namespace FileSystem {
 			*/
 		ResourceViewFactoryPublishingInitializationVisitor( FileSystem::ContentLibrary& contentLibrary );
 
-		//!	Destroys this @ref ResourceViewFactoryPublishingInitializationVisitor instance.
-		ETInlineHint ~ResourceViewFactoryPublishingInitializationVisitor() = default;
+		~ResourceViewFactoryPublishingInitializationVisitor() = default;
 
 	// ---------------------------------------------------
 
@@ -51,6 +50,12 @@ namespace FileSystem {
 			@returns A reference to *this for method chaining.
 			*/
 		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, FactoryFunctionPointer factory );
+		//!	Registers an object creation handler for a specified class of resource view object.
+		/*!	@param[in] className Null-terminated C string containing the type name of the resource.
+			@param[in] factory Factory function. This should attempt to allocate a new instance of a @ref ResourceView subclass and return it in the Result for the function.
+			@returns A reference to *this for method chaining.
+			*/
+		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, FactoryFunctionPointer factory );
 		
 	// - DATA MEMBERS ------------------------------------
 

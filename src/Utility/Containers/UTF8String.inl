@@ -16,6 +16,8 @@
 #include <Utility/Hash.hpp>
 //------------------------------------------------------------------//
 #include <utfcpp/v2_0/source/utf8/unchecked.h>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/stream.hpp>
 //------------------------------------------------------------------//
 #include <type_traits>
 //------------------------------------------------------------------//
@@ -142,7 +144,7 @@ namespace Eldritch2 {
 
 	template <class Allocator>
 	ETInlineHint bool UTF8String<Allocator>::EndsWith( const CharacterType character ) const {
-		return (*this) ? End()[-1] == character : false;
+		return (*this) ? (End()[-1] == character) : false;
 	}
 
 // ---------------------------------------------------
@@ -152,6 +154,21 @@ namespace Eldritch2 {
 		const auto needleLength( ::Eldritch2::StringLength( needle ) );
 
 		return (needleLength <= Length()) ? ::Eldritch2::EqualityCompareString( End() - needleLength, needle, needleLength ) : false;
+	}
+
+// ---------------------------------------------------
+
+	template <class Allocator>
+	template <typename Value>
+	bool UTF8String<Allocator>::ParseInto( Value&& value ) const {
+		using namespace ::boost::iostreams;
+
+	// ---
+
+		basic_array_source<CharacterType>	source( Begin(), End() );
+		stream<decltype(source)>			inStream( source );
+
+		return (inStream >> value).fail();
 	}
 
 // ---------------------------------------------------

@@ -112,7 +112,7 @@ namespace Scripting {
 
 		_pointer = nullptr;
 
-		return _pointer;
+		return result;
 	}
 
 // ---------------------------------------------------

@@ -60,6 +60,9 @@ namespace AngelScript {
 				@remarks Not thread-safe.
 				*/
 			void	Drain( ::asIScriptObject& scriptObject, ::asIScriptContext& scriptContext );
+
+		private:
+			::Eldritch2::IntrusiveVyukovMPSCQueue<Scripting::Message>	_pendingMessages;
 		};
 
 	// ---

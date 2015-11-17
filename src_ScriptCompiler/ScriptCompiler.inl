@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <FlatBufferMetadataBuilderVisitor.hpp>
 #include <FileSystem/SynchronousFileWriter.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/Containers/Range.hpp>
@@ -30,20 +31,20 @@
 namespace Eldritch2 {
 namespace Tools {
 
-	template <class GlobalAllocator, class FileAccessorFactory, class MetadataVisitor>
-	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory, MetadataVisitor>::ScriptCompilerTool() : AllocatorType( UTF8L("Root Allocator") ), _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ) {}
+	template <class GlobalAllocator, class FileAccessorFactory>
+	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ScriptCompilerTool() : AllocatorType( UTF8L("Root Allocator") ), _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	template <class GlobalAllocator, class FileAccessorFactory, class MetadataVisitor>
-	ETInlineHint typename ScriptCompilerTool<GlobalAllocator, FileAccessorFactory, MetadataVisitor>::AllocatorType& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory, MetadataVisitor>::GetAllocator() {
+	template <class GlobalAllocator, class FileAccessorFactory>
+	ETInlineHint typename ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AllocatorType& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetAllocator() {
 		return static_cast<AllocatorType&>(*this);
 	}
 
 // ---------------------------------------------------
 
-	template <class GlobalAllocator, class FileAccessorFactory, class MetadataVisitor>
-	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory, MetadataVisitor>::~ScriptCompilerTool() {
+	template <class GlobalAllocator, class FileAccessorFactory>
+	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::~ScriptCompilerTool() {
 		if( auto scriptModule = GetModule() ) {
 			scriptModule->Discard();
 		}
@@ -55,8 +56,9 @@ namespace Tools {
 
 // ---------------------------------------------------
 
-	template <class GlobalAllocator, class FileAccessorFactory, class MetadataVisitor>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory, MetadataVisitor>::AcceptMetadataVisitor( MetadataVisitor&& visitor ) {
+	template <class GlobalAllocator, class FileAccessorFactory>
+	template <class MetadataVisitor>
+	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AcceptMetadataVisitor( MetadataVisitor&& visitor ) {
 		visitor.BeginMetadataProcessing();
 
 		// The built-in metadata parser uses really inconsistent indexing that additionally isn't useful across execution boundaries, so we need to get a little creative here.
@@ -121,8 +123,8 @@ namespace Tools {
 
 // ---------------------------------------------------
 
-	template <class GlobalAllocator, class FileAccessorFactory, class MetadataVisitor>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory, MetadataVisitor>::ProcessInputFiles( const ::Eldritch2::Range<const ::Eldritch2::SystemChar**> inputFiles ) {
+	template <class GlobalAllocator, class FileAccessorFactory>
+	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ProcessInputFiles( const ::Eldritch2::Range<const ::Eldritch2::SystemChar**> inputFiles ) {
 		class OutputStream : public ::asIBinaryStream {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -130,7 +132,6 @@ namespace Tools {
 			//!	Constructs this @ref OutputStream instance.
 			ETInlineHint OutputStream( ::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>&& writer ) : writer( move( writer ) ) {}
 
-			//!	Destroys this @ref OutputStream instance.
 			~OutputStream() = default;
 
 		// ---------------------------------------------------
@@ -172,7 +173,7 @@ namespace Tools {
 			return -1;
 		}
 
-		return AcceptMetadataVisitor( MetadataVisitor( stream, *this ) );
+		return AcceptMetadataVisitor( FlatBufferMetadataBuilderVisitor( stream, *this ) );
 	}
 
 }	// namespace Tools

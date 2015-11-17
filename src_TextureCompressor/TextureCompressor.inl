@@ -19,22 +19,22 @@ namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	TextureCompressorTool<GlobalAllocator, FileAccessorFactory>::TextureCompressorTool() : AllocatorType( UTF8L("Root Allocator") ), BaseToolType( GetAllocator() ) {}
+	TextureCompressor<GlobalAllocator, FileAccessorFactory>::TextureCompressor() : AllocatorType( UTF8L("Root Allocator") ), BaseToolType( GetAllocator() ) {}
 
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ETInlineHint typename TextureCompressorTool<GlobalAllocator, FileAccessorFactory>::FileAccessorFactoryType& TextureCompressorTool<GlobalAllocator, FileAccessorFactory>::GetFileAccessorFactory() {}
+	ETInlineHint typename TextureCompressor<GlobalAllocator, FileAccessorFactory>::FileAccessorFactoryType& TextureCompressor<GlobalAllocator, FileAccessorFactory>::GetFileAccessorFactory() {}
 
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ETInlineHint typename TextureCompressorTool<GlobalAllocator, FileAccessorFactory>::AllocatorType& TextureCompressorTool<GlobalAllocator, FileAccessorFactory>::GetAllocator() {}
+	ETInlineHint typename TextureCompressor<GlobalAllocator, FileAccessorFactory>::AllocatorType& TextureCompressor<GlobalAllocator, FileAccessorFactory>::GetAllocator() {}
 
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int	TextureCompressorTool<GlobalAllocator, FileAccessorFactory>::ProcessInputFiles( ::Eldritch2::Range<const UTF8Char**> inputFiles ) {
+	int	TextureCompressor<GlobalAllocator, FileAccessorFactory>::ProcessInputFiles( ::Eldritch2::Range<const UTF8Char**> inputFiles ) {
 		for( const UTF8Char* file : inputFiles ) {
 
 		}

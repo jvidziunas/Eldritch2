@@ -150,7 +150,7 @@
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
-    <ClCompile Include="..\src\Tools\Tool.cpp" />
+    <ClCompile Include="..\src\Tools\ToolCRTPBase.cpp" />
     <ClCompile Include="..\src\Tools\Win32\FileAccessorFactory.cpp" />
     <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
@@ -171,7 +171,7 @@
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp" />
     <ClInclude Include="..\src\Tools\FileAccessorFactory.hpp" />
-    <ClInclude Include="..\src\Tools\Tool.hpp" />
+    <ClInclude Include="..\src\Tools\ToolCRTPBase.hpp" />
     <ClInclude Include="..\src\Tools\Win32\FileAccessorFactory.hpp" />
     <ClInclude Include="..\src\Utility\Assert.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
@@ -201,7 +201,7 @@
     <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl" />
     <None Include="..\src\FileSystem\SynchronousFileReader.inl" />
     <None Include="..\src\FileSystem\SynchronousFileWriter.inl" />
-    <None Include="..\src\Tools\Tool.inl" />
+    <None Include="..\src\Tools\ToolCRTPBase.inl" />
     <None Include="..\src\Utility\Containers\Range.inl" />
     <None Include="..\src\Utility\Memory\Allocator.inl" />
     <None Include="..\src\Utility\Memory\ChildAllocator.inl" />

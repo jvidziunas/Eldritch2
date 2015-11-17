@@ -21,13 +21,20 @@ class	btSoftBodySolver;
 
 template <typename BaseType>
 class btSoftBodyWorldMixin : public BaseType {
+// - TYPE PUBLISHING ---------------------------------
+
 public:
 	class CollisionConfiguration : public BaseType::CollisionConfiguration {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
-		typedef typename BaseType::CollisionConfiguration	UnderlyingConfiguration;
+		using UnderlyingConfiguration	= typename BaseType::CollisionConfiguration;
 
 	// ---------------------------------------------------
 
+		//!	Constructs this @ref CollisionConfiguration instance.
+		/*!	@param[in] constructorArguments Template parameter pack containing the arguments to be forwarded to the base collision configuration constructor.
+			*/
 		template <typename... ConstructorArguments>
 		CollisionConfiguration( ConstructorArguments&&... constructorArguments );
 
@@ -36,7 +43,7 @@ public:
 	// ---------------------------------------------------
 
 		///creation of soft-soft and soft-rigid, and otherwise fallback to base class implementation
-		virtual btCollisionAlgorithmCreateFunc* getCollisionAlgorithmCreateFunc( int proxyType0, int proxyType1 ) override;
+		virtual btCollisionAlgorithmCreateFunc*	getCollisionAlgorithmCreateFunc( int proxyType0, int proxyType1 ) override;
 
 	// ---------------------------------------------------
 
@@ -54,11 +61,11 @@ public:
 // ---------------------------------------------------
 
 public:
-	// Constructs this btSoftBodyWorldMixin.
+	//!	Constructs this @ref btSoftBodyWorldMixin.
 	template <typename... ConstructorArguments>
 	btSoftBodyWorldMixin( ::btSoftBodySolver* softBodySolver, ConstructorArguments&&... constructorArguments );
 
-	// Destroys this btSoftBodyWorldMixin.
+	//!	Destroys this @ref btSoftBodyWorldMixin.
 	virtual ~btSoftBodyWorldMixin();
 
 // ---------------------------------------------------
@@ -101,7 +108,8 @@ public:
 	/// rayTestSingle performs a raycast call and calls the resultCallback. It is used internally by rayTest.
 	/// In a future implementation, we consider moving the ray test as a virtual method in btCollisionShape.
 	/// This allows more customization.
-	static void	rayTestSingle( const ::btTransform& rayFromTrans, const ::btTransform& rayToTrans, ::btCollisionObject* collisionObject, const ::btCollisionShape* collisionShape, const ::btTransform& colObjWorldTransform, ::btCollisionWorld::RayResultCallback& resultCallback );
+	static void	rayTestSingle( const ::btTransform& rayFromTrans, const ::btTransform& rayToTrans, ::btCollisionObject* collisionObject,
+							   const ::btCollisionShape* collisionShape, const ::btTransform& colObjWorldTransform, ::btCollisionWorld::RayResultCallback& resultCallback );
 
 // ---------------------------------------------------
 

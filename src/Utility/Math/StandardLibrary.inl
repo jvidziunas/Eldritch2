@@ -94,7 +94,7 @@ namespace Eldritch2 {
 		static const ::Eldritch2::float32	P( 0.225f );
 		const ::Eldritch2::float32			temp( ::Eldritch2::FastSine( value ) );
 
-		return( P * ( temp * ::Eldritch2::Abs( temp ) - temp ) + temp );
+		return( P * ( temp * ::Eldritch2::AbsoluteValue( temp ) - temp ) + temp );
 	}
 
 // ---------------------------------------------------
@@ -103,7 +103,7 @@ namespace Eldritch2 {
 		static const ::Eldritch2::float64	P( 0.225 );
 		const ::Eldritch2::float64			temp( ::Eldritch2::FastSine( value ) );
 
-		return( P * ( temp * ::Eldritch2::Abs( temp ) - temp ) + temp );
+		return( P * ( temp * ::Eldritch2::AbsoluteValue( temp ) - temp ) + temp );
 	}
 
 // ---------------------------------------------------
@@ -188,7 +188,7 @@ namespace Eldritch2 {
 		static const ::Eldritch2::float32	fourOverPi( 1.2732395447351626861510701069801f );
 		static const ::Eldritch2::float32	fourOverPiSquared( -0.40528473456935108577551785283891f );
 
-		return( fourOverPi * value + ( fourOverPiSquared * value ) * ::Eldritch2::Abs( value ) );
+		return( fourOverPi * value + ( fourOverPiSquared * value ) * ::Eldritch2::AbsoluteValue( value ) );
 	}
 
 // ---------------------------------------------------
@@ -197,7 +197,7 @@ namespace Eldritch2 {
 		static const ::Eldritch2::float64	fourOverPi( 1.2732395447351626861510701069801 );
 		static const ::Eldritch2::float64	fourOverPiSquared( -0.40528473456935108577551785283891 );
 
-		return( fourOverPi * value + ( fourOverPiSquared * value ) * ::Eldritch2::Abs( value ) );
+		return( fourOverPi * value + ( fourOverPiSquared * value ) * ::Eldritch2::AbsoluteValue( value ) );
 	}
 
 // ---------------------------------------------------
@@ -519,42 +519,42 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Sign( ::Eldritch2::float32 value ) {
-		return( 0.0f != value ? ( value / ::Eldritch2::Abs( value ) ) : 0.0f );
+		return( 0.0f != value ? ( value / ::Eldritch2::AbsoluteValue( value ) ) : 0.0f );
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Sign( ::Eldritch2::float64 value ) {
-		return( 0.0f != value ? ( value / ::Eldritch2::Abs( value ) ) : 0.0f );
+		return( 0.0f != value ? ( value / ::Eldritch2::AbsoluteValue( value ) ) : 0.0f );
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int8 Sign( ::Eldritch2::int8 value ) {
-		return( 0 != value ? ( value / ::Eldritch2::Abs( value ) ) : 0 );
+		return( 0 != value ? ( value / ::Eldritch2::AbsoluteValue( value ) ) : 0 );
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int16 Sign( ::Eldritch2::int16 value ) {
-		return( 0 != value ? ( value / ::Eldritch2::Abs( value ) ) : 0 );
+		return( 0 != value ? ( value / ::Eldritch2::AbsoluteValue( value ) ) : 0 );
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int32 Sign( ::Eldritch2::int32 value ) {
-		return( 0 != value ? ( value / ::Eldritch2::Abs( value ) ) : 0 );
+		return( 0 != value ? ( value / ::Eldritch2::AbsoluteValue( value ) ) : 0 );
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int64 Sign( ::Eldritch2::int64 value ) {
-		return( 0 != value ? ( value / ::Eldritch2::Abs( value ) ) : 0 );
+		return( 0 != value ? ( value / ::Eldritch2::AbsoluteValue( value ) ) : 0 );
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 Abs( ::Eldritch2::float32 value ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32 AbsoluteValue( ::Eldritch2::float32 value ) {
 #if( ET_PLATFORM_X86 )
 #	if 0
 		const ::Eldritch2::int32	y( reinterpret_cast<::Eldritch2::int32&>(value) & 0x7FFFFFFF );
@@ -570,7 +570,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 Abs( ::Eldritch2::float64 value ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64 AbsoluteValue( ::Eldritch2::float64 value ) {
 #if( ET_PLATFORM_X86 )
 #	if 0
 		const ::Eldritch2::int64	y( reinterpret_cast<::Eldritch2::int64&>(value) & 0x7FFFFFFFFFFFFFFF );
@@ -586,25 +586,25 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int8 Abs( ::Eldritch2::int8 value ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int8 AbsoluteValue( ::Eldritch2::int8 value ) {
 		return value > 0 ? value : -value;
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int16 Abs( ::Eldritch2::int16 value ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int16 AbsoluteValue( ::Eldritch2::int16 value ) {
 		return value > 0 ? value : -value;
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int32 Abs( ::Eldritch2::int32 value ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int32 AbsoluteValue( ::Eldritch2::int32 value ) {
 		return value > 0 ? value : -value;
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int64 Abs( ::Eldritch2::int64 value ) {
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int64 AbsoluteValue( ::Eldritch2::int64 value ) {
 		return value > 0 ? value : -value;
 	}
 

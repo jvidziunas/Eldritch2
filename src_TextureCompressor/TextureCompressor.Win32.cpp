@@ -1,4 +1,3 @@
-#include "TextureCompressor.hpp"
 /*==================================================================*\
   TextureCompressor.cpp
   ------------------------------------------------------------------
@@ -23,5 +22,5 @@ int main( int argc, ::Eldritch2::UTF8Char** argv ) {
 
 // ---
 
-	return Tools::TextureCompressorTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv + 1, argv + argc } );
+	return Tools::TextureCompressor<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv + 1, argv + argc } );
 }

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Tool.inl
+  ToolCRTPBase.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -7,22 +7,35 @@
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-#pragma once
+
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Containers/Range.hpp>
+#include <Tools/ToolCRTPBase.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Tools {
+namespace Detail {
 
-	template <typename Option>
-	Tool::OptionRegistrationVisitor& Tool::OptionRegistrationVisitor::AddOption( const ::Eldritch2::UTF8Char* const /*name*/, Option& /*option*/ ) {
-		return *this;
+	ToolBase::OptionRegistrationVisitor::OptionRegistrationVisitor( Allocator& allocator ) : _settings( { allocator, UTF8L("Tool Option Registry Allocator") } ) {}
+
+// ---------------------------------------------------
+
+	int	ToolBase::OptionRegistrationVisitor::DispatchOptions( const ::Eldritch2::Range<const ::Eldritch2::SystemChar**> options ) const {
+		return 0;
 	}
 
+// ---------------------------------------------------
+
+	void ToolBase::RegisterOptions( OptionRegistrationVisitor& /*visitor*/ ) {
+		// Default implementation does nothing.
+	}
+
+}	// namespace Detail
 }	// namespace Tools
 }	// namespace Eldritch2
 

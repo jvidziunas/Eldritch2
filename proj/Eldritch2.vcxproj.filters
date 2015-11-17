@@ -1297,7 +1297,7 @@
       <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Hash.inl">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Utility</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

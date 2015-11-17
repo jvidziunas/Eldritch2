@@ -22,10 +22,10 @@ namespace Configuration {
 
 	template <typename SettingHandler>
 	void ParseINI( const ::Eldritch2::Range<const ::Eldritch2::UTF8Char*>& sourceData, SettingHandler settingHandler ) {
-		// The following is adapted from Ben Hoyt's inih library. Original source available at https://github.com/benhoyt/inih
-
 		using namespace ::Eldritch2;
 		using namespace ::std;
+
+	// ---
 
 		struct FunctionHelper {
 			static const UTF8Char* StripByteOrderMark( const UTF8Char* const begin, const UTF8Char* const end ) {
@@ -38,51 +38,42 @@ namespace Configuration {
 
 		// ---------------------------------------------------
 
-			static const UTF8Char* StripLeadingWhitespace( const UTF8Char* readLine, const UTF8Char* const readEnd ) {
-				for( ; readLine != readEnd && isspace( *readLine ); ++readLine ) {}
-
-				return readLine;
-			}
-
-		// ---------------------------------------------------
-
-			static const UTF8Char* StripTrailingWhitespace( const UTF8Char* readEnd, const UTF8Char* const readLine ) {
-				for( ; readLine != readEnd && isspace( readEnd[-1] ); --readEnd ) {}
-
-				return readEnd;
-			}
-
-		// ---------------------------------------------------
-
+#if( ET_COMPILER_IS_MSVC )
+//	MSVC complains needlessly about a harmless type promotion for ::std::isspace().
+#	pragma warning( push )
+#	pragma warning( disable : 6330 )
+#endif
 			static const UTF8Char* FindCharacterOrComment( const UTF8Char* readLine, const UTF8Char* const readEnd, const UTF8Char character ) {
-				int	wasWhitespace( 0 );
-
-				while( (readLine != readEnd) && (*readLine != character) && !(wasWhitespace && *readLine == UTF8L(';')) ) {
-					wasWhitespace = isspace( *readLine++ );
+				for( int wasWhitespace( 0 ); (readLine != readEnd) && (*readLine != character) && !(wasWhitespace && *readLine == UTF8L( ';' )); ) {
+					wasWhitespace = ::std::isspace( *readLine++ );
 				}
 
 				return readLine;
 			}
 		};
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
 
 	// ---
+
+		// The following is adapted from Ben Hoyt's inih library. Original source available at https://github.com/benhoyt/inih
 
 		Range<const UTF8Char*>	section( Range<const UTF8Char*>::EmptySet() );
 
 		// Consume the BOM, if one exists.
-		const UTF8Char* lineBegin( FunctionHelper::StripByteOrderMark( sourceData.first, sourceData.onePastLast ) );
+		const UTF8Char*	lineBegin( FunctionHelper::StripByteOrderMark( sourceData.first, sourceData.onePastLast ) );
+		const UTF8Char*	lineEnd;
 
 		// Scan through each line in the range.
 		for( const UTF8Char* readEnd( Utility::FindElement( lineBegin, sourceData.onePastLast, UTF8L('\n') ) ); sourceData.Contains( lineBegin ); (lineBegin = readEnd), readEnd = Utility::FindElement( lineBegin, sourceData.onePastLast, UTF8L('\n') ) ) {
 			// Strip out leading and trailing whitespace.
-			const UTF8Char* const	lineEnd( FunctionHelper::StripTrailingWhitespace( readEnd, (lineBegin = FunctionHelper::StripLeadingWhitespace( lineBegin, readEnd )) ) );
+			lineBegin	= StripLeadingWhitespace( lineBegin, readEnd );
+			lineEnd		= StripTrailingWhitespace( lineBegin, readEnd );
 
-			if( lineBegin == lineEnd ) {
-				// Empty/whitespace-only line.
-
-			} else if( *lineBegin == UTF8L(';') ) {
-				// Comment line. Skip and move on.
-
+			if( (lineBegin == lineEnd) || *lineBegin == UTF8L(';') ) {
+				// Comment/empty/whitespace-only line. Skip and move on.
+				continue;
 			} else if( *lineBegin == UTF8L('[') ) {
 				// Section designator.
 
@@ -94,7 +85,7 @@ namespace Configuration {
 
 				// ... which we confirm.
 				if( (sectionEnd != lineEnd) && (*sectionEnd == UTF8L(']')) ) {
-					section = Range<const UTF8Char*>( FunctionHelper::StripLeadingWhitespace( lineBegin, sectionEnd ), FunctionHelper::StripTrailingWhitespace( sectionEnd, lineBegin ) );
+					section = Range<const UTF8Char*>( StripLeadingWhitespace( lineBegin, sectionEnd ), StripTrailingWhitespace( lineBegin, sectionEnd ) );
 				}
 			} else {
 				// <name> = <value> pair
@@ -104,14 +95,14 @@ namespace Configuration {
 
 				// Ensure that any comments come after the assignment.
 				if( (separatorPosition != lineEnd) && (*separatorPosition == UTF8L('=')) ) {
-					Range<const UTF8Char*>	name( FunctionHelper::StripLeadingWhitespace( lineBegin, separatorPosition ), FunctionHelper::StripTrailingWhitespace( separatorPosition, lineBegin ) );
+					Range<const UTF8Char*>	name( StripLeadingWhitespace( lineBegin, separatorPosition ), StripTrailingWhitespace( lineBegin, separatorPosition ) );
 
 					if( !name.IsEmpty() ) {
-						Range<const UTF8Char*>	value( FunctionHelper::StripLeadingWhitespace( separatorPosition + 1, lineEnd ), FunctionHelper::FindCharacterOrComment( separatorPosition + 1, lineEnd, UTF8L('\n') ) );
+						Range<const UTF8Char*>	value( StripLeadingWhitespace( separatorPosition + 1, lineEnd ), FunctionHelper::FindCharacterOrComment( separatorPosition + 1, lineEnd, UTF8L('\n') ) );
 					
 						// If there is a comment after the assignment, make sure we strip it out
 						if( !value.IsEmpty() && *value.onePastLast == UTF8L(';') ) {
-							value.onePastLast = FunctionHelper::StripTrailingWhitespace( value.onePastLast - 1, value.first );
+							value.onePastLast = StripTrailingWhitespace( value.first, value.onePastLast - 1 );
 						}
 
 						// Valid pair found, call handler

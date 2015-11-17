@@ -272,7 +272,7 @@
 
 #endif
 
-#define ETUnreferencedParameter(ParameterName)         sizeof( ParameterName )
+#define ETUnreferencedParameter(ParameterName)         static_cast<void>( ParameterName )
 
 // Syntatic sugar. The function-style #define can be
 // used to make platform-dependent code and if/else

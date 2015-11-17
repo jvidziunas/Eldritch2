@@ -78,9 +78,6 @@
     <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp">
       <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Tools\Tool.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp">
       <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
@@ -117,6 +114,9 @@
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp">
       <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Tools\ToolCRTPBase.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h">
@@ -139,9 +139,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp">
       <Filter>Header Files\Utility\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Tools\Tool.hpp">
-      <Filter>Header Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\Range.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
@@ -191,6 +188,9 @@
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp">
       <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Tools\ToolCRTPBase.hpp">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Utility\Memory\Allocator.inl">
@@ -198,9 +198,6 @@
     </None>
     <None Include="..\src\Utility\Containers\Range.inl">
       <Filter>Source Files\Utility\Containers</Filter>
-    </None>
-    <None Include="..\src\Tools\Tool.inl">
-      <Filter>Source Files\Tools</Filter>
     </None>
     <None Include="..\src\Utility\Memory\ChildAllocator.inl">
       <Filter>Source Files\Utility\Memory</Filter>
@@ -219,6 +216,9 @@
     </None>
     <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl">
       <Filter>Source Files\FileSystem</Filter>
+    </None>
+    <None Include="..\src\Tools\ToolCRTPBase.inl">
+      <Filter>Source Files\Tools</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

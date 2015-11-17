@@ -16,32 +16,62 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\FileSystem\ReadableMemoryMappedFile.cpp" />
-    <ClCompile Include="..\src\Tools\Tool.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
+    <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
+    <ClCompile Include="..\src\Tools\ToolCRTPBase.cpp" />
+    <ClCompile Include="..\src\Tools\Win32\FileAccessorFactory.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
-    <ClCompile Include="..\src\Utility\MessagePackBase.cpp" />
-    <ClCompile Include="..\src\Utility\MessagePackWriter.cpp" />
-    <ClCompile Include="..\src_Bakinator\Bakinator.cpp" />
+    <ClCompile Include="..\src_Bakinator\Bakinator.Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\FileSystem\ReadableMemoryMappedFile.hpp" />
-    <ClInclude Include="..\src\Tools\Tool.hpp" />
+    <ClInclude Include="..\src\FileSystem\SynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\FileSystem\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp" />
+    <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\Tools\FileAccessorFactory.hpp" />
+    <ClInclude Include="..\src\Tools\ToolCRTPBase.hpp" />
+    <ClInclude Include="..\src\Tools\Win32\FileAccessorFactory.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\InstanceDeleters.hpp" />
     <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
-    <ClInclude Include="..\src\Utility\MessagePackBase.hpp" />
-    <ClInclude Include="..\src\Utility\MessagePackWriter.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Alignof.hpp" />
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Compiler.hpp" />
     <ClInclude Include="..\src\Utility\MPL\FloatTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\IntTypes.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Platform.hpp" />
+    <ClInclude Include="..\src_Bakinator\Bakinator.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\Tools\Tool.inl" />
+    <CustomBuild Include="..\src\Packages\PackageHeader.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
+      </AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;</Outputs>
+    </CustomBuild>
+    <None Include="..\src\FileSystem\ReadableMemoryMappedFile.inl" />
+    <None Include="..\src\FileSystem\SynchronousFileReader.inl" />
+    <None Include="..\src\FileSystem\SynchronousFileWriter.inl" />
+    <None Include="..\src\Tools\ToolCRTPBase.inl" />
+    <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
+    <None Include="..\src_Bakinator\Bakinator.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FDDD442B-008C-4F86-B0C1-CC6DBE1F7068}</ProjectGuid>
@@ -116,6 +146,8 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <PreprocessorDefinitions>NOMINMAX;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -146,6 +178,8 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <PreprocessorDefinitions>NOMINMAX;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -178,6 +212,8 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <PreprocessorDefinitions>NOMINMAX;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>

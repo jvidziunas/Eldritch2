@@ -27,7 +27,6 @@ namespace Tools {
 
 	public:
 		using ModuleMetadataBuilder	= Scripting::AngelScript::FlatBuffers::ModuleMetadataBuilder;
-
 		using FunctionMetadata		= Scripting::AngelScript::FlatBuffers::FunctionMetadata;
 		using PropertyMetadata		= Scripting::AngelScript::FlatBuffers::PropertyMetadata;
 		using TypeMetadata			= Scripting::AngelScript::FlatBuffers::TypeMetadata;
@@ -77,7 +76,7 @@ namespace Tools {
 
 		void	FinishTypeMetadataProcessing();
 
-	// ---------------------------------------------------
+	// - DATA MEMBERS ------------------------------------
 
 	private:
 		::Eldritch2::ResizableArray<flatbuffers::Offset<FunctionMetadata>>	_pendingFunctionMetadata;

@@ -114,12 +114,12 @@ namespace AngelScript {
 		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Frac( float )", asFUNCTIONPR( Frac, (float32), float32 ), asCALL_CDECL ) );
 		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Frac( double )", asFUNCTIONPR( Frac, (float64), float64 ), asCALL_CDECL ) );
 
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Abs( float )", asFUNCTIONPR( Abs, (float32), float32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Abs( double )", asFUNCTIONPR( Abs, (float64), float64 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 Abs( int8 )", asFUNCTIONPR( Abs, (int8), int8 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 Abs( int16 )", asFUNCTIONPR( Abs, (int16), int16 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 Abs( int32 )", asFUNCTIONPR( Abs, (int32), int32 ), asCALL_CDECL ) );
-		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 Abs( int64 )", asFUNCTIONPR( Abs, (int64), int64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float AbsoluteValue( float )", asFUNCTIONPR( AbsoluteValue, (float32), float32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double AbsoluteValue( double )", asFUNCTIONPR( AbsoluteValue, (float64), float64 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int8 AbsoluteValue( int8 )", asFUNCTIONPR( AbsoluteValue, (int8), int8 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int16 AbsoluteValue( int16 )", asFUNCTIONPR( AbsoluteValue, (int16), int16 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int32 AbsoluteValue( int32 )", asFUNCTIONPR( AbsoluteValue, (int32), int32 ), asCALL_CDECL ) );
+		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "int64 AbsoluteValue( int64 )", asFUNCTIONPR( AbsoluteValue, (int64), int64 ), asCALL_CDECL ) );
 
 		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "float Sign( float )", asFUNCTIONPR( Sign, (float32), float32 ), asCALL_CDECL ) );
 		ETRuntimeVerification( 0 <= engine->RegisterGlobalFunction( "double Sign( double )", asFUNCTIONPR( Sign, (float64), float64 ), asCALL_CDECL ) );

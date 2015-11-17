@@ -22,8 +22,8 @@
 //------------------------------------------------------------------//
 #if( ET_COMPILER_IS_MSVC )
 //	MSVC complains about macro redefinitions, since a few DirectX components separately
-// define some HRESULT values without an include guard. The definitions themselves are consistent,
-// so just disable the warning.
+//	define some HRESULT values without an include guard. The definitions themselves are consistent,
+//	so just disable the warning.
 #	pragma warning( push )
 #	pragma warning( disable : 4005 )
 #endif

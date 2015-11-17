@@ -14,10 +14,10 @@
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/MeshResourceView.hpp>
+#include <Renderer/Direct3D11/WorldView.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Renderer/Direct3D11/WorldView.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//

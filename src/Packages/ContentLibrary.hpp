@@ -149,12 +149,7 @@ namespace FileSystem {
 
 	// ---
 
-		struct ResourceViewFactory {
-			using FactoryFunctionPointer	= ::Eldritch2::InstancePointer<FileSystem::ResourceView> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
-
-			FactoryFunctionPointer	factoryFunction;
-			void*					parameter;
-		};
+		using ResourceViewFactory = ::Eldritch2::Pair<::Eldritch2::InstancePointer<FileSystem::ResourceView> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* ), void*>;
 
 	// - DATA MEMBERS ------------------------------------
 

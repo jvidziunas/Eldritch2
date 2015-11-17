@@ -795,6 +795,9 @@ namespace Detail {
 	::Eldritch2::Result<UserDefinedTypeRegistrar::ValueTypeBuilder<Native>> UserDefinedTypeRegistrar::RegisterUserDefinedValueType( ::Eldritch2::Allocator& builderAllocator ) {
 		struct DestructorWrapper {
 			static void ETCDecl	Invoke( void* const object ) {
+				// MSVC is weird and doesn't consider destructor calls 'using' a parameter.
+				static_cast<void>(object);
+
 				static_cast<Native*>(object)->~Native();
 			}
 		};

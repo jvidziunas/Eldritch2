@@ -20,7 +20,17 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #	define WIN32_LEAN_AND_MEAN
 #endif
+#if( ET_COMPILER_IS_MSVC )
+//	MSVC complains about macro redefinitions, since a few DirectX components separately
+// define some HRESULT values without an include guard. The definitions themselves are consistent,
+// so just disable the warning.
+#	pragma warning( push )
+#	pragma warning( disable : 4005 )
+#endif
 #include <D3D11.h>
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
 //------------------------------------------------------------------//
 
 //==================================================================//

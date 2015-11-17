@@ -31,7 +31,6 @@ namespace Win32 {
 		//!	Constructs this @ref FileAccessorFactory instance.
 		FileAccessorFactory() = default;
 
-		//!	Destroys this @ref FileAccessorFactory instance.
 		~FileAccessorFactory() = default;
 
 	// ---------------------------------------------------

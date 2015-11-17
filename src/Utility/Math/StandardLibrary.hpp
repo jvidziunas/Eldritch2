@@ -127,12 +127,12 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32	Abs( ::Eldritch2::float32 value );
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64	Abs( ::Eldritch2::float64 value );
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int8		Abs( ::Eldritch2::int8 value );
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int16		Abs( ::Eldritch2::int16 value );
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int32		Abs( ::Eldritch2::int32 value );
-	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int64		Abs( ::Eldritch2::int64 value );
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float32	AbsoluteValue( ::Eldritch2::float32 value );
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::float64	AbsoluteValue( ::Eldritch2::float64 value );
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int8		AbsoluteValue( ::Eldritch2::int8 value );
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int16		AbsoluteValue( ::Eldritch2::int16 value );
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int32		AbsoluteValue( ::Eldritch2::int32 value );
+	ETNoAliasHint ETNoThrowHint ETInlineHint ::Eldritch2::int64		AbsoluteValue( ::Eldritch2::int64 value );
 
 // ---------------------------------------------------
 

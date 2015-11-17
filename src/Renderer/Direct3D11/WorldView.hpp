@@ -87,7 +87,6 @@ namespace Direct3D11 {
 			//! Constructs this @ref SceneCameraComponent instance.
 			SceneCameraComponent( Direct3D11::SwapChain& swapChain, WorldView& owningView = GetActiveWorldView() );
 
-			//! Destroys this @ref SceneCameraComponent instance.
 			~SceneCameraComponent() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
@@ -118,7 +117,6 @@ namespace Direct3D11 {
 			//! Constructs this @ref MeshComponent instance.
 			MeshComponent( const Direct3D11::MeshResourceView& mesh, Animation::Armature& armature );
 
-			//! Destroys this @ref MeshComponent instance.
 			~MeshComponent() = default;
 
 		// ---------------------------------------------------

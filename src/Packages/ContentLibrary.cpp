@@ -134,7 +134,7 @@ namespace FileSystem {
 					// Loop through all the resource view factories...
 					for( const auto& factory : findFactoriesResult->second ) {
 						// ... attempting to create their respective resources...
-						auto	createResourceResult( factory.factoryFunction( resourceAllocator, name, factory.parameter ) );
+						auto	createResourceResult( factory.first( resourceAllocator, name, factory.second ) );
 
 						if( createResourceResult && createResourceResult->UpdateFromByteStream( data ) ) {
 							// ... and publishing them to the content library.

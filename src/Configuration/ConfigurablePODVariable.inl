@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/Range.hpp>
+//------------------------------------------------------------------//
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream.hpp>
 //------------------------------------------------------------------//
@@ -32,9 +33,9 @@ namespace Configuration {
 	// ---
 
 		basic_array_source<::Eldritch2::UTF8Char>	source( string.first, string.onePastLast );
-		stream<decltype(source)>					inputStream( source );
+		stream<decltype(source)>					inStream( source );
 
-		inputStream >> _value;
+		inStream >> _value;
 	}
 
 // ---------------------------------------------------
@@ -46,15 +47,15 @@ namespace Configuration {
 	// ---
 
 		basic_array_sink<::Eldritch2::UTF8Char>	sink( destinationBuffer, destinationBufferSizeInOctets );
-		stream<decltype(sink)>					outputStream( sink );
+		stream<decltype(sink)>					outStream( sink );
 
-		outputStream << _value;
+		outStream << _value;
 	}
 
 }	// namespace Configuration
 }	// namespace Eldritch2
 
 #if( ET_COMPILER_IS_MSVC )
-// Disable warnings about dead code elimination.
+//	Disable warnings about dead code elimination.
 #	pragma warning( disable : 4505 )
 #endif
