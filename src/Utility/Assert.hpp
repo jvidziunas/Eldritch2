@@ -49,10 +49,10 @@ namespace Eldritch2 {
 									ET_MULTILINE_MACRO_END
 #else
 #	if defined( ET_COMPILER_IS_MSVC )
-#		define ETRuntimeAssert(cond)	static_cast<void>(cond);
+#		define ETRuntimeAssert(cond)	static_cast<void>(sizeof((cond)));
 #	else
 #		define ETRuntimeAssert(cond)	ET_MULTILINE_MACRO_BEGIN \
-										static_cast<void>(cond); \
+										static_cast<void>(sizeof((cond))); \
 										ET_MULTILINE_MACRO_END
 #	endif
 #endif

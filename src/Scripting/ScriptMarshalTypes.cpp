@@ -265,7 +265,7 @@ namespace Scripting {
 			}
 
 			static ETInlineHint ETNoAliasHint OrientationMarshal ETScriptAPICall GetReverse( const OrientationMarshal* thisPointer ) {
-				return OrientationMarshal( thisPointer->Reverse() );
+				return OrientationMarshal( thisPointer->GetReverse() );
 			}
 
 			static ETInlineHint ETNoAliasHint Float4Marshal	ETScriptAPICall GetForwardVector( const OrientationMarshal* thisPointer ) {

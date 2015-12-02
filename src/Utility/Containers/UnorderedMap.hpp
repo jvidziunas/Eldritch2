@@ -13,6 +13,7 @@
 //==================================================================//
 #include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
+#include <Utility/Equals.hpp>
 #include <Utility/Hash.hpp>
 #include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
@@ -21,7 +22,7 @@
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class Hasher = ::Eldritch2::Hash<Key>, class KeyEqualityComparator = ::rde::equal_to<Key>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
+	template <typename Key, typename StoredObject, class Hasher = ::Eldritch2::Hash<Key>, class KeyEqualityComparator = ::Eldritch2::Equals<Key>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
 	class UnorderedMap {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -44,7 +45,7 @@ namespace Eldritch2 {
 		//! Constructs this @ref UnorderedMap instance.
 		ETInlineHint explicit UnorderedMap( AllocatorType&& allocatorType = AllocatorType() );
 		//! Constructs this @ref UnorderedMap instance.
-		ETInlineHint UnorderedMap( const SizeType initialCapacity, Hasher&& hasher = Hasher(), AllocatorType&& allocatorType = AllocatorType() );
+		ETInlineHint UnorderedMap( Hasher&& hasher, AllocatorType&& allocatorType = AllocatorType() );
 		//! Constructs this @ref UnorderedMap instance.
 		template <class AlternateAllocator, int alternateLoadFactor>
 		ETInlineHint UnorderedMap( const ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocatorType = AllocatorType() );
@@ -57,8 +58,14 @@ namespace Eldritch2 {
 
 		//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
 		ETInlineHint ConstIterator	Find( const KeyType& key ) const;
+		//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
+		template <typename AlternateKey>
+		ETInlineHint ConstIterator	Find( const AlternateKey& key ) const;
 		//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
 		ETInlineHint Iterator		Find( const KeyType& key );
+		//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
+		template <typename AlternateKey>
+		ETInlineHint Iterator		Find( const AlternateKey& key );
 
 		//! Erases all elements for which the result of the predicate returns true.
 		template <typename Predicate>

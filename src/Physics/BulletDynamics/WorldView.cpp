@@ -45,19 +45,14 @@ using namespace ::Eldritch2;
 
 namespace {
 
-	static ETThreadLocal BulletDynamics::WorldView*	activeScriptWorldViewForThread = nullptr;
-	static const UTF8Char							extentPropertyName[]	= UTF8L("Extent");
-	static const UTF8Char							extentDefaultValue[]	= UTF8L("10000.0");
+	static ETThreadLocal BulletDynamics::WorldView*	activeScriptWorldViewForThread	= nullptr;
+	static const ::btScalar							defaultWorldExtent				= static_cast<::btScalar>(10000.0f);
+	static const UTF8Char							extentPropertyName[]			= UTF8L("Extent");
 
 // ---------------------------------------------------
 
 	static ETNoAliasHint ::btVector3 DetermineAABBMinimaForWorld( const World& world ) {
-		FixedStackAllocator<96u>	tempAllocator( UTF8L("DetermineAABBMinimaForWorld() Temporary Allocator") );
-		::btScalar					extent( 10000.0f );
-
-		world.GetPropertyByKey( tempAllocator, extentPropertyName, extentDefaultValue ).ParseInto( extent );
-
-		extent = -AbsoluteValue( extent );
+		const auto	extent( -AbsoluteValue( world.GetPropertyByKey( extentPropertyName, defaultWorldExtent ) ) );
 
 		return ::btVector3( extent, extent, extent );
 	}
@@ -65,12 +60,7 @@ namespace {
 // ---------------------------------------------------
 
 	static ETNoAliasHint ::btVector3 DetermineAABBMaximaForWorld( const World& world ) {
-		FixedStackAllocator<96u>	tempAllocator( UTF8L("DetermineAABBMaximaForWorld() Temporary Allocator") );
-		::btScalar					extent( 10000.0f );
-
-		world.GetPropertyByKey( tempAllocator, extentPropertyName, extentDefaultValue ).ParseInto( extent );
-
-		extent = AbsoluteValue( extent );
+		const auto	extent( AbsoluteValue( world.GetPropertyByKey( extentPropertyName, defaultWorldExtent ) ) );
 
 		return ::btVector3( extent, extent, extent );
 	}

@@ -23,9 +23,9 @@
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ReferenceTypeBase.hpp>
-#include <Utility/StringOperators.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
+#include <Utility/StringHash.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Scripting/Message.hpp>
 //------------------------------------------------------------------//
@@ -64,11 +64,14 @@ namespace Foundation {
 
 		~World();
 
-	// ---------------------------------------------------
+	// - WORLD KEY-VALUE PROPERTY QUERY ------------------
 
-		Property	GetPropertyByKey( ::Eldritch2::Allocator& resultAllocator, const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const defaultValue = UTF8L("") ) const;
+		Property		GetPropertyByKey( ::Eldritch2::Allocator& resultAllocator, const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const defaultValue = UTF8L("") ) const;
 
-		void		SetProperty( const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const value );
+		template <typename PropertyValue>
+		PropertyValue	GetPropertyByKey( const ::Eldritch2::UTF8Char* const key, PropertyValue defaultValue ) const;
+
+		void			SetProperty( const ::Eldritch2::UTF8Char* const key, const ::Eldritch2::UTF8Char* const value );
 
 	// - WORLD SIMULATION --------------------------------
 
@@ -96,20 +99,22 @@ namespace Foundation {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator														_allocator;
-		::Eldritch2::ArenaChildAllocator												_viewAllocator;
+		::Eldritch2::ArenaChildAllocator									_allocator;
+		::Eldritch2::ArenaChildAllocator									_viewAllocator;
 
-		Scripting::ObjectHandle<Foundation::GameEngine>									_owningEngine;
-		Scripting::ObjectHandle<FileSystem::ContentPackage>								_package;
+		Scripting::ObjectHandle<Foundation::GameEngine>						_owningEngine;
+		Scripting::ObjectHandle<FileSystem::ContentPackage>					_package;
 
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>				_propertyMutex;
-		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>, ::Eldritch2::UTF8String<>>	_properties;
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>	_propertyMutex;
+		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>,
+								  ::Eldritch2::UTF8String<>,
+								  ::Eldritch2::StringHash<>>				_properties;
 
-		::Eldritch2::uint32																_isPaused : 1;
-		::Eldritch2::uint32																_isLoaded : 1;
+		::Eldritch2::uint32													_isPaused : 1;
+		::Eldritch2::uint32													_isLoaded : 1;
 
-		::Eldritch2::IntrusiveForwardList<Foundation::WorldView>						_attachedViews;
-		::Eldritch2::ErrorCode															_lastError;
+		::Eldritch2::IntrusiveForwardList<Foundation::WorldView>			_attachedViews;
+		::Eldritch2::ErrorCode												_lastError;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

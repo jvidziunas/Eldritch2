@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Hash.hpp
+  StringHash.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,24 +12,30 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/Compiler.hpp>
+#include <Utility/Containers/String.hpp>
+#include <Utility/Hash.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename T>
-	class Hash {
+	template <typename Character = ::Eldritch2::UTF8Char>
+	class StringHash : public ::Eldritch2::Hash<Character*> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Hash instance.
-		Hash() = default;
+		//!	Constructs this @ref StringHash instance.
+		StringHash() = default;
 
-		~Hash() = default;
+		~StringHash() = default;
 
 	// ---------------------------------------------------
 
-		ETNoAliasHint size_t	operator()( const T& object, const size_t seed = static_cast<size_t>(0) ) const;
+		// Pull additional overloads into scope for interoperability with C strings.
+		using ::Eldritch2::Hash<Character*>::operator();
+
+		template <typename Allocator>
+		ETNoAliasHint size_t	operator()( const String<Character, Allocator>& string, const size_t seed = static_cast<size_t>(0) ) const;
+		
 	};
 
 }	// namespace Eldritch2
@@ -37,5 +43,5 @@ namespace Eldritch2 {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/Hash.inl>
+#include <Utility/StringHash.inl>
 //------------------------------------------------------------------//

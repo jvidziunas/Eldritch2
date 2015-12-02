@@ -3,6 +3,7 @@
   ------------------------------------------------------------------
   Purpose:
 
+
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
@@ -11,56 +12,50 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/Allocator.hpp>
+#include <Utility/Containers/IntrusiveVyukovMPSCQueue.hpp>
+#include <Utility/Containers/IntrusiveForwardListHook.hpp>
+#include <Utility/Memory/ChildAllocator.hpp>
 //------------------------------------------------------------------//
 #include <boost/pool/simple_segregated_storage.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename Object>
-	class ObjectPoolAllocator : public ::Eldritch2::Allocator, private ::boost::simple_segregated_storage<::Eldritch2::Allocator::SizeType> {
+	class ObjectPoolAllocator : public ::Eldritch2::ChildAllocator, ::boost::simple_segregated_storage<ChildAllocator::SizeType> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		// Constructs this ObjectPoolAllocator instance.
-		ObjectPoolAllocator( const ::Eldritch2::UTF8Char* const name, const SizeType pageSizeInObjects, ::Eldritch2::Allocator& hostingAllocator );
+		//!	Constructs this @ref ObjectPoolAllocator instance.
+		ObjectPoolAllocator( const ::Eldritch2::UTF8Char* const name, const SizeType pageSizeInObjects, const SizeType objectSizeInBytes, ::Eldritch2::Allocator& hostingAllocator );
 
-		// Destroys this ObjectPoolAllocator instance.
+		//!	Destroys this @ref ObjectPoolAllocator instance.
 		~ObjectPoolAllocator();
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
-		// Allocates a contiguous chunk of memory with the specified length using the passed-in allocation behavior options.
 		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override;
-		// Allocates a contiguous chunk of memory with the specified length and alignment using the passed-in allocation behavior options.
 		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) override;
 
-		// Given a chunk of memory, attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size.
-		// The contents of the source memory are then copied over into the new region, if appropriate.
 		ETRestrictHint void*	Reallocate( void* const address, const SizeType sizeInBytes, const ReallocationOptions options ) override;
-		// Given a chunk of memory, attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size.
-		// The contents of the source memory are then copied over into the new region, if appropriate.
 		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override;
 
-		// Releases a chunk of memory previously allocated by Allocate() or Reallocate().
 		void					Deallocate( void* const address ) override;
-		// Releases a chunk of memory previously allocated by Allocate() or Reallocate() WITH aligned semantics.
 		void					Deallocate( void* const address, const AlignedDeallocationSemantics ) override;
 
-		SizeType	EstimateActualAllocationSizeInBytes( const SizeType allocationSizeInBytes, const SizeType alignmentInBytes ) const override;
+		SizeType				EstimateActualAllocationSizeInBytes( const SizeType allocationSizeInBytes, const SizeType alignmentInBytes ) const override;
+
+	// - TYPE PUBLISHING ---------------------------------
+
+	private:
+		struct ET16ByteAligned TrackedAllocation : public ::Eldritch2::IntrusiveForwardListBaseHook {
+			ET16ByteAligned char	arena[];
+		};
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		::Eldritch2::Allocator&	_hostingAllocator;
-		const SizeType			_objectsPerPage;
+		SizeType													_objectsPerPage;
+		SizeType													_elementSizeInBytes;
+		::Eldritch2::IntrusiveVyukovMPSCQueue<TrackedAllocation>	_allocations;
 	};
 
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Utility/Memory/ObjectPoolAllocator.inl>
-//------------------------------------------------------------------//

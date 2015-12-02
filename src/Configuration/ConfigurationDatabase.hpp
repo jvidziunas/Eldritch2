@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/UnorderedMap.hpp>
-#include <Utility/StringOperators.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {

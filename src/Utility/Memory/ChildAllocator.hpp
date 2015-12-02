@@ -50,14 +50,14 @@ namespace Eldritch2 {
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 		
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) override sealed;
+		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override;
+		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) override;
 
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const ReallocationOptions options ) override sealed;
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
+		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const ReallocationOptions options ) override;
+		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override;
 
-		void					Deallocate( void* const address ) override sealed;
-		void					Deallocate( void* const address, const AlignedDeallocationSemantics ) override sealed;
+		void					Deallocate( void* const address ) override;
+		void					Deallocate( void* const address, const AlignedDeallocationSemantics ) override;
 
 	// ---------------------------------------------------
 

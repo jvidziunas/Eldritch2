@@ -14,8 +14,10 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Memory/ObjectPoolAllocator.hpp>
+#include <Utility/Containers/UnorderedMap.hpp>
 #include <Renderer/Direct3D11/SwapChain.hpp>
 #include <Scripting/ReferenceTypeBase.hpp>
+#include <Renderer/VisibilitySystem.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
 #include <Animation/Armature.hpp>
@@ -33,6 +35,7 @@ namespace Eldritch2 {
 
 	namespace Renderer {
 		namespace Direct3D11 {
+			class	HLSLPipelineDefinitionView;
 			class	MeshResourceView;
 		}
 	}
@@ -71,19 +74,14 @@ namespace Direct3D11 {
 
 	// - TYPE PUBLISHING ---------------------------------
 
+		using MaterialUsageCache = ::Eldritch2::UnorderedMap<Direct3D11::HLSLPipelineDefinitionView*, int>;
+
+	// ---
+
 		class SceneCameraComponent : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceTypeBase, public Renderer::Camera {
-		// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			struct Viewport {
-				::Eldritch2::float32	offsetX;
-				::Eldritch2::float32	offsetY;
-				::Eldritch2::float32	width;
-				::Eldritch2::float32	height;
-			};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+		public:
 			//! Constructs this @ref SceneCameraComponent instance.
 			SceneCameraComponent( Direct3D11::SwapChain& swapChain, WorldView& owningView = GetActiveWorldView() );
 
@@ -106,6 +104,7 @@ namespace Direct3D11 {
 
 		private:
 			mutable Scripting::ObjectHandle<Direct3D11::SwapChain>	_swapChain;
+			MaterialUsageCache										_cachedUsages;
 		};
 
 	// ---
@@ -143,9 +142,13 @@ namespace Direct3D11 {
 
 	// - DATA MEMBERS ------------------------------------
 
-		const Direct3D11::MeshResourceView&						_defaultMesh;
-		::Eldritch2::ObjectPoolAllocator<MeshComponent>			_meshPool;
-		::Eldritch2::IntrusiveForwardList<SceneCameraComponent>	_attachedCameras;
+		const Direct3D11::MeshResourceView&							_defaultMesh;
+		::Eldritch2::ObjectPoolAllocator							_meshPool;
+		::Eldritch2::IntrusiveForwardList<SceneCameraComponent>		_attachedCameras;
+
+		Renderer::VisibilitySystem<Direct3D11::MeshResourceView>	_visibilitySystem;
+
+		MaterialUsageCache											_shadowMaterialUsageCache;
 	};
 
 }	// namespace Direct3D11

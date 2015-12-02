@@ -32,7 +32,9 @@ namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ScriptCompilerTool() : AllocatorType( UTF8L("Root Allocator") ), _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ) {}
+	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ScriptCompilerTool() : AllocatorType( UTF8L("Root Allocator") ),
+																					 _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ),
+																					 _inputFiles( { GetAllocator(), UTF8L("Input File Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -124,7 +126,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ProcessInputFiles( const ::Eldritch2::Range<const ::Eldritch2::SystemChar**> inputFiles ) {
+	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::Process() {
 		class OutputStream : public ::asIBinaryStream {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -153,12 +155,12 @@ namespace Tools {
 
 		OutputStream	stream( CreateWriter( GetAllocator(), SL("asdf") ) );
 
-		if( (!stream.writer) || (::asSUCCESS != StartNewModule( ::asCreateScriptEngine(), _outputModuleName.GetCharacterArray() )) ) {
+		if( (!stream.writer) || _inputFiles.IsEmpty() || (::asSUCCESS != StartNewModule( ::asCreateScriptEngine(), _outputModuleName.GetCharacterArray() )) ) {
 			return -1;
 		}
 
 		// Collate all the source script files together.
-		for( const SystemChar* fileName : inputFiles ) {
+		for( const auto& fileName : _inputFiles ) {
 			// Create a view of the source script file.
 			auto	mappedFile( CreateReadableMemoryMappedFile( GetAllocator(), fileName ) );
 			auto	sectionName( "asdf" );

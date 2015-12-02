@@ -23,7 +23,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Configuration {
 
-	ConfigurationDatabase::ConfigurationDatabase( Allocator& allocator ) : _variableDirectory( 128u, {}, { allocator, UTF8L( "Configuration Database Variable Directory Allocator" ) } ) {}
+	ConfigurationDatabase::ConfigurationDatabase( Allocator& allocator ) : _variableDirectory( { allocator, UTF8L("Configuration Database Variable Directory Allocator") } ) {}
 
 // ---------------------------------------------------
 

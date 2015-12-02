@@ -28,7 +28,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ETInlineHint ETNoAliasHint bool ContentLibrary::ResourceViewKey::operator==( const ContentLibrary::ResourceViewKey& other ) const {
-		return (*second == *other.second) && Utility::StringEqualComparator<>()( first, other.first );
+		return (*second == *other.second) && ::Eldritch2::EqualityCompareString( first, other.first );
 	}
 
 // ---------------------------------------------------

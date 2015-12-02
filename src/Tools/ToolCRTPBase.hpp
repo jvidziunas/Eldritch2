@@ -58,7 +58,7 @@ namespace Detail {
 		// ---------------------------------------------------
 
 		private:
-			using SettingHandler	= ::Eldritch2::Pair<void*, int (*)( const ::Eldritch2::SystemChar*, const ::Eldritch2::SystemChar*, void* const )>;
+			using SettingHandler = ::Eldritch2::Pair<void*, int (*)( const ::Eldritch2::Range<const ::Eldritch2::SystemChar*>, void* const )>;
 
 		// - DATA MEMBERS ------------------------------------
 

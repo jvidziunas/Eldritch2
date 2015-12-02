@@ -54,7 +54,6 @@ namespace Foundation {
 		//! Constructs this @ref GameEngine instance.
 		GameEngine( System::SystemInterface& systemInterface, Scheduler::TaskScheduler& scheduler, FileSystem::ContentProvider& contentProvider, ::Eldritch2::Allocator& allocator );
 
-		//! Destroys this @ref GameEngine instance.
 		~GameEngine() = default;
 
 	// ---------------------------------------------------
@@ -98,7 +97,6 @@ namespace Foundation {
 			//! Constructs this @ref ManagementService instance.
 			ManagementService( Foundation::GameEngine& owningEngine );
 
-			//! Destroys this @ref ManagementService instance.
 			~ManagementService() = default;
 
 		// - DEBUG/LOGGING INFORMATION -----------------------
@@ -131,24 +129,25 @@ namespace Foundation {
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator												_allocator;
+		::Eldritch2::ChildAllocator											_allocator;
 
-		Foundation::FileAppendingLogger											_logger;
-		FileSystem::ContentLibrary												_contentLibrary;
+		Foundation::FileAppendingLogger										_logger;
+		FileSystem::ContentLibrary											_contentLibrary;
 
-		System::SystemInterface&												_systemInterface;
-		Scheduler::TaskScheduler&												_scheduler;
+		System::SystemInterface&											_systemInterface;
+		Scheduler::TaskScheduler&											_scheduler;
 
-		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>		_attachedServices;
-		::Eldritch2::ResizableArray<WorldViewFactory>							_worldViewFactories;
-		size_t																	_worldViewAllocationHintInBytes;
+		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>	_attachedServices;
+		::Eldritch2::ResizableArray<WorldViewFactory>						_worldViewFactories;
+		size_t																_worldViewAllocationHintInBytes;
 
-		Configuration::ConfigurablePODVariable<LogMessageType>					_logEchoThreshold;
-		Configuration::ConfigurablePODVariable<size_t>							_taskArenaPerThreadAllocationSizeInBytes;
+		Configuration::ConfigurablePODVariable<LogMessageType>				_logEchoThreshold;
+		Configuration::ConfigurablePODVariable<size_t>						_taskArenaPerThreadAllocationSizeInBytes;
+		Configuration::ConfigurablePODVariable<size_t>						_worldArenaSizeInBytes;
 
-		::Eldritch2::IntrusiveVyukovMPSCQueue<Foundation::World>				_tickingWorlds;
+		::Eldritch2::IntrusiveVyukovMPSCQueue<Foundation::World>			_tickingWorlds;
 
-		ManagementService														_managementService;		
+		ManagementService													_managementService;		
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

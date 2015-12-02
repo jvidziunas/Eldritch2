@@ -26,7 +26,7 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using UnderlyingContainer					= ::Eldritch2::ResizableArray<::rde::pair<Key, StoredObject>, Allocator>;
+		using UnderlyingContainer					= ::Eldritch2::ResizableArray<::Eldritch2::Pair<Key, StoredObject>, Allocator>;
 
 	public:
 		using UnderlyingContainer::ValueType;

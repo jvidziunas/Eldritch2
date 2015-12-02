@@ -38,6 +38,8 @@ namespace Eldritch2 {
 		//! Constructs this @ref Range instance.
 		ETForceInlineHint Range( const ::Eldritch2::Range<Iterator>& rangeTemplate );
 
+		ETForceInlineHint ~Range() = default;
+
 	// ---------------------------------------------------
 
 		// Finds the first element contained within the Range that compares equal to the passed-in value, or the Range end iterator in the event no match was found.

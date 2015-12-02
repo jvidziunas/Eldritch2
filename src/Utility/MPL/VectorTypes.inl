@@ -18,7 +18,7 @@
 namespace Eldritch2 {
 
 	ETForceInlineHint Float4::Float4( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_set_ps( z, y, x, w ) );
+		::_mm_storeu_ps( coefficients, ::_mm_set_ps( z, y, x, w ) );
 	}
 
 // ---------------------------------------------------
@@ -31,73 +31,101 @@ namespace Eldritch2 {
 
 	template <::Eldritch2::Float4::VectorSwizzleComponent component0, ::Eldritch2::Float4::VectorSwizzleComponent component1, ::Eldritch2::Float4::VectorSwizzleComponent component2, ::Eldritch2::Float4::VectorSwizzleComponent component3>
 	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4& Float4::Swizzle() {
-		register const __m128	coeffs( ::_mm_loadu_ps( this->coefficients ) );
+		register const __m128	coeffs( ::_mm_loadu_ps( coefficients ) );
 
-		::_mm_storeu_ps( this->coefficients, ::_mm_shuffle_ps( coeffs, coeffs, static_cast<unsigned int>(_MM_SHUFFLE( component2, component1, component0, component3 )) ) );
-
-		return *this;
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	Float4::operator +( const ::Eldritch2::Float4 operand ) const {
-		return ::Eldritch2::Float4( ::_mm_add_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_loadu_ps( operand ) ).m128_f32 );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	Float4::operator -( const ::Eldritch2::Float4 operand ) const {
-		return ::Eldritch2::Float4( ::_mm_sub_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_loadu_ps( operand ) ).m128_f32 );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	Float4::operator *( const ::Eldritch2::float32 scalar ) const {
-		return ::Eldritch2::Float4( ::_mm_mul_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_set_ps1( scalar ) ).m128_f32 );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ETNoAliasHint::Eldritch2::Float4	Float4::operator /( const ::Eldritch2::float32 scalar ) const {
-		return ::Eldritch2::Float4( ::_mm_div_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_set_ps1( scalar ) ).m128_f32 );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator +=( const ::Eldritch2::Float4 operand ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_add_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_loadu_ps( operand ) ) );
+		::_mm_storeu_ps( coefficients, ::_mm_shuffle_ps( coeffs, coeffs, static_cast<unsigned int>(_MM_SHUFFLE( component2, component1, component0, component3 )) ) );
 
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator -=( const ::Eldritch2::Float4 operand ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_sub_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_loadu_ps( operand ) ) );
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator+( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+		return operand0 += operand1;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator-( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+		return operand0 -= operand1;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint::Eldritch2::Float4 operator*( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+		return operand0 *= operand1;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator*( ::Eldritch2::Float4 operand, const ::Eldritch2::float32 scalar ) {
+		return operand *= scalar;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 operator/( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+		return operand0 *= operand1;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator/( ::Eldritch2::Float4 operand, const ::Eldritch2::float32 scalar ) {
+		return operand /= scalar;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ::Eldritch2::Float4& Float4::operator+=( const ::Eldritch2::Float4& operand ) {
+		::_mm_storeu_ps( coefficients, ::_mm_add_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
 
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator *=( const ::Eldritch2::float32 scalar ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_mul_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_set_ps1( scalar ) ) );
+	ETForceInlineHint ::Eldritch2::Float4& Float4::operator-=( const ::Eldritch2::Float4& operand ) {
+		::_mm_storeu_ps( coefficients, ::_mm_sub_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
 
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator /=( const ::Eldritch2::float32 scalar ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_div_ps( ::_mm_loadu_ps( this->coefficients ), ::_mm_set_ps1( scalar ) ) );
+	ETForceInlineHint ::Eldritch2::Float4& Float4::operator*=( const ::Eldritch2::Float4& operand ) {
+		::_mm_storeu_ps( coefficients, ::_mm_mul_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
 
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator =( const ::Eldritch2::Float4 operand ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_loadu_ps( operand ) );
+	ETForceInlineHint ::Eldritch2::Float4& Float4::operator*=( const ::Eldritch2::float32 scalar ) {
+		::_mm_storeu_ps( coefficients, ::_mm_mul_ps( ::_mm_loadu_ps( coefficients ), ::_mm_set_ps1( scalar ) ) );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ::Eldritch2::Float4& Float4::operator/=( const ::Eldritch2::Float4& operand ) {
+		::_mm_storeu_ps( coefficients, ::_mm_div_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ::Eldritch2::Float4& Float4::operator/=( const ::Eldritch2::float32 scalar ) {
+		::_mm_storeu_ps( coefficients, ::_mm_div_ps( ::_mm_loadu_ps( coefficients ), ::_mm_set_ps1( scalar ) ) );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ::Eldritch2::Float4& Float4::operator=( const ::Eldritch2::Float4& operand ) {
+		::_mm_storeu_ps( coefficients, ::_mm_loadu_ps( operand ) );
 
 		return *this;
 	}
@@ -126,50 +154,22 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint Quaternion::Quaternion( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_set_ps( z, y, x, w ) );
+	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 Ceil( const ::Eldritch2::Float4 vector ) {
+		register ::Eldritch2::Float4	result;
+		
+		::_mm_storeu_ps( result.coefficients, ::_mm_ceil_ps( ::_mm_loadu_ps( vector.coefficients ) ) );
+
+		return result;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint Quaternion::Quaternion( const ::Eldritch2::float32* const coefficients ) {
-		::_mm_storeu_ps( this->coefficients, ::_mm_loadu_ps( coefficients ) );
-	}
+	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 Floor( const ::Eldritch2::Float4 vector ) {
+		register ::Eldritch2::Float4	result;
 
-// ---------------------------------------------------
+		::_mm_storeu_ps( result.coefficients, ::_mm_floor_ps( ::_mm_loadu_ps( vector.coefficients ) ) );
 
-	ETForceInlineHint ::Eldritch2::Quaternion& Quaternion::Normalize() {
-		const register __m128	coeffs( ::_mm_loadu_ps( this->coefficients ) );
-
-		::_mm_storeu_ps( this->coefficients, ::_mm_mul_ps( ::_mm_rsqrt_ps( ::_mm_dp_ps( coeffs, coeffs, 0xFF ) ), coeffs ) );
-
-		return *this;
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion Quaternion::Reverse() const {
-		return { -coefficients[0], -coefficients[1], -coefficients[2], coefficients[3] };
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 Quaternion::RotateVector( const ::Eldritch2::Float4 point ) const {
-		const ::Eldritch2::Float4	temp( ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), point ) * 2.0f );
-
-		return ::Eldritch2::Float4( point + (temp * coefficients[3]) + ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), temp ) );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint Quaternion::operator const Quaternion::CoefficientSet&() const {
-		return coefficients;
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint Quaternion::operator Quaternion::CoefficientSet&() {
-		return coefficients;
+		return result;
 	}
 
 // ---------------------------------------------------
@@ -192,6 +192,54 @@ namespace Eldritch2 {
 
 	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 LinearInterpolate( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1, const ::Eldritch2::float32 alpha ) {
 		return Float4( ::_mm_add_ps( ::_mm_loadu_ps( vector0 ), ::_mm_mul_ps( ::_mm_sub_ps( ::_mm_loadu_ps( vector1 ), ::_mm_loadu_ps( vector0 ) ), ::_mm_set_ps1( alpha ) ) ).m128_f32 );
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint Quaternion::Quaternion( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w ) {
+		::_mm_storeu_ps( this->coefficients, ::_mm_set_ps( z, y, x, w ) );
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint Quaternion::Quaternion( const ::Eldritch2::float32* const coefficients ) {
+		::_mm_storeu_ps( this->coefficients, ::_mm_loadu_ps( coefficients ) );
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ::Eldritch2::Quaternion& Quaternion::Normalize() {
+		const register __m128	coeffs( ::_mm_loadu_ps( this->coefficients ) );
+
+		::_mm_storeu_ps( this->coefficients, ::_mm_mul_ps( ::_mm_rsqrt_ps( ::_mm_dp_ps( coeffs, coeffs, 0xFF ) ), coeffs ) );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion Quaternion::GetReverse() const {
+		return { -coefficients[0], -coefficients[1], -coefficients[2], coefficients[3] };
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 Quaternion::RotateVector( const ::Eldritch2::Float4 point ) const {
+		const ::Eldritch2::Float4	temp( ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), point ) * 2.0f );
+
+		return ::Eldritch2::Float4( point + (temp * coefficients[3]) + ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), temp ) );
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint Quaternion::operator const Quaternion::CoefficientSet&() const {
+		return coefficients;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint Quaternion::operator Quaternion::CoefficientSet&() {
+		return coefficients;
 	}
 
 // ---------------------------------------------------

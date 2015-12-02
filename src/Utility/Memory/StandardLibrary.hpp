@@ -18,46 +18,54 @@
 //------------------------------------------------------------------//
 
 // Thanks for polluting the global namespace with your macros, Microsoft!
-#if( ET_PLATFORM_WINDOWS )
-#	ifdef CopyMemory
-#		if( ET_COMPILER_IS_MSVC )
-#			define POP_CopyMemory 1
-COMPILERMESSAGEGENERIC( "Cleaning up CopyMemory macro for use in the standard memory library." )
-#			pragma push_macro( "CopyMemory" )
-#			undef CopyMemory
-#		else
-#			error CopyMemory macro creates symbol/name resolution errors, replace me with cleanup code!
-#		endif
+#if defined( CopyMemory )
+#	if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_GCC )
+#		define POP_CopyMemory 1
+		COMPILERMESSAGEGENERIC( "Cleaning up CopyMemory macro for use in the standard memory library." )
+#		pragma push_macro( "CopyMemory" )
+#		undef CopyMemory
+#	else
+#		error CopyMemory macro creates symbol/name resolution errors, replace me with cleanup code!
 #	endif
-#	ifdef MoveMemory
-#		if( ET_COMPILER_IS_MSVC )
-#			define POP_MoveMemory 1
-COMPILERMESSAGEGENERIC( "Cleaning up MoveMemory macro for use in the standard memory library." )
-#			pragma push_macro( "MoveMemory" )
-#			undef MoveMemory
-#		else
-#			error MoveMemory macro creates symbol/name resolution errors, replace me with cleanup code!
-#		endif
+#endif
+#if defined( MoveMemory )
+#	if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_GCC )
+#		define POP_MoveMemory 1
+		COMPILERMESSAGEGENERIC( "Cleaning up MoveMemory macro for use in the standard memory library." )
+#		pragma push_macro( "MoveMemory" )
+#		undef MoveMemory
+#	else
+#		error MoveMemory macro creates symbol/name resolution errors, replace me with cleanup code!
 #	endif
-#	ifdef SetMemory
-#		if( ET_COMPILER_IS_MSVC )
-#			define POP_SetMemory 1
-COMPILERMESSAGEGENERIC( "Cleaning up SetMemory macro for use in the standard memory library." )
-#			pragma push_macro( "SetMemory" )
-#			undef SetMemory
-#		else
-#			error SetMemory macro creates symbol/name resolution errors, replace me with cleanup code!
-#		endif
+#endif
+#if defined( SetMemory )
+#	if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_GCC )
+#		define POP_SetMemory 1
+		COMPILERMESSAGEGENERIC( "Cleaning up SetMemory macro for use in the standard memory library." )
+#		pragma push_macro( "SetMemory" )
+#		undef SetMemory
+#	else
+#		error SetMemory macro creates symbol/name resolution errors, replace me with cleanup code!
 #	endif
-#	ifdef ZeroMemory
-#		if( ET_COMPILER_IS_MSVC )
-#			define POP_ZeroMemory 1
-COMPILERMESSAGEGENERIC( "Cleaning up ZeroMemory macro for use in the standard memory library." )
-#			pragma push_macro( "ZeroMemory" )
-#			undef ZeroMemory
-#		else
-#			error ZeroMemory macro creates symbol/name resolution errors, replace me with cleanup code!
-#		endif
+#endif
+#if defined( ZeroMemory )
+#	if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_GCC )
+#		define POP_ZeroMemory 1
+		COMPILERMESSAGEGENERIC( "Cleaning up ZeroMemory macro for use in the standard memory library." )
+#		pragma push_macro( "ZeroMemory" )
+#		undef ZeroMemory
+#	else
+#		error ZeroMemory macro creates symbol/name resolution errors, replace me with cleanup code!
+#	endif
+#endif
+#if defined( CompareString )
+#	if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_GCC )
+#		define POP_CompareString 1
+		COMPILERMESSAGEGENERIC( "Cleaning up CompareString macro for use in the standard memory library." )
+#		pragma push_macro( "CompareString" )
+#		undef CompareString
+#	else
+#		error CompareString macro creates symbol/name resolution errors, replace me with cleanup code!
 #	endif
 #endif
 
@@ -71,7 +79,7 @@ namespace Eldritch2 {
 		@see CopyMemoryNonTemporal()
 		@see MoveMemory()
 		*/
-	ETForceInlineHint ETNoAliasHint void*		CopyMemory( void* ETRestrictPtrHint destinationBuffer, const void* ETRestrictPtrHint sourceBuffer, const size_t lengthInBytes );
+	ETForceInlineHint ETNoAliasHint void*	CopyMemory( void* ETRestrictPtrHint destinationBuffer, const void* ETRestrictPtrHint sourceBuffer, const size_t lengthInBytes );
 
 	//! Copies a span of bytes.
 	/*! @param[in] destinationBuffer Pointer to start copying memory to.
@@ -82,32 +90,32 @@ namespace Eldritch2 {
 		@see CopyMemory()
 		@see MoveMemoryNonTemporal()
 		*/
-	ETForceInlineHint ETNoAliasHint void*		CopyMemoryNonTemporal( void* ETRestrictPtrHint destinationBuffer, const void* ETRestrictPtrHint sourceBuffer, const size_t lengthInBytes );
+	ETForceInlineHint ETNoAliasHint void*	CopyMemoryNonTemporal( void* ETRestrictPtrHint destinationBuffer, const void* ETRestrictPtrHint sourceBuffer, const size_t lengthInBytes );
 
 	//!	Utility wrapper around @ref CopyMemory() that handles casting and automatically adjusts for element size.
 	template <typename T>
-	ETForceInlineHint ETNoAliasHint T*			CopyArray( T* ETRestrictPtrHint destinationArray, const T* ETRestrictPtrHint sourceArray, const size_t arraySizeInElements );
+	ETForceInlineHint ETNoAliasHint T*		CopyArray( T* ETRestrictPtrHint destinationArray, const T* ETRestrictPtrHint sourceArray, const size_t arraySizeInElements );
 	//!	Utility wrapper around @ref CopyMemory() that handles casting and automatically adjusts for element size.
 	template <typename T, size_t arraySizeInElements>
-	ETForceInlineHint ETNoAliasHint auto		CopyArray( T(&destinationArray)[arraySizeInElements], const T(&sourceArray)[arraySizeInElements] ) -> decltype(destinationArray);
+	ETForceInlineHint ETNoAliasHint auto	CopyArray( T(&destinationArray)[arraySizeInElements], const T(&sourceArray)[arraySizeInElements] ) -> decltype(destinationArray);
 
 	//!	Utility wrapper around @ref CopyMemoryNonTemporal that handles casting and automatically adjusts for element size.
 	template <typename T>
-	ETForceInlineHint ETNoAliasHint T*			CopyArrayNonTemporal( T* ETRestrictPtrHint destinationArray, const T* ETRestrictPtrHint sourceArray, const size_t arraySizeInElements );
+	ETForceInlineHint ETNoAliasHint T*		CopyArrayNonTemporal( T* ETRestrictPtrHint destinationArray, const T* ETRestrictPtrHint sourceArray, const size_t arraySizeInElements );
 	//!	Utility wrapper around @ref CopyMemoryNonTemporal that handles casting and automatically adjusts for element size.
 	template <typename T, size_t arraySizeInElements>
-	ETForceInlineHint ETNoAliasHint auto		CopyArrayNonTemporal( T(&destinationArray)[arraySizeInElements], const T(&sourceArray)[arraySizeInElements] ) -> decltype(destinationArray);
+	ETForceInlineHint ETNoAliasHint auto	CopyArrayNonTemporal( T(&destinationArray)[arraySizeInElements], const T(&sourceArray)[arraySizeInElements] ) -> decltype(destinationArray);
 
 // ---------------------------------------------------
 
 	// Copies length bytes from the address specified by source to the location specified by destination.
 	// Unlike CopyMemory, the source and destination buffers may overlap.
-	ETForceInlineHint ETNoAliasHint void*		MoveMemory( void* destinationBuffer, const void* sourceBuffer, const size_t lengthInBytes );
+	ETForceInlineHint ETNoAliasHint void*	MoveMemory( void* destinationBuffer, const void* sourceBuffer, const size_t lengthInBytes );
 
 	// Copies length bytes from the address specified by source to the location specified by destination with
 	// non-temporal (unlikely to be accessed again soon) semantics. As with MoveMemory and unlike CopyMemory, the source
 	// and destination arrays may overlap.
-	ETForceInlineHint ETNoAliasHint void*		MoveMemoryNonTemporal( void* destinationBuffer, const void* sourceBuffer, const size_t lengthInBytes );
+	ETForceInlineHint ETNoAliasHint void*	MoveMemoryNonTemporal( void* destinationBuffer, const void* sourceBuffer, const size_t lengthInBytes );
 
 // ---------------------------------------------------
 
@@ -120,116 +128,120 @@ namespace Eldritch2 {
 
 	//!	Zeroes out the entirety of numElements instances of type T.
 	template <typename T, size_t arraySizeInElements>
-	ETForceInlineHint ETNoAliasHint auto	ZeroMemory( T(&destinationArray)[arraySizeInElements] ) -> decltype(destinationArray);
+	ETForceInlineHint ETNoAliasHint auto	ZeroMemory( T (&destinationArray)[arraySizeInElements] ) -> decltype(destinationArray);
 
 // ---------------------------------------------------
 
 	// Performs a raw, bitwise comparison of the first span bytes pointed to by buffer0 against the first span bytes pointed to
 	// by buffer1. If all bytes are equal, the result is 0. Otherwise, the result is greater than zero if the first byte that does
 	// not match in buffer0 is greater than the first byte that does not match in buffer1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareMemory( const void* buffer0, const void* buffer1, const size_t spanInBytes );
+	ETForceInlineHint ETNoAliasHint int		CompareMemory( const void* buffer0, const void* buffer1, const size_t spanInBytes );
 
 	// Performs a raw, bitwise comparison of the first span bytes pointed to by buffer0 against the first span bytes pointed to
 	// by buffer1. If all bytes are equal, the result is 0. Otherwise, the result is greater than zero if the first byte that does
 	// not match in buffer0 is greater than the first byte that does not match in buffer1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareMemoryCaseInsensitive( const void* buffer0, const void* buffer1, const size_t spanInBytes );
+	ETForceInlineHint ETNoAliasHint int		CompareMemoryCaseInsensitive( const void* buffer0, const void* buffer1, const size_t spanInBytes );
 
 	// Utility wrapper around CompareMemory that handles casting and automatically adjusts for element size.
 	template <typename T>
-	ETForceInlineHint ETNoAliasHint int			CompareArray( const T* array0, const T* array1, const size_t arraySizeInElements );
+	ETForceInlineHint ETNoAliasHint int		CompareArray( const T* array0, const T* array1, const size_t arraySizeInElements );
 	// Utility wrapper around CompareMemory that handles casting and automatically adjusts for element size.
 	template <typename T, size_t arraySizeInElements>
-	ETForceInlineHint ETNoAliasHint int			CompareArray( const T(&array0)[arraySizeInElements], const T(&array1)[arraySizeInElements] );
+	ETForceInlineHint ETNoAliasHint int		CompareArray( const T(&array0)[arraySizeInElements], const T(&array1)[arraySizeInElements] );
 
 	// Performs a raw, bitwise comparison of the individual characters in string0 against the individual characters in string1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in string0 is greater than the first character that does not match in string1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareString( const char* string0, const char* string1 );
+	ETForceInlineHint ETNoAliasHint int		CompareString( const char* string0, const char* string1 );
 	// Performs a raw, bitwise comparison of the individual characters in string0 against the individual characters in string1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in string0 is greater than the first character that does not match in string1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareString( const wchar_t* string0, const wchar_t* string1 );
-	// Performs a raw, bitwise comparison of the individual characters in string0 against the individual characters in string1.
-	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
-	// not match in string0 is greater than the first character that does not match in string1 and vice versa in the less-than case.
-	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint int			CompareString( const char (&string0)[stringSizeInCharacters], const char (&string1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint int		CompareString( const wchar_t* string0, const wchar_t* string1 );
 	// Performs a raw, bitwise comparison of the individual characters in string0 against the individual characters in string1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in string0 is greater than the first character that does not match in string1 and vice versa in the less-than case.
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint int			CompareString( const wchar_t (&string0)[stringSizeInCharacters], const wchar_t (&string1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint int		CompareString( const char (&string0)[stringSizeInCharacters], const char (&string1)[stringSizeInCharacters] );
+	// Performs a raw, bitwise comparison of the individual characters in string0 against the individual characters in string1.
+	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
+	// not match in string0 is greater than the first character that does not match in string1 and vice versa in the less-than case.
+	template <size_t stringSizeInCharacters>
+	ETForceInlineHint ETNoAliasHint int		CompareString( const wchar_t (&string0)[stringSizeInCharacters], const wchar_t (&string1)[stringSizeInCharacters] );
 
 	// Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareStringCaseInsensitive( const char* str0, const char* str1 );
+	ETForceInlineHint ETNoAliasHint int		CompareStringCaseInsensitive( const char* str0, const char* str1 );
 	// Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1 );
+	ETForceInlineHint ETNoAliasHint int		CompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1 );
 	// Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareStringCaseInsensitive( const char* str0, const char* str1, const size_t stringLengthInCharacters );
+	ETForceInlineHint ETNoAliasHint int		CompareStringCaseInsensitive( const char* str0, const char* str1, const size_t stringLengthInCharacters );
 	// Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case.
-	ETForceInlineHint ETNoAliasHint int			CompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1, const size_t stringLengthInCharacters );
-	// Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
-	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
-	// not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case.
-	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint int			CompareStringCaseInsensitive( const char (&str0)[stringSizeInCharacters], const char (&str1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint int		CompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1, const size_t stringLengthInCharacters );
 	// Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
 	// not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case.
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint int			CompareStringCaseInsensitive( const wchar_t (&str0)[stringSizeInCharacters], const wchar_t (&str1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint int		CompareStringCaseInsensitive( const char (&str0)[stringSizeInCharacters], const char (&str1)[stringSizeInCharacters] );
+	// Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
+	// If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
+	// not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case.
+	template <size_t stringSizeInCharacters>
+	ETForceInlineHint ETNoAliasHint int		CompareStringCaseInsensitive( const wchar_t (&str0)[stringSizeInCharacters], const wchar_t (&str1)[stringSizeInCharacters] );
 
 	// Performs a raw, bitwise comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is true, otherwise the function returns false.
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareString( const char* str0, const char* str1 );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareString( const char* str0, const char* str1 );
 	// Performs a raw, bitwise comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is true, otherwise the function returns false.
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareString( const wchar_t* str0, const wchar_t* str1 );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareString( const wchar_t* str0, const wchar_t* str1 );
 	// Performs a raw, bitwise comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is true, otherwise the function returns false.
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareString( const char* str0, const char* str1, const size_t lengthInCharacters );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareString( const char* str0, const char* str1, const size_t lengthInCharacters );
 	// Performs a raw, bitwise comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is true, otherwise the function returns false.
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareString( const wchar_t* str0, const wchar_t* str1, const size_t lengthInCharacters );
-	// Performs a raw, bitwise comparison of the individual characters in str0 against the individual characters in str1.
-	// If all characters are equal, the result is true, otherwise the function returns false.
-	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareString( const char (&str0)[stringSizeInCharacters], const char (&str1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareString( const wchar_t* str0, const wchar_t* str1, const size_t lengthInCharacters );
 	// Performs a raw, bitwise comparison of the individual characters in str0 against the individual characters in str1.
 	// If all characters are equal, the result is true, otherwise the function returns false.
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareString( const wchar_t (&str0)[stringSizeInCharacters], const wchar_t (&str1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareString( const char (&str0)[stringSizeInCharacters], const char (&str1)[stringSizeInCharacters] );
+	// Performs a raw, bitwise comparison of the individual characters in str0 against the individual characters in str1.
+	// If all characters are equal, the result is true, otherwise the function returns false.
+	template <size_t stringSizeInCharacters>
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareString( const wchar_t (&str0)[stringSizeInCharacters], const wchar_t (&str1)[stringSizeInCharacters] );
 
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareStringCaseInsensitive( const char* str0, const char* str1 );
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1 );
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareStringCaseInsensitive( const char* str0, const char* str1, const size_t lengthInCharacters );
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1, const size_t lengthInCharacters );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareStringCaseInsensitive( const char* str0, const char* str1 );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1 );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareStringCaseInsensitive( const char* str0, const char* str1, const size_t lengthInCharacters );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareStringCaseInsensitive( const wchar_t* str0, const wchar_t* str1, const size_t lengthInCharacters );
 
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareStringCaseInsensitive( const char (&str0)[stringSizeInCharacters], const char (&str1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareStringCaseInsensitive( const char (&str0)[stringSizeInCharacters], const char (&str1)[stringSizeInCharacters] );
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint bool		EqualityCompareStringCaseInsensitive( const wchar_t (&str0)[stringSizeInCharacters], const wchar_t (&str1)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint bool	EqualityCompareStringCaseInsensitive( const wchar_t (&str0)[stringSizeInCharacters], const wchar_t (&str1)[stringSizeInCharacters] );
+
+// ---------------------------------------------------
+
+	ETNoAliasHint size_t	HashMemory( const void* memory, const size_t sizeInBytes, const size_t seed = static_cast<size_t>(0) );
 
 // ---------------------------------------------------
 
 	// Given a character array, determine the number of characters in the array before the first instance of a null terminator.
-	ETForceInlineHint ETNoAliasHint size_t		StringLength( const char* string );
+	ETForceInlineHint ETNoAliasHint size_t	StringLength( const char* string );
 	// Given a character array, determine the number of characters in the array before the first instance of a null terminator.
-	ETForceInlineHint ETNoAliasHint size_t		StringLength( const wchar_t* string );
-	// Given a character array, determine the number of characters in the array before the first instance of a null terminator.
-	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint size_t		StringLength( const char (&str)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint size_t	StringLength( const wchar_t* string );
 	// Given a character array, determine the number of characters in the array before the first instance of a null terminator.
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint size_t		StringLength( const wchar_t (&str)[stringSizeInCharacters] );
+	ETForceInlineHint ETNoAliasHint size_t	StringLength( const char (&str)[stringSizeInCharacters] );
+	// Given a character array, determine the number of characters in the array before the first instance of a null terminator.
+	template <size_t stringSizeInCharacters>
+	ETForceInlineHint ETNoAliasHint size_t	StringLength( const wchar_t (&str)[stringSizeInCharacters] );
 
 // ---------------------------------------------------
 
@@ -239,10 +251,10 @@ namespace Eldritch2 {
 	ETForceInlineHint ETNoAliasHint wchar_t*	CopyString( wchar_t* destinationString, const wchar_t* src, const size_t maxLengthInCharacters );
 	// Copies the C string specified by src into the array pointed to by destinationString, including the terminator.
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint auto		CopyString( char( &destinationString )[stringSizeInCharacters], const char* sourceString ) -> decltype(destinationString);
+	ETForceInlineHint ETNoAliasHint auto		CopyString( char (&destinationString)[stringSizeInCharacters], const char* sourceString ) -> decltype(destinationString);
 	// Copies the C string specified by src into the array pointed to by destinationString, including the terminator.
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint auto		CopyString( wchar_t( &destinationString )[stringSizeInCharacters], const wchar_t* sourceString ) -> decltype(destinationString);
+	ETForceInlineHint ETNoAliasHint auto		CopyString( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* sourceString ) -> decltype(destinationString);
 
 // ---------------------------------------------------
 
@@ -256,7 +268,7 @@ namespace Eldritch2 {
 	ETForceInlineHint ETNoAliasHint auto		AppendString( char (&destinationString)[stringSizeInCharacters], const char* sourceString ) -> decltype(destinationString);
 	// Appends the C string specified by sourceString after the C string denoted by destinationString.
 	template <size_t stringSizeInCharacters>
-	ETForceInlineHint ETNoAliasHint auto		AppendString( wchar_t( &destinationString )[stringSizeInCharacters], const wchar_t* sourceString ) -> decltype(destinationString);
+	ETForceInlineHint ETNoAliasHint auto		AppendString( wchar_t (&destinationString)[stringSizeInCharacters], const wchar_t* sourceString ) -> decltype(destinationString);
 
 // ---------------------------------------------------
 
@@ -333,24 +345,24 @@ namespace Eldritch2 {
 
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint char*							PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, ... );
+	ETNoAliasHint char*		PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, ... );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint wchar_t*						PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, ... );
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	template <typename Character, size_t stringSizeInCharacters>
-	ETNoAliasHint auto							PrintFormatted( Character (&destinationString)[stringSizeInCharacters], const Character* const formatString, ... ) -> decltype(destinationString);
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint char*							PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, va_list args );
-	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
-	// according to the format rules laid out by the C standard library function printf/sprintf.
-	ETNoAliasHint wchar_t*						PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, va_list args );
+	ETNoAliasHint wchar_t*	PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, ... );
 	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
 	// according to the format rules laid out by the C standard library function printf/sprintf.
 	template <typename Character, size_t stringSizeInCharacters>
-	ETNoAliasHint auto							PrintFormatted( Character (&destinationString)[stringSizeInCharacters], const Character* const formatString, va_list args ) -> decltype(destinationString);
+	ETNoAliasHint auto		PrintFormatted( Character (&destinationString)[stringSizeInCharacters], const Character* const formatString, ... ) -> decltype(destinationString);
+	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
+	// according to the format rules laid out by the C standard library function printf/sprintf.
+	ETNoAliasHint char*		PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, va_list args );
+	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
+	// according to the format rules laid out by the C standard library function printf/sprintf.
+	ETNoAliasHint wchar_t*	PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, va_list args );
+	// Given a destination buffer, a format string and a number of additional arguments, attempt to fill the destination buffer
+	// according to the format rules laid out by the C standard library function printf/sprintf.
+	template <typename Character, size_t stringSizeInCharacters>
+	ETNoAliasHint auto		PrintFormatted( Character (&destinationString)[stringSizeInCharacters], const Character* const formatString, va_list args ) -> decltype(destinationString);
 
 // ---------------------------------------------------
 
@@ -381,27 +393,25 @@ namespace Eldritch2 {
 #endif
 //------------------------------------------------------------------//
 
-#if( ET_PLATFORM_WINDOWS )
-#	if( ET_COMPILER_IS_MSVC )
-#		ifdef POP_CopyMemory
-COMPILERMESSAGEGENERIC( "Reinstating CopyMemory macro." )
-#			pragma pop_macro( "CopyMemory" )
-#			undef POP_CopyMemory
-#		endif
-#		ifdef POP_MoveMemory
-COMPILERMESSAGEGENERIC( "Reinstating MoveMemory macro." )
-#			pragma pop_macro( "MoveMemory" )
-#			undef POP_MoveMemory
-#		endif
-#		ifdef POP_SetMemory
-COMPILERMESSAGEGENERIC( "Reinstating SetMemory macro." )
-#			pragma pop_macro( "SetMemory" )
-#			undef POP_SetMemory
-#		endif
-#		ifdef POP_ZeroMemory
-			COMPILERMESSAGEGENERIC( "Reinstating ZeroMemory macro." )
-#			pragma pop_macro( "ZeroMemory" )
-#			undef POP_ZeroMemory
-#		endif
+#if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_GCC )
+#	ifdef POP_CopyMemory
+		COMPILERMESSAGEGENERIC( "Reinstating CopyMemory macro." )
+#		pragma pop_macro( "CopyMemory" )
+#		undef POP_CopyMemory
+#	endif
+#	ifdef POP_MoveMemory
+		COMPILERMESSAGEGENERIC( "Reinstating MoveMemory macro." )
+#		pragma pop_macro( "MoveMemory" )
+#		undef POP_MoveMemory
+#	endif
+#	ifdef POP_SetMemory
+		COMPILERMESSAGEGENERIC( "Reinstating SetMemory macro." )
+#		pragma pop_macro( "SetMemory" )
+#		undef POP_SetMemory
+#	endif
+#	ifdef POP_ZeroMemory
+		COMPILERMESSAGEGENERIC( "Reinstating ZeroMemory macro." )
+#		pragma pop_macro( "ZeroMemory" )
+#		undef POP_ZeroMemory
 #	endif
 #endif

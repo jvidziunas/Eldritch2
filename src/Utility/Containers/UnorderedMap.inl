@@ -19,12 +19,12 @@
 namespace Eldritch2 {
 
 	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
+	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( AllocatorType&& allocator ) : UnorderedMap( Hasher(), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( const SizeType initialCapacity, Hasher&& hasher, AllocatorType&& allocator ) : _underlyingContainer( initialCapacity, ::std::move( hasher ), ::std::move( allocator ) ) {}
+	ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UnorderedMap( Hasher&& hasher, AllocatorType&& allocator ) : _underlyingContainer( 0u, ::std::move( hasher ), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
@@ -47,7 +47,23 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
+	template <typename AlternateKey>
+	ETInlineHint typename UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const AlternateKey& key ) {
+		return _underlyingContainer.find( key );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
 	ETInlineHint typename UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const KeyType& key ) const {
+		return _underlyingContainer.find( key );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
+	template <typename AlternateKey>
+	ETInlineHint typename UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const AlternateKey& key ) const {
 		return _underlyingContainer.find( key );
 	}
 

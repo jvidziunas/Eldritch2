@@ -48,7 +48,7 @@ using namespace ::Eldritch2;
 
 namespace {
 
-	static ETThreadLocal	::Renderer::Direct3D11::WorldView*	activeScriptWorldViewForThread = nullptr;
+	static ETThreadLocal Renderer::Direct3D11::WorldView*	activeScriptWorldViewForThread = nullptr;
 
 }	// anonymous namespace
 
@@ -56,7 +56,14 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	WorldView::WorldView( World& owningWorld, const MeshResourceView& defaultMesh ) : Foundation::WorldView( owningWorld ), _defaultMesh( defaultMesh ), _meshPool( UTF8L("Direct3D11 World View Mesh Pool Allocator"), 128u, GetWorldAllocator() ) {}
+	WorldView::WorldView( World& owningWorld, const MeshResourceView& defaultMesh ) : Foundation::WorldView( owningWorld ),
+																					  _defaultMesh( defaultMesh ),
+																					  _meshPool( UTF8L("Mesh Pool Allocator"), sizeof(MeshComponent), 128u, GetWorldAllocator() ),
+																					  _visibilitySystem( { owningWorld.GetPropertyByKey( UTF8L("VisibilityCellLength"), 16.0f ), owningWorld.GetPropertyByKey( UTF8L("VisibilityCellHeight"), 32.0f ) },
+																										 { owningWorld.GetPropertyByKey( UTF8L("VisibilityCellLength"), 16.0f ), owningWorld.GetPropertyByKey( UTF8L("VisibilityCellHeight"), 32.0f ) },
+																										 { GetWorldAllocator(), UTF8L("Shadow Caster Cell Allocator") },
+																										 { GetWorldAllocator(), UTF8L("Mesh Visibility Cell Allocator") } ),
+																					  _shadowMaterialUsageCache( { GetWorldAllocator(), UTF8L("Shadow Material Usage Cache") } ) {}
 
 // ---------------------------------------------------
 
@@ -67,28 +74,32 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PreScriptTickTaskVisitor ) {
-		class DrawViewsTask : public CRTPTransientTask<DrawViewsTask> {
+		class SubmitDrawCommandsTask : public CRTPTransientTask<SubmitDrawCommandsTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref DrawViewsTask instance.
-			ETInlineHint DrawViewsTask( WorldView& worldView, WorkerContext& executingContext, Task& visitingTask, Allocator& subtaskAllocator ) : CRTPTransientTask<DrawViewsTask>( visitingTask, Scheduler::ContinuationTaskSemantics ),
-																																				   _subtaskAllocator( subtaskAllocator ),
-																																				   _worldView( worldView ) {
+			//!	Constructs this @ref SubmitDrawCommandsTask instance.
+			ETInlineHint SubmitDrawCommandsTask( WorldView& worldView, WorkerContext& executingContext, Task& visitingTask, Allocator& subtaskAllocator ) : CRTPTransientTask<SubmitDrawCommandsTask>( visitingTask, Scheduler::ContinuationTaskSemantics ),
+																																							_subtaskAllocator( subtaskAllocator ),
+																																							_worldView( worldView ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
-			~DrawViewsTask() = default;
+			~SubmitDrawCommandsTask() = default;
 
 		// ---------------------------------------------------
 
 			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Draw Views Task");
+				return UTF8L("Submit Draw Commands Task");
 			}
 
 		// ---------------------------------------------------
 
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
+			Task* Execute( WorkerContext& executingContext ) override sealed {
+				for( const auto& camera : _worldView._attachedCameras ) {
+					// new(_subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ASDFTask();
+				}
+
 				return nullptr;
 			}
 
@@ -101,7 +112,7 @@ namespace Direct3D11 {
 
 	// ---
 
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) DrawViewsTask( *this, executingContext, visitingTask, subtaskAllocator );
+		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SubmitDrawCommandsTask( *this, executingContext, visitingTask, subtaskAllocator );
 	}
 
 // ---------------------------------------------------
@@ -119,6 +130,8 @@ namespace Direct3D11 {
 
 	WorldView& WorldView::GetActiveWorldView() {
 		ETRuntimeAssert( nullptr != activeScriptWorldViewForThread );
+
+	// ---
 
 		return *activeScriptWorldViewForThread;
 	}

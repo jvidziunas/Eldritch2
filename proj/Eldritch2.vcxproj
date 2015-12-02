@@ -331,12 +331,13 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.cpp" />
     <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp" />
+    <ClCompile Include="..\src\Utility\Containers\SpatialHash.cpp" />
     <ClCompile Include="..\src\Utility\DebugController.cpp" />
     <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
     <ClCompile Include="..\src\Utility\FourCCGenerator.cpp" />
-    <ClCompile Include="..\src\Utility\Hash.cpp" />
     <ClCompile Include="..\src\Utility\IntrusivePointerBase.cpp" />
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\ObjectPoolAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp" />
     <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp" />
     <ClCompile Include="..\src\Utility\RandomNumberGenerator.cpp" />
@@ -352,7 +353,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
     <ClCompile Include="..\src\Utility\memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp" />
-    <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp" />
+    <ClCompile Include="..\src\Utility\Containers\String.cpp" />
     <ClCompile Include="..\src\Utility\Math\FrustumUtils.cpp" />
     <ClCompile Include="..\src\Animation\Armature.cpp" />
     <ClCompile Include="..\src\Eldritch2.Win32.cpp" />
@@ -412,6 +413,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Renderer\Direct3D11\SwapChain.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\WorldView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp" />
+    <ClInclude Include="..\src\renderer\VisibilitySystem.hpp" />
     <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp" />
     <ClInclude Include="..\src\Scheduler\Win32\TaskScheduler.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodeMetadata.hpp" />
@@ -439,7 +441,9 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\String.hpp" />
     <ClInclude Include="..\src\Utility\DisposingResult.hpp" />
+    <ClInclude Include="..\src\Utility\Equals.hpp" />
     <ClInclude Include="..\src\Utility\Hash.hpp" />
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
@@ -448,7 +452,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
     <ClInclude Include="..\src\Utility\Pair.hpp" />
     <ClInclude Include="..\src\Utility\ResultBase.hpp" />
-    <ClInclude Include="..\src\Utility\StringOperators.hpp" />
+    <ClInclude Include="..\src\Utility\StringHash.hpp" />
     <ClInclude Include="..\src\Utility\DebugController.hpp" />
     <ClInclude Include="..\src\Utility\ErrorCode.hpp" />
     <ClInclude Include="..\src\Utility\FourCCGenerator.hpp" />
@@ -565,6 +569,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.inl" />
     <None Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.inl" />
     <None Include="..\src\Physics\BulletDynamics\EngineService.inl" />
+    <None Include="..\src\renderer\VisibilitySystem.inl" />
     <None Include="..\src\Scheduler\CRTPTransientTask.inl" />
     <None Include="..\src\Scheduler\Task.inl" />
     <None Include="..\src\Scheduler\WorkerContext.inl" />
@@ -598,10 +603,12 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\Containers\Range.inl" />
     <None Include="..\src\Utility\Containers\ResizableArray.inl" />
     <None Include="..\src\Utility\Containers\SpatialHash.inl" />
+    <None Include="..\src\Utility\Containers\String.inl" />
     <None Include="..\src\Utility\Containers\UnorderedMap.inl" />
     <None Include="..\src\Utility\Containers\UTF8String.inl" />
     <None Include="..\src\Utility\Counter.inl" />
     <None Include="..\src\Utility\DisposingResult.inl" />
+    <None Include="..\src\Utility\Equals.inl" />
     <None Include="..\src\Utility\ErrorCode.inl" />
     <None Include="..\src\Utility\Hash.inl" />
     <None Include="..\src\Utility\IdentifierPool.inl" />
@@ -611,12 +618,11 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
     <None Include="..\src\Utility\Memory\InstanceDeleters.inl" />
     <None Include="..\src\Utility\Memory\ObjectPool.inl" />
-    <None Include="..\src\Utility\Memory\ObjectPoolAllocator.inl" />
     <None Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.inl" />
     <None Include="..\src\Utility\Memory\StdAllocatorAdapterMixin.inl" />
     <None Include="..\src\Utility\Result.inl" />
     <None Include="..\src\Utility\ResultBase.inl" />
-    <None Include="..\src\Utility\StringOperators.inl" />
+    <None Include="..\src\Utility\StringHash.inl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\resources\Eldritch2.Resources.rc" />

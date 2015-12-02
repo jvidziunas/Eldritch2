@@ -32,8 +32,9 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	WorldView::SceneCameraComponent::SceneCameraComponent( SwapChain& swapChain, WorldView& owningView ) : _swapChain( swapChain ) {
+	WorldView::SceneCameraComponent::SceneCameraComponent( SwapChain& swapChain, WorldView& owningView ) : _swapChain( swapChain ), _cachedUsages( { owningView.GetWorldAllocator(), UTF8L("Scene Camera Component Cached Material Usage Allocator") } ) {
 		owningView._attachedCameras.PushFront( *this );
+		_cachedUsages.Reserve( 64u );
 	}
 
 // ---------------------------------------------------

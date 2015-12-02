@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/Direct3D11/HLSLPipelineDefinitionView.hpp>
-#include <Utility/MessagePackReader.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #if( ET_COMPILER_IS_MSVC )

@@ -17,7 +17,6 @@
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/DisposingResult.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
-#include <Utility/StringOperators.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 #include <typeinfo>
@@ -153,27 +152,26 @@ namespace FileSystem {
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator															_allocator;
-		::Eldritch2::ChildAllocator															_deserializationContextAllocator;
-		FileSystem::ContentProvider&														_contentProvider;
+		::Eldritch2::ChildAllocator													_allocator;
+		::Eldritch2::ChildAllocator													_deserializationContextAllocator;
+		FileSystem::ContentProvider&												_contentProvider;
 		
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_contentPackageCollectionMutex;
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>			_contentPackageCollectionMutex;
 
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_resourceViewCollectionMutex;		
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>			_resourceViewCollectionMutex;		
 
-		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*,
-								  ::Eldritch2::Hash<const ::Eldritch2::UTF8Char*>,
-								  Utility::StringEqualComparator<>>							_contentPackageCollection;
+		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*,
+								  FileSystem::ContentPackage*>						_contentPackageCollection;
 
 		//! The value type is left as a void* to prevent slicing for resource views that use multiple inheritance.
-		::Eldritch2::UnorderedMap<ResourceViewKey, const void*>								_resourceViewCollection;
+		::Eldritch2::UnorderedMap<ResourceViewKey, const void*>						_resourceViewCollection;
 
 		::Eldritch2::UnorderedMap<ResourceViewFactoryKey,
-								  ::Eldritch2::ResizableArray<ResourceViewFactory>>			_resourceViewFactoryCollection;
+								  ::Eldritch2::ResizableArray<ResourceViewFactory>>	_resourceViewFactoryCollection;
 
-		FileSystem::LoaderThread*															_loaderThread;
+		FileSystem::LoaderThread*													_loaderThread;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

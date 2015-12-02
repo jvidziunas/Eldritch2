@@ -1,5 +1,5 @@
 /*==================================================================*\
-  StringOperators.inl
+  Equals.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,23 +12,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/StandardLibrary.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Utility {
 
-	template <typename Character>
-	ETNoAliasHint bool StringComparator<Character>::operator()( const Character* left, const Character* right ) const {
-		return ::Eldritch2::CompareString( left, right ) < 0;
+	template <typename T>
+	template <typename U>
+	ETInlineHint bool Equals<T>::operator()( const T& object0, const U& object1 ) const {
+		return object0 == object1;
 	}
 
-// ---------------------------------------------------
-
-	template <typename Character>
-	ETNoAliasHint bool StringEqualComparator<Character>::operator()( const Character* left, const Character* right ) const {
-		return ::Eldritch2::EqualityCompareString( left, right );
-	}
-
-}	// namespace Utility
 }	// namespace Eldritch2

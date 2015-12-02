@@ -23,7 +23,6 @@ using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 namespace Eldritch2 {
 namespace Foundation {

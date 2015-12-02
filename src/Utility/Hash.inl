@@ -15,54 +15,136 @@
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
-#include <typeinfo>
+#include <type_traits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+namespace Detail {
+
+	//!	HashSelector is responsible for delegating out to the correct hash function for a type based on a specific set of type traits.
+	// TODO: This seems like it can be refactored and simplified.
+	template <typename KeyType>
+	struct HashSelector {
+		template <typename FunctionSignature>
+		struct HasMemberHashFunction {
+			static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Template parameter needs to be of function type." );
+		};
+
+	// ---
+
+		template <typename DesiredReturn, typename... Arguments>
+		struct HasMemberHashFunction<DesiredReturn ( Arguments... )> {
+		private:
+			template <typename T>
+			static typename ::std::is_same<DesiredReturn, decltype(::std::declval<const T>().GetHashCode( ::std::declval<Arguments>()... ))>::type Check( T* );
+
+			template <typename>
+			static ::std::false_type Check( ... );
+
+		// ---
+
+			using Type	= decltype(Check<KeyType>(nullptr));
+
+		public:
+			static const bool	value = Type::value;
+		};
+
+	// ---
+
+		template <typename FunctionSignature>
+		struct HasFreeHashFunction {
+			static_assert( ::std::integral_constant<FunctionSignature, false>::value, "Template parameter needs to be of function type." );
+		};
+
+	// ---
+
+		template <typename DesiredReturn, typename... Arguments>
+		struct HasFreeHashFunction<DesiredReturn ( Arguments... )> {
+		private:
+			template <typename T>
+			static typename ::std::is_same<DesiredReturn, decltype(GetHashCode( ::std::declval<const T>(), ::std::declval<Arguments>()... ))>::type Check( T* );
+
+			template <typename>
+			static ::std::false_type Check( ... );
+
+		// ---
+
+			using Type = decltype(Check<KeyType>( nullptr ));
+
+		public:
+			static const bool	value = Type::value;
+		};
+
+	// ---
+
+		template <bool hasMemberHashFunction = HasMemberHashFunction<size_t ( const size_t )>::value>
+		struct GetHashCodeDispatcher {
+			static bool Dispatch( const KeyType& /*key*/, const size_t /*seed*/ );
+		};
+
+	// ---
+
+		template <>
+		struct GetHashCodeDispatcher<true> {
+			static size_t Dispatch( const KeyType& key, const size_t seed ) {
+				static_assert( !HasFreeHashFunction<size_t ( const size_t )>::value,
+							   "Incorrect hash behavior detected!\n"
+							   "Types to be hashed must have either a member function with signature 'size_t GetHashCode( const size_t ) const'\n"
+							   "or a free (optionally friend) function in the containing namespace with signature 'size_t GetHashCode( <Type>&, const size_t )'\n"
+							   "as per Koenig lookup.\n"
+							   "\n"
+							   "If you are encountering this error, and you know at least one one such function exists, then there is likely an alternate form \n"
+							   "that exists somewhere in the translation unit, causing ambiguity. Templates will contribute to the overload set!\n" );
+
+			// ---
+
+				return key.GetHashCode( seed );
+			}
+		};
+
+	// ---
+
+		template <>
+		struct GetHashCodeDispatcher<false> {
+			static bool Dispatch( const KeyType& key, const size_t seed ) {
+				return GetHashCode( key, seed );
+			}
+		};
+
+	public:
+		static ETForceInlineHint ETNoAliasHint size_t Invoke( const KeyType& key, const size_t seed, const ::std::true_type /*hasMemberHash*/ ) {
+			return GetHashCodeDispatcher<>::Dispatch( key, seed );
+		}
+
+		static ETForceInlineHint ETNoAliasHint size_t Invoke( const KeyType& key, const size_t seed, const ::std::false_type /*hasMemberHash*/ ) {
+			static_assert(::std::is_standard_layout<KeyType>::value, "Hashed types must adhere to the C++ standard layout concept for the default implementation to work correctly!\n"
+																	 "Either specialize ::Eldritch2::Hash<> for this type, create a member function in the type with signature\n"
+																	 "'size_t GetHashCode( size_t )', or create a free (optionally friend) function in the same namespace as the type\n"
+																	 "with signature 'size_t GetHashCode( const <Type>&, size_t )' as per Koenig lookup.\n" );
+
+		// ---
+
+			return ::Eldritch2::HashMemory( &key, sizeof( key ), seed );
+		}
+	};
+
+}	// namespace Detail
 
 	template <typename T>
 	ETNoAliasHint size_t Hash<T>::operator()( const T& key, const size_t seed ) const {
-		return HashBase::operator()( &key, sizeof(key), seed );
+		using HashSelector	= Detail::HashSelector<T>;
+
+		static_assert( sizeof(key) != 0, "Hashed types must be complete!" );
+
+	// ---
+
+		return HashSelector::Invoke( key, seed, ::std::integral_constant<bool, HashSelector::HasFreeHashFunction<size_t ( const size_t )>::value || HashSelector::HasMemberHashFunction<size_t ( const size_t )>::value>() );
 	}
 
 // ---
 
 	template <>
-	class Hash<::Eldritch2::intptr> : public Detail::HashBase {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		Hash() = default;
-
-		~Hash() = default;
-
-		ETNoAliasHint size_t operator()( const ::Eldritch2::intptr key, const size_t seed = static_cast<size_t>(0) ) const {
-			return static_cast<size_t>(key) ^ seed;
-		}
-	};
-
-// ---
-
-	template <>
-	class Hash<::Eldritch2::uintptr> : public Detail::HashBase {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		Hash() = default;
-
-		~Hash() = default;
-
-	// ---------------------------------------------------
-
-		ETNoAliasHint size_t operator()( const ::Eldritch2::uintptr key, const size_t seed = static_cast<size_t>(0) ) const {
-			return static_cast<size_t>(key) ^ seed;
-		}
-	};
-
-// ---
-
-	template <>
-	class Hash<char*> : public Detail::HashBase {
+	class Hash<char*> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -73,16 +155,18 @@ namespace Eldritch2 {
 	// ---------------------------------------------------
 
 		ETNoAliasHint size_t operator()( const char* const key, const size_t lengthInBytes, const size_t seed ) const {
-			return HashBase::operator()( key, lengthInBytes, seed );
+			return ::Eldritch2::HashMemory( key, lengthInBytes, seed );
 		}
 
 		ETNoAliasHint size_t operator()( const char* const key, const size_t seed = static_cast<size_t>(0) ) const {
-			return HashBase::operator()( key, ::Eldritch2::StringLength( key ), seed );
+			return (*this)( key, ::Eldritch2::StringLength( key ), seed );
 		}
 	};
 
+// ---
+
 	template <>
-	class Hash<wchar_t*> : public Detail::HashBase {
+	class Hash<wchar_t*> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -94,35 +178,18 @@ namespace Eldritch2 {
 
 		ETNoAliasHint size_t operator()( const wchar_t* const key, const size_t lengthInCharacters, const size_t seed ) const {
 			// The basic hasher wants a size in bytes, so remember to multiply by the number of chars per wchar_t!
-			return HashBase::operator()( key, sizeof( wchar_t ) * lengthInCharacters, seed );
+			return ::Eldritch2::HashMemory( key, lengthInCharacters * sizeof(wchar_t), seed );
 		}
 
 		ETNoAliasHint size_t operator()( const wchar_t* const key, const size_t seed = static_cast<size_t>(0) ) const {
-			// The basic hasher wants a size in bytes, so remember to multiply by the number of chars per wchar_t!
-			return HashBase::operator()( key, sizeof(wchar_t) * ::Eldritch2::StringLength( key ), seed );
-		}
-	};
-
-	template <>
-	class Hash<::std::type_info*> : public Detail::HashBase {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		Hash() = default;
-
-		~Hash() = default;
-
-	// ---------------------------------------------------
-
-		ETNoAliasHint size_t operator()( const ::std::type_info* const key, const size_t seed = static_cast<size_t>(0) ) const {
-			return key->hash_code() ^ seed;
+			return (*this)( key, ::Eldritch2::StringLength( key ), seed );
 		}
 	};
 
 // ---
 
 	template <typename T>
-	class Hash<T*> : public Detail::HashBase {
+	class Hash<T*> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -153,7 +220,7 @@ namespace Eldritch2 {
 // ---
 
 	template <typename T1, typename T2>
-	class Hash<::Eldritch2::Pair<T1, T2>> : public Detail::HashBase {
+	class Hash<::Eldritch2::Pair<T1, T2>> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -164,7 +231,7 @@ namespace Eldritch2 {
 	// ---------------------------------------------------
 
 		ETNoAliasHint size_t operator()( const ::Eldritch2::Pair<T1, T2>& key, const size_t seed = static_cast<size_t>(0) ) const {
-			return ::Eldritch2::Hash<T1>()(key.first, ::Eldritch2::Hash<T2>()(key.second, seed));
+			return ::Eldritch2::Hash<T1>()( key.first, ::Eldritch2::Hash<T2>()( key.second, seed ) );
 		}
 	};
 

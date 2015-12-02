@@ -25,14 +25,24 @@ namespace Eldritch2 {
 namespace Renderer {
 
 	class Camera {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		struct Viewport {
+			::Eldritch2::float32	offsetX;
+			::Eldritch2::float32	offsetY;
+			::Eldritch2::float32	width;
+			::Eldritch2::float32	height;
+		};
+
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		//!	Constructs this @ref Camera instance.
 		Camera();
+		//!	Constructs this @ref Camera instance.
+		Camera( const Camera& ) = default;
 
-		//!	Destroys this @ref Camera instance.
-		~Camera();
+		~Camera() = default;
 
 	// ---------------------------------------------------
 

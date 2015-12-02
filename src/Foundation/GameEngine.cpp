@@ -46,7 +46,8 @@ namespace Foundation {
 																																				   _worldViewAllocationHintInBytes( 16u ),
 																																				   _contentLibrary( contentProvider, scheduler, _allocator ),
 																																				   _logEchoThreshold( LogMessageType::VERBOSE_WARNING ),
-																																				   _taskArenaPerThreadAllocationSizeInBytes( 4096u ),
+																																				   _taskArenaPerThreadAllocationSizeInBytes( 1024u * 1024u ),
+																																				   _worldArenaSizeInBytes( 16u * 1024u * 1024u ),
 																																				   _managementService( *this ) {}
 
 // ---------------------------------------------------

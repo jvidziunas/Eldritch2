@@ -53,7 +53,7 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	ErrorCode BytecodeMetadata::TypeMetadata::Bind( ::asIObjectType& scriptType, const FlatBuffers::TypeMetadata& metadata ) {
+	ErrorCode BytecodeMetadata::TypeMetadata::Bind( ::asITypeInfo& scriptType, const FlatBuffers::TypeMetadata& metadata ) {
 		for( auto methodMetadata( metadata.methods()->begin() ), end( metadata.methods()->end() ); methodMetadata != end; ++methodMetadata ) {
 			auto	scriptFunction( scriptType.GetMethodByIndex( methodMetadata->index() ) );
 
@@ -103,13 +103,13 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	const BytecodeMetadata::TypeMetadata* BytecodeMetadata::GetMetadata( const ::asIObjectType& type ) {
+	const BytecodeMetadata::TypeMetadata* BytecodeMetadata::GetMetadata( const ::asITypeInfo& type ) {
 		return static_cast<TypeMetadata*>(type.GetUserData());
 	}
 
 // ---------------------------------------------------
 
-	const BytecodeMetadata::PropertyMetadata* BytecodeMetadata::GetPropertyMetadata( const ::asIObjectType& objectType, const ::asUINT propertyIndex ) {
+	const BytecodeMetadata::PropertyMetadata* BytecodeMetadata::GetPropertyMetadata( const ::asITypeInfo& objectType, const ::asUINT propertyIndex ) {
 		const auto typeMetadata( GetMetadata( objectType ) );
 
 		return typeMetadata ? typeMetadata->GetPropertyMetadata( propertyIndex ) : nullptr;
@@ -143,7 +143,7 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void BytecodeMetadata::SetMetadata( ::asIObjectType& type, const TypeMetadata& metadata ) {
+	void BytecodeMetadata::SetMetadata( ::asITypeInfo& type, const TypeMetadata& metadata ) {
 		type.SetUserData( const_cast<TypeMetadata*>(&metadata) );
 	}
 

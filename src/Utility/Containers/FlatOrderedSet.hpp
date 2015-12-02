@@ -50,7 +50,6 @@ namespace Eldritch2 {
 		//!	Constructs this @ref FlatOrderedSet instance.
 		ETInlineHint FlatOrderedSet( ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>&& moveSource );
 
-		//!	Destroys this @ref FlatOrderedSet instance.
 		ETInlineHint ~FlatOrderedSet() = default;
 
 	// - ALGORITHMS --------------------------------------

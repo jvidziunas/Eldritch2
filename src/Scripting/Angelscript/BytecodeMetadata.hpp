@@ -33,7 +33,7 @@ namespace Eldritch2 {
 
 class	asIScriptFunction;
 class	asIScriptModule;
-class	asIObjectType;
+class	asITypeInfo;
 
 using asUINT	= unsigned int;
 
@@ -77,7 +77,7 @@ namespace AngelScript {
 
 		// ---------------------------------------------------
 
-			::Eldritch2::ErrorCode	Bind( ::asIObjectType& scriptType, const FlatBuffers::TypeMetadata& metadata );
+			::Eldritch2::ErrorCode	Bind( ::asITypeInfo& scriptType, const FlatBuffers::TypeMetadata& metadata );
 
 		// ---------------------------------------------------
 
@@ -121,13 +121,13 @@ namespace AngelScript {
 		/*!	@param[in] type The AngelScript type to inspect.
 			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the type.
 			*/
-		static const TypeMetadata*		GetMetadata( const ::asIObjectType& type );
+		static const TypeMetadata*		GetMetadata( const ::asITypeInfo& type );
 
 		//!	Extracts metadata for an an object property, if any has been previously associated.
 		/*!	@param[in] propertyIndex Zero-based index identifying the property to be inspected.
 			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the property.
 			*/
-		static const PropertyMetadata*	GetPropertyMetadata( const ::asIObjectType& objectType, const ::asUINT propertyIndex );
+		static const PropertyMetadata*	GetPropertyMetadata( const ::asITypeInfo& objectType, const ::asUINT propertyIndex );
 		static const PropertyMetadata*	GetPropertyMetadata( const ::asIScriptModule& module, const void* propertyAddress );
 
 	// ---------------------------------------------------
@@ -135,7 +135,7 @@ namespace AngelScript {
 	protected:
 		static void	SetMetadata( ::asIScriptFunction& function, const FunctionMetadata& metadata );
 		static void	SetMetadata( ::asIScriptModule& module, const ModuleMetadata& metadata );
-		static void	SetMetadata( ::asIObjectType& objectType, const TypeMetadata& metadata );
+		static void	SetMetadata( ::asITypeInfo& objectType, const TypeMetadata& metadata );
 
 	// ---------------------------------------------------
 

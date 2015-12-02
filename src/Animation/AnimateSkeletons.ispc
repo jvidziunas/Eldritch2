@@ -1,4 +1,4 @@
-#include "Eldritch2Math.ispch"
+#include "AnimationCommon.ispch"
 
 struct AnimatedJoint {
 };

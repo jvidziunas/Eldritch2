@@ -37,7 +37,7 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Foundation {
 
-	World::World( ObjectHandle<ContentPackage>&& package, GameEngine& owningEngine ) : _allocator( owningEngine._allocator, UTF8L("World Allocator") ),
+	World::World( ObjectHandle<ContentPackage>&& package, GameEngine& owningEngine ) : _allocator( owningEngine._allocator, owningEngine._worldArenaSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World Allocator") ),
 																					   _viewAllocator( _allocator, owningEngine._worldViewAllocationHintInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World View Allocator") ),
 																					   _owningEngine( owningEngine ),
 																					   _package( move( package ) ),
@@ -73,11 +73,8 @@ namespace Foundation {
 
 	// ---
 
-		// TODO: Improve the UnorderedMap interface to accept arbitrary key argument types so we can just pass in the C string
-		FixedStackAllocator<96u>	tempAllocator( UTF8L("World::GetPropertyByKey() Temporary Allocator") );
-
 		{	ScopedReaderLock	_( *_propertyMutex );
-			auto				pairCandidate( _properties.Find( { rawKey, FindEndOfString( rawKey ), { tempAllocator, UTF8L("World Key String Allocator") } } ) );
+			auto				pairCandidate( _properties.Find( rawKey ) );
 
 			if( pairCandidate != _properties.End() ) {
 				return { pairCandidate->second, { resultAllocator, returnedStringAllocatorName } };

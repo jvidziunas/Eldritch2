@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Utility/Memory/StandardLibrary.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -23,9 +23,7 @@ namespace Configuration {
 // ---------------------------------------------------
 
 	ETInlineHint ETNoAliasHint bool	ConfigurationDatabase::Key::operator==( const Key& right ) const {
-		Utility::StringEqualComparator<::Eldritch2::UTF8Char>	comparator;
-
-		return comparator( first, right.first ) && comparator( second, right.second );
+		return ::Eldritch2::EqualityCompareString( first, right.first ) && ::Eldritch2::EqualityCompareString( second, right.second );
 	}
 
 }	// namespace Configuration

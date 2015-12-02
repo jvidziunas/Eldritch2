@@ -309,9 +309,6 @@
     <ClCompile Include="..\src\Input\PlaystationController.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Containers\UTF8String.cpp">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp">
       <Filter>Source Files\Configuration</Filter>
     </ClCompile>
@@ -579,8 +576,14 @@
     <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageSink.cpp">
       <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\Hash.cpp">
-      <Filter>Source Files\Utility</Filter>
+    <ClCompile Include="..\src\Utility\Containers\String.cpp">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Memory\ObjectPoolAllocator.cpp">
+      <Filter>Source Files\Utility\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Containers\SpatialHash.cpp">
+      <Filter>Source Files\Utility\Containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -736,9 +739,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Configuration\ConfigurablePODVariable.hpp">
       <Filter>Header Files\Configuration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\StringOperators.hpp">
-      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
@@ -1085,6 +1085,18 @@
     <ClInclude Include="..\src\Utility\Hash.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\String.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\VisibilitySystem.hpp">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\StringHash.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Equals.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1221,9 +1233,6 @@
     <None Include="..\src\Utility\ResultBase.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
-    <None Include="..\src\Utility\StringOperators.inl">
-      <Filter>Source Files\Utility</Filter>
-    </None>
     <None Include="..\src\Utility\Containers\FlatOrderedMap.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
@@ -1287,9 +1296,6 @@
     <None Include="..\src\Utility\Memory\ObjectPool.inl">
       <Filter>Source Files\Utility\Memory</Filter>
     </None>
-    <None Include="..\src\Utility\Memory\ObjectPoolAllocator.inl">
-      <Filter>Source Files\Utility\Memory</Filter>
-    </None>
     <None Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.inl">
       <Filter>Source Files\Utility\Memory</Filter>
     </None>
@@ -1297,6 +1303,18 @@
       <Filter>Source Files\Utility\Memory</Filter>
     </None>
     <None Include="..\src\Utility\Hash.inl">
+      <Filter>Source Files\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\String.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\renderer\VisibilitySystem.inl">
+      <Filter>Source Files\Renderer</Filter>
+    </None>
+    <None Include="..\src\Utility\StringHash.inl">
+      <Filter>Source Files\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Equals.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
   </ItemGroup>

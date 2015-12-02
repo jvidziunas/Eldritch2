@@ -25,13 +25,13 @@ namespace Detail {
 
 	template <typename Option>
 	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddOption( const ::Eldritch2::SystemChar* const name, const ::Eldritch2::SystemChar shortName, Option& option ) {
-		auto	insertResult( _shortSettings.Insert( SettingHandler{ shortName, [] ( const ::Eldritch2::SystemChar* value, const ::Eldritch2::SystemChar* valueEnd, void* const settingAddress ) -> int {
+		auto	insertResult( _shortSettings.Insert( SettingHandler{ shortName, [] ( const ::Eldritch2::Range<const ::Eldritch2::SystemChar*> value, void* const settingAddress ) -> int {
 			using namespace ::boost::iostreams;
 
 		// ---
 
-			array_source<decltype(*value)>	source( value, valueEnd );
-			stream<decltype(source)>		stream( source );
+			array_source<::Eldritch2::SystemChar>	source( value.first, value.onePastLast );
+			stream<decltype(source)>				stream( source );
 
 			stream >> *static_cast<Option*>(settingAddress);
 
@@ -47,13 +47,13 @@ namespace Detail {
 
 	template <typename Option>
 	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddOption( const ::Eldritch2::SystemChar* const name, Option& option ) {
-		auto	insertResult( _shortSettings.Insert( SettingHandler{ shortName, [] ( const ::Eldritch2::SystemChar* value, const ::Eldritch2::SystemChar* valueEnd, void* const settingAddress ) -> int {
+		auto	insertResult( _shortSettings.Insert( SettingHandler{ shortName, [] ( const ::Eldritch2::Range<const ::Eldritch2::SystemChar*> value, void* const settingAddress ) -> int {
 			using namespace ::boost::iostreams;
 
 		// ---
 
-			array_source<decltype(*value)>	source( value, valueEnd );
-			stream<decltype(source)>		stream( source );
+			array_source<::Eldritch2::SystemChar>	source( value.first, value.onePastLast );
+			stream<decltype(source)>				stream( source );
 
 			stream >> *static_cast<Option*>(settingAddress);
 
@@ -69,19 +69,15 @@ namespace Detail {
 
 	template <typename ImplementingType>
 	int	ToolCRTPBase<ImplementingType>::Run( const Range<const SystemChar**> options ) {
-		const auto	positionalArgumentsBegin( Utility::RemoveIf( options.first, options.onePastLast, [] ( const SystemChar* const option ) {
-			return *option != SL('-');
-		} ) );
-
 		{	// Register tool options.
 			OptionRegistrationVisitor	visitor( static_cast<ImplementingType&>(*this).GetAllocator() );
 
 			static_cast<ImplementingType&>(*this).RegisterOptions( visitor );
 
-			visitor.DispatchOptions( { options.first, positionalArgumentsBegin } );
+			visitor.DispatchOptions( options );
 		}
 
-		return static_cast<ImplementingType&>(*this).ProcessInputFiles( { positionalArgumentsBegin, options.onePastLast } );
+		return static_cast<ImplementingType&>(*this).Process();
 	}
 
 }	// namespace Tools

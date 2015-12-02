@@ -12,14 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/UTF8String.hpp>
+#include <Utility/Containers/String.hpp>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 
-	const Detail::StringBase::UTF32CodepointSemantics		UTF32CodepointSemantics;
 	const Detail::StringBase::ReturnEndOfNeedleSemantics	ReturnEndOfNeedleSemantics;
 
 }	// namespace Eldritch2

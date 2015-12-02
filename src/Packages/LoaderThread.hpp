@@ -19,8 +19,6 @@
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Scheduler/Thread.hpp>
 //------------------------------------------------------------------//
-#include <memory>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Utility {
@@ -77,7 +75,7 @@ namespace FileSystem {
 		::Eldritch2::ChildAllocator															_allocator;
 		::Eldritch2::IntrusiveVyukovMPSCQueue<FileSystem::PackageDeserializationContext>	_initializationQueue;
 		::Eldritch2::IntrusiveForwardList<FileSystem::PackageDeserializationContext>		_outstandingLoadList;
-		::std::unique_ptr<Utility::UserSemaphore, Utility::AlignedInstanceDeleter>			_loadSemaphore;
+		::Eldritch2::AlignedInstancePointer<Utility::UserSemaphore>							_loadSemaphore;
 		::std::atomic<ExecutionBehavior>													_executionBehavior;
 	};
 

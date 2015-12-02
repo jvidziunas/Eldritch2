@@ -6,12 +6,13 @@ Additionally, the project is not currently buildable from a direct Git clone; th
 If you'd like to get a copy of the executable, (currently tested/running under 64-bit Windows only) let me know and I'll send something your way! Be warned, it's pretty boring right now.
 
 ## External Dependencies
-* [Bullet Dynamics Engine] (http://bulletphysics.org/wordpress/) (experimental v3, using community multithreading support branch)
+* [Bullet Dynamics Engine] (http://bulletphysics.org/wordpress/), experimental v3, using community multithreading support branch
 * [Angelscript](http://www.angelcode.com/angelscript/)
-* [Microprofile](https://bitbucket.org/jonasmeyer/microprofile) (with Arseny Kapoulkine's extensions)
+* [Microprofile](https://bitbucket.org/jonasmeyer/microprofile), with Arseny Kapoulkine's extensions
 * [Recast Navigation/Detour](https://github.com/memononen/recastnavigation)
-* [Boost](http://www.boost.org/) (version 1.59)
+* [Boost](http://www.boost.org/), version 1.59
 * [Steamworks](https://partner.steamgames.com/)
+* [RDESTL](https://github.com/msinilo/rdestl), with customizations/extensions
 
 ## Project Structure
 At a high level, project directories are arranged in a hierarchy. Shared or engine-related files live in the `/src/` subdirectory, and the current set of planned tools each have their own special sibling folder named according to the pattern `/src_<Tool Name>/`.

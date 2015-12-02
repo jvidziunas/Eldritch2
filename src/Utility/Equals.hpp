@@ -1,5 +1,5 @@
 /*==================================================================*\
-  StringOperators.hpp
+  Equals.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,29 +12,31 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/CharTypes.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Utility {
 
-	template <typename Character = char>
-	struct StringComparator {
-		ETNoAliasHint bool	operator()( const Character* left, const Character* right ) const;
+	template <typename T>
+	class Equals {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref Equals instance.
+		Equals() = default;
+
+		~Equals() = default;
+
+	// ---------------------------------------------------
+
+		template <typename U = T>
+		ETInlineHint bool	operator()( const T& object0, const U& object1 ) const;
 	};
 
-// ---------------------------------------------------
-
-	template <typename Character = char>
-	struct StringEqualComparator {
-		ETNoAliasHint bool	operator()( const Character* left, const Character* right ) const;
-	};
-
-}	// namespace Utility
 }	// namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/StringOperators.inl>
+#include <Utility/Equals.inl>
 //------------------------------------------------------------------//

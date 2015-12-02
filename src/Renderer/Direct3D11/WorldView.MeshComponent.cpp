@@ -42,8 +42,8 @@ namespace Direct3D11 {
 	ETNoAliasHint void WorldView::MeshComponent::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static MeshComponent* ETScriptAPICall Factory0( const StringMarshal& meshName, Armature* armature ) {
-				WorldView&	worldView( GetActiveWorldView() );
-				const auto&				contentLibrary( worldView.GetEngineContentLibrary() );
+				auto&		worldView( GetActiveWorldView() );
+				const auto&	contentLibrary( worldView.GetEngineContentLibrary() );
 
 				return new(worldView._meshPool, Allocator::AllocationOption::PERMANENT_ALLOCATION) MeshComponent( contentLibrary.ResolveViewByName( meshName.GetCharacterArray(), worldView._defaultMesh ), *armature );
 			}
@@ -79,6 +79,7 @@ namespace Direct3D11 {
 			typeRegistrar.EnsureValueTypeDeclared<StringMarshal>().EnsureReferenceTypeDeclared<Armature>();
 
 			typeBuilder.ExposeFactory( &FunctionHelper::Factory0 );
+
 			typeBuilder.ExposeVirtualProperty( "Visible", &FunctionHelper::GetVisible ).ExposeVirtualProperty( "Visible", &FunctionHelper::SetVisible );
 			typeBuilder.ExposeVirtualProperty( "Armature", &FunctionHelper::GetArmature );
 

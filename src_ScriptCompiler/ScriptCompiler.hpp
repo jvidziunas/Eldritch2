@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Containers/UTF8String.hpp>
 #include <Tools/ToolCRTPBase.hpp>
 //------------------------------------------------------------------//
@@ -50,7 +51,7 @@ namespace Tools {
 
 	// ---------------------------------------------------
 
-		int	ProcessInputFiles( const ::Eldritch2::Range<const ::Eldritch2::SystemChar**> inputFiles );
+		int	Process();
 
 	// ---------------------------------------------------
 
@@ -61,7 +62,8 @@ namespace Tools {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::UTF8String<>	_outputModuleName;
+		::Eldritch2::UTF8String<>								_outputModuleName;
+		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_inputFiles;
 	};
 
 }	// namespace Tools

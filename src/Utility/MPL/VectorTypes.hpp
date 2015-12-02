@@ -41,8 +41,9 @@ namespace Eldritch2 {
 		ETForceInlineHint Float4( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
 		//!	Constructs this @ref Float4 instance.
 		ETForceInlineHint Float4( const ::Eldritch2::float32* const values );
+		//!	Constructs this @ref Float4 instance.
+		ETForceInlineHint Float4( const ::Eldritch2::Float4& ) = default;
 
-		//!	Destroys this @ref Float4 instance.
 		ETForceInlineHint ~Float4() = default;
 
 	// ---------------------------------------------------
@@ -52,21 +53,39 @@ namespace Eldritch2 {
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator +( const ::Eldritch2::Float4 operand ) const;
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator -( const ::Eldritch2::Float4 operand ) const;
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator *( const ::Eldritch2::float32 scalar ) const;
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator /( const ::Eldritch2::float32 scalar ) const;
+		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator+( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 );
+		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator-( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 );
+		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator*( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 );
+		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator*( ::Eldritch2::Float4 operand0, const ::Eldritch2::float32 scalar );
+		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator/( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 );
+		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator/( ::Eldritch2::Float4 operand0, const ::Eldritch2::float32 scalar );
 
-		ETForceInlineHint ::Eldritch2::Float4&				operator +=( const ::Eldritch2::Float4 operand );
-		ETForceInlineHint ::Eldritch2::Float4&				operator -=( const ::Eldritch2::Float4 operand );
-		ETForceInlineHint ::Eldritch2::Float4&				operator *=( const ::Eldritch2::float32 scalar );
-		ETForceInlineHint ::Eldritch2::Float4&				operator /=( const ::Eldritch2::float32 scalar );
+		ETForceInlineHint ::Eldritch2::Float4&						operator+=( const ::Eldritch2::Float4& operand );
+		ETForceInlineHint ::Eldritch2::Float4&						operator-=( const ::Eldritch2::Float4& operand );
+		ETForceInlineHint ::Eldritch2::Float4&						operator*=( const ::Eldritch2::Float4& operand );
+		ETForceInlineHint ::Eldritch2::Float4&						operator*=( const ::Eldritch2::float32 scalar );
+		ETForceInlineHint ::Eldritch2::Float4&						operator/=( const ::Eldritch2::Float4& operand );
+		ETForceInlineHint ::Eldritch2::Float4&						operator/=( const ::Eldritch2::float32 scalar );
 
-		ETForceInlineHint ::Eldritch2::Float4&				operator =( const ::Eldritch2::Float4 operand );
+		ETForceInlineHint ::Eldritch2::Float4&						operator=( const ::Eldritch2::Float4& operand );
 
 	// ---------------------------------------------------
 
 		ETForceInlineHint ::Eldritch2::Float4&	Normalize();
+
+	// ---------------------------------------------------
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	Ceil( const ::Eldritch2::Float4 vector );
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	Floor( const ::Eldritch2::Float4 vector );
+
+	// ---------------------------------------------------
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::float32	DotProduct( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1 );
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	CrossProduct( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1 );
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	LinearInterpolate( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1, const ::Eldritch2::float32 alpha );
 
 	// ---------------------------------------------------
 
@@ -94,8 +113,9 @@ namespace Eldritch2 {
 		ETForceInlineHint Quaternion( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
 		//!	Constructs this @ref Quaternion instance.
 		ETForceInlineHint Quaternion( const ::Eldritch2::float32* const values );
+		//!	Constructs this @ref Quaternion instance.
+		ETForceInlineHint Quaternion( const ::Eldritch2::Quaternion& ) = default;
 
-		//!	Destroys this @ref Quaternion instance.
 		ETForceInlineHint ~Quaternion() = default;
 
 	// ---------------------------------------------------
@@ -104,11 +124,19 @@ namespace Eldritch2 {
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion	Reverse() const;
+		ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion	GetReverse() const;
 
 	// ---------------------------------------------------
 
 		ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 RotateVector( const ::Eldritch2::Float4 point ) const;
+
+	// ---------------------------------------------------
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::float32		DotProduct( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1 );
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion	LinearInterpolate( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1, const ::Eldritch2::float32 alpha );
+
+		friend ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion	LinearInterpolateNonConstantVelocity( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1, const ::Eldritch2::float32 alpha );
 
 	// ---------------------------------------------------
 
@@ -119,22 +147,6 @@ namespace Eldritch2 {
 
 		CoefficientSet	coefficients;
 	};
-
-// ---------------------------------------------------
-
-	ETInlineHint ETNoAliasHint ::Eldritch2::float32	DotProduct( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1 );
-
-	ETInlineHint ETNoAliasHint ::Eldritch2::Float4	CrossProduct( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1 );
-
-	ETInlineHint ETNoAliasHint ::Eldritch2::Float4	LinearInterpolate( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1, const ::Eldritch2::float32 alpha );
-
-// ---------------------------------------------------
-
-	ETInlineHint ETNoAliasHint ::Eldritch2::float32		DotProduct( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1 );
-
-	ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion	LinearInterpolate( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1, const ::Eldritch2::float32 alpha );
-
-	ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion	LinearInterpolateNonConstantVelocity( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1, const ::Eldritch2::float32 alpha );
 
 }	// namespace Eldritch2
 

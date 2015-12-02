@@ -44,7 +44,6 @@ namespace Eldritch2 {
 		//! Constructs this @ref IntrusiveForwardList instance.
 		ETInlineHint IntrusiveForwardList() = default;
 
-		//!	Destroys this @ref IntrusiveForwardList instance.
 		ETInlineHint ~IntrusiveForwardList() = default;
 
 	// - ALGORITHMS --------------------------------------

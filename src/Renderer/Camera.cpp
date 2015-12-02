@@ -27,10 +27,6 @@ namespace Renderer {
 	Camera::Camera() : _nearDepth( 0.1f ), _farDepth( 1000.0f ), /* 80-degree horizontal FOV */ _horizontalFOVInRadians( 0.44444f * 3.14159265358972f ), /* 16:9 aspect ratio */ _verticalFOVInRadians( _horizontalFOVInRadians * 0.5625f ) {}
 
 // ---------------------------------------------------
-
-	Camera::~Camera() {}
-
-// ---------------------------------------------------
 	
 	RadianMeasure Camera::GetHorizontalFOV() const {
 		return RadianMeasure( _horizontalFOVInRadians );
