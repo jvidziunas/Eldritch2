@@ -1,9 +1,9 @@
 /*==================================================================*\
-  WorldViewFactoryPublishingInitializationVisitor.inl
+  Less.inl
   ------------------------------------------------------------------
   Purpose:
   
-
+  
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
@@ -16,14 +16,10 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Foundation {
 
-	ETInlineHint Foundation::WorldViewFactoryPublishingInitializationVisitor& WorldViewFactoryPublishingInitializationVisitor::PublishFactory( const size_t allocationHintInBytes, ErrorCode (*factoryFunction)( ::Eldritch2::Allocator&, Foundation::World&, void* ) ) {
-		return PublishFactory( nullptr, allocationHintInBytes, factoryFunction );
+	template <typename T>
+	ETInlineHint bool Less<T>::operator()( const T& object0, const T& object1 ) const {
+		return object0 < object1;
 	}
 
-}	// namespace Foundation
 }	// namespace Eldritch2
-
-
-

@@ -44,7 +44,7 @@ namespace Direct3D11 {
 
 	public:
 		//!	Constructs this @ref DeviceBuilder instance.
-		DeviceBuilder( const Utility::COMPointer<::IDXGIFactory1>& factory = nullptr );
+		DeviceBuilder( const Utility::COMPointer<::IDXGIFactory1>& factory = Utility::COMPointer<::IDXGIFactory1>( nullptr ) );
 
 		//!	Constructs this @ref DeviceBuilder instance.
 		~DeviceBuilder() = default;

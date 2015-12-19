@@ -62,9 +62,8 @@ namespace Direct3D11 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref MeshResourceView instance.
-		MeshResourceView( const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		MeshResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
-		// Destroys this @ref MeshResourceView instance.
 		~MeshResourceView() = default;
 
 	// ---------------------------------------------------

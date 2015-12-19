@@ -33,7 +33,7 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	ShaderResourceResourceView::ShaderResourceResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ), _minLoadedLOD( numeric_limits<decltype(_minLoadedLOD)>::max() ) {}
+	ShaderResourceResourceView::ShaderResourceResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ), _minLoadedLOD( numeric_limits<decltype(_minLoadedLOD)>::max() ) {}
 
 // ---------------------------------------------------
 

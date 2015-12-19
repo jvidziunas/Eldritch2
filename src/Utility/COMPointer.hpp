@@ -28,16 +28,16 @@ namespace Utility {
 		ETInlineHint COMPointer( CompatibleInterfaceType* const pointer, const PassthroughReferenceCountingSemantics );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
-		ETInlineHint explicit COMPointer( CompatibleInterfaceType* const pointer );
+		ETInlineHint COMPointer( CompatibleInterfaceType* const pointer );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
 		ETInlineHint COMPointer( CompatibleInterfaceType& reference, const PassthroughReferenceCountingSemantics );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
-		ETInlineHint explicit COMPointer( CompatibleInterfaceType& reference );
+		ETInlineHint COMPointer( CompatibleInterfaceType& reference );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
-		ETInlineHint explicit COMPointer( const Utility::COMPointer<CompatibleInterfaceType>& handle );
+		ETInlineHint COMPointer( const Utility::COMPointer<CompatibleInterfaceType>& handle );
 		//!	Constructs this @ref COMPointer instance.
 		template <class CompatibleInterfaceType>
 		ETInlineHint COMPointer( Utility::COMPointer<CompatibleInterfaceType>&& handle );
@@ -60,6 +60,7 @@ namespace Utility {
 
 	// ---------------------------------------------------
 
+		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( const Utility::COMPointer<InterfaceType>& other );
 		template <class CompatibleInterfaceType>
 		ETInlineHint Utility::COMPointer<InterfaceType>&	operator=( const Utility::COMPointer<CompatibleInterfaceType>& other );
 		template <class CompatibleInterfaceType>

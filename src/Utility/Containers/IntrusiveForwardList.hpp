@@ -129,7 +129,7 @@ namespace Eldritch2 {
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint operator bool() const;
+		ETInlineHint operator	bool() const;
 
 		ETInlineHint SizeType	Size() const;
 

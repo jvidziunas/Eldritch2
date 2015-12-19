@@ -24,17 +24,7 @@
 #include <Foundation/Player.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
-#if( ET_COMPILER_IS_MSVC )
-//	Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
-#	pragma warning( push )
-#	pragma warning( disable : 6340 )
-#endif
-#include <isteamclient.h>
-#include <isteamnetworking.h>
-#include <steam_gameserver.h>
-#if( ET_COMPILER_IS_MSVC )
-#	pragma warning( pop )
-#endif
+#include <steamclientpublic.h>
 //------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
@@ -53,22 +43,12 @@ namespace Steamworks {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum : size_t {
-			NETWORK_MTU_SIZE = 1200u
-		};
-
-	// ---
-
-		using NetworkID	= ::std::pair<::CSteamID, int>;
-
-	// ---
-
 		class Player : public Foundation::Player {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Constructs this @ref Player instance.
-			Player( const NetworkID& networkID, EngineService& networkingService, ::Eldritch2::Allocator& allocator );
+			Player( const Scripting::ObjectHandle<Foundation::World>& world, EngineService& service, ::Eldritch2::Allocator& allocator );
 
 			//!	Destroys this @ref Player instance.
 			~Player() = default;
@@ -86,9 +66,9 @@ namespace Steamworks {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::Eldritch2::UTF8String<>	_name;
-			EngineService&				_networkingService;
-			const NetworkID				_networkID;
+			::Eldritch2::UTF8String<>					_name;
+			EngineService&								_service;
+			Scripting::ObjectHandle<Foundation::World>	_world;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -105,17 +85,12 @@ namespace Steamworks {
 
 	// ---------------------------------------------------
 
-		bool	TryRecievePacket( const int channelID, ::CSteamID& senderID, char( &packetBuffer )[NETWORK_MTU_SIZE] );
-
-		void	TrySendPacket( const int channelID, const ::CSteamID destinationID, void* const packetBuffer, const size_t packetSizeInBytes );
-
-		void	CloseReplicationOnChannel( const int channelID );
+		::Eldritch2::ErrorCode	AllocateWorldView( ::Eldritch2::Allocator& allocator, Foundation::World& world ) override;
 
 	// ---------------------------------------------------
 
 	protected:
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( Foundation::WorldViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( const PostInitializationVisitor ) override sealed;
 
@@ -124,54 +99,36 @@ namespace Steamworks {
 
 	// ---------------------------------------------------
 
-		::Eldritch2::Result<Player>	AcknowledgePlayerConnection( const NetworkID& networkID );
+		::Eldritch2::ErrorCode	ProcessAndDispatchCallbacks();
 
-		::Eldritch2::ErrorCode		ProcessAndDispatchCallbacks();
-
-		void						InitiateSteamConnection();
-
-		void						AcknowledgePlayerDisconnection( const NetworkID& networkID );
-
-		void						AcknowledgeClientDisconnection( const ::CSteamID clientID );
+		void					InitiateSteamConnection();
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnSteamServersConnected,		::SteamServersConnected_t,		_steamServersConnected );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnSteamServersConnectFailure,	::SteamServerConnectFailure_t,	_steamServersConnectFailure );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnSteamServersDisconnected,	::SteamServersDisconnected_t,	_steamServersDisconnected );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnP2PSessionRequest,			::P2PSessionRequest_t,			_peerToPeerSessionRequest );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnP2PSessionConnectionFail,	::P2PSessionConnectFail_t,		_peerToPeerSessionConnectFail );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnPolicyResponse,				::GSPolicyResponse_t,			_policyResponse );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnValidateAuthTicketResponse,	::ValidateAuthTicketResponse_t, _gameServerAuthTicketResponse );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnClientGameServerDeny,		::ClientGameServerDeny_t,		_clientGameServerDeny );
-		STEAM_GAMESERVER_CALLBACK( EngineService, OnClientGameServerKick,		::GSClientKick_t,				_clientGameServerKick );
+		::Eldritch2::ChildAllocator									_allocator;
 
-		::Eldritch2::ChildAllocator												_allocator;
+		Utility::ReaderWriterUserMutex*								_networkMutex;
 
-		Utility::ReaderWriterUserMutex*											_networkMutex;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_steamPort;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_gamePort;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_queryPort;
 
-		::std::atomic<int>														_worldIDCounter;
+		Configuration::ConfigurableUTF8String						_versionString;
+		Configuration::ConfigurableUTF8String						_lobbyWorldName;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>				_steamPort;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>				_gamePort;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>				_queryPort;
+		Configuration::ConfigurablePODVariable<bool>				_useVACAuthentication;
+		Configuration::ConfigurablePODVariable<bool>				_useSteamworks;
 
-		Configuration::ConfigurableUTF8String									_versionString;
-		Configuration::ConfigurableUTF8String									_lobbyWorldName;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_replicationUploadBandwidthLimitInKilobytesPerSecond;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_replicationDownloadBandwidthLimitInKilobytesPerSecond;
 
-		Configuration::ConfigurablePODVariable<bool>							_useVACAuthentication;
-		Configuration::ConfigurablePODVariable<bool>							_useSteamworks;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_contentDownloadBandwidthLimitInKilobytesPerSecond;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_contentUploadBandwidthLimitInKilobytesPerSecond;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>				_replicationUploadBandwidthLimitInKilobytesPerSecond;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>				_replicationDownloadBandwidthLimitInKilobytesPerSecond;
+		::Eldritch2::FlatOrderedSet<::CSteamID>						_banList;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>				_contentDownloadBandwidthLimitInKilobytesPerSecond;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>				_contentUploadBandwidthLimitInKilobytesPerSecond;
-
-		::Eldritch2::FlatOrderedSet<::CSteamID>									_banList;
-		::Eldritch2::FlatOrderedMap<NetworkID, Scripting::ObjectHandle<Player>>	_playerDirectory;
-		Scripting::ObjectHandle<Foundation::World>								_lobbyWorld;
+		Scripting::ObjectHandle<Foundation::World>					_lobbyWorld;
 	};
 
 }	// namespace Steamworks

@@ -40,7 +40,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	const ContentLibrary& WorldView::GetEngineContentLibrary() const {
-		return _owningWorld._owningEngine->_contentLibrary;
+		return _owningWorld._owningEngine->GetContentLibrary();
 	}
 
 // ---------------------------------------------------
@@ -64,6 +64,12 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PostScriptTickTaskVisitor ) {
+		// Default implementation should not do anything.
+	}
+
+// ---------------------------------------------------
+
+	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, MessageBus& /*visitor*/ ) {
 		// Default implementation should not do anything.
 	}
 

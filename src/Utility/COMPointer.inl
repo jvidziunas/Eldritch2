@@ -118,6 +118,15 @@ namespace Utility {
 // ---------------------------------------------------
 
 	template <class InterfaceType>
+	ETInlineHint Utility::COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( const Utility::COMPointer<InterfaceType>& other ) {
+		Acquire( other._pointer );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	template <class InterfaceType>
 	template <class CompatibleInterfaceType>
 	ETInlineHint Utility::COMPointer<InterfaceType>& COMPointer<InterfaceType>::operator=( const Utility::COMPointer<CompatibleInterfaceType>& other ) {
 		static_assert( ::std::is_convertible<CompatibleInterfaceType*, InterfaceType*>::value, "COM pointers can only be assigned to compatible types!" );

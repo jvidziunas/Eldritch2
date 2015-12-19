@@ -23,7 +23,9 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	void ReadableMemoryMappedFile::PrefetchRangeForRead( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const {
-		this->PrefetchRangeForRead( Range<const char*>( static_cast<const char*>(GetAddressForFileByteOffset( offsetInBytes )), rangeSizeInBytes ) );
+		const auto	begin( static_cast<const char*>(GetAddressForFileByteOffset( offsetInBytes )) );
+
+		PrefetchRangeForRead( { begin, begin + rangeSizeInBytes } );
 	}
 
 }	// namespace FileSystem

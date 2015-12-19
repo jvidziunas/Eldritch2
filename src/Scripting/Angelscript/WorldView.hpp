@@ -12,21 +12,25 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/AngelScript/SmartPointers.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
 #include <Scripting/ObjectHandle.hpp>
-#include <Scripting/MessageSink.hpp>
+#include <Scripting/MessageBus.hpp>
 #include <Foundation/WorldView.hpp>
-//------------------------------------------------------------------//
-#include <angelscript.h>
-//------------------------------------------------------------------//
-#include <memory>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Scripting {
 		class	ScriptAPIRegistrationInitializationVisitor;
+		class	MessageBus;
 	}
 }
+
+class	asIScriptFunction;
+class	asIScriptContext;
+class	asIScriptObject;
+class	asIScriptEngine;
+class	asIObjectType;
 
 namespace Eldritch2 {
 namespace Scripting {
@@ -36,38 +40,28 @@ namespace AngelScript {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		//!	Deleter for C++ smart pointer objects.
-		struct ScriptObjectDeleter {
-			void	operator()( ::asIScriptObject* const object );
-		};
-
-	// ---
-
-		class MessageSink : public Scripting::MessageSink {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		class MessageBus : public Scripting::MessageBus {
+		// - TYPE PUBLISHING ---------------------------------
 
 		public:
-			//!	Constructs this @ref MessageSink instance.
-			MessageSink() = default;
+			using HandlerCache = ::Eldritch2::UnorderedMap<::Eldritch2::Pair<::asIObjectType*, const char*>, ::asIScriptFunction*>;
 
-			~MessageSink() = default;
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+			//!	Constructs this @ref MessageBus instance.
+			MessageBus() = default;
+
+			~MessageBus() = default;
 
 		// ---------------------------------------------------
 
-			//!	Pops all script messages currently stored in the queue, calling handler functions on the specified script object.
-			/*!	@param[in] scriptObject AngelScript object to execute handler functions on.
+			//!	Pops all script messages currently stored in the queue, calling handler functions on the owned script object.
+			/*!	@param[in] scriptObject Angelscript object that the MessageBus is collecting event notifications for.
 				@param[in] scriptContext AngelScript execution context that will run script code.
 				@remarks Not thread-safe.
 				*/
-			void	Drain( ::asIScriptObject& scriptObject, ::asIScriptContext& scriptContext );
-
-		private:
-			::Eldritch2::IntrusiveVyukovMPSCQueue<Scripting::Message>	_pendingMessages;
+			void	DispatchQueuedMessages( HandlerCache& cache, ::asIScriptObject& scriptObject, ::asIScriptContext& scriptContext );
 		};
-
-	// ---
-
-		using ScriptObjectHandle = ::std::unique_ptr<::asIScriptObject, ScriptObjectDeleter>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -75,6 +69,10 @@ namespace AngelScript {
 		WorldView( Foundation::World& owningWorld, ::asIScriptEngine& scriptEngine );
 
 		~WorldView();
+
+	// ---------------------------------------------------
+
+		AngelScript::ObjectHandle	Spawn( const char* const className );
 
 	// ---------------------------------------------------
 
@@ -95,12 +93,8 @@ namespace AngelScript {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator						_stringAllocator;
-		::asIScriptEngine&								_scriptEngine;
-		
-		ScriptObjectHandle								_gameRulesEntity;
-		::Eldritch2::UnorderedMap<::Eldritch2::uint64,
-								  ScriptObjectHandle>	_entityDispatchTable;
+		::Eldritch2::ChildAllocator	_stringAllocator;
+		::asIScriptEngine&			_scriptEngine;
 	};
 
 }	// namespace AngelScript

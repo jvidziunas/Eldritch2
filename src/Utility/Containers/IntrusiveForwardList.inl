@@ -31,13 +31,12 @@ namespace Eldritch2 {
 
 	template <class StoredObject>
 	ETInlineHint IntrusiveForwardList<StoredObject>::IntrusiveForwardList( ::Eldritch2::IntrusiveForwardList<StoredObject>&& sourceContainer ) {
-		auto&	underlyingContainer( sourceContainer._underlyingContainer );
+		auto&	thisContainer( *this );
 		auto	current( Begin() );
 
-		while( auto* element = underlyingContainer.front() ) {
-			underlyingContainer.pop_front();
-			current = InsertAfter( current, *element );
-		}
+		sourceContainer.ClearAndDispose( [&current, &thisContainer] ( Reference newElement ) {
+			current = thisContainer.InsertAfter( current, newElement );
+		} );
 	}
 
 // ---------------------------------------------------
@@ -216,14 +215,14 @@ namespace Eldritch2 {
 
 	template <class StoredObject>
 	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::Insert( const Iterator location, Reference item ) {
-		return _container.insert( location, item );
+		return _container.insert( location, &item );
 	}
 
 // ---------------------------------------------------
 
 	template <class StoredObject>
 	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::InsertAfter( const Iterator location, Reference item ) {
-		return _container.insert_after( location, item );
+		return _container.insert_after( location, &item );
 	}
 
 // ---------------------------------------------------
@@ -300,8 +299,8 @@ namespace Eldritch2 {
 	template <class StoredObject>
 	template <typename Disposer>
 	ETInlineHint void IntrusiveForwardList<StoredObject>::ClearAndDispose( Disposer disposer ) {
-		for( Iterator current( Begin() ), end( End() ); current != end; ) {
-			current = EraseAndDispose( current, disposer );
+		while( !Empty() ) {
+			PopFrontAndDispose( disposer );
 		}
 	}
 

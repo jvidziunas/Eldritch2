@@ -70,12 +70,8 @@ namespace Scripting {
 
 	template <class Object>
 	template <typename CompatibleObject>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( Scripting::ObjectHandle<CompatibleObject>&& handle ) : ObjectHandle( handle._pointer, ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( Scripting::ObjectHandle<CompatibleObject>&& handle ) : ObjectHandle( handle.Release(), ::Eldritch2::PassthroughReferenceCountingSemantics ) {
 		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
-
-	// ---
-
-		handle._pointer = nullptr;
 	}
 
 // ---------------------------------------------------
@@ -141,6 +137,13 @@ namespace Scripting {
 	template <class Object>
 	ETInlineHint const Object& ObjectHandle<Object>::operator*() const {
 		return *_pointer;
+	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( const Scripting::ObjectHandle<Object>& handle ) {
+		return (*this) = handle._pointer;
 	}
 
 // ---------------------------------------------------

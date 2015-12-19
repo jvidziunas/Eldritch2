@@ -53,12 +53,14 @@ namespace Foundation {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using Property	= ::Eldritch2::UTF8String<>;
+		using PropertyKey			= ::Eldritch2::UTF8String<>;
+		using Property				= ::Eldritch2::UTF8String<>;
+		using PropertyCollection	= ::Eldritch2::UnorderedMap<PropertyKey, Property, ::Eldritch2::StringHash<>>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref World instance.
-		World( Scripting::ObjectHandle<FileSystem::ContentPackage>&& package, Foundation::GameEngine& owningEngine );
+		World( Foundation::GameEngine& owningEngine );
 		//! Constructs this @ref World instance.
 		World( const Foundation::World& ) = delete;
 
@@ -75,13 +77,19 @@ namespace Foundation {
 
 	// - WORLD SIMULATION --------------------------------
 
-		void	QueueUpdateTasks( ::Eldritch2::Allocator& frameTaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& worldUpdatesCompleteTask );
+		::Eldritch2::ErrorCode	BeginContentLoad();
+
+		void					QueueUpdateTasks( ::Eldritch2::Allocator& frameTaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& worldUpdatesCompleteTask );
 
 	// - STATE INSPECTION --------------------------------
 
 		ETInlineHint const FileSystem::ContentPackage&	GetRootPackage() const;
 
-		ETInlineHint ::Eldritch2::ErrorCode				GetLastError() const;
+		ETInlineHint ::Eldritch2::Allocator&			GetAllocator();
+
+		ETInlineHint ::Eldritch2::uint32				EncounteredFatalError() const;
+
+		ETInlineHint void								RaiseFatalError() const;
 
 	// ---------------------------------------------------
 
@@ -91,30 +99,32 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
+		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetMainPackageKey();
+
+	// ---------------------------------------------------
+
 	protected:
 		void	Dispose() override sealed;
 
-		void	DeleteViews();
+		void	Reset();
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		::Eldritch2::ArenaChildAllocator									_allocator;
-		::Eldritch2::ArenaChildAllocator									_viewAllocator;
+		::Eldritch2::ArenaChildAllocator::Checkpoint						_allocationCheckpoint;
 
 		Scripting::ObjectHandle<Foundation::GameEngine>						_owningEngine;
-		Scripting::ObjectHandle<FileSystem::ContentPackage>					_package;
+		Scripting::ObjectHandle<const FileSystem::ContentPackage>			_package;
 
 		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>	_propertyMutex;
-		::Eldritch2::UnorderedMap<::Eldritch2::UTF8String<>,
-								  ::Eldritch2::UTF8String<>,
-								  ::Eldritch2::StringHash<>>				_properties;
+		PropertyCollection													_properties;
 
 		::Eldritch2::uint32													_isPaused : 1;
 		::Eldritch2::uint32													_isLoaded : 1;
 
 		::Eldritch2::IntrusiveForwardList<Foundation::WorldView>			_attachedViews;
-		::Eldritch2::ErrorCode												_lastError;
+		mutable ::std::atomic<::Eldritch2::uint32>							_fatalErrorCount;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

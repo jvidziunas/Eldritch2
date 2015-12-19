@@ -62,30 +62,31 @@ namespace Foundation {
 
 	// - LOGGING -----------------------------------------
 
-		Foundation::Logger&	GetLoggerForMessageType( const Foundation::LogMessageType type );
+		Foundation::Logger&	GetLoggerForMessageType( const Foundation::LogMessageType type ) const;
 
 	// ---------------------------------------------------
+
+		ETInlineHint const FileSystem::ContentLibrary&	GetContentLibrary() const;
+		ETInlineHint FileSystem::ContentLibrary&		GetContentLibrary();
 
 		//! Retrieves a read-only view of the @ref TaskScheduler instance this @ref GameEngine runs threads on.
 		ETInlineHint const Scheduler::TaskScheduler&	GetTaskScheduler() const;
 		//! Retrieves a view of the @ref TaskScheduler instance this @ref GameEngine runs threads on.
 		ETInlineHint Scheduler::TaskScheduler&			GetTaskScheduler();
 
-	// ---------------------------------------------------
-
 		//! Retrieves a read-only view the @ref SystemInterface describing the hardware this @ref GameEngine instance is executing on.
-		ETInlineHint const System::SystemInterface&	GetSystemInterface() const;
+		ETInlineHint const System::SystemInterface&		GetSystemInterface() const;
+
+		ETInlineHint ::Eldritch2::Allocator&			GetAllocator();
 
 	// ---------------------------------------------------
 
 	protected:
-		::Eldritch2::ErrorCode	InstantiateViewsForWorld( ::Eldritch2::Allocator& allocator, Foundation::World& world );
+		size_t	CalculateFrameArenaSizeInBytes() const;
 
-		size_t					CalculateFrameArenaSizeInBytes() const;
+		void	ClearAttachedServices();
 
-		void					ClearAttachedServices();
-
-		void					Dispose() override sealed;
+		void	Dispose() override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -116,30 +117,15 @@ namespace Foundation {
 			void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const WorldTickTaskVisitor ) override sealed;
 		};
 
-	// ---
-
-		struct WorldViewFactory {
-			using FactoryFunctionPointer	= ::Eldritch2::ErrorCode (*)( ::Eldritch2::Allocator&, Foundation::World&, void* );
-
-		// ---------------------------------------------------
-
-			FactoryFunctionPointer	factoryFunction;
-			void*					userParameter;
-		};
-
 	// - DATA MEMBERS ------------------------------------
 
 		::Eldritch2::ChildAllocator											_allocator;
 
-		Foundation::FileAppendingLogger										_logger;
+		mutable Foundation::FileAppendingLogger								_logger;
 		FileSystem::ContentLibrary											_contentLibrary;
 
 		System::SystemInterface&											_systemInterface;
 		Scheduler::TaskScheduler&											_scheduler;
-
-		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>	_attachedServices;
-		::Eldritch2::ResizableArray<WorldViewFactory>						_worldViewFactories;
-		size_t																_worldViewAllocationHintInBytes;
 
 		Configuration::ConfigurablePODVariable<LogMessageType>				_logEchoThreshold;
 		Configuration::ConfigurablePODVariable<size_t>						_taskArenaPerThreadAllocationSizeInBytes;
@@ -147,13 +133,12 @@ namespace Foundation {
 
 		::Eldritch2::IntrusiveVyukovMPSCQueue<Foundation::World>			_tickingWorlds;
 
+		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>	_attachedServices;
 		ManagementService													_managementService;		
 
 	// - FRIEND CLASS DECLARATION ------------------------
 
-		friend class ::Eldritch2::Foundation::WorldViewFactoryPublishingInitializationVisitor;
 		friend class ::Eldritch2::Foundation::GameEngineService;
-		friend class ::Eldritch2::Foundation::WorldView;
 		friend class ::Eldritch2::Foundation::World;
 	};
 

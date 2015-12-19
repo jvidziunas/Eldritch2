@@ -777,9 +777,9 @@ namespace Detail {
 
 		EnsureReferenceTypeDeclared<Native>();
 
-		int	result( _scriptEngine.RegisterObjectBehaviour( UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_ADDREF, "void f()", ::asMETHOD( Native, AddReference ), ::asCALL_THISCALL ) );
+		int	result( _scriptEngine.RegisterObjectBehaviour( UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_ADDREF, "void f()", ::asMETHODPR( Native, AddReference, () const, void ), ::asCALL_THISCALL ) );
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
-		result = _scriptEngine.RegisterObjectBehaviour( UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_RELEASE, "void f()", ::asMETHOD( Native, ReleaseReference ), ::asCALL_THISCALL );
+		result = _scriptEngine.RegisterObjectBehaviour( UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_RELEASE, "void f()", ::asMETHODPR( Native, ReleaseReference, () const, void ), ::asCALL_THISCALL );
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
 		if( auto builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {

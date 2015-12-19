@@ -76,7 +76,7 @@ namespace Win32 {
 															   _allocator( { GetEngineAllocator(), UTF8L("Win32 Input Service Allocator") } ),
 															   _keyboardHook( ::SetWindowsHookEx( WH_KEYBOARD_LL, &WinKeyEatHook, ::GetModuleHandle( nullptr ), 0 ) ),
 															   _deviceDirectoryMutex( GetEngineTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
-															   _deviceDirectory( 0u, ::rde::less<::HANDLE>(), { _allocator, UTF8L("Win32 Raw Input Device Directory Allocator") } ),
+															   _deviceDirectory( 0u, {}, { _allocator, UTF8L( "Win32 Raw Input Device Directory Allocator" ) } ),
 															   _pollingThread( *this ) {
 		ETRuntimeAssert( nullptr != _deviceDirectoryMutex );
 	}
@@ -116,11 +116,13 @@ namespace Win32 {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			// Constructs this InitializeRawInputTask instance.
+			//!	Constructs this @ref InitializeRawInputTask instance.
 			ETInlineHint InitializeRawInputTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeRawInputTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
 																																  _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
+
+			~InitializeRawInputTask() = default;
 
 		// ---------------------------------------------------
 
@@ -167,7 +169,7 @@ namespace Win32 {
 
 			// Fill a temporary array with more detailed information about each device, including its type and an internal handle.
 			if( static_cast<::UINT>(-1) != ::GetRawInputDeviceList( deviceList, &deviceCount, sizeof( ::RAWINPUTDEVICELIST ) ) ) {
-				for( ::RAWINPUTDEVICELIST& device : Range<::RAWINPUTDEVICELIST*>( deviceList, deviceCount ) ) {
+				for( ::RAWINPUTDEVICELIST& device : Range<::RAWINPUTDEVICELIST*>( deviceList, deviceList + deviceCount ) ) {
 					HandleDeviceAttach( device.hDevice );
 				}
 			} else {

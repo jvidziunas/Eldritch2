@@ -137,8 +137,8 @@ namespace Win32 {
 		totalWorkerCount = Max<size_t>( totalWorkerCount, 1u );
 
 		// Allocate a big array of worker thread objects.
-		if( auto workerThreadMemory = ::operator new( totalWorkerCount * sizeof(WorkerThread), _allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION ) ) {
-			_workerThreads = Range<WorkerThread*>( static_cast<WorkerThread*>(workerThreadMemory), totalWorkerCount );
+		if( auto workerThreadMemory = static_cast<WorkerThread*>(::operator new(totalWorkerCount * sizeof( WorkerThread ), _allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION)) ) {
+			_workerThreads = Range<WorkerThread*>( workerThreadMemory, workerThreadMemory + totalWorkerCount );
 
 			for( WorkerThread& workerThread : _workerThreads ) {
 				new(&workerThread) TaskScheduler::WorkerThread( *this );
@@ -242,8 +242,7 @@ namespace Win32 {
 				::InitializeSRWLock( &_lock );
 			}
 
-			//!	Destroys this @ref UserMutex instance.
-			ETForceInlineHint ~UserMutex() = default;
+			~UserMutex() = default;
 
 		// ---------------------------------------------------
 
@@ -427,7 +426,7 @@ namespace Win32 {
 			workerIndex = (workerIndex + 1) % _workerThreads.Size();
 		}
 
-		return _workerThreads[workerIndex];
+		return _workerThreads.first[workerIndex];
 	}
 
 // ---------------------------------------------------

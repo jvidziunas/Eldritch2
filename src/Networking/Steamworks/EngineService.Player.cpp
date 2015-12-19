@@ -18,20 +18,21 @@
 
 using namespace ::Eldritch2::Networking;
 using namespace ::Eldritch2::Foundation;
+using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Networking {
 namespace Steamworks {
 
-	EngineService::Player::Player( const NetworkID& networkID, EngineService& networkingService, Allocator& allocator ) : _name( { allocator, UTF8L("Player Name Allocator") } ),
-																														  _networkingService( networkingService ),
-																														  _networkID( networkID ) {}
+	EngineService::Player::Player( const ObjectHandle<World>& world, EngineService& service, Allocator& allocator ) : _name( { allocator, UTF8L( "Player Name Allocator" ) } ),
+																													  _service( service ),
+																													  _world( world ) {}
 
 // ---------------------------------------------------
 
 	void EngineService::Player::Dispose() {
-		_networkingService._allocator.Delete( *this );
+		_service._allocator.Delete( *this );
 	}
 
 // ---------------------------------------------------

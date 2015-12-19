@@ -38,8 +38,20 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	ETInlineHint ::Eldritch2::ErrorCode World::GetLastError() const {
-		return _lastError;
+	ETInlineHint ::Eldritch2::Allocator& World::GetAllocator() {
+		return _allocator;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint void World::RaiseFatalError() const {
+		_fatalErrorCount.fetch_add( 1u, ::std::memory_order_acq_rel );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ::Eldritch2::uint32 World::EncounteredFatalError() const {
+		return 0u != _fatalErrorCount.load( ::std::memory_order_acquire );
 	}
 
 }	// namespace Foundation

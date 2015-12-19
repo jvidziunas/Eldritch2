@@ -12,11 +12,12 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/ResizableArray.hpp>
+#include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
-#include <Utility/DisposingResult.hpp>
+#include <Packages/ResourceViewFactory.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
+#include <Utility/CountedResult.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 #include <typeinfo>
@@ -47,9 +48,13 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	class ContentLibrary : private Utility::Noncopyable {
+	// - TYPE PUBLISHING ---------------------------------
+		
+	public:
+		using ResourceViewFactoryCollection = ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceViewFactory>;
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
 		//! Constructs this @ref ContentLibrary instance.
 		/*! @param[in] contentProvider @ref ContentProvider that will translate package names into operating system file objects.
 			@param[in] scheduler @ref TaskScheduler instance that will be responsible for running the internal @ref LoaderThread instance.
@@ -65,14 +70,14 @@ namespace FileSystem {
 
 		//! Signals to the @ref ContentLibrary that the resources in the specified package will be needed in the near future.
 		/*! @param[in] packageName A null-terminated C string containing the name of the package file, without any suffix or file extension.
-			@returns A @ref DisposingResult containing the content package, or an @ref ErrorCode indicating why a failure occurred.
+			@returns A @ref CountedResult containing the content package, or an @ref ErrorCode indicating why a failure occurred.
 			@remarks If the desired package is already resident in memory, then a reference to it is added instead.
 			@remarks Thread-safe.
 			@see @ref ContentPackage, @ref CreatePackageForEditorWorld()
 			*/
-		::Eldritch2::DisposingResult<FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
+		::Eldritch2::CountedResult<const FileSystem::ContentPackage>	ResolvePackageByName( const ::Eldritch2::UTF8Char* const packageName );
 
-		::Eldritch2::DisposingResult<FileSystem::ContentPackage>	CreatePackageForEditorWorld();
+		::Eldritch2::CountedResult<const FileSystem::ContentPackage>	CreatePackageForEditorWorld();
 
 	// ---------------------------------------------------
 
@@ -93,33 +98,13 @@ namespace FileSystem {
 			*/
 		ETInlineHint FileSystem::ContentProvider&	GetContentProvider() const;
 
+	// ---------------------------------------------------
+
+		ETInlineHint ::Eldritch2::Range<ResourceViewFactoryCollection::Iterator>	GetFactoriesForResourceType( const ::Eldritch2::UTF8Char* const resourceTypeName );
+
 	// - TYPE PUBLISHING ---------------------------------
 	
 	private:
-		class ResourceViewFactoryKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//! Constructs this @ref ResourceViewFactoryKey instance.
-			/*! @param[in] begin Pointer to the beginning of a C string containing the name of a resource type. Does not have to be null-terminated.
-				@param[in] end Pointer to one past the last character of the string headed by the _begin_ parameter. This does not necessarily have to (but may) point to a null character.
-				*/
-			ETInlineHint ResourceViewFactoryKey( const ::Eldritch2::UTF8Char* const begin, const ::Eldritch2::UTF8Char* const end );
-
-			//! Constructs this @ref ResourceViewFactoryKey instance.
-			ETInlineHint ResourceViewFactoryKey() = default;
-
-		// ---------------------------------------------------
-
-			//! Tests two @ref ResourceViewFactoryKey instances for equality.
-			/*! @param[in] other The second @ref ResourceViewFactoryKey in the comparison.
-				@returns _True_ if the two keys describe the same view type, _false_ if they reference different types.
-				*/
-			ETNoAliasHint bool	operator==( const ResourceViewFactoryKey& other ) const;
-		};
-
-	// ---
-
 		class ResourceViewKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -146,37 +131,30 @@ namespace FileSystem {
 			ETInlineHint ETNoAliasHint bool	operator==( const ResourceViewKey& other ) const;
 		};
 
-	// ---
-
-		using ResourceViewFactory = ::Eldritch2::Pair<::Eldritch2::InstancePointer<FileSystem::ResourceView> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* ), void*>;
-
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator													_allocator;
-		::Eldritch2::ChildAllocator													_deserializationContextAllocator;
-		FileSystem::ContentProvider&												_contentProvider;
+		::Eldritch2::ChildAllocator																_allocator;
+		::Eldritch2::ChildAllocator																_deserializationContextAllocator;
+		FileSystem::ContentProvider&															_contentProvider;
 		
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>			_contentPackageCollectionMutex;
-
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>						_contentPackageDirectoryMutex;
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>			_resourceViewCollectionMutex;		
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>						_resourceViewDirectoryMutex;		
 
-		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*,
-								  FileSystem::ContentPackage*>						_contentPackageCollection;
+		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*>	_contentPackageDirectory;
+		::Eldritch2::UnorderedMap<ResourceViewKey, const FileSystem::ResourceView*>				_resourceViewDirectory;
+		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, ResourceViewFactoryCollection>	_resourceFactoryDirectory;
 
-		//! The value type is left as a void* to prevent slicing for resource views that use multiple inheritance.
-		::Eldritch2::UnorderedMap<ResourceViewKey, const void*>						_resourceViewCollection;
+		ResourceViewFactoryCollection															_nullFactoryCollection;
 
-		::Eldritch2::UnorderedMap<ResourceViewFactoryKey,
-								  ::Eldritch2::ResizableArray<ResourceViewFactory>>	_resourceViewFactoryCollection;
-
-		FileSystem::LoaderThread*													_loaderThread;
+		FileSystem::LoaderThread*																_loaderThread;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 
 		friend class ::Eldritch2::FileSystem::ResourceViewFactoryPublishingInitializationVisitor;
-		friend class ::Eldritch2::FileSystem::PackageDeserializationContext;
+		friend class ::Eldritch2::FileSystem::ContentPackage;
+		friend class ::Eldritch2::FileSystem::ResourceView;
 	};
 
 }	// namespace FileSystem

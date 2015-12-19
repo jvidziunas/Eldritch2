@@ -18,15 +18,15 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	ETInlineHint void ReferenceTypeBase::AddReference() {
+	ETInlineHint void ReferenceTypeBase::AddReference() const {
 		_referenceCount.fetch_add( 1u, ::std::memory_order_acquire );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint void ReferenceTypeBase::ReleaseReference() {
+	ETInlineHint void ReferenceTypeBase::ReleaseReference() const {
 		if( 1u == _referenceCount.fetch_sub( 1u, ::std::memory_order_release ) ) {
-			this->Dispose();
+			const_cast<ReferenceTypeBase*>(this)->Dispose();
 		}
 	}
 

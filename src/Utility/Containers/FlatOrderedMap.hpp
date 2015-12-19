@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
+#include <Utility/Less.hpp>
 #include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
 #include <rdestl/functional.h>
@@ -21,7 +22,7 @@
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class OrderingPredicate = ::rde::less<Key>, class Allocator = ::Eldritch2::ChildAllocator>
+	template <typename Key, typename StoredObject, class OrderingPredicate = ::Eldritch2::Less<Key>, class Allocator = ::Eldritch2::ChildAllocator>
 	class FlatOrderedMap : private ::Eldritch2::ResizableArray<::Eldritch2::Pair<Key, StoredObject>, Allocator> {
 	// - TYPE PUBLISHING ---------------------------------
 

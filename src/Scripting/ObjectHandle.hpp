@@ -59,6 +59,7 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
+		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( const Scripting::ObjectHandle<Object>& handle );
 		template <typename CompatibleObject>
 		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( const Scripting::ObjectHandle<CompatibleObject>& handle );
 		template <typename CompatibleObject>

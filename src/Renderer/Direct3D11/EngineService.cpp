@@ -14,7 +14,6 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
-#include <Foundation/WorldViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/Builders/DeviceBuilder.hpp>
@@ -62,10 +61,6 @@ namespace Renderer {
 namespace Direct3D11 {
 
 	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-															   _MSAACount( 1u ),
-															   _MSAAQuality( 0u ),
-															   _adaptiveResolutionMaxAreaFraction( 1.0f ),
-															   _adaptiveResolutionMinAreaFraction( 0.25f ),
 									 						   _VSyncMode( 0u ),
 															   _preferredAdapterName( GetEngineAllocator() ),
 															   _forceDebugRuntime( false ),
@@ -77,6 +72,12 @@ namespace Direct3D11 {
 
 	const UTF8Char* const EngineService::GetName() const {
 		return UTF8L("Direct3D11 Renderer");
+	}
+
+// ---------------------------------------------------
+
+	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
+		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
 	}
 
 // ---------------------------------------------------
@@ -108,9 +109,12 @@ namespace Direct3D11 {
 	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
 		visitor.PushSection( UTF8L("Direct3D11") );
 
-		visitor.Register( UTF8L("VSyncMode"), _VSyncMode ).Register( UTF8L("PreferredAdapterName"), _preferredAdapterName ).Register( UTF8L("ForceDebugRuntime"), _forceDebugRuntime );
-		visitor.Register( UTF8L("MSAASamplesPerPixel"), _MSAACount ).Register( UTF8L("MSAAQualityLevel"), _MSAAQuality ).Register( UTF8L("MaximumFramesToRenderAhead"), _maximumFramesToRenderAhead );
-		visitor.Register( UTF8L("MaximumAdaptiveResolutionScreenFraction"), _adaptiveResolutionMaxAreaFraction ).Register( UTF8L("MinimumAdaptiveResolutionScreenFraction"), _adaptiveResolutionMinAreaFraction );
+		visitor.Register( UTF8L("VSyncMode"), _VSyncMode ).Register( UTF8L("PreferredAdapterName"), _preferredAdapterName )
+			   .Register( UTF8L("ForceDebugRuntime"), _forceDebugRuntime ).Register( UTF8L("MaximumFramesToRenderAhead"), _maximumFramesToRenderAhead );
+
+		_shaderResourceViewFactory.AcceptInitializationVisitor( visitor );
+		_meshResourceViewFactory.AcceptInitializationVisitor( visitor );
+		_pipelineViewFactory.AcceptInitializationVisitor( visitor );
 	}
 
 // ---------------------------------------------------
@@ -125,8 +129,7 @@ namespace Direct3D11 {
 				TrySchedulingOnContext( executingContext );
 			}
 
-			// Destroys this @ref CreateDeviceTask instance.
-			ETInlineHint ~CreateDeviceTask() = default;
+			~CreateDeviceTask() = default;
 
 		// ---------------------------------------------------
 
@@ -154,27 +157,9 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		using AllocationOption	= Allocator::AllocationOption;
-
-	// ---
-
-		visitor.PublishFactory( MeshResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) {
-			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) MeshResourceView( name, allocator ), { allocator } );
-		} )
-		.PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* renderer ) {
-			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) HLSLPipelineDefinitionView( static_cast<EngineService*>(renderer)->_device, name, allocator ), { allocator } );
-		} )
-		.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*renderer*/ ) {
-			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( name, allocator ), { allocator } );
-		} );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( this, sizeof(WorldView), [] ( Allocator& allocator, World& world, void* renderer ) -> ErrorCode {
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(renderer)->_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
-		} );
+		visitor.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), _shaderResourceViewFactory )
+			   .PublishFactory( MeshResourceView::GetSerializedDataTag(), _meshResourceViewFactory )
+			   .PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), _pipelineViewFactory );
 	}
 
 // ---------------------------------------------------
@@ -188,10 +173,12 @@ namespace Direct3D11 {
 		deviceBuilder.SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled().SetDriverThreadingOptimizationsEnabled( _allowDriverThreadingOptimizations );
 		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.GetCharacterArray() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
 
-		if( auto device = deviceBuilder.Build() ) {
+		if( const auto device = deviceBuilder.Build() ) {
 			GetLogger()( UTF8L("Constructed Direct3D device successfully.") ET_UTF8_NEWLINE_LITERAL );
 
-			_device	= move( device );
+			_shaderResourceViewFactory.SetDevice( device );
+			_meshResourceViewFactory.SetDevice( device );
+			_pipelineViewFactory.SetDevice( device );
 		} else {
 			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to instantiate Direct3D!.") ET_UTF8_NEWLINE_LITERAL );
 		}

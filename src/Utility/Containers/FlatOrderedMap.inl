@@ -95,7 +95,7 @@ namespace Eldritch2 {
 	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key ) {
 		auto	location( LowerBound( key ) );
 
-		if( location != this->End() && GetOrderingPredicate()(key, location->first) ) {
+		if( location != this->End() && GetOrderingPredicate()(location->first, key) ) {
 			location = this->End();
 		}
 
@@ -108,7 +108,7 @@ namespace Eldritch2 {
 	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::ConstIterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key ) const {
 		auto	location( LowerBound( key ) );
 
-		if( location != this->End() && GetOrderingPredicate()(key, location->first) ) {
+		if( location != this->End() && GetOrderingPredicate()(location->first, key) ) {
 			location = this->End();
 		}
 
@@ -122,7 +122,7 @@ namespace Eldritch2 {
 		auto	location( LowerBound( key ) );
 
 		if( location != this->End() ) {
-			return GetOrderingPredicate()(key, location->first) ? defaultValue : location->second;
+			return GetOrderingPredicate()(location->first, key) ? defaultValue : location->second;
 		}
 
 		return defaultValue;
@@ -135,7 +135,7 @@ namespace Eldritch2 {
 		auto	location( LowerBound( key ) );
 
 		if( location != this->End() ) {
-			return GetOrderingPredicate()(key, location->first) ? defaultValue : location->second;
+			return GetOrderingPredicate()(location->first, key) ? defaultValue : location->second;
 		}
 
 		return defaultValue;

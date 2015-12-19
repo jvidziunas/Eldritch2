@@ -57,7 +57,6 @@ namespace Foundation {
 		//!	Constructs this @ref Player instance.
 		ETInlineHint Player() = default;
 
-		//!	Destroys this @ref Player instance.
 		ETInlineHint ~Player() = default;
 	};
 

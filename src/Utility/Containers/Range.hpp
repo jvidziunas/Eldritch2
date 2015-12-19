@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/MPL/Compiler.hpp>
-//------------------------------------------------------------------//
-#include <iterator>
+#include <type_traits>
+#include <utility>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -25,16 +25,13 @@ namespace Eldritch2 {
 
 	public:
 		using IteratorType	= Iterator;
-		using ValueType		= typename ::std::iterator_traits<Iterator>::value_type;
-		using Reference		= typename ::std::iterator_traits<Iterator>::reference;
-		using DistanceType	= typename ::std::iterator_traits<Iterator>::distance_type;
+		using Reference		= decltype(*::std::declval<Iterator>());
+		using ValueType		= typename ::std::remove_reference<Reference>::type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref Range instance.
 		ETForceInlineHint Range( Iterator rangeBegin, Iterator rangeEnd );
-		//! Constructs this @ref Range instance.
-		ETForceInlineHint Range( Iterator rangeBegin, const DistanceType rangeSizeInElements );
 		//! Constructs this @ref Range instance.
 		ETForceInlineHint Range( const ::Eldritch2::Range<Iterator>& rangeTemplate );
 
@@ -71,16 +68,12 @@ namespace Eldritch2 {
 	// ---------------------------------------------------
 
 		//! Checks to see if this @ref Range contains any elements (begin and end do not point to the same element)
-		ETForceInlineHint operator bool() const;
+		ETForceInlineHint operator	bool() const;
 
 		//! Checks to see if this @ref Range is the empty set (begin and end point to the same element)
-		ETForceInlineHint bool IsEmpty() const;
+		ETForceInlineHint bool		IsEmpty() const;
 
-		ETForceInlineHint DistanceType	Size() const;
-
-	// ---------------------------------------------------
-
-		ETForceInlineHint Reference	operator[]( DistanceType offset ) const;
+		ETForceInlineHint size_t	Size() const;
 
 	// ---------------------------------------------------
 

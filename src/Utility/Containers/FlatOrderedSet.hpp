@@ -13,14 +13,13 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
-//------------------------------------------------------------------//
-#include <rdestl/functional.h>
-#include <rdestl/pair.h>
+#include <Utility/Less.hpp>
+#include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, class OrderingPredicate = ::rde::less<StoredObject>, class Allocator = ::Eldritch2::ChildAllocator>
+	template <typename StoredObject, class OrderingPredicate = ::Eldritch2::Less<StoredObject>, class Allocator = ::Eldritch2::ChildAllocator>
 	class FlatOrderedSet : private ::Eldritch2::ResizableArray<StoredObject, Allocator> {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -33,7 +32,7 @@ namespace Eldritch2 {
 		using UnderlyingContainer::AllocatorType;
 		using UnderlyingContainer::Iterator;
 		using UnderlyingContainer::ConstIterator;
-		using InsertResult							= ::rde::pair<Iterator, bool>;
+		using InsertResult							= ::Eldritch2::Pair<Iterator, bool>;
 		using UnderlyingContainer::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

@@ -13,17 +13,26 @@
 // INCLUDES
 //==================================================================//
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Foundation/WorldViewFactoryPublishingInitializationVisitor.hpp>
 #include <Networking/Steamworks/EngineService.hpp>
 #include <Networking/Steamworks/WorldView.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Scheduler/TaskScheduler.hpp>
-#include <Utility/DisposingResult.hpp>
+#include <Utility/CountedResult.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/Result.hpp>
 #include <Build.hpp>
+//------------------------------------------------------------------//
+#if( ET_COMPILER_IS_MSVC )
+//	Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
+#	pragma warning( push )
+#	pragma warning( disable : 6340 )
+#endif
+#include <steam_api.h>
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -48,18 +57,8 @@ namespace Networking {
 namespace Steamworks {
 
 	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-															   _steamServersConnected( this, &EngineService::OnSteamServersConnected ),
-															   _steamServersConnectFailure( this, &EngineService::OnSteamServersConnectFailure ),
-															   _steamServersDisconnected( this, &EngineService::OnSteamServersDisconnected ),
-															   _peerToPeerSessionRequest( this, &EngineService::OnP2PSessionRequest ),
-															   _peerToPeerSessionConnectFail( this, &EngineService::OnP2PSessionConnectionFail ),
-															   _policyResponse( this, &EngineService::OnPolicyResponse ),
-															   _gameServerAuthTicketResponse( this, &EngineService::OnValidateAuthTicketResponse ),
-															   _clientGameServerDeny( this, &EngineService::OnClientGameServerDeny ),
-															   _clientGameServerKick( this, &EngineService::OnClientGameServerKick ),
 															   _allocator( GetEngineAllocator(), UTF8L("Steamworks Networking Service Root Allocator") ),
 															   _networkMutex( owningEngine.GetTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
-															   _worldIDCounter( 1u ),
 															   _steamPort( 6690u ),
 															   _gamePort( 6691u ),
 															   _queryPort( 6692u ),
@@ -71,23 +70,11 @@ namespace Steamworks {
 															   _replicationDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
 															   _contentDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
 															   _contentUploadBandwidthLimitInKilobytesPerSecond( 1024u ),
-															   _banList( { _allocator, UTF8L("Steamworks Ban List Allocator") } ),
-															   _playerDirectory( { _allocator, UTF8L("Steamworks Player Directory Allocator") } ) {}
+															   _banList( { _allocator, UTF8L("Steamworks Ban List Allocator") } ) {}
 
 // ---------------------------------------------------
 
 	EngineService::~EngineService() {
-		_playerDirectory.Clear();
-
-		if( ::SteamGameServer() ) {
-			if( ::SteamGameServer()->BLoggedOn() ) {
-				::SteamGameServer()->LogOff();
-			}
-
-			::SteamGameServer()->EnableHeartbeats( false );
-			::SteamGameServer_Shutdown();
-		}
-		
 		::SteamAPI_Shutdown();
 
 		if( _networkMutex ) {
@@ -103,24 +90,8 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	bool EngineService::TryRecievePacket( const int channelID, ::CSteamID& senderID, char (&packetBuffer)[NETWORK_MTU_SIZE] ) {
-		ScopedLock	_( *_networkMutex );
-
-		return ::SteamGameServerNetworking()->ReadP2PPacket( packetBuffer, static_cast<uint32>(sizeof(packetBuffer)), nullptr, &senderID, channelID );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::TrySendPacket( const int channelID, const ::CSteamID destinationID, void* const packetBuffer, const size_t packetSizeInBytes ) {
-		::SteamNetworking()->SendP2PPacket( destinationID, packetBuffer, static_cast<uint32>(packetSizeInBytes), k_EP2PSendUnreliableNoDelay, channelID );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::CloseReplicationOnChannel( const int channelID ) {
-		ScopedLock	_( *_networkMutex );
-
-		// ::SteamGameServerNetworking()->CloseP2PChannelWithUser( channelID );
+	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
+		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( *this, world ) ? Error::NONE : Error::OUT_OF_MEMORY;
 	}
 
 // ---------------------------------------------------
@@ -145,22 +116,10 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( this, sizeof(WorldView), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
-			auto&	networkingService( *static_cast<EngineService*>(parameter) );
-			auto	networkID( networkingService._worldIDCounter.fetch_add( 1u, memory_order_acquire ) );
-
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( networkingService, networkID, world ) ? Error::NONE : Error::OUT_OF_MEMORY;
-		} );
-	}
-
-// ---------------------------------------------------
-
 	void EngineService::AcceptInitializationVisitor( const PostInitializationVisitor ) {
-		auto	createPlayerResult( AcknowledgePlayerConnection( NetworkID( ::SteamUser()->GetSteamID(), 0u ) ) );
-		auto	createLobbyWorldResult( _lobbyWorldName ? CreateWorld( _lobbyWorldName.GetCharacterArray() ) : CreateEditorWorld() );
+		// auto	createPlayerResult( AcknowledgePlayerConnection( { ::SteamUser()->GetSteamID(), 0u } ) );
 
-		if( createPlayerResult && createLobbyWorldResult ) {
+		if( auto createLobbyWorldResult = CreateWorld( _lobbyWorldName.GetCharacterArray() ) ) {
 			_lobbyWorld = move( createLobbyWorldResult.object );
 		}
 	}
@@ -170,10 +129,10 @@ namespace Steamworks {
 	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& postConfigurationLoadInitializationTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
 		class InitializeSteamworksTask : public CRTPTransientTask<InitializeSteamworksTask> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		public:
 			//!	Constructs this @ref InitializeSteamworksTask instance.
-			ETInlineHint InitializeSteamworksTask( EngineService& host, Task& postConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeSteamworksTask>( postConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ),
-																																										 _host( host ) {
+			ETInlineHint InitializeSteamworksTask( EngineService& host, Task& postConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeSteamworksTask>( postConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -209,8 +168,7 @@ namespace Steamworks {
 
 		public:
 			//!	Constructs this @ref ProcessCallbacksTask instance.
-			ETInlineHint ProcessCallbacksTask( EngineService& host, Task& serviceTickTask, WorkerContext& executingContext ) : CRTPTransientTask<ProcessCallbacksTask>( serviceTickTask, Scheduler::CodependentTaskSemantics ),
-																																			 _host( host ) {
+			ETInlineHint ProcessCallbacksTask( EngineService& host, Task& serviceTickTask, WorkerContext& executingContext ) : CRTPTransientTask<ProcessCallbacksTask>( serviceTickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
@@ -246,11 +204,6 @@ namespace Steamworks {
 
 		// Attempt to establish a connection with the Steam master servers.
 		if( ::SteamAPI_Init() ) {
-			if( _useSteamworks && ::SteamGameServer_Init( serverAddress, _steamPort, _gamePort, _queryPort, serverMode, _versionString.GetCharacterArray() ) ) {
-				::SteamGameServer()->SetProduct( UTF8_PROJECT_NAME );
-				::SteamGameServer()->SetGameDescription( UTF8_PROJECT_NAME );
-			}
-
 			GetLogger()( UTF8L("Initial Steam connection established.") ET_UTF8_NEWLINE_LITERAL );
 		} else {
 			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
@@ -259,127 +212,11 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	Result<EngineService::Player> EngineService::AcknowledgePlayerConnection( const NetworkID& networkID ) {
-		const auto	candidate( _playerDirectory.Find( networkID ) );
-
-		if( candidate == _playerDirectory.End() ) {
-			GetLogger()( UTF8L("Player {%llu:%i} connected.") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
-
-			if( auto player = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) Player( networkID, *this, _allocator ) ) {
-				_playerDirectory.Insert( { networkID, ObjectHandle<Player>( *player, ::Eldritch2::PassthroughReferenceCountingSemantics ) } );
-				
-				return { move( player ) };
-			}
-
-			return { Error::OUT_OF_MEMORY };
-		} else {
-			GetLogger( LogMessageType::WARNING )( UTF8L("Received duplicate player join notification for player {%llu:%i}!)") ET_UTF8_NEWLINE_LITERAL, networkID.first.ConvertToUint64(), networkID.second );
-			
-			return { candidate->second };
-		}
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::AcknowledgePlayerDisconnection( const NetworkID& networkID ) {
-		_playerDirectory.Erase( networkID );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::AcknowledgeClientDisconnection( const ::CSteamID clientID ) {
-		using PlayerDirectory = decltype(_playerDirectory);
-
-	// ---
-
-		_playerDirectory.Erase( _playerDirectory.RemoveIf( [clientID] ( const PlayerDirectory::ValueType& client ) { return client.first.first == clientID; } ), _playerDirectory.End() );
-	}
-
-// ---------------------------------------------------
-
 	ErrorCode EngineService::ProcessAndDispatchCallbacks() {
-		enum : int {
-			REPLICATION_CHANNEL	= 0
-		};
-
-	// ---
-
 		::SteamAPI_RunCallbacks();
-
-		if( nullptr != ::SteamGameServerNetworking() ) {
-			::CSteamID	senderID;
-			char		packetBuffer[NETWORK_MTU_SIZE];
-
-			::SteamGameServer_RunCallbacks();
-
-			// Read all player update data
-			while( TryRecievePacket( REPLICATION_CHANNEL, senderID, packetBuffer ) ) {
-
-			}
-		}
+		::SteamGameServer_RunCallbacks();
 
 		return Error::NONE;
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnSteamServersConnected( ::SteamServersConnected_t* /*connectionParameters*/ ) {
-		GetLogger()( UTF8L("Steam connection re-established.") ET_UTF8_NEWLINE_LITERAL );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnSteamServersConnectFailure( ::SteamServerConnectFailure_t* /*connectionFailureParameters*/ ) {}
-
-// ---------------------------------------------------
-
-	void EngineService::OnSteamServersDisconnected( ::SteamServersDisconnected_t* /*disconnectionParameters*/ ) {
-		GetLogger( LogMessageType::ERROR )( UTF8L("Disconnected from Steam servers!") ET_UTF8_NEWLINE_LITERAL );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnP2PSessionRequest( ::P2PSessionRequest_t* requestedConnection ) {
-		const ::CSteamID	accountID( requestedConnection->m_steamIDRemote );
-
-		if( !_banList.Contains( accountID ) ) {
-			::SteamGameServerNetworking()->AcceptP2PSessionWithUser( accountID );
-		}
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnP2PSessionConnectionFail( ::P2PSessionConnectFail_t* failedConnection ) {
-		static const UTF8Char* const	disconnectionReasonStrings[::EP2PSessionError::k_EP2PSessionErrorMax] = {
-			UTF8L( "" ),
-			UTF8L( ": Player not running same application" ),
-			UTF8L( ": Local player does not have permission to run the application" ),
-			UTF8L( ": Remote player not logged in to Steam" ),
-			UTF8L( ": Connection timeout/blocked" )
-		};
-		
-		GetLogger( LogMessageType::ERROR )( UTF8L("Dropped connection to client %llu%s.") ET_UTF8_NEWLINE_LITERAL, failedConnection->m_steamIDRemote.ConvertToUint64(), disconnectionReasonStrings[failedConnection->m_eP2PSessionError] );
-
-		AcknowledgeClientDisconnection( failedConnection->m_steamIDRemote );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnPolicyResponse( ::GSPolicyResponse_t* ) {}
-
-// ---------------------------------------------------
-
-	void EngineService::OnValidateAuthTicketResponse( ::ValidateAuthTicketResponse_t* /*pParam*/ ) {}
-
-// ---------------------------------------------------
-
-	void EngineService::OnClientGameServerDeny( ::ClientGameServerDeny_t* ) {}
-
-// ---------------------------------------------------
-
-	void EngineService::OnClientGameServerKick( ::GSClientKick_t* kickedClient ) {
-		// EDenyReason m_eDenyReason;
-		AcknowledgeClientDisconnection( kickedClient->m_SteamID );
 	}
 
 }	// namespace Steamworks

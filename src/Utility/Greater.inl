@@ -1,5 +1,5 @@
 /*==================================================================*\
-  MessageSink.hpp
+  Greater.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,25 +12,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/Compiler.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
 
-	class MessageSink {
-	public:
-		void	SendMessage();
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	template <typename T>
+	ETInlineHint bool Greater<T>::operator()( const T& object0, const T& object1 ) const {
+		return object0 > object1;
+	}
 
-	protected:
-		//!	Constructs this @ref MessageSink instance.
-		MessageSink() = default;
-
-		//!	Destroys this @ref MessageSink instance.
-		~MessageSink() = default;
-	};
-
-}	// namespace Scripting
 }	// namespace Eldritch2
 

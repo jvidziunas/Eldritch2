@@ -113,7 +113,7 @@ namespace Direct3D11 {
 		};
 
 		COMPointer<::IDXGIAdapter1>	adapter;
-		::ID3D11Device*				device( nullptr );
+		COMPointer<::ID3D11Device>	device;
 
 		if( (nullptr != _adapterName) && !EqualityCompareString( _adapterName, UTF8L("") ) ) {
 			COMPointer<::IDXGIAdapter1>	temporaryAdapter;
@@ -127,7 +127,7 @@ namespace Direct3D11 {
 			}
 		}
 
-		if( SUCCEEDED( ::D3D11CreateDevice( adapter.GetUnadornedPointer(), ::D3D_DRIVER_TYPE_HARDWARE, nullptr, _deviceFlags, featureLevels, _countof(featureLevels), D3D11_SDK_VERSION, &device, nullptr, nullptr ) ) ) {
+		if( SUCCEEDED( ::D3D11CreateDevice( adapter.GetUnadornedPointer(), ::D3D_DRIVER_TYPE_HARDWARE, nullptr, _deviceFlags, featureLevels, _countof(featureLevels), D3D11_SDK_VERSION, device.GetInterfacePointer(), nullptr, nullptr ) ) ) {
 			COMPointer<::IDXGIDevice1>	infrastructureDevice;
 
 			// If the device supports the command, attempt to cap the render-ahead to the previously-specified amount.
@@ -138,7 +138,7 @@ namespace Direct3D11 {
 			}
 		}
 
-		return { device, ::Eldritch2::PassthroughReferenceCountingSemantics };
+		return ::std::move( device );
 	}
 
 }	// namespace Direct3D11

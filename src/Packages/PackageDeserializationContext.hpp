@@ -15,6 +15,7 @@
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ObjectHandle.hpp>
+#include <Utility/Result.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -22,10 +23,6 @@ namespace Eldritch2 {
 		class	ReadableMemoryMappedFile;
 		class	ContentPackage;
 		class	ContentLibrary;
-	}
-
-	namespace Utility {
-		class	ScopedLock;
 	}
 
 	class	ErrorCode;
@@ -42,7 +39,7 @@ namespace FileSystem {
 		/*!	@param[in] package Movable object handle to the @ref ContentPackage this @ref PackageDeserializationContext will be deserializing.
 			@remarks The @ref PackageDeserializationContext will continue to hold a reference to the @ref ContentPackage while in scope.
 			*/
-		PackageDeserializationContext( Scripting::ObjectHandle<FileSystem::ContentPackage>&& package );
+		PackageDeserializationContext( const Scripting::ObjectHandle<FileSystem::ContentPackage>& package );
 	
 		//! Destroys this @ref PackageDeserializationContext instance.
 		~PackageDeserializationContext();
@@ -67,6 +64,10 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
+		::Eldritch2::Result<FileSystem::ReadableMemoryMappedFile>	CreateBackingFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const suffix );
+
+	// ---------------------------------------------------
+
 		//!	Gets the @ref ContentPackage instance this @ref DeserializerContext is responsible for deserializing.
 		/*!	@returns A const reference to the @ref ContentPackage instance this @ref DeserializerContext is deserializing.
 			@remarks Thread-safe.
@@ -84,7 +85,7 @@ namespace FileSystem {
 		/*!	@returns The @ref ContentLibrary the @ref PackageDeserializationContext is publishing content to.
 			@remarks Thread-safe.
 			*/
-		FileSystem::ContentLibrary&						GetContentLibrary() const;
+		FileSystem::ContentLibrary&						GetContentLibrary();
 
 	// - DATA MEMBERS ------------------------------------
 

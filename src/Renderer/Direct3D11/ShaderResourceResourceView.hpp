@@ -38,9 +38,8 @@ namespace Direct3D11 {
 
 	public:
 		//! Constructs this @ref ShaderResourceResourceView instance.
-		ShaderResourceResourceView( const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		ShaderResourceResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
-		//! Destroys this @ref ShaderResourceResourceView instance.
 		~ShaderResourceResourceView() = default;
 
 	// ---------------------------------------------------

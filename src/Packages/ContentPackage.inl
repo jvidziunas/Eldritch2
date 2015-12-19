@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -18,14 +18,38 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ETInlineHint const ::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>& ContentPackage::GetReferencedPackageCollection() const {
+	ETInlineHint const ContentPackage::DependencyCollection& ContentPackage::GetDependencies() const {
 		return _referencedPackages;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint const ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceView>& ContentPackage::GetExportedResourceCollection() const {
+	ETInlineHint ContentPackage::DependencyCollection& ContentPackage::GetDependencies() {
+		return _referencedPackages;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint const ContentPackage::ExportCollection& ContentPackage::GetExports() const {
 		return _exportedResources;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ContentPackage::ExportCollection& ContentPackage::GetExports() {
+		return _exportedResources;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint const FileSystem::ContentLibrary& ContentPackage::GetContentLibrary() const {
+		return _owningLibrary;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint FileSystem::ContentLibrary& ContentPackage::GetContentLibrary() {
+		return _owningLibrary;
 	}
 
 // ---------------------------------------------------
@@ -42,20 +66,8 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint ::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>& ContentPackage::GetDependencies() {
-		return _referencedPackages;
-	}
-
-// ---------------------------------------------------
-
 	ETInlineHint::Eldritch2::Allocator& ContentPackage::GetAllocator() {
 		return _allocator;
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint FileSystem::ContentLibrary& ContentPackage::GetLibrary() const {
-		return _owningLibrary;
 	}
 
 // ---------------------------------------------------

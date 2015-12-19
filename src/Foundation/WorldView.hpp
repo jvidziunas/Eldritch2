@@ -22,6 +22,10 @@ namespace Eldritch2 {
 		class	World;
 	}
 
+	namespace Scripting {
+		class	MessageBus;
+	}
+
 	namespace FileSystem {
 		class	ContentLibrary;
 	}
@@ -56,6 +60,7 @@ namespace Foundation {
 		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PreScriptTickTaskVisitor );
 		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const ScriptTickTaskVisitor );
 		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PostScriptTickTaskVisitor );
+		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, Scripting::MessageBus& visitor );
 
 	// ---------------------------------------------------
 
@@ -75,30 +80,35 @@ namespace Foundation {
 	// - WORLD VIEW SANDBOX METHODS ----------------------
 
 		//!	Retrieves a read-only view of the hosting @ref World.
-		/*!	 @returns A const reference to the owning @ref World.
+		/*!	@returns A const reference to the owning @ref World.
+			@threadsafe
 			*/
 		ETInlineHint const Foundation::World&	GetOwningWorld() const;
 
 		//!	Retrieves the hosting game engine's @ref ContentLibrary.
 		/*!	@returns A const reference to the @ref ContentLibrary used by the @ref GameEngine that owns *this.
+			@threadsafe
 			*/
 		const FileSystem::ContentLibrary&		GetEngineContentLibrary() const;
 
 		//!	Retrieves the hosting world's general-purpose @ref Allocator.
+		/*!	@threadsafe
+			*/
 		::Eldritch2::Allocator&					GetWorldAllocator();
 
 		//!	Notifies the @ref World that the view is interested in pausing simulation.
+		/*!	@threadsafe
+			*/
 		void									SetPaused( bool paused = true );
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref WorldView instance.
-		/*!	@param[in] owningWorld <Parameter Description>
+		/*!	@param[in] owningWorld @ref World instance responsible for this @ref WorldView.
 			*/
 		WorldView( Foundation::World& owningWorld );
 
 	public:
-		//!	Destroys this @ref WorldView instance.
 		virtual ~WorldView() = default;
 	
 	// - DATA MEMBERS ------------------------------------

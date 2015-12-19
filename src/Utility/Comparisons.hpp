@@ -1,5 +1,5 @@
 /*==================================================================*\
-  DisposingResult.hpp
+  Comparisons.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,13 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ObjectHandle.hpp>
-#include <Utility/ResultBase.hpp>
+#include <Utility/Greater.hpp>
+#include <Utility/Equals.hpp>
+#include <Utility/Less.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-
-	template <typename ResultObject>
-	using DisposingResult	= Detail::ResultBase<Scripting::ObjectHandle<ResultObject>>;
-
-}	// namespace Eldritch2

@@ -55,8 +55,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	HLSLPipelineDefinitionView::HLSLPipelineDefinitionView( const COMPointer<::ID3D11Device>& device, const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ),
-																																						   _device( device ) {}
+	HLSLPipelineDefinitionView::HLSLPipelineDefinitionView( const COMPointer<::ID3D11Device>& device, ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ), _device( device ) {}
 
 // ---------------------------------------------------
 

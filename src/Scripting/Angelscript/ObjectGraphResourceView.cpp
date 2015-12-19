@@ -27,7 +27,7 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	ObjectGraphResourceView::ObjectGraphResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ) {}
+	ObjectGraphResourceView::ObjectGraphResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
 
 // ---------------------------------------------------
 

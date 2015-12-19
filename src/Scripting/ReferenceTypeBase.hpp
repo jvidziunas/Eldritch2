@@ -26,9 +26,9 @@ namespace Scripting {
 	public:
 		ETInlineHint size_t	GetReferenceCount() const;
 
-		ETInlineHint void	AddReference();
+		ETInlineHint void	AddReference() const;
 
-		ETInlineHint void	ReleaseReference();
+		ETInlineHint void	ReleaseReference() const;
 
 		virtual void		Dispose() abstract;
 

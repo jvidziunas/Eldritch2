@@ -18,13 +18,17 @@
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 
+using namespace ::Eldritch2::FileSystem;
+using namespace ::Eldritch2::Physics;
+using namespace ::Eldritch2;
+
 namespace Eldritch2 {
 namespace Physics {
 namespace BulletDynamics {
 
-	CollisionShapeResourceView::CollisionShapeResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ),
-																												 _shapeAllocator( allocator, UTF8L("Bullet Collision Shape Allocator") ),
-																												 _shapes( { allocator, UTF8L("Bullet Collision Shape View Subshape Collection Allocator") } ) {}
+	CollisionShapeResourceView::CollisionShapeResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ),
+																																										 _shapeAllocator( allocator, UTF8L("Bullet Collision Shape Allocator") ),
+																																										 _shapes( { allocator, UTF8L("Bullet Collision Shape View Subshape Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 

@@ -37,30 +37,30 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Foundation {
 
-	World::World( ObjectHandle<ContentPackage>&& package, GameEngine& owningEngine ) : _allocator( owningEngine._allocator, owningEngine._worldArenaSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World Allocator") ),
-																					   _viewAllocator( _allocator, owningEngine._worldViewAllocationHintInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World View Allocator") ),
-																					   _owningEngine( owningEngine ),
-																					   _package( move( package ) ),
-																					   _propertyMutex( owningEngine.GetTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
-																					   _properties( { _allocator, UTF8L("World Key-Value Pair Table Allocator") } ),
-																					   _isPaused( 1u ),
-																					   _isLoaded( 0u ),
-																					   _lastError( Error::NONE ) {
-		owningEngine._tickingWorlds.PushBack( *this );
-
-		if( const auto instantiateViewsResult = owningEngine.InstantiateViewsForWorld( _viewAllocator, *this ) ) {
-			owningEngine.GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Loading world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) );
-		} else {
-			owningEngine.GetLoggerForMessageType( LogMessageType::ERROR )( UTF8L("Error instantiating view objects for world '%p': %s.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), instantiateViewsResult.ToUTF8String() );
-			_lastError = instantiateViewsResult;
+	World::World( GameEngine& owningEngine ) : _allocator( owningEngine._allocator, owningEngine._worldArenaSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World Allocator") ),
+											   _allocationCheckpoint( _allocator.CreateCheckpoint() ),
+											   _owningEngine( owningEngine ),
+											   _package( nullptr ),
+											   _propertyMutex( owningEngine.GetTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
+											   _properties( { _allocator, UTF8L("World Key-Value Pair Table Allocator") } ),
+											   _isPaused( 1u ),
+											   _isLoaded( 0u ),
+											   _fatalErrorCount( 0u ) {
+		if( nullptr == _propertyMutex ) {
+			owningEngine.GetLoggerForMessageType( LogMessageType::ERROR )( UTF8L("Error allocating mutex for world '%p': %s.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), ErrorCode( Error::OUT_OF_MEMORY ).ToUTF8String() );
+			RaiseFatalError();
 		}
+
+		if( !EncounteredFatalError() ) {
+			owningEngine._tickingWorlds.PushBack( *this );
+		}	
 	}
 
 // ---------------------------------------------------
 
 	World::~World() {
 		_owningEngine->GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Destroying world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) );
-		DeleteViews();
+		Reset();
 	}
 
 // ---------------------------------------------------
@@ -68,7 +68,7 @@ namespace Foundation {
 	World::Property World::GetPropertyByKey( Allocator& resultAllocator, const UTF8Char* const rawKey, const UTF8Char* const defaultValue ) const {
 		static const UTF8Char	returnedStringAllocatorName[] = UTF8L("World Property String Allocator");
 
-		ETRuntimeAssert( nullptr != rawKey )
+		ETRuntimeAssert( nullptr != rawKey );
 		ETRuntimeAssert( nullptr != defaultValue );
 
 	// ---
@@ -88,7 +88,7 @@ namespace Foundation {
 
 	void World::SetProperty( const UTF8Char* const rawKey, const UTF8Char* const rawValue ) {
 		// Can't be const, resources may be moved out of the container.
-		UTF8String<>	key( rawKey, FindEndOfString( rawKey ), { _allocator, UTF8L("World Key String Allocator") } );
+		PropertyKey	key( rawKey, FindEndOfString( rawKey ), { _allocator, UTF8L("World Key String Allocator") } );
 
 		{	ScopedLock	_( *_propertyMutex );
 			auto		pairCandidate( _properties.Find( key ) );
@@ -99,6 +99,28 @@ namespace Foundation {
 				_properties.Insert( { move( key ), { rawValue, FindEndOfString( rawValue ), { _allocator, UTF8L("World Property String Allocator") } } } );
 			}
 		}	// End of lock scope.
+	}
+
+// ---------------------------------------------------
+
+	ErrorCode World::BeginContentLoad() {
+		FixedStackAllocator<96u>	temp( UTF8L("World::BeginContentLoad() Temporary Allocator") );
+
+		// Calling this function multiple at multiple points doesn't constitute a fatal error per se, but we don't want to do this more than once.
+		if( (nullptr != _package) || EncounteredFatalError() ) {
+			return Error::INVALID_OBJECT_STATE;
+		}
+
+		const auto	resourceName( GetPropertyByKey( temp, GetMainPackageKey(), UTF8L("") ) );
+		auto		initiateLoadResult( _owningEngine->GetContentLibrary().ResolvePackageByName( resourceName.GetCharacterArray() ) );
+
+		if( initiateLoadResult ) {
+			_package = ::std::move( initiateLoadResult.object );
+		} else {
+			RaiseFatalError();
+		}
+		
+		return initiateLoadResult.resultCode;
 	}
 
 // ---------------------------------------------------
@@ -122,17 +144,15 @@ namespace Foundation {
 			}
 
 			Task* Execute( WorkerContext& executingContext ) override sealed {
-				WorldView::FrameTickTaskVisitor	visitor;
-
 				for( WorldView& currentView : _worldReference->_attachedViews ) {
-					currentView.AcceptTaskVisitor( _frameTaskAllocator, executingContext, *this, visitor );
+					currentView.AcceptTaskVisitor( _frameTaskAllocator, executingContext, *this, WorldView::FrameTickTaskVisitor() );
 				}
 
 				return nullptr;
 			}
 
 			void Finalize( WorkerContext& executingContext ) override {
-				if( _worldReference->GetLastError() ) {
+				if( !_worldReference->EncounteredFatalError() ) {
 					_worldReference->_owningEngine->_tickingWorlds.PushBack( *_worldReference.Release() );
 				}
 
@@ -169,29 +189,33 @@ namespace Foundation {
 
 			// ---
 
-				switch( _worldReference->GetRootPackage().GetResidencyState() ) {
-					case ResidencyState::PUBLISHED: {
-						const WorldView::LoadFinalizationVisitor	visitor;
+				if( _worldReference->_package ) {
+					switch( _worldReference->GetRootPackage().GetResidencyState() ) {
+						case ResidencyState::PUBLISHED: {
+							const WorldView::LoadFinalizationVisitor	visitor;
 
-						for( WorldView& currentView : _worldReference->_attachedViews ) {
-							currentView.AcceptViewVisitor( visitor );
-						}
+							for( WorldView& currentView : _worldReference->_attachedViews ) {
+								currentView.AcceptViewVisitor( visitor );
+							}
 
-						_worldReference->_isLoaded = 1u;
-						break;
-					}	// case ResidencyState::PUBLISHED
+							_worldReference->_isLoaded = 1u;
+							break;
+						}	// case ResidencyState::PUBLISHED
 
-					case ResidencyState::FAILED: {
-						_worldReference->_lastError = Error::UNSPECIFIED;
-						break;
-					}	// case ResidencyState::FAILED
-				}	// switch( _worldReference->GetRootPackage().GetResidencyState() )
+						case ResidencyState::FAILED: {
+							_worldReference->RaiseFatalError();
+							break;
+						}	// case ResidencyState::FAILED
+					}	// switch( _worldReference->GetRootPackage().GetResidencyState() )
+				} else {
+					_worldReference->RaiseFatalError();
+				}
 
 				return nullptr;
 			}
 
 			void Finalize( WorkerContext& executingContext ) override {
-				if( _worldReference->GetLastError() ) {
+				if( !_worldReference->EncounteredFatalError() ) {
 					_worldReference->_owningEngine->_tickingWorlds.PushBack( *_worldReference.Release() );
 				}
 
@@ -228,13 +252,19 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
+	ETNoAliasHint const ::Eldritch2::UTF8Char* const World::GetMainPackageKey() {
+		return UTF8L("PackageName");
+	}
+
+// ---------------------------------------------------
+
 	void World::Dispose() {
 		_owningEngine->_allocator.Delete( *this );
 	}
 
 // ---------------------------------------------------
 
-	void World::DeleteViews() {
+	void World::Reset() {
 		{	// Broadcast a delete message to all the views so they can clean any shared resources.
 			const WorldView::DeletionPreparationVisitor	visitor;
 
@@ -245,11 +275,13 @@ namespace Foundation {
 		
 
 		{	// Invoke the destructor and deallocate all currently-attached views.
-			Allocator&	viewAllocator( _viewAllocator );
+			auto&	allocator( _allocator );
 
-			_attachedViews.ClearAndDispose( [&viewAllocator] ( WorldView& view ) {
-				viewAllocator.Delete( view );
+			_attachedViews.ClearAndDispose( [&allocator] ( WorldView& view ) {
+				allocator.Delete( view );
 			} );
+
+			allocator.RestoreCheckpoint( _allocationCheckpoint );
 		}
 	}
 

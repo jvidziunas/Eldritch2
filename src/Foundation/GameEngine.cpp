@@ -42,8 +42,6 @@ namespace Foundation {
 																																				   _logger( contentProvider, UTF8L("Eldritch2.log") ),
 																																				   _systemInterface( systemInterface ),
 																																				   _scheduler( scheduler ),
-																																				   _worldViewFactories( 0u, { _allocator, UTF8L("Game Engine World View Factory Collection Allocator") } ),
-																																				   _worldViewAllocationHintInBytes( 16u ),
 																																				   _contentLibrary( contentProvider, scheduler, _allocator ),
 																																				   _logEchoThreshold( LogMessageType::VERBOSE_WARNING ),
 																																				   _taskArenaPerThreadAllocationSizeInBytes( 1024u * 1024u ),
@@ -60,7 +58,7 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	Logger&	GameEngine::GetLoggerForMessageType( const LogMessageType type ) {
+	Logger&	GameEngine::GetLoggerForMessageType( const LogMessageType type ) const {
 		class NullLogger : public Logger {
 		public:
 			void	Write( const UTF8Char* const /*string*/, const size_t /*lengthInOctets*/ ) override sealed {}
@@ -75,20 +73,6 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	ErrorCode GameEngine::InstantiateViewsForWorld( Allocator& allocator, World& world ) {
-		for( const auto& viewFactory : _worldViewFactories ) {
-			const auto	result( viewFactory.factoryFunction( allocator, world, viewFactory.userParameter ) );
-
-			if( !result ) {
-				return result;
-			}
-		}
-
-		return Error::NONE;
-	}
-
-// ---------------------------------------------------
-
 	size_t GameEngine::CalculateFrameArenaSizeInBytes() const {
 		return (_taskArenaPerThreadAllocationSizeInBytes * _scheduler.GetMaximumTaskParallelism()) + 1024u;
 	}
@@ -96,7 +80,6 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void GameEngine::ClearAttachedServices() {
-		_worldViewFactories.Clear( ::Eldritch2::ReleaseMemorySemantics );
 		_attachedServices.Clear();
 	}
 

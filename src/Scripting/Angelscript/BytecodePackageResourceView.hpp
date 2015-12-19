@@ -13,17 +13,9 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Angelscript/BytecodeMetadata.hpp>
+#include <Scripting/AngelScript/SmartPointers.hpp>
 #include <Packages/ResourceView.hpp>
 //------------------------------------------------------------------//
-#include <memory>
-//------------------------------------------------------------------//
-
-namespace Eldritch2 {
-	class	ErrorCode;
-}
-
-class	asIScriptEngine;
-class	asIScriptModule;
 
 namespace Eldritch2 {
 namespace Scripting {
@@ -34,9 +26,8 @@ namespace AngelScript {
 
 	public:
 		//! Constructs this @ref BytecodePackageResourceView instance.
-		BytecodePackageResourceView( ::asIScriptEngine& engine, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		BytecodePackageResourceView( ModuleHandle&& moduleHandle, FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
-		//! Destroys this @ref BytecodePackageResourceView instance.
 		~BytecodePackageResourceView() = default;
 
 	// ---------------------------------------------------
@@ -47,16 +38,10 @@ namespace AngelScript {
 
 		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
 
-	// ---------------------------------------------------
-
-	private:
-		struct ModuleDeleter {
-			void	operator()( ::asIScriptModule* const module );
-		};
-
 	// - DATA MEMBERS ------------------------------------
 
-		::std::unique_ptr<::asIScriptModule, ModuleDeleter>	_module;
+	private:
+		ModuleHandle	_module;
 	};
 
 }	// namespace AngelScript

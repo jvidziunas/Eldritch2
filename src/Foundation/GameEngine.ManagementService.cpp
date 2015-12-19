@@ -17,7 +17,6 @@
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Foundation/WorldViewFactoryPublishingInitializationVisitor.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Scheduler/TaskScheduler.hpp>
@@ -265,58 +264,21 @@ namespace Foundation {
 
 	void GameEngine::ManagementService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const InitializeEngineTaskVisitor ) {
 		class PublishResourceViewFactoriesTask : public CRTPTransientTask<PublishResourceViewFactoriesTask> {
-		public:
-			class PublishWorldViewFactoriesTask : public Task {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			public:
-				//! Constructs this @ref PublishWorldViewFactoriesTask instance.
-				ETInlineHint PublishWorldViewFactoriesTask( ManagementService& host, PublishResourceViewFactoriesTask& parent, WorkerContext& executingContext ) : Task( parent, Scheduler::CodependentTaskSemantics ), _host( host ) {
-					TrySchedulingOnContext( executingContext );
-				}
-
-				//! Destroys this @ref PublishWorldViewFactoriesTask instance.
-				ETInlineHint ~PublishWorldViewFactoriesTask() = default;
-
-			// ---------------------------------------------------
-
-				ETInlineHint ManagementService&	GetHost() {
-					return _host;
-				}
-
-			// ---------------------------------------------------
-
-				const UTF8Char* const GetHumanReadableName() const override sealed {
-					return UTF8L("Publish Service World View Factories Task");
-				}
-
-				Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-					GetHost().BroadcastInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor( GetHost()._owningEngine ) );
-
-					return nullptr;
-				}
-
-			// - DATA MEMBERS ------------------------------------
-
-			private:
-				ManagementService&	_host;
-			};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+		public:
 			//!	Constructs this @ref PublishResourceViewFactoriesTask instance.
 			ETInlineHint PublishResourceViewFactoriesTask( ManagementService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<PublishResourceViewFactoriesTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
-																																			_publishWorldViewFactoriesTask( host, *this, executingContext ) {
+																																			_hostingService( host ) {
 				TrySchedulingOnContext( executingContext );
 			}
 
-			//!	Destroys this @ref PublishResourceViewFactoriesTask instance.
-			ETInlineHint ~PublishResourceViewFactoriesTask() = default;
+			~PublishResourceViewFactoriesTask() = default;
 
 		// ---------------------------------------------------
 
 			ETInlineHint ManagementService&	GetHost() {
-				return _publishWorldViewFactoriesTask.GetHost();
+				return _hostingService;
 			}
 
 		// ---------------------------------------------------
@@ -334,7 +296,7 @@ namespace Foundation {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			PublishWorldViewFactoriesTask	_publishWorldViewFactoriesTask;
+			ManagementService&	_hostingService;
 		};
 
 	// ---

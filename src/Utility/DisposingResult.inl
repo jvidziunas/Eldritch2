@@ -1,5 +1,5 @@
 /*==================================================================*\
-  DisposingResult.inl
+  CountedResult.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -20,37 +20,37 @@ namespace Utility {
 
 	template <typename ResultObject>
 	template <typename CompatibleResultObject>
-	ETInlineHint DisposingResult<ResultObject>::DisposingResult( Scripting::ObjectHandle<CompatibleResultObject>&& object ) : object( ::std::move( object ) ), resultCode( ::Eldritch2::Error::NONE ) {}
+	ETInlineHint CountedResult<ResultObject>::CountedResult( Scripting::ObjectHandle<CompatibleResultObject>&& object ) : object( ::std::move( object ) ), resultCode( ::Eldritch2::Error::NONE ) {}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
 	template <typename CompatibleResultObject>
-	ETInlineHint DisposingResult<ResultObject>::DisposingResult( Utility::DisposingResult<CompatibleResultObject>&& rhs ) : object( ::std::move( rhs.object ) ), resultCode( rhs.resultCode ) {}
+	ETInlineHint CountedResult<ResultObject>::CountedResult( Utility::CountedResult<CompatibleResultObject>&& rhs ) : object( ::std::move( rhs.object ) ), resultCode( rhs.resultCode ) {}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETInlineHint DisposingResult<ResultObject>::DisposingResult( const ::Eldritch2::ErrorCode errorCode ) : object( nullptr ), resultCode( errorCode ) {}
+	ETInlineHint CountedResult<ResultObject>::CountedResult( const ::Eldritch2::ErrorCode errorCode ) : object( nullptr ), resultCode( errorCode ) {}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETForceInlineHint DisposingResult<ResultObject>::operator ::Eldritch2::ErrorCode&() {
+	ETForceInlineHint CountedResult<ResultObject>::operator ::Eldritch2::ErrorCode&() {
 		return resultCode;
 	}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETForceInlineHint DisposingResult<ResultObject>::operator const ::Eldritch2::ErrorCode&() const {
+	ETForceInlineHint CountedResult<ResultObject>::operator const ::Eldritch2::ErrorCode&() const {
 		return resultCode;
 	}
 
 // ---------------------------------------------------
 
 	template <typename ResultObject>
-	ETForceInlineHint DisposingResult<ResultObject>::operator bool() const {
+	ETForceInlineHint CountedResult<ResultObject>::operator bool() const {
 		return static_cast<bool>(resultCode);
 	}
 

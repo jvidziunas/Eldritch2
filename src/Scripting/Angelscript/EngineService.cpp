@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
-#include <Foundation/WorldViewFactoryPublishingInitializationVisitor.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Scripting/AngelScript/BytecodePackageResourceView.hpp>
 #include <Scripting/AngelScript/ObjectGraphResourceView.hpp>
@@ -60,13 +59,7 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	void EngineService::EngineDeleter::operator()( ::asIScriptEngine* const scriptEngine ) {
-		scriptEngine->ShutDownAndRelease();
-	}
-
-// ---------------------------------------------------
-
-	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ), _scriptEngine( nullptr ) {}
+	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ) {}
 
 // ---------------------------------------------------
 
@@ -76,10 +69,8 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( this, sizeof(WorldView), [] ( Allocator& allocator, World& world, void* parameter ) -> ErrorCode {
-			return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, static_cast<EngineService*>(parameter)->GetScriptEngine() ) ? Error::NONE : Error::OUT_OF_MEMORY;
-		} );
+	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
+		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, GetScriptEngine() ) ? Error::NONE : Error::OUT_OF_MEMORY;
 	}
 
 // ---------------------------------------------------
@@ -91,18 +82,8 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		using AllocationOption	= Allocator::AllocationOption;
-
-	// ---
-
-		// Bytecode package
-		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* parameter ) {
-			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) BytecodePackageResourceView( static_cast<EngineService*>(parameter)->GetScriptEngine(), name, allocator ), { allocator } );
-		} )
-		// Object graph
-		.PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*parameter*/ ) {
-			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( name, allocator ), { allocator } );
-		} );
+		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), _bytecodePackageFactory )
+			   .PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), _objectGraphFactory );
 	}
 
 // ---------------------------------------------------
@@ -117,8 +98,7 @@ namespace AngelScript {
 				TrySchedulingOnContext( executingContext );
 			}
 
-			//!	Destroys this @ref ExposeScriptAPITask instance.
-			ETInlineHint ~ExposeScriptAPITask() = default;
+			~ExposeScriptAPITask() = default;
 
 		// ---------------------------------------------------
 
@@ -156,6 +136,8 @@ namespace AngelScript {
 				TrySchedulingOnContext( executingContext );
 			}
 
+			~CollectScriptGarbageTask() = default;
+
 		// ---------------------------------------------------
 
 			const UTF8Char* const GetHumanReadableName() const override sealed {
@@ -163,7 +145,7 @@ namespace AngelScript {
 			}
 
 			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host._scriptEngine->GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
+				_host.GetScriptEngine().GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
 				return nullptr;
 			}
 
@@ -187,8 +169,8 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	void EngineService::MessageCallback( const ::asSMessageInfo* messageInfo ) {
-		LogMessageType	messageType( LogMessageType::MESSAGE );
-		const char*		description( UTF8L("message") );
+		LogMessageType	messageType;
+		const char*		description;
 		
 		switch( messageInfo->type ) {
 			case asMSGTYPE_ERROR: {
@@ -201,6 +183,11 @@ namespace AngelScript {
 				description = "warning";
 				break;
 			}
+			case asMSGTYPE_INFORMATION: {
+				messageType = LogMessageType::MESSAGE;
+				description = "message";
+				break;
+			}
 		}
 
 		GetLogger( messageType )( UTF8L("Angelscript %s in '%s'[%i, %i]: %s.") ET_UTF8_NEWLINE_LITERAL, description, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
@@ -211,13 +198,12 @@ namespace AngelScript {
 	void EngineService::CreateScriptAPI() {
 		GetLogger()( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
 
-		if( decltype(_scriptEngine) scriptEngine { ::asCreateScriptEngine() } ) {
+		if( AngelScript::EngineHandle scriptEngine { ::asCreateScriptEngine() } ) {
 			scriptEngine->SetMessageCallback( ::asMETHOD( EngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
 
-			{
+			{	// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
 				ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
 				
-				// Register critical components first.
 				StringMarshal::ExposeScriptAPI( registrationVisitor );
 				Float4Marshal::ExposeScriptAPI( registrationVisitor );
 				OrientationMarshal::ExposeScriptAPI( registrationVisitor );
@@ -232,8 +218,8 @@ namespace AngelScript {
 
 			GetLogger()( UTF8L("Script API registered successfully.") ET_UTF8_NEWLINE_LITERAL );
 
-			// Transfer ownership to the main engine.
-			_scriptEngine = move( scriptEngine );
+			// Transfer ownership.
+			_bytecodePackageFactory.SetScriptEngine( ::std::move( scriptEngine ) );
 		} else {
 			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
 		}

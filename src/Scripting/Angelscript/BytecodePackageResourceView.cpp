@@ -27,21 +27,14 @@ using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	void BytecodePackageResourceView::ModuleDeleter::operator()( ::asIScriptModule* const module ) {
-		module->Discard();
-	}
-
-// ---------------------------------------------------
-
-	BytecodePackageResourceView::BytecodePackageResourceView( ::asIScriptEngine& engine, const UTF8Char* const name, Allocator& allocator ) : ResourceView( name, allocator ),
-																																			  BytecodeMetadata( allocator ),
-																																			  _module( engine.GetModule( GetName().GetCharacterArray(), ::asGM_CREATE_IF_NOT_EXISTS ) ) {}
+	BytecodePackageResourceView::BytecodePackageResourceView( ModuleHandle&& moduleHandle, ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ),
+																																																		BytecodeMetadata( allocator ),
+																																																		_module( ::std::move( moduleHandle ) ) {}
 
 // ---------------------------------------------------
 

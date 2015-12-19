@@ -13,9 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
-#include <Utility/DisposingResult.hpp>
+#include <Utility/CountedResult.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/CharTypes.hpp>
+#include <Utility/Result.hpp>
 #include <Logging/Logger.hpp>
 //------------------------------------------------------------------//
 
@@ -25,8 +26,8 @@ namespace Eldritch2 {
 	}
 
 	namespace Foundation {
-		class	WorldViewFactoryPublishingInitializationVisitor;
 		class	GameEngine;
+		class	WorldView;
 		class	World;
 	}
 
@@ -73,6 +74,8 @@ namespace Foundation {
 	// ---------------------------------------------------
 
 	protected:
+		virtual ::Eldritch2::ErrorCode	AllocateWorldView( ::Eldritch2::Allocator& allocator, Foundation::World& world );
+	
 		//! Interested service classes should override this method in order to participate in script API setup.
 		/*!	@param[in] visitor The type registrar that will handle publishing the service's types, methods and variables to script objects.
 			@remark The default implementation does nothing.
@@ -83,10 +86,6 @@ namespace Foundation {
 		/*!	@remark The default implementation does nothing.
 			*/
 		virtual void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-		//! Interested service classes should override this method in order to participate in resource/world view creation.
-		/*!	@remark The default implementation does nothing.
-			*/
-		virtual void	AcceptInitializationVisitor( Foundation::WorldViewFactoryPublishingInitializationVisitor& visitor );
 		//! Interested service classes should override this method in order to participate in resource/world view creation.
 		/*!	@remark The default implementation does nothing.
 			*/
@@ -146,40 +145,33 @@ namespace Foundation {
 	// - GAME ENGINE SERVICE SANDBOX METHODS -------------
 
 		//! Creates a new game world using an anonymous editor package.
-		/*!	@remark Use @ref CreateWorld() for normal game loads, etc.
-			@see @ref CreateWorld(), @ref ContentLibrary::CreatePackageForEditorWorld()
-			*/
-		::Eldritch2::DisposingResult<Foundation::World>	CreateEditorWorld();
-
-		//! Creates a new game world using an anonymous editor package.
 		/*!	@param[in] worldResourceName Null-terminated C string containing the name of the root content package for the world. This will be passed to @ref FileSystem::ContentLibrary::ResolvePackageByName()
-			@remark Use @ref CreateEditorWorld() for making new worlds for use with the editor tool.
-			@see @ref CreateEditorWorld(), @ref FileSystem::ContentPackage, @ref FileSystem::ContentLibrary::ResolvePackageByName()
+			@see @ref FileSystem::ContentPackage, @ref FileSystem::ContentLibrary::ResolvePackageByName()
 			*/
-		::Eldritch2::DisposingResult<Foundation::World>	CreateWorld( const ::Eldritch2::UTF8Char* const worldResourceName );
+		::Eldritch2::CountedResult<Foundation::World>		CreateWorld( const ::Eldritch2::UTF8Char* const worldResourceName );
 
 		//! Retrieves a read-only view of the @ref GameEngine instance that owns this @ref GameEngineService.
-		ETInlineHint const Foundation::GameEngine&		GetHostingEngine() const;
+		ETInlineHint const Foundation::GameEngine&			GetHostingEngine() const;
 
 		//! Retrieves a read-only view of the @ref FileSystem::ContentLibrary instance owned by the @ref GameEngine this @ref GameEngineService is attached to.
 		/*!	@see @ref FileSystem::ContentLibrary
 			*/
-		const FileSystem::ContentLibrary&				GetEngineContentLibrary() const;
+		const FileSystem::ContentLibrary&					GetEngineContentLibrary() const;
 
 		//! Retrieves the Scheduler::TaskScheduler instance used by the @ref GameEngine this @ref GameEngineService is attached to.
 		/*!	@see @ref Scheduler::TaskScheduler
 			*/
-		Scheduler::TaskScheduler&						GetEngineTaskScheduler() const;
+		Scheduler::TaskScheduler&							GetEngineTaskScheduler() const;
 
 		//! Retrieves the 'global' engine allocator.
 		/*!	@see @ref Allocator
 			*/
-		::Eldritch2::Allocator&							GetEngineAllocator();
+		::Eldritch2::Allocator&								GetEngineAllocator();
 
 		//! Instructs the hosting engine's scheduler to create an operating system thread and have it assume ownership/begin execution of the given Thread instance.
 		/*!	@see @ref Scheduler::Thread
 			*/
-		::Eldritch2::ErrorCode							LaunchThread( Scheduler::Thread& thread );
+		::Eldritch2::ErrorCode								LaunchThread( Scheduler::Thread& thread );
 
 	// - LOGGING -----------------------------------------
 

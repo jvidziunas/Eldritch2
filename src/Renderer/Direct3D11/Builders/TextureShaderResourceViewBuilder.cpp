@@ -67,7 +67,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	COMPointer<::ID3D11ShaderResourceView> TextureShaderResourceViewBuilder::Compile( ::ID3D11Resource* const resource ) {
-		return nullptr;
+		return { nullptr };
 	}
 
 // ---------------------------------------------------
@@ -79,7 +79,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	COMPointer<::ID3D11ShaderResourceView> TextureShaderResourceViewBuilder::Compile( ::ID3D11Texture2D* const resource ) {
-		return nullptr;
+		return { nullptr };
 	}
 
 // ---------------------------------------------------
@@ -91,7 +91,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	COMPointer<::ID3D11ShaderResourceView> TextureShaderResourceViewBuilder::Compile( ::ID3D11Texture3D* const resource ) {
-		return nullptr;
+		return { nullptr };
 	}
 
 }	// namespace Direct3D11

@@ -12,13 +12,12 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/InstanceDeleters.hpp>
-#include <Packages/ResourceView.hpp>
-#include <Utility/Result.hpp>
+#include <Packages/ResourceViewFactory.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace FileSystem {
+		class	ResourceViewFactory;
 		class	ContentLibrary;
 	}
 }
@@ -27,13 +26,9 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	class ResourceViewFactoryPublishingInitializationVisitor {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using FactoryFunctionPointer	= ::Eldritch2::InstancePointer<FileSystem::ResourceView> (*)( ::Eldritch2::Allocator&, const ::Eldritch2::UTF8Char* const, void* );
-
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+	public:
 		//!	Constructs this @ref ResourceViewFactoryPublishingInitializationVisitor instance.
 		/*!	@param[in] contentLibrary The @ref ContentLibrary to which resource view factories will be registered.
 			*/
@@ -45,17 +40,10 @@ namespace FileSystem {
 
 		//!	Registers an object creation handler for a specified class of resource view object.
 		/*!	@param[in] className Null-terminated C string containing the type name of the resource.
-			@param[in] parameter Pointer parameter to be sent to the callback for resource creation.
-			@param[in] factory Factory function. This should attempt to allocate a new instance of a @ref ResourceView subclass and return it in the Result for the function.
+			@param[in] factory Reference to the @ref ResourceViewFactory that will create views of published content.
 			@returns A reference to *this for method chaining.
 			*/
-		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, void* const parameter, FactoryFunctionPointer factory );
-		//!	Registers an object creation handler for a specified class of resource view object.
-		/*!	@param[in] className Null-terminated C string containing the type name of the resource.
-			@param[in] factory Factory function. This should attempt to allocate a new instance of a @ref ResourceView subclass and return it in the Result for the function.
-			@returns A reference to *this for method chaining.
-			*/
-		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* const className, FactoryFunctionPointer factory );
+		ResourceViewFactoryPublishingInitializationVisitor&	PublishFactory( const ::Eldritch2::UTF8Char* className, FileSystem::ResourceViewFactory& factory );
 		
 	// - DATA MEMBERS ------------------------------------
 

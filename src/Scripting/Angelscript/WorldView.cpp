@@ -39,17 +39,13 @@ namespace AngelScript {
 
 	WorldView::WorldView( Foundation::World& owningWorld, ::asIScriptEngine& scriptEngine ) : Foundation::WorldView( owningWorld ),
 																							  _stringAllocator( { GetWorldAllocator(), UTF8L("World String Root Allocator") } ),
-																							  _scriptEngine( (scriptEngine.AddRef(), scriptEngine) ),
-																							  _entityDispatchTable( { GetWorldAllocator(), UTF8L("Angelscript World View Dispatch Table Allocator") } ),
-																							  _gameRulesEntity( nullptr ) {}
+																							  _scriptEngine( (scriptEngine.AddRef(), scriptEngine) ) {}
 
 // ---------------------------------------------------
 
 	WorldView::~WorldView() {
 		// Since scripts can create objects not directly owned by this WorldView, we need to make sure all shared resources have been released before we start destroying world views.
 		// This should have been done within WorldView::AcceptViewVisitor( const DeletionPreparationVisitor ).
-		ETRuntimeAssert( _gameRulesEntity == nullptr );
-		ETRuntimeAssert( _entityDispatchTable.Empty() );
 
 	// ---
 
@@ -241,15 +237,11 @@ namespace AngelScript {
 
 	void WorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& visitor ) {
 		auto	Spawn( [] ( const StringMarshal& className ) {
-			auto&		scriptEngine( activeScriptWorldView->_scriptEngine );
-			const auto	objectType( scriptEngine.GetObjectTypeByName( className.GetCharacterArray() ) );
+			if( activeScriptWorldView->Spawn( className.GetCharacterArray() ) ) {
 
-			if( !objectType ) {
+			} else {
 				::asGetActiveContext()->SetException( "Invalid class name for Spawn()!" );
-				return;
 			}
-
-			scriptEngine.CreateScriptObject( objectType );
 		} );
 
 		visitor.ExposeFunction( "Spawn", static_cast<void (ETScriptAPICall *)( const StringMarshal& )>(Spawn) );
@@ -260,9 +252,18 @@ namespace AngelScript {
 	void WorldView::AcceptViewVisitor( const DeletionPreparationVisitor ) {
 		// Prepare for script execution (this will take place within the various release methods called implicitly below)
 		BroadcastViewVisitor( ScriptExecutionPreparationVisitor() );
+	}
 
-		_gameRulesEntity.reset();
-		_entityDispatchTable.Clear();
+// ---------------------------------------------------
+
+	AngelScript::ObjectHandle WorldView::Spawn( const char* const className ) {
+		const auto	objectType( _scriptEngine.GetTypeInfoByName( className ) );
+
+		if( objectType && (objectType->GetFlags() & ::asOBJ_SCRIPT_OBJECT) ) {
+			return { static_cast<::asIScriptObject*>(_scriptEngine.CreateScriptObject( objectType )), {} };
+		}
+
+		return { nullptr };
 	}
 
 }	// namespace AngelScript

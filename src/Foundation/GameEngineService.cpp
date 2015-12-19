@@ -14,8 +14,8 @@
 //==================================================================//
 #include <Configuration/ConfigurationDatabase.hpp>
 #include <Foundation/GameEngineService.hpp>
-#include <Utility/DisposingResult.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
+#include <Utility/CountedResult.hpp>
 #include <Scheduler/TaskScheduler.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Foundation/GameEngine.hpp>
@@ -28,15 +28,6 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
-using namespace ::std;
-
-namespace {
-
-	enum : size_t {
-		MESSAGE_BUFFER_SIZE = 256u
-	};
-
-}	// anonymous namespace
 
 namespace Eldritch2 {
 namespace Foundation {
@@ -48,64 +39,60 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	Allocator& GameEngineService::GetEngineAllocator() {
-		return _owningEngine._allocator;
+		return _owningEngine.GetAllocator();
 	}
 
 // ---------------------------------------------------
 
-	DisposingResult<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
-		auto	createWorldPackageResult( _owningEngine._contentLibrary.ResolvePackageByName( worldResourceName ) );
+	ErrorCode GameEngineService::AllocateWorldView( Allocator& /*allocator*/, World& /*world*/ ) {
+		// Default implementation does nothing.
 
-		if( createWorldPackageResult ) {
-			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( move( createWorldPackageResult.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
-				if( const auto error = world->GetLastError() ) {
-					// Transfer ownership of the world to the result object and thus to outer code.
-					return { move( world ) };
-				} else {
-					GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, error.ToUTF8String() );
-					return { error };
-				}
-			}
-
-			return { Error::OUT_OF_MEMORY };
-		}
-
-		GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, createWorldPackageResult.resultCode.ToUTF8String() );
-
-		return { createWorldPackageResult.resultCode };
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------
 
-	DisposingResult<World> GameEngineService::CreateEditorWorld() {
-		auto	createWorldPackageResult( _owningEngine._contentLibrary.CreatePackageForEditorWorld() );
+	CountedResult<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
+		ObjectHandle<World>	world( new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics );
 
-		if( createWorldPackageResult ) {
-			if( ObjectHandle<World>	world { new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( move( createWorldPackageResult.object ), _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
-				if( world->GetLastError() ) {
-					// Transfer ownership of the world to the result object and thus to outer code.
-					return { move( world ) };
-				} else {
-					return { world->GetLastError() };
+		if( world ) {
+			ErrorCode	operationResult( Error::NONE );
+
+			world->SetProperty( World::GetMainPackageKey(), worldResourceName );
+
+			for( auto& service : _owningEngine._attachedServices ) {
+				operationResult = service.AllocateWorldView( world->GetAllocator(), *world );
+
+				if( !operationResult ) {
+					GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
+					return { operationResult };
 				}
 			}
 
-			return { Error::OUT_OF_MEMORY };
-		}
+			operationResult = world->BeginContentLoad();
 
-		return { createWorldPackageResult.resultCode };
+			if( !operationResult ) {
+				GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
+				return { operationResult };
+			}
+
+			// Transfer ownership of the world to the result object and thus to outer code.
+			return { ::std::move( world ) };
+		}
+		
+		return { Error::OUT_OF_MEMORY };
 	}
 
 // ---------------------------------------------------
 
 	const ContentLibrary& GameEngineService::GetEngineContentLibrary() const {
-		return _owningEngine._contentLibrary;
+		return _owningEngine.GetContentLibrary();
 	}
 
 // ---------------------------------------------------
 
 	TaskScheduler& GameEngineService::GetEngineTaskScheduler() const {
-		return _owningEngine._scheduler;
+		return _owningEngine.GetTaskScheduler();
 	}
 
 // ---------------------------------------------------
@@ -117,12 +104,6 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void GameEngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& /*visitor*/ ) {
-		// Default implementation should not do anything.
-	}
-
-// ---------------------------------------------------
-
-	void GameEngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& /*visitor*/ ) {
 		// Default implementation should not do anything.
 	}
 
@@ -171,7 +152,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	ErrorCode GameEngineService::LaunchThread( Thread& thread ) {
-		return _owningEngine._scheduler.Enqueue( thread );
+		return _owningEngine.GetTaskScheduler().Enqueue( thread );
 	}
 
 // ---------------------------------------------------

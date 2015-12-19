@@ -255,7 +255,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp" />
     <ClCompile Include="..\src\Foundation\WorldView.cpp" />
-    <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Input\Keyboard.cpp" />
     <ClCompile Include="..\src\Input\Mouse.cpp" />
     <ClCompile Include="..\src\Input\PlaystationController.cpp" />
@@ -273,6 +272,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Packages\LoaderThread.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.CollisionShapeViewFactory.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterArmatureComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp" />
@@ -286,6 +286,9 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\TextureShaderResourceViewBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.MeshViewFactory.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.PipelineViewFactory.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.ShaderResourceViewFactory.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\MeshResourceView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp" />
@@ -299,10 +302,13 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.WorkerThread.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\EngineService.BytecodePackageViewFactory.cpp" />
+    <ClCompile Include="..\src\Scripting\Angelscript\EngineService.ObjectGraphViewFactory.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.cpp" />
+    <ClCompile Include="..\src\scripting\Angelscript\SmartPointers.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.cpp" />
-    <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageSink.cpp" />
+    <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageBus.cpp" />
     <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp" />
@@ -380,7 +386,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp" />
-    <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Input\Keyboard.hpp" />
     <ClInclude Include="..\src\Input\Mouse.hpp" />
     <ClInclude Include="..\src\Input\PlaystationController.hpp" />
@@ -390,6 +395,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Networking\Steamworks\WorldView.hpp" />
     <ClInclude Include="..\src\Packages\PackageDeserializationContext.hpp" />
     <ClInclude Include="..\src\Packages\LoaderThread.hpp" />
+    <ClInclude Include="..\src\Packages\ResourceViewFactory.hpp" />
     <ClInclude Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.hpp" />
@@ -419,10 +425,11 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodeMetadata.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.hpp" />
+    <ClInclude Include="..\src\scripting\Angelscript\SmartPointers.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\EngineService.hpp" />
     <ClInclude Include="..\src\Scripting\Message.hpp" />
-    <ClInclude Include="..\src\Scripting\MessageSink.hpp" />
+    <ClInclude Include="..\src\Scripting\MessageBus.hpp" />
     <ClInclude Include="..\src\Scripting\ReferenceTypeBase.hpp" />
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp" />
     <ClInclude Include="..\src\packages\ContentLibrary.hpp" />
@@ -434,6 +441,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\System\Win32\SystemInterface.hpp" />
     <ClInclude Include="..\src\Utility\Algorithms.hpp" />
     <ClInclude Include="..\src\Utility\Assert.hpp" />
+    <ClInclude Include="..\src\Utility\Comparisons.hpp" />
     <ClInclude Include="..\src\Utility\COMPointer.hpp" />
     <ClInclude Include="..\src\Utility\Concurrency\StripedLock.hpp" />
     <ClInclude Include="..\src\Utility\Concurrency\StripedReaderWriterLock.hpp" />
@@ -442,10 +450,12 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
     <ClInclude Include="..\src\Utility\Containers\String.hpp" />
-    <ClInclude Include="..\src\Utility\DisposingResult.hpp" />
+    <ClInclude Include="..\src\Utility\CountedResult.hpp" />
     <ClInclude Include="..\src\Utility\Equals.hpp" />
+    <ClInclude Include="..\src\Utility\Greater.hpp" />
     <ClInclude Include="..\src\Utility\Hash.hpp" />
     <ClInclude Include="..\src\Utility\IntrusivePointerBase.hpp" />
+    <ClInclude Include="..\src\Utility\Less.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ObjectPoolAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />
@@ -551,7 +561,6 @@ call "deploy.x64.bat"
     <None Include="..\src\Foundation\GameEngineService.inl" />
     <None Include="..\src\Foundation\World.inl" />
     <None Include="..\src\Foundation\WorldView.inl" />
-    <None Include="..\src\Foundation\WorldViewFactoryPublishingInitializationVisitor.inl" />
     <None Include="..\src\Packages\ContentLibrary.inl" />
     <None Include="..\src\Packages\ContentPackage.inl" />
     <None Include="..\src\Packages\PackageDeserializationContext.inl" />
@@ -585,6 +594,8 @@ call "deploy.x64.bat"
     <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl" />
     <None Include="..\src\Scripting\AngelScript\EngineService.inl" />
     <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl" />
+    <None Include="..\src\Scripting\Message.inl" />
+    <None Include="..\src\Scripting\MessageBus.inl" />
     <None Include="..\src\Scripting\ObjectHandle.inl" />
     <None Include="..\src\Scripting\ReferenceTypeBase.inl" />
     <None Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.inl" />
@@ -610,8 +621,10 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\DisposingResult.inl" />
     <None Include="..\src\Utility\Equals.inl" />
     <None Include="..\src\Utility\ErrorCode.inl" />
+    <None Include="..\src\Utility\Greater.inl" />
     <None Include="..\src\Utility\Hash.inl" />
     <None Include="..\src\Utility\IdentifierPool.inl" />
+    <None Include="..\src\Utility\Less.inl" />
     <None Include="..\src\Utility\Math\StandardLibrary.inl" />
     <None Include="..\src\Utility\Memory\Allocator.inl" />
     <None Include="..\src\Utility\Memory\ArenaAllocator.inl" />

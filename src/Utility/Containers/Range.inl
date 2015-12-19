@@ -53,11 +53,6 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Iterator>
-	ETForceInlineHint Range<Iterator>::Range( Iterator begin, const DistanceType rangeSizeInElements ) : Range( begin, begin + rangeSizeInElements ) {}
-
-// ---------------------------------------------------
-
-	template <typename Iterator>
 	ETForceInlineHint Range<Iterator>::Range( const ::Eldritch2::Range<Iterator>& rangeTemplate ) : Range( rangeTemplate.first, rangeTemplate.onePastLast ) {}
 
 // ---------------------------------------------------
@@ -160,16 +155,8 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Iterator>
-	ETForceInlineHint typename Range<Iterator>::DistanceType Range<Iterator>::Size() const {
+	ETForceInlineHint size_t Range<Iterator>::Size() const {
 		return ::std::distance( first, onePastLast );
-	}
-
-// ---------------------------------------------------
-
-	template <typename Iterator>
-	ETForceInlineHint typename Range<Iterator>::Reference Range<Iterator>::operator[]( DistanceType offset ) const {
-		Iterator	temp( first );
-		return ( ::std::advance( temp, offset ), *temp );
 	}
 
 // ---------------------------------------------------

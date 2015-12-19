@@ -22,6 +22,24 @@
 namespace Eldritch2 {
 namespace Foundation {
 
+	ETInlineHint ::Eldritch2::Allocator& GameEngine::GetAllocator() {
+		return _allocator;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint const FileSystem::ContentLibrary& GameEngine::GetContentLibrary() const {
+		return _contentLibrary;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint FileSystem::ContentLibrary& GameEngine::GetContentLibrary() {
+		return _contentLibrary;
+	}
+
+// ---------------------------------------------------
+
 	ETInlineHint const Scheduler::TaskScheduler& GameEngine::GetTaskScheduler() const {
 		return _scheduler;
 	}

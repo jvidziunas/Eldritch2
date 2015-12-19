@@ -12,8 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/AngelScript/SmartPointers.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Foundation/GameEngineService.hpp>
+#include <Packages/ResourceViewFactory.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -43,16 +45,19 @@ namespace AngelScript {
 
 		const ::Eldritch2::UTF8Char* const	GetName() const override sealed;
 
+		ETInlineHint ::asIScriptEngine&		GetScriptEngine() const;
+
 	// ---------------------------------------------------
 
-		ETInlineHint ::asIScriptEngine&	GetScriptEngine() const;
+		::Eldritch2::ErrorCode	AllocateWorldView( ::Eldritch2::Allocator& allocator, Foundation::World& world ) override;
 
 	// ---------------------------------------------------
 
 	protected:
 		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( Foundation::WorldViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
+
+	// ---------------------------------------------------
 
 		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const InitializeEngineTaskVisitor ) override sealed;
 		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const ServiceTickTaskVisitor ) override sealed;
@@ -65,17 +70,64 @@ namespace AngelScript {
 
 		void						CreateScriptAPI();
 
-	// ---------------------------------------------------
+	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		struct EngineDeleter {
-			void	operator()( ::asIScriptEngine* const scriptEngine );
+		class BytecodePackageViewFactory : public FileSystem::ResourceViewFactory {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref BytecodePackageViewFactory instance.
+			BytecodePackageViewFactory();
+
+			~BytecodePackageViewFactory() = default;
+
+		// ---------------------------------------------------
+
+			ETInlineHint ::asIScriptEngine&	GetScriptEngine() const;
+
+			ETInlineHint void				SetScriptEngine( AngelScript::EngineHandle&& engine );
+
+		// ---------------------------------------------------
+
+			::Eldritch2::ErrorCode AllocateResourceView( ::Eldritch2::Allocator& allocator, FileSystem::ContentLibrary& contentLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name ) override;
+
+		// ---------------------------------------------------
+
+			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			AngelScript::EngineHandle	_scriptEngine;
+		};
+
+	// ---
+
+		class ObjectGraphViewFactory : public FileSystem::ResourceViewFactory {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref ObjectGraphViewFactory instance.
+			ObjectGraphViewFactory() = default;
+
+			~ObjectGraphViewFactory() = default;
+
+		// ---------------------------------------------------
+
+			::Eldritch2::ErrorCode AllocateResourceView( ::Eldritch2::Allocator& allocator, FileSystem::ContentLibrary& contentLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name ) override;
+
+		// ---------------------------------------------------
+			
+			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
 		};
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator							_allocator;
-		::std::unique_ptr<::asIScriptEngine, EngineDeleter>	_scriptEngine;
+		::Eldritch2::ChildAllocator	_allocator;
+
+		BytecodePackageViewFactory	_bytecodePackageFactory;
+		ObjectGraphViewFactory		_objectGraphFactory;
 	};
 
 }	// namespace AngelScript

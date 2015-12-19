@@ -14,7 +14,6 @@
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Foundation/WorldViewFactoryPublishingInitializationVisitor.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Physics/BulletDynamics/CollisionShapeResourceView.hpp>
 #include <Physics/BulletDynamics/EngineService.hpp>
@@ -29,7 +28,6 @@ using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2::Physics;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 namespace Eldritch2 {
 namespace Physics {
@@ -45,15 +43,14 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
+	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
+		return new(allocator, alignof(WorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *this ) ? Error::NONE : Error::OUT_OF_MEMORY;
+	}
+
+// ---------------------------------------------------
+
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		using AllocationOption	= Allocator::AllocationOption;
-
-	// ---
-
-		// Collision shape view.
-		visitor.PublishFactory( CollisionShapeResourceView::GetSerializedDataTag(), this, [] ( Allocator& allocator, const UTF8Char* const name, void* /*engine*/ ) {
-			return InstancePointer<ResourceView>( new(allocator, AllocationOption::PERMANENT_ALLOCATION) CollisionShapeResourceView( name, allocator ), { allocator } );
-		} );
+		visitor.PublishFactory( CollisionShapeResourceView::GetSerializedDataTag(), _collisionShapeFactory );
 	}
 
 // ---------------------------------------------------
@@ -63,23 +60,14 @@ namespace BulletDynamics {
 
 		visitor.Register( UTF8L("WorldPersistentManifoldPoolSizeInElements"), _persistentManifoldPoolSizeInElements );
 		visitor.Register( UTF8L("WorldCollisionAlgorithmPoolSizeInElements"), _collisionAlgorithmPoolSizeInElements );
+
+		_collisionShapeFactory.AcceptInitializationVisitor( visitor );
 	}
 
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
 		WorldView::ExposeScriptAPI( visitor );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::AcceptInitializationVisitor( WorldViewFactoryPublishingInitializationVisitor& visitor ) {
-		// Reserve a little extra slack here for the aligned allocation.
-		visitor.PublishFactory( this, sizeof(WorldView) + (alignof(WorldView) - 1u), [] ( Allocator& allocator, World& world, void* engine ) -> ErrorCode {
-			// Important to use aligned allocation. Visual Studio uses a movaps instruction for the compiler-generated btVector3::operator=() method, and it's quite common for
-			// one of the vectors to end up on an unaligned boundary.
-			return new(allocator, alignof(WorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *static_cast<EngineService*>(engine) ) ? Error::NONE : Error::OUT_OF_MEMORY;
-		} );
 	}
 
 }	// namespace BulletDynamics

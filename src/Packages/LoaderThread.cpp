@@ -25,7 +25,6 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 namespace Eldritch2 {
 namespace FileSystem {
@@ -47,7 +46,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	void LoaderThread::RequestGracefulShutdown() {
-		_executionBehavior.store( ExecutionBehavior::TERMINATE, memory_order_release );
+		_executionBehavior.store( ExecutionBehavior::TERMINATE, ::std::memory_order_release );
 
 		// Mark the semaphore so the thread knows to wake up.
 		if( _loadSemaphore ) {
@@ -58,11 +57,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ErrorCode LoaderThread::BeginLoad( ContentPackage& package ) {
-		using AllocationOption	= Allocator::AllocationOption;
-
-	// ---
-
-		if( unique_ptr<PackageDeserializationContext, InstanceDeleter> context { new(_allocator, AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( { package } ), { _allocator } } ) {
+		if( InstancePointer<PackageDeserializationContext> context { new(_allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( { package } ), { _allocator } } ) {
 			const auto	openFileResult( context->OpenFile() );
 			
 			if( openFileResult ) {
@@ -102,7 +97,7 @@ namespace FileSystem {
 			return Error::INVALID_OBJECT_STATE;
 		}
 
-		while( (_loadSemaphore->Acquire(), ExecutionBehavior::CONTINUE == _executionBehavior.load( memory_order_acquire )) ) {
+		while( (_loadSemaphore->Acquire(), ExecutionBehavior::CONTINUE == _executionBehavior.load( ::std::memory_order_acquire )) ) {
 			// Initialize any new deserialization, and add to the 
 			_initializationQueue.PopFrontAndDispose( [&threadAllocator, &loadList] ( PackageDeserializationContext& context ) {
 				if( context.DeserializeDependencies() ) {
@@ -116,7 +111,7 @@ namespace FileSystem {
 			loadList.RemoveAndDisposeIf( [] ( const PackageDeserializationContext& context ) {
 				bool	dependenciesLoaded( true );
 
-				for( const auto& referencedPackage : context.GetBoundPackage().GetReferencedPackageCollection() ) {
+				for( const auto& referencedPackage : context.GetBoundPackage().GetDependencies() ) {
 					switch( referencedPackage->GetResidencyState() ) {
 						case ResidencyState::FAILED: {
 							// We have a load failure. Early out by returning true.

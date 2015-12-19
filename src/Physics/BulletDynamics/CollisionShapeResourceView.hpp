@@ -31,7 +31,7 @@ namespace BulletDynamics {
 
 	public:
 		//! Constructs this @ref CollisionShapeResourceView instance.
-		CollisionShapeResourceView( const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		CollisionShapeResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref CollisionShapeResourceView instance.
 		~CollisionShapeResourceView();

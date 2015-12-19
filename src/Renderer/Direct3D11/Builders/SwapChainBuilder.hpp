@@ -32,7 +32,7 @@ namespace Direct3D11 {
 
 	public:
 		//!	Constructs this @ref SwapChainBuilder instance.
-		SwapChainBuilder( const Utility::COMPointer<::IDXGIFactory1>& factory = nullptr );
+		SwapChainBuilder( const Utility::COMPointer<::IDXGIFactory1>& factory = Utility::COMPointer<::IDXGIFactory1>( nullptr ) );
 
 		//!	Destroys this @ref SwapChainBuilder instance.
 		~SwapChainBuilder() = default;

@@ -522,9 +522,6 @@
     <ClCompile Include="..\src\Foundation\WorldView.cpp">
       <Filter>Source Files\Foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.cpp">
-      <Filter>Source Files\Foundation</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\foundation\Player.cpp">
       <Filter>Source Files\Foundation</Filter>
     </ClCompile>
@@ -573,9 +570,6 @@
     <ClCompile Include="..\src\FileSystem\Win32\AsynchronousFileReader.cpp">
       <Filter>Source Files\FileSystem\Win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageSink.cpp">
-      <Filter>Source Files\Scripting\Angelscript</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\String.cpp">
       <Filter>Source Files\Utility\Containers</Filter>
     </ClCompile>
@@ -584,6 +578,30 @@
     </ClCompile>
     <ClCompile Include="..\src\Utility\Containers\SpatialHash.cpp">
       <Filter>Source Files\Utility\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scripting\Angelscript\SmartPointers.cpp">
+      <Filter>Source Files\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageBus.cpp">
+      <Filter>Source Files\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.ShaderResourceViewFactory.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.PipelineViewFactory.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\EngineService.BytecodePackageViewFactory.cpp">
+      <Filter>Source Files\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\Angelscript\EngineService.ObjectGraphViewFactory.cpp">
+      <Filter>Source Files\Scripting\Angelscript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.MeshViewFactory.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.CollisionShapeViewFactory.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -818,9 +836,6 @@
     <ClInclude Include="..\src\Utility\Result.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\DisposingResult.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Filesystem\ContentProvider.hpp">
       <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
@@ -989,9 +1004,6 @@
     <ClInclude Include="..\src\Foundation\WorldView.hpp">
       <Filter>Header Files\Foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\foundation\WorldViewFactoryPublishingInitializationVisitor.hpp">
-      <Filter>Header Files\Foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile2.hpp">
       <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
@@ -1073,9 +1085,6 @@
     <ClInclude Include="..\src\FileSystem\Win32\AsynchronousFileWriter.hpp">
       <Filter>Header Files\FileSystem\Win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Scripting\MessageSink.hpp">
-      <Filter>Header Files\Scripting</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scripting\Message.hpp">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
@@ -1095,6 +1104,27 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Equals.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scripting\Angelscript\SmartPointers.hpp">
+      <Filter>Header Files\Scripting\Angelscript</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\MessageBus.hpp">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Packages\ResourceViewFactory.hpp">
+      <Filter>Header Files\Packages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\CountedResult.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Less.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Comparisons.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Greater.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1153,9 +1183,6 @@
       <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Foundation\WorldView.inl">
-      <Filter>Source Files\Foundation</Filter>
-    </None>
-    <None Include="..\src\Foundation\WorldViewFactoryPublishingInitializationVisitor.inl">
       <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Packages\ContentLibrary.inl">
@@ -1315,6 +1342,18 @@
       <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\Equals.inl">
+      <Filter>Source Files\Utility</Filter>
+    </None>
+    <None Include="..\src\Scripting\Message.inl">
+      <Filter>Source Files\Scripting</Filter>
+    </None>
+    <None Include="..\src\Scripting\MessageBus.inl">
+      <Filter>Source Files\Scripting</Filter>
+    </None>
+    <None Include="..\src\Utility\Less.inl">
+      <Filter>Source Files\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Greater.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
   </ItemGroup>
