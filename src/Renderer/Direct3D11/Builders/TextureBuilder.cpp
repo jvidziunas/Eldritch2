@@ -47,14 +47,14 @@ namespace Renderer {
 namespace Direct3D11 {
 
 	TextureBuilder::TextureBuilder( const COMPointer<::ID3D11Device>& device ) : _device( device ),
-																									 _depthInTexels( 1u ),
-																									 _mipLevels( 1u ),
-																									 _format( ::DXGI_FORMAT_UNKNOWN ),
-																									 _usage( ::D3D11_USAGE_DEFAULT ),
-																									 _bindFlags( 0u ),
-																									 _accessFlags( 0u ),
-																									 _miscFlags( 0u ),
-																									 _debugName( nullptr ) {
+																				 _depthInTexels( 1u ),
+																				 _mipLevels( 1u ),
+																				 _format( ::DXGI_FORMAT_UNKNOWN ),
+																				 _usage( ::D3D11_USAGE_DEFAULT ),
+																				 _bindFlags( 0u ),
+																				 _accessFlags( 0u ),
+																				 _miscFlags( 0u ),
+																				 _debugName( nullptr ) {
 		SetTexture2D( 1u, 1u, 1u );
 
 		_sampleDesc.Count	= 1u;

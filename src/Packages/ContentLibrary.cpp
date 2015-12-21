@@ -92,7 +92,7 @@ namespace FileSystem {
 	// ---
 
 		// Oddball positioning here, but the scoping gymnastics are necessary to prevent lock re-entrancy in the content package destructor.
-		ObjectHandle<DeserializedContentPackage>	createdPackage( nullptr );
+		ObjectHandle<DeserializedContentPackage>	createdPackage;
 
 		{	ScopedLock	_( *_contentPackageDirectoryMutex );
 			const auto	packageCandidate( _contentPackageDirectory.Find( packageName ) );
@@ -144,7 +144,7 @@ namespace FileSystem {
 	// ---
 
 		if( auto newPackage = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) ) {
-			return { ObjectHandle<const ContentPackage>( newPackage, ::Eldritch2::PassthroughReferenceCountingSemantics ) };
+			return { static_cast<ContentPackage*>(newPackage) };
 		}
 
 		return { Error::OUT_OF_MEMORY };

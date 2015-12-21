@@ -37,10 +37,12 @@ namespace Scripting {
 		ETInlineHint ObjectHandle( CompatibleObject& reference, const DefaultReferenceCountingSemantics = ::Eldritch2::DefaultReferenceCountingSemantics );
 		//!	Constructs this @ref ObjectHandle instance.
 		template <typename CompatibleObject>
-		ETInlineHint ObjectHandle( const Scripting::ObjectHandle<CompatibleObject>& handle );
+		ETInlineHint ObjectHandle( const ObjectHandle<CompatibleObject>& handle );
 		//!	Constructs this @ref ObjectHandle instance.
 		template <typename CompatibleObject>
-		ETInlineHint ObjectHandle( Scripting::ObjectHandle<CompatibleObject>&& handle );
+		ETInlineHint ObjectHandle( ObjectHandle<CompatibleObject>&& handle );
+		//!	Constructs this @ref ObjectHandle instance.
+		ETInlineHint ObjectHandle( const ObjectHandle<Object>& handle );
 		//!	Constructs this @ref ObjectHandle instance.
 		ETInlineHint ObjectHandle( decltype(nullptr) );
 		//!	Constructs this @ref ObjectHandle instance.
@@ -59,13 +61,13 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
-		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( const Scripting::ObjectHandle<Object>& handle );
+		ETInlineHint ObjectHandle<Object>&	operator=( const ObjectHandle<Object>& handle );
 		template <typename CompatibleObject>
-		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( const Scripting::ObjectHandle<CompatibleObject>& handle );
+		ETInlineHint ObjectHandle<Object>&	operator=( const ObjectHandle<CompatibleObject>& handle );
 		template <typename CompatibleObject>
-		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( Scripting::ObjectHandle<CompatibleObject>&& handle );
+		ETInlineHint ObjectHandle<Object>&	operator=( ObjectHandle<CompatibleObject>&& handle );
 		template <typename CompatibleObject>
-		ETInlineHint Scripting::ObjectHandle<Object>&	operator=( CompatibleObject* const object );
+		ETInlineHint ObjectHandle<Object>&	operator=( CompatibleObject* const object );
 
 	// ---------------------------------------------------
 

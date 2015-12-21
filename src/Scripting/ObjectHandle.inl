@@ -62,7 +62,7 @@ namespace Scripting {
 
 	template <class Object>
 	template <typename CompatibleObject>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( const Scripting::ObjectHandle<CompatibleObject>& handle ) : ObjectHandle( handle._pointer ) {
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( const ObjectHandle<CompatibleObject>& handle ) : ObjectHandle( handle._pointer ) {
 		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
 	}
 
@@ -70,9 +70,14 @@ namespace Scripting {
 
 	template <class Object>
 	template <typename CompatibleObject>
-	ETInlineHint ObjectHandle<Object>::ObjectHandle( Scripting::ObjectHandle<CompatibleObject>&& handle ) : ObjectHandle( handle.Release(), ::Eldritch2::PassthroughReferenceCountingSemantics ) {
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( ObjectHandle<CompatibleObject>&& handle ) : ObjectHandle( handle.Release(), ::Eldritch2::PassthroughReferenceCountingSemantics ) {
 		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
 	}
+
+// ---------------------------------------------------
+
+	template <class Object>
+	ETInlineHint ObjectHandle<Object>::ObjectHandle( const ObjectHandle<Object>& handle ) : ObjectHandle( handle._pointer ) {}
 
 // ---------------------------------------------------
 
@@ -142,7 +147,7 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	template <class Object>
-	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( const Scripting::ObjectHandle<Object>& handle ) {
+	ETInlineHint ObjectHandle<Object>& ObjectHandle<Object>::operator=( const ObjectHandle<Object>& handle ) {
 		return (*this) = handle._pointer;
 	}
 
@@ -150,7 +155,7 @@ namespace Scripting {
 
 	template <class Object>
 	template <typename CompatibleObject>
-	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( const Scripting::ObjectHandle<CompatibleObject>& handle ) {
+	ETInlineHint ObjectHandle<Object>& ObjectHandle<Object>::operator=( const ObjectHandle<CompatibleObject>& handle ) {
 		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
 
 	// ---
@@ -162,7 +167,7 @@ namespace Scripting {
 
 	template <class Object>
 	template <typename CompatibleObject>
-	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( Scripting::ObjectHandle<CompatibleObject>&& handle ) {
+	ETInlineHint ObjectHandle<Object>& ObjectHandle<Object>::operator=( ObjectHandle<CompatibleObject>&& handle ) {
 		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
 
 	// ---
@@ -182,7 +187,7 @@ namespace Scripting {
 
 	template <class Object>
 	template <typename CompatibleObject>
-	ETInlineHint Scripting::ObjectHandle<Object>& ObjectHandle<Object>::operator=( CompatibleObject* const object ) {
+	ETInlineHint ObjectHandle<Object>& ObjectHandle<Object>::operator=( CompatibleObject* const object ) {
 		static_assert( ::std::is_convertible<CompatibleObject*, Object*>::value, "Object handles can only be assigned to compatible types!" );
 
 	// ---
