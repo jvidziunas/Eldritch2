@@ -4,3 +4,6 @@
 [submodule "extern/recastnavigation"]
 	path = extern/recastnavigation
 	url = https://github.com/recastnavigation/recastnavigation.git
+[submodule "extern/microprofile"]
+	path = extern/microprofile
+	url = https://github.com/theunknownxy/microprofile.git
