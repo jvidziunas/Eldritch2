@@ -7,3 +7,6 @@
 [submodule "extern/microprofile"]
 	path = extern/microprofile
 	url = https://github.com/theunknownxy/microprofile.git
+[submodule "extern/opus"]
+	path = extern/opus
+	url = https://git.xiph.org/opus.git
