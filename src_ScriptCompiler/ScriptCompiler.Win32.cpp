@@ -18,11 +18,11 @@
 //------------------------------------------------------------------//
 
 #if( ET_PLATFORM_WINDOWS )
-int main( int argc, const ::Eldritch2::SystemChar** argv ) {
+int main( int argc, ::Eldritch2::UTF8Char** argv ) {
 	using namespace ::Eldritch2;
 
 // ---
 
-	return Tools::ScriptCompilerTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv + 1, argv + argc } );
+	return Tools::ScriptCompilerTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv, argv + argc } );
 }
 #endif

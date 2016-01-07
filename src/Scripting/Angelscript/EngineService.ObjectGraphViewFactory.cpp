@@ -15,6 +15,7 @@
 #include <Scripting/AngelScript/ObjectGraphResourceView.hpp>
 #include <Scripting/Angelscript/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
+#include <Utility/Containers/Range.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
@@ -26,7 +27,7 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	ErrorCode EngineService::ObjectGraphViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name ) {
+	ErrorCode EngineService::ObjectGraphViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
 		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( contentLibrary, package, name, allocator ) ? Error::NONE : Error::OUT_OF_MEMORY;
 	}
 

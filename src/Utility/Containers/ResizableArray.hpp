@@ -58,9 +58,9 @@ namespace Detail {
 		/*!	@param[in] initialSize Initial capacity hint, in elements.
 			@param[in] allocator Movable reference to an allocator to be moved into the container.
 			*/
-		ETInlineHint explicit ResizableArray( AllocatorType&& allocator = Allocator() );
+		ETInlineHint ResizableArray( AllocatorType&& allocator = Allocator() );
 		//! Constructs this @ref ResizableArray instance.
-		ETInlineHint explicit ResizableArray( ::Eldritch2::ResizableArray<StoredObject, Allocator>&& moveSource );
+		ETInlineHint ResizableArray( ::Eldritch2::ResizableArray<StoredObject, Allocator>&& moveSource );
 		//! Constructs this @ref ResizableArray instance.
 		/*!	@param[in] initialSize Initial capacity hint, in elements.
 			@param[in] allocator Movable reference to an allocator to be moved into the container.

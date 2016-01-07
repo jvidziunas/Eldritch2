@@ -23,58 +23,44 @@ namespace Eldritch2 {
 namespace Tools {
 namespace Detail {
 
-	template <typename Option>
-	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddOption( const ::Eldritch2::SystemChar* const name, const ::Eldritch2::SystemChar shortName, Option& option ) {
-		auto	insertResult( _shortSettings.Insert( SettingHandler{ shortName, [] ( const ::Eldritch2::Range<const ::Eldritch2::SystemChar*> value, void* const settingAddress ) -> int {
-			using namespace ::boost::iostreams;
+	template <typename Argument>
+	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddTypedArgument( const ::Eldritch2::UTF8Char* const name, const ::std::function<int (const Argument)>& handler ) {
+		using namespace ::std::placeholders;
+		using namespace ::boost::iostreams;
 
-		// ---
+	// ---
 
-			array_source<::Eldritch2::SystemChar>	source( value.first, value.onePastLast );
-			stream<decltype(source)>				stream( source );
+		_knownOptions.PushBack( { name, [handler] ( const ::Eldritch2::UTF8Char* const begin, const ::Eldritch2::UTF8Char* const end ) -> int {
+			basic_array_source<::Eldritch2::UTF8Char>	source( begin, end );
+			stream<decltype(source)>					stream( source );
+			Argument									optionValue;
 
-			stream >> *static_cast<Option*>(settingAddress);
+			stream >> optionValue;
 
-			return stream.fail() ? -1 : 0;
-		} } ) );
+			return stream.fail() ? -1 : handler( optionValue );
+		} } );
 
-		ETRuntimeAssert( insertResult.second );
-
-		return AddOption( name, option );
+		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename Option>
-	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddOption( const ::Eldritch2::SystemChar* const name, Option& option ) {
-		auto	insertResult( _shortSettings.Insert( SettingHandler{ shortName, [] ( const ::Eldritch2::Range<const ::Eldritch2::SystemChar*> value, void* const settingAddress ) -> int {
-			using namespace ::boost::iostreams;
-
-		// ---
-
-			array_source<::Eldritch2::SystemChar>	source( value.first, value.onePastLast );
-			stream<decltype(source)>				stream( source );
-
-			stream >> *static_cast<Option*>(settingAddress);
-
-			return stream.fail() ? -1 : 0;
-		} } ) );
-
-		ETRuntimeAssert( insertResult.second );
-
-		return *this;
+	template <typename Argument>
+	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddTypedArgument( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const shortName, const ::std::function<int (const Argument)>& handler ) {
+		AddTypedArgument( name, handler );
+		return AddTypedArgument( shortName, handler );
 	}
 
 }	// namespace Detail
 
 	template <typename ImplementingType>
-	int	ToolCRTPBase<ImplementingType>::Run( const Range<const SystemChar**> options ) {
-		{	// Register tool options.
-			OptionRegistrationVisitor	visitor( static_cast<ImplementingType&>(*this).GetAllocator() );
+	int	ToolCRTPBase<ImplementingType>::Run( const Range<UTF8Char**> options ) {
+		{	OptionRegistrationVisitor	visitor( static_cast<ImplementingType&>(*this).GetAllocator() );
 
+			// Register tool options.
 			static_cast<ImplementingType&>(*this).RegisterOptions( visitor );
 
-			visitor.DispatchOptions( options );
+			visitor.DispatchProgramArguments( options );
 		}
 
 		return static_cast<ImplementingType&>(*this).Process();

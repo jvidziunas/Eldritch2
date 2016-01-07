@@ -270,6 +270,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Packages\ContentPackage.cpp" />
     <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp" />
     <ClCompile Include="..\src\Packages\LoaderThread.cpp" />
+    <ClCompile Include="..\src\Packages\ResourceViewFactory.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.CollisionShapeViewFactory.cpp" />
@@ -291,6 +292,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.ShaderResourceViewFactory.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\MeshResourceView.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\RenderTargetResourceView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\SwapChain.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.cpp" />
@@ -414,6 +416,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Renderer\Direct3D11\ForwardDeclarations.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\MeshResourceView.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\RenderTargetResourceView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\ResourceCommon.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\SwapChain.hpp" />
@@ -450,6 +453,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
     <ClInclude Include="..\src\Utility\Containers\String.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\SystemString.hpp" />
     <ClInclude Include="..\src\Utility\CountedResult.hpp" />
     <ClInclude Include="..\src\Utility\Equals.hpp" />
     <ClInclude Include="..\src\Utility\Greater.hpp" />
@@ -615,6 +619,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\Containers\ResizableArray.inl" />
     <None Include="..\src\Utility\Containers\SpatialHash.inl" />
     <None Include="..\src\Utility\Containers\String.inl" />
+    <None Include="..\src\Utility\Containers\SystemString.inl" />
     <None Include="..\src\Utility\Containers\UnorderedMap.inl" />
     <None Include="..\src\Utility\Containers\UTF8String.inl" />
     <None Include="..\src\Utility\Counter.inl" />

@@ -150,9 +150,11 @@
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
+    <ClCompile Include="..\src\Scripting\AngelScript\SmartPointers.cpp" />
     <ClCompile Include="..\src\Tools\ToolCRTPBase.cpp" />
     <ClCompile Include="..\src\Tools\Win32\FileAccessorFactory.cpp" />
     <ClCompile Include="..\src\Utility\Assert.cpp" />
+    <ClCompile Include="..\src\Utility\Containers\String.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp" />
@@ -175,6 +177,9 @@
     <ClInclude Include="..\src\Tools\Win32\FileAccessorFactory.hpp" />
     <ClInclude Include="..\src\Utility\Assert.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\String.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\SystemString.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp" />
@@ -203,6 +208,9 @@
     <None Include="..\src\FileSystem\SynchronousFileWriter.inl" />
     <None Include="..\src\Tools\ToolCRTPBase.inl" />
     <None Include="..\src\Utility\Containers\Range.inl" />
+    <None Include="..\src\Utility\Containers\String.inl" />
+    <None Include="..\src\Utility\Containers\SystemString.inl" />
+    <None Include="..\src\Utility\Containers\UTF8String.inl" />
     <None Include="..\src\Utility\Memory\Allocator.inl" />
     <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
     <None Include="..\src\Utility\Memory\StandardLibrary.Win.inl" />

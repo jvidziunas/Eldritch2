@@ -1,8 +1,8 @@
 /*==================================================================*\
-  ShaderResourceResourceView.hpp
+  RenderTargetResourceView.hpp
   ------------------------------------------------------------------
   Purpose:
-
+  
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/ResourceView.hpp>
-#include <Utility/MPL/IntTypes.hpp>
 #include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
 #if( ET_COMPILER_IS_MSVC )
@@ -33,30 +32,26 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	class ShaderResourceResourceView : public FileSystem::ResourceView {
+	class RenderTargetResourceView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref ShaderResourceResourceView instance.
-		ShaderResourceResourceView( FileSystem::ContentLibrary&			owningLibrary,
-									FileSystem::ContentPackage&			package,
-									const ::Eldritch2::UTF8Char* const	name,
-									::Eldritch2::Allocator&				allocator );
+		//! Constructs this @ref RenderTargetResourceView instance.
+		RenderTargetResourceView( FileSystem::ContentLibrary&			owningLibrary,
+								  FileSystem::ContentPackage&			package,
+								  const ::Eldritch2::UTF8Char* const	name,
+								  ::Eldritch2::Allocator&				allocator );
 
-		~ShaderResourceResourceView() = default;
+		~RenderTargetResourceView() = default;
 
 	// ---------------------------------------------------
 
 		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
 
-	// ---------------------------------------------------
-
-		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
-
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		Utility::COMPointer<::ID3D11ShaderResourceView>	_shaderView;
+		Utility::COMPointer<::ID3D11RenderTargetView>	_renderTargetView;
 	};
 
 }	// namespace Direct3D11

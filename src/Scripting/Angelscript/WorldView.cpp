@@ -219,11 +219,21 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	void WorldView::AcceptViewVisitor( const LoadFinalizationVisitor ) {
-		FixedStackAllocator<96u>	tempAllocator( UTF8L("WorldView::AcceptViewVisitor() Temporary Allocator") );
-		const auto					resourceName( GetOwningWorld().GetPropertyByKey( tempAllocator, UTF8L("ResourceName") ) );
+		FixedStackAllocator<128u>	tempAllocator( UTF8L("WorldView::AcceptViewVisitor() Temporary Allocator") );
+		const auto					allocationCheckpoint( tempAllocator.CreateCheckpoint() );
 
-		if( !resourceName.Empty() ) {
-			GetEngineContentLibrary().ResolveViewByName( resourceName.GetCharacterArray(), *static_cast<ObjectGraphResourceView*>(nullptr) ).DeserializeIntoWorldView( *this );
+		{	const auto	rulesClassName( GetOwningWorld().GetPropertyByKey( tempAllocator, UTF8L("GameRules") ) );
+			_rulesEntity = ::std::move( Spawn( rulesClassName.GetCharacterArray() ) );
+		}
+
+		// Rewind the allocation to conserve/recycle stack space. We don't need both strings at once.
+		tempAllocator.RestoreCheckpoint( allocationCheckpoint );
+
+		{	const auto	resourceName( GetOwningWorld().GetPropertyByKey( tempAllocator, UTF8L("ResourceName") ) );
+
+			if( !resourceName.Empty() ) {
+				GetEngineContentLibrary().ResolveViewByName( resourceName.GetCharacterArray(), *static_cast<ObjectGraphResourceView*>(nullptr) ).DeserializeIntoWorldView( *this );
+			}
 		}
 	}
 
@@ -252,6 +262,8 @@ namespace AngelScript {
 	void WorldView::AcceptViewVisitor( const DeletionPreparationVisitor ) {
 		// Prepare for script execution (this will take place within the various release methods called implicitly below)
 		BroadcastViewVisitor( ScriptExecutionPreparationVisitor() );
+
+		_rulesEntity.reset();
 	}
 
 // ---------------------------------------------------

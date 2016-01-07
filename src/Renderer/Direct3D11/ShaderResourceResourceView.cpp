@@ -33,7 +33,7 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	ShaderResourceResourceView::ShaderResourceResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ), _minLoadedLOD( numeric_limits<decltype(_minLoadedLOD)>::max() ) {}
+	ShaderResourceResourceView::ShaderResourceResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
 
 // ---------------------------------------------------
 
@@ -43,7 +43,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint const UTF8Char* const ShaderResourceResourceView::GetSerializedDataTag() {
+	const UTF8Char* const ShaderResourceResourceView::GetSerializedDataTag() {
 		return UTF8L("ShaderResource");
 	}
 

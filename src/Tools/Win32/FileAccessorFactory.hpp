@@ -35,11 +35,11 @@ namespace Win32 {
 
 	// ---------------------------------------------------
 
-		::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
+		::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const fileName ) override;
 
-		::Eldritch2::InstancePointer<FileSystem::SynchronousFileReader>		CreateReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
+		::Eldritch2::InstancePointer<FileSystem::SynchronousFileReader>		CreateReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const fileName ) override;
 
-		::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>		CreateWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::SystemChar* const fileName ) override;
+		::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>		CreateWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const fileName ) override;
 	};
 
 }	// namespace Win32

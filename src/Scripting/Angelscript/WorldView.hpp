@@ -95,6 +95,7 @@ namespace AngelScript {
 	private:
 		::Eldritch2::ChildAllocator	_stringAllocator;
 		::asIScriptEngine&			_scriptEngine;
+		AngelScript::ObjectHandle	_rulesEntity;
 	};
 
 }	// namespace AngelScript

@@ -13,6 +13,7 @@ If you'd like to get a copy of the executable, (currently tested/running under 6
 * [Boost](http://www.boost.org/), version 1.59
 * [Steamworks](https://partner.steamgames.com/)
 * [RDESTL](https://github.com/msinilo/rdestl), with customizations/extensions
+* [SimpleOpt](https://github.com/brofield/simpleopt)
 
 ## Project Structure
 At a high level, project directories are arranged in a hierarchy. Shared or engine-related files live in the `/src/` subdirectory, and the current set of planned tools each have their own special sibling folder named according to the pattern `/src_<Tool Name>/`.

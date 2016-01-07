@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Bakinator.cpp
+  ResourceViewFactory.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,17 +12,19 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <Tools/Win32/FileAccessorFactory.hpp>
-#include <Bakinator.hpp>
+#include <Packages/ResourceViewFactory.hpp>
+#include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 
-#if( ET_PLATFORM_WINDOWS )
-int main( int argc, const ::Eldritch2::SystemChar** argv ) {
-	using namespace ::Eldritch2;
+using namespace ::Eldritch2;
 
-// ---
+namespace Eldritch2 {
+namespace FileSystem {
 
-	return Tools::Bakinator<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv, argv + argc } );
-}
-#endif
+	ErrorCode ResourceViewFactory::AllocateEngineResources( Allocator& /*allocator*/, ContentLibrary& /*contentLibrary*/, ContentPackage& /*package*/ ) {
+		// Default implementation does nothing.
+		return Error::NONE;
+	}
+
+}	// namespace FileSystem
+}	// namespace Eldritch2

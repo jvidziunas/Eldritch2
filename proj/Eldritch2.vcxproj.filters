@@ -603,6 +603,12 @@
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.CollisionShapeViewFactory.cpp">
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\RenderTargetResourceView.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Packages\ResourceViewFactory.cpp">
+      <Filter>Source Files\Packages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
@@ -1127,6 +1133,12 @@
     <ClInclude Include="..\src\Utility\Greater.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\RenderTargetResourceView.hpp">
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\SystemString.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1355,6 +1367,9 @@
     </None>
     <None Include="..\src\Utility\Greater.inl">
       <Filter>Source Files\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\SystemString.inl">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

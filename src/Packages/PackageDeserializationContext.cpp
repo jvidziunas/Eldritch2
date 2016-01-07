@@ -118,7 +118,7 @@ namespace FileSystem {
 		if( auto exports = FlatBuffers::GetHeader( _file->GetAddressForFileByteOffset( 0u ) )->exports() ) {
 			for( auto definition : *exports ) {
 				for( auto& factory : GetContentLibrary().GetFactoriesForResourceType( definition->type()->c_str() ) ) {
-					result = factory.AllocateResourceView( package.GetAllocator(), package.GetContentLibrary(), package, definition->name()->c_str() );
+					result = factory.AllocateResourceView( package.GetAllocator(), package.GetContentLibrary(), package, definition->name()->c_str(), Range<const char*>::EmptySet() );
 
 					if( !result ) {
 						break;

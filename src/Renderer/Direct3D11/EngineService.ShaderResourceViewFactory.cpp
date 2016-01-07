@@ -44,7 +44,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::ShaderResourceViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name ) {
+	ErrorCode EngineService::ShaderResourceViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
 		ETRuntimeAssert( _device );
 
 	// ---

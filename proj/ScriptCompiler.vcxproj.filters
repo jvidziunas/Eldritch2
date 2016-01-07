@@ -117,6 +117,12 @@
     <ClCompile Include="..\src\Tools\ToolCRTPBase.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Utility\Containers\String.cpp">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\AngelScript\SmartPointers.cpp">
+      <Filter>Source Files\AngelScript</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h">
@@ -191,6 +197,15 @@
     <ClInclude Include="..\src\Tools\ToolCRTPBase.hpp">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\String.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\SystemString.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Utility\Memory\Allocator.inl">
@@ -219,6 +234,15 @@
     </None>
     <None Include="..\src\Tools\ToolCRTPBase.inl">
       <Filter>Source Files\Tools</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\String.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\UTF8String.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\SystemString.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

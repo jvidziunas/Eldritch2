@@ -104,13 +104,13 @@ namespace Detail {
 		template <class AlternateAllocator>
 		ETInlineHint String<Character, AlternateAllocator>	Substring( AlternateAllocator& allocator, const ConstIterator begin );
 
-		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const str );
-		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const str, const SizeType lengthInBytes );
+		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const string );
+		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const begin, const CharacterType* const end );
 
 		ETInlineHint String<Character, Allocator>&	Append( const CharacterType character );
 		
 		ETInlineHint String<Character, Allocator>&	Append( const CharacterType* const string );
-		ETInlineHint String<Character, Allocator>&	Append( const CharacterType* const stringBegin, const SizeType lengthInBytes );
+		ETInlineHint String<Character, Allocator>&	Append( const CharacterType* const begin, const CharacterType* const end );
 		template <class AlternateAllocator>
 		ETInlineHint String<Character, Allocator>&	Append( const String<Character, AlternateAllocator>& string );
 

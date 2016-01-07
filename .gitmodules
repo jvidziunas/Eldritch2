@@ -1,0 +1,3 @@
+[submodule "extern/simpleopt"]
+	path = extern/simpleopt
+	url = https://github.com/brofield/simpleopt.git

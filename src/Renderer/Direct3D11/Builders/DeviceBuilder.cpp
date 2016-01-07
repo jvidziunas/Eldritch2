@@ -116,13 +116,19 @@ namespace Direct3D11 {
 		COMPointer<::ID3D11Device>	device;
 
 		if( (nullptr != _adapterName) && !EqualityCompareString( _adapterName, UTF8L("") ) ) {
-			COMPointer<::IDXGIAdapter1>	temporaryAdapter;
 			::DXGI_ADAPTER_DESC1		adapterDescription;
 			wchar_t						wideAdapterName[128u];
 
-			for( ::UINT adapterID( 0u ); DXGI_ERROR_NOT_FOUND != _factory->EnumAdapters1( adapterID, temporaryAdapter.GetInterfacePointer() ); ++adapterID ) {
+			for( ::UINT adapterID( 0u ); ; ++adapterID ) {
+				COMPointer<::IDXGIAdapter1>	temporaryAdapter;
+
+				if( DXGI_ERROR_NOT_FOUND == _factory->EnumAdapters1( adapterID, temporaryAdapter.GetInterfacePointer() ) ) {
+					break;
+				}
+
 				if( SUCCEEDED( adapter->GetDesc1( &adapterDescription ) ) && EqualityCompareString( adapterDescription.Description, wideAdapterName ) ) {
 					adapter = move( temporaryAdapter );
+					break;
 				}
 			}
 		}

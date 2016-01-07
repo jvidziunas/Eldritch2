@@ -32,28 +32,41 @@ namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ScriptCompilerTool() : AllocatorType( UTF8L("Root Allocator") ),
+	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ScriptCompilerTool() : _globalAllocator( UTF8L("Root Allocator") ),
+																					 _engine( ::asCreateScriptEngine() ),
+																					 _fileAccessorFactory(),
+																					 _scriptBuilder(),
 																					 _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ),
-																					 _inputFiles( { GetAllocator(), UTF8L("Input File Collection Allocator") } ) {}
-
-// ---------------------------------------------------
-
-	template <class GlobalAllocator, class FileAccessorFactory>
-	ETInlineHint typename ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AllocatorType& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetAllocator() {
-		return static_cast<AllocatorType&>(*this);
-	}
+																					 _inputFiles( { GetAllocator(), UTF8L("Input File Name Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::~ScriptCompilerTool() {
-		if( auto scriptModule = GetModule() ) {
+		if( auto scriptModule = GetScriptBuilder().GetModule() ) {
 			scriptModule->Discard();
 		}
+	}
 
-		if( engine ) {
-			engine->ShutDownAndRelease();
-		}
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	ETInlineHint typename ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AllocatorType& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetAllocator() {
+		return _globalAllocator;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	ETInlineHint typename ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::FileAccessorFactoryType& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetFileAccessorFactory() {
+		return _fileAccessorFactory;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	ETInlineHint ::CScriptBuilder& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetScriptBuilder() {
+		return _scriptBuilder;
 	}
 
 // ---------------------------------------------------
@@ -61,32 +74,32 @@ namespace Tools {
 	template <class GlobalAllocator, class FileAccessorFactory>
 	template <class MetadataVisitor>
 	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AcceptMetadataVisitor( MetadataVisitor&& visitor ) {
+		const auto	scriptModule( GetScriptBuilder().GetModule() );
+
 		visitor.BeginMetadataProcessing();
 
 		// The built-in metadata parser uses really inconsistent indexing that additionally isn't useful across execution boundaries, so we need to get a little creative here.
 		// Since type/function/property indices will remain the same within the module, we instead will loop through each exposed element in the module, check if any metadata has
 		// been associated with the element, and then dispatch out to the visitor if appropriate.
+		{	visitor.BeginTypeMetadataProcessing();
 
-		if( !typeMetadataMap.empty() ) {
-			visitor.BeginTypeMetadataProcessing();
-
-			for( uint32 index( 0u ), typeCount( GetModule()->GetObjectTypeCount() ); index != typeCount; ++index ) {
-				auto	type( GetModule()->GetObjectTypeByIndex( index ) );
-				int		typeID( type->GetTypeId() );
+			for( uint32 index( 0u ), typeCount( scriptModule->GetObjectTypeCount() ); index != typeCount; ++index ) {
+				const auto	type( scriptModule->GetObjectTypeByIndex( index ) );
+				int			typeID( type->GetTypeId() );
 
 				for( uint32 methodIndex( 0u ), methodCount( type->GetMethodCount() ); index != methodCount; ++methodIndex ) {
-					if( auto metadata = GetMetadataStringForTypeMethod( typeID, type->GetMethodByIndex( methodIndex ) ) ) {
+					if( auto metadata = GetScriptBuilder().GetMetadataStringForTypeMethod( typeID, type->GetMethodByIndex( methodIndex ) ) ) {
 						visitor.ProcessTypePropertyMetadata( methodIndex, metadata );
 					}
 				}
 
 				for( uint32 propertyIndex( 0u ), propertyCount( type->GetPropertyCount() ); index != propertyCount; ++propertyIndex ) {
-					if( auto metadata = GetMetadataStringForTypeProperty( typeID, static_cast<int>(propertyIndex) ) ) {
+					if( auto metadata = GetScriptBuilder().GetMetadataStringForTypeProperty( typeID, static_cast<int>(propertyIndex) ) ) {
 						visitor.ProcessTypePropertyMetadata( propertyIndex, metadata );
 					}
 				}
 
-				if( auto metadata = GetMetadataStringForType( type->GetTypeId() ) ) {
+				if( auto metadata = GetScriptBuilder().GetMetadataStringForType( type->GetTypeId() ) ) {
 					visitor.ProcessTypeMetadata( index, metadata );
 				}
 			}
@@ -94,13 +107,12 @@ namespace Tools {
 			visitor.FinishTypeMetadataProcessing();
 		}
 
-		if( !funcMetadataMap.empty() ) {
-			visitor.BeginFunctionMetadataProcessing();
+		{	visitor.BeginFunctionMetadataProcessing();
 
-			for( uint32 index( 0u ); index != GetModule()->GetFunctionCount(); ++index ) {
-				auto	function( GetModule()->GetFunctionByIndex( index ) );
+			for( uint32 index( 0u ); index != scriptModule->GetFunctionCount(); ++index ) {
+				auto	function( scriptModule->GetFunctionByIndex( index ) );
 
-				if( auto metadata = GetMetadataStringForFunc( function ) ) {
+				if( auto metadata = GetScriptBuilder().GetMetadataStringForFunc( function ) ) {
 					visitor.ProcessFunctionMetadata( index, metadata );
 				}
 			}
@@ -108,11 +120,10 @@ namespace Tools {
 			visitor.FinishFunctionMetadataProcessing();
 		}
 
-		if( !varMetadataMap.empty() ) {
-			visitor.BeginPropertyMetadataProcessing();
+		{	visitor.BeginPropertyMetadataProcessing();
 
-			for( uint32 index( 0u ); index != GetModule()->GetGlobalVarCount(); ++index ) {
-				if( auto metadata = GetMetadataStringForVar( static_cast<int>(index) ) ) {
+			for( uint32 index( 0u ); index != scriptModule->GetGlobalVarCount(); ++index ) {
+				if( auto metadata = GetScriptBuilder().GetMetadataStringForVar( static_cast<int>(index) ) ) {
 					visitor.ProcessFunctionMetadata( index, metadata );
 				}
 			}
@@ -132,7 +143,7 @@ namespace Tools {
 
 		public:
 			//!	Constructs this @ref OutputStream instance.
-			ETInlineHint OutputStream( ::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>&& writer ) : writer( move( writer ) ) {}
+			ETInlineHint OutputStream( ::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>&& writer ) : writer( ::std::move( writer ) ) {}
 
 			~OutputStream() = default;
 
@@ -153,29 +164,88 @@ namespace Tools {
 
 	// ---
 
-		OutputStream	stream( CreateWriter( GetAllocator(), SL("asdf") ) );
+		OutputStream	stream( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputModuleName.GetCharacterArray() ) );
 
-		if( (!stream.writer) || _inputFiles.IsEmpty() || (::asSUCCESS != StartNewModule( ::asCreateScriptEngine(), _outputModuleName.GetCharacterArray() )) ) {
+		if( !stream.writer || (nullptr == GetScriptBuilder().GetModule()) ) {
 			return -1;
 		}
 
 		// Collate all the source script files together.
 		for( const auto& fileName : _inputFiles ) {
 			// Create a view of the source script file.
-			auto	mappedFile( CreateReadableMemoryMappedFile( GetAllocator(), fileName ) );
-			auto	sectionName( "asdf" );
+			auto	mappedFile( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), fileName.GetCharacterArray() ) );
 
 			// Try to append all the data from source.
-			if( !mappedFile || (0 > AddSectionFromMemory( sectionName, static_cast<const char*>(mappedFile->GetAddressForFileByteOffset( 0u )), mappedFile->GetAccessibleRegionSizeInBytes() )) ) {
+			if( !mappedFile || (0 > GetScriptBuilder().AddSectionFromMemory( fileName.GetCharacterArray(), static_cast<const char*>(mappedFile->GetAddressForFileByteOffset( 0u )), mappedFile->GetAccessibleRegionSizeInBytes() )) ) {
 				return -1;
 			}
 		}
 
-		if( (::asSUCCESS != BuildModule()) || (::asSUCCESS != GetModule()->SaveByteCode( &stream )) ) {
+		if( (::asSUCCESS != GetScriptBuilder().BuildModule()) || (::asSUCCESS != GetScriptBuilder().GetModule()->SaveByteCode( &stream )) ) {
 			return -1;
 		}
 
-		return AcceptMetadataVisitor( FlatBufferMetadataBuilderVisitor( stream, *this ) );
+		return AcceptMetadataVisitor( FlatBufferMetadataBuilderVisitor( stream, GetAllocator() ) );
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+		const ::Eldritch2::UTF8Char	extensionString[]	= UTF8L(".AngelScriptBytecodeMetadata");
+
+		_outputModuleName.Assign( argument, argumentEnd );
+
+		// Trim off the extension string if specified on the command line. We'll add it back in later.
+		if( _outputModuleName.EndsWith( extensionString ) ) {
+			_outputModuleName.Resize( _outputModuleName.Length() - (_countof( extensionString ) - 1) );
+		}
+
+		// Ensure we don't leak resources.
+		if( auto existingModule = GetScriptBuilder().GetModule() ) {
+			existingModule->Discard();
+		}
+
+		// Internally, the module name won't have the extension.
+		GetScriptBuilder().StartNewModule( _engine.get(), _outputModuleName.GetCharacterArray() );
+
+		// Add the file extension back on. This is used during the actual processing step to create the output file.
+		_outputModuleName.Append( extensionString );
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::SetOptimizationLevel( const int level ) {
+		_engine->SetEngineProperty( ::asEEngineProp::asEP_OPTIMIZE_BYTECODE, static_cast<::asPWORD>(level > 0) );
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AddInputFile( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+		_inputFiles.PushBack( { argument, argumentEnd, { GetAllocator(), UTF8L("Input File Name Allocator") } } );
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	void ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::RegisterOptions( OptionRegistrationVisitor& visitor ) {
+		using namespace ::std::placeholders;
+
+	// ---
+
+		visitor.AddArgument( UTF8L("-moduleName"), UTF8L("-m"), ::std::bind( &ScriptCompilerTool::SetOutputModuleName, this, _1, _2 ) );
+		visitor.AddTypedArgument<int>( UTF8L("-optimizationLevel"), UTF8L("-o"), ::std::bind( &ScriptCompilerTool::SetOptimizationLevel, this, _1 ) );
+
+		visitor.AddInputFileHandler( ::std::bind( &ScriptCompilerTool::AddInputFile, this, _1, _2 ) );
+		
 	}
 
 }	// namespace Tools

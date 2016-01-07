@@ -183,7 +183,8 @@ namespace AngelScript {
 				description = "warning";
 				break;
 			}
-			case asMSGTYPE_INFORMATION: {
+			case asMSGTYPE_INFORMATION:
+			default: {
 				messageType = LogMessageType::MESSAGE;
 				description = "message";
 				break;

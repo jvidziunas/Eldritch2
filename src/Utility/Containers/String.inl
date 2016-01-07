@@ -41,7 +41,9 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint String<Character, Allocator>::String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator ) : _underlyingContainer( string, static_cast<SizeType>(stringEnd - string), ::std::move( allocator ) ) {}
+	ETInlineHint String<Character, Allocator>::String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator ) : String( ::std::move( allocator ) ) {
+		Assign( string, stringEnd );
+	}
 
 // ---------------------------------------------------
 
@@ -201,7 +203,7 @@ namespace Eldritch2 {
 	template <typename Character, class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::operator=( const String<Character, AlternateAllocator>& rhs ) {
-		return Assign( rhs.Begin(), rhs.LengthInBytes() );
+		return Assign( rhs.Begin(), rhs.End() );
 	}
 
 // ---------------------------------------------------
@@ -230,8 +232,8 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Assign( const CharacterType* const string, const SizeType lengthInBytes ) {
-		_underlyingContainer.assign( string, lengthInBytes );
+	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Assign( const CharacterType* const begin, const CharacterType* const end ) {
+		_underlyingContainer.assign( begin, end - begin );
 
 		return *this;
 	}
@@ -240,7 +242,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Assign( const CharacterType* const string ) {
-		_underlyingContainer.assign( string, static_cast<SizeType>(::Eldritch2::StringLength( string )) );
+		_underlyingContainer.assign( string, ::Eldritch2::FindEndOfString( string ) );
 
 		return *this;
 	}
@@ -258,14 +260,14 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Append( const CharacterType* const string ) {
-		return Append( string, static_cast<SizeType>(::Eldritch2::StringLength( string )) );
+		return Append( string, ::Eldritch2::FindEndOfString( string ) );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Append( const CharacterType* const stringBegin, const SizeType lengthInBytes ) {
-		_underlyingContainer.append( stringBegin, lengthInBytes );
+	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Append( const CharacterType* const begin, const CharacterType* const end ) {
+		_underlyingContainer.append( begin, end - begin );
 
 		return *this;
 	}
@@ -415,6 +417,23 @@ namespace Eldritch2 {
 	template <typename Character, class StringAllocator>
 	ETNoAliasHint bool operator==( const Character* const string0, const String<Character, StringAllocator>& string1 ) {
 		return 0 == string1.Compare( string0 );
+	}
+
+// ---------------------------------------------------
+
+	template <class Stream, typename Character, class StringAllocator>
+	ETNoAliasHint Stream& operator>>( Stream& stream, String<Character, StringAllocator>& string0 ) {
+		using StreamSentry = Stream::sentry;
+
+	// ---
+
+		StreamSentry	sentry( stream );
+
+		if( sentry ) {
+
+		}
+
+		return stream;
 	}
 
 }	// namespace Eldritch2
