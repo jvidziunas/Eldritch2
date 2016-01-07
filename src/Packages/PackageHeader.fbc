@@ -4,8 +4,8 @@ file_extension	"PackageHeader";
 namespace Eldritch2.FileSystem.FlatBuffers;
 
 struct BlockDescriptor {
-	offset	: uint;
-	length	: uint;
+	offset	: ulong;
+	length	: ulong;
 }
 
 table Export {

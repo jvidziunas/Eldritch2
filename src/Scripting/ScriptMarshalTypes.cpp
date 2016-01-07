@@ -55,7 +55,7 @@ namespace Scripting {
 			}
 
 			static StringMarshal& ETScriptAPICall OpAssign( StringMarshal* thisPointer, const StringMarshal& otherString ) {
-				return static_cast<StringMarshal&>((*thisPointer).Assign( otherString.GetCharacterArray(), otherString.Length() ));
+				return static_cast<StringMarshal&>((*thisPointer).Assign( otherString.Begin(), otherString.End() ));
 			}
 
 			static StringMarshal& ETScriptAPICall OpAddAssign( StringMarshal* thisPointer, const StringMarshal& additionalString ) {

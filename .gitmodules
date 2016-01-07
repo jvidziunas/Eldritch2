@@ -1,3 +1,6 @@
 [submodule "extern/simpleopt"]
 	path = extern/simpleopt
 	url = https://github.com/brofield/simpleopt.git
+[submodule "extern/recastnavigation"]
+	path = extern/recastnavigation
+	url = https://github.com/recastnavigation/recastnavigation.git

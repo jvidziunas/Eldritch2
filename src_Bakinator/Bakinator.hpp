@@ -12,27 +12,19 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/Range.hpp>
+#include <Utility/Containers/ResizableArray.hpp>
+#include <Utility/Containers/UTF8String.hpp>
 #include <Tools/ToolCRTPBase.hpp>
-//------------------------------------------------------------------//
-#include <Packages/PackageHeader_generated.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	class Bakinator : public GlobalAllocator, FileAccessorFactory, public Tools::ToolCRTPBase<Bakinator<GlobalAllocator, FileAccessorFactory>> {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using	FileAccessorFactoryType = FileAccessorFactory;
-		using	AllocatorType			= GlobalAllocator;
-		using	HeaderBuilder			= FileSystem::FlatBuffers::HeaderBuilder;
-		using	Export					= FileSystem::FlatBuffers::Export;
-
+	class Bakinator : public Tools::ToolCRTPBase<Bakinator<GlobalAllocator, FileAccessorFactory>> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+	public:
 		//!	Constructs this @ref Bakinator instance.
 		Bakinator();
 
@@ -40,32 +32,37 @@ namespace Tools {
 
 	// ---------------------------------------------------
 
+		ETInlineHint FileAccessorFactory&	GetFileAccessorFactory();
+
 		//!	Retrieves the @ref Allocator the tool uses to perform internal memory allocations.
 		/*!	@returns A reference to the @ref AllocatorType the tool should use to make memory allocations.
 			*/
-		ETInlineHint AllocatorType&	GetAllocator();
+		ETInlineHint GlobalAllocator&		GetAllocator();
 
 	// ---------------------------------------------------
 
-		int	ProcessInputFiles( const ::Eldritch2::Range<const ::Eldritch2::SystemChar**> inputFiles );
+		void	RegisterOptions( OptionRegistrationVisitor& visitor );
+
+		int		Process();
 
 	// ---------------------------------------------------
 
 	protected:
-		int	AddImport( const ::Eldritch2::UTF8Char* const name );
+		int	SetOutputFileName( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
 
-		int	AddExport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const type, const ::Eldritch2::uint32 sizeInBytes );
+		int	AddImport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
+
+		int	AddExport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ResizableArray<flatbuffers::Offset<flatbuffers::String>>	_pendingImports;
-		::Eldritch2::ResizableArray<flatbuffers::Offset<Export>>				_pendingExports;
+		GlobalAllocator											_allocator;
+		FileAccessorFactory										_fileAccessorFactory;
 
-		flatbuffers::FlatBufferBuilder											_builder;
-		HeaderBuilder															_headerBuilder;
-
-		::Eldritch2::uint32														_dataBlobSize;
+		::Eldritch2::UTF8String<>								_outputFileName;
+		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_importNames;
+		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_exportNames;
 	};
 
 }	// namespace Tools

@@ -43,7 +43,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	const UTF8Char* const ShaderResourceResourceView::GetSerializedDataTag() {
+	ETNoAliasHint const UTF8Char* const ShaderResourceResourceView::GetSerializedDataTag() {
 		return UTF8L("ShaderResource");
 	}
 

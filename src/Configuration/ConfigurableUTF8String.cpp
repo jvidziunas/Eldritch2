@@ -40,7 +40,7 @@ namespace Configuration {
 // ---------------------------------------------------
 	
 	void ConfigurableUTF8String::SetValue( const Range<const UTF8Char*>& string ) {
-		Assign( string.first, static_cast<SizeType>(string.onePastLast - string.first) );
+		Assign( string.first, string.onePastLast );
 	}
 
 // ---------------------------------------------------

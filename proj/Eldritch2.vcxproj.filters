@@ -1371,6 +1371,9 @@
     <None Include="..\src\Utility\Containers\SystemString.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\src\logging\Logger.inl">
+      <Filter>Source Files\Logging</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\resources\Eldritch2.Resources.rc">

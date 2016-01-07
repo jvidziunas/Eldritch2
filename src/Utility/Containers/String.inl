@@ -218,7 +218,7 @@ namespace Eldritch2 {
 	template <typename Character, class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint String<Character, AlternateAllocator> String<Character, Allocator>::Substring( AlternateAllocator& allocator, const ConstIterator begin, const ConstIterator end ) {
-		return { begin, end, allocator, UTF8L("String Allocator") };
+		return { begin, end, { allocator, UTF8L("String Allocator") } };
 	}
 
 // ---------------------------------------------------
@@ -233,7 +233,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Assign( const CharacterType* const begin, const CharacterType* const end ) {
-		_underlyingContainer.assign( begin, end - begin );
+		_underlyingContainer.assign( begin, static_cast<int>(end - begin) );
 
 		return *this;
 	}
@@ -242,9 +242,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Assign( const CharacterType* const string ) {
-		_underlyingContainer.assign( string, ::Eldritch2::FindEndOfString( string ) );
-
-		return *this;
+		return Assign( string, ::Eldritch2::FindEndOfString( string ) );
 	}
 
 // ---------------------------------------------------
@@ -277,7 +275,7 @@ namespace Eldritch2 {
 	template <typename Character, class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Append( const String<Character, AlternateAllocator>& string ) {
-		return Append( string.Begin(), string.Length() );
+		return Append( string.Begin(), string.End() );
 	}
 
 // ---------------------------------------------------

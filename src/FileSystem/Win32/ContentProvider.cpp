@@ -75,7 +75,7 @@ namespace {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint static uint64	GetFileSizeInBytes( const ::HANDLE fileHandle ) {
+	ETForceInlineHint ETNoAliasHint static uint64 GetFileSizeInBytes( const ::HANDLE fileHandle ) {
 		::LARGE_INTEGER	result;
 
 		return( !!::GetFileSizeEx( fileHandle, &result ) ? static_cast<uint64>(result.QuadPart) : 0u );

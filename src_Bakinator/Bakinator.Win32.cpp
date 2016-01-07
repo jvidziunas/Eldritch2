@@ -18,7 +18,7 @@
 //------------------------------------------------------------------//
 
 #if( ET_PLATFORM_WINDOWS )
-int main( int argc, const ::Eldritch2::SystemChar** argv ) {
+int main( int argc, ::Eldritch2::UTF8Char** argv ) {
 	using namespace ::Eldritch2;
 
 // ---

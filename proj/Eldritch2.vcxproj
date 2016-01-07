@@ -565,6 +565,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Foundation\GameEngineService.inl" />
     <None Include="..\src\Foundation\World.inl" />
     <None Include="..\src\Foundation\WorldView.inl" />
+    <None Include="..\src\logging\Logger.inl" />
     <None Include="..\src\Packages\ContentLibrary.inl" />
     <None Include="..\src\Packages\ContentPackage.inl" />
     <None Include="..\src\Packages\PackageDeserializationContext.inl" />
