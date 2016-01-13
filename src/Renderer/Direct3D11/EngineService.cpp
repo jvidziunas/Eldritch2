@@ -26,6 +26,9 @@
 #include <Packages/ContentLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
+#define MICROPROFILE_GPU_TIMERS_D3D11 1
+#include <microprofile/microprofile.h>
+//------------------------------------------------------------------//
 
 //==================================================================//
 // LIBRARIES
@@ -175,6 +178,10 @@ namespace Direct3D11 {
 
 		if( const auto device = deviceBuilder.Build() ) {
 			GetLogger()( UTF8L("Constructed Direct3D device successfully.") ET_UTF8_NEWLINE_LITERAL );
+
+			device->GetImmediateContext( _immediateContext.GetInterfacePointer() );
+
+			::MicroProfileGpuInitD3D11( device.GetUnadornedPointer(), _immediateContext.GetUnadornedPointer() );
 
 			_shaderResourceViewFactory.SetDevice( device );
 			_meshResourceViewFactory.SetDevice( device );

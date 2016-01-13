@@ -10,3 +10,6 @@
 [submodule "extern/opus"]
 	path = extern/opus
 	url = https://git.xiph.org/opus.git
+[submodule "extern/rdestl"]
+	path = extern/rdestl
+	url = https://github.com/jvidziunas/rdestl.git

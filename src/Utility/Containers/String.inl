@@ -41,16 +41,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint String<Character, Allocator>::String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator ) : String( ::std::move( allocator ) ) {
-		Assign( string, stringEnd );
-	}
+	ETInlineHint String<Character, Allocator>::String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator ) : _underlyingContainer( string, static_cast<SizeType>(stringEnd - string), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
 	template <size_t literalLength>
 	// Remember to subtract 1 here to account for the terminating null character.
-	ETInlineHint String<Character, Allocator>::String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator ) : _underlyingContainer( stringLiteral, static_cast<SizeType>(literalLength-1), ::std::move( allocator ) ) {}
+	ETInlineHint String<Character, Allocator>::String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator ) : _underlyingContainer( stringLiteral, static_cast<SizeType>(literalLength)-1, ::std::move( allocator ) ) {}
 	
 // ---------------------------------------------------
 
@@ -104,7 +102,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::IteratorToLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const {
-		auto	position( IteratorToFirstInstance( needle ) );
+		auto	position( IteratorToLastInstance( needle ) );
 
 		return position ? position + ::Eldritch2::StringLength( needle ) : nullptr;
 	}
@@ -120,7 +118,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint bool String<Character, Allocator>::Contains( const CharacterType* const needle ) const {
-		return End() != tIteratorToFirstInstance( needle );
+		return End() != IteratorToFirstInstance( needle );
 	}
 
 // ---------------------------------------------------
@@ -217,16 +215,16 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	template <class AlternateAllocator>
-	ETInlineHint String<Character, AlternateAllocator> String<Character, Allocator>::Substring( AlternateAllocator& allocator, const ConstIterator begin, const ConstIterator end ) {
-		return { begin, end, { allocator, UTF8L("String Allocator") } };
+	ETInlineHint String<Character, AlternateAllocator> String<Character, Allocator>::CreateSubstring( AlternateAllocator&& allocator, const ConstIterator begin, const ConstIterator end ) {
+		return { begin, end, ::std::move( allocator ) };
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
 	template <class AlternateAllocator>
-	ETInlineHint String<Character, AlternateAllocator> String<Character, Allocator>::Substring( AlternateAllocator& allocator, const ConstIterator begin ) {
-		return Substring( allocator, begin, this->End() );
+	ETInlineHint String<Character, AlternateAllocator> String<Character, Allocator>::CreateSubstring( AlternateAllocator&& allocator, const ConstIterator begin ) {
+		return CreateSubstring( ::std::move( allocator ), begin, this->End() );
 	}
 
 // ---------------------------------------------------
@@ -285,6 +283,8 @@ namespace Eldritch2 {
 		if( !EndsWith( character ) ) {
 			Append( character );
 		}
+
+		return *this;
 	}
 
 // ---------------------------------------------------
@@ -294,6 +294,8 @@ namespace Eldritch2 {
 		if( !EndsWith( string ) ) {
 			Append( string );
 		}
+
+		return *this;
 	}
 
 // ---------------------------------------------------

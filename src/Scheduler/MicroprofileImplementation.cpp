@@ -13,7 +13,11 @@
 // INCLUDES
 //==================================================================//
 #include <Scheduler/Thread.hpp>
+#ifdef UNICODE
+#	undef UNICODE
+#endif
 #define MICROPROFILE_USE_THREAD_NAME_CALLBACK 1
+#define MICROPROFILE_GPU_TIMERS_D3D11 1
 #define MICROPROFILE_IMPL
 #include <microprofile/microprofile.h>
 //------------------------------------------------------------------//

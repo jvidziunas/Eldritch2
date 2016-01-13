@@ -21,8 +21,10 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	Bakinator<GlobalAllocator, FileAccessorFactory>::Bakinator() : _allocator( UTF8L("Root Allocator") ),
-																   _importNames( { GetAllocator(), UTF8L("Bakinator Import Collection Allocator") } ),
-																   _exportNames( { GetAllocator(), UTF8L("Bakinator Export Collection Allocator") } ) {}
+																   _outputFileName( { GetAllocator(), UTF8L("Output File Name Allocator") } ),
+																   _outputDataBlobName( { GetAllocator(), UTF8L("Output Data Blob File Name Allocator") } ),
+																   _importNames( { GetAllocator(), UTF8L("Imported Package Name Collection Allocator") } ),
+																   _exportNames( { GetAllocator(), UTF8L("Export File Name Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -66,15 +68,21 @@ namespace Tools {
 		HeaderBuilder								headerBuilder( builder );
 		uint64										dataBlobSize( 0u );
 		auto										outputWriter( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputFileName.GetCharacterArray() ) );
+		auto										dataFileWriter( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputDataBlobName.GetCharacterArray() ) );
+
+		if( !outputWriter || !dataFileWriter ) {
+			return -1;
+		}
 		
 		for( const auto& importName : _importNames ) {
 			pendingImports.PushBack( builder.CreateString( importName.GetCharacterArray() ) );
 		}
 
 		for( const auto& exportName : _exportNames ) {
-			const auto			extensionPosition( exportName.FindLastInstance( UTF8L('.') ) );
-			const UTF8String<>	typeName( exportName.Substring( GetAllocator(), (extensionPosition != exportName.End() ? extensionPosition + 1 : extensionPosition) ) );
-			const UTF8String<>	inPackageName( exportName.Substring( GetAllocator(), exportName.Begin(), extensionPosition ) );
+			const auto			extensionPosition( exportName.IteratorToLastInstance( UTF8L('.') ) );
+			const auto			fileNamePosition( exportName.IteratorToLastInstance( ET_UTF8_DIR_SEPARATOR ) );
+			const UTF8String<>	inPackageName( (fileNamePosition != exportName.End() ? fileNamePosition + 1 : exportName.Begin()), extensionPosition, { GetAllocator(), UTF8L("Export In-Package Name Allocator") } );
+			const UTF8String<>	typeName( (extensionPosition != exportName.End() ? extensionPosition + 1 : extensionPosition), exportName.End(), { GetAllocator(), UTF8L("Export Type Name Allocator") } );
 			auto				reader( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), exportName.GetCharacterArray() ) );
 
 			// Ensure the file was opened.
@@ -82,14 +90,15 @@ namespace Tools {
 				return -1;
 			}
 
-			const BlockDescriptor	dataDescriptor( dataBlobSize, reader->GetAccessibleRegionSizeInBytes() );
-
 			pendingExports.PushBack( CreateExport( builder,
 												   builder.CreateString( inPackageName.GetCharacterArray() ),
 												   builder.CreateString( typeName.GetCharacterArray() ),
-												   &dataDescriptor ) );
+												   dataBlobSize,
+												   reader->GetAccessibleRegionSizeInBytes() ) );
 
-			dataBlobSize += dataDescriptor.length();
+			dataFileWriter->Write( reader->GetAddressForFileByteOffset( 0u ), reader->GetAccessibleRegionSizeInBytes() );
+
+			dataBlobSize += reader->GetAccessibleRegionSizeInBytes();
 		}
 
 		FinishHeaderBuffer( builder,
@@ -97,7 +106,7 @@ namespace Tools {
 										  pendingImports ? builder.CreateVector( pendingImports.Data(), pendingImports.Size() ) : 0,
 										  pendingExports ? builder.CreateVector( pendingExports.Data(), pendingExports.Size() ) : 0 ) );
 
-		_outputWriter.Write( builder.GetBufferPointer(), builder.GetSize() );
+		outputWriter->Write( builder.GetBufferPointer(), builder.GetSize() );
 
 		return 0;
 	}
@@ -106,7 +115,8 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	int	Bakinator<GlobalAllocator, FileAccessorFactory>::SetOutputFileName( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd ) {
-		_outputFileName.Assign( name, nameEnd );
+		_outputFileName.Assign( name, nameEnd ).EnsureEndsWith( UTF8L(".e2toc") );
+		_outputDataBlobName.Assign( _outputFileName.Begin(), _outputFileName.IteratorToLastInstance( UTF8L('.') ) );
 
 		return 0;
 	}

@@ -1137,7 +1137,7 @@
       <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\SystemString.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1368,11 +1368,11 @@
     <None Include="..\src\Utility\Greater.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
-    <None Include="..\src\Utility\Containers\SystemString.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="..\src\logging\Logger.inl">
       <Filter>Source Files\Logging</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\SystemString.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

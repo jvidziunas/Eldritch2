@@ -421,7 +421,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	ETForceInlineHint ETNoAliasHint char* FindLastInstance( char* string, const char* substring ) {
-		return const_cast<char*>(::Eldritch2::FindFirstInstance( const_cast<const char*>(string), substring ));
+		return const_cast<char*>(::Eldritch2::FindLastInstance( const_cast<const char*>(string), substring ));
 	}
 
 // ---------------------------------------------------
@@ -462,7 +462,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	ETForceInlineHint ETNoAliasHint wchar_t* FindLastInstance( wchar_t* string, const wchar_t* substring ) {
-		return const_cast<wchar_t*>(::Eldritch2::FindFirstInstance( const_cast<const wchar_t*>(string), substring ));
+		return const_cast<wchar_t*>(::Eldritch2::FindLastInstance( const_cast<const wchar_t*>(string), substring ));
 	}
 
 // ---------------------------------------------------

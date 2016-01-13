@@ -23,7 +23,7 @@ namespace Eldritch2 {
 
 	public:
 		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint explicit UTF8String( AllocatorType&& allocator = AllocatorType() );
+		ETInlineHint UTF8String( AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
 		ETInlineHint UTF8String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
@@ -33,7 +33,9 @@ namespace Eldritch2 {
 		template <class AlternateAllocator>
 		ETInlineHint UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint explicit UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString );
+		ETInlineHint UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString );
+		//!	Constructs this @ref UTF8String instance.
+		ETInlineHint explicit UTF8String( const ::Eldritch2::UTF8String<Allocator>& sourceString ) = delete;
 
 		ETInlineHint ~UTF8String() = default;
 	};

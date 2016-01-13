@@ -61,6 +61,7 @@ namespace Tools {
 		FileAccessorFactory										_fileAccessorFactory;
 
 		::Eldritch2::UTF8String<>								_outputFileName;
+		::Eldritch2::UTF8String<>								_outputDataBlobName;
 		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_importNames;
 		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_exportNames;
 	};

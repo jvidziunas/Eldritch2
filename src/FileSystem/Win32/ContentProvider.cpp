@@ -259,7 +259,7 @@ namespace Win32 {
 											 AGGREGATE_SYNCHRONOUS_READ_ATTRIBUTES,
 											 nullptr ) );
 
-		if( const ::HANDLE fileMapping { ::CreateFileMapping( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) } ) {
+		if( const ::HANDLE fileMapping { ::CreateFileMappingW( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) } ) {
 			if( const auto mappedView = static_cast<const char*>(::MapViewOfFile( fileMapping, FILE_MAP_READ, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), static_cast<::SIZE_T>(0u) )) ) {
 				if( auto resultObject = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ReadableMemoryMappedFile( Range<const char*>{ mappedView, mappedView + GetFileSizeInBytes( file ) } ) ) {
 					return { move( resultObject ) };

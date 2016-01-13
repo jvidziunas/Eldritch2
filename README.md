@@ -8,11 +8,11 @@ If you'd like to get a copy of the executable, (currently tested/running under 6
 ## External Dependencies
 * [Bullet Dynamics Engine] (http://bulletphysics.org/wordpress/), experimental v3, using community multithreading support branch
 * [Angelscript](http://www.angelcode.com/angelscript/)
-* [Microprofile](https://bitbucket.org/jonasmeyer/microprofile), with Arseny Kapoulkine's extensions
+* [Microprofile](https://github.com/theunknownxy/microprofile)
 * [Recast Navigation/Detour](https://github.com/memononen/recastnavigation)
 * [Boost](http://www.boost.org/), version 1.59
 * [Steamworks](https://partner.steamgames.com/)
-* [RDESTL](https://github.com/msinilo/rdestl), with customizations/extensions
+* [My RDESTL fork](https://github.com/jvidziunas/rdestl)
 * [SimpleOpt](https://github.com/brofield/simpleopt)
 
 ## Project Structure

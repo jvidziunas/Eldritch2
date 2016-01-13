@@ -73,6 +73,8 @@ namespace Foundation {
 						TrySchedulingOnContext( executingContext );
 					}
 
+					~TickServicesTask() = default;
+
 				// ---------------------------------------------------
 
 					ETInlineHint const ObjectHandle<GameEngine>& GetEngineReference() {
@@ -114,6 +116,8 @@ namespace Foundation {
 					TrySchedulingOnContext( executingContext );
 				}
 
+				~TickWorldsTask() = default;
+
 			// ---------------------------------------------------
 
 				ETInlineHint const ObjectHandle<GameEngine>& GetEngineReference() {
@@ -153,6 +157,8 @@ namespace Foundation {
 				TrySchedulingOnContext( executingContext );
 			}
 
+			~TickFrameTask() = default;
+
 		// ---------------------------------------------------
 
 			ETInlineHint const ObjectHandle<GameEngine>& GetEngineReference() {
@@ -180,7 +186,7 @@ namespace Foundation {
 			void Finalize( WorkerContext& executingContext ) override sealed {
 				auto&	engineAllocator( GetGameEngine()._allocator );
 
-				::MicroProfileFlip();
+				::MicroProfileFlip( nullptr );
 
 				if( !GetEngineReference().IsSoleReferenceToObject() ) {
 					new(engineAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) TickFrameTask( GetManagementService(), executingContext );

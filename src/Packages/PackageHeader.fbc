@@ -1,17 +1,13 @@
 file_identifier	"ECRF";
-file_extension	"PackageHeader";
+file_extension	"e2toc";
 
 namespace Eldritch2.FileSystem.FlatBuffers;
-
-struct BlockDescriptor {
-	offset	: ulong;
-	length	: ulong;
-}
 
 table Export {
 	name	: string (required);
 	type	: string (required);
-	block	: BlockDescriptor (required);
+	offset	: ulong;
+	length	: ulong;
 }
 
 table Header {

@@ -21,10 +21,12 @@
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Tools\ToolCRTPBase.cpp" />
     <ClCompile Include="..\src\Tools\Win32\FileAccessorFactory.cpp" />
+    <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp" />
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="..\src_Bakinator\Bakinator.Win32.cpp" />
   </ItemGroup>
@@ -43,6 +45,7 @@
     <ClInclude Include="..\src\Utility\Memory\InstanceDeleters.hpp" />
     <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="..\src\Utility\MPL\Alignof.hpp" />
     <ClInclude Include="..\src\Utility\MPL\CharTypes.hpp" />
@@ -71,6 +74,7 @@
     <None Include="..\src\FileSystem\SynchronousFileWriter.inl" />
     <None Include="..\src\Tools\ToolCRTPBase.inl" />
     <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
+    <None Include="..\src\Utility\Memory\StandardLibrary.Win.inl" />
     <None Include="..\src_Bakinator\Bakinator.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

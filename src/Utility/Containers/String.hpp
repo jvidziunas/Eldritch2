@@ -56,7 +56,9 @@ namespace Detail {
 		template <class AlternateAllocator>
 		ETInlineHint String( const String<Character, AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref String instance.
-		ETInlineHint explicit String( String<Character, Allocator>&& sourceString );
+		ETInlineHint String( String<Character, Allocator>&& sourceString );
+		//!	Constructs this @ref String instance.
+		ETInlineHint String( const String<Character, Allocator>& sourceString ) = delete;
 
 		ETInlineHint ~String() = default;
 
@@ -100,9 +102,9 @@ namespace Detail {
 	// - CONTAINER MANIPULATION --------------------------
 
 		template <class AlternateAllocator>
-		ETInlineHint String<Character, AlternateAllocator>	Substring( AlternateAllocator& allocator, const ConstIterator begin, const ConstIterator end );
+		ETInlineHint String<Character, AlternateAllocator>	CreateSubstring( AlternateAllocator&& allocator, const ConstIterator begin, const ConstIterator end );
 		template <class AlternateAllocator>
-		ETInlineHint String<Character, AlternateAllocator>	Substring( AlternateAllocator& allocator, const ConstIterator begin );
+		ETInlineHint String<Character, AlternateAllocator>	CreateSubstring( AlternateAllocator&& allocator, const ConstIterator begin );
 
 		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const string );
 		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const begin, const CharacterType* const end );

@@ -198,6 +198,7 @@ namespace Direct3D11 {
 		Configuration::ConfigurablePODVariable<bool>				_allowDriverThreadingOptimizations;
 
 		const Direct3D11::MeshResourceView*							_defaultMeshView;
+		Utility::COMPointer<::ID3D11DeviceContext>					_immediateContext;
 		Scripting::ObjectHandle<Direct3D11::SwapChain>				_primarySwapChain;
 	};
 
