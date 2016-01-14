@@ -301,7 +301,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp" />
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp" />
     <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.cpp" />
-    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.WorkerThread.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.BytecodePackageViewFactory.cpp" />
@@ -424,6 +423,8 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp" />
     <ClInclude Include="..\src\renderer\VisibilitySystem.hpp" />
     <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp" />
+    <ClInclude Include="..\src\Scheduler\PrivateQueueWorker.hpp" />
+    <ClInclude Include="..\src\Scheduler\Win32Fiber\TaskScheduler.hpp" />
     <ClInclude Include="..\src\Scheduler\Win32\TaskScheduler.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodeMetadata.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.hpp" />
@@ -585,6 +586,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Physics\BulletDynamics\EngineService.inl" />
     <None Include="..\src\renderer\VisibilitySystem.inl" />
     <None Include="..\src\Scheduler\CRTPTransientTask.inl" />
+    <None Include="..\src\Scheduler\PrivateQueueWorker.inl" />
     <None Include="..\src\Scheduler\Task.inl" />
     <None Include="..\src\Scheduler\WorkerContext.inl" />
     <CustomBuild Include="..\src\Scripting\Angelscript\BytecodeMetadata.fbc">

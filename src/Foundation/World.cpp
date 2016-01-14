@@ -37,7 +37,7 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Foundation {
 
-	World::World( GameEngine& owningEngine ) : _allocator( owningEngine._allocator, owningEngine._worldArenaSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World Allocator") ),
+	World::World( GameEngine& owningEngine ) : _allocator( owningEngine.GetAllocator(), owningEngine._worldArenaSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World Allocator") ),
 											   _allocationCheckpoint( _allocator.CreateCheckpoint() ),
 											   _owningEngine( owningEngine ),
 											   _package( nullptr ),

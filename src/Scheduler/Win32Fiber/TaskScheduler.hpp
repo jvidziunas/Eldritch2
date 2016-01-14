@@ -27,14 +27,14 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 namespace Scheduler {
-namespace Win32 {
+namespace Win32Fiber {
 
 	class TaskScheduler : public Scheduler::TaskScheduler {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		using ProcessorAffinity	= ::Eldritch2::uint64;
-		using WorkerThread		= Scheduler::PrivateQueueWorker<Win32::TaskScheduler>;
+		using WorkerThread		= Scheduler::PrivateQueueWorker<Win32Fiber::TaskScheduler>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -47,8 +47,6 @@ namespace Win32 {
 	// - THREAD SCHEDULING -------------------------------
 
 		::Eldritch2::ErrorCode	Enqueue( Scheduler::Thread& thread ) override sealed;
-
-		::Eldritch2::ErrorCode	ConvertCallerToThread( Scheduler::Thread& thread );
 
 	// ---------------------------------------------------
 
@@ -85,6 +83,10 @@ namespace Win32 {
 		WorkerThread&	GetRandomWorkerThread( const WorkerThread& executingWorker, size_t& randomSeed );
 
 		size_t			GetMaximumTaskParallelism() const override sealed;
+
+	// ---------------------------------------------------
+
+		::Eldritch2::ErrorCode	ConvertCallerToThread( Scheduler::Thread& thread );
 
 	// - DATA MEMBERS ------------------------------------
 

@@ -151,7 +151,7 @@ namespace Foundation {
 		::Eldritch2::CountedResult<Foundation::World>		CreateWorld( const ::Eldritch2::UTF8Char* const worldResourceName );
 
 		//! Retrieves a read-only view of the @ref GameEngine instance that owns this @ref GameEngineService.
-		ETInlineHint const Foundation::GameEngine&			GetHostingEngine() const;
+		ETInlineHint const Foundation::GameEngine&			GetGameEngine() const;
 
 		//! Retrieves a read-only view of the @ref FileSystem::ContentLibrary instance owned by the @ref GameEngine this @ref GameEngineService is attached to.
 		/*!	@see @ref FileSystem::ContentLibrary

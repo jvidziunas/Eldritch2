@@ -69,9 +69,9 @@ namespace Foundation {
 		ETInlineHint const FileSystem::ContentLibrary&	GetContentLibrary() const;
 		ETInlineHint FileSystem::ContentLibrary&		GetContentLibrary();
 
-		//! Retrieves a read-only view of the @ref TaskScheduler instance this @ref GameEngine runs threads on.
+		//! Retrieves the @ref TaskScheduler instance this @ref GameEngine runs threads on.
 		ETInlineHint const Scheduler::TaskScheduler&	GetTaskScheduler() const;
-		//! Retrieves a view of the @ref TaskScheduler instance this @ref GameEngine runs threads on.
+		//! Retrieves the @ref TaskScheduler instance this @ref GameEngine runs threads on.
 		ETInlineHint Scheduler::TaskScheduler&			GetTaskScheduler();
 
 		//! Retrieves a read-only view the @ref SystemInterface describing the hardware this @ref GameEngine instance is executing on.

@@ -34,5 +34,11 @@ namespace Foundation {
 		}
 	}
 
+// ---------------------------------------------------
+
+	ETInlineHint const Foundation::GameEngine& GameEngineService::GetGameEngine() const {
+		return _owningEngine;
+	}
+
 }	// namespace Foundation
 }	// namespace Eldritch2

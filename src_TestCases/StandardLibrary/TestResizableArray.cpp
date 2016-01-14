@@ -24,6 +24,7 @@ TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" 
 
 		REQUIRE( testArray.Size() == 0 );
 		REQUIRE( testArray.GetCapacity() >= 5 );
+		REQUIRE( testArray.IsEmpty() );
 
 		WHEN( "the size is increased" ) {
 			testArray.Resize( 10 );
@@ -32,13 +33,10 @@ TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" 
 				REQUIRE( testArray.Size() == 10 );
 				REQUIRE( testArray.GetCapacity() >= 10 );
 			}
-		}
-		WHEN( "the size is reduced" ) {
-			testArray.Resize( 0 );
 
-			THEN( "the size changes but not capacity" ) {
-				REQUIRE( testArray.Size() == 0 );
-				REQUIRE( testArray.GetCapacity() >= 5 );
+			AND_THEN( "the container is not empty" ) {
+				REQUIRE( !testArray.IsEmpty() );
+				REQUIRE( !!testArray );
 			}
 		}
 		WHEN( "more capacity is reserved" ) {
@@ -47,6 +45,11 @@ TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" 
 			THEN( "the capacity changes but not the size" ) {
 				REQUIRE( testArray.Size() == 0 );
 				REQUIRE( testArray.GetCapacity() >= 10 );
+			}
+
+			AND_THEN( "the container is still empty" ) {
+				REQUIRE( testArray.IsEmpty() );
+				REQUIRE( !testArray );
 			}
 		}
 		WHEN( "less capacity is reserved" ) {
@@ -63,8 +66,14 @@ TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" 
 			THEN( "the size changes" ) {
 				REQUIRE( testArray.Size() == 1 );
 			}
+
 			AND_THEN( "the back element is updated" ) {
 				REQUIRE( testArray.Back() == 5u );
+			}
+
+			AND_THEN( "the container is not empty" ) {
+				REQUIRE( !testArray.IsEmpty() );
+				REQUIRE( !!testArray );
 			}
 		}
 	}

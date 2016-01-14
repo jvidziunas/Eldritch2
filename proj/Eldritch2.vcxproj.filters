@@ -229,6 +229,12 @@
     <Filter Include="Header Files\FileSystem\Win32">
       <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scheduler\Win32Fiber">
+      <UniqueIdentifier>{c67cc6c7-c879-48cd-b70a-5a8b304ffbd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scheduler\Win32Fiber">
+      <UniqueIdentifier>{81c92d00-d27c-4d56-93dd-49af19b7bf63}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp">
@@ -382,9 +388,6 @@
       <Filter>Source Files\System\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.cpp">
-      <Filter>Source Files\Scheduler\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.WorkerThread.cpp">
       <Filter>Source Files\Scheduler\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp">
@@ -1139,6 +1142,12 @@
     <ClInclude Include="..\src\Utility\Containers\SystemString.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Scheduler\Win32Fiber\TaskScheduler.hpp">
+      <Filter>Header Files\Scheduler\Win32Fiber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scheduler\PrivateQueueWorker.hpp">
+      <Filter>Header Files\Scheduler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1373,6 +1382,9 @@
     </None>
     <None Include="..\src\Utility\Containers\SystemString.inl">
       <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Scheduler\PrivateQueueWorker.inl">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -141,7 +141,7 @@ namespace Win32 {
 			_workerThreads = Range<WorkerThread*>( workerThreadMemory, workerThreadMemory + totalWorkerCount );
 
 			for( WorkerThread& workerThread : _workerThreads ) {
-				new(&workerThread) TaskScheduler::WorkerThread( *this );
+				new(&workerThread) TaskScheduler::WorkerThread( *this, _allocator );
 			}
 
 			// Queue the bootstrap task to the primary thread.
@@ -373,7 +373,7 @@ namespace Win32 {
 
 	// ---
 
-		if( const auto semaphoreHandle = ::CreateSemaphore( nullptr, static_cast<::LONG>(initialCount), static_cast<::LONG>(maximumCount), nullptr ) ) {
+		if( const auto semaphoreHandle = ::CreateSemaphoreW( nullptr, static_cast<::LONG>(initialCount), static_cast<::LONG>(maximumCount), nullptr ) ) {
 			if( auto semaphore = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION) Semaphore( semaphoreHandle ) ) {
 				return { move( semaphore ) };
 			}

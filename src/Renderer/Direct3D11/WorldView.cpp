@@ -13,9 +13,9 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Renderer/Direct3D11/WorldView.hpp>
 #include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Renderer/Direct3D11/WorldView.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
