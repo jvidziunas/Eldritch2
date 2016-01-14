@@ -13,3 +13,6 @@
 [submodule "extern/rdestl"]
 	path = extern/rdestl
 	url = https://github.com/jvidziunas/rdestl.git
+[submodule "extern/catch"]
+	path = extern/catch
+	url = https://github.com/philsquared/Catch.git

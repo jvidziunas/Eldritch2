@@ -37,7 +37,7 @@ namespace Configuration {
 		terminatedSection[section.Size()]	= UTF8L('\0');
 		terminatedName[name.Size()]			= UTF8L('\0');
 		
-		const auto	variable( _variableDirectory.Find( Key( terminatedSection, terminatedName ) ) );
+		const auto	variable( _variableDirectory.Find( VariableKey( terminatedSection, terminatedName ) ) );
 
 		if( variable != _variableDirectory.End() ) {
 			variable->second->SetValue( value );

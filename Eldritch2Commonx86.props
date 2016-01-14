@@ -5,7 +5,7 @@
   <PropertyGroup Label="UserMacros">
     <MainSrcDir>$(SolutionDir)src\</MainSrcDir>
     <ExternSrcDir>$(SolutionDir)extern\</ExternSrcDir>
-    <ProjectSrcDir>$(SolutionDir)$(ProjectName)\</ProjectSrcDir>
+    <ProjectSrcDir>$(SolutionDir)src_$(ProjectName)\</ProjectSrcDir>
     <IntermediateDir>$(SolutionDir)obj\$(ProjectName)\x86\$(Configuration)\</IntermediateDir>
     <ExternLibDir>$(ExternSrcDir)lib\x86\$(Configuration)\</ExternLibDir>
     <BinaryDir>$(SolutionDir)bin\x86\$(Configuration)\</BinaryDir>

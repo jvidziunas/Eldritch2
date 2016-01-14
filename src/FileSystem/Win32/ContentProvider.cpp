@@ -178,8 +178,8 @@ namespace Win32 {
 	ContentProvider::ContentProvider( const System::Win32::SystemInterface& systemInterface ) : _getSectorSizeFromHandleFunction( GetSectorSizeQueryAPI( systemInterface ) ) {
 		wchar_t*	folderPtr( nullptr );
 
-		if( 0 != ::GetCurrentDirectoryW( _countof( _packageContentPath ), _packageContentPath ) ) {
-			::PathAppendW( _packageContentPath, L"..\\..\\Content\\" );
+		if( 0 != ::GetCurrentDirectoryW( _countof( _knownContentPaths[static_cast<size_t>(KnownContentLocation::PACKAGE_DIRECTORY)]), _knownContentPaths[static_cast<size_t>(KnownContentLocation::PACKAGE_DIRECTORY)] ) ) {
+			::PathAppendW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::PACKAGE_DIRECTORY)], L"..\\Content\\");
 		}
 
 		// Retrieve the Documents library path for this machine.

@@ -18,12 +18,18 @@
 namespace Eldritch2 {
 namespace Configuration {
 
-	ETInlineHint ConfigurationDatabase::Key::Key( const ::Eldritch2::UTF8Char* const section, const ::Eldritch2::UTF8Char* const name ) : Pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*>( section, name ) {}
+	ETInlineHint ConfigurationDatabase::VariableKey::VariableKey( const ::Eldritch2::UTF8Char* const section, const ::Eldritch2::UTF8Char* const name ) : Pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*>( section, name ) {}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint bool	ConfigurationDatabase::Key::operator==( const Key& right ) const {
-		return ::Eldritch2::EqualityCompareString( first, right.first ) && ::Eldritch2::EqualityCompareString( second, right.second );
+	ETInlineHint ETNoAliasHint size_t GetHashCode( const ConfigurationDatabase::VariableKey& key, const size_t seed ) {
+		return ::Eldritch2::HashMemory( key.second, ::Eldritch2::StringLength( key.second ), ::Eldritch2::HashMemory( key.first, ::Eldritch2::StringLength( key.first ), seed ) );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETNoAliasHint bool operator==( const ConfigurationDatabase::VariableKey& left, const ConfigurationDatabase::VariableKey& right ) {
+		return ::Eldritch2::EqualityCompareString( left.first, right.first ) && ::Eldritch2::EqualityCompareString( left.second, right.second );
 	}
 
 }	// namespace Configuration

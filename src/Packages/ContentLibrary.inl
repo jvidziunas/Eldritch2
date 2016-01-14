@@ -23,12 +23,6 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint bool ContentLibrary::ResourceViewKey::operator==( const ContentLibrary::ResourceViewKey& other ) const {
-		return (*second == *other.second) && ::Eldritch2::EqualityCompareString( first, other.first );
-	}
-
-// ---------------------------------------------------
-
 	template <typename View>
 	const View& ContentLibrary::ResolveViewByName( const UTF8Char* const name, const View& defaultView ) const {
 		static_assert( ::std::is_base_of<FileSystem::ResourceView, View>::value, "ResolveViewByName() must be used to convert to ResourceView-derived types!" );
@@ -57,6 +51,18 @@ namespace FileSystem {
 		}
 
 		return { _nullFactoryCollection.Begin(), _nullFactoryCollection.End() };
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETNoAliasHint size_t GetHashCode( const ContentLibrary::ResourceViewKey& key, const size_t seed ) {
+		return key.second->hash_code() * ::Eldritch2::Hash<const ::Eldritch2::UTF8Char*>()( key.first, seed );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETNoAliasHint bool operator==( const ContentLibrary::ResourceViewKey& left, const ContentLibrary::ResourceViewKey& right ) {
+		return (*left.second == *right.second) && ::Eldritch2::EqualityCompareString( left.first, right.first );
 	}
 
 }	// namespace FileSystem

@@ -18,7 +18,7 @@
 	/>
 	<UserMacro
 		Name="ProjectSrcDir"
-		Value="$(SolutionDir)$(ProjectName)\"
+		Value="$(SolutionDir)src_$(ProjectName)\"
 	/>
 	<UserMacro
 		Name="IntermediateDir"

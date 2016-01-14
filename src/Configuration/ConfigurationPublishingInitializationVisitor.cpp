@@ -34,7 +34,7 @@ namespace Configuration {
 // ---------------------------------------------------
 
 	ConfigurationPublishingInitializationVisitor& ConfigurationPublishingInitializationVisitor::Register( const UTF8Char* const name, ConfigurableVariable& variable ) {
-		_database._variableDirectory.Insert( ::rde::make_pair( ConfigurationDatabase::Key( _section, name ), &variable ) );
+		_database._variableDirectory.Insert( ::rde::make_pair( ConfigurationDatabase::VariableKey( _section, name ), &variable ) );
 
 		return *this;
 	}

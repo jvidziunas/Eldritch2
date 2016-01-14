@@ -53,6 +53,24 @@ namespace FileSystem {
 	public:
 		using ResourceViewFactoryCollection = ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceViewFactory>;
 
+		class ResourceViewKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*> {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref ResourceViewKey instance.
+			/*!	@param[in] resourceName The name of the @ref ResourceView to find.
+				@param[in] resourceType The concrete polymorphic type of the @ref ResourceView
+				*/
+			ETInlineHint ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType );
+			//! Constructs this @ref ResourceViewKey instance.
+			/*! @param[in] view @ref ResourceView to create a key for.
+				*/
+			ResourceViewKey( const FileSystem::ResourceView& view );
+
+			//! Constructs this @ref ResourceViewKey instance.
+			ETInlineHint ResourceViewKey() = default;
+		};
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref ContentLibrary instance.
@@ -102,37 +120,9 @@ namespace FileSystem {
 
 		ETInlineHint ::Eldritch2::Range<ResourceViewFactoryCollection::Iterator>	GetFactoriesForResourceType( const ::Eldritch2::UTF8Char* const resourceTypeName );
 
-	// - TYPE PUBLISHING ---------------------------------
-	
-	private:
-		class ResourceViewKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref ResourceViewKey instance.
-			/*!	@param[in] resourceName The name of the @ref ResourceView to find.
-				@param[in] resourceType The concrete polymorphic type of the @ref ResourceView
-				*/
-			ETInlineHint ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType );
-			//! Constructs this @ref ResourceViewKey instance.
-			/*! @param[in] view @ref ResourceView to create a key for.
-				*/
-			ResourceViewKey( const FileSystem::ResourceView& view );
-
-			//! Constructs this @ref ResourceViewKey instance.
-			ETInlineHint ResourceViewKey() = default;
-
-		// ---------------------------------------------------
-
-			//! Tests two @ref ResourceViewKey instances for equality.
-			/*! @param[in] other The second @ref ResourceViewKey in the comparison.
-				@returns _True_ if the two keys describe the same view, _false_ if they reference different types.
-				*/
-			ETInlineHint ETNoAliasHint bool	operator==( const ResourceViewKey& other ) const;
-		};
-
 	// - DATA MEMBERS ------------------------------------
 
+	private:
 		::Eldritch2::ChildAllocator																_allocator;
 		::Eldritch2::ChildAllocator																_deserializationContextAllocator;
 		FileSystem::ContentProvider&															_contentProvider;
@@ -156,6 +146,15 @@ namespace FileSystem {
 		friend class ::Eldritch2::FileSystem::ContentPackage;
 		friend class ::Eldritch2::FileSystem::ResourceView;
 	};
+
+// ---------------------------------------------------
+
+	ETInlineHint ETNoAliasHint size_t	GetHashCode( const ContentLibrary::ResourceViewKey& key, const size_t seed );
+
+	//! Tests two @ref ResourceViewKey instances for equality.
+	/*! @returns _True_ if the two keys describe the same view, _false_ if they reference different types.
+	*/
+	ETInlineHint ETNoAliasHint bool		operator==( const ContentLibrary::ResourceViewKey& left, const ContentLibrary::ResourceViewKey& right );
 
 }	// namespace FileSystem
 }	// namespace Eldritch2

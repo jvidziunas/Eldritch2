@@ -62,7 +62,7 @@ namespace FileSystem {
 			return Error::NONE;
 		}
 
-		const auto	createFileResult( CreateBackingFile( _allocator, UTF8L(".eldritch2package") ) );
+		const auto	createFileResult( CreateBackingFile( _allocator, UTF8L(".e2toc") ) );
 
 		if( createFileResult ) {
 			_file = createFileResult.object;
@@ -76,68 +76,86 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ErrorCode PackageDeserializationContext::DeserializeDependencies() {
+		using namespace ::Eldritch2::FileSystem::FlatBuffers;
+
 		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
 		ETRuntimeAssert( nullptr != _file );
 
 	// ---
 
-		ErrorCode	result( Error::NONE );
-		
-		if( auto data = _file->GetAddressForFileByteOffset( 0u ) ) {
-			if( auto imports = FlatBuffers::HeaderBufferHasIdentifier( data ) ? FlatBuffers::GetHeader( data )->imports() : nullptr ) {
-				for( auto import : *imports ) {
-					if( auto packageResolutionResult = GetContentLibrary().ResolvePackageByName( import->c_str() ) ) {
-						GetBoundPackage().GetDependencies().PushBack( ::std::move( packageResolutionResult.object ) );
-					} else {
-						result = packageResolutionResult.resultCode;
-						break;
-					}
-				}
-			}
-		} else {
+		const auto	data( _file->GetAddressForFileByteOffset( 0u ) );
+
+		// Ensure we have data and that there is at minimum a marker.
+		if( !(nullptr == data) || !HeaderBufferHasIdentifier( data ) ) {
 			// Publish load failure.
 			GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
 
-			result = Error::INVALID_PARAMETER;
+			return Error::INVALID_PARAMETER;
+		}
+		
+		// Loop through the list of additional content the package signifies itself as requiring.
+		if( auto imports = GetHeader( data )->imports() ) {
+			for( auto currentImport : *imports ) {
+				const auto	packageResolutionResult( GetContentLibrary().ResolvePackageByName( currentImport->c_str() ) );
+
+				if( !packageResolutionResult ) {
+					return packageResolutionResult.resultCode;
+				}
+
+				GetBoundPackage().GetDependencies().PushBack( ::std::move( packageResolutionResult.object ) );
+			}
 		}
 
-		return result;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------
 
 	ErrorCode PackageDeserializationContext::DeserializeContent() {
+		using namespace ::Eldritch2::FileSystem::FlatBuffers;
+
 		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
 		ETRuntimeAssert( nullptr != _file );
 
 	// ---
 
-		ErrorCode	result( Error::NONE );
-		auto&		package( GetBoundPackage() );
+		const auto	exports( GetHeader( _file->GetAddressForFileByteOffset( 0u ) )->exports() );
 
-		if( auto exports = FlatBuffers::GetHeader( _file->GetAddressForFileByteOffset( 0u ) )->exports() ) {
-			for( auto definition : *exports ) {
-				for( auto& factory : GetContentLibrary().GetFactoriesForResourceType( definition->type()->c_str() ) ) {
-					result = factory.AllocateResourceView( package.GetAllocator(), package.GetContentLibrary(), package, definition->name()->c_str(), Range<const char*>::EmptySet() );
+		if( nullptr != exports ) {
+			const auto	dataFile( CreateBackingFile( _allocator, UTF8L("") ) );
+
+			if( !dataFile ) {
+				GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+				return dataFile;
+			}
+
+			for( auto currentExport : *exports ) {
+				for( auto& currentFactory : GetContentLibrary().GetFactoriesForResourceType( currentExport->type()->c_str() ) ) {
+					const auto	result( currentFactory.AllocateResourceView( GetBoundPackage().GetAllocator(),
+																			 GetBoundPackage().GetContentLibrary(),
+																			 GetBoundPackage(),
+																			 currentExport->name()->c_str(),
+																			 dataFile.object->TryGetStructureArrayAtOffset<const char>( currentExport->offset(), currentExport->length() ) ) );
 
 					if( !result ) {
-						break;
+						GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+						return result;
 					}
 				}
 			}
 		}
 
 		// Broadcast the new residency state (either published or failed) depending on whether or not the load was successful.
-		package.UpdateResidencyStateOnLoaderThread( result ? ResidencyState::PUBLISHED : ResidencyState::FAILED );
+		GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::PUBLISHED );
 
-		return result;
+		return Error::NONE;
 	}
 
 // ---------------------------------------------------
 
 	Result<ReadableMemoryMappedFile> PackageDeserializationContext::CreateBackingFile( Allocator& allocator, const UTF8Char* const suffix ) {
 		const size_t						nameSizeInBytes( StringLength( GetBoundPackage().GetName() ) + StringLength( suffix ) );
-		UTF8String<ExternalArenaAllocator>	fileName( { _alloca( nameSizeInBytes + 33u ), nameSizeInBytes + 33u, UTF8L( "ContentPackage::CreateBackingFile() Temporary Allocator" ) } );
+		UTF8String<ExternalArenaAllocator>	fileName( { _alloca( nameSizeInBytes + 33u ), nameSizeInBytes + 33u, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") } );
 
 		fileName.Reserve( nameSizeInBytes );
 		fileName.Append( GetBoundPackage().GetName() ).Append( suffix ? suffix : UTF8L("") );

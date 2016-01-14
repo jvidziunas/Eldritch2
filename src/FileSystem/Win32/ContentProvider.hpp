@@ -101,7 +101,6 @@ namespace Win32 {
 	// - DATA MEMBERS ------------------------------------
 
 		const GetSectorSizeFromHandleFunction	_getSectorSizeFromHandleFunction;
-		KnownContentPath						_packageContentPath;
 		KnownContentPath						_knownContentPaths[static_cast<size_t>(KnownContentLocation::COUNT)];
 	};
 

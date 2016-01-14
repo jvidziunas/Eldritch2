@@ -137,6 +137,8 @@ namespace Foundation {
 				TrySchedulingOnContext( executingContext );
 			}
 
+			~TickWorldTask() = default;
+
 		// ---------------------------------------------------
 
 			const UTF8Char* const GetHumanReadableName() const override sealed {
