@@ -32,7 +32,7 @@ namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::ScriptCompilerTool() : _globalAllocator( UTF8L("Root Allocator") ),
+	ScriptCompiler<GlobalAllocator, FileAccessorFactory>::ScriptCompiler() : _globalAllocator( UTF8L("Root Allocator") ),
 																					 _engine( ::asCreateScriptEngine() ),
 																					 _fileAccessorFactory(),
 																					 _scriptBuilder(),
@@ -42,7 +42,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::~ScriptCompilerTool() {
+	ScriptCompiler<GlobalAllocator, FileAccessorFactory>::~ScriptCompiler() {
 		if( auto scriptModule = GetScriptBuilder().GetModule() ) {
 			scriptModule->Discard();
 		}
@@ -51,21 +51,21 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ETInlineHint typename ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AllocatorType& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetAllocator() {
+	ETInlineHint typename ScriptCompiler<GlobalAllocator, FileAccessorFactory>::AllocatorType& ScriptCompiler<GlobalAllocator, FileAccessorFactory>::GetAllocator() {
 		return _globalAllocator;
 	}
 
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ETInlineHint typename ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::FileAccessorFactoryType& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetFileAccessorFactory() {
+	ETInlineHint typename ScriptCompiler<GlobalAllocator, FileAccessorFactory>::FileAccessorFactoryType& ScriptCompiler<GlobalAllocator, FileAccessorFactory>::GetFileAccessorFactory() {
 		return _fileAccessorFactory;
 	}
 
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	ETInlineHint ::CScriptBuilder& ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::GetScriptBuilder() {
+	ETInlineHint ::CScriptBuilder& ScriptCompiler<GlobalAllocator, FileAccessorFactory>::GetScriptBuilder() {
 		return _scriptBuilder;
 	}
 
@@ -73,7 +73,7 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	template <class MetadataVisitor>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AcceptMetadataVisitor( MetadataVisitor&& visitor ) {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::AcceptMetadataVisitor( MetadataVisitor&& visitor ) {
 		const auto	scriptModule( GetScriptBuilder().GetModule() );
 
 		visitor.BeginMetadataProcessing();
@@ -137,7 +137,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::Process() {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::Process() {
 		class OutputStream : public ::asIBinaryStream {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -191,7 +191,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
 		const ::Eldritch2::UTF8Char	extensionString[]	= UTF8L(".AngelScriptBytecodeMetadata");
 
 		_outputModuleName.Assign( argument, argumentEnd );
@@ -218,7 +218,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::SetOptimizationLevel( const int level ) {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetOptimizationLevel( const int level ) {
 		_engine->SetEngineProperty( ::asEEngineProp::asEP_OPTIMIZE_BYTECODE, static_cast<::asPWORD>(level > 0) );
 
 		return 0;
@@ -227,7 +227,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::AddInputFile( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::AddInputFile( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
 		_inputFiles.PushBack( { argument, argumentEnd, { GetAllocator(), UTF8L("Input File Name Allocator") } } );
 
 		return 0;
@@ -236,15 +236,15 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	void ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>::RegisterOptions( OptionRegistrationVisitor& visitor ) {
+	void ScriptCompiler<GlobalAllocator, FileAccessorFactory>::RegisterOptions( OptionRegistrationVisitor& visitor ) {
 		using namespace ::std::placeholders;
 
 	// ---
 
-		visitor.AddArgument( UTF8L("-moduleName"), UTF8L("-m"), ::std::bind( &ScriptCompilerTool::SetOutputModuleName, this, _1, _2 ) );
-		visitor.AddTypedArgument<int>( UTF8L("-optimizationLevel"), UTF8L("-o"), ::std::bind( &ScriptCompilerTool::SetOptimizationLevel, this, _1 ) );
+		visitor.AddArgument( UTF8L("-moduleName"), UTF8L("-m"), ::std::bind( &ScriptCompiler::SetOutputModuleName, this, _1, _2 ) );
+		visitor.AddTypedArgument<int>( UTF8L("-optimizationLevel"), UTF8L("-o"), ::std::bind( &ScriptCompiler::SetOptimizationLevel, this, _1 ) );
 
-		visitor.AddInputFileHandler( ::std::bind( &ScriptCompilerTool::AddInputFile, this, _1, _2 ) );
+		visitor.AddInputFileHandler( ::std::bind( &ScriptCompiler::AddInputFile, this, _1, _2 ) );
 		
 	}
 

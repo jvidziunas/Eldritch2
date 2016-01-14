@@ -1,11 +1,11 @@
 /*==================================================================*\
-  Bakinator.hpp
+  GeometryCompiler.hpp
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -21,20 +21,20 @@ namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	class Bakinator : public Tools::ToolCRTPBase<Bakinator<GlobalAllocator, FileAccessorFactory>> {
+	class GeometryCompiler : public Tools::ToolCRTPBase<GeometryCompiler<GlobalAllocator, FileAccessorFactory>> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Bakinator instance.
-		Bakinator();
+		//!	Constructs this @ref GeometryCompiler instance.
+		GeometryCompiler();
 
-		~Bakinator() = default;
+		~GeometryCompiler() = default;
 
 	// ---------------------------------------------------
 
 		ETInlineHint FileAccessorFactory&	GetFileAccessorFactory();
 
-		//!	Retrieves the @ref GlobalAllocator the tool uses to perform internal memory allocations.
+		//!	Retrieves the @ref Allocator the tool uses to perform internal memory allocations.
 		/*!	@returns A reference to the @ref GlobalAllocator the tool should use to make memory allocations.
 			*/
 		ETInlineHint GlobalAllocator&		GetAllocator();
@@ -48,11 +48,9 @@ namespace Tools {
 	// ---------------------------------------------------
 
 	protected:
-		int	SetOutputFileName( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
+		int	SetPassword( const ::Eldritch2::UTF8Char* const password, const ::Eldritch2::UTF8Char* const passwordEnd );
 
-		int	AddImport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
-
-		int	AddExport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
+		int	AddInputFile( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -60,10 +58,8 @@ namespace Tools {
 		GlobalAllocator											_allocator;
 		FileAccessorFactory										_fileAccessorFactory;
 
-		::Eldritch2::UTF8String<>								_outputFileName;
-		::Eldritch2::UTF8String<>								_outputDataBlobName;
-		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_importNames;
-		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_exportNames;
+		::Eldritch2::UTF8String<>								_password;
+		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_inputNames;
 	};
 
 }	// namespace Tools
@@ -72,5 +68,5 @@ namespace Tools {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Bakinator.inl>
+#include <GeometryCompiler.inl>
 //------------------------------------------------------------------//

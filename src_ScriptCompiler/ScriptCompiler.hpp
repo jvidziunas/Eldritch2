@@ -30,7 +30,7 @@ namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	class ScriptCompilerTool : public Tools::ToolCRTPBase<ScriptCompilerTool<GlobalAllocator, FileAccessorFactory>> {
+	class ScriptCompiler : public Tools::ToolCRTPBase<ScriptCompiler<GlobalAllocator, FileAccessorFactory>> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -39,10 +39,10 @@ namespace Tools {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref ScriptCompilerTool instance.
-		ScriptCompilerTool();
+		//!	Constructs this @ref ScriptCompiler instance.
+		ScriptCompiler();
 
-		~ScriptCompilerTool();
+		~ScriptCompiler();
 
 	// ---------------------------------------------------
 

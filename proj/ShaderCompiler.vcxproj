@@ -14,6 +14,9 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src_ShaderCompiler\ShaderCompiler.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{98EA248F-16AA-4AF4-AB1B-5AF55FA228BB}</ProjectGuid>
     <RootNamespace>ShaderCompiler</RootNamespace>

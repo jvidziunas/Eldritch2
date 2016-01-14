@@ -23,6 +23,6 @@ int main( int argc, ::Eldritch2::UTF8Char** argv ) {
 
 // ---
 
-	return Tools::ScriptCompilerTool<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv, argv + argc } );
+	return Tools::ScriptCompiler<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv, argv + argc } );
 }
 #endif

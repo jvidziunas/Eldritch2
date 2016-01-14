@@ -22,12 +22,10 @@
 #include <Utility/Math/StandardLibrary.hpp>
 #include <Utility/Memory/Allocator.hpp>
 #include <Utility/Assert.hpp>
-#include <Logging/Logger.hpp>
 //------------------------------------------------------------------//
 #include <memory>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Foundation;
 using namespace ::Eldritch2;
 
 namespace Eldritch2 {
