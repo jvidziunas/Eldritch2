@@ -28,9 +28,9 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	template <typename TaskVisitor>
-	void GameEngineService::BroadcastTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, TaskVisitor&& visitor ) {
+	void GameEngineService::BroadcastTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, TaskVisitor&& visitor ) {
 		for( auto& service : _owningEngine._attachedServices ) {
-			service.AcceptTaskVisitor( subtaskAllocator, visitingTask, executingContext, visitor );
+			service.AcceptTaskVisitor( executingContext, finishCounter, visitor );
 		}
 	}
 

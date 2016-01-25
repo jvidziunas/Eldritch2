@@ -38,7 +38,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	ErrorCode ShaderResourceResourceView::UpdateFromByteStream( const Range<const char*> /*sourceBytes*/ ) {
-		return Error::OPERATION_NOT_SUPPORTED;
+		return Error::UnsupportedOperation;
 	}
 
 // ---------------------------------------------------

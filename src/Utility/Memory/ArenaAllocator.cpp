@@ -81,7 +81,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	void ArenaAllocatorBase::Deallocate( void* const /*address*/, const AlignedDeallocationSemantics ) {}
+	void ArenaAllocatorBase::Deallocate( void* const /*address*/, const AlignedDeallocationSemanticsTag ) {}
 
 // ---------------------------------------------------
 

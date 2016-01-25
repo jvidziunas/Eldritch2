@@ -300,7 +300,8 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCameraComponent.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp" />
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp" />
-    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.cpp" />
+    <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.cpp" />
+    <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.WorkerThread.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.BytecodePackageViewFactory.cpp" />
@@ -328,8 +329,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp" />
     <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp" />
     <ClCompile Include="..\src\Scheduler\Thread.cpp" />
-    <ClCompile Include="..\src\Scheduler\Task.cpp" />
-    <ClCompile Include="..\src\scheduler\TaskScheduler.cpp" />
+    <ClCompile Include="..\src\scheduler\ThreadScheduler.cpp" />
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp" />
     <ClCompile Include="..\src\scripting\Angelscript\WorldView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\NativeBindings.cpp" />
@@ -422,10 +422,9 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Renderer\Direct3D11\WorldView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp" />
     <ClInclude Include="..\src\renderer\VisibilitySystem.hpp" />
-    <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp" />
     <ClInclude Include="..\src\Scheduler\PrivateQueueWorker.hpp" />
-    <ClInclude Include="..\src\Scheduler\Win32Fiber\TaskScheduler.hpp" />
-    <ClInclude Include="..\src\Scheduler\Win32\TaskScheduler.hpp" />
+    <ClInclude Include="..\src\Scheduler\Win32\FiberScheduler.hpp" />
+    <ClInclude Include="..\src\Scheduler\Win32\ThreadScheduler.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodeMetadata.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.hpp" />
@@ -434,7 +433,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Scripting\Angelscript\EngineService.hpp" />
     <ClInclude Include="..\src\Scripting\Message.hpp" />
     <ClInclude Include="..\src\Scripting\MessageBus.hpp" />
-    <ClInclude Include="..\src\Scripting\ReferenceTypeBase.hpp" />
+    <ClInclude Include="..\src\Scripting\ReferenceCountable.hpp" />
     <ClInclude Include="..\src\Scripting\ScriptMarshalTypes.hpp" />
     <ClInclude Include="..\src\packages\ContentLibrary.hpp" />
     <ClInclude Include="..\src\Packages\ContentPackage.hpp" />
@@ -522,8 +521,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp" />
     <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp" />
     <ClInclude Include="..\src\Scheduler\Thread.hpp" />
-    <ClInclude Include="..\src\Scheduler\Task.hpp" />
-    <ClInclude Include="..\src\scheduler\TaskScheduler.hpp" />
+    <ClInclude Include="..\src\scheduler\ThreadScheduler.hpp" />
     <ClInclude Include="..\src\Scheduler\WorkerContext.hpp" />
     <ClInclude Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.hpp" />
     <ClInclude Include="..\src\scripting\Angelscript\WorldView.hpp" />
@@ -564,6 +562,15 @@ call "deploy.x64.bat"
     <None Include="..\src\FileSystem\Win32\ContentProvider.inl" />
     <None Include="..\src\Foundation\GameEngine.inl" />
     <None Include="..\src\Foundation\GameEngineService.inl" />
+    <CustomBuild Include="..\src\Foundation\SerializedWorld.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+    </CustomBuild>
     <None Include="..\src\Foundation\World.inl" />
     <None Include="..\src\Foundation\WorldView.inl" />
     <None Include="..\src\logging\Logger.inl" />
@@ -572,9 +579,9 @@ call "deploy.x64.bat"
     <None Include="..\src\Packages\PackageDeserializationContext.inl" />
     <CustomBuild Include="..\src\Packages\PackageHeader.fbc">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
@@ -584,16 +591,42 @@ call "deploy.x64.bat"
     <None Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.inl" />
     <None Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.inl" />
     <None Include="..\src\Physics\BulletDynamics\EngineService.inl" />
+    <CustomBuild Include="..\src\Physics\CollisionShapes.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Physics\ArticulatedBody.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Renderer\PipelineTypes.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="..\src\Renderer\HLSLPipeline.fbc" />
     <None Include="..\src\renderer\VisibilitySystem.inl" />
-    <None Include="..\src\Scheduler\CRTPTransientTask.inl" />
     <None Include="..\src\Scheduler\PrivateQueueWorker.inl" />
-    <None Include="..\src\Scheduler\Task.inl" />
     <None Include="..\src\Scheduler\WorkerContext.inl" />
     <CustomBuild Include="..\src\Scripting\Angelscript\BytecodeMetadata.fbc">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums  -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
@@ -604,8 +637,17 @@ call "deploy.x64.bat"
     <None Include="..\src\Scripting\Message.inl" />
     <None Include="..\src\Scripting\MessageBus.inl" />
     <None Include="..\src\Scripting\ObjectHandle.inl" />
-    <None Include="..\src\Scripting\ReferenceTypeBase.inl" />
+    <None Include="..\src\Scripting\ReferenceCountable.inl" />
     <None Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.inl" />
+    <CustomBuild Include="..\src\Sound\SoundBank.fbc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
+    </CustomBuild>
     <None Include="..\src\Utility\Algorithms.inl" />
     <None Include="..\src\Utility\COMPointer.inl" />
     <None Include="..\src\Utility\Containers\FlatOrderedMap.inl" />

@@ -29,29 +29,29 @@ namespace Detail {
 // ---------------------------------------------------
 
 	template <typename PublicAllocatorType>
-	ETForceInlineHint void* RDESTLAllocatorAdapterMixin<PublicAllocatorType>::allocate( unsigned int bytes, int /*flags*/ ) {
-		return this->allocate_aligned( bytes, sizeof(void*) );
+	ETForceInlineHint void* RDESTLAllocatorAdapterMixin<PublicAllocatorType>::allocate( unsigned int bytes, int flags ) {
+		return allocate_aligned( bytes, sizeof(void*), flags );
 	}
 
 // ---------------------------------------------------
 
 	template <typename PublicAllocatorType>
 	ETForceInlineHint void* RDESTLAllocatorAdapterMixin<PublicAllocatorType>::allocate_aligned( unsigned int bytes, unsigned int alignment, int /*flags*/ ) {
-		return this->Allocate( bytes, alignment, AllocationOption::TEMPORARY_ALLOCATION );
+		return Allocate( bytes, alignment, AllocationDuration::Temporary );
 	}
 
 // ---------------------------------------------------
 
 	template <typename PublicAllocatorType>
 	ETForceInlineHint void RDESTLAllocatorAdapterMixin<PublicAllocatorType>::deallocate( void* ptr, unsigned int /*bytes*/ ) {
-		this->Deallocate( ptr, ::Eldritch2::AlignedDeallocationSemantics );
+		Deallocate( ptr, ::Eldritch2::AlignedDeallocationSemantics );
 	}
 
 // ---------------------------------------------------
 
 	template <typename PublicAllocatorType>
 	ETForceInlineHint const char* RDESTLAllocatorAdapterMixin<PublicAllocatorType>::get_name() const {
-		return this->GetName();
+		return GetName();
 	}
 
 }	// namespace Detail

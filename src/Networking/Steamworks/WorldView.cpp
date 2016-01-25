@@ -14,7 +14,6 @@
 //==================================================================//
 #include <Networking/Steamworks/EngineService.hpp>
 #include <Networking/Steamworks/WorldView.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -90,85 +89,26 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PreScriptTickTaskVisitor ) {
-		class ReceivePacketsTask : public CRTPTransientTask<ReceivePacketsTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref ReceivePacketsTask instance.
-			ETInlineHint ReceivePacketsTask( WorldView& host, WorkerContext& executingContext, Task& preScriptTickTask ) : CRTPTransientTask<ReceivePacketsTask>( preScriptTickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~ReceivePacketsTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Steamworks Receive Packets Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				::CSteamID	senderID;
-				char		receivedPacket[1200u];
-				uint32		receivedSize( 0u );
-
-				while( _host._serverNetworking->ReadP2PPacket( receivedPacket, sizeof(receivedPacket), &receivedSize, &senderID ) ) {
-
-				}
-
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			WorldView&	_host;
-		};
-
-	// ---
-
-		if( _serverNetworking ) {
-			new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ReceivePacketsTask( *this, executingContext, visitingTask );
+	void WorldView::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PreScriptTickTaskVisitor ) {
+		if( nullptr == _serverNetworking ) {
+			return;
 		}
+
+		executingContext.Enqueue( finishCounter, { this, [] ( void* view, WorkerContext& /*executingContext*/ ) {
+			::CSteamID	senderID;
+			uint32		packetSize( 0u );
+			auto&		networking( *static_cast<WorldView*>(view)->_serverNetworking );
+			char		packet[1200u];
+
+			while( networking.ReadP2PPacket( packet, sizeof(packet), &packetSize, &senderID ) ) {
+				// Dispatch received packet.
+			}
+		} } );
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PostScriptTickTaskVisitor ) {
-		class BroadcastPacketsTask : public CRTPTransientTask<BroadcastPacketsTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref BroadcastPacketsTask instance.
-			ETInlineHint BroadcastPacketsTask( WorldView& host, WorkerContext& executingContext, Task& postScriptTickTask ) : CRTPTransientTask<BroadcastPacketsTask>( postScriptTickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~BroadcastPacketsTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Steamworks Broadcast Packets Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			WorldView&	_host;
-		};
-
-	// ---
-
-		if( _serverNetworking ) {
-			new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) BroadcastPacketsTask( *this, executingContext, visitingTask );
-		}
-	}
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostScriptTickTaskVisitor ) {}
 
 // ---------------------------------------------------
 
@@ -208,7 +148,7 @@ namespace Steamworks {
 		_userHandle				= serverUser;
 		_ownsPipeAndHandle		= true;
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------

@@ -748,7 +748,7 @@ namespace Direct3D {
 		};
 
 		if( (layout < GPULayout::COUNT) & (format < GPUStorageFormat::COUNT) ) {
-			return textureLayouts[static_cast<size_t>(layout)].formats[static_cast<size_t>(format)].sRGBFormats[static_cast<bool>(flags & FilteringFlags::SAMPLE_AS_SRGB)];
+			return textureLayouts[static_cast<size_t>(layout)].formats[static_cast<size_t>(format)].sRGBFormats[static_cast<bool>(flags & FilteringFlags::SampleAsSrgb)];
 		}
 
 		return ::DXGI_FORMAT_UNKNOWN;

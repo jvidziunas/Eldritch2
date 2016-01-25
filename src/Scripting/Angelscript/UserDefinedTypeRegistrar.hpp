@@ -36,19 +36,19 @@ namespace AngelScript {
 
 	public:
 		enum class BinaryOperatorClass {
-			ADDITION,
-			SUBTRACTION,
-			MULTIPLICATION,
-			DIVISION,
+			Addition,
+			Subtraction,
+			Multiplication,
+			Division,
 
-			ASSIGNMENT,
+			Assignment,
 
-			ADDITION_ASSIGNMENT,
-			SUBTRACTION_ASSIGNMENT,
-			MULTIPLICATION_ASSIGNMENT,
-			DIVISION_ASSIGNMENT,
+			AdditionAssignment,
+			SubtractionAssignment,
+			MultiplicationAssignment,
+			DivisionAssignment,
 
-			OPERATOR_COUNT
+			COUNT
 		};
 
 	// ---

@@ -19,9 +19,9 @@ namespace Eldritch2 {
 namespace Foundation {
 
 	template <typename TaskVisitor>
-	void WorldView::BroadcastTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, TaskVisitor&& visitor ) {
+	void WorldView::BroadcastTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, TaskVisitor&& visitor ) {
 		for( auto& view : _owningWorld._attachedViews ) {
-			view.AcceptTaskVisitor( subtaskAllocator, executingContext, visitingTask, visitor );
+			view.AcceptTaskVisitor( executingContext, finishCounter, visitor );
 		}
 	}
 

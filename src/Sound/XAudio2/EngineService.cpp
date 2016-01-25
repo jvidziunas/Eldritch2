@@ -14,7 +14,6 @@
 //==================================================================//
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
 #include <Sound/XAudio2/EngineService.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Foundation/GameEngine.hpp>
 //------------------------------------------------------------------//
@@ -69,44 +68,15 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
-		class InitalizeXAudioTask : public CRTPTransientTask<InitalizeXAudioTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			// Constructs this InitializeXAudioTask instance.
-			ETInlineHint InitalizeXAudioTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitalizeXAudioTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
-																																  _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Initialize XAudio2 Task");
-			}
-
-		// ---------------------------------------------------
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.InitializeXAudio();
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) InitalizeXAudioTask( *this, visitingTask, executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->InitializeXAudio();
+		} } );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const ServiceTickTaskVisitor ) {
+	void EngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const ServiceTickTaskVisitor ) {
 		::XAUDIO2_PERFORMANCE_DATA	performanceData;
 
 		_audio->GetPerformanceData( &performanceData );
@@ -114,7 +84,7 @@ namespace XAudio2 {
 		if( _audioGlitchCount != performanceData.GlitchesSinceEngineStarted ) {
 			_audioGlitchCount = performanceData.GlitchesSinceEngineStarted;
 
-			GetLogger( LogMessageType::ERROR )( UTF8L("XAudio reported audio processing stall since last invocation of IXAudio2::GetPerformanceData()!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::Error )( UTF8L("XAudio reported audio processing stall since last invocation of IXAudio2::GetPerformanceData()!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 
@@ -139,16 +109,16 @@ namespace XAudio2 {
 		GetLogger()( UTF8L("Creating XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
 
 		if( FAILED( ::XAudio2Create( audio.GetInterfacePointer(), (ETIsDebugModeEnabled() ? XAUDIO2_DEBUG_ENGINE : 0), ::XAUDIO2_DEFAULT_PROCESSOR ) ) || FAILED( audio->StartEngine() ) ) {
-			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
 
-			return Error::UNSPECIFIED;
+			return Error::Unspecified;
 		}
 
 		GetLogger()( UTF8L("Created XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
 
 		_audio = move( audio );
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
@@ -162,7 +132,7 @@ namespace XAudio2 {
 // ---------------------------------------------------
 
 	void EngineService::OnCriticalError( ::HRESULT /*error*/ ) {
-		GetLogger( LogMessageType::ERROR )( UTF8L("Critical error in XAudio!") );
+		GetLogger( LogMessageType::Error )( UTF8L("Critical error in XAudio!") );
 	}
 
 }	// namespace XAudio2

@@ -25,7 +25,7 @@ namespace Eldritch2 {
 namespace Networking {
 namespace Steamworks {
 
-	EngineService::Player::Player( const ObjectHandle<World>& world, EngineService& service, Allocator& allocator ) : _name( { allocator, UTF8L( "Player Name Allocator" ) } ),
+	EngineService::Player::Player( const ObjectHandle<World>& world, EngineService& service, Allocator& allocator ) : _name( { allocator, UTF8L("Player Name Allocator") } ),
 																													  _service( service ),
 																													  _world( world ) {}
 

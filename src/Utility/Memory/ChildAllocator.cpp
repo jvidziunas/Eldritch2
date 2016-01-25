@@ -83,7 +83,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	void ChildAllocator::Deallocate( void* const address, const AlignedDeallocationSemantics semantics ) {
+	void ChildAllocator::Deallocate( void* const address, const AlignedDeallocationSemanticsTag semantics ) {
 		_parent.Deallocate( address, semantics );
 	}
 

@@ -13,9 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
-#include <Utility/CountedResult.hpp>
+#include <Scheduler/WorkerContext.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/CharTypes.hpp>
+#include <Utility/CountedResult.hpp>
 #include <Utility/Result.hpp>
 #include <Logging/Logger.hpp>
 //------------------------------------------------------------------//
@@ -41,8 +42,7 @@ namespace Eldritch2 {
 	}
 
 	namespace Scheduler {
-		class	WorkerContext;
-		class	TaskScheduler;
+		class	ThreadScheduler;
 		class	Thread;
 		class	Task;
 	}
@@ -96,43 +96,38 @@ namespace Foundation {
 		virtual void	AcceptInitializationVisitor( const PostInitializationVisitor );
 
 		//! Interested service classes should override this method to schedule simple bootstrap tasks with no additional data dependencies.
-		/*!	@param[in] subtaskAllocator Allocator instance that provides memory for possible Task instances. The managed memory will exist until the end of the initialization process.
-			@param[in] visitingTask The Scheduler::Task instance responsible for performing initial service initialization. Services are encouraged to add codependent Task instances to perform additional work.
-			@param[in] executingContext The Scheduler::WorkerContext instance currently executing the visiting Task.
+		/*!	@param[in] executingContext The Scheduler::WorkerContext instance that should execute any internal work.
+			@param[in] finishCounter The Scheduler::WorkerContext::FinishCounter responsible for tracking the completion of initialization work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduler::Task, @ref Scheduler::WorkerContext
 			*/
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const InitializeEngineTaskVisitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor );
 		//! Interested service classes should override this method to schedule initialization tasks that do not require the use of any user-configurable variables.
-		/*!	@param[in] subtaskAllocator @ref Allocator instance that provides memory for possible Task instances. The managed memory will exist until the end of the initialization process.
-			@param[in] visitingTask The Scheduler::Task instance responsible for performing initial service initialization. Services are encouraged to add codependent Task instances to perform additional work.
-			@param[in] executingContext The Scheduler::WorkerContext instance currently executing the visiting Task.
+		/*!	@param[in] executingContext The Scheduler::WorkerContext instance that should execute any internal work.
+			@param[in] finishCounter The Scheduler::WorkerContext::FinishCounter responsible for tracking the completion of initialization work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduler::Task, @ref Scheduler::WorkerContext
 			*/
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor );
 		//! Interested service classes should override this method to schedule initialization tasks that require the use of user-configurable variables.
-		/*!	@param[in] subtaskAllocator Allocator instance that provides memory for possible Task instances. The managed memory will exist until the end of the initialization process.
-			@param[in] visitingTask The Scheduler::Task instance responsible for performing initial service initialization. Services are encouraged to add codependent Task instances to perform additional work.
-			@param[in] executingContext The Scheduler::WorkerContext instance currently executing the visiting Task.
+		/*!	@param[in] executingContext The Scheduler::WorkerContext instance that should execute any internal work.
+			@param[in] finishCounter The Scheduler::WorkerContext::FinishCounter responsible for tracking the completion of initialization work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduler::Task, @ref Scheduler::WorkerContext
 			*/
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor );
-		/*!	@param[in] subtaskAllocator Allocator instance that provides memory for possible Task instances. The managed memory will exist until the end of the initialization process.
-			@param[in] visitingTask The Scheduler::Task instance responsible for performing initial service initialization. Services are encouraged to add codependent Task instances to perform additional work.
-			@param[in] executingContext The Scheduler::WorkerContext instance currently executing the visiting Task.
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor );
+		/*!	@param[in] executingContext The Scheduler::WorkerContext instance that should execute any internal work.
+			@param[in] finishCounter The Scheduler::WorkerContext::FinishCounter responsible for tracking the completion of initialization work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduler::Task, @ref Scheduler::WorkerContext
 			*/
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const ServiceTickTaskVisitor );
-		/*!	@param[in] subtaskAllocator Allocator instance that provides memory for possible Task instances. The managed memory will exist until the end of the initialization process.
-			@param[in] visitingTask The Scheduler::Task instance responsible for performing initial service initialization. Services are encouraged to add codependent Task instances to perform additional work.
-			@param[in] executingContext The Scheduler::WorkerContext instance currently executing the visiting Task.
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor );
+		/*!	@param[in] executingContext The Scheduler::WorkerContext instance that should execute any internal work.
+			@param[in] finishCounter The Scheduler::WorkerContext::FinishCounter responsible for tracking the completion of initialization work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduler::Task, @ref Scheduler::WorkerContext
 			*/
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const WorldTickTaskVisitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const WorldTickTaskVisitor );
 
 	// ---------------------------------------------------
 
@@ -140,7 +135,7 @@ namespace Foundation {
 		void	BroadcastInitializationVisitor( InitializationVisitor&& visitor );
 
 		template <typename TaskVisitor>
-		void	BroadcastTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, TaskVisitor&& visitor );
+		void	BroadcastTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, TaskVisitor&& visitor );
 
 	// - GAME ENGINE SERVICE SANDBOX METHODS -------------
 
@@ -158,10 +153,10 @@ namespace Foundation {
 			*/
 		const FileSystem::ContentLibrary&					GetEngineContentLibrary() const;
 
-		//! Retrieves the Scheduler::TaskScheduler instance used by the @ref GameEngine this @ref GameEngineService is attached to.
-		/*!	@see @ref Scheduler::TaskScheduler
+		//! Retrieves the Scheduler::ThreadScheduler instance used by the @ref GameEngine this @ref GameEngineService is attached to.
+		/*!	@see @ref Scheduler::ThreadScheduler
 			*/
-		Scheduler::TaskScheduler&							GetEngineTaskScheduler() const;
+		Scheduler::ThreadScheduler&							GetEngineThreadScheduler() const;
 
 		//! Retrieves the 'global' engine allocator.
 		/*!	@see @ref Allocator
@@ -175,7 +170,7 @@ namespace Foundation {
 
 	// - LOGGING -----------------------------------------
 
-		Foundation::Logger&	GetLogger( const Foundation::LogMessageType type = Foundation::LogMessageType::MESSAGE ) const;
+		Foundation::Logger&	GetLogger( const Foundation::LogMessageType type = Foundation::LogMessageType::Message ) const;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

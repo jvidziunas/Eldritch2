@@ -1,0 +1,14 @@
+include "CollisionShapes.fbc";
+
+namespace Eldritch2.Physics.FlatBuffers;
+
+table Body {
+	BoneIndex	: ushort;
+	Shape		: CollisionShape (required);
+}
+
+table ArticulatedBody {
+	Bodies	: [Body];
+}
+
+root_type ArticulatedBody;

@@ -15,7 +15,7 @@
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Containers/UTF8String.hpp>
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Packages/ResourceView.hpp>
@@ -38,14 +38,14 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace FileSystem {
 
-	class ContentPackage : public Scripting::ReferenceTypeBase, public Utility::Noncopyable {
+	class ContentPackage : public Scripting::ReferenceCountable, public Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		enum class ResidencyState : ::Eldritch2::uint32 {
-			FAILED,		//!< The package or one of its dependencies encountered a fatal error while loading. The package contents will never be available.
-			LOADING,	//!< The package and/or one of its dependencies are currently in the process of being paged into memory. The contents of the package may be available in the future.
-			PUBLISHED	//!< The package, its dependencies and their contents have loaded fully.
+			Failed,		//!< The package or one of its dependencies encountered a fatal error while loading. The package contents will never be available.
+			Loading,	//!< The package and/or one of its dependencies are currently in the process of being paged into memory. The contents of the package may be available in the future.
+			Published	//!< The package, its dependencies and their contents have loaded fully.
 		};
 
 		using DependencyCollection	= ::Eldritch2::ResizableArray<Scripting::ObjectHandle<const FileSystem::ContentPackage>>;

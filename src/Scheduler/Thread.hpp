@@ -21,7 +21,7 @@
 
 namespace Eldritch2 {
 	namespace Scheduler {
-		class	TaskScheduler;
+		class	ThreadScheduler;
 	}
 }
 
@@ -66,7 +66,7 @@ namespace Scheduler {
 	// ---------------------------------------------------
 
 	protected:
-		virtual ::Eldritch2::ErrorCode Run() abstract;
+		virtual void	Run() abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -80,14 +80,13 @@ namespace Scheduler {
 
 	private:
 		enum ExecutionState : ::Eldritch2::uint32 {
-			UNINITIALIZED,
-			RUNNING,
-			DONE
+			Uninitialized,
+			Running,
+			Done
 		};
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ErrorCode			_resultCode;
 		/** Marker used by the underlying operating system thread to indicate whether or not it has forked/joined. */
 		::std::atomic<ExecutionState>	_executionState;
 	};

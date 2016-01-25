@@ -58,21 +58,21 @@ namespace {
 	// ---
 
 		switch( presentationMode ) {
-			case PresentationMode::WINDOWED: {
+			case PresentationMode::Windowed: {
 				return WS_OVERLAPPEDWINDOW;
 			}	// case PresentationMode::WINDOWED
 
 		// ---
 
-			case PresentationMode::WINDOWED_FULLSCREEN: {
+			case PresentationMode::WindowedFullscreen: {
 				return WS_MAXIMIZE;
-			}	// case PresentationMode::WINDOWED_FULLSCREEN
+			}	// case PresentationMode::WindowedFullscreen
 
 		// ---
 
-			case PresentationMode::FULLSCREEN: {
+			case PresentationMode::Fullscreen: {
 				return WS_MAXIMIZE;
-			}	// case PresentationMode::FULLSCREEN
+			}	// case PresentationMode::Fullscreen
 		};
 
 		return 0;
@@ -94,7 +94,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	ErrorCode SwapChain::Run() {
+	void SwapChain::Run() {
 		enum : ::DWORD {
 			NO_EXTENDED_STYLES = static_cast<::DWORD>(0)
 		};
@@ -102,38 +102,36 @@ namespace Direct3D11 {
 	// ---
 
 		ObjectHandle<SwapChain>	thisReference( this );
-		const auto				windowHandle( ::CreateWindowEx( NO_EXTENDED_STYLES,
-																nullptr,
-																nullptr,
-																WindowStyleFromPresentationMode( _presentationParameters.presentationMode ),
-																CW_USEDEFAULT,
-																CW_USEDEFAULT,
-																static_cast<int>(_presentationParameters.widthInPixels),
-																static_cast<int>(_presentationParameters.heightInPixels),
-																nullptr,
-																nullptr,
-																GetInstance(),
-																this ) );
+		const auto				windowHandle( ::CreateWindowExW( NO_EXTENDED_STYLES,
+																 nullptr,
+																 nullptr,
+																 WindowStyleFromPresentationMode( _presentationParameters.presentationMode ),
+																 CW_USEDEFAULT,
+																 CW_USEDEFAULT,
+																 static_cast<int>(_presentationParameters.widthInPixels),
+																 static_cast<int>(_presentationParameters.heightInPixels),
+																 nullptr,
+																 nullptr,
+																 GetInstance(),
+																 this ) );
 
 		if( nullptr == windowHandle ) {
-			return Error::UNSPECIFIED;
+			return;
 		}
 
 		::ShowWindow( windowHandle, GetCmdShow() );
 
-		for( ::MSG receivedMessage; 0 != ::GetMessage( &receivedMessage, windowHandle, static_cast<::UINT>(0), static_cast<::UINT>(0xFFFFFFFF) ); ) {
+		for( ::MSG receivedMessage; 0 != ::GetMessageW( &receivedMessage, windowHandle, static_cast<::UINT>(0), static_cast<::UINT>(0xFFFFFFFF) ); ) {
 			::TranslateMessage( &receivedMessage );
-			::DispatchMessage( &receivedMessage );
+			::DispatchMessageW( &receivedMessage );
 		}
-
-		return Error::NONE;
 	}
 
 // ---------------------------------------------------
 
 	void SwapChain::RequestGracefulShutdown() {
 		if( const auto windowHandle = _windowHandle.load( memory_order_acquire ) ) {
-			::PostMessage( windowHandle, WM_CLOSE, 0, 0 );
+			::PostMessageW( windowHandle, WM_CLOSE, 0, 0 );
 		}
 	}
 
@@ -182,14 +180,10 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	void SwapChain::SetCaption( const UTF8Char* const captionString ) {
-#	if( ETIsBuildUnicode() )
-		const UTF8Char* const	endOfString( FindEndOfString( captionString ) );
-		wchar_t* const			newText( static_cast<wchar_t*>(_alloca( sizeof(wchar_t) * (endOfString - captionString) )) );
+		const auto	endOfString( FindEndOfString( captionString ) );
+		const auto	newText( static_cast<wchar_t*>(_alloca( sizeof(wchar_t) * (endOfString - captionString) )) );
 
 		::SetWindowTextW( _windowHandle, (::utf8::utf8to16( captionString, endOfString, newText ), newText) );
-#	else
-		::SetWindowTextA( _windowHandle, captionString );
-#	endif
 	}
 
 // ---------------------------------------------------
@@ -213,8 +207,8 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	::ATOM SwapChain::RegisterWindowClass() {
-		const ::HINSTANCE	applicationInstance( ::GetModuleHandle( nullptr ) );
-		const ::WNDCLASSEX	windowClass = {
+		const ::HINSTANCE	applicationInstance( ::GetModuleHandleW( nullptr ) );
+		const ::WNDCLASSEXW	windowClass = {
 			static_cast<::DWORD>(sizeof( windowClass )),
 			static_cast<::UINT>(0),
 			[] ( ::HWND windowHandle, ::UINT messageID, ::WPARAM wParam, ::LPARAM lParam ) -> ::LRESULT {
@@ -222,31 +216,31 @@ namespace Direct3D11 {
 					auto	swapChain( static_cast<SwapChain*>(reinterpret_cast<::LPCREATESTRUCT>(lParam)->lpCreateParams) );
 
 					swapChain->_windowHandle.store( windowHandle, memory_order_release );
-					::SetWindowLongPtr( windowHandle, GWLP_USERDATA, reinterpret_cast<::LONG_PTR>(swapChain) );
+					::SetWindowLongPtrW( windowHandle, GWLP_USERDATA, reinterpret_cast<::LONG_PTR>(swapChain) );
 				}
 
-				if( auto swapChain = reinterpret_cast<SwapChain*>(::GetWindowLongPtr( windowHandle, GWLP_USERDATA )) ) {
+				if( auto swapChain = reinterpret_cast<SwapChain*>(::GetWindowLongPtrW( windowHandle, GWLP_USERDATA )) ) {
 					// We've successfully attached, skip the branch for all subsequent messages
-					::SetWindowLongPtr( windowHandle, GWLP_WNDPROC, reinterpret_cast<::LONG_PTR>(static_cast<::WNDPROC>([] ( ::HWND windowHandle, ::UINT messageID, ::WPARAM wParam, ::LPARAM lParam ) -> ::LRESULT {
-						return reinterpret_cast<SwapChain*>(::GetWindowLongPtr( windowHandle, GWLP_USERDATA ))->MessageProc( messageID, wParam, lParam );
+					::SetWindowLongPtrW( windowHandle, GWLP_WNDPROC, reinterpret_cast<::LONG_PTR>(static_cast<::WNDPROC>([] ( ::HWND windowHandle, ::UINT messageID, ::WPARAM wParam, ::LPARAM lParam ) -> ::LRESULT {
+						return reinterpret_cast<SwapChain*>(::GetWindowLongPtrW( windowHandle, GWLP_USERDATA ))->MessageProc( messageID, wParam, lParam );
 					})) );
 					return swapChain->MessageProc( messageID, wParam, lParam );
 				}
 
-				return ::DefWindowProc( windowHandle, messageID, wParam, lParam );
+				return ::DefWindowProcW( windowHandle, messageID, wParam, lParam );
 			},
 			0,
 			0,
-			GetModuleHandle( nullptr ),
-			static_cast<::HICON>(::LoadImage( applicationInstance, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, ::GetSystemMetrics( SM_CXICON ), ::GetSystemMetrics( SM_CYICON ), LR_DEFAULTSIZE )),
+			::GetModuleHandleW( nullptr ),
+			static_cast<::HICON>(::LoadImageW( applicationInstance, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, ::GetSystemMetrics( SM_CXICON ), ::GetSystemMetrics( SM_CYICON ), LR_DEFAULTSIZE )),
 			nullptr,
 			nullptr,
 			nullptr,
-			SL("Eldritch2Window"),
-			static_cast<::HICON>(::LoadImage( applicationInstance, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, ::GetSystemMetrics( SM_CXSMICON ), ::GetSystemMetrics( SM_CYSMICON ), LR_DEFAULTSIZE ))
+			L"Eldritch2Window",
+			static_cast<::HICON>(::LoadImageW( applicationInstance, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, ::GetSystemMetrics( SM_CXSMICON ), ::GetSystemMetrics( SM_CYSMICON ), LR_DEFAULTSIZE ))
 		};
 
-		return ::RegisterClassEx( &windowClass );
+		return ::RegisterClassExW( &windowClass );
 	}
 
 // ---------------------------------------------------
@@ -279,7 +273,7 @@ namespace Direct3D11 {
 		// ---
 
 			default: {
-				return ::DefWindowProc( _windowHandle, messageID, wParam, lParam );
+				return ::DefWindowProcW( _windowHandle, messageID, wParam, lParam );
 			}
 		}	// switch( msgID )
 	}

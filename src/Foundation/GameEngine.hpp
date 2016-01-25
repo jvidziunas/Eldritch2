@@ -17,8 +17,8 @@
 #include <Configuration/ConfigurablePODVariable.hpp>
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Foundation/GameEngineService.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Logging/FileAppendingLogger.hpp>
-#include <Scripting/ReferenceTypeBase.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Foundation/World.hpp>
 //------------------------------------------------------------------//
@@ -31,7 +31,7 @@ namespace Eldritch2 {
 	}
 
 	namespace Scheduler {
-		class	TaskScheduler;
+		class	ThreadScheduler;
 	}
 
 	namespace System {
@@ -47,12 +47,12 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Foundation {
 
-	class GameEngine : public Scripting::ReferenceTypeBase {
+	class GameEngine : public Scripting::ReferenceCountable {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref GameEngine instance.
-		GameEngine( System::SystemInterface& systemInterface, Scheduler::TaskScheduler& scheduler, FileSystem::ContentProvider& contentProvider, ::Eldritch2::Allocator& allocator );
+		GameEngine( System::SystemInterface& systemInterface, Scheduler::ThreadScheduler& scheduler, FileSystem::ContentProvider& contentProvider, ::Eldritch2::Allocator& allocator );
 
 		~GameEngine() = default;
 
@@ -69,10 +69,10 @@ namespace Foundation {
 		ETInlineHint const FileSystem::ContentLibrary&	GetContentLibrary() const;
 		ETInlineHint FileSystem::ContentLibrary&		GetContentLibrary();
 
-		//! Retrieves the @ref TaskScheduler instance this @ref GameEngine runs threads on.
-		ETInlineHint const Scheduler::TaskScheduler&	GetTaskScheduler() const;
-		//! Retrieves the @ref TaskScheduler instance this @ref GameEngine runs threads on.
-		ETInlineHint Scheduler::TaskScheduler&			GetTaskScheduler();
+		//! Retrieves the @ref ThreadScheduler instance this @ref GameEngine runs threads on.
+		ETInlineHint const Scheduler::ThreadScheduler&	GetThreadScheduler() const;
+		//! Retrieves the @ref ThreadScheduler instance this @ref GameEngine runs threads on.
+		ETInlineHint Scheduler::ThreadScheduler&		GetThreadScheduler();
 
 		//! Retrieves a read-only view the @ref SystemInterface describing the hardware this @ref GameEngine instance is executing on.
 		ETInlineHint const System::SystemInterface&		GetSystemInterface() const;
@@ -81,7 +81,6 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-	protected:
 		size_t	CalculateFrameArenaSizeInBytes() const;
 
 		void	ClearAttachedServices();
@@ -106,26 +105,27 @@ namespace Foundation {
 
 		// ---------------------------------------------------
 
-			void	BootstrapEngine( const size_t threadCount );
+			void	InitializeEngineAndLaunchFrameLoop( Scheduler::WorkerContext& executingContext );
 
 		// ---------------------------------------------------
 
 		protected:
 			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
 
-			void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const InitializeEngineTaskVisitor ) override sealed;
-			void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const WorldTickTaskVisitor ) override sealed;
+			void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) override sealed;
+			void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const WorldTickTaskVisitor ) override sealed;
 		};
 
 	// - DATA MEMBERS ------------------------------------
 
 		::Eldritch2::ChildAllocator											_allocator;
 
+		// Mutable so logs can be written even if we only have a const reference to the engine.
 		mutable Foundation::FileAppendingLogger								_logger;
 		FileSystem::ContentLibrary											_contentLibrary;
 
 		System::SystemInterface&											_systemInterface;
-		Scheduler::TaskScheduler&											_scheduler;
+		Scheduler::ThreadScheduler&											_scheduler;
 
 		Configuration::ConfigurablePODVariable<LogMessageType>				_logEchoThreshold;
 		Configuration::ConfigurablePODVariable<size_t>						_taskArenaPerThreadAllocationSizeInBytes;
@@ -134,7 +134,9 @@ namespace Foundation {
 		::Eldritch2::IntrusiveVyukovMPSCQueue<Foundation::World>			_tickingWorlds;
 
 		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>	_attachedServices;
-		ManagementService													_managementService;		
+		ManagementService													_managementService;
+
+		Scheduler::WorkerContext::FinishCounter								_frameFinishCounter;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

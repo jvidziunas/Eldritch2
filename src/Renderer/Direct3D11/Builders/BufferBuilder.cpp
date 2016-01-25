@@ -295,15 +295,15 @@ namespace Direct3D11 {
 		}
 
 		if( FAILED( device->CreateBuffer( &desc, _initialData ? &initialData : nullptr, _out.GetInterfacePointer() ) ) ) {
-			return Error::UNSPECIFIED;
+			return Error::Unspecified;
 		}
 
 		if( needsSRV && FAILED( device->CreateShaderResourceView( _out.GetUnadornedPointer(), &viewDesc, _outView.GetInterfacePointer() ) ) ) {
-			return Error::UNSPECIFIED;
+			return Error::Unspecified;
 		}
 
 		if( needsUAV && FAILED( device->CreateUnorderedAccessView( _out.GetUnadornedPointer(), &unorderedViewDesc, _outUnorderedAccessView.GetInterfacePointer() ) ) ) {
-			return Error::UNSPECIFIED;
+			return Error::Unspecified;
 		}
 
 #	if( ET_DEBUG_MODE_ENABLED )
@@ -314,7 +314,7 @@ namespace Direct3D11 {
 		}
 #	endif
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------

@@ -13,6 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
+#include <FileSystem/ReadableMemoryMappedFile.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Utility/Result.hpp>
@@ -42,11 +44,9 @@ namespace FileSystem {
 		PackageDeserializationContext( const Scripting::ObjectHandle<FileSystem::ContentPackage>& package );
 	
 		//! Destroys this @ref PackageDeserializationContext instance.
-		~PackageDeserializationContext();
+		~PackageDeserializationContext() = default;
 
 	// ---------------------------------------------------
-
-		::Eldritch2::ErrorCode	OpenFile();
 
 		//! Informs the @ref PackageDeserializationContext that it should initiate load requests for all the external content packages the contained resources depend on.
 		/*!	@see @ref DeserializeDependencies(), @ref LoaderThread::Run()
@@ -91,9 +91,11 @@ namespace FileSystem {
 
 	private:
 		//! Package reference. This will keep the package alive throughout the deserialization process.
-		Scripting::ObjectHandle<FileSystem::ContentPackage>	_packageReference;
-		::Eldritch2::FixedStackAllocator<64u>				_allocator;
-		FileSystem::ReadableMemoryMappedFile*				_file;
+		Scripting::ObjectHandle<FileSystem::ContentPackage>					_packageReference;
+		::Eldritch2::FixedStackAllocator<64u>								_backingFileAllocator;
+
+		// Ensure this is placed after the allocator for the destructors to fire in the correct order.
+		::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	_tableOfContentsFile;
 	};
 
 }	// namespace FileSystem

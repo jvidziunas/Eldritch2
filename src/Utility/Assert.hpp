@@ -22,8 +22,8 @@
 namespace Eldritch2 {
 
 	enum AssertionFailure : ::Eldritch2::uint8 {
-		FATAL		= 0,
-		NONFATAL	= 1
+		Fatal		= 0,
+		NonFatal	= 1
 	};
 
 // ---

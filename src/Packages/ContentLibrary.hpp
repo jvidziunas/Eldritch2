@@ -34,7 +34,7 @@ namespace Eldritch2 {
 	}
 
 	namespace Scheduler {
-		class	TaskScheduler;
+		class	ThreadScheduler;
 	}
 
 	namespace Utility {
@@ -75,11 +75,11 @@ namespace FileSystem {
 
 		//! Constructs this @ref ContentLibrary instance.
 		/*! @param[in] contentProvider @ref ContentProvider that will translate package names into operating system file objects.
-			@param[in] scheduler @ref TaskScheduler instance that will be responsible for running the internal @ref LoaderThread instance.
+			@param[in] scheduler @ref ThreadScheduler instance that will be responsible for running the internal @ref LoaderThread instance.
 			@param[in] allocator @ref Allocator instance this @ref ContentProvider should use to perform internal allocations.
 			@see @ref ContentProvider, @ref LoaderThread, @ref ContentPackage
 			*/
-		ContentLibrary( FileSystem::ContentProvider& contentProvider, Scheduler::TaskScheduler& scheduler, ::Eldritch2::Allocator& allocator );
+		ContentLibrary( FileSystem::ContentProvider& contentProvider, Scheduler::ThreadScheduler& scheduler, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref ContentLibrary instance.
 		~ContentLibrary();

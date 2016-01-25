@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Utility/COMPointer.hpp>
 #include <Foundation/Window.hpp>
 #include <Scheduler/Thread.hpp>
@@ -35,7 +35,7 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	class SwapChain : public Scripting::ReferenceTypeBase, public Foundation::Window, public Scheduler::Thread {
+	class SwapChain : public Scripting::ReferenceCountable, public Foundation::Window, public Scheduler::Thread {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -51,9 +51,9 @@ namespace Direct3D11 {
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	Run() override sealed;
+		void	Run() override sealed;
 
-		void					RequestGracefulShutdown() override sealed;
+		void	RequestGracefulShutdown() override sealed;
 
 	// - SCRIPT API REFERENCE ----------------------------
 

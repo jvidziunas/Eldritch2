@@ -42,14 +42,14 @@ namespace Win32 {
 
 	void ReadableMemoryMappedFile::PrefetchRangeForRead( const Range<const char*> memoryRange ) const {
 		enum : size_t {
-			PREFETCH_STRIDE	= 4096u
+			PrefetchStride	= 4096u
 		};
 
 	// ---
 
 		char readTarget;
 
-		for( const char* temp( memoryRange.first ); temp < memoryRange.onePastLast; temp += PREFETCH_STRIDE ) {
+		for( const char* temp( memoryRange.first ); temp < memoryRange.onePastLast; temp += PrefetchStride ) {
 			readTarget = *temp;
 		}
 	}

@@ -16,7 +16,7 @@
 #include <Physics/BulletDynamics/btHeightfieldTerrainShapeEx.hpp>
 #include <Physics/BulletDynamics/btSoftBodyWorldMixin.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Foundation/WorldView.hpp>
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
@@ -31,7 +31,7 @@
 namespace Eldritch2 {
 	namespace Scripting {
 		class	ScriptAPIRegistrationInitializationVisitor;
-		class	ReferenceTypeBase;
+		class	ReferenceCountable;
 	}
 
 	namespace Physics {
@@ -60,17 +60,17 @@ namespace BulletDynamics {
 	// ---
 
 		enum FilterBehaviors : short {
-			DEFAULT_FILTER			= 1,
-			STATIC_FILTER			= 2,
-			KINEMATIC_FILTER		= 4,
-			DEBRIS_FILTER			= 8,
-			SENSOR_TRIGGER_FILTER	= 16,
-			CHARACTER_FILTER		= 32,
-			VISIBILITY_FILTER		= 64,
-			PROJECTILE_FILTER		= 128,
-			CUSTOM_GROUP_BEGIN		= 256,
-			NONE					= 0,
-			ALL						= ~NONE,
+			DefaultFilter		= 1,
+			StaticFilter		= 2,
+			KinematicFilter		= 4,
+			DebrisFilter		= 8,
+			SensorTriggerFilter	= 16,
+			CharacterFilter		= 32,
+			VisibilityFilter	= 64,
+			ProjectileFilter	= 128,
+			CustomGroupBegin	= 256,
+			None				= 0,
+			All					= ~None,
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -97,8 +97,8 @@ namespace BulletDynamics {
 
 	// ---------------------------------------------------
 
-		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PreScriptTickTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PostScriptTickTaskVisitor ) override sealed;
+		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreScriptTickTaskVisitor ) override sealed;
+		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostScriptTickTaskVisitor ) override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -107,8 +107,8 @@ namespace BulletDynamics {
 
 		public:
 			enum : short {
-				COLLISION_FILTER_GROUP	= (FilterBehaviors::CHARACTER_FILTER),
-				COLLISION_FILTER_MASK	= (FilterBehaviors::STATIC_FILTER | FilterBehaviors::DEFAULT_FILTER | FilterBehaviors::SENSOR_TRIGGER_FILTER)
+				CollisionFilterGroup	= (FilterBehaviors::CharacterFilter),
+				CollisionFilterMask		= (FilterBehaviors::StaticFilter | FilterBehaviors::DefaultFilter | FilterBehaviors::SensorTriggerFilter)
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -138,13 +138,13 @@ namespace BulletDynamics {
 
 	// ---
 
-		class TerrainColliderComponent : public Scripting::ReferenceTypeBase {
+		class TerrainColliderComponent : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
 			enum : short {
-				COLLISION_FILTER_GROUP	= FilterBehaviors::STATIC_FILTER,
-				COLLISION_FILTER_MASK	= FilterBehaviors::NONE
+				CollisionFilterGroup	= FilterBehaviors::StaticFilter,
+				CollisionFilterMask		= FilterBehaviors::None
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -177,13 +177,13 @@ namespace BulletDynamics {
 
 	// ---
 
-		class TriggerVolumeComponent : public Scripting::ReferenceTypeBase {
+		class TriggerVolumeComponent : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
 			enum : short {
-				COLLISION_FILTER_GROUP	= FilterBehaviors::SENSOR_TRIGGER_FILTER,
-				COLLISION_FILTER_MASK	= FilterBehaviors::NONE
+				CollisionFilterGroup	= FilterBehaviors::SensorTriggerFilter,
+				CollisionFilterMask		= FilterBehaviors::None
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -215,13 +215,13 @@ namespace BulletDynamics {
 
 	// ---
 
-		class PhysicalSoftBodyComponent : public Scripting::ReferenceTypeBase {
+		class PhysicalSoftBodyComponent : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
 			enum : short {
-				COLLISION_FILTER_GROUP	= FilterBehaviors::DEFAULT_FILTER,
-				COLLISION_FILTER_MASK	= (FilterBehaviors::STATIC_FILTER | FilterBehaviors::DEFAULT_FILTER)
+				CollisionFilterGroup	= FilterBehaviors::DefaultFilter,
+				CollisionFilterMask		= (FilterBehaviors::StaticFilter | FilterBehaviors::DefaultFilter)
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------

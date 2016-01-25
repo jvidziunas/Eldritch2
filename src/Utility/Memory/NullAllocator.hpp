@@ -36,7 +36,7 @@ namespace Eldritch2 {
 		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
 
 		void					Deallocate( void* const address ) override sealed;
-		void					Deallocate( void* const address, const AlignedDeallocationSemantics ) override sealed;
+		void					Deallocate( void* const address, const AlignedDeallocationSemanticsTag ) override sealed;
 
 	// - ALLOCATION STATISTICS ---------------------------
 

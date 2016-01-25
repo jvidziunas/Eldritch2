@@ -24,10 +24,10 @@ namespace System {
 
 	public:
 		enum class SystemMemoryState {
-			LOW_USAGE,
-			NORMAL_USAGE,
-			HIGH_USAGE,
-			CRITICAL_USAGE,
+			Low,
+			Normal,
+			High,
+			Critical,
 
 		// ---
 

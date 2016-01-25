@@ -29,10 +29,10 @@ namespace Foundation {
 #endif
 
 	enum LogMessageType : ::Eldritch2::uint32 {
-		VERBOSE_WARNING = 0u,
-		WARNING,
-		ERROR,
-		MESSAGE
+		VerboseWarning = 0u,
+		Warning,
+		Error,
+		Message
 	};
 
 #ifdef CLEANUP_ERROR

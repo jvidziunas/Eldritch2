@@ -67,7 +67,7 @@ namespace Detail {
 			return this->Allocate( newSizeInBytes, options );
 		}
 
-		return ::HeapReAlloc( _heap, (options & ReallocationOption::FAIL_IF_MOVE_REQUIRED) ? HEAP_REALLOC_IN_PLACE_ONLY : 0u, address, newSizeInBytes );
+		return ::HeapReAlloc( _heap, (options & ReallocationOption::FailOnMove) ? HEAP_REALLOC_IN_PLACE_ONLY : 0u, address, newSizeInBytes );
 	}
 
 // ---------------------------------------------------
@@ -81,7 +81,7 @@ namespace Detail {
 			return returnPointer;
 		}
 
-		if( options & ReallocationOption::FAIL_IF_MOVE_REQUIRED ) {
+		if( options & ReallocationOption::FailOnMove ) {
 			return nullptr;
 		}
 

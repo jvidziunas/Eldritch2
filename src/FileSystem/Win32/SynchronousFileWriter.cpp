@@ -35,7 +35,7 @@ namespace Win32 {
 	SynchronousFileWriter::BlockingResult SynchronousFileWriter::Write( const void* const sourceBuffer, const size_t lengthToWriteInBytes ) {
 		enum : size_t {
 			// Maximum size of an atomic write operation, specified in bytes.
-			MAXIMUM_WRITE_SIZE_IN_BYTES = static_cast<size_t>(static_cast<::DWORD>(-1))
+			MaximumWriteSizeInBytes = static_cast<size_t>(static_cast<::DWORD>(-1))
 		};
 
 	// ---
@@ -46,7 +46,7 @@ namespace Win32 {
 		// Since Windows can only work with writes representable with a DWORD, we need to loop to accommodate (potential) values held in a 64-bit size_t
 		while( (FALSE != writeResult) & (static_cast<size_t>(readPointer - static_cast<const char*>(sourceBuffer)) < lengthToWriteInBytes) ) {
 			// Cap the write at the maximum representable value held in a DWORD. Remember to round *after* the comparison!
-			const ::DWORD	numberOfBytesToWrite( static_cast<::DWORD>(Min<size_t>( lengthToWriteInBytes, MAXIMUM_WRITE_SIZE_IN_BYTES )) );
+			const ::DWORD	numberOfBytesToWrite( static_cast<::DWORD>(Min<size_t>( lengthToWriteInBytes, MaximumWriteSizeInBytes )) );
 			::DWORD			numberOfBytesWrittenThisIteration;
 
 			writeResult = ::WriteFile( _fileHandle, readPointer, numberOfBytesToWrite, &numberOfBytesWrittenThisIteration, nullptr );
@@ -54,7 +54,7 @@ namespace Win32 {
 			readPointer += numberOfBytesWrittenThisIteration;
 		}
 
-		return { FALSE != writeResult ? Error::NONE : Error::UNSPECIFIED, static_cast<size_t>(readPointer - static_cast<const char*>(sourceBuffer)) };
+		return { FALSE != writeResult ? Error::None : Error::Unspecified, static_cast<size_t>(readPointer - static_cast<const char*>(sourceBuffer)) };
 	}
 
 // ---------------------------------------------------

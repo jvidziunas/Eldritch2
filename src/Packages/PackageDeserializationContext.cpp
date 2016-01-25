@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/PackageDeserializationContext.hpp>
-#include <FileSystem/ReadableMemoryMappedFile.hpp>
 #include <FileSystem/ContentProvider.hpp>
 #include <Utility/CountedResult.hpp>
 #include <Packages/ContentLibrary.hpp>
@@ -46,55 +45,39 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	PackageDeserializationContext::PackageDeserializationContext( const ObjectHandle<ContentPackage>& package ) : _packageReference( package ),
-																												  _allocator( UTF8L("Deserialization Context File Allocator") ),
-																												  _file( nullptr ) {}
-
-// ---------------------------------------------------
-
-	PackageDeserializationContext::~PackageDeserializationContext() {
-		_allocator.Delete( _file );
-	}
-
-// ---------------------------------------------------
-
-	ErrorCode PackageDeserializationContext::OpenFile() {
-		if( _file ) {
-			return Error::NONE;
-		}
-
-		const auto	createFileResult( CreateBackingFile( _allocator, UTF8L(".e2toc") ) );
-
-		if( createFileResult ) {
-			_file = createFileResult.object;
-		} else {
-			GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
-		}
-
-		return createFileResult.resultCode;
-	}
+																												  _backingFileAllocator( UTF8L("Deserialization Context File Allocator") ),
+																												  _tableOfContentsFile( nullptr, { _backingFileAllocator } ) {}
 
 // ---------------------------------------------------
 
 	ErrorCode PackageDeserializationContext::DeserializeDependencies() {
 		using namespace ::Eldritch2::FileSystem::FlatBuffers;
 
-		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
-		ETRuntimeAssert( nullptr != _file );
-
 	// ---
 
-		const auto	data( _file->GetAddressForFileByteOffset( 0u ) );
+		if( nullptr == _tableOfContentsFile ) {
+			const auto	createTableOfContentsResult( CreateBackingFile( _backingFileAllocator, UTF8L(".e2toc") ) );
+
+			if( createTableOfContentsResult ) {
+				_tableOfContentsFile.reset( createTableOfContentsResult.object );
+			} else {
+				GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::Failed );
+				return createTableOfContentsResult.resultCode;
+			}
+		}
+
+		const auto	data( _tableOfContentsFile->GetAddressForFileByteOffset( 0u ) );
 
 		// Ensure we have data and that there is at minimum a marker.
-		if( !(nullptr == data) || !HeaderBufferHasIdentifier( data ) ) {
+		if( nullptr == data || !PackageHeaderBufferHasIdentifier( data ) ) {
 			// Publish load failure.
-			GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+			GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::Failed );
 
-			return Error::INVALID_PARAMETER;
+			return Error::InvalidParameter;
 		}
 		
 		// Loop through the list of additional content the package signifies itself as requiring.
-		if( auto imports = GetHeader( data )->imports() ) {
+		if( auto imports = GetPackageHeader( data )->Imports() ) {
 			for( auto currentImport : *imports ) {
 				const auto	packageResolutionResult( GetContentLibrary().ResolvePackageByName( currentImport->c_str() ) );
 
@@ -106,7 +89,7 @@ namespace FileSystem {
 			}
 		}
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
@@ -115,30 +98,28 @@ namespace FileSystem {
 		using namespace ::Eldritch2::FileSystem::FlatBuffers;
 
 		// This should have been created before deserialization began. If this hasn't been created yet, someone's been ignoring documentation/error codes!
-		ETRuntimeAssert( nullptr != _file );
+		ETRuntimeAssert( nullptr != _tableOfContentsFile );
 
 	// ---
 
-		const auto	exports( GetHeader( _file->GetAddressForFileByteOffset( 0u ) )->exports() );
-
-		if( nullptr != exports ) {
-			const auto	dataFile( CreateBackingFile( _allocator, UTF8L("") ) );
+		 if( const auto exports = GetPackageHeader( _tableOfContentsFile->GetAddressForFileByteOffset( 0u ) )->Exports() ) {
+			const auto	dataFile( CreateBackingFile( _backingFileAllocator, UTF8L("") ) );
 
 			if( !dataFile ) {
-				GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+				GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::Failed );
 				return dataFile;
 			}
 
 			for( auto currentExport : *exports ) {
-				for( auto& currentFactory : GetContentLibrary().GetFactoriesForResourceType( currentExport->type()->c_str() ) ) {
+				for( auto& currentFactory : GetContentLibrary().GetFactoriesForResourceType( currentExport->Type()->c_str() ) ) {
 					const auto	result( currentFactory.AllocateResourceView( GetBoundPackage().GetAllocator(),
 																			 GetBoundPackage().GetContentLibrary(),
 																			 GetBoundPackage(),
-																			 currentExport->name()->c_str(),
-																			 dataFile.object->TryGetStructureArrayAtOffset<const char>( currentExport->offset(), currentExport->length() ) ) );
+																			 currentExport->Name()->c_str(),
+																			 dataFile.object->TryGetStructureArrayAtOffset<const char>( currentExport->Offset(), currentExport->Length() ) ) );
 
 					if( !result ) {
-						GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::FAILED );
+						GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::Failed );
 						return result;
 					}
 				}
@@ -146,9 +127,9 @@ namespace FileSystem {
 		}
 
 		// Broadcast the new residency state (either published or failed) depending on whether or not the load was successful.
-		GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::PUBLISHED );
+		GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::Published );
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
@@ -160,7 +141,7 @@ namespace FileSystem {
 		fileName.Reserve( nameSizeInBytes );
 		fileName.Append( GetBoundPackage().GetName() ).Append( suffix ? suffix : UTF8L("") );
 
-		return GetContentLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, ContentProvider::KnownContentLocation::PACKAGE_DIRECTORY, fileName.GetCharacterArray() );
+		return GetContentLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, ContentProvider::KnownContentLocation::PackageDirectory, fileName.GetCharacterArray() );
 	}
 
 // ---------------------------------------------------

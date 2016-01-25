@@ -21,27 +21,44 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Scheduler {
 
-	WorkerContext::WorkerContext( const WorkItem& defaultWorkItem, ::Eldritch2::Allocator& allocator ) : _workItems( 0u, { allocator, UTF8L("Worker Context Job Queue Allocator") } ) {
-		_workItems.Reserve( 64u );
-		_workItems.EmplaceBack( defaultWorkItem );
+	WorkerContext::WorkerContext( const CompletionItem& defaultItem, ::Eldritch2::Allocator& allocator ) : _completionItems( { allocator, UTF8L("Worker Context Completion Queue Allocator") } ) {
+		_completionItems.Reserve( 64u );
+		_completionItems.PushBack( defaultItem );
 	}
 
 // ---------------------------------------------------
 
-	void WorkerContext::Enqueue( const WorkItem& workItem ) {
-		_workItems.EmplaceBack( workItem );
+	WorkerContext::WorkerContext( WorkerContext&& source ) : _completionItems( ::std::move( source._completionItems ) ) {}
+
+// ---------------------------------------------------
+
+	void WorkerContext::Enqueue( FinishCounter& finishCounter, const WorkItem* workItemBegin, const WorkItem* workItemEnd ) {
+		finishCounter.fetch_add( static_cast<int>(workItemEnd - workItemBegin), ::std::memory_order_relaxed );
+
+		while( workItemBegin != workItemEnd ) {
+			_completionItems.PushBack( { &finishCounter, *workItemBegin++, } );
+		}
 	}
 
 // ---------------------------------------------------
 
-	WorkerContext::WorkItem WorkerContext::PopTask() {
-		const WorkItem result( _workItems.Back() );
+	void WorkerContext::Enqueue( FinishCounter& finishCounter, const WorkItem& workItem ) {
+		finishCounter.fetch_add( 1, ::std::memory_order_relaxed );
 
-		if( _workItems.Size() > 1u ) {
-			_workItems.PopBack();
+		_completionItems.PushBack( { &finishCounter, workItem } );
+	}
+
+// ---------------------------------------------------
+
+	WorkerContext::CompletionItem WorkerContext::PopCompletionItem() {
+		const auto	item( _completionItems.Back() );
+
+		// Don't pop the default/last work item.
+		if( _completionItems.Size() > 1u ) {
+			_completionItems.PopBack();
 		}
 
-		return result;
+		return item;
 	}
 
 }	// namespace Scheduler

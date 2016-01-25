@@ -84,7 +84,7 @@ namespace Scripting {
 
 			typeBuilder.ExposeVirtualProperty( "Length", &FunctionHelper::GetLength );
 
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::ASSIGNMENT, &FunctionHelper::OpAssign ).ExposeBinaryOperator( BinaryOperatorClass::ADDITION_ASSIGNMENT, &FunctionHelper::OpAddAssign );
+			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign ).ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign );
 
 			/* typeBuilder.ExposeBinaryOperator( BinaryOperatorClasses::COMPARISON, &FunctionHelper::OpCompare ); */
 
@@ -219,11 +219,11 @@ namespace Scripting {
 			typeBuilder.ExposeMethod( "Normalize", &FunctionHelper::Normalize );
 
 			// Operator registration
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::ADDITION, &FunctionHelper::OpAdd ).ExposeBinaryOperator( BinaryOperatorClass::SUBTRACTION, &FunctionHelper::OpSubtract );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::MULTIPLICATION, &FunctionHelper::OpMultiply ).ExposeBinaryOperator( BinaryOperatorClass::DIVISION, &FunctionHelper::OpDivide );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::ASSIGNMENT, &FunctionHelper::OpAssign );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::ADDITION_ASSIGNMENT, &FunctionHelper::OpAddAssign ).ExposeBinaryOperator( BinaryOperatorClass::SUBTRACTION_ASSIGNMENT, &FunctionHelper::OpSubtractAssign );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::MULTIPLICATION_ASSIGNMENT, &FunctionHelper::OpMultiplyAssign ).ExposeBinaryOperator( BinaryOperatorClass::DIVISION_ASSIGNMENT, &FunctionHelper::OpDivideAssign );
+			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Addition, &FunctionHelper::OpAdd ).ExposeBinaryOperator( BinaryOperatorClass::Subtraction, &FunctionHelper::OpSubtract );
+			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Multiplication, &FunctionHelper::OpMultiply ).ExposeBinaryOperator( BinaryOperatorClass::Division, &FunctionHelper::OpDivide );
+			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign );
+			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign ).ExposeBinaryOperator( BinaryOperatorClass::SubtractionAssignment, &FunctionHelper::OpSubtractAssign );
+			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::MultiplicationAssignment, &FunctionHelper::OpMultiplyAssign ).ExposeBinaryOperator( BinaryOperatorClass::DivisionAssignment, &FunctionHelper::OpDivideAssign );
 
 			// Global function registration
 			typeRegistrar.ExposeFunction( "DotProduct", &FunctionHelper::DotProduct ).ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate ).ExposeFunction( "CrossProduct", &FunctionHelper::CrossProduct );

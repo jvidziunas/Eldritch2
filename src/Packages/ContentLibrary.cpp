@@ -13,10 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/InstanceNew.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Packages/ContentPackage.hpp>
-#include <Scheduler/TaskScheduler.hpp>
 #include <Utility/CountedResult.hpp>
 #include <Packages/LoaderThread.hpp>
 #include <Packages/ResourceView.hpp>
@@ -37,7 +37,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ContentLibrary::ContentLibrary( ContentProvider& contentProvider, TaskScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Content Library Package Data Allocator") ),
+	ContentLibrary::ContentLibrary( ContentProvider& contentProvider, ThreadScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Content Library Package Data Allocator") ),
 																														 _deserializationContextAllocator( allocator, UTF8L("Content Library Package Data Allocator") ),
 																														 _contentProvider( contentProvider ),
 																														 _contentPackageDirectoryMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
@@ -45,7 +45,7 @@ namespace FileSystem {
 																														 _contentPackageDirectory( { allocator, UTF8L("Content Library Package Bucket Allocator") } ),
 																														 _resourceViewDirectory( { allocator, UTF8L("Content Library Resource View Bucket Allocator") } ),
 																														 _resourceFactoryDirectory( { allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") } ),
-																														 _loaderThread( new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) LoaderThread( scheduler, _allocator ) ) {
+																														 _loaderThread( new(_allocator, Allocator::AllocationDuration::Normal) LoaderThread( scheduler, _allocator ) ) {
 		// Don't bother launching the thread if we have no synchronization mechanisms (Highly unlikely in practice!)
 		if( ETBranchLikelyHint( _contentPackageDirectoryMutex && _resourceViewDirectoryMutex && _loaderThread ) ) {
 			scheduler.Enqueue( *_loaderThread );
@@ -102,7 +102,7 @@ namespace FileSystem {
 				return { ObjectHandle<ContentPackage>( *packageCandidate->second ) };
 			}
 
-			createdPackage = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) DeserializedContentPackage( packageName, *this, _allocator );
+			createdPackage = new(_allocator, Allocator::AllocationDuration::Normal) DeserializedContentPackage( packageName, *this, _allocator );
 		}	// End of lock scope.
 
 		if( createdPackage ) {
@@ -116,7 +116,7 @@ namespace FileSystem {
 			return { beginLoadResult };
 		}
 		
-		return { Error::OUT_OF_MEMORY };
+		return { Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------
@@ -129,7 +129,7 @@ namespace FileSystem {
 			//!	Constructs this @ref EditorPackage instance.
 			ETInlineHint EditorPackage( ContentLibrary& owningLibrary, Allocator& allocator ) : ContentPackage( UTF8L("<Editor Package>"), owningLibrary, allocator ) {
 				// No content to load, so just skip directly to the published state.
-				UpdateResidencyStateOnLoaderThread( ResidencyState::PUBLISHED );
+				UpdateResidencyStateOnLoaderThread( ResidencyState::Published );
 			}
 
 			~EditorPackage() = default;
@@ -143,11 +143,11 @@ namespace FileSystem {
 
 	// ---
 
-		if( auto newPackage = new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) EditorPackage( *this, _allocator ) ) {
+		if( auto newPackage = new(_allocator, Allocator::AllocationDuration::Normal) EditorPackage( *this, _allocator ) ) {
 			return { static_cast<ContentPackage*>(newPackage) };
 		}
 
-		return { Error::OUT_OF_MEMORY };
+		return { Error::OutOfMemory };
 	}
 
 }	// namespace FileSystem

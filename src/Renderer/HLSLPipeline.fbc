@@ -1,0 +1,12 @@
+file_identifier	"EHPD";
+file_extension	"hlslpipelinedefinition";
+
+include "PipelineTypes.fbc"
+
+namespace Eldritch2.Renderer.FlatBuffers;
+
+table HLSLPipeline {
+	Usages	: [Usage];
+}
+
+root_type HLSLPipeline;

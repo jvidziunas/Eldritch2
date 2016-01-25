@@ -15,9 +15,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Scheduler/TaskScheduler.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -37,17 +36,17 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Foundation {
 
-	World::World( GameEngine& owningEngine ) : _allocator( owningEngine.GetAllocator(), owningEngine._worldArenaSizeInBytes, Allocator::AllocationOption::PERMANENT_ALLOCATION, UTF8L("World Allocator") ),
+	World::World( GameEngine& owningEngine ) : _allocator( owningEngine.GetAllocator(), owningEngine._worldArenaSizeInBytes, Allocator::AllocationDuration::Normal, UTF8L("World Allocator") ),
 											   _allocationCheckpoint( _allocator.CreateCheckpoint() ),
 											   _owningEngine( owningEngine ),
 											   _package( nullptr ),
-											   _propertyMutex( owningEngine.GetTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
+											   _propertyMutex( owningEngine.GetThreadScheduler().AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
 											   _properties( { _allocator, UTF8L("World Key-Value Pair Table Allocator") } ),
 											   _isPaused( 1u ),
 											   _isLoaded( 0u ),
 											   _fatalErrorCount( 0u ) {
 		if( nullptr == _propertyMutex ) {
-			owningEngine.GetLoggerForMessageType( LogMessageType::ERROR )( UTF8L("Error allocating mutex for world '%p': %s.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), ErrorCode( Error::OUT_OF_MEMORY ).ToUTF8String() );
+			owningEngine.GetLoggerForMessageType( LogMessageType::Error )( UTF8L("Error allocating mutex for world '%p': %s.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), ErrorCode( Error::OutOfMemory ).ToUTF8String() );
 			RaiseFatalError();
 		}
 
@@ -59,7 +58,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	World::~World() {
-		_owningEngine->GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Destroying world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) );
+		_owningEngine->GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Destroying world '%p'.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this) );
 		Reset();
 	}
 
@@ -108,7 +107,7 @@ namespace Foundation {
 
 		// Calling this function multiple at multiple points doesn't constitute a fatal error per se, but we don't want to do this more than once.
 		if( (nullptr != _package) || EncounteredFatalError() ) {
-			return Error::INVALID_OBJECT_STATE;
+			return Error::InvalidObjectState;
 		}
 
 		const auto	resourceName( GetPropertyByKey( temp, GetMainPackageKey(), UTF8L("") ) );
@@ -125,119 +124,68 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void World::QueueUpdateTasks( Allocator& frameTaskAllocator, WorkerContext& executingContext, Task& frameWorldUpdatesCompleteTask ) {
-		class TickWorldTask : public CRTPTransientTask<TickWorldTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-		
-		public:
-			//!	Constructs this @ref TickWorldTask instance.
-			ETInlineHint TickWorldTask( World& world, WorkerContext& executingContext, Task& updatesCompleteTask, Allocator& frameTaskAllocator ) : CRTPTransientTask<TickWorldTask>( updatesCompleteTask, Scheduler::CodependentTaskSemantics ),
-																																					_worldReference( world ),
-																																					_frameTaskAllocator( frameTaskAllocator ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~TickWorldTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Tick World Task");
-			}
-
-			Task* Execute( WorkerContext& executingContext ) override sealed {
-				for( WorldView& currentView : _worldReference->_attachedViews ) {
-					currentView.AcceptTaskVisitor( _frameTaskAllocator, executingContext, *this, WorldView::FrameTickTaskVisitor() );
-				}
-
-				return nullptr;
-			}
-
-			void Finalize( WorkerContext& executingContext ) override {
-				if( !_worldReference->EncounteredFatalError() ) {
-					_worldReference->_owningEngine->_tickingWorlds.PushBack( *_worldReference.Release() );
-				}
-
-				CRTPTransientTask<TickWorldTask>::Finalize( executingContext );
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			// This handle ensures the world will not be deleted until the task has finished executing.
-			ObjectHandle<World>	_worldReference;
-			Allocator&			_frameTaskAllocator;
-		};
+	void World::QueueUpdateTasks( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter ) {
+		using ResidencyState = ContentPackage::ResidencyState;
 
 	// ---
 
-		class TryFinalizeLoadTask : public CRTPTransientTask<TryFinalizeLoadTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-		public:
-			//!	Constructs this @ref FinalizeLoadTask instance.
-			ETInlineHint TryFinalizeLoadTask( World& world, WorkerContext& executingContext, Task& updatesCompleteTask ) : CRTPTransientTask<TryFinalizeLoadTask>( updatesCompleteTask, Scheduler::CodependentTaskSemantics ),
-																														   _worldReference( world ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Try Finalize World Load Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				using ResidencyState = ContentPackage::ResidencyState;
-
-			// ---
-
-				if( _worldReference->_package ) {
-					switch( _worldReference->GetRootPackage().GetResidencyState() ) {
-						case ResidencyState::PUBLISHED: {
-							const WorldView::LoadFinalizationVisitor	visitor;
-
-							for( WorldView& currentView : _worldReference->_attachedViews ) {
-								currentView.AcceptViewVisitor( visitor );
-							}
-
-							_worldReference->_isLoaded = 1u;
-							break;
-						}	// case ResidencyState::PUBLISHED
-
-						case ResidencyState::FAILED: {
-							_worldReference->RaiseFatalError();
-							break;
-						}	// case ResidencyState::FAILED
-					}	// switch( _worldReference->GetRootPackage().GetResidencyState() )
-				} else {
-					_worldReference->RaiseFatalError();
-				}
-
-				return nullptr;
-			}
-
-			void Finalize( WorkerContext& executingContext ) override {
-				if( !_worldReference->EncounteredFatalError() ) {
-					_worldReference->_owningEngine->_tickingWorlds.PushBack( *_worldReference.Release() );
-				}
-
-				CRTPTransientTask<TryFinalizeLoadTask>::Finalize( executingContext );
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
+		auto	TickWorldTask( [] ( void* world, WorkerContext& executingContext ) {
 			// This handle ensures the world will not be deleted until the task has finished executing.
-			ObjectHandle<World>	_worldReference;
-		};
+			ObjectHandle<World>	worldReference( static_cast<World*>(world), ::Eldritch2::PassthroughReferenceCountingSemantics );
+
+			{	WorkerContext::FinishCounter	tickFinishCounter( 0 );
+				for( auto& currentView : worldReference->_attachedViews ) {
+					currentView.AcceptTaskVisitor( executingContext, tickFinishCounter, WorldView::FrameTickTaskVisitor() );
+				}
+
+				executingContext.WaitForCounter( tickFinishCounter );
+			}
+
+			if( !worldReference->EncounteredFatalError() ) {
+				auto&	worldTemp( *worldReference.Release() );
+
+				worldTemp._owningEngine->_tickingWorlds.PushBack( worldTemp );
+			}
+		} );
 
 	// ---
 
-		if( IsLoaded() ) {
-			new(frameTaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) TickWorldTask( *this, executingContext, frameWorldUpdatesCompleteTask, frameTaskAllocator );
-		} else {
-			new(frameTaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) TryFinalizeLoadTask( *this, executingContext, frameWorldUpdatesCompleteTask );
-		}
+		auto	TryFinalizeLoadTask( [] ( void* world, WorkerContext& /*executingContext*/ ) {
+			// This handle ensures the world will not be deleted until the task has finished executing.
+			ObjectHandle<World>	worldReference( static_cast<World*>(world), ::Eldritch2::PassthroughReferenceCountingSemantics );
+
+			if( worldReference->_package ) {
+				switch( worldReference->GetRootPackage().GetResidencyState() ) {
+					case ResidencyState::Published: {
+						const WorldView::LoadFinalizationVisitor	visitor;
+
+						for( WorldView& currentView : worldReference->_attachedViews ) {
+							currentView.AcceptViewVisitor( visitor );
+						}
+
+						worldReference->_isLoaded = 1u;
+						break;
+					}	// case ResidencyState::Published
+
+					case ResidencyState::Failed: {
+						worldReference->RaiseFatalError();
+						break;
+					}	// case ResidencyState::Failed
+				}	// switch( _worldReference->GetRootPackage().GetResidencyState() )
+			} else {
+				worldReference->RaiseFatalError();
+			}
+
+			if( !worldReference->EncounteredFatalError() ) {
+				auto&	worldTemp( *worldReference.Release() );
+
+				worldTemp._owningEngine->_tickingWorlds.PushBack( worldTemp );
+			}
+		} );
+
+	// ---
+
+		executingContext.Enqueue( finishCounter, { this, (IsLoaded() ? static_cast<WorkerContext::WorkFunction>(TickWorldTask) : static_cast<WorkerContext::WorkFunction>(TryFinalizeLoadTask)) } );
 	}
 
 // ---------------------------------------------------
@@ -267,8 +215,8 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void World::Reset() {
-		{	// Broadcast a delete message to all the views so they can clean any shared resources.
-			const WorldView::DeletionPreparationVisitor	visitor;
+		// Broadcast a delete message to all the views so they can clean any shared resources.
+		{	const WorldView::DeletionPreparationVisitor	visitor;
 
 			for( WorldView& view : _attachedViews ) {
 				view.AcceptViewVisitor( visitor );
@@ -276,8 +224,8 @@ namespace Foundation {
 		}
 		
 
-		{	// Invoke the destructor and deallocate all currently-attached views.
-			auto&	allocator( _allocator );
+		// Invoke the destructor and deallocate all currently-attached views.
+		{	auto&	allocator( _allocator );
 
 			_attachedViews.ClearAndDispose( [&allocator] ( WorldView& view ) {
 				allocator.Delete( view );

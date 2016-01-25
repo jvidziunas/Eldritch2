@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Foundation/GameEngineService.hpp>
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 //------------------------------------------------------------------//
 #ifdef ET_PLATFORM_WINDOWS
 #	define WIN32_LEAN_AND_MEAN
@@ -30,20 +30,19 @@ namespace XInput {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class Controller : public Scripting::ReferenceTypeBase {
+		class Controller : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
 			enum : ::DWORD {
-				INVALID_CONTROLLER_INDEX = static_cast<::DWORD>(-1)
+				InvalidControllerIndex = static_cast<::DWORD>(-1)
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 			//!	Constructs this @ref Controller instance.
-			Controller( const ::DWORD controllerIndex = Controller::INVALID_CONTROLLER_INDEX );
+			Controller( const ::DWORD controllerIndex = Controller::InvalidControllerIndex );
 
-			//!	Destroys this @ref Controller instance.
 			~Controller() = default;
 
 		// ---------------------------------------------------
@@ -82,7 +81,7 @@ namespace XInput {
 	protected:
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) override sealed;
 
-		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const ServiceTickTaskVisitor ) override sealed;
+		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) override sealed;
 
 	// - DATA MEMBERS ------------------------------------
 	

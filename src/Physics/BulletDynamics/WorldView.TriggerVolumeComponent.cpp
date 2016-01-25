@@ -31,7 +31,7 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	WorldView::TriggerVolumeComponent::TriggerVolumeComponent( WorldView& owningWorldView ) : _ghostObject() {
-		owningWorldView._dynamicsWorld.addCollisionObject( &_ghostObject, COLLISION_FILTER_GROUP, COLLISION_FILTER_MASK );
+		owningWorldView._dynamicsWorld.addCollisionObject( &_ghostObject, TriggerVolumeComponent::CollisionFilterGroup, TriggerVolumeComponent::CollisionFilterMask );
 	}
 
 // ---------------------------------------------------
@@ -41,7 +41,7 @@ namespace BulletDynamics {
 			static TriggerVolumeComponent* Factory0() {
 				auto&	worldView( GetActiveWorldView() );
 
-				return new(worldView.GetWorldAllocator(), alignof(TriggerVolumeComponent), Allocator::AllocationOption::PERMANENT_ALLOCATION) TriggerVolumeComponent( worldView );
+				return new(worldView.GetWorldAllocator(), alignof(TriggerVolumeComponent), Allocator::AllocationDuration::Normal) TriggerVolumeComponent( worldView );
 			}
 
 			static void SetIsEnabled( TriggerVolumeComponent* /*component*/, bool /*enabled*/ ) {}

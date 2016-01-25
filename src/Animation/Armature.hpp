@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Containers/ResizableArray.hpp>
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Utility/MPL/FloatTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -30,11 +30,11 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Animation {
 
-	class Armature : public Scripting::ReferenceTypeBase {
+	class Armature : public Scripting::ReferenceCountable {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class AnimationLayer : public Scripting::ReferenceTypeBase {
+		class AnimationLayer : public Scripting::ReferenceCountable {
 		public:
 			virtual void	EvaluatePoseForTime( const ::Eldritch2::uint16 maximumBoneToConsider, const ::Eldritch2::uint64 time ) abstract;
 
@@ -77,7 +77,7 @@ namespace Animation {
 
 	// ---
 
-		class PostprocessAnimationLayer : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceTypeBase {
+		class PostprocessAnimationLayer : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceCountable {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		protected:

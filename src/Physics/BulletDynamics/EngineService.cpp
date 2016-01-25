@@ -44,7 +44,7 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		return new(allocator, alignof(WorldView), Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *this ) ? Error::NONE : Error::OUT_OF_MEMORY;
+		return new(allocator, alignof(WorldView), Allocator::AllocationDuration::Normal) WorldView( world, *this ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------

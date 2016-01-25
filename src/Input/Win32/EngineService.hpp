@@ -50,7 +50,7 @@ namespace Win32 {
 	protected:
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
 
-		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor ) override sealed;
+		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor ) override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -71,9 +71,9 @@ namespace Win32 {
 
 		// ---------------------------------------------------
 
-			::Eldritch2::ErrorCode	Run() override sealed;
+			void	Run() override sealed;
 
-			void					RequestGracefulShutdown() override;
+			void	RequestGracefulShutdown() override;
 
 		// - DATA MEMBERS ------------------------------------
 

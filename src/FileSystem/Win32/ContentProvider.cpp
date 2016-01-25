@@ -23,8 +23,8 @@
 #include <Utility/Math/StandardLibrary.hpp>
 #include <System/Win32/SystemInterface.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
 #include <Utility/Concurrency/Lock.hpp>
-#include <Scheduler/TaskScheduler.hpp>
 #include <Utility/Result.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
@@ -151,7 +151,7 @@ namespace {
 		}
 #endif
 
-		if( auto queryFunction = ::GetProcAddress( ::GetModuleHandle( SL("ntdll.dll") ), "NtQueryVolumeInformationFile" ) ) {
+		if( auto queryFunction = ::GetProcAddress( ::GetModuleHandleW( L"ntdll.dll" ), "NtQueryVolumeInformationFile" ) ) {
 			queryVolumeInformationFile = reinterpret_cast<decltype(queryVolumeInformationFile)>(queryFunction);
 
 			return [] ( const ::HANDLE fileHandle ) -> size_t {
@@ -178,21 +178,21 @@ namespace Win32 {
 	ContentProvider::ContentProvider( const System::Win32::SystemInterface& systemInterface ) : _getSectorSizeFromHandleFunction( GetSectorSizeQueryAPI( systemInterface ) ) {
 		wchar_t*	folderPtr( nullptr );
 
-		if( 0 != ::GetCurrentDirectoryW( _countof( _knownContentPaths[static_cast<size_t>(KnownContentLocation::PACKAGE_DIRECTORY)]), _knownContentPaths[static_cast<size_t>(KnownContentLocation::PACKAGE_DIRECTORY)] ) ) {
-			::PathAppendW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::PACKAGE_DIRECTORY)], L"..\\Content\\");
+		if( 0 != ::GetCurrentDirectoryW( _countof( _knownContentPaths[static_cast<size_t>(KnownContentLocation::PackageDirectory)]), _knownContentPaths[static_cast<size_t>(KnownContentLocation::PackageDirectory)] ) ) {
+			::PathAppendW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::PackageDirectory)], L"..\\Content\\");
 		}
 
 		// Retrieve the Documents library path for this machine.
 		if( SUCCEEDED( ::SHGetKnownFolderPath( FOLDERID_Documents, 0, nullptr, &folderPtr ) ) ) {	
-			::PathCombineW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::USER_DOCUMENTS)], folderPtr, L"My Games\\" WPROJECT_NAME L"\\" );
-			::CreateDirectoryW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::USER_DOCUMENTS)], nullptr );
+			::PathCombineW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::UserDocuments)], folderPtr, L"My Games\\" WPROJECT_NAME L"\\" );
+			::CreateDirectoryW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::UserDocuments)], nullptr );
 			::CoTaskMemFree( folderPtr );
 		}
 
 		// Retrieve the AppData_Local folder for this machine.
 		if( SUCCEEDED( ::SHGetKnownFolderPath( FOLDERID_LocalAppData, 0, nullptr, &folderPtr ) ) ) {	
-			::PathCombineW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::APPDATA_LOCAL)], folderPtr, WPROJECT_NAME L"\\");
-			::CreateDirectoryW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::APPDATA_LOCAL)], nullptr );
+			::PathCombineW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::AppDataLocal)], folderPtr, WPROJECT_NAME L"\\");
+			::CreateDirectoryW( _knownContentPaths[static_cast<size_t>(KnownContentLocation::AppDataLocal)], nullptr );
 			::CoTaskMemFree( folderPtr );
 		}
 	}
@@ -211,7 +211,7 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileReader( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationDuration::Temporary) AsynchronousFileReader( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -219,7 +219,7 @@ namespace Win32 {
 		// If the reader creation failed, we're responsible for closing the file handle here (the reader will not be able to do this in the destructor)
 		::CloseHandle( file );
 
-		return { Error::BAD_FILE_NAME };
+		return { Error::InvalidFileName };
 	}
 
 // ---------------------------------------------------
@@ -236,7 +236,7 @@ namespace Win32 {
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileReader( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationDuration::Temporary) SynchronousFileReader( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -244,7 +244,7 @@ namespace Win32 {
 		// If the reader creation failed, we're responsible for closing the file handle here (the reader will not be able to do this in the destructor)
 		::CloseHandle( file );
 
-		return { Error::BAD_FILE_NAME };
+		return { Error::InvalidFileName };
 	}
 
 // ---------------------------------------------------
@@ -261,7 +261,7 @@ namespace Win32 {
 
 		if( const ::HANDLE fileMapping { ::CreateFileMappingW( file, nullptr, PAGE_READONLY, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), nullptr ) } ) {
 			if( const auto mappedView = static_cast<const char*>(::MapViewOfFile( fileMapping, FILE_MAP_READ, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), static_cast<::SIZE_T>(0u) )) ) {
-				if( auto resultObject = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ReadableMemoryMappedFile( Range<const char*>{ mappedView, mappedView + GetFileSizeInBytes( file ) } ) ) {
+				if( auto resultObject = new(allocator, Allocator::AllocationDuration::Temporary) ReadableMemoryMappedFile( Range<const char*>{ mappedView, mappedView + GetFileSizeInBytes( file ) } ) ) {
 					return { move( resultObject ) };
 				}
 			}
@@ -271,7 +271,7 @@ namespace Win32 {
 
 		::CloseHandle( file );
 
-		return { Error::BAD_FILE_NAME };
+		return { Error::InvalidFileName };
 	}
 
 // ---------------------------------------------------
@@ -282,13 +282,13 @@ namespace Win32 {
 											 GENERIC_WRITE,
 											 FILE_SHARE_WRITE,
 											 nullptr,
-											 FileOverwriteBehavior::FAIL_IF_FILE_EXISTS == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
+											 FileOverwriteBehavior::FailIfFileExists == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
 											 AGGREGATE_WRITE_ATTRIBUTES,
 											 nullptr ) );
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) AsynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationDuration::Temporary) AsynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -296,7 +296,7 @@ namespace Win32 {
 		// If the writer creation failed, we're responsible for closing the file handle here (the writer will not be able to do this in the destructor)
 		::CloseHandle( file );
 
-		return { Error::BAD_FILE_NAME };
+		return { Error::InvalidFileName };
 	}
 
 // ---------------------------------------------------
@@ -307,13 +307,13 @@ namespace Win32 {
 											 GENERIC_WRITE,
 											 FILE_SHARE_WRITE,
 											 nullptr,
-											 FileOverwriteBehavior::FAIL_IF_FILE_EXISTS == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
+											 FileOverwriteBehavior::FailIfFileExists == overwriteBehavior ? CREATE_NEW : CREATE_ALWAYS,
 											 AGGREGATE_SYNCHRONOUS_WRITE_ATTRIBUTES,
 											 nullptr ) );
 
 		// GetSectorSizeFromHandle returns 0 in the event sector information is unavailable.
 		if( const size_t diskSectorSizeInBytes = _getSectorSizeFromHandleFunction( file ) ) {
-			if( auto accessor = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
+			if( auto accessor = new(allocator, Allocator::AllocationDuration::Temporary) SynchronousFileWriter( file, diskSectorSizeInBytes ) ) {
 				return { move( accessor ) };
 			}
 		}
@@ -321,7 +321,7 @@ namespace Win32 {
 		// If the writer creation failed, we're responsible for closing the file handle here (the writer will not be able to do this in the destructor)
 		::CloseHandle( file );
 
-		return { Error::BAD_FILE_NAME };
+		return { Error::InvalidFileName };
 	}
 
 // ---------------------------------------------------
@@ -344,7 +344,7 @@ namespace Win32 {
 			ErrorCode Append( const void* const sourceData, const size_t lengthToWriteInBytes ) override {
 				::DWORD	writtenLengthInBytes;
 
-				return FALSE != ::WriteFile( _fileHandle, sourceData, static_cast<::DWORD>(lengthToWriteInBytes), &writtenLengthInBytes, nullptr ) ? Error::NONE : Error::UNSPECIFIED;
+				return FALSE != ::WriteFile( _fileHandle, sourceData, static_cast<::DWORD>(lengthToWriteInBytes), &writtenLengthInBytes, nullptr ) ? Error::None : Error::Unspecified;
 			}
 
 		// - DATA MEMBERS ------------------------------------
@@ -365,17 +365,17 @@ namespace Win32 {
 											 nullptr ) );
 
 		if( INVALID_HANDLE_VALUE != file ) {
-			if( auto appender = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) Win32SynchronousFileAppender( file ) ) {
+			if( auto appender = new(allocator, Allocator::AllocationDuration::Temporary) Win32SynchronousFileAppender( file ) ) {
 				return { move( appender ) };
 			}
 
-			return { Error::OUT_OF_MEMORY };
+			return { Error::OutOfMemory };
 		}
 
 		// If the writer creation failed, we're responsible for closing the file handle here (the writer will not be able to do this in the destructor)
 		::CloseHandle( file );
 
-		return { Error::BAD_FILE_NAME };
+		return { Error::InvalidFileName };
 	}
 
 // ---------------------------------------------------
@@ -385,7 +385,7 @@ namespace Win32 {
 		WidePath	sourceFilePath;
 
 		if( UTF8FileNameToWidePath( destinationFilePath, PathFromKnownContentLocation( contentLocation ), destinationFileName ) && UTF8FileNameToWidePath( sourceFilePath, PathFromKnownContentLocation( contentLocation ), sourceFileName ) ) {
-			::CopyFileW( sourceFilePath, destinationFilePath, FileOverwriteBehavior::OVERWRITE_IF_FILE_EXISTS == overwriteBehavior ? FALSE : TRUE );
+			::CopyFileW( sourceFilePath, destinationFilePath, FileOverwriteBehavior::OverwriteIfFileExists == overwriteBehavior ? FALSE : TRUE );
 		}
 	}
 

@@ -21,7 +21,6 @@
 #include <Renderer/Direct3D11/EngineService.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Renderer/Direct3D11/WorldView.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -80,7 +79,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, *_defaultMeshView ) ? Error::NONE : Error::OUT_OF_MEMORY;
+		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( world, *_defaultMeshView ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------
@@ -115,6 +114,7 @@ namespace Direct3D11 {
 		visitor.Register( UTF8L("VSyncMode"), _VSyncMode ).Register( UTF8L("PreferredAdapterName"), _preferredAdapterName )
 			   .Register( UTF8L("ForceDebugRuntime"), _forceDebugRuntime ).Register( UTF8L("MaximumFramesToRenderAhead"), _maximumFramesToRenderAhead );
 
+		// Allow view factories to register their configuration.
 		_shaderResourceViewFactory.AcceptInitializationVisitor( visitor );
 		_meshResourceViewFactory.AcceptInitializationVisitor( visitor );
 		_pipelineViewFactory.AcceptInitializationVisitor( visitor );
@@ -122,39 +122,10 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
-		class CreateDeviceTask : public CRTPTransientTask<CreateDeviceTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//! Constructs this @ref CreateDeviceTask instance.
-			ETInlineHint CreateDeviceTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<CreateDeviceTask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~CreateDeviceTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Create Direct3D11 Device Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.InitializeDirect3D();
-
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) CreateDeviceTask( *this, visitingTask, executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->InitializeDirect3D();
+		} } );
 	}
 
 // ---------------------------------------------------
@@ -187,7 +158,7 @@ namespace Direct3D11 {
 			_meshResourceViewFactory.SetDevice( device );
 			_pipelineViewFactory.SetDevice( device );
 		} else {
-			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to instantiate Direct3D!.") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to instantiate Direct3D!.") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 

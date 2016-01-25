@@ -36,7 +36,7 @@ namespace Scripting {
 
 	// ---
 
-		if( const auto wrappedMessage = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) MessageWrapper( ::std::move( message ) ) ) {
+		if( const auto wrappedMessage = new(allocator, Allocator::AllocationDuration::Temporary) MessageWrapper( ::std::move( message ) ) ) {
 			SendMessage( target, *static_cast<Scripting::Message*>(wrappedMessage) );
 		}
 	}

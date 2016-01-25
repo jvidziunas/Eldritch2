@@ -15,7 +15,6 @@
 #include <Physics/BulletDynamics/EngineService.hpp>
 #include <Physics/BulletDynamics/WorldView.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Utility/Assert.hpp>
@@ -91,8 +90,7 @@ namespace BulletDynamics {
 																					 _persistentManifoldPool( 32u, hostingEngine.GetWorldPersistentManifoldPoolSizeInElements() ),
 																					 _collisionAlgorithmPool( 16u, hostingEngine.GetWorldCollisionAlgorithmPoolSizeInElements() ),
 																					 _softBodySolver(),
-																					 _collisionConfiguration( CreateCollisionConfigurationConstructionInfo( _persistentManifoldPool,
-																																							_collisionAlgorithmPool ) ),
+																					 _collisionConfiguration( CreateCollisionConfigurationConstructionInfo( _persistentManifoldPool, _collisionAlgorithmPool ) ),
 																					 _dispatcher( &_collisionConfiguration ),
 																					 _pairCache(),
 																					 _broadphaseInterface( DetermineAABBMinimaForWorld( owningWorld ),
@@ -117,45 +115,16 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PreScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreScriptTickTaskVisitor ) {
 		// Do pathfinding?
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PostScriptTickTaskVisitor ) {
-		class SimulateWorldTask : public CRTPTransientTask<SimulateWorldTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//! Constructs this @ref SimulateWorldTask instance.
-			ETInlineHint SimulateWorldTask( WorldView& owner, WorkerContext& executingContext, Task& postScriptTickTask ) : CRTPTransientTask<SimulateWorldTask>( postScriptTickTask, Scheduler::CodependentTaskSemantics ), _owner( owner ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~SimulateWorldTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Bullet Simulate World Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_owner._dynamicsWorld.stepSimulation2( 1.0f / 60.0f );
-
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			WorldView&	_owner;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SimulateWorldTask( *this, executingContext, visitingTask );
+	void WorldView::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostScriptTickTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, [] ( void* view, WorkerContext& /*executingContext*/ ) {
+			static_cast<WorldView*>(view)->_dynamicsWorld.stepSimulation2( 1.0f / 60.0f );
+		} } );
 	}
 
 // ---------------------------------------------------

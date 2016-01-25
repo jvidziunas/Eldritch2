@@ -34,7 +34,7 @@ namespace Eldritch2 {
 		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
 
 		void					Deallocate( void* const address ) override sealed;
-		void					Deallocate( void* const address, const AlignedDeallocationSemantics ) override sealed;
+		void					Deallocate( void* const address, const AlignedDeallocationSemanticsTag ) override sealed;
 
 	// ---------------------------------------------------
 
@@ -123,7 +123,7 @@ namespace Eldritch2 {
 	class FixedStackAllocator : public ::Eldritch2::ArenaAllocatorBase {
 	public:
 		enum : size_t {
-			RESERVED_SIZE_IN_BYTES = arenaSizeInBytes
+			ReservedSizeInBytes = arenaSizeInBytes
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

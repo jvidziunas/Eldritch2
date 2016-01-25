@@ -1,0 +1,15 @@
+namespace Eldritch2.Foundation.FlatBuffers;
+
+table Property {
+	Name	: string (required);
+	Value	: string (required);
+}
+
+table Header {
+	Properties : [Property];
+
+}
+
+root_type Header;
+file_identifier	"EWDF";
+file_extension	"e2world";

@@ -25,7 +25,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	ETForceInlineHint ErrorCode::operator bool() const {
-		return( static_cast<::Eldritch2::int32>(::Eldritch2::Error::NONE) <= _value );
+		return( static_cast<::Eldritch2::int32>(::Eldritch2::Error::None) <= _value );
 	}
 
 // ---------------------------------------------------

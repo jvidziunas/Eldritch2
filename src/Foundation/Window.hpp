@@ -26,9 +26,9 @@ namespace Foundation {
 	public:
 		struct PresentationParameters {
 			enum class Mode {
-				WINDOWED,
-				WINDOWED_FULLSCREEN,
-				FULLSCREEN
+				Windowed,
+				WindowedFullscreen,
+				Fullscreen
 			};
 
 			PresentationParameters::Mode	presentationMode;

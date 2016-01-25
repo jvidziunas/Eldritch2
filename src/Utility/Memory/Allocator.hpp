@@ -35,23 +35,20 @@ namespace Eldritch2 {
 
 	// ---
 
-		enum AllocationOption : AllocationOptions {
-			TEMPORARY_ALLOCATION = 0,
-			PERMANENT_ALLOCATION = 1
+		enum AllocationDuration : AllocationOptions {
+			Temporary	= 0,
+			Normal		= 1
 		};
 
 	// ---
 
 		enum ReallocationOption : ReallocationOptions {
-			TEMPORARY_REALLOCATION = AllocationOption::TEMPORARY_ALLOCATION,
-			PERMANENT_REALLOCATION = AllocationOption::PERMANENT_ALLOCATION,
-
-			FAIL_IF_MOVE_REQUIRED = 2u
+			FailOnMove	= 2u
 		};
 
 	// ---
 
-		struct AlignedDeallocationSemantics {};
+		struct AlignedDeallocationSemanticsTag {};
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
@@ -68,7 +65,7 @@ namespace Eldritch2 {
 		//! Releases a chunk of memory previously allocated by @ref Allocate() or @ref Reallocate().
 		virtual void					Deallocate( void* const address ) abstract;
 		//! Releases a chunk of memory previously allocated by @ref Allocate() or @ref Reallocate() WITH aligned semantics.
-		virtual void					Deallocate( void* const address, const AlignedDeallocationSemantics );
+		virtual void					Deallocate( void* const address, const AlignedDeallocationSemanticsTag );
 
 	// ---------------------------------------------------
 
@@ -80,10 +77,10 @@ namespace Eldritch2 {
 		ETForceInlineHint void	Delete( Object* const object );
 		//!	Given an object known to have been allocated from this @ref Allocator, calls the destructor for the given object and then releases its memory back to the @ref Allocator for later use.
 		template <typename Object>
-		ETForceInlineHint void	Delete( Object& object, const AlignedDeallocationSemantics );
+		ETForceInlineHint void	Delete( Object& object, const AlignedDeallocationSemanticsTag );
 		//!	Given an object known to have been allocated from this @ref Allocator, calls the destructor for the given object and then releases its memory back to the @ref Allocator for later use.
 		template <typename Object>
-		ETForceInlineHint void	Delete( Object* const object, const AlignedDeallocationSemantics );
+		ETForceInlineHint void	Delete( Object* const object, const AlignedDeallocationSemanticsTag );
 
 	// - DEBUG INFORMATION -------------------------------
 
@@ -129,11 +126,11 @@ namespace Eldritch2 {
 	template <typename ObjectType>
 	ETForceInlineHint void						DeleteTemporaryArray( ::Eldritch2::Allocator& allocator, ObjectType* const allocatedArray );
 	template <typename ObjectType>
-	ETForceInlineHint void						DeleteTemporaryArray( ::Eldritch2::Allocator& allocator, ObjectType* const allocatedArray, ::Eldritch2::Allocator::AlignedDeallocationSemantics );
+	ETForceInlineHint void						DeleteTemporaryArray( ::Eldritch2::Allocator& allocator, ObjectType* const allocatedArray, const ::Eldritch2::Allocator::AlignedDeallocationSemanticsTag );
 
 // ---------------------------------------------------
 
-	extern const Allocator::AlignedDeallocationSemantics	AlignedDeallocationSemantics;
+	extern const Allocator::AlignedDeallocationSemanticsTag	AlignedDeallocationSemantics;
 
 }	// namespace Eldritch2
 

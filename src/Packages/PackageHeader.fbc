@@ -4,15 +4,15 @@ file_extension	"e2toc";
 namespace Eldritch2.FileSystem.FlatBuffers;
 
 table Export {
-	name	: string (required);
-	type	: string (required);
-	offset	: ulong;
-	length	: ulong;
+	Name	: string (required);
+	Type	: string (required);
+	Offset	: ulong;
+	Length	: ulong;
 }
 
-table Header {
-	imports : [string];
-	exports : [Export];
+table PackageHeader {
+	Imports : [string];
+	Exports : [Export];
 }
 
-root_type Header;
+root_type PackageHeader;

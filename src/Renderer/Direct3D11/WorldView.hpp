@@ -16,7 +16,7 @@
 #include <Utility/Memory/ObjectPoolAllocator.hpp>
 #include <Utility/Containers/UnorderedMap.hpp>
 #include <Renderer/Direct3D11/SwapChain.hpp>
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Renderer/VisibilitySystem.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
@@ -69,8 +69,8 @@ namespace Direct3D11 {
 
 	// ---------------------------------------------------
 
-		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PreScriptTickTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PostScriptTickTaskVisitor ) override sealed;
+		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreScriptTickTaskVisitor ) override sealed;
+		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostScriptTickTaskVisitor ) override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -78,7 +78,7 @@ namespace Direct3D11 {
 
 	// ---
 
-		class SceneCameraComponent : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceTypeBase, public Renderer::Camera {
+		class SceneCameraComponent : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceCountable, public Renderer::Camera {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
@@ -109,7 +109,7 @@ namespace Direct3D11 {
 
 	// ---
 
-		class MeshComponent : public Scripting::ReferenceTypeBase {
+		class MeshComponent : public Scripting::ReferenceCountable {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:

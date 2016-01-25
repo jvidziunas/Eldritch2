@@ -35,7 +35,7 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	WorldView::CharacterArmatureComponent::CharacterArmatureComponent( WorldView& owningWorldView ) : _ghostObject(), _controller( &_ghostObject, nullptr, 0.1f ) {
-		owningWorldView._dynamicsWorld.addCollisionObject( &_ghostObject, COLLISION_FILTER_GROUP, COLLISION_FILTER_MASK );
+		owningWorldView._dynamicsWorld.addCollisionObject( &_ghostObject, CharacterArmatureComponent::CollisionFilterGroup, CharacterArmatureComponent::CollisionFilterMask );
 		owningWorldView._dynamicsWorld.addAction( &_controller );
 	}
 
@@ -46,7 +46,7 @@ namespace BulletDynamics {
 			static CharacterArmatureComponent* ETScriptAPICall Factory0( const StringMarshal& /*resourceName*/ ) {
 				auto&	worldView( GetActiveWorldView() );
 
-				return new(worldView.GetWorldAllocator(), alignof(CharacterArmatureComponent), Allocator::AllocationOption::PERMANENT_ALLOCATION) CharacterArmatureComponent( worldView );
+				return new(worldView.GetWorldAllocator(), alignof(CharacterArmatureComponent), Allocator::AllocationDuration::Normal) CharacterArmatureComponent( worldView );
 			}
 
 			static bool ETScriptAPICall IsOnGround( const CharacterArmatureComponent* armature ) {

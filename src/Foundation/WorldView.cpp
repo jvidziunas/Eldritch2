@@ -45,31 +45,31 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const FrameTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const FrameTickTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PreScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreScriptTickTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const ScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const ScriptTickTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PostScriptTickTaskVisitor ) {
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostScriptTickTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, MessageBus& /*visitor*/ ) {
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, MessageBus& /*visitor*/ ) {
 		// Default implementation should not do anything.
 	}
 

@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
-#include <Scheduler/Task.hpp>
+#include <Scheduler/WorkerContext.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -28,10 +28,6 @@ namespace Eldritch2 {
 
 	namespace FileSystem {
 		class	ContentLibrary;
-	}
-
-	namespace Scheduler {
-		class	WorkerContext;
 	}
 
 	class	Allocator;
@@ -56,11 +52,11 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const FrameTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PreScriptTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const ScriptTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, const PostScriptTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, Scripting::MessageBus& visitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const FrameTickTaskVisitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreScriptTickTaskVisitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ScriptTickTaskVisitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostScriptTickTaskVisitor );
+		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, Scripting::MessageBus& visitor );
 
 	// ---------------------------------------------------
 
@@ -72,7 +68,7 @@ namespace Foundation {
 
 	protected:
 		template <typename TaskVisitor>
-		void	BroadcastTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& visitingTask, TaskVisitor&& visitor );
+		void	BroadcastTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, TaskVisitor&& visitor );
 
 		template <typename ViewVisitor>
 		void	BroadcastViewVisitor( ViewVisitor&& visitor );

@@ -23,21 +23,21 @@ namespace {
 
 	enum : ::DWORD {
 		//!	Maximum size of an atomic write operation, specified in bytes.
-		MAXIMUM_WRITE_SIZE_IN_BYTES	= ~static_cast<::DWORD>(0u)
+		MaximumWriteSizeInBytes	= ~static_cast<::DWORD>(0u)
 	};
 
 // ---
 
 	enum : size_t {
 		//!	Maximum size of an atomic write operation, specified in bytes and expanded into a size_t.
-		EXPANDED_MAXIMUM_WRITE_SIZE_IN_BYTES	= static_cast<size_t>(MAXIMUM_WRITE_SIZE_IN_BYTES)
+		ExpandedMaximumWriteSizeInBytes	= static_cast<size_t>(MaximumWriteSizeInBytes)
 	};
 
 // ---
 
 	enum : ::BOOL {
-		BLOCK_UNTIL_COMPLETE	= TRUE,
-		RETURN_IF_NOT_COMPLETE	= FALSE
+		BlockUntilComplete	= TRUE,
+		ReturnIfNotComplete	= FALSE
 	};
 
 // ---------------------------------------------------
@@ -83,13 +83,13 @@ namespace Win32 {
 		// Reset the cancellation flag.
 		_cancellationFlag.store( 0u, memory_order_release );
 
-		for( ::DWORD writtenAmountInBytes; (0u == _cancellationFlag.load( memory_order_acquire )) & (lengthToWriteInBytes > EXPANDED_MAXIMUM_WRITE_SIZE_IN_BYTES); lengthToWriteInBytes -= writtenAmountInBytes ) {
+		for( ::DWORD writtenAmountInBytes; (0u == _cancellationFlag.load( memory_order_acquire )) & (lengthToWriteInBytes > ExpandedMaximumWriteSizeInBytes); lengthToWriteInBytes -= writtenAmountInBytes ) {
 			// Ensure the *true* async write is as big as possible, defer any of the final fixup to the async call.
-			const ::DWORD amountToWriteInBytes( static_cast<::DWORD>( Min<size_t>( EXPANDED_MAXIMUM_WRITE_SIZE_IN_BYTES, (lengthToWriteInBytes - EXPANDED_MAXIMUM_WRITE_SIZE_IN_BYTES) ) ) );
+			const ::DWORD	amountToWriteInBytes( static_cast<::DWORD>(Min<size_t>( ExpandedMaximumWriteSizeInBytes, (lengthToWriteInBytes - ExpandedMaximumWriteSizeInBytes) )) );
 			// While slightly cumbersome, we need to use asynchronous writes and then block in order for cancellation to work.
 			::WriteFile( _fileHandle, sourceBuffer, amountToWriteInBytes, nullptr, &_overlapped );
 
-			::GetOverlappedResult( _fileHandle, &_overlapped, &writtenAmountInBytes, BLOCK_UNTIL_COMPLETE );
+			::GetOverlappedResult( _fileHandle, &_overlapped, &writtenAmountInBytes, BlockUntilComplete );
 
 			// Update the aggregate write counter for the user finalization call...
 			_additionalWrittenBytes += writtenAmountInBytes;
@@ -104,7 +104,7 @@ namespace Win32 {
 									 sourceBuffer,
 									 static_cast<::DWORD>(lengthToWriteInBytes),
 									 nullptr,
-									 &_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Error::UNSPECIFIED : Error::NONE;
+									 &_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Error::Unspecified : Error::None;
 	}
 
 // ---------------------------------------------------
@@ -113,16 +113,16 @@ namespace Win32 {
 		::DWORD	writtenBytes( 0u );
 
 		// GetOverlappedResult specifically returns FALSE if the operation is incomplete, otherwise the result can be anything.
-		return FALSE != ::GetOverlappedResult( _fileHandle, &_overlapped, &writtenBytes, RETURN_IF_NOT_COMPLETE );
+		return FALSE != ::GetOverlappedResult( _fileHandle, &_overlapped, &writtenBytes, ReturnIfNotComplete );
 	}
 
 // ---------------------------------------------------
 
 	AsynchronousFileWriter::BlockingResult AsynchronousFileWriter::BlockUntilWriteComplete() {
 		::DWORD			writtenBytes( 0u );
-		const ::BOOL	overlappedResult( ::GetOverlappedResult( _fileHandle, &_overlapped, &writtenBytes, BLOCK_UNTIL_COMPLETE ) );
+		const ::BOOL	overlappedResult( ::GetOverlappedResult( _fileHandle, &_overlapped, &writtenBytes, BlockUntilComplete ) );
 
-		return AsynchronousFileWriter::BlockingResult( ( ( FALSE == overlappedResult ) | IsFatalErrorCondition( ::GetLastError() ) ) ? Error::UNSPECIFIED : Error::NONE, _additionalWrittenBytes + writtenBytes );
+		return AsynchronousFileWriter::BlockingResult( ( (FALSE == overlappedResult) | IsFatalErrorCondition( ::GetLastError() ) ) ? Error::Unspecified : Error::None, _additionalWrittenBytes + writtenBytes );
 	}
 
 // ---------------------------------------------------

@@ -46,7 +46,7 @@ namespace Win32 {
 			}
 
 			if( const auto mappedView = static_cast<const char*>(::MapViewOfFile( fileMapping, FILE_MAP_READ, static_cast<::DWORD>(0u), static_cast<::DWORD>(0u), static_cast<::SIZE_T>(0u) )) ) {
-				returnObject = new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) FileSystem::Win32::ReadableMemoryMappedFile(Range<const char*>{ mappedView, mappedView + mappingSize.QuadPart });
+				returnObject = new(allocator, Allocator::AllocationDuration::Temporary) FileSystem::Win32::ReadableMemoryMappedFile(Range<const char*>{ mappedView, mappedView + mappingSize.QuadPart });
 
 				if( !returnObject ) {
 					// If we've reached this point, the final allocation failed and we're still responsible for releasing resources.
@@ -75,7 +75,7 @@ namespace Win32 {
 
 		const ::HANDLE	file( ::CreateFileW( wideString, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, nullptr ) );
 
-		return { (INVALID_HANDLE_VALUE != file ? new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) FileSystem::Win32::SynchronousFileReader( file, 1u ) : nullptr), { allocator } };
+		return { (INVALID_HANDLE_VALUE != file ? new(allocator, Allocator::AllocationDuration::Temporary) FileSystem::Win32::SynchronousFileReader( file, 1u ) : nullptr), { allocator } };
 	}
 
 // ---------------------------------------------------
@@ -88,7 +88,7 @@ namespace Win32 {
 
 		const ::HANDLE	file( ::CreateFileW( wideString, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr ) );
 
-		return { (INVALID_HANDLE_VALUE != file ? new(allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) FileSystem::Win32::SynchronousFileWriter( file, 1u ) : nullptr), { allocator } };
+		return { (INVALID_HANDLE_VALUE != file ? new(allocator, Allocator::AllocationDuration::Temporary) FileSystem::Win32::SynchronousFileWriter( file, 1u ) : nullptr), { allocator } };
 	}
 
 }	// namespace Win32

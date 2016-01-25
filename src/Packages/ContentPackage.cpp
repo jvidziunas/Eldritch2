@@ -24,11 +24,11 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ContentPackage::ContentPackage( const UTF8Char* const name, ContentLibrary& owningLibrary, Allocator& allocator ) : ReferenceTypeBase( 0u ),
+	ContentPackage::ContentPackage( const UTF8Char* const name, ContentLibrary& owningLibrary, Allocator& allocator ) : ReferenceCountable( 0u ),
 																														_allocator( allocator, UTF8L("Package Allocator") ),
 																														_name( name, name + StringLength( name ), { allocator, UTF8L("Package Name Allocator") } ),
 																														_owningLibrary( owningLibrary ),
-																														_residencyState( ResidencyState::LOADING ),
+																														_residencyState( ResidencyState::Loading ),
 																														_referencedPackages( { allocator, UTF8L("Package Dependency Collection Allocator") } ) {}
 
 // ---------------------------------------------------

@@ -29,7 +29,6 @@
 #	pragma warning( disable : 4005 )
 #endif
 #include <D3D11.h>
-
 #if( ET_COMPILER_IS_MSVC )
 #	pragma warning( pop )
 #endif
@@ -73,7 +72,7 @@ namespace Direct3D11 {
 
 	// ---------------------------------------------------
 
-		void	AcceptTaskVisitor( ::Eldritch2::Allocator& subtaskAllocator, Scheduler::Task& visitingTask, Scheduler::WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) override sealed;
+		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) override sealed;
 
 	// ---------------------------------------------------
 

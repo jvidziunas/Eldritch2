@@ -40,8 +40,8 @@ namespace Animation {
 	// ---
 
 		enum ActiveFoot : bool {
-			LEFT,
-			RIGHT
+			Left,
+			Right
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

@@ -4,33 +4,33 @@ file_extension	"AngelScriptBytecodeMetadata";
 namespace Eldritch2.Scripting.AngelScript.FlatBuffers;
 
 enum TypeFlags : uint (bit_flags) {
-	NORMAL	= 0
+	Normal	= 0
 }
 
 enum PropertyFlags: uint (bit_flags) {
-	NORMAL	= 0
+	Normal	= 0
 }
 
 table FunctionMetadata {
-	index	: uint (key);
-	flags	: TypeFlags = NORMAL;
+	Index	: uint (key);
+	Flags	: TypeFlags = Normal;
 }
 
 table PropertyMetadata {
-	index	: uint (key);
-	flags	: PropertyFlags = NORMAL;
+	Index	: uint (key);
+	Flags	: PropertyFlags = Normal;
 }
 
 table TypeMetadata {
-	index		: uint (key);
-	methods		: [FunctionMetadata];
-	properties	: [PropertyMetadata];
+	Index		: uint (key);
+	Methods		: [FunctionMetadata];
+	Properties	: [PropertyMetadata];
 }
 
 table ModuleMetadata {
-	functions	: [FunctionMetadata];
-	types		: [TypeMetadata];
-	properties	: [PropertyMetadata];
+	Functions	: [FunctionMetadata];
+	Types		: [TypeMetadata];
+	Properties	: [PropertyMetadata];
 }
 
 root_type ModuleMetadata;

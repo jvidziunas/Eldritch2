@@ -34,17 +34,17 @@ namespace FileSystem {
 
 	public:
 		enum ExecutionBehavior : ::Eldritch2::uint32 {
-			TERMINATE,	//!< The @ref LoaderThread should cease execution at the earliest possible opportunity.
-			CONTINUE	//!< The @ref LoaderThread should continue deserializing packages.
+			Terminate,	//!< The @ref LoaderThread should cease execution at the earliest possible opportunity.
+			Continue	//!< The @ref LoaderThread should continue deserializing packages.
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref LoaderThread instance.
-		/*! @param[in] scheduler @ref TaskScheduler instance that will run this @ref LoaderThread.
+		/*! @param[in] scheduler @ref ThreadScheduler instance that will run this @ref LoaderThread.
 			@param[in] allocator @ref Allocator the @ref LoaderThread should use to create @ref PackageDeserializationContext instances.
 			*/
-		LoaderThread( Scheduler::TaskScheduler& scheduler, ::Eldritch2::Allocator& allocator );
+		LoaderThread( Scheduler::ThreadScheduler& scheduler, ::Eldritch2::Allocator& allocator );
 
 		//! Destroys this @ref LoaderThread instance.
 		~LoaderThread();
@@ -65,9 +65,7 @@ namespace FileSystem {
 
 	protected:
 		//! Entry point for the content load thread.
-		/*! @returns An @ref ErrorCode describing the final state of the @ref Scheduler::Thread at function exit.
-			*/
-		::Eldritch2::ErrorCode Run() override sealed;
+		void	Run() override sealed;
 
 	// - DATA MEMBERS ------------------------------------
 

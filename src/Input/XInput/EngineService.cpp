@@ -12,7 +12,6 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Input/XInput/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -44,40 +43,12 @@ namespace XInput {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const ServiceTickTaskVisitor ) {
-		class SampleXInputTask : public CRTPTransientTask<SampleXInputTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref SampleXInputTask instance.
-			ETInlineHint SampleXInputTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<SampleXInputTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
-																														_host( host ) {
-				TrySchedulingOnContext( executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
+			for( auto& controller : static_cast<EngineService*>(service)->_controllers ) {
+				controller.ReadInput();
 			}
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override {
-				return UTF8L("Sample XInput Devices Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override {
-				for( auto& controller : _host._controllers ) {
-					controller.ReadInput();
-				}
-
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SampleXInputTask( *this, visitingTask, executingContext );
+		} } );
 	}
 
 }	// namespace XInput

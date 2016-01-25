@@ -42,7 +42,7 @@ namespace Eldritch2 {
 		if( empty() ) {
 			const auto	allocationSize( sizeof(TrackedAllocation) + (_elementSizeInBytes * _objectsPerPage) );
 
-			if( void* ETRestrictPtrHint const newPage = ChildAllocator::Allocate( allocationSize, alignof( TrackedAllocation ), AllocationOption::PERMANENT_ALLOCATION ) ) {
+			if( void* ETRestrictPtrHint const newPage = ChildAllocator::Allocate( allocationSize, alignof( TrackedAllocation ), AllocationDuration::Normal ) ) {
 				const auto	trackedAllocation( new(newPage) TrackedAllocation );
 
 				// Add to the internal list for deletion on allocator destruction.
@@ -90,7 +90,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	void ObjectPoolAllocator::Deallocate( void* const address, const AlignedDeallocationSemantics ) {
+	void ObjectPoolAllocator::Deallocate( void* const address, const AlignedDeallocationSemanticsTag ) {
 		return ObjectPoolAllocator::Deallocate( address );
 	}
 

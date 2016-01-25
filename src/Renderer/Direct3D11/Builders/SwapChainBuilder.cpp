@@ -138,16 +138,16 @@ namespace Direct3D11 {
 		};
 
 		if( FAILED( _factory->CreateSwapChain( device, &desc, &tempChain ) ) ) {
-			return Error::UNSPECIFIED;
+			return Error::Unspecified;
 		}
 
 		_swapChain.Acquire( tempChain );
 
 		if( FAILED( _factory->MakeWindowAssociation( _windowHandle, _associationFlags ) ) ) {
-			return Error::UNSPECIFIED;
+			return Error::Unspecified;
 		}
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------

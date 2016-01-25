@@ -22,7 +22,7 @@
 #include <Utility/Containers/UTF8String.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
 #include <Utility/StringHash.hpp>
@@ -49,7 +49,7 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Foundation {
 
-	class World : public Scripting::ReferenceTypeBase, public ::Eldritch2::IntrusiveForwardListBaseHook {
+	class World : public Scripting::ReferenceCountable, public ::Eldritch2::IntrusiveForwardListBaseHook {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -77,9 +77,7 @@ namespace Foundation {
 
 	// - WORLD SIMULATION --------------------------------
 
-		::Eldritch2::ErrorCode	BeginContentLoad();
-
-		void					QueueUpdateTasks( ::Eldritch2::Allocator& frameTaskAllocator, Scheduler::WorkerContext& executingContext, Scheduler::Task& worldUpdatesCompleteTask );
+		void	QueueUpdateTasks( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter );
 
 	// - STATE INSPECTION --------------------------------
 
@@ -93,9 +91,11 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-		bool	IsLoaded() const;
+		::Eldritch2::ErrorCode	BeginContentLoad();
 
-		bool	IsPaused() const;
+		bool					IsLoaded() const;
+
+		bool					IsPaused() const;
 
 	// ---------------------------------------------------
 

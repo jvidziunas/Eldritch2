@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Utility/MPL/CharTypes.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//
@@ -20,7 +20,7 @@
 namespace Eldritch2 {
 namespace Foundation {
 
-	class ETPureAbstractHint Player : public Scripting::ReferenceTypeBase {
+	class ETPureAbstractHint Player : public Scripting::ReferenceCountable {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:

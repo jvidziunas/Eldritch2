@@ -32,7 +32,7 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	ErrorCode ObjectGraphResourceView::DeserializeIntoWorldView( WorldView& /*worldView*/ ) const {
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
@@ -44,7 +44,7 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	ErrorCode ObjectGraphResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
-		return Error::NONE;
+		return Error::None;
 	}
 
 }	// namespace AngelScript

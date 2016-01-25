@@ -40,13 +40,13 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	ETInlineHint const Scheduler::TaskScheduler& GameEngine::GetTaskScheduler() const {
+	ETInlineHint const Scheduler::ThreadScheduler& GameEngine::GetThreadScheduler() const {
 		return _scheduler;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint Scheduler::TaskScheduler& GameEngine::GetTaskScheduler() {
+	ETInlineHint Scheduler::ThreadScheduler& GameEngine::GetThreadScheduler() {
 		return _scheduler;
 	}
 

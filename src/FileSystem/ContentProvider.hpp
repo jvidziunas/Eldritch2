@@ -46,11 +46,11 @@ namespace FileSystem {
 
 	public:
 		enum class KnownContentLocation : ::Eldritch2::uint32 {
-			USER_DOCUMENTS,
-			APPDATA_LOCAL,
-			APPDATA_SHARED,
-			PACKAGE_DIRECTORY,
-			DOWNLOADED_CONTENT_DIRECTORY,
+			UserDocuments,
+			AppDataLocal,
+			AppDataShared,
+			PackageDirectory,
+			DownloadedContentDirectory,
 
 		// ---
 
@@ -58,22 +58,22 @@ namespace FileSystem {
 		};
 
 		enum class FileOverwriteBehavior : ::Eldritch2::uint32 {
-			FAIL_IF_FILE_EXISTS,
-			OVERWRITE_IF_FILE_EXISTS,
+			FailIfFileExists,
+			OverwriteIfFileExists,
 
 		// ---
 
-			DEFAULT = OVERWRITE_IF_FILE_EXISTS
+			Default = OverwriteIfFileExists
 		};
 
 		enum class PackageOverrideBehavior : ::Eldritch2::uint32 {
-			ALLOW_OVERRIDE,
-			DISABLE_OVERRIDE,
-			FORCE_OVERRIDE,
+			AllowOverride,
+			DisableOverride,
+			ForceOverride,
 
 		// ---
 
-			DEFAULT = ALLOW_OVERRIDE
+			Default = AllowOverride
 		};
 
 	// - FILE READ ACCESS --------------------------------
@@ -98,13 +98,13 @@ namespace FileSystem {
 
 		//!	Creates an asynchronous file writer object that can be used to access the contents of a file/stream in such a way that other tasks can (optionally) complete while waiting for the backing device to finish the request.
 		template <typename KnownContentLocationIterator>
-		::Eldritch2::Result<FileSystem::AsynchronousFileWriter>			CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT );
-		virtual ::Eldritch2::Result<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT ) abstract;
+		::Eldritch2::Result<FileSystem::AsynchronousFileWriter>			CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::Default );
+		virtual ::Eldritch2::Result<FileSystem::AsynchronousFileWriter>	CreateAsynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::Default ) abstract;
 
 		//!	Creates an synchronous file writer object that can be used to access the contents of a file/stream without requiring that the calling thread be able to complete additional work while the underlying device operates.
 		template <typename KnownContentLocationIterator>
-		::Eldritch2::Result<FileSystem::SynchronousFileWriter>			CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT );
-		virtual ::Eldritch2::Result<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT ) abstract;
+		::Eldritch2::Result<FileSystem::SynchronousFileWriter>			CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::Range<KnownContentLocationIterator>& locations, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::Default );
+		virtual ::Eldritch2::Result<FileSystem::SynchronousFileWriter>	CreateSynchronousFileWriter( ::Eldritch2::Allocator& allocator, const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::Default ) abstract;
 
 	// - FILE APPEND ACCESS ------------------------------
 
@@ -114,7 +114,7 @@ namespace FileSystem {
 
 	// - FREE (UNPACKAGED) FILE MANIPULATION -------------
 
-		virtual void	CopyFreeFile( const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const destinationFileName, const ::Eldritch2::UTF8Char* const sourceFileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::DEFAULT ) abstract;
+		virtual void	CopyFreeFile( const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const destinationFileName, const ::Eldritch2::UTF8Char* const sourceFileName, const FileOverwriteBehavior overwriteBehavior = FileOverwriteBehavior::Default ) abstract;
 
 		virtual void	DeleteFreeFile( const KnownContentLocation contentLocation, const ::Eldritch2::UTF8Char* const fileName ) abstract;
 

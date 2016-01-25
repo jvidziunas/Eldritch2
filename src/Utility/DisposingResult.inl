@@ -20,7 +20,7 @@ namespace Utility {
 
 	template <typename ResultObject>
 	template <typename CompatibleResultObject>
-	ETInlineHint CountedResult<ResultObject>::CountedResult( Scripting::ObjectHandle<CompatibleResultObject>&& object ) : object( ::std::move( object ) ), resultCode( ::Eldritch2::Error::NONE ) {}
+	ETInlineHint CountedResult<ResultObject>::CountedResult( Scripting::ObjectHandle<CompatibleResultObject>&& object ) : object( ::std::move( object ) ), resultCode( ::Eldritch2::Error::None ) {}
 
 // ---------------------------------------------------
 

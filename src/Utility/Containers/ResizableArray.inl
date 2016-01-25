@@ -266,7 +266,7 @@ namespace Eldritch2 {
 	template <typename StoredObject, typename Allocator>
 	template <typename... ElementConstructorArguments>
 	ETInlineHint void ResizableArray<StoredObject, Allocator>::EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments ) {
-		_underlyingContainer.push_back( ::std::forward<ElementConstructorArguments>( elementConstructorArguments )... );
+		_underlyingContainer.emplace_back( ::std::forward<ElementConstructorArguments>( elementConstructorArguments )... );
 	}
 
 // ---------------------------------------------------

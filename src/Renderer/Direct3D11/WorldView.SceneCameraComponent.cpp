@@ -50,7 +50,7 @@ namespace Direct3D11 {
 			static SceneCameraComponent* ETScriptAPICall Factory1( SwapChain* swapChain ) {
 				WorldView&	worldView( GetActiveWorldView() );
 
-				return new(worldView.GetWorldAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) SceneCameraComponent( *swapChain, worldView );
+				return new(worldView.GetWorldAllocator(), Allocator::AllocationDuration::Normal) SceneCameraComponent( *swapChain, worldView );
 			}
 
 		// ---------------------------------------------------

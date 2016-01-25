@@ -23,12 +23,12 @@ namespace Eldritch2 {
 namespace Utility {
 
 	enum class FrustumPlane : ::Eldritch2::uint8 {
-		LEFT	= 0,
-		RIGHT	= 1,
-		TOP		= 2,
-		BOTTOM	= 3,
-		NEAR	= 4,
-		FAR		= 5
+		Left	= 0,
+		Right	= 1,
+		Top		= 2,
+		Bottom	= 3,
+		Near	= 4,
+		Far		= 5
 	};
 
 // ---------------------------------------------------

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  TaskScheduler.hpp
+  ThreadScheduler.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scheduler/WorkerContext.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 #include <Utility/Result.hpp>
@@ -20,7 +21,6 @@
 namespace Eldritch2 {
 	namespace Scheduler {
 		class	Thread;
-		class	Task;
 	}
 
 	namespace Utility {
@@ -41,25 +41,25 @@ namespace Scheduler {
 
 // ---------------------------------------------------
 
-	class ETPureAbstractHint TaskScheduler : private Utility::Noncopyable {
+	class ETPureAbstractHint ThreadScheduler : private Utility::Noncopyable {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		//!	Execution priority for a thread. 
 		enum class ThreadPriority {
-			BELOW_NORMAL,
-			NORMAL,
-			ABOVE_NORMAL,
-			CRITICAL,
+			BelowNormal,
+			Normal,
+			AboveNormal,
+			Priority,
 
-			PRIORITY_COUNT
+			COUNT
 		};
 
 	// ---
 
 		enum class EventInitialState {
-			UNSIGNALED,
-			SIGNALED
+			Unsignaled,
+			Signaled
 		};
 
 	// ---
@@ -69,21 +69,19 @@ namespace Scheduler {
 
 	// - WORK SCHEDULING ---------------------------------
 
-		// Attempts to assign exclusive ownership of the denoted @ref Module instance to this @ref TaskScheduler.
+		// Attempts to assign exclusive ownership of the denoted @ref Module instance to this @ref ThreadScheduler.
 		// If the operation succeeds, the associated code for the @ref Module will be executed continually
-		// on a unique operating system thread until it is either dequeued from the @ref TaskScheduler or
+		// on a unique operating system thread until it is either dequeued from the @ref ThreadScheduler or
 		// manually told to cease execution.
 		virtual ::Eldritch2::ErrorCode	Enqueue( Scheduler::Thread& thread ) abstract;
 
 	// ---------------------------------------------------
 
-		virtual ::Eldritch2::ErrorCode	Bootstrap( Scheduler::Task& initialTask, size_t totalWorkerCount ) abstract;
+		virtual void	Bootstrap( size_t totalWorkerCount, const Scheduler::WorkerContext::WorkItem& initialTask );
 
-		virtual void					FlagForShutdown() abstract;
+		virtual void	FlagForShutdown() abstract;
 
 	// ---------------------------------------------------
-
-		virtual void	Sleep( const ::Eldritch2::uint64 timeInMicroseconds ) abstract;
 
 		virtual void	Backoff( BackoffContext& context );
 
@@ -97,25 +95,23 @@ namespace Scheduler {
 
 	// - SYNCHRONIZATION OBJECT ALLOCATION ---------------
 
-		//!	Instructs the @ref TaskScheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
+		//!	Instructs the @ref ThreadScheduler to allocate a read/write lock that allows concurrent read access, but enforces mutually-exclusive writes (also ensuring no readers are currently accessing the protected resource)
 		virtual ::Eldritch2::Result<Utility::ReaderWriterUserMutex>	AllocateReaderWriterUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
 
-		virtual ::Eldritch2::Result<Utility::WaitableUserEvent>		AllocateWaitableEvent( ::Eldritch2::Allocator& allocator, const EventInitialState initialState ) abstract;
+		//!	Instructs the @ref ThreadScheduler to allocate a semaphore object useful for limiting the degree of concurrent access to a shared resource.
+		virtual ::Eldritch2::Result<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const int initialCount, const int maximumCount ) abstract;
 
-		//!	Instructs the @ref TaskScheduler to allocate a semaphore object useful for limiting the degree of concurrent access to a shared resource.
-		virtual ::Eldritch2::Result<Utility::UserSemaphore>			AllocateSemaphore( ::Eldritch2::Allocator& allocator, const size_t initialCount, const size_t maximumCount ) abstract;
-
-		//!	Instructs the @ref TaskScheduler to allocate a basic mutually-exclusive lock.
+		//!	Instructs the @ref ThreadScheduler to allocate a basic mutually-exclusive lock.
 		virtual ::Eldritch2::Result<Utility::UserMutex>				AllocateUserMutex( ::Eldritch2::Allocator& allocator ) abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//!	Constructs this @ref TaskScheduler instance.
-		TaskScheduler() = default;
+		//!	Constructs this @ref ThreadScheduler instance.
+		ThreadScheduler() = default;
 
-		//!	Destroys this @ref TaskScheduler instance.
-		~TaskScheduler() = default;
+		//!	Destroys this @ref ThreadScheduler instance.
+		~ThreadScheduler() = default;
 	};
 
 }	// namespace Scheduler

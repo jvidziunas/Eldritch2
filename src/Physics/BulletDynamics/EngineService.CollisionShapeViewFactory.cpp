@@ -32,7 +32,7 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	ErrorCode EngineService::CollisionShapeViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
-		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) CollisionShapeResourceView( contentLibrary, package, name, allocator ) ? Error::NONE : Error::OUT_OF_MEMORY;
+		return new(allocator, Allocator::AllocationDuration::Normal) CollisionShapeResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
 	}
 
 }	// namespace BulletDynamics

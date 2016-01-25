@@ -23,7 +23,7 @@ namespace FileSystem {
 
 	ErrorCode ResourceViewFactory::AllocateEngineResources( Allocator& /*allocator*/, ContentLibrary& /*contentLibrary*/, ContentPackage& /*package*/ ) {
 		// Default implementation does nothing.
-		return Error::NONE;
+		return Error::None;
 	}
 
 }	// namespace FileSystem

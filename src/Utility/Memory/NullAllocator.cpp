@@ -51,7 +51,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	void NullAllocator::Deallocate( void* /*address*/, const AlignedDeallocationSemantics ) {}
+	void NullAllocator::Deallocate( void* /*address*/, const AlignedDeallocationSemanticsTag ) {}
 
 // ---------------------------------------------------
 

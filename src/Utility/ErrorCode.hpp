@@ -22,15 +22,15 @@
 namespace Eldritch2 {
 
 	enum class Error : ::Eldritch2::int32 {
-		OPERATION_NOT_SUPPORTED	= -9,
-		ACCESS_DENIED			= -7,
-		INVALID_OBJECT_STATE	= -6,
-		BAD_FILE_NAME			= -5,
-		NULL_PARAMETER			= -4,
-		INVALID_PARAMETER		= -3,
-		OUT_OF_MEMORY			= -2,
-		UNSPECIFIED				= -1,
-		NONE					=  0
+		UnsupportedOperation	= -9,
+		AccessDenied			= -7,
+		InvalidObjectState		= -6,
+		InvalidFileName			= -5,
+		NullParameter			= -4,
+		InvalidParameter		= -3,
+		OutOfMemory				= -2,
+		Unspecified				= -1,
+		None					=  0
 	};
 
 // ---------------------------------------------------
@@ -40,7 +40,7 @@ namespace Eldritch2 {
 
 	public:
 		//!	Constructs this @ref ErrorCode instance.
-		ETForceInlineHint ErrorCode( const ::Eldritch2::Error bitfield = ::Eldritch2::Error::NONE );
+		ETForceInlineHint ErrorCode( const ::Eldritch2::Error bitfield = ::Eldritch2::Error::None );
 		//!	Constructs this @ref ErrorCode instance.
 		ETForceInlineHint ErrorCode( const ::Eldritch2::ErrorCode& source ) = default;
 

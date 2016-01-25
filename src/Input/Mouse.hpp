@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ReferenceTypeBase.hpp>
+#include <Scripting/ReferenceCountable.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -27,7 +27,7 @@ namespace Eldritch2 {
 namespace Eldritch2 {
 namespace Input {
 
-	class Mouse : public Scripting::ReferenceTypeBase {
+	class Mouse : public Scripting::ReferenceCountable {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:

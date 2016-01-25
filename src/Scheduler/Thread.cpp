@@ -18,23 +18,22 @@
 
 using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 namespace Eldritch2 {
 namespace Scheduler {
 
-	Thread::Thread() : _resultCode( Error::NONE ), _executionState( ExecutionState::UNINITIALIZED ) {}
+	Thread::Thread() : _executionState( ExecutionState::Uninitialized ) {}
 
 // ---------------------------------------------------
 
 	Thread::~Thread() {
-		ETRuntimeAssert( ExecutionState::RUNNING != _executionState.load( memory_order_acquire ) );
+		ETRuntimeAssert( ExecutionState::Running != _executionState.load( ::std::memory_order_consume ) );
 	}
 
 // ---------------------------------------------------
 
 	bool Thread::HasCompleted() const {
-		return ExecutionState::DONE == _executionState.load( memory_order_acquire );
+		return ExecutionState::Done == _executionState.load( ::std::memory_order_consume );
 	}
 
 // ---------------------------------------------------
@@ -42,23 +41,23 @@ namespace Scheduler {
 	void Thread::EnsureTerminated() {
 		RequestGracefulShutdown();
 
-		while( ExecutionState::RUNNING == _executionState.load( memory_order_relaxed ) ) {}
+		while( ExecutionState::Running == _executionState.load( ::std::memory_order_consume ) ) {}
 	}
 
 // ---------------------------------------------------
 
 	bool Thread::HasStartedExecution() const {
-		return ExecutionState::UNINITIALIZED != _executionState.load( memory_order_consume );
+		return ExecutionState::Uninitialized != _executionState.load( ::std::memory_order_consume );
 	}
 
 // ---------------------------------------------------
 
 	void Thread::SchedulerEntryPoint() {
-		auto	expectedState( ExecutionState::UNINITIALIZED );
+		auto	expectedState( ExecutionState::Uninitialized );
 
-		if( _executionState.compare_exchange_strong( expectedState, ExecutionState::RUNNING, memory_order_acquire ) ) {
-			_resultCode = Run();
-			_executionState.store( ExecutionState::DONE, memory_order_release );
+		if( _executionState.compare_exchange_strong( expectedState, ExecutionState::Running, ::std::memory_order_acq_rel ) ) {
+			Run();
+			_executionState.store( ExecutionState::Done, ::std::memory_order_release );
 		}	
 	}
 

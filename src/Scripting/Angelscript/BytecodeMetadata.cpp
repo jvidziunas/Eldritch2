@@ -33,13 +33,13 @@ namespace AngelScript {
 
 	ErrorCode BytecodeMetadata::FunctionMetadata::Bind( ::asIScriptFunction& scriptFunction, const FlatBuffers::FunctionMetadata& /*metadata*/ ) {
 		SetMetadata( scriptFunction, *this );
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
 
 	ErrorCode BytecodeMetadata::PropertyMetadata::Bind( const FlatBuffers::PropertyMetadata& /*metadata*/ ) {
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
@@ -54,24 +54,24 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	ErrorCode BytecodeMetadata::TypeMetadata::Bind( ::asITypeInfo& scriptType, const FlatBuffers::TypeMetadata& metadata ) {
-		for( auto methodMetadata( metadata.methods()->begin() ), end( metadata.methods()->end() ); methodMetadata != end; ++methodMetadata ) {
-			auto	scriptFunction( scriptType.GetMethodByIndex( methodMetadata->index() ) );
+		for( auto methodMetadata( metadata.Methods()->begin() ), end( metadata.Methods()->end() ); methodMetadata != end; ++methodMetadata ) {
+			auto	scriptFunction( scriptType.GetMethodByIndex( methodMetadata->Index() ) );
 
 			if( !scriptFunction ) {
-				return Error::INVALID_PARAMETER;
+				return Error::InvalidParameter;
 			}
 
 			_methodMetadata.PushBack();
 			_methodMetadata.Back().Bind( *scriptFunction, **methodMetadata );
 		}
 
-		for( auto propertyMetadata( metadata.properties()->begin() ), end( metadata.properties()->end() ); propertyMetadata != end; ++propertyMetadata ) {
-			_propertyMetadata.Insert( { propertyMetadata->index(), PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
+		for( auto propertyMetadata( metadata.Properties()->begin() ), end( metadata.Properties()->end() ); propertyMetadata != end; ++propertyMetadata ) {
+			_propertyMetadata.Insert( { propertyMetadata->Index(), PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
 		}
 
 		SetMetadata( scriptType, *this );
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
@@ -154,84 +154,84 @@ namespace AngelScript {
 
 		SetMetadata( module, *this );
 
-		return LoadTypeMetadata( module, *metadata ) && LoadFunctionMetadata( module, *metadata ) && LoadPropertyMetadata( module, *metadata ) ? Error::NONE : Error::INVALID_PARAMETER;
+		return LoadTypeMetadata( module, *metadata ) && LoadFunctionMetadata( module, *metadata ) && LoadPropertyMetadata( module, *metadata ) ? Error::None : Error::InvalidParameter;
 	}
 
 // ---------------------------------------------------
 
 	ErrorCode BytecodeMetadata::LoadTypeMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
 		// Early out if there is no type metadata stored in the module.
-		if( !sourceData.types() ) {
-			return Error::NONE;
+		if( !sourceData.Types() ) {
+			return Error::None;
 		}
 
 		// Minimize repeated allocations.
-		_typeMetadata.SetCapacity( sourceData.types()->size() );
+		_typeMetadata.SetCapacity( sourceData.Types()->size() );
 
-		for( auto metadata( sourceData.types()->begin() ), end( sourceData.types()->end() ); metadata != end; ++metadata ) {
-			auto	scriptType( module.GetObjectTypeByIndex( metadata->index() ) );
+		for( auto metadata( sourceData.Types()->begin() ), end( sourceData.Types()->end() ); metadata != end; ++metadata ) {
+			auto	scriptType( module.GetObjectTypeByIndex( metadata->Index() ) );
 
 			// Ensure the index is legal and we have a valid script type.
 			if( !scriptType ) {
-				return Error::INVALID_PARAMETER;
+				return Error::InvalidParameter;
 			}
 
 			_typeMetadata.PushBack( { _rootAllocator } );
 			_typeMetadata.Back().Bind( *scriptType, **metadata );
 		}
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
 
 	ErrorCode BytecodeMetadata::LoadFunctionMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
 		// Early out if there is no free function metadata stored in the module.
-		if( !sourceData.functions() ) {
-			return Error::NONE;
+		if( !sourceData.Functions() ) {
+			return Error::None;
 		}
 
 		// Minimize repeated allocations.
-		_functionMetadata.SetCapacity( sourceData.functions()->size() );
+		_functionMetadata.SetCapacity( sourceData.Functions()->size() );
 
-		for( auto metadata( sourceData.functions()->begin() ), end( sourceData.functions()->end() ); metadata != end; ++metadata ) {
-			auto	scriptFunction( module.GetFunctionByIndex( metadata->index() ) );
+		for( auto metadata( sourceData.Functions()->begin() ), end( sourceData.Functions()->end() ); metadata != end; ++metadata ) {
+			auto	scriptFunction( module.GetFunctionByIndex( metadata->Index() ) );
 
 			// Ensure the index is legal and we have a valid script function.
 			if( !scriptFunction ) {
-				return Error::INVALID_PARAMETER;
+				return Error::InvalidParameter;
 			}
 
 			_functionMetadata.PushBack();
 			_functionMetadata.Back().Bind( *scriptFunction, **metadata );
 		}
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
 
 	ErrorCode BytecodeMetadata::LoadPropertyMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
 		// Early out if there is no global property metadata stored in the module.
-		if( !sourceData.properties() ) {
-			return Error::NONE;
+		if( !sourceData.Properties() ) {
+			return Error::None;
 		}
 
 		// Minimize repeated allocations.
-		_propertyMetadata.SetCapacity( sourceData.properties()->size() );
+		_propertyMetadata.SetCapacity( sourceData.Properties()->size() );
 
-		for( auto metadata( sourceData.properties()->begin() ), end( sourceData.properties()->end() ); metadata != end; ++metadata ) {
-			auto	scriptProperty( module.GetAddressOfGlobalVar( metadata->index() ) );
+		for( auto metadata( sourceData.Properties()->begin() ), end( sourceData.Properties()->end() ); metadata != end; ++metadata ) {
+			auto	scriptProperty( module.GetAddressOfGlobalVar( metadata->Index() ) );
 
 			// Ensure the index is legal and we have a valid property.
 			if( !scriptProperty ) {
-				return Error::INVALID_PARAMETER;
+				return Error::InvalidParameter;
 			}
 
 			_propertyMetadata.Insert( { scriptProperty, PropertyMetadata() } ).first->second.Bind( **metadata );
 		}
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 }	// namespace AngelScript

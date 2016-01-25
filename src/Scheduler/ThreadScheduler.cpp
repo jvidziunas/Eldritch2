@@ -1,32 +1,30 @@
 /*==================================================================*\
-  Task.inl
+  ThreadScheduler.cpp
   ------------------------------------------------------------------
   Purpose:
-
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-#pragma once
+
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Scheduler/ThreadScheduler.hpp>
 //------------------------------------------------------------------//
+
+using namespace ::Eldritch2::Scheduler;
+using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Scheduler {
 
-	ETInlineHint bool Task::IsContinuedBy( const Scheduler::Task& task ) const {
-		return &task == _continuationTask;
-	}
+	void ThreadScheduler::Backoff( BackoffContext& /*context*/ ) {}
 
 // ---------------------------------------------------
 
-	ETInlineHint bool Task::IsCodependentOn( const Scheduler::Task& task ) const {
-		return &task == _codependentTask;
-	}
+	void ThreadScheduler::SetThreadPriorityForCaller( ThreadPriority /*priority*/ ) {}
 
 }	// namespace Scheduler
 }	// namespace Eldritch2

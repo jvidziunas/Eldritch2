@@ -41,8 +41,8 @@ using namespace ::Eldritch2;
 namespace {
 
 	enum : ::UINT {
-		ALL_SLICES_IN_RESOURCE	= static_cast<::UINT>(-1),
-		LAST_MIP_IN_RESOURCE	= static_cast<::UINT>(-1)
+		AllSlicesInResource	= static_cast<::UINT>(-1),
+		LastMipInResource	= static_cast<::UINT>(-1)
 	};
 
 }	// anonymous namespace
@@ -53,9 +53,9 @@ namespace Direct3D11 {
 
 	TextureShaderResourceViewBuilder::TextureShaderResourceViewBuilder() : _formatOverride( ::DXGI_FORMAT_UNKNOWN ),
 																		   _initialSlice( 0u ),
-																		   _sizeInSlices( ALL_SLICES_IN_RESOURCE ),
+																		   _sizeInSlices( AllSlicesInResource ),
 																		   _firstMipIndex( 0u ),
-																		   _lastMipIndex( LAST_MIP_IN_RESOURCE ),
+																		   _lastMipIndex( LastMipInResource ),
 																		   _debugName( nullptr ) {}
 
 // ---------------------------------------------------

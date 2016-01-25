@@ -58,7 +58,7 @@ namespace {
 		::OutputDebugStringA( debugOutputString );
 #		endif
 
-		return AssertionFailure::FATAL;
+		return AssertionFailure::Fatal;
 	}
 
 	static AssertionHandler	assertHandler = &DefaultHandler;

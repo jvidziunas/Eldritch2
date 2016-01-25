@@ -32,9 +32,8 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	WorldView::TerrainColliderComponent::TerrainColliderComponent( WorldView& owningView ) : _collisionShape( 0, 0, nullptr, 0.0f, 0.0f, 0.0f, 0, PHY_FLOAT, false ),
-																							 _body( ::btRigidBody::btRigidBodyConstructionInfo( 0.0f, nullptr, &_collisionShape ) ) {
-		owningView._dynamicsWorld.addCollisionObject( &_body, COLLISION_FILTER_GROUP, COLLISION_FILTER_MASK );
+	WorldView::TerrainColliderComponent::TerrainColliderComponent( WorldView& owningView ) : _collisionShape( 0, 0, nullptr, 0.0f, 0.0f, 0.0f, 0, PHY_FLOAT, false ), _body( ::btRigidBody::btRigidBodyConstructionInfo( 0.0f, nullptr, &_collisionShape ) ) {
+		owningView._dynamicsWorld.addCollisionObject( &_body, TerrainColliderComponent::CollisionFilterGroup, TerrainColliderComponent::CollisionFilterMask );
 	}
 
 // ---------------------------------------------------
@@ -44,7 +43,7 @@ namespace BulletDynamics {
 			static TerrainColliderComponent* ETScriptAPICall Factory0( const StringMarshal& /*resourceName*/ ) {
 				auto&	worldView( GetActiveWorldView() );
 
-				return new(worldView.GetWorldAllocator(), alignof(TerrainColliderComponent), Allocator::AllocationOption::PERMANENT_ALLOCATION) TerrainColliderComponent( worldView );
+				return new(worldView.GetWorldAllocator(), alignof(TerrainColliderComponent), Allocator::AllocationDuration::Normal) TerrainColliderComponent( worldView );
 			}
 
 			static void ETScriptAPICall SetIsEnabled( TerrainColliderComponent* /*component*/, bool /*enabled*/ ) {}

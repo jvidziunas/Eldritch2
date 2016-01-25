@@ -30,7 +30,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	ErrorCode RenderTargetResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
-		return Error::NONE;
+		return Error::None;
 	}
 
 }	// namespace Direct3D11

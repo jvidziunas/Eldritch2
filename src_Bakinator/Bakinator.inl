@@ -48,8 +48,9 @@ namespace Tools {
 
 	// ---
 
-		visitor.AddArgument( UTF8L("-import"), UTF8L("-i"), ::std::bind( &Bakinator::AddImport, this, _1, _2 ) );
-		visitor.AddArgument( UTF8L("-packageName"), UTF8L("-n"), ::std::bind( &Bakinator::SetOutputFileName, this, _1, _2 ) );
+		visitor.AddArgument(	UTF8L("--import"),		UTF8L("-i"),	::std::bind( &Bakinator::AddImport, this, _1, _2 ) );
+		visitor.AddArgument(	UTF8L("--packageName"),	UTF8L("-n"),	::std::bind( &Bakinator::SetOutputFileName, this, _1, _2 ) );
+
 		visitor.AddInputFileHandler( ::std::bind( &Bakinator::AddExport, this, _1, _2 ) );
 	}
 

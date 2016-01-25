@@ -52,6 +52,10 @@ namespace Tools {
 
 		int	AddInputFile( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
 
+		int SetSkipTextureCoordinates( const bool value );
+
+		int	SetSkipOrientation( const bool value );
+
 	// - DATA MEMBERS ------------------------------------
 
 	private:
@@ -60,6 +64,8 @@ namespace Tools {
 
 		::Eldritch2::UTF8String<>								_password;
 		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_inputNames;
+		bool													_skipTextureCoordinates;
+		bool													_skipOrientation;
 	};
 
 }	// namespace Tools

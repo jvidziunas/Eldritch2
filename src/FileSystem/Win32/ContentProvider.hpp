@@ -31,7 +31,7 @@ namespace Eldritch2 {
 	}
 
 	namespace Scheduler {
-		class	TaskScheduler;
+		class	ThreadScheduler;
 	}
 }
 

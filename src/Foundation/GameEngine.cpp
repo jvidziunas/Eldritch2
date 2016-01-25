@@ -13,7 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Math/StandardLibrary.hpp>
-#include <Scheduler/TaskScheduler.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
+#include <Scheduler/WorkerContext.hpp>
 #include <System/SystemInterface.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Logging/Logger.hpp>
@@ -38,20 +39,24 @@ using namespace ::std;
 namespace Eldritch2 {
 namespace Foundation {
 
-	GameEngine::GameEngine( SystemInterface& systemInterface, TaskScheduler& scheduler, ContentProvider& contentProvider, Allocator& allocator ) : _allocator( allocator, UTF8L("Game Engine Allocator") ),
-																																				   _logger( contentProvider, UTF8L("Eldritch2.log") ),
-																																				   _systemInterface( systemInterface ),
-																																				   _scheduler( scheduler ),
-																																				   _contentLibrary( contentProvider, scheduler, _allocator ),
-																																				   _logEchoThreshold( LogMessageType::VERBOSE_WARNING ),
-																																				   _taskArenaPerThreadAllocationSizeInBytes( 1024u * 1024u ),
-																																				   _worldArenaSizeInBytes( 16u * 1024u * 1024u ),
-																																				   _managementService( *this ) {}
+	GameEngine::GameEngine( SystemInterface& systemInterface, ThreadScheduler& scheduler, ContentProvider& contentProvider, Allocator& allocator ) : _allocator( allocator, UTF8L("Game Engine Allocator") ),
+																																					 _logger( contentProvider, UTF8L("Eldritch2.log") ),
+																																					 _systemInterface( systemInterface ),
+																																					 _scheduler( scheduler ),
+																																					 _contentLibrary( contentProvider, scheduler, _allocator ),
+																																					 _logEchoThreshold( LogMessageType::VerboseWarning ),
+																																					 _taskArenaPerThreadAllocationSizeInBytes( 1024u * 1024u ),
+																																					 _worldArenaSizeInBytes( 16u * 1024u * 1024u ),
+																																					 _managementService( *this ) {}
 
 // ---------------------------------------------------
 
 	int GameEngine::ApplicationEntryPoint() {
-		_managementService.BootstrapEngine( Max<size_t>( _systemInterface.GetThreadCount() - 1u, 1u ) );
+		const auto	threadCount( Max<size_t>( GetSystemInterface().GetThreadCount() - 1u, 1u ) );
+
+		GetThreadScheduler().Bootstrap( threadCount, { &_managementService, [] ( void* managementService, WorkerContext& executingContext ) {
+			static_cast<ManagementService*>(managementService)->InitializeEngineAndLaunchFrameLoop( executingContext );
+		} } );
 
 		return 0;
 	}
@@ -86,7 +91,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void GameEngine::Dispose() {
-		GetLoggerForMessageType( LogMessageType::MESSAGE )( UTF8L("Terminating execution.") ET_UTF8_NEWLINE_LITERAL );
+		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Terminating execution.") ET_UTF8_NEWLINE_LITERAL );
 		_scheduler.FlagForShutdown();
 	}
 
@@ -94,5 +99,6 @@ namespace Foundation {
 }	// namespace Eldritch2
 
 #if( ET_COMPILER_IS_MSVC )
+//	Enable 'conditional expression is constant' warning
 #	pragma warning( pop )
 #endif

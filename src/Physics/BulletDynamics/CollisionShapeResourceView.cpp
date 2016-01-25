@@ -47,7 +47,7 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	ErrorCode CollisionShapeResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------

@@ -35,7 +35,7 @@ namespace Win32 {
 	SynchronousFileReader::BlockingResult SynchronousFileReader::Read( void* const destinationBuffer, const size_t lengthToReadInBytes )  {
 		enum : size_t {
 			// Maximum size of an atomic read operation, specified in bytes.
-			MAXIMUM_READ_SIZE_IN_BYTES = static_cast<::DWORD>(-1)
+			MaximumReadSizeInBytes = static_cast<::DWORD>(-1)
 		};
 
 	// ---
@@ -46,7 +46,7 @@ namespace Win32 {
 		// Since Windows can only work with reads representable with a DWORD, we need to loop to accommodate (potential) values held in a 64-bit size_t
 		while( (FALSE != readResult) & (static_cast<size_t>(writePointer - static_cast<char*>(destinationBuffer)) < lengthToReadInBytes) ) {
 			// Cap the read at the maximum representable value held in a DWORD. Remember to round *after* the comparison!
-			const ::DWORD	numberOfBytesToRead( static_cast<::DWORD>(Min<size_t>( lengthToReadInBytes, MAXIMUM_READ_SIZE_IN_BYTES )) );
+			const ::DWORD	numberOfBytesToRead( static_cast<::DWORD>(Min<size_t>( lengthToReadInBytes, MaximumReadSizeInBytes )) );
 			::DWORD			numberOfBytesReadThisIteration;
 
 			readResult = ::ReadFile( _fileHandle, writePointer, numberOfBytesToRead, &numberOfBytesReadThisIteration, nullptr );
@@ -54,7 +54,7 @@ namespace Win32 {
 			writePointer += numberOfBytesReadThisIteration;
 		}
 
-		return { FALSE != readResult ? Error::NONE : Error::UNSPECIFIED, static_cast<size_t>(writePointer - static_cast<char*>(destinationBuffer)) };
+		return { FALSE != readResult ? Error::None : Error::Unspecified, static_cast<size_t>(writePointer - static_cast<char*>(destinationBuffer)) };
 	}
 
 // ---------------------------------------------------

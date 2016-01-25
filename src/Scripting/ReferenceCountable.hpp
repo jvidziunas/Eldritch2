@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ReferenceTypeBase.hpp
+  ReferenceCountable.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -20,7 +20,7 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	class ReferenceTypeBase {
+	class ReferenceCountable {
 	// - REFERENCE MANAGEMENT ----------------------------
 
 	public:
@@ -35,11 +35,11 @@ namespace Scripting {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//!	Constructs this @ref ReferenceTypeBase instance.
-		ETInlineHint ReferenceTypeBase( const size_t initialReferenceCount = 1u );
+		//!	Constructs this @ref ReferenceCountable instance.
+		ETInlineHint ReferenceCountable( const size_t initialReferenceCount = 1u );
 
-		//!	Destroys this @ref ReferenceTypeBase instance.
-		ETInlineHint ~ReferenceTypeBase() = default;
+		//!	Destroys this @ref ReferenceCountable instance.
+		ETInlineHint ~ReferenceCountable() = default;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -53,5 +53,5 @@ namespace Scripting {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Scripting/ReferenceTypeBase.inl>
+#include <Scripting/ReferenceCountable.inl>
 //------------------------------------------------------------------//

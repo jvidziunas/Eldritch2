@@ -50,7 +50,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	ErrorCode MeshResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
-		return Error::OPERATION_NOT_SUPPORTED;
+		return Error::UnsupportedOperation;
 	}
 
 // ---------------------------------------------------

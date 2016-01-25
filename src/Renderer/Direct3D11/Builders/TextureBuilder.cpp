@@ -73,23 +73,23 @@ namespace Direct3D11 {
 		}
 
 		switch( baseHeader.headerClass ) {
-			case HeaderClass::TEXTURE_2D: {
+			case HeaderClass::Texture2D: {
 				const auto&	header( baseHeader.headers.as2D );
 				SetTexture2D( header.topLevelWidthInPixels, header.topLevelHeightInPixels, header.arraySizeInSlices );
 				break;
-			}	// case HeaderClass::TEXTURE_2D
+			}	// case HeaderClass::Texture2D
 
-			case HeaderClass::TEXTURE_3D: {
+			case HeaderClass::Texture3D: {
 				const auto&	header( baseHeader.headers.as3D );
 				SetTexture2D( header.topLevelWidthInPixels, header.topLevelHeightInPixels, header.topLevelHeightInPixels );
 				break;
-			}	// case HeaderClass::TEXTURE_3D
+			}	// case HeaderClass::Texture3D
 
-			case HeaderClass::CUBEMAP: {
+			case HeaderClass::Cubemap: {
 				const auto&	header( baseHeader.headers.asCubemap );
 				SetCubemap( header.edgeSizeInPixels, header.edgeSizeInPixels, header.arraySizeInCubemaps );
 				break;
-			}	// case HeaderClass::CUBEMAP
+			}	// case HeaderClass::Cubemap
 		}
 		
 		return SetMSAAProperties( 1u, 0u ).SetNeedsShaderResourceView();

@@ -229,12 +229,6 @@
     <Filter Include="Header Files\FileSystem\Win32">
       <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Scheduler\Win32Fiber">
-      <UniqueIdentifier>{c67cc6c7-c879-48cd-b70a-5a8b304ffbd2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Scheduler\Win32Fiber">
-      <UniqueIdentifier>{81c92d00-d27c-4d56-93dd-49af19b7bf63}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp">
@@ -254,12 +248,6 @@
     </ClCompile>
     <ClCompile Include="..\src\renderer\Camera.cpp">
       <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scheduler\Task.cpp">
-      <Filter>Source Files\Scheduler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scheduler\TaskScheduler.cpp">
-      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scheduler\WorkerContext.cpp">
       <Filter>Source Files\Scheduler</Filter>
@@ -386,9 +374,6 @@
     </ClCompile>
     <ClCompile Include="..\src\System\Win32\SystemInterface.cpp">
       <Filter>Source Files\System\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Scheduler\Win32\TaskScheduler.cpp">
-      <Filter>Source Files\Scheduler\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp">
       <Filter>Source Files\Renderer</Filter>
@@ -612,6 +597,15 @@
     <ClCompile Include="..\src\Packages\ResourceViewFactory.cpp">
       <Filter>Source Files\Packages</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\scheduler\ThreadScheduler.cpp">
+      <Filter>Source Files\Scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.cpp">
+      <Filter>Source Files\Scheduler\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.WorkerThread.cpp">
+      <Filter>Source Files\Scheduler\Win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
@@ -716,12 +710,6 @@
     <ClInclude Include="..\src\Renderer\GPUFormats.hpp">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Scheduler\Task.hpp">
-      <Filter>Header Files\Scheduler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\scheduler\TaskScheduler.hpp">
-      <Filter>Header Files\Scheduler</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scheduler\WorkerContext.hpp">
       <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
@@ -752,9 +740,6 @@
     <ClInclude Include="..\src\Packages\ContentPackage.hpp">
       <Filter>Header Files\Packages</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Scheduler\CRTPTransientTask.hpp">
-      <Filter>Header Files\Scheduler</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Input\Keyboard.hpp">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
@@ -784,9 +769,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Configuration\INIParser.hpp">
       <Filter>Header Files\Configuration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scripting\ReferenceTypeBase.hpp">
-      <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Animation\Armature.hpp">
       <Filter>Header Files\Animation</Filter>
@@ -877,9 +859,6 @@
     </ClInclude>
     <ClInclude Include="..\src\System\Win32\SystemInterface.hpp">
       <Filter>Header Files\System\Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Scheduler\Win32\TaskScheduler.hpp">
-      <Filter>Header Files\Scheduler\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp">
       <Filter>Header Files\Renderer</Filter>
@@ -1142,11 +1121,20 @@
     <ClInclude Include="..\src\Utility\Containers\SystemString.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Scheduler\Win32Fiber\TaskScheduler.hpp">
-      <Filter>Header Files\Scheduler\Win32Fiber</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Scheduler\PrivateQueueWorker.hpp">
       <Filter>Header Files\Scheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scheduler\ThreadScheduler.hpp">
+      <Filter>Header Files\Scheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scheduler\Win32\ThreadScheduler.hpp">
+      <Filter>Header Files\Scheduler\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scheduler\Win32\FiberScheduler.hpp">
+      <Filter>Header Files\Scheduler\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\ReferenceCountable.hpp">
+      <Filter>Header Files\Scripting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1230,19 +1218,10 @@
     <None Include="..\src\Physics\BulletDynamics\EngineService.inl">
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </None>
-    <None Include="..\src\Scheduler\CRTPTransientTask.inl">
-      <Filter>Source Files\Scheduler</Filter>
-    </None>
-    <None Include="..\src\Scheduler\Task.inl">
-      <Filter>Source Files\Scheduler</Filter>
-    </None>
     <None Include="..\src\Scheduler\WorkerContext.inl">
       <Filter>Source Files\Scheduler</Filter>
     </None>
     <None Include="..\src\Scripting\ObjectHandle.inl">
-      <Filter>Source Files\Scripting</Filter>
-    </None>
-    <None Include="..\src\Scripting\ReferenceTypeBase.inl">
       <Filter>Source Files\Scripting</Filter>
     </None>
     <None Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.inl">
@@ -1383,8 +1362,14 @@
     <None Include="..\src\Utility\Containers\SystemString.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
+    <None Include="..\src\Renderer\HLSLPipeline.fbc">
+      <Filter>IDL Files</Filter>
+    </None>
     <None Include="..\src\Scheduler\PrivateQueueWorker.inl">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Scheduler</Filter>
+    </None>
+    <None Include="..\src\Scripting\ReferenceCountable.inl">
+      <Filter>Source Files\Scripting</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1397,6 +1382,21 @@
       <Filter>IDL Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\src\Scripting\Angelscript\BytecodeMetadata.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Physics\ArticulatedBody.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Physics\CollisionShapes.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Foundation\SerializedWorld.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Sound\SoundBank.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Renderer\PipelineTypes.fbc">
       <Filter>IDL Files</Filter>
     </CustomBuild>
   </ItemGroup>

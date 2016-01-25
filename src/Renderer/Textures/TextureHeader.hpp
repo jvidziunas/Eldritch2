@@ -23,9 +23,9 @@ namespace Renderer {
 
 	public:
 		enum Class : ::Eldritch2::uint8 {
-			TEXTURE_2D,
-			TEXTURE_3D,
-			CUBEMAP
+			Texture2D,
+			Texture3D,
+			Cubemap
 		};
 
 	// ---

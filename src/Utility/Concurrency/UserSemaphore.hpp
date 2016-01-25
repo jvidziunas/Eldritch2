@@ -20,7 +20,7 @@ namespace Utility {
 
 	class ETPureAbstractHint UserSemaphore : private Utility::Noncopyable {
 	public:
-		virtual size_t	IncreaseCount( const size_t count = 1u ) abstract;
+		virtual int		IncreaseCount( const int count = 1u ) abstract;
 
 		virtual void	Acquire() abstract;
 

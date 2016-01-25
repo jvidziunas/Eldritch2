@@ -40,7 +40,7 @@ namespace XInput {
 // ---------------------------------------------------
 
 	EngineService::Controller::Controller( const ::DWORD controllerIndex ) : _controllerIndex( controllerIndex ) {
-		if( Controller::INVALID_CONTROLLER_INDEX != controllerIndex ) {
+		if( Controller::InvalidControllerIndex != controllerIndex ) {
 			::XInputGetState( controllerIndex, &_state );
 		}
 	}
@@ -48,14 +48,14 @@ namespace XInput {
 // ---------------------------------------------------
 
 	void EngineService::Controller::ReadInput() {
-		if( (Controller::INVALID_CONTROLLER_INDEX != _controllerIndex) && (ERROR_DEVICE_NOT_CONNECTED != ::XInputGetState( _controllerIndex, &_state )) ) {
+		if( (Controller::InvalidControllerIndex != _controllerIndex) && (ERROR_DEVICE_NOT_CONNECTED != ::XInputGetState( _controllerIndex, &_state )) ) {
 		}
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint void EngineService::Controller::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L( "EngineService::Controller::ExposeScriptAPI() Temporary Allocator" ) );
+		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("EngineService::Controller::ExposeScriptAPI() Temporary Allocator") );
 
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<Controller>( temporaryAllocator ) ) {
 			auto&	typeBuilder( *registerResult.object );

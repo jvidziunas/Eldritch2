@@ -29,7 +29,7 @@ namespace {
 	class NullAppender : public SynchronousFileAppender {
 	public:
 		ErrorCode Append( const void* const /*sourceData*/, const size_t /*lengthToWriteInBytes*/ ) {
-			return Error::NONE;
+			return Error::None;
 		}
 	};
 
@@ -38,7 +38,7 @@ namespace {
 // ---
 
 	SynchronousFileAppender& CreateFileAppender( Allocator& allocator, ContentProvider& contentProvider, const UTF8Char* const fileName ) {
-		if( const auto createAppenderResult = contentProvider.CreateSynchronousFileAppender( allocator, ContentProvider::KnownContentLocation::USER_DOCUMENTS, fileName ) ) {
+		if( const auto createAppenderResult = contentProvider.CreateSynchronousFileAppender( allocator, ContentProvider::KnownContentLocation::UserDocuments, fileName ) ) {
 			return *createAppenderResult.object;
 		}
 

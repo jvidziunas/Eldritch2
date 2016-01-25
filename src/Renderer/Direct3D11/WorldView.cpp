@@ -14,7 +14,6 @@
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/WorldView.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
 #include <Utility/ErrorCode.hpp>
@@ -73,51 +72,11 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& subtaskAllocator, WorkerContext& executingContext, Task& visitingTask, const PreScriptTickTaskVisitor ) {
-		class SubmitDrawCommandsTask : public CRTPTransientTask<SubmitDrawCommandsTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref SubmitDrawCommandsTask instance.
-			ETInlineHint SubmitDrawCommandsTask( WorldView& worldView, WorkerContext& executingContext, Task& visitingTask, Allocator& subtaskAllocator ) : CRTPTransientTask<SubmitDrawCommandsTask>( visitingTask, Scheduler::ContinuationTaskSemantics ),
-																																							_subtaskAllocator( subtaskAllocator ),
-																																							_worldView( worldView ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~SubmitDrawCommandsTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Submit Draw Commands Task");
-			}
-
-		// ---------------------------------------------------
-
-			Task* Execute( WorkerContext& executingContext ) override sealed {
-				for( const auto& camera : _worldView._attachedCameras ) {
-					// new(_subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ASDFTask();
-				}
-
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			Allocator&	_subtaskAllocator;
-			WorldView&	_worldView;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) SubmitDrawCommandsTask( *this, executingContext, visitingTask, subtaskAllocator );
-	}
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreScriptTickTaskVisitor ) {}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, WorkerContext& /*executingContext*/, Task& /*visitingTask*/, const PostScriptTickTaskVisitor ) {}
+	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostScriptTickTaskVisitor ) {}
 
 // ---------------------------------------------------
 

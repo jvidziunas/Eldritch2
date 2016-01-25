@@ -33,11 +33,11 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	ScriptCompiler<GlobalAllocator, FileAccessorFactory>::ScriptCompiler() : _globalAllocator( UTF8L("Root Allocator") ),
-																					 _engine( ::asCreateScriptEngine() ),
-																					 _fileAccessorFactory(),
-																					 _scriptBuilder(),
-																					 _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ),
-																					 _inputFiles( { GetAllocator(), UTF8L("Input File Name Collection Allocator") } ) {}
+																			 _engine( ::asCreateScriptEngine() ),
+																			 _fileAccessorFactory(),
+																			 _scriptBuilder(),
+																			 _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ),
+																			 _inputFiles( { GetAllocator(), UTF8L("Input File Name Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -241,8 +241,9 @@ namespace Tools {
 
 	// ---
 
-		visitor.AddArgument( UTF8L("-moduleName"), UTF8L("-m"), ::std::bind( &ScriptCompiler::SetOutputModuleName, this, _1, _2 ) );
-		visitor.AddTypedArgument<int>( UTF8L("-optimizationLevel"), UTF8L("-o"), ::std::bind( &ScriptCompiler::SetOptimizationLevel, this, _1 ) );
+		visitor.AddTypedArgument<int>(	UTF8L( "--optimizationLevel" ),	UTF8L( "-o" ),	::std::bind( &ScriptCompiler::SetOptimizationLevel, this, _1 ) );
+		visitor.AddArgument(			UTF8L("--moduleName"),			UTF8L("-m"),	::std::bind( &ScriptCompiler::SetOutputModuleName, this, _1, _2 ) );
+		
 
 		visitor.AddInputFileHandler( ::std::bind( &ScriptCompiler::AddInputFile, this, _1, _2 ) );
 		

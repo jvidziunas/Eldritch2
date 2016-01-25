@@ -45,7 +45,7 @@ namespace Direct3D11 {
 				auto&		worldView( GetActiveWorldView() );
 				const auto&	contentLibrary( worldView.GetEngineContentLibrary() );
 
-				return new(worldView._meshPool, Allocator::AllocationOption::PERMANENT_ALLOCATION) MeshComponent( contentLibrary.ResolveViewByName( meshName.GetCharacterArray(), worldView._defaultMesh ), *armature );
+				return new(worldView._meshPool, Allocator::AllocationDuration::Normal) MeshComponent( contentLibrary.ResolveViewByName( meshName.GetCharacterArray(), worldView._defaultMesh ), *armature );
 			}
 
 		// ---------------------------------------------------

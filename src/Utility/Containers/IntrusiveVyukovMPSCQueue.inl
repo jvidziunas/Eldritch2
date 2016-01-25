@@ -19,7 +19,13 @@ namespace Eldritch2 {
 
 	template <class StoredObject>
 	typename IntrusiveVyukovMPSCQueue<StoredObject>::ValueType* IntrusiveVyukovMPSCQueue<StoredObject>::PopFront() {
-		return static_cast<ValueType*>(IntrusiveVyukovMPSCQueueBase::PopFront());
+		auto	result( static_cast<ValueType*>(IntrusiveVyukovMPSCQueueBase::PopFront()) );
+#if( ET_DEBUG_MODE_ENABLED )
+		if( result ) {
+			result->next = result;
+		}
+#endif
+		return result;
 	}
 
 // ---------------------------------------------------

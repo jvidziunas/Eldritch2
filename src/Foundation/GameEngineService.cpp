@@ -15,10 +15,10 @@
 #include <Configuration/ConfigurationDatabase.hpp>
 #include <Foundation/GameEngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Utility/CountedResult.hpp>
-#include <Scheduler/TaskScheduler.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Foundation/GameEngine.hpp>
+#include <Utility/CountedResult.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
@@ -47,16 +47,16 @@ namespace Foundation {
 	ErrorCode GameEngineService::AllocateWorldView( Allocator& /*allocator*/, World& /*world*/ ) {
 		// Default implementation does nothing.
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 // ---------------------------------------------------
 
 	CountedResult<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
-		ObjectHandle<World>	world( new(GetEngineAllocator(), Allocator::AllocationOption::PERMANENT_ALLOCATION) World( _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics );
+		ObjectHandle<World>	world( new(GetEngineAllocator(), Allocator::AllocationDuration::Normal) World( _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics );
 
 		if( world ) {
-			ErrorCode	operationResult( Error::NONE );
+			ErrorCode	operationResult( Error::None );
 
 			world->SetProperty( World::GetMainPackageKey(), worldResourceName );
 
@@ -64,7 +64,7 @@ namespace Foundation {
 				operationResult = service.AllocateWorldView( world->GetAllocator(), *world );
 
 				if( !operationResult ) {
-					GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
+					GetLogger( LogMessageType::Error )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
 					return { operationResult };
 				}
 			}
@@ -72,7 +72,7 @@ namespace Foundation {
 			operationResult = world->BeginContentLoad();
 
 			if( !operationResult ) {
-				GetLogger( LogMessageType::ERROR )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
+				GetLogger( LogMessageType::Error )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
 				return { operationResult };
 			}
 
@@ -80,7 +80,7 @@ namespace Foundation {
 			return { ::std::move( world ) };
 		}
 		
-		return { Error::OUT_OF_MEMORY };
+		return { Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------
@@ -91,8 +91,8 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	TaskScheduler& GameEngineService::GetEngineTaskScheduler() const {
-		return _owningEngine.GetTaskScheduler();
+	ThreadScheduler& GameEngineService::GetEngineThreadScheduler() const {
+		return _owningEngine.GetThreadScheduler();
 	}
 
 // ---------------------------------------------------
@@ -121,38 +121,38 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const InitializeEngineTaskVisitor ) {
+	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const InitializeEngineTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const PreConfigurationLoadedTaskVisitor ) {
+	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreConfigurationLoadedTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const PostConfigurationLoadedTaskVisitor ) {
+	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostConfigurationLoadedTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const ServiceTickTaskVisitor ) {
+	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const ServiceTickTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptTaskVisitor( Allocator& /*subtaskAllocator*/, Task& /*visitingTask*/, WorkerContext& /*executingContext*/, const WorldTickTaskVisitor ) {
+	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const WorldTickTaskVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
 	ErrorCode GameEngineService::LaunchThread( Thread& thread ) {
-		return _owningEngine.GetTaskScheduler().Enqueue( thread );
+		return _owningEngine.GetThreadScheduler().Enqueue( thread );
 	}
 
 // ---------------------------------------------------

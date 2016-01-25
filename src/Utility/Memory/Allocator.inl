@@ -25,14 +25,14 @@ namespace Eldritch2 {
 
 	template <typename ObjectType>
 	ETForceInlineHint ETNoAliasHint typename ObjectType* AllocateTemporaryArray( ::Eldritch2::Allocator& allocator, size_t arraySizeInObjects ) {
-		return static_cast<ObjectType*>(allocator.Allocate( arraySizeInObjects * sizeof(ObjectType), Allocator::AllocationOption::TEMPORARY_ALLOCATION ));
+		return static_cast<ObjectType*>(allocator.Allocate( arraySizeInObjects * sizeof(ObjectType), Allocator::AllocationDuration::Temporary ));
 	}
 
 // ---------------------------------------------------
 
 	template <typename ObjectType>
 	ETForceInlineHint ETNoAliasHint typename ObjectType* AllocateTemporaryArray( ::Eldritch2::Allocator& allocator, size_t arraySizeInObjects, size_t arrayAlignmentInBytes ) {
-		return static_cast<ObjectType*>(allocator.Allocate( arraySizeInObjects * sizeof(ObjectType), arrayAlignmentInBytes, Allocator::AllocationOption::TEMPORARY_ALLOCATION ));
+		return static_cast<ObjectType*>(allocator.Allocate( arraySizeInObjects * sizeof(ObjectType), arrayAlignmentInBytes, Allocator::AllocationDuration::Temporary ));
 	}
 
 // ---------------------------------------------------
@@ -45,7 +45,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Allocator, typename ObjectType>
-	ETForceInlineHint void DeleteTemporaryArray( ::Eldritch2::Allocator& allocator, ObjectType* const allocatedArray, const ::Eldritch2::Allocator::AlignedDeallocationSemantics ) {
+	ETForceInlineHint void DeleteTemporaryArray( ::Eldritch2::Allocator& allocator, ObjectType* const allocatedArray, const ::Eldritch2::Allocator::AlignedDeallocationSemanticsTag ) {
 		allocator.Deallocate( allocatedArray, ::Eldritch2::AlignedDeallocationSemantics );
 	}
 
@@ -68,14 +68,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Object>
-	ETForceInlineHint void Allocator::Delete( Object& object, const ::Eldritch2::Allocator::AlignedDeallocationSemantics semantics ) {
+	ETForceInlineHint void Allocator::Delete( Object& object, const ::Eldritch2::Allocator::AlignedDeallocationSemanticsTag semantics ) {
 		this->Deallocate( (object.~Object(), &object), semantics );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Object>
-	ETForceInlineHint void Allocator::Delete( Object* const object, const ::Eldritch2::Allocator::AlignedDeallocationSemantics semantics ) {
+	ETForceInlineHint void Allocator::Delete( Object* const object, const ::Eldritch2::Allocator::AlignedDeallocationSemanticsTag semantics ) {
 		if( nullptr != object ) {
 			this->Delete( *object, semantics );
 		}

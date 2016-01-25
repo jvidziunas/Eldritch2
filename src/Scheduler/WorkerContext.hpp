@@ -14,6 +14,8 @@
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
 //------------------------------------------------------------------//
+#include <atomic>
+//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Scheduler {
@@ -22,38 +24,56 @@ namespace Scheduler {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		using FinishCounter = ::std::atomic<int>;
+		using WorkFunction	= void (*)( void*, WorkerContext& );
+
+	// ---
+		
 		struct WorkItem {
-		// - TYPE PUBLISHING ---------------------------------
+			void*			argument;
+			WorkFunction	function;
+		};
 
-			using CodePointer	= void (*)( void*, WorkerContext& );
+	// ---
 
-		// ---
-
-			CodePointer	codePointer;
-			void*		data;
+		struct CompletionItem {
+			FinishCounter*	counter;
+			WorkItem		workItem;
 		};
 
 	// ---------------------------------------------------
+		
+		template <size_t workItemCount>
+		ETInlineHint void	Enqueue( FinishCounter& finishCounter, const WorkItem (&workItems)[workItemCount] );
+		void				Enqueue( FinishCounter& finishCounter, const WorkItem* workItemBegin, const WorkItem* workItemEnd );
+		void				Enqueue( FinishCounter& finishCounter, const WorkItem& workItem );
 
-		void	Enqueue( const WorkItem& workItem );
+		virtual void		WaitForCounter( FinishCounter& finishCounter, int value = 0 ) abstract;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
 		//!	Constructs this @ref WorkerContext instance.
-		WorkerContext( const WorkItem& defaultWorkItem, ::Eldritch2::Allocator& allocator );
-
+		WorkerContext( const CompletionItem& defaultItem, ::Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref WorkerContext instance.
+		WorkerContext( WorkerContext&& );
 		//!	Destroys this @ref WorkerContext instance.
 		~WorkerContext() = default;
 
 	// ---------------------------------------------------
 
-		WorkItem	PopTask();
+		CompletionItem	PopCompletionItem();
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ResizableArray<WorkItem>	_workItems;
+		::Eldritch2::ResizableArray<CompletionItem>	_completionItems;
 	};
 
 }	// namespace Scheduler
 }	// namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Scheduler/WorkerContext.inl>
+//------------------------------------------------------------------//

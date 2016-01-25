@@ -28,7 +28,7 @@ namespace Scripting {
 namespace AngelScript {
 
 	ErrorCode EngineService::ObjectGraphViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
-		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) ObjectGraphResourceView( contentLibrary, package, name, allocator ) ? Error::NONE : Error::OUT_OF_MEMORY;
+		return new(allocator, Allocator::AllocationDuration::Normal) ObjectGraphResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------

@@ -60,15 +60,15 @@ namespace Renderer {
 // ---------------------------------------------------
 
 	enum class GPUStorageFormat : ::Eldritch2::uint8 {
-		NORMALIZED			= 0,
-		sRGB_NORMALIZED,
-		SIGNED_NORMALIZED,
+		Normalized			= 0,
+		SrgbNormalized,
+		SignedNormalized,
 
-		INTEGER,
-		SIGNED_INTEGER,
+		Integer,
+		SignedInteger,
 
-		FLOAT,
-		SIGNED_FLOAT,
+		Float,
+		SignedFloat,
 
 		COUNT
 	};
@@ -76,8 +76,8 @@ namespace Renderer {
 // ---------------------------------------------------
 
 	enum FilteringFlags : ::Eldritch2::uint8 {
-		INTERPOLATE_AT_16_BIT_IF_AVAILABLE	= 1u,
-		SAMPLE_AS_SRGB						= 2u
+		InterpolateAt16BitIfAvailable	= 1u,
+		SampleAsSrgb					= 2u
 	};
 
 }	// namespace Renderer

@@ -20,7 +20,6 @@
 #include <FileSystem/SynchronousFileWriter.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Configuration/EngineService.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <FileSystem/ContentProvider.hpp>
 #include <Configuration/INIParser.hpp>
@@ -66,122 +65,28 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& initializeEngineTask, WorkerContext& executingContext, const InitializeEngineTaskVisitor ) {
-		class PostConfigurationLoadedTask : public CRTPTransientTask<PostConfigurationLoadedTask> {
-		// - TYPE PUBLISHING ---------------------------------
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& executingContext ) {
+			{	WorkerContext::FinishCounter	preConfigurationLoadedFinishCounter( 0 );
+				static_cast<EngineService*>(service)->BroadcastTaskVisitor( executingContext, preConfigurationLoadedFinishCounter, EngineService::PreConfigurationLoadedTaskVisitor() );
 
-		public:
-			class PreConfigurationLoadedTask : public Task {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			public:
-				//!	Constructs this @ref PreConfigurationLoadedTask instance.
-				ETInlineHint PreConfigurationLoadedTask( EngineService& host, PostConfigurationLoadedTask& parent, WorkerContext& executingContext, Allocator& subtaskAllocator ) : Task( parent, Scheduler::ContinuationTaskSemantics ),
-																																														   _host( host ),
-																																														   _subtaskAllocator( subtaskAllocator ) {
-					TrySchedulingOnContext( executingContext );
-				}
-
-				//!	Destroys this @ref PreConfigurationLoadedTask instance.
-				~PreConfigurationLoadedTask() = default;
-
-			// ---------------------------------------------------
-
-				ETInlineHint EngineService& GetHost() {
-					return _host;
-				}
-
-				ETInlineHint Allocator& GetSubtaskAllocator() {
-					return _subtaskAllocator;
-				}
-
-			// ---------------------------------------------------
-
-				const UTF8Char* const GetHumanReadableName() const override sealed {
-					return UTF8L("Perform Pre-Configuration Broadcast Initialization");
-				}
-
-				Task* Execute( WorkerContext& executingContext ) override sealed {
-					GetHost().BroadcastTaskVisitor( _subtaskAllocator, *this, executingContext, EngineService::PreConfigurationLoadedTaskVisitor() );
-					return nullptr;
-				}
-
-			// - DATA MEMBERS ------------------------------------
-
-			private:
-				EngineService&	_host;
-				Allocator&				_subtaskAllocator;
-			};
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			//!	Constructs this @ref PostConfigurationLoadedTask instance.
-			ETInlineHint PostConfigurationLoadedTask( EngineService& host, Task& initializeEngineTask, WorkerContext& executingContext, Allocator& subtaskAllocator ) : CRTPTransientTask<PostConfigurationLoadedTask>( initializeEngineTask, Scheduler::CodependentTaskSemantics ),
-																																										_preConfigurationLoadedTask( host, *this, executingContext, subtaskAllocator ) {
-				TrySchedulingOnContext( executingContext );
+				executingContext.WaitForCounter( preConfigurationLoadedFinishCounter );
 			}
 
-			//!	Destroys this @ref PostConfigurationLoadedTask instance.
-			~PostConfigurationLoadedTask() = default;
+			{	WorkerContext::FinishCounter	postConfigurationLoadedFinishCounter( 0 );
+				static_cast<EngineService*>(service)->BroadcastTaskVisitor( executingContext, postConfigurationLoadedFinishCounter, EngineService::PostConfigurationLoadedTaskVisitor() );
 
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Perform Post-Configuration Broadcast Initialization");
+				executingContext.WaitForCounter( postConfigurationLoadedFinishCounter );
 			}
-
-			Task* Execute( WorkerContext& executingContext ) override sealed {
-				_preConfigurationLoadedTask.GetHost().BroadcastTaskVisitor( _preConfigurationLoadedTask.GetSubtaskAllocator(), *this, executingContext, EngineService::PostConfigurationLoadedTaskVisitor() );
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			PreConfigurationLoadedTask	_preConfigurationLoadedTask;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) PostConfigurationLoadedTask( *this, initializeEngineTask, executingContext, subtaskAllocator );
+		} } );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& preConfigurationLoadInitializationTask, WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor ) {
-		class LoadSerializedConfigurationTask : public CRTPTransientTask<LoadSerializedConfigurationTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref LoadSerializedConfigurationTask instance.
-			ETInlineHint LoadSerializedConfigurationTask( EngineService& host, Task& preConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<LoadSerializedConfigurationTask>( preConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ),
-																																										_host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			//!	Destroys this @ref LoadSerializedConfigurationTask instance.
-			~LoadSerializedConfigurationTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Load/Broadcast User Configuration");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.BroadcastConfigurationToEngine();
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) LoadSerializedConfigurationTask( *this, preConfigurationLoadInitializationTask, executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->BroadcastConfigurationToEngine();
+		} } );
 	}
 
 // ---------------------------------------------------
@@ -195,15 +100,15 @@ namespace Configuration {
 		// Try to create a file writer for the temporary settings file.
 		FixedStackAllocator<64u>	temporaryAllocator( UTF8L("EngineService::DumpConfigurationToFile() Temporary Allocator") );
 
-		if( const auto getWriterResult = _contentProvider.CreateSynchronousFileWriter( temporaryAllocator, KnownContentLocation::USER_DOCUMENTS, tempConfigurationFileName, FileOverwriteBehavior::OVERWRITE_IF_FILE_EXISTS ) ) {
+		if( const auto getWriterResult = _contentProvider.CreateSynchronousFileWriter( temporaryAllocator, KnownContentLocation::UserDocuments, tempConfigurationFileName, FileOverwriteBehavior::OverwriteIfFileExists ) ) {
 			// Dump configuration
 
 			// Commit the temporary settings file by copying the temporary one over the actual.
-			_contentProvider.CopyFreeFile( KnownContentLocation::USER_DOCUMENTS, configurationFileName, tempConfigurationFileName, FileOverwriteBehavior::OVERWRITE_IF_FILE_EXISTS );
+			_contentProvider.CopyFreeFile( KnownContentLocation::UserDocuments, configurationFileName, tempConfigurationFileName, FileOverwriteBehavior::OverwriteIfFileExists );
 			// Destroy the file writer...
 			temporaryAllocator.Delete( *getWriterResult.object );
 			// ... then destroy the temporary file since we no longer need it.
-			_contentProvider.DeleteFreeFile( KnownContentLocation::USER_DOCUMENTS, tempConfigurationFileName );
+			_contentProvider.DeleteFreeFile( KnownContentLocation::UserDocuments, tempConfigurationFileName );
 		}
 	}
 
@@ -214,7 +119,7 @@ namespace Configuration {
 
 		GetLogger()( UTF8L("Loading configuration from file '%s'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
 
-		if( const auto getMappedFileResult = _contentProvider.CreateReadableMemoryMappedFile( tempAllocator, ContentProvider::KnownContentLocation::USER_DOCUMENTS, configurationFileName ) ) {
+		if( const auto getMappedFileResult = _contentProvider.CreateReadableMemoryMappedFile( tempAllocator, ContentProvider::KnownContentLocation::UserDocuments, configurationFileName ) ) {
 			ConfigurationDatabase&							database( *this );
 			ConfigurationPublishingInitializationVisitor	visitor( database );
 			ReadableMemoryMappedFile&						mappedFile( *getMappedFileResult.object );
@@ -232,7 +137,7 @@ namespace Configuration {
 
 			tempAllocator.Delete( *getMappedFileResult.object );
 		} else {
-			GetLogger( LogMessageType::ERROR )( UTF8L("Error reading configuration file: %s"), getMappedFileResult.resultCode.ToUTF8String() );
+			GetLogger( LogMessageType::Error )( UTF8L("Error reading configuration file: %s"), getMappedFileResult.resultCode.ToUTF8String() );
 		}
 	}
 

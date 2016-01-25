@@ -25,7 +25,7 @@ namespace Detail {
 // ---------------------------------------------------
 
 	template <typename ResultPointer>
-	ETForceInlineHint ResultBase<ResultPointer>::ResultBase( ResultPointer&& resultObject ) : object( ::std::move( resultObject ) ), resultCode( ::Eldritch2::Error::NONE ) {}
+	ETForceInlineHint ResultBase<ResultPointer>::ResultBase( ResultPointer&& resultObject ) : object( ::std::move( resultObject ) ), resultCode( ::Eldritch2::Error::None ) {}
 
 // ---------------------------------------------------
 

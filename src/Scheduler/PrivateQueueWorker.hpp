@@ -15,8 +15,6 @@
 #include <Scheduler/WorkerContext.hpp>
 #include <Scheduler/Thread.hpp>
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Scheduler {
@@ -27,11 +25,17 @@ namespace Scheduler {
 
 	public:
 		//!	Constructs this @ref PrivateQueueWorker instance.
-		/*!	@param[in] scheduler The @ref HostScheduler instance that will own the new @ref PrivateQueueWorker.
+		/*!	@param[in] defaultWorkItem Work item that will be run when no additional tasks are available to the context.
 			@param[in] allocator The @ref Allocator the @ref PrivateQueueWorker will use to perform internal allocations.
 			*/
-		PrivateQueueWorker( HostScheduler& scheduler, ::Eldritch2::Allocator& allocator );
+		PrivateQueueWorker( const WorkItem& defaultWorkItem, ::Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref PrivateQueueWorker instance.
+		PrivateQueueWorker( const PrivateQueueWorker& ) = delete;
+	protected:
+		//!	Constructs this @ref PrivateQueueWorker instance.
+		PrivateQueueWorker( PrivateQueueWorker&& );
 
+	public:
 		~PrivateQueueWorker() = default;
 
 	// ---------------------------------------------------
@@ -40,18 +44,26 @@ namespace Scheduler {
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	Run() override sealed;
+		void	Run() override;
 
-		void					RequestGracefulShutdown() override;
+		void	RequestGracefulShutdown() override;
+
+	// ---------------------------------------------------
+
+		virtual void	OnBegin();
+
+		virtual void	OnTerminate();
 
 	// ---------------------------------------------------
 
 	protected:
 		ETInlineHint bool	TryBeginWorkSharingWithThief( PrivateQueueWorker& thief );
 
-		void				AcquireReceiverInitiatedStolenTask( HostScheduler& scheduler );
+		virtual void		CompleteWorkSharingRequest( PrivateQueueWorker& thief );
 
-		void				TryCompleteWorkSharingRequest();
+	// ---------------------------------------------------
+
+		void	AcquireReceiverInitiatedStolenTask( HostScheduler& scheduler );
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -64,7 +76,7 @@ namespace Scheduler {
 
 	// ---
 
-		enum class ExecutionBehavior : uint32 {
+		enum class ExecutionBehavior : ::Eldritch2::uint32 {
 			TERMINATE,
 			CONTINUE
 		};

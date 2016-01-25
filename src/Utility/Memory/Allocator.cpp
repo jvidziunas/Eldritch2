@@ -30,7 +30,7 @@ using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 
-	const Allocator::AlignedDeallocationSemantics AlignedDeallocationSemantics;
+	const Allocator::AlignedDeallocationSemanticsTag AlignedDeallocationSemantics;
 
 // ---------------------------------------------------
 
@@ -63,8 +63,8 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	void Allocator::Deallocate( void* address, AlignedDeallocationSemantics ) {
-		return this->Deallocate( GetAllocationPointerFromAlignedUserPointer( address ) );
+	void Allocator::Deallocate( void* address, const AlignedDeallocationSemanticsTag ) {
+		return Deallocate( GetAllocationPointerFromAlignedUserPointer( address ) );
 	}
 
 // ---------------------------------------------------

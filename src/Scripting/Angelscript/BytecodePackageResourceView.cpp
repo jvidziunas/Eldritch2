@@ -67,7 +67,7 @@ namespace AngelScript {
 
 		Reader	reader( bytes );
 
-		return (::asSUCCESS == _module->LoadByteCode( &reader )) ? BindToModule( *_module, reader.remainingData ) : Error::INVALID_PARAMETER;
+		return (::asSUCCESS == _module->LoadByteCode( &reader )) ? BindToModule( *_module, reader.remainingData ) : Error::InvalidParameter;
 	}
 
 }	// namespace AngelScript

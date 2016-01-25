@@ -19,8 +19,8 @@
 #include <Utility/Memory/Win32HeapAllocator.hpp>
 #include <FileSystem/Win32/ContentProvider.hpp>
 #include <Utility/Win32ApplicationHelpers.hpp>
+#include <Scheduler/Win32/FiberScheduler.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
-#include <Scheduler/Win32/TaskScheduler.hpp>
 #include <System/Win32/SystemInterface.hpp>
 #include <Configuration/EngineService.hpp>
 #include <Sound/XAudio2/EngineService.hpp>
@@ -51,7 +51,7 @@ namespace {
 
 	class Application : public Win32GlobalHeapAllocator,
 						public System::Win32::SystemInterface,
-						public Scheduler::Win32::TaskScheduler,
+						public Scheduler::Win32::FiberScheduler,
 						public FileSystem::Win32::ContentProvider,
 						public Foundation::GameEngine {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -59,7 +59,7 @@ namespace {
 	public:
 		//!	Constructs this @ref Application instance.
 		Application() : Win32GlobalHeapAllocator( UTF8L("Root Allocator") ),
-						Scheduler::Win32::TaskScheduler( GetSystemInterface(), GetGlobalAllocator() ),
+						Scheduler::Win32::FiberScheduler( GetSystemInterface(), GetGlobalAllocator() ),
 						FileSystem::Win32::ContentProvider( GetSystemInterface() ),
 						Foundation::GameEngine( GetSystemInterface(), GetScheduler(), GetContentProvider(), GetGlobalAllocator() ),
 						_configurationService( GetGameEngine(), GetContentProvider() ),
@@ -86,8 +86,8 @@ namespace {
 			return static_cast<System::Win32::SystemInterface&>(*this);
 		}
 
-		ETInlineHint Scheduler::Win32::TaskScheduler& GetScheduler() {
-			return static_cast<Scheduler::Win32::TaskScheduler&>(*this);
+		ETInlineHint Scheduler::Win32::FiberScheduler& GetScheduler() {
+			return static_cast<Scheduler::Win32::FiberScheduler&>(*this);
 		}
 
 		ETInlineHint FileSystem::Win32::ContentProvider& GetContentProvider() {

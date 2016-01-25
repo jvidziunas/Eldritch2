@@ -22,7 +22,6 @@
 #include <Scripting/Angelscript/WorldView.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -70,7 +69,7 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( world, GetScriptEngine() ) ? Error::NONE : Error::OUT_OF_MEMORY;
+		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( world, GetScriptEngine() ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------
@@ -88,76 +87,18 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const InitializeEngineTaskVisitor ) {
-		class ExposeScriptAPITask : public CRTPTransientTask<ExposeScriptAPITask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref ExposeScriptAPITask instance.
-			ETInlineHint ExposeScriptAPITask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<ExposeScriptAPITask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~ExposeScriptAPITask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Expose Script API Task");
-			}
-
-		// ---------------------------------------------------
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.CreateScriptAPI();
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ExposeScriptAPITask( *this, visitingTask, executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->CreateScriptAPI();
+		} } );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const ServiceTickTaskVisitor ) {
-		class CollectScriptGarbageTask : public CRTPTransientTask<CollectScriptGarbageTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref CollectScriptGarbageTask instance.
-			ETInlineHint CollectScriptGarbageTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<CollectScriptGarbageTask>( visitingTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-			~CollectScriptGarbageTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Destroy Script Garbage Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.GetScriptEngine().GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) CollectScriptGarbageTask( *this, visitingTask, executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->GetScriptEngine().GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
+		} } );
 	}
 
 // ---------------------------------------------------
@@ -174,18 +115,18 @@ namespace AngelScript {
 		
 		switch( messageInfo->type ) {
 			case asMSGTYPE_ERROR: {
-				messageType = LogMessageType::ERROR;
+				messageType = LogMessageType::Error;
 				description = "error";
 				break;
 			}
 			case asMSGTYPE_WARNING: {
-				messageType = LogMessageType::WARNING;
+				messageType = LogMessageType::Warning;
 				description = "warning";
 				break;
 			}
 			case asMSGTYPE_INFORMATION:
 			default: {
-				messageType = LogMessageType::MESSAGE;
+				messageType = LogMessageType::Message;
 				description = "message";
 				break;
 			}
@@ -199,11 +140,11 @@ namespace AngelScript {
 	void EngineService::CreateScriptAPI() {
 		GetLogger()( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
 
-		if( AngelScript::EngineHandle scriptEngine { ::asCreateScriptEngine() } ) {
+		if( AngelScript::EngineHandle scriptEngine{ ::asCreateScriptEngine() } ) {
 			scriptEngine->SetMessageCallback( ::asMETHOD( EngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
 
-			{	// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
-				ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
+			// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
+			{	ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
 				
 				StringMarshal::ExposeScriptAPI( registrationVisitor );
 				Float4Marshal::ExposeScriptAPI( registrationVisitor );
@@ -222,7 +163,7 @@ namespace AngelScript {
 			// Transfer ownership.
 			_bytecodePackageFactory.SetScriptEngine( ::std::move( scriptEngine ) );
 		} else {
-			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 

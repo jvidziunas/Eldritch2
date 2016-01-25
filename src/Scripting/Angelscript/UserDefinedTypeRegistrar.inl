@@ -30,7 +30,7 @@ namespace Scripting {
 namespace AngelScript {
 namespace Detail {
 
-	const char* const	operatorNameTable[static_cast<size_t>(AngelScript::UserDefinedTypeRegistrar::BinaryOperatorClass::OPERATOR_COUNT)] = {
+	const char* const	operatorNameTable[static_cast<size_t>(AngelScript::UserDefinedTypeRegistrar::BinaryOperatorClass::COUNT)] = {
 		"opAdd",
 		"opSub",
 		"opMul",
@@ -590,7 +590,7 @@ namespace Detail {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		ETRuntimeVerificationWithMsg( BinaryOperatorClass::OPERATOR_COUNT != operatorClass, "Failed exposing script API to engine!" );
+		ETRuntimeVerificationWithMsg( BinaryOperatorClass::COUNT != operatorClass, "Failed exposing script API to engine!" );
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, angelscriptOperatorNameTable[operatorClass] );
 
@@ -610,7 +610,7 @@ namespace Detail {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		ETRuntimeVerificationWithMsg( BinaryOperatorClass::OPERATOR_COUNT != operatorClass, "Failed exposing script API to engine!" );
+		ETRuntimeVerificationWithMsg( BinaryOperatorClass::COUNT != operatorClass, "Failed exposing script API to engine!" );
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, angelscriptOperatorNameTable[operatorClass], true );
 
@@ -630,7 +630,7 @@ namespace Detail {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		ETRuntimeVerificationWithMsg( BinaryOperatorClass::OPERATOR_COUNT != operatorClass, "Failed exposing script API to engine!" );
+		ETRuntimeVerificationWithMsg( BinaryOperatorClass::COUNT != operatorClass, "Failed exposing script API to engine!" );
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, Detail::operatorNameTable[static_cast<size_t>(operatorClass)] );
 
@@ -650,7 +650,7 @@ namespace Detail {
 		basic_array_sink<char>	sink( signature );
 		stream<decltype(sink)>	stream( sink );
 
-		ETRuntimeVerificationWithMsg( BinaryOperatorClass::OPERATOR_COUNT != operatorClass, "Failed exposing script API to engine!" );
+		ETRuntimeVerificationWithMsg( BinaryOperatorClass::COUNT != operatorClass, "Failed exposing script API to engine!" );
 
 		Detail::FunctionDeclarationFormatter<Return, RightHandOperand>::Format( stream, Detail::operatorNameTable[static_cast<size_t>(operatorClass)] );
 
@@ -770,7 +770,7 @@ namespace Detail {
 
 	template <typename Native>
 	::Eldritch2::Result<UserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>> UserDefinedTypeRegistrar::RegisterUserDefinedReferenceType( Allocator& builderAllocator ) {
-		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
+		using AllocationOption	= ::Eldritch2::Allocator::AllocationDuration;
 		using BuilderType		= UserDefinedTypeRegistrar::ReferenceTypeBuilder<Native>;
 
 	// ---
@@ -782,11 +782,11 @@ namespace Detail {
 		result = _scriptEngine.RegisterObjectBehaviour( UserDefinedTypeRegistrar::TypeStringGenerator<Native>::GetTypeName(), ::asBEHAVE_RELEASE, "void f()", ::asMETHODPR( Native, ReleaseReference, () const, void ), ::asCALL_THISCALL );
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		if( auto builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
+		if( auto builder = new(builderAllocator, AllocationOption::Temporary) BuilderType( _scriptEngine ) ) {
 			return { ::std::move( builder ) };
 		}
 
-		return { Error::OUT_OF_MEMORY };
+		return { Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------
@@ -802,7 +802,7 @@ namespace Detail {
 			}
 		};
 
-		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
+		using AllocationOption	= ::Eldritch2::Allocator::AllocationDuration;
 		using BuilderType		= UserDefinedTypeRegistrar::ValueTypeBuilder<Native>;
 
 	// ---
@@ -813,29 +813,29 @@ namespace Detail {
 
 		ETRuntimeVerificationWithMsg( ::asSUCCESS <= result, "Failed exposing script API to engine!" );
 
-		if( auto builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) BuilderType( _scriptEngine ) ) {
+		if( auto builder = new(builderAllocator, AllocationOption::Temporary) BuilderType( _scriptEngine ) ) {
 			return { ::std::move( builder ) };
 		}
 
-		return { Error::OUT_OF_MEMORY };
+		return { Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------
 
 	template <typename Enum>
 	::Eldritch2::Result<UserDefinedTypeRegistrar::EnumTypeBuilder<Enum>> UserDefinedTypeRegistrar::RegisterUserDefinedEnumType( ::Eldritch2::Allocator& builderAllocator ) {
-		using AllocationOption	= ::Eldritch2::Allocator::AllocationOption;
+		using AllocationOption	= ::Eldritch2::Allocator::AllocationDuration;
 		using Builder			= UserDefinedTypeRegistrar::EnumTypeBuilder<Enum>;
 
 	// ---
 
 		EnsureEnumTypeDeclared<Enum>();
 
-		if( auto builder = new(builderAllocator, AllocationOption::TEMPORARY_ALLOCATION) Builder( _scriptEngine ) ) {
+		if( auto builder = new(builderAllocator, AllocationOption::Temporary) Builder( _scriptEngine ) ) {
 			return { ::std::move( builder ) };
 		}
 
-		return { Error::OUT_OF_MEMORY };
+		return { Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------

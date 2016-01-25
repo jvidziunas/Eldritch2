@@ -15,10 +15,9 @@
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
 #include <Networking/Steamworks/EngineService.hpp>
 #include <Networking/Steamworks/WorldView.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
 #include <Utility/Concurrency/Lock.hpp>
-#include <Scheduler/TaskScheduler.hpp>
 #include <Utility/CountedResult.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/Result.hpp>
@@ -58,7 +57,7 @@ namespace Steamworks {
 
 	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
 															   _allocator( GetEngineAllocator(), UTF8L("Steamworks Networking Service Root Allocator") ),
-															   _networkMutex( owningEngine.GetTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
+															   _networkMutex( owningEngine.GetThreadScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
 															   _steamPort( 6690u ),
 															   _gamePort( 6691u ),
 															   _queryPort( 6692u ),
@@ -91,7 +90,7 @@ namespace Steamworks {
 // ---------------------------------------------------
 
 	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) WorldView( *this, world ) ? Error::NONE : Error::OUT_OF_MEMORY;
+		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( *this, world ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------
@@ -126,72 +125,18 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& postConfigurationLoadInitializationTask, WorkerContext& executingContext, const PostConfigurationLoadedTaskVisitor ) {
-		class InitializeSteamworksTask : public CRTPTransientTask<InitializeSteamworksTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref InitializeSteamworksTask instance.
-			ETInlineHint InitializeSteamworksTask( EngineService& host, Task& postConfigurationLoadInitializationTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeSteamworksTask>( postConfigurationLoadInitializationTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Initialize Steamworks Task");
-			}
-
-		// ---------------------------------------------------
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.InitiateSteamConnection();
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) InitializeSteamworksTask( *this, postConfigurationLoadInitializationTask, executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->InitiateSteamConnection();
+		} } );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& serviceTickTask, WorkerContext& executingContext, const ServiceTickTaskVisitor ) {
-		class ProcessCallbacksTask : public CRTPTransientTask<ProcessCallbacksTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref ProcessCallbacksTask instance.
-			ETInlineHint ProcessCallbacksTask( EngineService& host, Task& serviceTickTask, WorkerContext& executingContext ) : CRTPTransientTask<ProcessCallbacksTask>( serviceTickTask, Scheduler::CodependentTaskSemantics ), _host( host ) {
-				TrySchedulingOnContext( executingContext );
-			}
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Steamworks Callback Processing Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.ProcessAndDispatchCallbacks();
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) ProcessCallbacksTask( *this, serviceTickTask, executingContext );
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->ProcessAndDispatchCallbacks();
+		} } );
 	}
 
 // ---------------------------------------------------
@@ -206,7 +151,7 @@ namespace Steamworks {
 		if( ::SteamAPI_Init() ) {
 			GetLogger()( UTF8L("Initial Steam connection established.") ET_UTF8_NEWLINE_LITERAL );
 		} else {
-			GetLogger( LogMessageType::ERROR )( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 
@@ -216,7 +161,7 @@ namespace Steamworks {
 		::SteamAPI_RunCallbacks();
 		::SteamGameServer_RunCallbacks();
 
-		return Error::NONE;
+		return Error::None;
 	}
 
 }	// namespace Steamworks

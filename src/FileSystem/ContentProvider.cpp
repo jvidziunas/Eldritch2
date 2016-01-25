@@ -24,7 +24,7 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	ErrorCode ContentProvider::RegisterConfigurableVariables( ConfigurationDatabase& /*database*/ ) {
-		return Error::NONE;
+		return Error::None;
 	}
 
 }	// namespace Foundation

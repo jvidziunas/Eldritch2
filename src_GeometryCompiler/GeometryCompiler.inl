@@ -22,6 +22,12 @@
 ET_LINK_LIBRARY( "libfbxsdk-md.lib" )
 //------------------------------------------------------------------//
 
+namespace {
+
+
+
+}	// anonymous namespace
+
 namespace Eldritch2 {
 namespace Tools {
 
@@ -52,6 +58,10 @@ namespace Tools {
 
 	// ---
 
+		visitor.AddTypedArgument<bool>(	UTF8L("--skipTextureCoordinates"),	UTF8L("-t"),	::std::bind( &GeometryCompiler::SetSkipTextureCoordinates, this, _1 ) );
+		visitor.AddTypedArgument<bool>(	UTF8L("--skipOrientation"),			UTF8L("-o"),	::std::bind( &GeometryCompiler::SetSkipOrientation, this, _1 ) );
+		visitor.AddArgument(			UTF8L("--password" ),				UTF8L("-p"),	::std::bind( &GeometryCompiler::SetPassword, this, _1, _2 ) );
+
 		visitor.AddInputFileHandler( ::std::bind( &GeometryCompiler::AddInputFile, this, _1, _2 ) );
 	}
 
@@ -66,6 +76,7 @@ namespace Tools {
 			return -1;
 		}
 
+		// Set the password for protected files, if applicable.
 		if( _password ) {
 			settings->SetStringProp( IMP_FBX_PASSWORD, _password.GetCharacterArray() );
 			settings->SetBoolProp( IMP_FBX_PASSWORD_ENABLE, true );
@@ -90,8 +101,35 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
+	int GeometryCompiler<GlobalAllocator, FileAccessorFactory>::SetPassword( const ::Eldritch2::UTF8Char* const password, const ::Eldritch2::UTF8Char* const passwordEnd ) {
+		_password.Assign( password, passwordEnd );
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
 	int	GeometryCompiler<GlobalAllocator, FileAccessorFactory>::AddInputFile( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd ) {
 		_inputNames.PushBack( { name, nameEnd, { GetAllocator(), UTF8L("Input File Name Allocator") } } );
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	int GeometryCompiler<GlobalAllocator, FileAccessorFactory>::SetSkipTextureCoordinates( const bool value ) {
+		_skipTextureCoordinates = value;
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	int GeometryCompiler<GlobalAllocator, FileAccessorFactory>::SetSkipOrientation( const bool value ) {
+		_skipOrientation = value;
 
 		return 0;
 	}

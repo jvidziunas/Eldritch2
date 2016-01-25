@@ -23,21 +23,21 @@ namespace {
 
 	enum : ::DWORD {
 		// Maximum size of an atomic read operation, specified in bytes.
-		MAXIMUM_READ_SIZE_IN_BYTES	= ~static_cast<::DWORD>(0u)
+		MaximumReadSizeInBytes	= ~static_cast<::DWORD>(0u)
 	};
 
 // ---
 
 	enum : size_t {
 		// Maximum size of an atomic read operation, specified in bytes and expanded into a size_t.
-		EXPANDED_MAXIMUM_READ_SIZE_IN_BYTES		= static_cast<size_t>(MAXIMUM_READ_SIZE_IN_BYTES)
+		ExpandedMaximumReadSizeInBytes		= static_cast<size_t>(MaximumReadSizeInBytes)
 	};
 
 // ---
 
 	enum : ::BOOL {
-		BLOCK_UNTIL_COMPLETE	= TRUE,
-		RETURN_IF_NOT_COMPLETE	= FALSE
+		BlockUntilComplete	= TRUE,
+		ReturnIfNotComplete	= FALSE
 	};
 
 // ---------------------------------------------------
@@ -84,10 +84,9 @@ namespace Win32 {
 		_cancellationFlag.store( 0u, memory_order_release );
 
 		// Loop through the large, size_t sized write operation, breaking it into chunks that can be accomplished with a single ReadFile call.
-		for( ::DWORD readAmountInBytes; (0u == _cancellationFlag.load( memory_order_acquire )) & ( lengthToReadInBytes > EXPANDED_MAXIMUM_READ_SIZE_IN_BYTES ); lengthToReadInBytes -= readAmountInBytes ) {
+		for( ::DWORD readAmountInBytes; (0u == _cancellationFlag.load( memory_order_acquire )) & ( lengthToReadInBytes > ExpandedMaximumReadSizeInBytes ); lengthToReadInBytes -= readAmountInBytes ) {
 			// Ensure the *true* async read is as big as possible, defer any of the final fixup to the async call.
-			const ::DWORD amountToReadInBytes( static_cast<::DWORD>( Min<size_t>( EXPANDED_MAXIMUM_READ_SIZE_IN_BYTES,
-																				  lengthToReadInBytes - EXPANDED_MAXIMUM_READ_SIZE_IN_BYTES ) ) );
+			const ::DWORD	amountToReadInBytes( static_cast<::DWORD>(Min<size_t>( ExpandedMaximumReadSizeInBytes, lengthToReadInBytes - ExpandedMaximumReadSizeInBytes )) );
 			// While slightly cumbersome, we need to use asynchronous reads and then block in order for cancellation to work.
 			::ReadFile( _fileHandle, destinationBuffer, amountToReadInBytes, nullptr, &_overlapped );
 
@@ -97,16 +96,16 @@ namespace Win32 {
 			_additionalReadBytes += readAmountInBytes;
 
 			// ... and advance the read pointer to pull in new data.
-			destinationBuffer = static_cast<void*>( static_cast<char*>( destinationBuffer ) + readAmountInBytes );
+			destinationBuffer = static_cast<char*>(destinationBuffer) + readAmountInBytes;
 		}
 
 		// Finally, finish reading any remaining bytes from the file. If the total size of the read operation was representable within the range of a DWORD, we should actually
 		// end up here directly, only ever issuing one read command.
 		return FALSE == ::ReadFile( _fileHandle,
 									destinationBuffer,
-									static_cast<::DWORD>( lengthToReadInBytes ),
+									static_cast<::DWORD>(lengthToReadInBytes),
 									nullptr,
-									&_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Error::UNSPECIFIED : Error::NONE;
+									&_overlapped ) && IsFatalErrorCondition( ::GetLastError() ) ? Error::Unspecified : Error::None;
 	}
 
 // ---------------------------------------------------
@@ -115,17 +114,16 @@ namespace Win32 {
 		::DWORD	readBytes( 0u );
 
 		// GetOverlappedResult specifically returns FALSE if the operation is incomplete, otherwise the result can be anything.
-		return FALSE != ::GetOverlappedResult( _fileHandle, &_overlapped, &readBytes, RETURN_IF_NOT_COMPLETE );
+		return FALSE != ::GetOverlappedResult( _fileHandle, &_overlapped, &readBytes, ReturnIfNotComplete );
 	}
 
 // ---------------------------------------------------
 
 	AsynchronousFileReader::BlockingResult AsynchronousFileReader::BlockUntilReadComplete() {
 		::DWORD			readBytes( 0u );
-		const ::BOOL	overlappedResult( ::GetOverlappedResult( _fileHandle, &_overlapped, &readBytes, BLOCK_UNTIL_COMPLETE ) );
+		const ::BOOL	overlappedResult( ::GetOverlappedResult( _fileHandle, &_overlapped, &readBytes, BlockUntilComplete ) );
 
-		return AsynchronousFileReader::BlockingResult( ( ( FALSE == overlappedResult ) | IsFatalErrorCondition( ::GetLastError() ) ) ? Error::UNSPECIFIED : Error::NONE,
-													   _additionalReadBytes + readBytes );
+		return AsynchronousFileReader::BlockingResult( ( (FALSE == overlappedResult) | IsFatalErrorCondition( ::GetLastError() ) ) ? Error::Unspecified : Error::None, _additionalReadBytes + readBytes );
 	}
 
 // ---------------------------------------------------

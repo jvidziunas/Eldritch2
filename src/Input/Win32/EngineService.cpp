@@ -15,10 +15,10 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Scheduler/CRTPTransientTask.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Input/Win32/EngineService.hpp>
-#include <Scheduler/TaskScheduler.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
+#include <Scheduler/WorkerContext.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -74,8 +74,8 @@ namespace Win32 {
 
 	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
 															   _allocator( { GetEngineAllocator(), UTF8L("Win32 Input Service Allocator") } ),
-															   _keyboardHook( ::SetWindowsHookEx( WH_KEYBOARD_LL, &WinKeyEatHook, ::GetModuleHandle( nullptr ), 0 ) ),
-															   _deviceDirectoryMutex( GetEngineTaskScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
+															   _keyboardHook( ::SetWindowsHookExW( WH_KEYBOARD_LL, &WinKeyEatHook, ::GetModuleHandleW( nullptr ), 0 ) ),
+															   _deviceDirectoryMutex( GetEngineThreadScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
 															   _deviceDirectory( 0u, {}, { _allocator, UTF8L( "Win32 Raw Input Device Directory Allocator" ) } ),
 															   _pollingThread( *this ) {
 		ETRuntimeAssert( nullptr != _deviceDirectoryMutex );
@@ -111,52 +111,22 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( Allocator& subtaskAllocator, Task& visitingTask, WorkerContext& executingContext, const PreConfigurationLoadedTaskVisitor ) {
-		class InitializeRawInputTask : public CRTPTransientTask<InitializeRawInputTask> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor ) {
+		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
+			static_cast<EngineService*>(service)->GetLogger()( UTF8L("Initializing input service.") ET_UTF8_NEWLINE_LITERAL );
 
-		public:
-			//!	Constructs this @ref InitializeRawInputTask instance.
-			ETInlineHint InitializeRawInputTask( EngineService& host, Task& visitingTask, WorkerContext& executingContext ) : CRTPTransientTask<InitializeRawInputTask>( visitingTask, Scheduler::CodependentTaskSemantics ),
-																																  _host( host ) {
-				TrySchedulingOnContext( executingContext );
+			if( const auto result = static_cast<EngineService*>(service)->LaunchThread( static_cast<EngineService*>(service)->_pollingThread ) ) {
+				static_cast<EngineService*>(service)->GetLogger()( UTF8L("Initialized event polling thread.") ET_UTF8_NEWLINE_LITERAL );
+			} else {
+				static_cast<EngineService*>(service)->GetLogger( LogMessageType::Error )( UTF8L("Error initializing input service: %s!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
 			}
-
-			~InitializeRawInputTask() = default;
-
-		// ---------------------------------------------------
-
-			const UTF8Char* const GetHumanReadableName() const override sealed {
-				return UTF8L("Initialize Win32 Raw Input Task");
-			}
-
-			Task* Execute( WorkerContext& /*executingContext*/ ) override sealed {
-				_host.GetLogger()( UTF8L("Initializing input service.") ET_UTF8_NEWLINE_LITERAL );
-
-				if( const auto result = _host.LaunchThread( _host._pollingThread ) ) {
-					_host.GetLogger()( UTF8L("Initialized event polling thread.") ET_UTF8_NEWLINE_LITERAL );
-				} else {
-					_host.GetLogger( LogMessageType::ERROR )( UTF8L("Error initializing input service: %s!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
-				}
-
-				return nullptr;
-			}
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			EngineService&	_host;
-		};
-
-	// ---
-		
-		new(subtaskAllocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) InitializeRawInputTask( *this, visitingTask, executingContext );
+		} } );
 	}
 
 // ---------------------------------------------------
 
 	void EngineService::EnumerateAvailableRawInputDevices() {
-		ScopedLock	_( *_deviceDirectoryMutex );
+		ScopedLock	deviceDirectoryLock( *_deviceDirectoryMutex );
 		::UINT		deviceCount( 0u );
 
 		// Ask Windows how many raw input devices it knows about.
@@ -173,11 +143,11 @@ namespace Win32 {
 					HandleDeviceAttach( device.hDevice );
 				}
 			} else {
-				GetLogger( LogMessageType::ERROR )( UTF8L("Input service: Failed to associate input devices!") ET_UTF8_NEWLINE_LITERAL );
+				GetLogger( LogMessageType::Error )( UTF8L("Input service: Failed to associate input devices!") ET_UTF8_NEWLINE_LITERAL );
 			}
 
 		} else {
-			GetLogger( LogMessageType::ERROR )( UTF8L("Input service: Failed to enumerate raw input devices!") ET_UTF8_NEWLINE_LITERAL );
+			GetLogger( LogMessageType::Error )( UTF8L("Input service: Failed to enumerate raw input devices!") ET_UTF8_NEWLINE_LITERAL );
 		}
 	}
 
@@ -191,6 +161,10 @@ namespace Win32 {
 				::GetRawInputDeviceInfoW( deviceHandle, RIDI_DEVICEINFO, this, &infoSize );
 				::GetRawInputDeviceInfoW( deviceHandle, RIDI_DEVICENAME, name, &nameLength );
 			}
+
+			~RawInputDeviceInfo() = default;
+
+		// ---------------------------------------------------
 
 			bool IsVirtualOrUnavailable() const {
 				if( INVALID_HANDLE_VALUE == ::CreateFileW( name, 0u, (FILE_SHARE_READ | FILE_SHARE_WRITE), nullptr, OPEN_EXISTING, 0u, nullptr ) ) {
@@ -218,7 +192,7 @@ namespace Win32 {
 		switch( deviceInfo.dwType ) {
 			case RIM_TYPEMOUSE: {
 				GetLogger()( UTF8L("Attached mouse (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
-				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) EngineService::Mouse( deviceHandle, *this );
+				new(_allocator, Allocator::AllocationDuration::Normal) EngineService::Mouse( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEMOUSE
 
@@ -226,14 +200,14 @@ namespace Win32 {
 
 			case RIM_TYPEKEYBOARD: {
 				GetLogger()( UTF8L("Attached keyboard (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle));
-				new(_allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) EngineService::Keyboard( deviceHandle, *this );
+				new(_allocator, Allocator::AllocationDuration::Normal) EngineService::Keyboard( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEKEYBOARD
 
 		// ---
 
 			default: {
-				GetLogger( LogMessageType::ERROR )( UTF8L("Received device attach notification for unknown HID type! (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
+				GetLogger( LogMessageType::Error )( UTF8L("Received device attach notification for unknown HID type! (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
 				break;
 			}	// default
 		};	// switch( deviceInfo.dwType )

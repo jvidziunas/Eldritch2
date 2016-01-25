@@ -49,7 +49,7 @@ namespace Direct3D11 {
 
 	// ---
 
-		return new(allocator, Allocator::AllocationOption::PERMANENT_ALLOCATION) ShaderResourceResourceView( contentLibrary, package, name, allocator ) ? Error::NONE : Error::OUT_OF_MEMORY;
+		return new(allocator, Allocator::AllocationDuration::Normal) ShaderResourceResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------

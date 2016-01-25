@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Utility/Concurrency/UserSemaphore.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Scheduler/TaskScheduler.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/LoaderThread.hpp>
 #include <Utility/Result.hpp>
@@ -29,9 +29,9 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	LoaderThread::LoaderThread( TaskScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Loader Thread Allocator") ),
-																				   _loadSemaphore( scheduler.AllocateSemaphore( _allocator, 0u, 128u ).object, { _allocator } ),
-																				   _executionBehavior( ExecutionBehavior::CONTINUE ) {}
+	LoaderThread::LoaderThread( ThreadScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Loader Thread Allocator") ),
+																					 _loadSemaphore( scheduler.AllocateSemaphore( _allocator, 0u, 128u ).object, { _allocator } ),
+																					 _executionBehavior( ExecutionBehavior::Continue ) {}
 
 // ---------------------------------------------------
 
@@ -46,7 +46,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	void LoaderThread::RequestGracefulShutdown() {
-		_executionBehavior.store( ExecutionBehavior::TERMINATE, ::std::memory_order_release );
+		_executionBehavior.store( ExecutionBehavior::Terminate, ::std::memory_order_release );
 
 		// Mark the semaphore so the thread knows to wake up.
 		if( _loadSemaphore ) {
@@ -57,24 +57,20 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ErrorCode LoaderThread::BeginLoad( ContentPackage& package ) {
-		if( InstancePointer<PackageDeserializationContext> context { new(_allocator, Allocator::AllocationOption::TEMPORARY_ALLOCATION) PackageDeserializationContext( { package } ), { _allocator } } ) {
-			const auto	openFileResult( context->OpenFile() );
-			
-			if( openFileResult ) {
-				_initializationQueue.PushBack( *context.release() );
+		InstancePointer<PackageDeserializationContext> context( new(_allocator, Allocator::AllocationDuration::Temporary) PackageDeserializationContext( { package } ), { _allocator } );
 
-				// Mark the semaphore so the thread knows to wake up.
-				if( _loadSemaphore ) {
-					_loadSemaphore->IncreaseCount();
-				}
-
-				return Error::NONE;
-			}
-
-			return openFileResult;
+		if( nullptr == context ) {
+			return Error::OutOfMemory;
 		}
 
-		return Error::OUT_OF_MEMORY;
+		_initializationQueue.PushBack( *context.release() );
+
+		// Mark the semaphore so the thread knows to wake up.
+		if( _loadSemaphore ) {
+			_loadSemaphore->IncreaseCount();
+		}
+
+		return Error::None;
 	}
 
 // ---------------------------------------------------
@@ -85,7 +81,7 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ErrorCode LoaderThread::Run() {
+	void LoaderThread::Run() {
 		using ResidencyState = ContentPackage::ResidencyState;
 
 	// ---
@@ -94,10 +90,10 @@ namespace FileSystem {
 		auto&	loadList( _outstandingLoadList );
 
 		if( !_loadSemaphore ) {
-			return Error::INVALID_OBJECT_STATE;
+			return;
 		}
 
-		while( (_loadSemaphore->Acquire(), ExecutionBehavior::CONTINUE == _executionBehavior.load( ::std::memory_order_acquire )) ) {
+		while( (_loadSemaphore->Acquire(), ExecutionBehavior::Continue == _executionBehavior.load( ::std::memory_order_consume )) ) {
 			// Initialize any new deserialization, and add to the 
 			_initializationQueue.PopFrontAndDispose( [&threadAllocator, &loadList] ( PackageDeserializationContext& context ) {
 				if( context.DeserializeDependencies() ) {
@@ -113,17 +109,17 @@ namespace FileSystem {
 
 				for( const auto& referencedPackage : context.GetBoundPackage().GetDependencies() ) {
 					switch( referencedPackage->GetResidencyState() ) {
-						case ResidencyState::FAILED: {
+						case ResidencyState::Failed: {
 							// We have a load failure. Early out by returning true.
 							return true;
-						}	// case ResidencyState::FAILED
+						}	// case ResidencyState::Failed
 
-						case ResidencyState::LOADING: {
+						case ResidencyState::Loading: {
 							// This dependency is unloaded. Mark this, but continue looping through the other dependencies so we can catch/propagate actual
 							// failures instead of silently stopping on the first unloaded dependency we encounter.
 							dependenciesLoaded = false;
 							continue;
-						}	// case ResidencyState::LOADING
+						}	// case ResidencyState::Loading
 					};	// switch( referencedPackage->GetResidencyState() )
 				}
 
@@ -133,8 +129,6 @@ namespace FileSystem {
 				threadAllocator.Delete( context );
 			} );
 		}
-
-		return Error::NONE;
 	}
 
 }	// namespace FileSystem
