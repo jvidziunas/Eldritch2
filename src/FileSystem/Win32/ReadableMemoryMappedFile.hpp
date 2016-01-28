@@ -36,7 +36,7 @@ namespace Win32 {
 
 	// ---------------------------------------------------
 
-		void	PrefetchRangeForRead( const ::Eldritch2::Range<const char*> memoryRange ) const override;
+		void	PrefetchRange( const ::Eldritch2::Range<const char*> memoryRange ) const override;
 
 	// ---------------------------------------------------
 

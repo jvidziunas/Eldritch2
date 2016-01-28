@@ -19,6 +19,7 @@
 #include <Utility/ErrorCode.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
 #if( ET_COMPILER_IS_MSVC )
 //	Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
 #	pragma warning( push )
@@ -89,30 +90,37 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PreScriptTickTaskVisitor ) {
+	void WorldView::OnPreScriptTick( WorkerContext& executingContext ) {
+		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Pull remote state", 0xBBBBBB );
+
+		::CSteamID	senderID;
+		uint32		packetSize( 0u );
+		char		packet[1200u];
+
 		if( nullptr == _serverNetworking ) {
 			return;
 		}
 
-		executingContext.Enqueue( finishCounter, { this, [] ( void* view, WorkerContext& /*executingContext*/ ) {
-			::CSteamID	senderID;
-			uint32		packetSize( 0u );
-			auto&		networking( *static_cast<WorldView*>(view)->_serverNetworking );
-			char		packet[1200u];
-
-			while( networking.ReadP2PPacket( packet, sizeof(packet), &packetSize, &senderID ) ) {
-				// Dispatch received packet.
-			}
-		} } );
+		while( _serverNetworking->ReadP2PPacket( packet, sizeof(packet), &packetSize, &senderID ) ) {
+			// Dispatch received packet.
+		}
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostScriptTickTaskVisitor ) {}
+	void WorldView::OnPostScriptTick( WorkerContext& executingContext ) {
+		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Push local state", 0xBBCCBB );
+
+		if( nullptr == _serverNetworking ) {
+			return;
+		}
+	}
 
 // ---------------------------------------------------
 
 	ErrorCode WorldView::ConnectToSteam( ::ISteamClient* const steamClient ) {
+		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Initiate world Steam connection", 0xCCCCFF );
+
 		::HSteamPipe	pipe;
 		::HSteamUser	serverUser( steamClient->CreateLocalUser( &pipe, EAccountType::k_EAccountTypeGameServer ) );
 

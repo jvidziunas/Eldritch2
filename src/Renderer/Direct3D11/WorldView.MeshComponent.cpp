@@ -43,7 +43,7 @@ namespace Direct3D11 {
 		struct FunctionHelper {
 			static MeshComponent* ETScriptAPICall Factory0( const StringMarshal& meshName, Armature* armature ) {
 				auto&		worldView( GetActiveWorldView() );
-				const auto&	contentLibrary( worldView.GetEngineContentLibrary() );
+				const auto&	contentLibrary( worldView.GetContentLibrary() );
 
 				return new(worldView._meshPool, Allocator::AllocationDuration::Normal) MeshComponent( contentLibrary.ResolveViewByName( meshName.GetCharacterArray(), worldView._defaultMesh ), *armature );
 			}

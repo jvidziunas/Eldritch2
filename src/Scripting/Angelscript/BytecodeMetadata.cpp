@@ -30,7 +30,6 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-
 	ErrorCode BytecodeMetadata::FunctionMetadata::Bind( ::asIScriptFunction& scriptFunction, const FlatBuffers::FunctionMetadata& /*metadata*/ ) {
 		SetMetadata( scriptFunction, *this );
 		return Error::None;

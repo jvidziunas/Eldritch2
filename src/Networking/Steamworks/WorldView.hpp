@@ -50,8 +50,9 @@ namespace Steamworks {
 	// ---------------------------------------------------
 
 	protected:
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreScriptTickTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostScriptTickTaskVisitor ) override sealed;
+		void	OnPreScriptTick( Scheduler::WorkerContext& executingContext ) override sealed;
+
+		void	OnPostScriptTick( Scheduler::WorkerContext& executingContext ) override sealed;
 
 	// ---------------------------------------------------
 

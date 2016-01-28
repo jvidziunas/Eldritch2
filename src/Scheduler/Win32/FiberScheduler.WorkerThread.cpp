@@ -55,11 +55,6 @@ namespace Win32 {
 	FiberScheduler::WorkerThread::~WorkerThread() {
 		::DeleteFiber( _counterWaitFiber );
 		::DeleteFiber( _switchFiber );
-
-		while( _pooledFibers ) {
-			::DeleteFiber( _pooledFibers.Back() );
-			_pooledFibers.PopBack();
-		}
 	}
 
 // ---------------------------------------------------
@@ -86,9 +81,9 @@ namespace Win32 {
 
 	void FiberScheduler::WorkerThread::Run() {
 		enum : SIZE_T {
-			SupportFiberStackSizeInBytes	= (32768u * 4u),
+			SupportFiberStackSizeInBytes	= 32768u,
 			FiberStackSizeInBytes			= 524288u,
-			FiberCount						= 15u
+			FiberCount						= 16u
 		};
 
 	// ---
@@ -122,9 +117,16 @@ namespace Win32 {
 			}, this ) );
 		}
 
-		_initialFiber = ::ConvertThreadToFiberEx( this, FIBER_FLAG_FLOAT_SWITCH );
+		_initialFiber	= ::ConvertThreadToFiberEx( this, FIBER_FLAG_FLOAT_SWITCH );
 
-		FiberEntryPoint();
+		for( auto fiber( _pooledFibers.Back() ); !_pooledFibers.IsEmpty(); fiber = _pooledFibers.Back() ) {
+			_pooledFibers.PopBack();
+
+			::SwitchToFiber( fiber );
+			::DeleteFiber( _waitingTaskStagingArea.fiber );
+
+			// We will resume here once one of the work fibers receives the quit signal.
+		}
 
 		::ConvertFiberToThread();
 
@@ -161,7 +163,7 @@ namespace Win32 {
 		if( scheduler.GetRandomWorkerThread( *this, _randomWorkerSeed ).TryBeginWorkSharingWithThief( *this ) ) {
 			do {
 				// Switch over to the other thread on systems with Hyper-Threading technology, as it might be able to respond/share work.
-				::_mm_pause(); ::_mm_pause();
+				::_mm_pause();
 				// If anyone asks for some tasks, inform them that we don't have anything to share.
 				if( const auto thief = _thiefCell.load( ::std::memory_order_consume ) ) {
 					_thiefCell.store( nullptr, ::std::memory_order_release );
@@ -178,17 +180,18 @@ namespace Win32 {
 // ---------------------------------------------------
 
 	void FiberScheduler::WorkerThread::CompleteWorkSharingRequest( WorkerThread& thief ) {
-		// Note that this will (and should) not transfer the final steal work task in slot 0 of the work queue.
-		const auto	stolenItemBegin( _completionItems.End() - (_completionItems.Size() / 2) );
+		// Prefer stealing closer to the task root.
+		const auto	stolenItemBegin( _completionItems.Begin() + 1 );
+		const auto	stolenItemEnd( stolenItemBegin + (_completionItems.Size() / 2) );
 
-		for( const auto& completion : Range<const CompletionItem*> { stolenItemBegin, _completionItems.ConstEnd() } ) {
+		for( const auto& completion : Range<const CompletionItem*> { stolenItemBegin, stolenItemEnd } ) {
 			thief._completionItems.PushBack( completion );
 		}
 
 		// Ensure all our writes complete before signaling a finished state.
 		thief._transferCell.store( BarrierStatus::Complete, ::std::memory_order_release );
 
-		_completionItems.Erase( stolenItemBegin, _completionItems.End() );
+		_completionItems.Erase( stolenItemBegin, stolenItemEnd );
 	}
 
 // ---------------------------------------------------
@@ -206,7 +209,6 @@ namespace Win32 {
 		if( finishCounter.load( ::std::memory_order_consume ) == value ) {
 			return;
 		}
-		// SET TARGET FIBER HERE AND IN THE OTHER WAIT FUNCTIONS!!!
 
 		if( _pooledFibers ) {
 			_targetFiber = _pooledFibers.Back();
@@ -264,19 +266,6 @@ namespace Win32 {
 		_thiefCell.store( nullptr, ::std::memory_order_release );
 
 		while( ExecutionBehavior::Terminate != _executionBehavior.load( ::std::memory_order_consume ) ) {
-			auto	resumableTask( Find( _suspendedContexts.Begin(), _suspendedContexts.End(), [] ( const SuspendedContext& context ) { return context.testResumableFunction( context ); } ) );
-
-			if( resumableTask != _suspendedContexts.End() ) {
-				const auto	fiber( resumableTask->fiber );
-
-				_suspendedContexts.Erase( resumableTask, ::Eldritch2::UnorderedSemantics );
-
-				SwitchFibers( fiber );
-				continue;
-			}
-
-			const auto	completionItem( PopCompletionItem() );
-
 			// Distribute any work (if it remains) to other worker threads if they ask for it.
 			if( const auto thief = _thiefCell.load( ::std::memory_order_consume ) ) {
 				// Don't need to compare here.
@@ -285,14 +274,31 @@ namespace Win32 {
 				CompleteWorkSharingRequest( *thief );
 			}
 
-			completionItem.workItem.function( completionItem.workItem.argument, *this );
-			completionItem.counter->fetch_sub( 1, ::std::memory_order_acq_rel );
+			auto	resumableTask( Find( _suspendedContexts.Begin(), _suspendedContexts.End(), [] ( const SuspendedContext& context ) { return context.testResumableFunction( context ); } ) );
+
+			if( resumableTask != _suspendedContexts.End() ) {
+				const auto	fiber( resumableTask->fiber );
+
+				_suspendedContexts.Erase( resumableTask, ::Eldritch2::UnorderedSemantics );
+
+				SwitchFibers( fiber );
+			}
+
+			{	const auto	completionItem( PopCompletionItem() );
+
+				completionItem.workItem.function( completionItem.workItem.argument, *this );
+				completionItem.counter->fetch_sub( 1, ::std::memory_order_acq_rel );
+			}
 		}
 
 		// Mark ourselves as unable to be stolen from-- we're not producing work items any more!
 		if( const auto thief = _thiefCell.exchange( this, ::std::memory_order_acquire ) ) {
 			thief->_transferCell.store( BarrierStatus::Complete, ::std::memory_order_release );
 		}
+
+		_waitingTaskStagingArea.fiber = ::GetCurrentFiber();
+		// Switch back to the main fiber.
+		::SwitchToFiber( _initialFiber );
 	}
 
 }	// namespace Win32

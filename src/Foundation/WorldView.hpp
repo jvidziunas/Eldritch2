@@ -18,12 +18,7 @@
 
 namespace Eldritch2 {
 	namespace Foundation {
-		struct	FrameBarrierSet;
 		class	World;
-	}
-
-	namespace Scripting {
-		class	MessageBus;
 	}
 
 	namespace FileSystem {
@@ -40,41 +35,42 @@ namespace Foundation {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		struct FrameTickTaskVisitor {};
-
-		struct PreScriptTickTaskVisitor {};
-		struct ScriptTickTaskVisitor {};
-		struct PostScriptTickTaskVisitor {};
-
 		struct ScriptExecutionPreparationVisitor {};
 		struct DeletionPreparationVisitor {};
-		struct LoadFinalizationVisitor {};
 
 	// ---------------------------------------------------
 
-		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const FrameTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreScriptTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ScriptTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostScriptTickTaskVisitor );
-		virtual void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, Scripting::MessageBus& visitor );
+		template <void (WorldView::*TickFunction)( Scheduler::WorkerContext& )>
+		void	InvokeTickFunction( Scheduler::WorkerContext::FinishCounter& finishCounter, Scheduler::WorkerContext& executingContext );
 
-	// ---------------------------------------------------
-
-		virtual void	AcceptViewVisitor( const ScriptExecutionPreparationVisitor );
-		virtual void	AcceptViewVisitor( const DeletionPreparationVisitor );
-		virtual void	AcceptViewVisitor( const LoadFinalizationVisitor );
-
-	// ---------------------------------------------------
-
-	protected:
-		template <typename TaskVisitor>
-		void	BroadcastTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, TaskVisitor&& visitor );
+		template <void (WorldView::*TickFunction)( Scheduler::WorkerContext& )>
+		void	InvokeTickFunction( Scheduler::WorkerContext& executingContext );
 
 		template <typename ViewVisitor>
 		void	BroadcastViewVisitor( ViewVisitor&& visitor );
 
 	// - WORLD VIEW SANDBOX METHODS ----------------------
 
+		virtual void	OnFrameTick( Scheduler::WorkerContext& executingContext );
+
+		virtual void	OnPreScriptTick( Scheduler::WorkerContext& executingContext );
+
+		virtual void	OnScriptTick( Scheduler::WorkerContext& executingContext );
+
+		virtual void	OnPostScriptTick( Scheduler::WorkerContext& executingContext );
+
+	// ---------------------------------------------------
+
+		virtual void	OnGameStart( Scheduler::WorkerContext& executingContext );
+
+	// ---------------------------------------------------
+
+		virtual void	AcceptViewVisitor( const ScriptExecutionPreparationVisitor );
+		virtual void	AcceptViewVisitor( const DeletionPreparationVisitor );
+
+	// ---------------------------------------------------
+
+	protected:
 		//!	Retrieves a read-only view of the hosting @ref World.
 		/*!	@returns A const reference to the owning @ref World.
 			@threadsafe
@@ -85,7 +81,7 @@ namespace Foundation {
 		/*!	@returns A const reference to the @ref ContentLibrary used by the @ref GameEngine that owns *this.
 			@threadsafe
 			*/
-		const FileSystem::ContentLibrary&		GetEngineContentLibrary() const;
+		const FileSystem::ContentLibrary&		GetContentLibrary() const;
 
 		//!	Retrieves the hosting world's general-purpose @ref Allocator.
 		/*!	@threadsafe

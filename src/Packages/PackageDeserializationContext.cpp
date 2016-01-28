@@ -44,9 +44,9 @@ namespace {
 namespace Eldritch2 {
 namespace FileSystem {
 
-	PackageDeserializationContext::PackageDeserializationContext( const ObjectHandle<ContentPackage>& package ) : _packageReference( package ),
-																												  _backingFileAllocator( UTF8L("Deserialization Context File Allocator") ),
-																												  _tableOfContentsFile( nullptr, { _backingFileAllocator } ) {}
+	PackageDeserializationContext::PackageDeserializationContext( const ObjectHandle<ContentPackage>& package, Allocator& allocator ) : _allocator( allocator, UTF8L("Deserialization Context Allocator") ),
+																																		_packageReference( package ),
+																																		_tableOfContentsFile( nullptr, { _allocator } ) {}
 
 // ---------------------------------------------------
 
@@ -56,7 +56,7 @@ namespace FileSystem {
 	// ---
 
 		if( nullptr == _tableOfContentsFile ) {
-			const auto	createTableOfContentsResult( CreateBackingFile( _backingFileAllocator, UTF8L(".e2toc") ) );
+			const auto	createTableOfContentsResult( CreateBackingFile( _allocator, UTF8L(".e2toc") ) );
 
 			if( createTableOfContentsResult ) {
 				_tableOfContentsFile.reset( createTableOfContentsResult.object );
@@ -103,7 +103,7 @@ namespace FileSystem {
 	// ---
 
 		 if( const auto exports = GetPackageHeader( _tableOfContentsFile->GetAddressForFileByteOffset( 0u ) )->Exports() ) {
-			const auto	dataFile( CreateBackingFile( _backingFileAllocator, UTF8L("") ) );
+			const auto	dataFile( CreateBackingFile( _allocator, UTF8L("") ) );
 
 			if( !dataFile ) {
 				GetBoundPackage().UpdateResidencyStateOnLoaderThread( ResidencyState::Failed );
@@ -135,10 +135,8 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	Result<ReadableMemoryMappedFile> PackageDeserializationContext::CreateBackingFile( Allocator& allocator, const UTF8Char* const suffix ) {
-		const size_t						nameSizeInBytes( StringLength( GetBoundPackage().GetName() ) + StringLength( suffix ) );
-		UTF8String<ExternalArenaAllocator>	fileName( { _alloca( nameSizeInBytes + 33u ), nameSizeInBytes + 33u, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") } );
+		UTF8String<>	fileName( { _allocator, UTF8L("ContentPackage::CreateBackingFile() Temporary Allocator") } );
 
-		fileName.Reserve( nameSizeInBytes );
 		fileName.Append( GetBoundPackage().GetName() ).Append( suffix ? suffix : UTF8L("") );
 
 		return GetContentLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, ContentProvider::KnownContentLocation::PackageDirectory, fileName.GetCharacterArray() );

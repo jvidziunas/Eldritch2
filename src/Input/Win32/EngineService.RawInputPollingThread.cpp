@@ -17,6 +17,7 @@
 #include <Input/Win32/EngineService.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
 #include <windowsx.h>
 //------------------------------------------------------------------//
 
@@ -29,15 +30,15 @@ namespace {
 
 	static ETForceInlineHint void RegisterCallingThreadForRawInput() {
 		enum : ::DWORD {
-			KeyboardAttachFlags	= (RIDEV_APPKEYS | RIDEV_NOLEGACY),
-			MouseAttachFlags	= (RIDEV_NOLEGACY)
+			KeyboardAttachFlags = (RIDEV_NOLEGACY | RIDEV_APPKEYS),
+			MouseAttachFlags	= RIDEV_NOLEGACY
 		};
 
 		enum : ::USHORT {
-			KeyboardUsagePage = 0x01,
-			KeyboardUsage = 0x06,
-			MouseUsagePage = 0x01,
-			MouseUsage = 0x02
+			KeyboardUsagePage	= 0x01,
+			KeyboardUsage		= 0x06,
+			MouseUsagePage		= 0x01,
+			MouseUsage			= 0x02
 		};
 
 		const ::RAWINPUTDEVICE	inputDeviceRegistrationList[] = {
@@ -87,6 +88,8 @@ namespace Win32 {
 
 		// GetMessage() returns 0 if it recieved a WM_QUIT message. This call intentionally blocks.
 		while( 0 != ::GetMessageW( &receivedMessage, nullptr, 0u, 0xFFFFFFFF ) ) {
+			MICROPROFILE_SCOPEI( "Input", "Dispatch raw input events", 0xABABAB );
+
 			switch( receivedMessage.message ) {
 				case WM_INPUT: {
 					::RAWINPUT	rawInput;
@@ -105,6 +108,9 @@ namespace Win32 {
 
 				default: ETNoDefaultCaseHint;
 			}	// switch( receivedMessage.message )
+			
+			::TranslateMessage( &receivedMessage );
+			::DispatchMessageW( &receivedMessage );
 		}
 
 		_threadID = 0u;

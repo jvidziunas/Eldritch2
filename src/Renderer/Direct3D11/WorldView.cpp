@@ -18,6 +18,8 @@
 #include <Utility/MPL/VectorTypes.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
+#define MICROPROFILE_GPU_TIMERS_D3D11 1
+#include <microprofile/microprofile.h>
 #if( ET_COMPILER_IS_MSVC )
 //	MSVC complains about macro redefinitions, since a few DirectX components separately
 //	define some HRESULT values without an include guard. The definitions themselves are consistent,
@@ -72,11 +74,9 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreScriptTickTaskVisitor ) {}
-
-// ---------------------------------------------------
-
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostScriptTickTaskVisitor ) {}
+	void WorldView::OnPreScriptTick( WorkerContext& /*executingContext*/ ) {
+		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Dispatch Render Commands", 0xBBCCBB );
+	}
 
 // ---------------------------------------------------
 

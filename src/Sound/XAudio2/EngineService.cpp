@@ -17,6 +17,8 @@
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Foundation/GameEngine.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
+//------------------------------------------------------------------//
 
 //==================================================================//
 // LIBRARIES
@@ -35,11 +37,16 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2::Sound;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 #ifdef ERROR
 #	undef ERROR	
 #endif
+
+namespace {
+
+	MICROPROFILE_DEFINE( audioProcessingPass, "XAudio2 Audio Renderer", "Audio processing pass", 0xCCBBCB );
+
+}	// anonymous namespace
 
 namespace Eldritch2 {
 namespace Sound {
@@ -68,24 +75,24 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->InitializeXAudio();
-		} } );
-	}
+	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& /*executingContext*/ ) {
+		decltype(_audio)	audio;
 
-// ---------------------------------------------------
+		GetLogger()( UTF8L("Creating XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const ServiceTickTaskVisitor ) {
-		::XAUDIO2_PERFORMANCE_DATA	performanceData;
+		if( FAILED( ::XAudio2Create( audio.GetInterfacePointer(), (ETIsDebugModeEnabled() ? XAUDIO2_DEBUG_ENGINE : 0), ::XAUDIO2_DEFAULT_PROCESSOR ) ) || FAILED( audio->RegisterForCallbacks( this ) ) ) {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
 
-		_audio->GetPerformanceData( &performanceData );
-
-		if( _audioGlitchCount != performanceData.GlitchesSinceEngineStarted ) {
-			_audioGlitchCount = performanceData.GlitchesSinceEngineStarted;
-
-			GetLogger( LogMessageType::Error )( UTF8L("XAudio reported audio processing stall since last invocation of IXAudio2::GetPerformanceData()!") ET_UTF8_NEWLINE_LITERAL );
+			return;
 		}
+
+		if( FAILED( audio->StartEngine() ) ) {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to start XAudio2 engine!") ET_UTF8_NEWLINE_LITERAL );
+		}
+
+		GetLogger()( UTF8L("Created XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
+
+		_audio = ::std::move( audio );
 	}
 
 // ---------------------------------------------------
@@ -103,31 +110,31 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::InitializeXAudio() {
-		decltype(_audio)	audio;
+	void EngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
+		MICROPROFILE_SCOPEI( "XAudio2 Audio Renderer", "Update", 0xABBBCB );
 
-		GetLogger()( UTF8L("Creating XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
+		::XAUDIO2_PERFORMANCE_DATA	performanceData;
 
-		if( FAILED( ::XAudio2Create( audio.GetInterfacePointer(), (ETIsDebugModeEnabled() ? XAUDIO2_DEBUG_ENGINE : 0), ::XAUDIO2_DEFAULT_PROCESSOR ) ) || FAILED( audio->StartEngine() ) ) {
-			GetLogger( LogMessageType::Error )( UTF8L("Unable to create XAudio2 instance!") ET_UTF8_NEWLINE_LITERAL );
+		_audio->GetPerformanceData( &performanceData );
 
-			return Error::Unspecified;
+		if( _audioGlitchCount != performanceData.GlitchesSinceEngineStarted ) {
+			_audioGlitchCount = performanceData.GlitchesSinceEngineStarted;
+
+			GetLogger( LogMessageType::Error )( UTF8L("XAudio reported audio processing stall since last invocation of IXAudio2::GetPerformanceData()!") ET_UTF8_NEWLINE_LITERAL );
 		}
-
-		GetLogger()( UTF8L("Created XAudio2 instance.") ET_UTF8_NEWLINE_LITERAL );
-
-		_audio = move( audio );
-
-		return Error::None;
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::OnProcessingPassStart() {}
+	void EngineService::OnProcessingPassStart() {
+		MICROPROFILE_CONDITIONAL( _audioProcessingPassTick = ::MicroProfileEnter( g_mp_audioProcessingPass ) );
+	}
 
 // ---------------------------------------------------
 
-	void EngineService::OnProcessingPassEnd() {}
+	void EngineService::OnProcessingPassEnd() {
+		MICROPROFILE_CONDITIONAL( ::MicroProfileLeave( g_mp_audioProcessingPass, _audioProcessingPassTick ) );
+	}
 
 // ---------------------------------------------------
 

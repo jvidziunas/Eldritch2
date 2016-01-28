@@ -28,7 +28,6 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2::System;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 #if( ET_COMPILER_IS_MSVC )
 #	pragma warning( push )
@@ -40,13 +39,14 @@ namespace Eldritch2 {
 namespace Foundation {
 
 	GameEngine::GameEngine( SystemInterface& systemInterface, ThreadScheduler& scheduler, ContentProvider& contentProvider, Allocator& allocator ) : _allocator( allocator, UTF8L("Game Engine Allocator") ),
-																																					 _logger( contentProvider, UTF8L("Eldritch2.log") ),
+																																					 _logger( contentProvider, UTF8L("Logs") ET_UTF8_DIR_SEPARATOR UTF8L("Eldritch2.log") ),
 																																					 _systemInterface( systemInterface ),
 																																					 _scheduler( scheduler ),
 																																					 _contentLibrary( contentProvider, scheduler, _allocator ),
 																																					 _logEchoThreshold( LogMessageType::VerboseWarning ),
-																																					 _taskArenaPerThreadAllocationSizeInBytes( 1024u * 1024u ),
 																																					 _worldArenaSizeInBytes( 16u * 1024u * 1024u ),
+																																					 _worldMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
+																																					 _worldCount( 0u ),
 																																					 _managementService( *this ) {}
 
 // ---------------------------------------------------
@@ -78,21 +78,32 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	size_t GameEngine::CalculateFrameArenaSizeInBytes() const {
-		return (_taskArenaPerThreadAllocationSizeInBytes * _scheduler.GetMaximumTaskParallelism()) + 1024u;
+	void GameEngine::NotifyOfNewWorld( World& world ) {
+		{	ScopedLock	_( *_worldMutex );
+
+			_worlds.PushFront( world );
+			_worldCount.fetch_add( 1u, ::std::memory_order_relaxed );
+		}	// End of lock scope.
+		
+		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Attached world %p.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(&world) );
+	}
+
+// ---------------------------------------------------
+
+	void GameEngine::NotifyOfWorldDestruction( World& world ) {
+		{	ScopedLock	_( *_worldMutex );
+
+			_worlds.Erase( _worlds.IteratorTo( world ) );
+			_worldCount.fetch_sub( 1u, ::std::memory_order_acq_rel );
+		}	// End of lock scope.
+
+		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Detached world %p.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(&world) );
 	}
 
 // ---------------------------------------------------
 
 	void GameEngine::ClearAttachedServices() {
-		_attachedServices.Clear();
-	}
-
-// ---------------------------------------------------
-
-	void GameEngine::Dispose() {
-		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Terminating execution.") ET_UTF8_NEWLINE_LITERAL );
-		_scheduler.FlagForShutdown();
+		GetAttachedServices().Clear();
 	}
 
 }	// namespace Foundation

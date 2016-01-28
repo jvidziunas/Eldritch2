@@ -48,9 +48,9 @@ namespace Win32 {
 	// ---------------------------------------------------
 
 	protected:
-		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
+		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor ) override sealed;
+		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
 

@@ -102,6 +102,10 @@ namespace Win32 {
 // ---------------------------------------------------
 
 	FiberScheduler::~FiberScheduler() {
+		for( auto& worker : _workerThreads ) {
+			worker.EnsureTerminated();
+		}
+
 		_workerThreads.Clear();
 
 		::MicroProfileShutdown();
@@ -233,9 +237,12 @@ namespace Win32 {
 		// ---------------------------------------------------
 
 			void Enter() override sealed {
-				while( !TryEnter() ) {
-					if( const auto activeWorker = WorkerThread::GetActiveWorkerThread() ) {
+				if( const auto worker = WorkerThread::GetActiveWorkerThread() ) {
+					while( !TryEnter() ) {
+						// Yield current thread.
 					}
+				} else {
+					::AcquireSRWLockExclusive( &_lock );
 				}
 			}
 
@@ -250,9 +257,12 @@ namespace Win32 {
 		// ---------------------------------------------------
 
 			void EnterAsReader() override sealed {
-				while( !TryEnterAsReader() ) {
-					if( const auto activeWorker = WorkerThread::GetActiveWorkerThread() ) {
+				if( const auto worker = WorkerThread::GetActiveWorkerThread() ) {
+					while( !TryEnterAsReader() ) {
+						// Yield current thread.
 					}
+				} else {
+					::AcquireSRWLockShared( &_lock );
 				}
 			}
 
@@ -286,38 +296,58 @@ namespace Win32 {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			ETInlineHint Semaphore( const int initialCount, const int maximumCount ) : _counter( initialCount ), _maximumCount( maximumCount ) {}
+			ETInlineHint Semaphore( const ::HANDLE semaphoreHandle ) : _semaphoreHandle( semaphoreHandle ) {}
 
-			~Semaphore() = default;
+			~Semaphore() {
+				::CloseHandle( _semaphoreHandle );
+			}
 
 		// ---------------------------------------------------
 
 			int IncreaseCount( const int count ) override sealed {
-				return _counter.fetch_add( count, ::std::memory_order_relaxed );
+				::LONG	previousCount( 0 );
+
+				::ReleaseSemaphore( _semaphoreHandle, count, &previousCount );
+
+				return static_cast<int>( previousCount );
 			}
 
 		// ---------------------------------------------------
 
 			void Acquire() override sealed {
-				auto	currentValue( _counter.load( ::std::memory_order_acquire ) );
+				if( const auto worker = WorkerThread::GetActiveWorkerThread() ) {
+					while( !TryAcquire() ) {
+
+					}
+				} else {
+					::WaitForSingleObject( _semaphoreHandle, INFINITE );
+				}
+			}
+
+			bool TryAcquire() override sealed {
+				// Timeout interval of 0 will cause the function to return immediately.
+				return WAIT_OBJECT_0 == ::WaitForSingleObject( _semaphoreHandle, 0 );
 			}
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::std::atomic<int>	_counter;
-			const int			_maximumCount;
+			const ::HANDLE	_semaphoreHandle;
 		};
 
 	// ---
 
-		ETRuntimeAssert( initialCount <= maximumCount );
+		if( const auto semaphore = ::CreateSemaphoreW( nullptr, initialCount, maximumCount, nullptr ) ) {
+			if( auto result = new(allocator, _syncObjectAlignmentInBytes, Allocator::AllocationDuration::Normal) Semaphore( semaphore ) ) {
+				return { ::std::move( result ) };
+			}
 
-		if( auto semaphore = new(allocator, Allocator::AllocationDuration::Normal) Semaphore( initialCount, maximumCount ) ) {
-			return { ::std::move( semaphore ) };
+			::CloseHandle( semaphore );
+
+			return { Error::OutOfMemory };
 		}
-
-		return { Error::OutOfMemory };
+		
+		return { Error::InvalidParameter };
 	}
 
 // ---------------------------------------------------

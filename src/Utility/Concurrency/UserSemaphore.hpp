@@ -24,6 +24,8 @@ namespace Utility {
 
 		virtual void	Acquire() abstract;
 
+		virtual bool	TryAcquire() abstract;
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:

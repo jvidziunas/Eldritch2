@@ -15,7 +15,7 @@
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
 #include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Physics/BulletDynamics/CollisionShapeResourceView.hpp>
+#include <Physics/BulletDynamics/ArticulatedBodyResourceView.hpp>
 #include <Physics/BulletDynamics/EngineService.hpp>
 #include <Physics/BulletDynamics/WorldView.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
@@ -50,7 +50,7 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( CollisionShapeResourceView::GetSerializedDataTag(), _collisionShapeFactory );
+		visitor.PublishFactory( ArticulatedBodyResourceView::GetSerializedDataTag(), _collisionShapeFactory );
 	}
 
 // ---------------------------------------------------

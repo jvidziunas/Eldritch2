@@ -46,19 +46,18 @@ namespace XAudio2 {
 	// ---------------------------------------------------
 
 	protected:
+		void	OnEngineConfigurationBroadcast( Scheduler::WorkerContext& executingContext ) override sealed;
+
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) override sealed;
 
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) override sealed;
+	// ---------------------------------------------------
+
+		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
 	// ---------------------------------------------------
 
 	private:
-		::Eldritch2::ErrorCode	InitializeXAudio();
-
-	// ---------------------------------------------------
-
 		void	OnProcessingPassStart() override;
 
 		void	OnProcessingPassEnd() override;
@@ -73,6 +72,7 @@ namespace XAudio2 {
 		Configuration::ConfigurableUTF8String						_deviceName;
 
 		::Eldritch2::uint32											_audioGlitchCount;
+		::Eldritch2::uint64											_audioProcessingPassTick;
 
 		Utility::COMPointer<::IXAudio2>								_audio;
 	};

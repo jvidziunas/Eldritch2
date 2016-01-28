@@ -46,7 +46,7 @@ namespace FileSystem {
 																														 _resourceViewDirectory( { allocator, UTF8L("Content Library Resource View Bucket Allocator") } ),
 																														 _resourceFactoryDirectory( { allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") } ),
 																														 _loaderThread( new(_allocator, Allocator::AllocationDuration::Normal) LoaderThread( scheduler, _allocator ) ) {
-		// Don't bother launching the thread if we have no synchronization mechanisms (Highly unlikely in practice!)
+		// Launch the thread if we have synchronization mechanisms.
 		if( ETBranchLikelyHint( _contentPackageDirectoryMutex && _resourceViewDirectoryMutex && _loaderThread ) ) {
 			scheduler.Enqueue( *_loaderThread );
 		}
@@ -59,13 +59,15 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ContentLibrary::~ContentLibrary() {
-		ETRuntimeAssert( _contentPackageDirectory.Empty() );
-		ETRuntimeAssert( _resourceViewDirectory.Empty() );
-
 		if( auto thread = _loaderThread ) {
 			thread->EnsureTerminated();
 			_allocator.Delete( *thread );
 		}
+
+		// Test *after* tearing down the loader thread, as internally it keeps packages alive.
+
+		ETRuntimeAssert( _contentPackageDirectory.Empty() );
+		ETRuntimeAssert( _resourceViewDirectory.Empty() );
 	}
 
 // ---------------------------------------------------

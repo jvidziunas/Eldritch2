@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/BulletDynamics/CollisionShapeResourceView.hpp>
+#include <Physics/BulletDynamics/ArticulatedBodyResourceView.hpp>
 #include <Physics/BulletDynamics/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Containers/Range.hpp>
@@ -31,8 +31,12 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::CollisionShapeViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
-		return new(allocator, Allocator::AllocationDuration::Normal) CollisionShapeResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
+	ErrorCode EngineService::CollisionShapeViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> sourceAsset ) {
+		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) ArticulatedBodyResourceView( contentLibrary, package, name, allocator ) ) {
+			return view->UpdateFromByteStream( sourceAsset );
+		}
+
+		return Error::OutOfMemory;
 	}
 
 }	// namespace BulletDynamics

@@ -22,10 +22,18 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	void ReadableMemoryMappedFile::PrefetchRangeForRead( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const {
-		const auto	begin( static_cast<const char*>(GetAddressForFileByteOffset( offsetInBytes )) );
+	void ReadableMemoryMappedFile::PrefetchRange( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const {
+		PrefetchRange( TryGetStructureArrayAtOffset<char>( offsetInBytes, rangeSizeInBytes ) );
+	}
 
-		PrefetchRangeForRead( { begin, begin + rangeSizeInBytes } );
+// ---------------------------------------------------
+
+	void ReadableMemoryMappedFile::EvictRange( const ::Eldritch2::Range<const char*> /*memoryRange*/ ) const {}
+
+// ---------------------------------------------------
+
+	void ReadableMemoryMappedFile::EvictRange( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const {
+		EvictRange( TryGetStructureArrayAtOffset<char>( offsetInBytes, rangeSizeInBytes ) );
 	}
 
 }	// namespace FileSystem

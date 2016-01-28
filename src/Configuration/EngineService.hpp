@@ -42,24 +42,17 @@ namespace Configuration {
 	// ---------------------------------------------------
 
 	protected:
+		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
+
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) override sealed;
-
-	// ---------------------------------------------------
-
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor ) override sealed;
 
 	// ---------------------------------------------------
 
 		void	DumpConfigurationToFile() const;
 
-	// ---------------------------------------------------
-
-	private:
-		void	BroadcastConfigurationToEngine();
-
 	// - DATA MEMBERS ------------------------------------
 
+	private:
 		FileSystem::ContentProvider&	_contentProvider;
 	};
 

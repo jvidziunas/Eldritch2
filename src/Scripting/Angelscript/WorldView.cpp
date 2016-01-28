@@ -24,6 +24,8 @@
 #include <Foundation/World.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
+//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Scripting;
@@ -56,55 +58,16 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const FrameTickTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, []( void* view, WorkerContext& executingContext ) {
-			{	WorkerContext::FinishCounter	preScriptTickFinishCounter( 0 );
-				static_cast<WorldView*>(view)->BroadcastTaskVisitor( executingContext, preScriptTickFinishCounter, WorldView::PreScriptTickTaskVisitor() );
-
-				executingContext.WaitForCounter( preScriptTickFinishCounter );
-			}
-
-			{	WorkerContext::FinishCounter	scriptTickFinishCounter( 0 );
-				static_cast<WorldView*>(view)->BroadcastTaskVisitor( executingContext, scriptTickFinishCounter, WorldView::ScriptTickTaskVisitor() );
-
-				executingContext.WaitForCounter( scriptTickFinishCounter );
-			}
-
-			{	WorkerContext::FinishCounter	scriptTickFinishCounter( 0 );
-				static_cast<WorldView*>(view)->BroadcastTaskVisitor( executingContext, scriptTickFinishCounter, WorldView::PostScriptTickTaskVisitor() );
-
-				executingContext.WaitForCounter( scriptTickFinishCounter );
-			}
-		} } );
+	void WorldView::OnFrameTick( WorkerContext& executingContext ) {
+		InvokeTickFunction<&Foundation::WorldView::OnPreScriptTick>( executingContext );
+		InvokeTickFunction<&Foundation::WorldView::OnScriptTick>( executingContext );
+		InvokeTickFunction<&Foundation::WorldView::OnPostScriptTick>( executingContext );
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const ScriptTickTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, []( void* /*view*/, WorkerContext& /*executingContext*/ ) {
-			// Dispatch script messages
-		} } );
-	}
-
-// ---------------------------------------------------
-
-	void WorldView::AcceptViewVisitor( const LoadFinalizationVisitor ) {
-		FixedStackAllocator<128u>	tempAllocator( UTF8L("WorldView::AcceptViewVisitor() Temporary Allocator") );
-		const auto					allocationCheckpoint( tempAllocator.CreateCheckpoint() );
-
-		{	const auto	rulesClassName( GetOwningWorld().GetPropertyByKey( tempAllocator, UTF8L("GameRules") ) );
-			_rulesEntity = ::std::move( Spawn( rulesClassName.GetCharacterArray() ) );
-		}
-
-		// Rewind the allocation to conserve/recycle stack space. We don't need both strings at once.
-		tempAllocator.RestoreCheckpoint( allocationCheckpoint );
-
-		{	const auto	resourceName( GetOwningWorld().GetPropertyByKey( tempAllocator, UTF8L("ResourceName") ) );
-
-			if( !resourceName.Empty() ) {
-				GetEngineContentLibrary().ResolveViewByName( resourceName.GetCharacterArray(), *static_cast<ObjectGraphResourceView*>(nullptr) ).DeserializeIntoWorldView( *this );
-			}
-		}
+	void WorldView::OnScriptTick( WorkerContext& /*executingContext*/ ) {
+		MICROPROFILE_SCOPEI( "Angelscript Virtual Machine", "Process script messages", 0xCDCDCD );
 	}
 
 // ---------------------------------------------------
@@ -134,6 +97,23 @@ namespace AngelScript {
 		BroadcastViewVisitor( ScriptExecutionPreparationVisitor() );
 
 		_rulesEntity.reset();
+	}
+
+// ---------------------------------------------------
+
+	void WorldView::OnGameStart( WorkerContext& /*executingContext*/ ) {
+		MICROPROFILE_SCOPEI( "Angelscript Virtual Machine", "Process game start", 0xCDCDCD );
+
+		const auto	rulesObjectName( GetOwningWorld().GetPropertyByKey( _stringAllocator, UTF8L("GameRulesClass"), UTF8L("") ) );
+		const auto	resourceObjectName( GetOwningWorld().GetPropertyByKey( _stringAllocator, UTF8L("Resource"), UTF8L("") ) );
+
+		if( !rulesObjectName.IsEmpty() ) {
+			_rulesEntity = ::std::move( Spawn( rulesObjectName.GetCharacterArray() ) );
+		}
+
+		if( !resourceObjectName.IsEmpty() ) {
+			GetContentLibrary().ResolveViewByName( resourceObjectName.GetCharacterArray(), *static_cast<ObjectGraphResourceView*>(nullptr) ).DeserializeIntoWorldView( *this );
+		}
 	}
 
 // ---------------------------------------------------

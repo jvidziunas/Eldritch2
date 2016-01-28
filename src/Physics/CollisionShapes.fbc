@@ -6,8 +6,6 @@ struct Float3 {
 	Z	: float;
 }
 
-table NullShape {}
-
 table SphereShape {
 	Radius	: float;
 }
@@ -16,44 +14,43 @@ table BoxShape {
 	HalfExtent	: Float3;
 }
 
-table XCapsuleShape {
+table CapsuleShapeX {
 	Radius	: float;
 	Height	: float;
 }
 
-table YCapsuleShape {
+table CapsuleShapeY {
 	Radius	: float;
 	Height	: float;
 }
 
-table ZCapsuleShape {
+table CapsuleShapeZ {
 	Radius	: float;
 	Height	: float;
 }
 
-table XConeShape {
+table ConeShapeX {
 	Radius	: float;
 	Height	: float;
 }
 
-table YConeShape {
+table ConeShapeY {
 	Radius	: float;
 	Height	: float;
 }
 
-table ZConeShape {
+table ConeShapeZ {
 	Radius	: float;
 	Height	: float;
 }
 
 union CollisionShape {
-	NullShape,
 	SphereShape,
 	BoxShape,
-	XCapsuleShape,
-	YCapsuleShape,
-	ZCapsuleShape,
-	XConeShape,
-	YConeShape,
-	ZConeShape
+	CapsuleShapeX,
+	CapsuleShapeY,
+	CapsuleShapeZ,
+	ConeShapeX,
+	ConeShapeY,
+	ConeShapeZ
 }

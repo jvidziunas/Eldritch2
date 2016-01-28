@@ -40,7 +40,7 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void ReadableMemoryMappedFile::PrefetchRangeForRead( const Range<const char*> memoryRange ) const {
+	void ReadableMemoryMappedFile::PrefetchRange( const Range<const char*> memoryRange ) const {
 		enum : size_t {
 			PrefetchStride	= 4096u
 		};

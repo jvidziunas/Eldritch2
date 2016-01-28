@@ -65,28 +65,33 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& executingContext ) {
-			{	WorkerContext::FinishCounter	preConfigurationLoadedFinishCounter( 0 );
-				static_cast<EngineService*>(service)->BroadcastTaskVisitor( executingContext, preConfigurationLoadedFinishCounter, EngineService::PreConfigurationLoadedTaskVisitor() );
+	void EngineService::OnEngineInitializationStarted( WorkerContext& executingContext ) {
+		FixedStackAllocator<64u>	tempAllocator( UTF8L( "EngineService::OnEngineInitializationStarted() Temporary Allocator" ) );
 
-				executingContext.WaitForCounter( preConfigurationLoadedFinishCounter );
-			}
+		GetLogger()( UTF8L("Loading configuration from file '%s'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
 
-			{	WorkerContext::FinishCounter	postConfigurationLoadedFinishCounter( 0 );
-				static_cast<EngineService*>(service)->BroadcastTaskVisitor( executingContext, postConfigurationLoadedFinishCounter, EngineService::PostConfigurationLoadedTaskVisitor() );
+		if( const auto getMappedFileResult = _contentProvider.CreateReadableMemoryMappedFile( tempAllocator, ContentProvider::KnownContentLocation::UserDocuments, configurationFileName ) ) {
+			ConfigurationDatabase&							database( *this );
+			ConfigurationPublishingInitializationVisitor	visitor( database );
+			ReadableMemoryMappedFile&						mappedFile( *getMappedFileResult.object );
 
-				executingContext.WaitForCounter( postConfigurationLoadedFinishCounter );
-			}
-		} } );
-	}
+			// Haul the whole file into memory.
+			mappedFile.PrefetchRange( 0u, mappedFile.GetAccessibleRegionSizeInBytes() );
+			// While we're waiting for the disk to do its thing, register all the variables from the game engine we're attached to.
+			BroadcastInitializationVisitor( visitor );
 
-// ---------------------------------------------------
+			ParseINI( mappedFile.TryGetStructureArrayAtOffset<UTF8Char>( 0u, mappedFile.GetAccessibleRegionSizeInBytes() ), [&database] ( const Range<const UTF8Char*>& section, const Range<const UTF8Char*>& name, const Range<const UTF8Char*>& value ) {
+				database.SetValue( section, name, value );
+			} );
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->BroadcastConfigurationToEngine();
-		} } );
+			GetLogger()(UTF8L( "Configuration loaded successfully." ) ET_UTF8_NEWLINE_LITERAL);
+
+			tempAllocator.Delete( *getMappedFileResult.object );
+		} else {
+			GetLogger( LogMessageType::Error )(UTF8L( "Error reading configuration file: %s" ), getMappedFileResult.resultCode.ToUTF8String());
+		}
+
+		InvokeInitializationFunction<&GameEngineService::OnEngineConfigurationBroadcast>( executingContext );
 	}
 
 // ---------------------------------------------------
@@ -109,35 +114,6 @@ namespace Configuration {
 			temporaryAllocator.Delete( *getWriterResult.object );
 			// ... then destroy the temporary file since we no longer need it.
 			_contentProvider.DeleteFreeFile( KnownContentLocation::UserDocuments, tempConfigurationFileName );
-		}
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::BroadcastConfigurationToEngine() {
-		FixedStackAllocator<64u>	tempAllocator( UTF8L("EngineService::BroadcastConfigurationToEngine() Temporary Allocator") );
-
-		GetLogger()( UTF8L("Loading configuration from file '%s'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
-
-		if( const auto getMappedFileResult = _contentProvider.CreateReadableMemoryMappedFile( tempAllocator, ContentProvider::KnownContentLocation::UserDocuments, configurationFileName ) ) {
-			ConfigurationDatabase&							database( *this );
-			ConfigurationPublishingInitializationVisitor	visitor( database );
-			ReadableMemoryMappedFile&						mappedFile( *getMappedFileResult.object );
-
-			// Haul the whole file into memory.
-			mappedFile.PrefetchRangeForRead( 0u, mappedFile.GetAccessibleRegionSizeInBytes() );
-			// While we're waiting for the disk to do its thing, register all the variables from the game engine we're attached to.
-			BroadcastInitializationVisitor( visitor );
-
-			ParseINI( mappedFile.TryGetStructureArrayAtOffset<UTF8Char>( 0u, mappedFile.GetAccessibleRegionSizeInBytes() ), [&database] ( const Range<const UTF8Char*>& section, const Range<const UTF8Char*>& name, const Range<const UTF8Char*>& value ) {
-				database.SetValue( section, name, value );
-			} );
-
-			GetLogger()( UTF8L("Configuration loaded successfully.") ET_UTF8_NEWLINE_LITERAL );
-
-			tempAllocator.Delete( *getMappedFileResult.object );
-		} else {
-			GetLogger( LogMessageType::Error )( UTF8L("Error reading configuration file: %s"), getMappedFileResult.resultCode.ToUTF8String() );
 		}
 	}
 

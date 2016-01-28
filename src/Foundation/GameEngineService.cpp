@@ -33,7 +33,7 @@ namespace Eldritch2 {
 namespace Foundation {
 
 	GameEngineService::GameEngineService( GameEngine& owningEngine ) : _owningEngine( owningEngine ) {
-		owningEngine._attachedServices.PushFront( *this );
+		owningEngine.NotifyOfNewService( *this );
 	}
 
 // ---------------------------------------------------
@@ -53,29 +53,7 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	CountedResult<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
-		ObjectHandle<World>	world( new(GetEngineAllocator(), Allocator::AllocationDuration::Normal) World( _owningEngine ), ::Eldritch2::PassthroughReferenceCountingSemantics );
-
-		if( world ) {
-			ErrorCode	operationResult( Error::None );
-
-			world->SetProperty( World::GetMainPackageKey(), worldResourceName );
-
-			for( auto& service : _owningEngine._attachedServices ) {
-				operationResult = service.AllocateWorldView( world->GetAllocator(), *world );
-
-				if( !operationResult ) {
-					GetLogger( LogMessageType::Error )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
-					return { operationResult };
-				}
-			}
-
-			operationResult = world->BeginContentLoad();
-
-			if( !operationResult ) {
-				GetLogger( LogMessageType::Error )( UTF8L("Error creating world: %s!") ET_UTF8_NEWLINE_LITERAL, operationResult.ToUTF8String() );
-				return { operationResult };
-			}
-
+		if( ObjectHandle<World>	world{ new(GetEngineAllocator(), Allocator::AllocationDuration::Normal) World( _owningEngine, worldResourceName ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
 			// Transfer ownership of the world to the result object and thus to outer code.
 			return { ::std::move( world ) };
 		}
@@ -93,6 +71,18 @@ namespace Foundation {
 
 	ThreadScheduler& GameEngineService::GetEngineThreadScheduler() const {
 		return _owningEngine.GetThreadScheduler();
+	}
+
+// ---------------------------------------------------
+
+	void GameEngineService::OnEngineInitializationStarted( WorkerContext& /*executingContext*/ ) {
+		// Default implementation should not do anything.
+	}
+
+// ---------------------------------------------------
+
+	void GameEngineService::OnEngineConfigurationBroadcast( WorkerContext& /*executingContext*/ ) {
+		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
@@ -115,37 +105,19 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptInitializationVisitor( const PostInitializationVisitor ) {
+	void GameEngineService::OnEngineInitializationCompleted( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const InitializeEngineTaskVisitor ) {
+	void GameEngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreConfigurationLoadedTaskVisitor ) {
-		// Default implementation should not do anything.
-	}
-
-// ---------------------------------------------------
-
-	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostConfigurationLoadedTaskVisitor ) {
-		// Default implementation should not do anything.
-	}
-
-// ---------------------------------------------------
-
-	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const ServiceTickTaskVisitor ) {
-		// Default implementation should not do anything.
-	}
-
-// ---------------------------------------------------
-
-	void GameEngineService::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const WorldTickTaskVisitor ) {
+	void GameEngineService::OnWorldTickStarted( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}
 

@@ -25,6 +25,7 @@
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
 #include <angelscript.h>
 //------------------------------------------------------------------//
 #include <memory>
@@ -80,25 +81,53 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
+	void EngineService::OnEngineInitializationStarted( WorkerContext& /*executingContext*/ ) {
+		MICROPROFILE_SCOPEI( "Angelscript Virtual Machine", "Create script API", 0xBBBBBBBB );
+
+		GetLogger()( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
+
+		AngelScript::EngineHandle	scriptEngine( ::asCreateScriptEngine() );
+
+		if( !scriptEngine ) {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
+
+			return;
+		}
+
+		scriptEngine->SetMessageCallback( ::asMETHOD( EngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
+		// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
+
+		// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
+		{	ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
+			
+			StringMarshal::ExposeScriptAPI( registrationVisitor );
+			Float4Marshal::ExposeScriptAPI( registrationVisitor );
+			OrientationMarshal::ExposeScriptAPI( registrationVisitor );
+			
+			BroadcastInitializationVisitor( registrationVisitor );
+		}
+
+		RegisterCMathLibrary( scriptEngine.get() );
+		RegisterAlgorithmLibrary( scriptEngine.get() );
+
+		scriptEngine->RegisterStringFactory( StringMarshal::scriptTypeName, ::asMETHOD( EngineService, MarshalStringLiteral ), ::asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
+
+		GetLogger()( UTF8L("Script API registered successfully.") ET_UTF8_NEWLINE_LITERAL );
+
+		// Transfer ownership.
+		_bytecodePackageFactory.SetScriptEngine( ::std::move( scriptEngine ) );
+	}
+
+// ---------------------------------------------------
+
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), _bytecodePackageFactory )
-			   .PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), _objectGraphFactory );
+		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), _bytecodePackageFactory ).PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), _objectGraphFactory );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->CreateScriptAPI();
-		} } );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->GetScriptEngine().GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
-		} } );
+	void EngineService::OnServiceTickStarted( WorkerContext& executingContext ) {
+		GetScriptEngine().GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
 	}
 
 // ---------------------------------------------------
@@ -133,38 +162,6 @@ namespace AngelScript {
 		}
 
 		GetLogger( messageType )( UTF8L("Angelscript %s in '%s'[%i, %i]: %s.") ET_UTF8_NEWLINE_LITERAL, description, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::CreateScriptAPI() {
-		GetLogger()( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
-
-		if( AngelScript::EngineHandle scriptEngine{ ::asCreateScriptEngine() } ) {
-			scriptEngine->SetMessageCallback( ::asMETHOD( EngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
-
-			// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
-			{	ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
-				
-				StringMarshal::ExposeScriptAPI( registrationVisitor );
-				Float4Marshal::ExposeScriptAPI( registrationVisitor );
-				OrientationMarshal::ExposeScriptAPI( registrationVisitor );
-				
-				BroadcastInitializationVisitor( registrationVisitor );
-			}
-
-			RegisterCMathLibrary( scriptEngine.get() );
-			RegisterAlgorithmLibrary( scriptEngine.get() );
-			scriptEngine->RegisterStringFactory( StringMarshal::scriptTypeName, ::asMETHOD( EngineService, MarshalStringLiteral ), ::asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
-			// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
-
-			GetLogger()( UTF8L("Script API registered successfully.") ET_UTF8_NEWLINE_LITERAL );
-
-			// Transfer ownership.
-			_bytecodePackageFactory.SetScriptEngine( ::std::move( scriptEngine ) );
-		} else {
-			GetLogger( LogMessageType::Error )( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
-		}
 	}
 
 }	// namespace AngelScript

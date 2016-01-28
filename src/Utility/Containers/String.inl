@@ -148,7 +148,7 @@ namespace Eldritch2 {
 	ETInlineHint bool String<Character, Allocator>::BeginsWith( const CharacterType* const needle ) const {
 		const auto needleLength( ::Eldritch2::StringLength( needle ) );
 
-		return (needleLength <= Length()) ? ::Eldritch2::EqualityCompareString( GetCharacterArray(), needle, needleLength ) : false;
+		return (needleLength <= GetLength()) ? ::Eldritch2::EqualityCompareString( GetCharacterArray(), needle, needleLength ) : false;
 	}
 
 // ---------------------------------------------------
@@ -164,7 +164,7 @@ namespace Eldritch2 {
 	ETInlineHint bool String<Character, Allocator>::EndsWith( const CharacterType* const needle ) const {
 		const auto needleLength( ::Eldritch2::StringLength( needle ) );
 
-		return (needleLength <= Length()) ? ::Eldritch2::EqualityCompareString( End() - needleLength, needle, needleLength ) : false;
+		return (needleLength <= GetLength()) ? ::Eldritch2::EqualityCompareString( End() - needleLength, needle, needleLength ) : false;
 	}
 
 // ---------------------------------------------------
@@ -339,7 +339,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint size_t	String<Character, Allocator>::GetHashCode( const size_t hashSeed ) const {
-		return ::Eldritch2::HashMemory( GetCharacterArray(), (Length() * sizeof(CharacterType)), hashSeed );
+		return ::Eldritch2::HashMemory( GetCharacterArray(), (GetLength() * sizeof(CharacterType)), hashSeed );
 	}
 
 // ---------------------------------------------------
@@ -359,14 +359,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::SizeType String<Character, Allocator>::Length() const {
+	ETInlineHint typename String<Character, Allocator>::SizeType String<Character, Allocator>::GetLength() const {
 		return static_cast<SizeType>(::std::distance( _underlyingContainer.begin(), _underlyingContainer.end() ));
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint bool String<Character, Allocator>::Empty() const {
+	ETInlineHint bool String<Character, Allocator>::IsEmpty() const {
 		return _underlyingContainer.empty();
 	}
 
@@ -374,7 +374,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>::operator bool() {
-		return !Empty();
+		return !IsEmpty();
 	}
 
 // ---------------------------------------------------

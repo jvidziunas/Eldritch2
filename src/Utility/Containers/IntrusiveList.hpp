@@ -12,12 +12,14 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/IntrusiveListHook.hpp>
+//------------------------------------------------------------------//
 #include <boost/intrusive/list.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename StoredObject, typename NodeTraits = ::boost::intrusive::base_hook<::Eldritch2::IntrusiveListBaseHook>>
 	class IntrusiveList {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -120,7 +122,6 @@ namespace Eldritch2 {
 
 		ETInlineHint Iterator	InsertAfter( Iterator location, Reference item );
 
-		ETInlineHint void	Erase( Reference item );
 		ETInlineHint void	Erase( Iterator position );
 		ETInlineHint void	Erase( Iterator begin, Iterator end );
 

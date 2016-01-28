@@ -81,14 +81,16 @@ namespace AngelScript {
 	// ---------------------------------------------------
 
 	protected:
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const FrameTickTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ScriptTickTaskVisitor ) override sealed;
+		void	OnFrameTick( Scheduler::WorkerContext& executingContext ) override sealed;
+
+		void	OnScriptTick( Scheduler::WorkerContext& executingContext ) override sealed;
 
 	// ---------------------------------------------------
 
 		void	AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) override sealed;
 		void	AcceptViewVisitor( const DeletionPreparationVisitor ) override sealed;
-		void	AcceptViewVisitor( const LoadFinalizationVisitor ) override sealed;
+
+		void	OnGameStart( Scheduler::WorkerContext& executingContext ) override sealed;
 
 	// - DATA MEMBERS ------------------------------------
 

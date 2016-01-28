@@ -198,7 +198,7 @@ namespace Tools {
 
 		// Trim off the extension string if specified on the command line. We'll add it back in later.
 		if( _outputModuleName.EndsWith( extensionString ) ) {
-			_outputModuleName.Resize( _outputModuleName.Length() - (_countof( extensionString ) - 1) );
+			_outputModuleName.Resize( _outputModuleName.GetLength() - (_countof( extensionString ) - 1) );
 		}
 
 		// Ensure we don't leak resources.

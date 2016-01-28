@@ -18,6 +18,8 @@
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
+//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
 using namespace ::Eldritch2::FileSystem;
@@ -48,6 +50,8 @@ namespace Direct3D11 {
 		ETRuntimeAssert( _device );
 
 	// ---
+
+		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Create shader resource view", 0xAAAAAA );
 
 		return new(allocator, Allocator::AllocationDuration::Normal) ShaderResourceResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
 	}

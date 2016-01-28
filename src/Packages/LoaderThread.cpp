@@ -19,6 +19,8 @@
 #include <Packages/LoaderThread.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
+//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Scheduler;
@@ -57,7 +59,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ErrorCode LoaderThread::BeginLoad( ContentPackage& package ) {
-		InstancePointer<PackageDeserializationContext> context( new(_allocator, Allocator::AllocationDuration::Temporary) PackageDeserializationContext( { package } ), { _allocator } );
+		InstancePointer<PackageDeserializationContext> context( new(_allocator, Allocator::AllocationDuration::Temporary) PackageDeserializationContext( { package }, _allocator ), { _allocator } );
 
 		if( nullptr == context ) {
 			return Error::OutOfMemory;
@@ -94,8 +96,10 @@ namespace FileSystem {
 		}
 
 		while( (_loadSemaphore->Acquire(), ExecutionBehavior::Continue == _executionBehavior.load( ::std::memory_order_consume )) ) {
-			// Initialize any new deserialization, and add to the 
+			// Initialize any new deserialization, and add to the pending list.
 			_initializationQueue.PopFrontAndDispose( [&threadAllocator, &loadList] ( PackageDeserializationContext& context ) {
+				MICROPROFILE_SCOPEI("Content Load", "Initialize load operation", 0xFFFFFF );
+
 				if( context.DeserializeDependencies() ) {
 					loadList.PushFront( context );
 				} else {
@@ -125,6 +129,7 @@ namespace FileSystem {
 
 				return dependenciesLoaded;
 			}, [&threadAllocator] ( PackageDeserializationContext& context ) {
+				MICROPROFILE_SCOPEI( "Content Load", "Deserialize content", 0xCCCCFF );
 				context.DeserializeContent();
 				threadAllocator.Delete( context );
 			} );

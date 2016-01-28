@@ -1,5 +1,5 @@
 /*==================================================================*\
-  CollisionShapeResourceView.hpp
+  ArticulatedBodyResourceView.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/FlatOrderedMap.hpp>
+#include <Utility/Containers/ResizableArray.hpp>
 #include <Packages/ResourceView.hpp>
 //------------------------------------------------------------------//
 
@@ -26,15 +26,15 @@ namespace Eldritch2 {
 namespace Physics {
 namespace BulletDynamics {
 
-	class CollisionShapeResourceView : public FileSystem::ResourceView {
+	class ArticulatedBodyResourceView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref CollisionShapeResourceView instance.
-		CollisionShapeResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		//! Constructs this @ref ArticulatedBodyResourceView instance.
+		ArticulatedBodyResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
-		//! Destroys this @ref CollisionShapeResourceView instance.
-		~CollisionShapeResourceView();
+		//! Destroys this @ref ArticulatedBodyResourceView instance.
+		~ArticulatedBodyResourceView();
 
 	// ---------------------------------------------------
 
@@ -47,8 +47,8 @@ namespace BulletDynamics {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator												_shapeAllocator;
-		::Eldritch2::FlatOrderedMap<::Eldritch2::uint32, ::btCollisionShape*>	_shapes;
+		::Eldritch2::ChildAllocator							_shapeAllocator;
+		::Eldritch2::ResizableArray<::btCollisionShape*>	_shapes;
 	};
 
 }	// namespace BulletDynamics

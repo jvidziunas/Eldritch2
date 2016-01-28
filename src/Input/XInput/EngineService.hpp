@@ -81,7 +81,9 @@ namespace XInput {
 	protected:
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) override sealed;
 
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) override sealed;
+	// ---------------------------------------------------
+
+		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
 	// - DATA MEMBERS ------------------------------------
 	

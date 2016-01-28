@@ -15,7 +15,7 @@
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
 #include <FileSystem/ReadableMemoryMappedFile.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
+#include <Utility/Memory/ChildAllocator.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Utility/Result.hpp>
 //------------------------------------------------------------------//
@@ -41,7 +41,7 @@ namespace FileSystem {
 		/*!	@param[in] package Movable object handle to the @ref ContentPackage this @ref PackageDeserializationContext will be deserializing.
 			@remarks The @ref PackageDeserializationContext will continue to hold a reference to the @ref ContentPackage while in scope.
 			*/
-		PackageDeserializationContext( const Scripting::ObjectHandle<FileSystem::ContentPackage>& package );
+		PackageDeserializationContext( const Scripting::ObjectHandle<FileSystem::ContentPackage>& package, ::Eldritch2::Allocator& allocator );
 	
 		//! Destroys this @ref PackageDeserializationContext instance.
 		~PackageDeserializationContext() = default;
@@ -90,9 +90,9 @@ namespace FileSystem {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
+		::Eldritch2::ChildAllocator											_allocator;
 		//! Package reference. This will keep the package alive throughout the deserialization process.
 		Scripting::ObjectHandle<FileSystem::ContentPackage>					_packageReference;
-		::Eldritch2::FixedStackAllocator<64u>								_backingFileAllocator;
 
 		// Ensure this is placed after the allocator for the destructors to fire in the correct order.
 		::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	_tableOfContentsFile;

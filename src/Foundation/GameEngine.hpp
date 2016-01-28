@@ -12,12 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/IntrusiveVyukovMPSCQueue.hpp>
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Configuration/ConfigurablePODVariable.hpp>
-#include <Utility/Containers/ResizableArray.hpp>
+#include <Utility/Containers/IntrusiveList.hpp>
 #include <Foundation/GameEngineService.hpp>
-#include <Scripting/ReferenceCountable.hpp>
 #include <Logging/FileAppendingLogger.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Foundation/World.hpp>
@@ -26,10 +24,6 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Foundation {
-		class	GameEngine;
-	}
-
 	namespace Scheduler {
 		class	ThreadScheduler;
 	}
@@ -38,16 +32,13 @@ namespace Eldritch2 {
 		class	SystemInterface;
 	}
 
-	class	ErrorCode;
 	class	Allocator;
-	template <typename Iterator>
-	class	Range;
 }
 
 namespace Eldritch2 {
 namespace Foundation {
 
-	class GameEngine : public Scripting::ReferenceCountable {
+	class GameEngine {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -66,26 +57,35 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-		ETInlineHint const FileSystem::ContentLibrary&	GetContentLibrary() const;
-		ETInlineHint FileSystem::ContentLibrary&		GetContentLibrary();
+		ETInlineHint const ::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>&	GetAttachedServices() const;
+		ETInlineHint ::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>&			GetAttachedServices();
+
+		ETInlineHint const FileSystem::ContentLibrary&											GetContentLibrary() const;
+		ETInlineHint FileSystem::ContentLibrary&												GetContentLibrary();
 
 		//! Retrieves the @ref ThreadScheduler instance this @ref GameEngine runs threads on.
-		ETInlineHint const Scheduler::ThreadScheduler&	GetThreadScheduler() const;
+		ETInlineHint const Scheduler::ThreadScheduler&											GetThreadScheduler() const;
 		//! Retrieves the @ref ThreadScheduler instance this @ref GameEngine runs threads on.
-		ETInlineHint Scheduler::ThreadScheduler&		GetThreadScheduler();
+		ETInlineHint Scheduler::ThreadScheduler&												GetThreadScheduler();
 
 		//! Retrieves a read-only view the @ref SystemInterface describing the hardware this @ref GameEngine instance is executing on.
-		ETInlineHint const System::SystemInterface&		GetSystemInterface() const;
+		ETInlineHint const System::SystemInterface&												GetSystemInterface() const;
 
-		ETInlineHint ::Eldritch2::Allocator&			GetAllocator();
+		ETInlineHint ::Eldritch2::Allocator&													GetAllocator();
+
+		ETInlineHint size_t																		GetWorldArenaSizeInBytes() const;
 
 	// ---------------------------------------------------
 
-		size_t	CalculateFrameArenaSizeInBytes() const;
+		ETInlineHint void	NotifyOfNewService( Foundation::GameEngineService& service );
 
-		void	ClearAttachedServices();
+		void				NotifyOfNewWorld( Foundation::World& world );
 
-		void	Dispose() override sealed;
+		void				NotifyOfWorldDestruction( Foundation::World& world );
+
+		void				ClearAttachedServices();
+
+		void				ClearAttachedWorlds();
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -110,10 +110,13 @@ namespace Foundation {
 		// ---------------------------------------------------
 
 		protected:
+			void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
+
 			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
 
-			void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) override sealed;
-			void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const WorldTickTaskVisitor ) override sealed;
+		// ---------------------------------------------------
+			
+			void	OnWorldTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 		};
 
 	// - DATA MEMBERS ------------------------------------
@@ -128,20 +131,14 @@ namespace Foundation {
 		Scheduler::ThreadScheduler&											_scheduler;
 
 		Configuration::ConfigurablePODVariable<LogMessageType>				_logEchoThreshold;
-		Configuration::ConfigurablePODVariable<size_t>						_taskArenaPerThreadAllocationSizeInBytes;
 		Configuration::ConfigurablePODVariable<size_t>						_worldArenaSizeInBytes;
 
-		::Eldritch2::IntrusiveVyukovMPSCQueue<Foundation::World>			_tickingWorlds;
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>	_worldMutex;
+		::Eldritch2::IntrusiveList<Foundation::World>						_worlds;
+		::std::atomic<size_t>												_worldCount;
 
 		::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>	_attachedServices;
 		ManagementService													_managementService;
-
-		Scheduler::WorkerContext::FinishCounter								_frameFinishCounter;
-
-	// - FRIEND CLASS DECLARATION ------------------------
-
-		friend class ::Eldritch2::Foundation::GameEngineService;
-		friend class ::Eldritch2::Foundation::World;
 	};
 
 }	// namespace Foundation

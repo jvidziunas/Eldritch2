@@ -264,9 +264,6 @@
     <ClCompile Include="..\src\Utility\FourCCGenerator.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\RandomNumberGenerator.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\ScopedFPUController.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -427,9 +424,6 @@
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.cpp">
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp">
@@ -606,6 +600,12 @@
     <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.WorkerThread.cpp">
       <Filter>Source Files\Scheduler\Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\foundation\World.ManagementView.cpp">
+      <Filter>Source Files\Foundation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
@@ -630,9 +630,6 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\IdentifierPool.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\RandomNumberGenerator.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ScopedFPUController.hpp">
@@ -917,9 +914,6 @@
     <ClInclude Include="..\src\Physics\BulletDynamics\WorldView.hpp">
       <Filter>Header Files\Physics\Bullet Dynamics</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.hpp">
-      <Filter>Header Files\Physics\Bullet Dynamics</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.hpp">
       <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
@@ -1135,6 +1129,12 @@
     </ClInclude>
     <ClInclude Include="..\src\Scripting\ReferenceCountable.hpp">
       <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.hpp">
+      <Filter>Header Files\Physics\Bullet Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveListHook.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

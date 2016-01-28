@@ -254,6 +254,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
     <ClCompile Include="..\src\Foundation\GameEngine.ManagementService.cpp" />
+    <ClCompile Include="..\src\foundation\World.ManagementView.cpp" />
     <ClCompile Include="..\src\Foundation\WorldView.cpp" />
     <ClCompile Include="..\src\Input\Keyboard.cpp" />
     <ClCompile Include="..\src\Input\Mouse.cpp" />
@@ -277,7 +278,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterArmatureComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp" />
@@ -347,7 +348,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\Memory\ObjectPoolAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp" />
     <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp" />
-    <ClCompile Include="..\src\Utility\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\src\Utility\ScopedFPUController.cpp" />
     <ClCompile Include="..\src\Utility\SurjectiveQueryEngine.cpp" />
     <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
@@ -402,7 +402,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.hpp" />
-    <ClInclude Include="..\src\Physics\BulletDynamics\CollisionShapeResourceView.hpp" />
+    <ClInclude Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\EngineService.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\WorldView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.hpp" />
@@ -451,6 +451,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Concurrency\WaitableUserEvent.hpp" />
     <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveListHook.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
     <ClInclude Include="..\src\Utility\Containers\String.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SystemString.hpp" />
@@ -472,7 +473,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\FourCCGenerator.hpp" />
     <ClInclude Include="..\src\Utility\IdentifierPool.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
-    <ClInclude Include="..\src\Utility\RandomNumberGenerator.hpp" />
     <ClInclude Include="..\src\Utility\Result.hpp" />
     <ClInclude Include="..\src\Utility\ScopedFPUController.hpp" />
     <ClInclude Include="..\src\Utility\SurjectiveQueryEngine.hpp" />

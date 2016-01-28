@@ -15,12 +15,23 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <istream>
-#include <ostream>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Foundation {
+
+	ETInlineHint const ::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>& GameEngine::GetAttachedServices() const {
+		return _attachedServices;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint::Eldritch2::IntrusiveForwardList<Foundation::GameEngineService>& GameEngine::GetAttachedServices() {
+		return _attachedServices;
+	}
+
+// ---------------------------------------------------
 
 	ETInlineHint ::Eldritch2::Allocator& GameEngine::GetAllocator() {
 		return _allocator;
@@ -54,6 +65,18 @@ namespace Foundation {
 
 	ETInlineHint const System::SystemInterface& GameEngine::GetSystemInterface() const {
 		return _systemInterface;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint size_t GameEngine::GetWorldArenaSizeInBytes() const {
+		return _worldArenaSizeInBytes;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint void GameEngine::NotifyOfNewService( Foundation::GameEngineService& service ) {
+		GetAttachedServices().PushFront( service );
 	}
 
 }	// namespace Foundation

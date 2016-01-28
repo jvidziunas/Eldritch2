@@ -13,8 +13,8 @@
 // INCLUDES
 //==================================================================//
 #include <Input/XInput/EngineService.hpp>
-#include <Utility/Memory/InstanceNew.hpp>
-#include <Utility/ErrorCode.hpp>
+//------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Foundation;
@@ -43,12 +43,12 @@ namespace XInput {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
-			for( auto& controller : static_cast<EngineService*>(service)->_controllers ) {
-				controller.ReadInput();
-			}
-		} } );
+	void EngineService::OnServiceTickStarted( WorkerContext& executingContext ) {
+		MICROPROFILE_SCOPEI( "Input", "XInput Controller Sample", 0xFFFFFF );
+
+		for( auto& controller : _controllers ) {
+			controller.ReadInput();
+		}
 	}
 
 }	// namespace XInput

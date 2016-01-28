@@ -84,6 +84,34 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
+	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& executingContext ) {
+		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Initialize Direct3D", 0xFFBBBB );
+
+		DeviceBuilder	deviceBuilder;
+		const bool		useDebugLayer( (0 != ::IsDebuggerPresent()) | _forceDebugRuntime );
+
+		GetLogger()( UTF8L("Creating Direct3D %s.") ET_UTF8_NEWLINE_LITERAL, (useDebugLayer ? UTF8L("debug device") : UTF8L("device")) );
+
+		deviceBuilder.SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled().SetDriverThreadingOptimizationsEnabled( _allowDriverThreadingOptimizations );
+		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.GetCharacterArray() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
+
+		if( const auto device = deviceBuilder.Build() ) {
+			GetLogger()( UTF8L("Constructed Direct3D device successfully.") ET_UTF8_NEWLINE_LITERAL );
+
+			device->GetImmediateContext( _immediateContext.GetInterfacePointer() );
+
+			::MicroProfileGpuInitD3D11( device.GetUnadornedPointer(), _immediateContext.GetUnadornedPointer() );
+
+			_shaderResourceViewFactory.SetDevice( device );
+			_meshResourceViewFactory.SetDevice( device );
+			_pipelineViewFactory.SetDevice( device );
+		} else {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to instantiate Direct3D!.") ET_UTF8_NEWLINE_LITERAL );
+		}
+	}
+
+// ---------------------------------------------------
+
 	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
 		struct FunctionHelper {
 			static SwapChain* ETScriptAPICall GetPrimarySwapChain() {
@@ -122,14 +150,6 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->InitializeDirect3D();
-		} } );
-	}
-
-// ---------------------------------------------------
-
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
 		visitor.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), _shaderResourceViewFactory )
 			   .PublishFactory( MeshResourceView::GetSerializedDataTag(), _meshResourceViewFactory )
@@ -138,28 +158,8 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void EngineService::InitializeDirect3D() {
-		DeviceBuilder	deviceBuilder;
-		const bool		useDebugLayer( (0 != ::IsDebuggerPresent()) | _forceDebugRuntime );
-
-		GetLogger()( UTF8L("Creating Direct3D %sdevice.") ET_UTF8_NEWLINE_LITERAL, (useDebugLayer ? UTF8L("debug ") : UTF8L("")) );
-
-		deviceBuilder.SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled().SetDriverThreadingOptimizationsEnabled( _allowDriverThreadingOptimizations );
-		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.GetCharacterArray() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
-
-		if( const auto device = deviceBuilder.Build() ) {
-			GetLogger()( UTF8L("Constructed Direct3D device successfully.") ET_UTF8_NEWLINE_LITERAL );
-
-			device->GetImmediateContext( _immediateContext.GetInterfacePointer() );
-
-			::MicroProfileGpuInitD3D11( device.GetUnadornedPointer(), _immediateContext.GetUnadornedPointer() );
-
-			_shaderResourceViewFactory.SetDevice( device );
-			_meshResourceViewFactory.SetDevice( device );
-			_pipelineViewFactory.SetDevice( device );
-		} else {
-			GetLogger( LogMessageType::Error )( UTF8L("Unable to instantiate Direct3D!.") ET_UTF8_NEWLINE_LITERAL );
-		}
+	void EngineService::OnServiceTickStarted( WorkerContext& executingContext ) {
+		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Flip swap chains", 0xFABBCB );
 	}
 
 }	// namespace Direct3D11

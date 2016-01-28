@@ -90,45 +90,45 @@ namespace Steamworks {
 	// ---------------------------------------------------
 
 	protected:
+		void	OnEngineConfigurationBroadcast( Scheduler::WorkerContext& executingContext ) override sealed;
+
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( const PostInitializationVisitor ) override sealed;
 
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) override sealed;
+		void	OnEngineInitializationCompleted( Scheduler::WorkerContext& executingContext ) override sealed;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	ProcessAndDispatchCallbacks();
+		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
-		void					InitiateSteamConnection();
+	// ---------------------------------------------------
+
+		void	OnPlayerConnected();
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator									_allocator;
+		::Eldritch2::ChildAllocator											_allocator;
 
-		Utility::ReaderWriterUserMutex*								_networkMutex;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>			_steamPort;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>			_gamePort;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>			_queryPort;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_steamPort;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_gamePort;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_queryPort;
+		Configuration::ConfigurableUTF8String								_versionString;
+		Configuration::ConfigurableUTF8String								_lobbyWorldName;
 
-		Configuration::ConfigurableUTF8String						_versionString;
-		Configuration::ConfigurableUTF8String						_lobbyWorldName;
+		Configuration::ConfigurablePODVariable<bool>						_useVACAuthentication;
+		Configuration::ConfigurablePODVariable<bool>						_useSteamworks;
 
-		Configuration::ConfigurablePODVariable<bool>				_useVACAuthentication;
-		Configuration::ConfigurablePODVariable<bool>				_useSteamworks;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>			_replicationUploadBandwidthLimitInKilobytesPerSecond;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>			_replicationDownloadBandwidthLimitInKilobytesPerSecond;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_replicationUploadBandwidthLimitInKilobytesPerSecond;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_replicationDownloadBandwidthLimitInKilobytesPerSecond;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>			_contentDownloadBandwidthLimitInKilobytesPerSecond;
+		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>			_contentUploadBandwidthLimitInKilobytesPerSecond;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_contentDownloadBandwidthLimitInKilobytesPerSecond;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_contentUploadBandwidthLimitInKilobytesPerSecond;
+		::Eldritch2::FlatOrderedSet<::CSteamID>								_banList;
 
-		::Eldritch2::FlatOrderedSet<::CSteamID>						_banList;
-
-		Scripting::ObjectHandle<Foundation::World>					_lobbyWorld;
+		Scripting::ObjectHandle<Foundation::World>							_lobbyWorld;
 	};
 
 }	// namespace Steamworks

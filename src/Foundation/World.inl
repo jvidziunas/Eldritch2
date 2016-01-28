@@ -32,8 +32,26 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
+	ETInlineHint const ::Eldritch2::IntrusiveForwardList<Foundation::WorldView>& World::GetAttachedViews() const {
+		return _attachedViews;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint::Eldritch2::IntrusiveForwardList<Foundation::WorldView>& World::GetAttachedViews() {
+		return _attachedViews;
+	}
+
+// ---------------------------------------------------
+
 	ETInlineHint const FileSystem::ContentPackage& World::GetRootPackage() const {
 		return *static_cast<const FileSystem::ContentPackage*>(_package);
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint const FileSystem::ContentLibrary& World::GetContentLibrary() const {
+		return _contentLibrary;
 	}
 
 // ---------------------------------------------------

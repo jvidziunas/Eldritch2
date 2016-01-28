@@ -54,21 +54,20 @@ namespace AngelScript {
 	// ---------------------------------------------------
 
 	protected:
+		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
+
 		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
 
 	// ---------------------------------------------------
+		
+		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) override sealed;
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) override sealed;
-
-	// ---------------------------------------------------
+	// - SCRIPT MARSHALING -------------------------------
 
 		Scripting::StringMarshal	MarshalStringLiteral( const unsigned int literalLengthInOctets, const ::Eldritch2::UTF8Char* const stringLiteral );
 
 		void						MessageCallback( const ::asSMessageInfo* messageInfo );
-
-		void						CreateScriptAPI();
 
 	// - TYPE PUBLISHING ---------------------------------
 

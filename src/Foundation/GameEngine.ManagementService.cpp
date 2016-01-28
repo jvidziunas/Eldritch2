@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
+#include <Scheduler/ThreadScheduler.hpp>
 #include <Scheduler/WorkerContext.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Foundation/World.hpp>
@@ -43,62 +44,55 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void GameEngine::ManagementService::InitializeEngineAndLaunchFrameLoop( Scheduler::WorkerContext& executingContext ) {
-		//! This is responsible for keeping the engine alive for the duration of initialization.
-		ObjectHandle<GameEngine>	engineReference( _owningEngine, ::Eldritch2::PassthroughReferenceCountingSemantics );
+		::MicroProfileSetForceEnable( true );
+		::MicroProfileSetEnableAllGroups( true );
+		::MicroProfileSetForceMetaCounters( true );
 
-		{	MICROPROFILE_SCOPEI( "Initialization", "Initialization", 0xAAAAAAAA );
-			{	WorkerContext::FinishCounter	initializationCounter( 0 );
-				BroadcastTaskVisitor( executingContext, initializationCounter, GameEngineService::InitializeEngineTaskVisitor() );
-
-				// Wait for all initialization tasks to complete.
-				executingContext.WaitForCounter( initializationCounter );
-			}
-
-			BroadcastInitializationVisitor( GameEngineService::PostInitializationVisitor() );
+		{	MICROPROFILE_SCOPEI( "Initialization", "Initialization", 0xAAAAAA );
+			InvokeInitializationFunction<&GameEngineService::OnEngineInitializationStarted>( executingContext );
+			InvokeInitializationFunction<&GameEngineService::OnEngineInitializationCompleted>( executingContext );
 		}
 
 		// Log a successful initialization...
-		GetLogger( LogMessageType::Message )(UTF8L( "Engine initialization complete!" ) ET_UTF8_NEWLINE_LITERAL);
+		GetLogger( LogMessageType::Message )( UTF8L("Engine initialization complete!") ET_UTF8_NEWLINE_LITERAL );
 
-		// ... flip the initialization 'frame'...
-		::MicroProfileFlip( nullptr );
+		// Execute while we have worlds.
+		while( 0u != _owningEngine._worldCount.load( ::std::memory_order_consume ) ) {
+			::MicroProfileFlip( nullptr );
 
-		// ... and begin the frame loop.
-		while( !engineReference.IsSoleReferenceToObject() ) {
-			{	MICROPROFILE_SCOPEI( "Main", "Frame", 0xAAAAAAAA );
-				{	MICROPROFILE_SCOPEI( "Main", "Engine Service Tick", 0xEEEEEEEE );
-					WorkerContext::FinishCounter	tickServicesCounter( 0 );
-					BroadcastTaskVisitor( executingContext, tickServicesCounter, GameEngineService::ServiceTickTaskVisitor() );
-
-					executingContext.WaitForCounter( tickServicesCounter );
+			{	MICROPROFILE_SCOPEI( "Main", "Frame", 0xAAAAAA );
+				{	MICROPROFILE_SCOPEI( "Main", "Engine Service Tick", 0xEEEEEE );
+					InvokeTickFunction<&GameEngineService::OnServiceTickStarted>( executingContext );
 				}
 		
-				{	MICROPROFILE_SCOPEI( "Main", "World Tick", 0xFFFFFFFF );
-					WorkerContext::FinishCounter	tickWorldsCounter( 0 );
-					BroadcastTaskVisitor( executingContext, tickWorldsCounter, GameEngineService::WorldTickTaskVisitor() );
-
-					executingContext.WaitForCounter( tickWorldsCounter );
+				{	MICROPROFILE_SCOPEI( "Main", "World Tick", 0xFFFFFF );
+					InvokeTickFunction<&GameEngineService::OnWorldTickStarted>( executingContext );
 				}
 			}
-
-			::MicroProfileFlip( nullptr );
 		}
+
+		GetLogger( LogMessageType::Message )( UTF8L("Terminating execution.") ET_UTF8_NEWLINE_LITERAL );
+		_owningEngine.GetThreadScheduler().FlagForShutdown();
 	}
 
 // ---------------------------------------------------
 
-	void GameEngine::ManagementService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const InitializeEngineTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, [] ( void* managementService, WorkerContext& /*executingContext*/ ) {
-			static_cast<ManagementService*>(managementService)->BroadcastInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor( static_cast<ManagementService*>(managementService)->_owningEngine._contentLibrary ) );
-		} } );
+	void GameEngine::ManagementService::OnEngineInitializationStarted( WorkerContext& /*executingContext*/ ) {
+		BroadcastInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor( _owningEngine._contentLibrary ) );
 	}
 
 // ---------------------------------------------------
 
-	void GameEngine::ManagementService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const WorldTickTaskVisitor ) {
-		_owningEngine._tickingWorlds.ClearAndDispose( [&executingContext, &finishCounter] ( World& tickingWorld ) {
-			tickingWorld.QueueUpdateTasks( executingContext, finishCounter );
-		} );
+	void GameEngine::ManagementService::OnWorldTickStarted( WorkerContext& executingContext ) {
+		WorkerContext::FinishCounter	finishCounter( 0 );
+
+		{	ScopedReaderLock	_( *_owningEngine._worldMutex );
+			for( auto& world : _owningEngine._worlds ) {
+				world.QueueUpdateTasks( executingContext, finishCounter );
+			}
+		}	// End of lock scope.
+		
+		executingContext.WaitForCounter( finishCounter );
 	}
 
 // ---------------------------------------------------
@@ -106,7 +100,7 @@ namespace Foundation {
 	void GameEngine::ManagementService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
 		visitor.PushSection( UTF8L("Engine") );
 
-		visitor.Register( UTF8L("LogEchoThreshold"), _owningEngine._logEchoThreshold ).Register( UTF8L("TaskArenaPerThreadAllocationSizeInBytes"), _owningEngine._taskArenaPerThreadAllocationSizeInBytes );
+		visitor.Register( UTF8L("LogEchoThreshold"), _owningEngine._logEchoThreshold );
 	}
 
 }	// namespace Foundation

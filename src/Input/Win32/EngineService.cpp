@@ -111,16 +111,14 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PreConfigurationLoadedTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, [] ( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->GetLogger()( UTF8L("Initializing input service.") ET_UTF8_NEWLINE_LITERAL );
+	void EngineService::OnEngineInitializationStarted( WorkerContext& executingContext ) {
+		GetLogger()( UTF8L("Initializing input service.") ET_UTF8_NEWLINE_LITERAL );
 
-			if( const auto result = static_cast<EngineService*>(service)->LaunchThread( static_cast<EngineService*>(service)->_pollingThread ) ) {
-				static_cast<EngineService*>(service)->GetLogger()( UTF8L("Initialized event polling thread.") ET_UTF8_NEWLINE_LITERAL );
-			} else {
-				static_cast<EngineService*>(service)->GetLogger( LogMessageType::Error )( UTF8L("Error initializing input service: %s!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
-			}
-		} } );
+		if( const auto result = LaunchThread( _pollingThread ) ) {
+			GetLogger()( UTF8L("Initialized event polling thread.") ET_UTF8_NEWLINE_LITERAL );
+		} else {
+			GetLogger( LogMessageType::Error )( UTF8L("Error initializing input service: %s!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
+		}
 	}
 
 // ---------------------------------------------------

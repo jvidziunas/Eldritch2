@@ -12,24 +12,36 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scheduler/WorkerContext.hpp>
 #include <Foundation/World.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Foundation {
 
-	template <typename TaskVisitor>
-	void WorldView::BroadcastTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, TaskVisitor&& visitor ) {
-		for( auto& view : _owningWorld._attachedViews ) {
-			view.AcceptTaskVisitor( executingContext, finishCounter, visitor );
+	template <void (WorldView::*TickFunction)(Scheduler::WorkerContext&)>
+	void WorldView::InvokeTickFunction( Scheduler::WorkerContext::FinishCounter& finishCounter, Scheduler::WorkerContext& executingContext ) {
+		for( WorldView& view : _owningWorld.GetAttachedViews() ) {
+			executingContext.Enqueue( finishCounter, { &view, [] ( void* parameter, Scheduler::WorkerContext& executingContext ) { (static_cast<WorldView*>(parameter)->*TickFunction)( executingContext ); } } );
 		}
+	}
+
+// ---------------------------------------------------
+
+	template <void (WorldView::*TickFunction)( Scheduler::WorkerContext& )>
+	void WorldView::InvokeTickFunction( Scheduler::WorkerContext& executingContext ) {
+		Scheduler::WorkerContext::FinishCounter	finishCounter( 0 );
+
+		InvokeTickFunction<TickFunction>( finishCounter, executingContext );
+
+		executingContext.WaitForCounter( finishCounter );
 	}
 
 // ---------------------------------------------------
 
 	template <typename ViewVisitor>
 	void WorldView::BroadcastViewVisitor( ViewVisitor&& visitor ) {
-		for( auto& view : _owningWorld._attachedViews ) {
+		for( auto& view : _owningWorld.GetAttachedViews() ) {
 			view.AcceptViewVisitor( visitor );
 		}
 	}

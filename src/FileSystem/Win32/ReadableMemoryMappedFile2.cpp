@@ -34,13 +34,13 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void ReadableMemoryMappedFile2::PrefetchRangeForRead( const Range<const char*> memoryRange ) const {
+	void ReadableMemoryMappedFile2::PrefetchRange( const Range<const char*> memoryRange ) const {
 #if( WIN8_MEMORY_MAPPED_FILE_AVAILABLE )
 		::WIN32_MEMORY_RANGE_ENTRY	ranges[] = { { const_cast<char*>(memoryRange.first), memoryRange.Size() } };
 
 		::PrefetchVirtualMemory( ::GetCurrentProcess(), _countof( ranges ), ranges, 0 );
 #else
-		ReadableMemoryMappedFile::PrefetchRangeForRead( memoryRange );
+		ReadableMemoryMappedFile::PrefetchRange( memoryRange );
 #endif
 	}
 

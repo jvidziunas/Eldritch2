@@ -29,8 +29,11 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		virtual void	PrefetchRangeForRead( const ::Eldritch2::Range<const char*> memoryRange ) const abstract;
-		void			PrefetchRangeForRead( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const;
+		virtual void	PrefetchRange( const ::Eldritch2::Range<const char*> memoryRange ) const abstract;
+		void			PrefetchRange( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const;
+
+		virtual void	EvictRange( const ::Eldritch2::Range<const char*> memoryRange ) const;
+		virtual void	EvictRange( const size_t offsetInBytes, const size_t rangeSizeInBytes ) const;
 
 	// ---------------------------------------------------
 

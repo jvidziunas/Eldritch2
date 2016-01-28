@@ -66,17 +66,15 @@ namespace Direct3D11 {
 	// ---------------------------------------------------
 
 	protected:
+		void	OnEngineConfigurationBroadcast( Scheduler::WorkerContext& executingContext ) override sealed;
+
 		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
 
 	// ---------------------------------------------------
 
-		void	AcceptTaskVisitor( Scheduler::WorkerContext& executingContext, Scheduler::WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) override sealed;
-
-	// ---------------------------------------------------
-
-		void	InitializeDirect3D();
+		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
 

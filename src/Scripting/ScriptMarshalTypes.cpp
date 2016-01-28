@@ -40,7 +40,7 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( const StringMarshal& string, Allocator& allocator ) : StringMarshal( string.GetCharacterArray(), string.Length(), allocator ) {}
+	StringMarshal::StringMarshal( const StringMarshal& string, Allocator& allocator ) : StringMarshal( string.GetCharacterArray(), string.GetLength(), allocator ) {}
 
 // ---------------------------------------------------
 
@@ -67,7 +67,7 @@ namespace Scripting {
 			}
 
 			static StringMarshal::SizeType ETScriptAPICall GetLength( const StringMarshal* thisPointer ) {
-				return thisPointer->Length();
+				return thisPointer->GetLength();
 			}
 		};
 

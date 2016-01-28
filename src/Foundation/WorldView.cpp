@@ -14,7 +14,6 @@
 //==================================================================//
 #include <Foundation/GameEngine.hpp>
 #include <Foundation/WorldView.hpp>
-#include <Utility/ErrorCode.hpp>
 #include <Foundation/World.hpp>
 //------------------------------------------------------------------//
 
@@ -28,48 +27,42 @@ namespace Eldritch2 {
 namespace Foundation {
 
 	WorldView::WorldView( World& owningWorld ) : _owningWorld( owningWorld ) {
-		owningWorld._attachedViews.PushFront( *this );
+		owningWorld.GetAttachedViews().PushFront( *this );
 	}
 
 // ---------------------------------------------------
 
 	Allocator& WorldView::GetWorldAllocator() {
-		return _owningWorld._allocator;
+		return _owningWorld.GetAllocator();
 	}
 
 // ---------------------------------------------------
 
-	const ContentLibrary& WorldView::GetEngineContentLibrary() const {
-		return _owningWorld._owningEngine->GetContentLibrary();
+	const ContentLibrary& WorldView::GetContentLibrary() const {
+		return _owningWorld.GetContentLibrary();
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const FrameTickTaskVisitor ) {
+	void WorldView::OnFrameTick( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreScriptTickTaskVisitor ) {
+	void WorldView::OnPreScriptTick( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const ScriptTickTaskVisitor ) {
+	void WorldView::OnScriptTick( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PostScriptTickTaskVisitor ) {
-		// Default implementation should not do anything.
-	}
-
-// ---------------------------------------------------
-
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, MessageBus& /*visitor*/ ) {
+	void WorldView::OnPostScriptTick( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}
 
@@ -81,20 +74,14 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptViewVisitor( const LoadFinalizationVisitor ) {
-		// Default implementation should not do anything.
-	}
-
-// ---------------------------------------------------
-
 	void WorldView::AcceptViewVisitor( const DeletionPreparationVisitor ) {
 		// Default implementation should not do anything.
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::SetPaused( bool paused ) {
-		_owningWorld._isPaused = paused ? 1u : 0u;
+	void WorldView::OnGameStart( WorkerContext& /*executingContext*/ ) {
+		// Default implementation should not do anything.
 	}
 
 }	// namespace Foundation

@@ -16,3 +16,6 @@
 [submodule "extern/catch"]
 	path = extern/catch
 	url = https://github.com/philsquared/Catch.git
+[submodule "extern/cppformat"]
+	path = extern/cppformat
+	url = https://github.com/cppformat/cppformat.git

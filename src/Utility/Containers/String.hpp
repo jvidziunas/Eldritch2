@@ -142,9 +142,9 @@ namespace Detail {
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint SizeType	Length() const;
+		ETInlineHint SizeType	GetLength() const;
 
-		ETInlineHint bool		Empty() const;
+		ETInlineHint bool		IsEmpty() const;
 
 		ETInlineHint operator bool();
 

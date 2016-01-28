@@ -19,6 +19,8 @@
 #include <Utility/ErrorCode.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
+//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Foundation;
 using namespace ::Eldritch2::Scheduler;
@@ -115,16 +117,16 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& /*executingContext*/, WorkerContext::FinishCounter& /*finishCounter*/, const PreScriptTickTaskVisitor ) {
+	void WorldView::OnPreScriptTick( WorkerContext& /*executingContext*/ ) {
 		// Do pathfinding?
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostScriptTickTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, [] ( void* view, WorkerContext& /*executingContext*/ ) {
-			static_cast<WorldView*>(view)->_dynamicsWorld.stepSimulation2( 1.0f / 60.0f );
-		} } );
+	void WorldView::OnPostScriptTick( WorkerContext& executingContext ) {
+		MICROPROFILE_SCOPEI( "Bullet Dynamics Engine", "Step physics simulation", 0xFFBBBB );
+
+		_dynamicsWorld.stepSimulation2( 1.0f / 60.0f );
 	}
 
 // ---------------------------------------------------

@@ -23,6 +23,7 @@
 #include <Utility/Result.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
+#include <microprofile/microprofile.h>
 #if( ET_COMPILER_IS_MSVC )
 //	Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
 #	pragma warning( push )
@@ -49,7 +50,6 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 namespace Eldritch2 {
 namespace Networking {
@@ -57,7 +57,6 @@ namespace Steamworks {
 
 	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
 															   _allocator( GetEngineAllocator(), UTF8L("Steamworks Networking Service Root Allocator") ),
-															   _networkMutex( owningEngine.GetThreadScheduler().AllocateReaderWriterUserMutex( _allocator ).object ),
 															   _steamPort( 6690u ),
 															   _gamePort( 6691u ),
 															   _queryPort( 6692u ),
@@ -75,10 +74,6 @@ namespace Steamworks {
 
 	EngineService::~EngineService() {
 		::SteamAPI_Shutdown();
-
-		if( _networkMutex ) {
-			_allocator.Delete( *_networkMutex, ::Eldritch2::AlignedDeallocationSemantics );
-		}
 	}
 
 // ---------------------------------------------------
@@ -91,6 +86,24 @@ namespace Steamworks {
 
 	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
 		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( *this, world ) ? Error::None : Error::OutOfMemory;
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& /*executingContext*/ ) {
+		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Initiate Steam connection", 0xBBBBBB );
+
+		GetLogger()( UTF8L("Connecting to Steam instance.") ET_UTF8_NEWLINE_LITERAL );
+
+		const ::EServerMode	serverMode( _useVACAuthentication ? ::eServerModeAuthenticationAndSecure : ::eServerModeAuthentication );
+		const uint32		serverAddress( 0u ); // INADDR_ANY
+
+		// Attempt to establish a connection with the Steam master servers.
+		if( ::SteamAPI_Init() ) {
+			GetLogger()( UTF8L("Initial Steam connection established.") ET_UTF8_NEWLINE_LITERAL );
+		} else {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
+		}
 	}
 
 // ---------------------------------------------------
@@ -115,53 +128,29 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( const PostInitializationVisitor ) {
-		// auto	createPlayerResult( AcknowledgePlayerConnection( { ::SteamUser()->GetSteamID(), 0u } ) );
+	void EngineService::OnEngineInitializationCompleted( WorkerContext& /*executingContext*/ ) {
+		auto	createLobbyWorldResult( CreateWorld( _lobbyWorldName.GetCharacterArray() ) );
 
-		if( auto createLobbyWorldResult = CreateWorld( _lobbyWorldName.GetCharacterArray() ) ) {
-			_lobbyWorld = move( createLobbyWorldResult.object );
+		if( !createLobbyWorldResult ) {
+			return;
 		}
+
+		_lobbyWorld = ::std::move( createLobbyWorldResult.object );
+
+		// AcknowledgePlayerConnection( { ::SteamUser()->GetSteamID(), 0u } );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const PostConfigurationLoadedTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->InitiateSteamConnection();
-		} } );
-	}
+	void EngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
+		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Process and dispatch callbacks", 0xAAAAAA );
 
-// ---------------------------------------------------
-
-	void EngineService::AcceptTaskVisitor( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter, const ServiceTickTaskVisitor ) {
-		executingContext.Enqueue( finishCounter, { this, []( void* service, WorkerContext& /*executingContext*/ ) {
-			static_cast<EngineService*>(service)->ProcessAndDispatchCallbacks();
-		} } );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::InitiateSteamConnection() {
-		GetLogger()( UTF8L("Connecting to Steam instance.") ET_UTF8_NEWLINE_LITERAL );
-
-		const ::EServerMode	serverMode( _useVACAuthentication ? ::eServerModeAuthenticationAndSecure : ::eServerModeAuthentication );
-		const uint32		serverAddress( 0u ); // INADDR_ANY
-
-		// Attempt to establish a connection with the Steam master servers.
-		if( ::SteamAPI_Init() ) {
-			GetLogger()( UTF8L("Initial Steam connection established.") ET_UTF8_NEWLINE_LITERAL );
-		} else {
-			GetLogger( LogMessageType::Error )( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
-		}
-	}
-
-// ---------------------------------------------------
-
-	ErrorCode EngineService::ProcessAndDispatchCallbacks() {
 		::SteamAPI_RunCallbacks();
 		::SteamGameServer_RunCallbacks();
 
-		return Error::None;
+		if( _lobbyWorld && (_lobbyWorld->EncounteredFatalError()) ) {
+			_lobbyWorld = nullptr;
+		}
 	}
 
 }	// namespace Steamworks
