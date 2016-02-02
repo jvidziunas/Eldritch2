@@ -14,8 +14,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/FlatOrderedMap.hpp>
 #include <Foundation/GameEngineService.hpp>
+#include <Utility/Containers/FlatMap.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Scheduler/Thread.hpp>
 #include <Input/Keyboard.hpp>
@@ -159,7 +159,7 @@ namespace Win32 {
 		::Eldritch2::ChildAllocator									_allocator;
 		const ::HHOOK												_keyboardHook;
 		Utility::ReaderWriterUserMutex*								_deviceDirectoryMutex;
-		::Eldritch2::FlatOrderedMap<::HANDLE, RawInputSubscriber*>	_deviceDirectory;
+		::Eldritch2::FlatMap<::HANDLE, RawInputSubscriber*>	_deviceDirectory;
 		RawInputPollingThread										_pollingThread;
 	};
 

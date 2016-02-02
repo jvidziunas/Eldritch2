@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/FlatOrderedMap.hpp>
+#include <Utility/Containers/FlatMap.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/MPL/CharTypes.hpp>
 #include <Utility/MPL/IntTypes.hpp>

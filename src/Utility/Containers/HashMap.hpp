@@ -1,5 +1,5 @@
 /*==================================================================*\
-  UnorderedMap.hpp
+  HashMap.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -23,7 +23,7 @@
 namespace Eldritch2 {
 
 	template <typename Key, typename StoredObject, class Hasher = ::Eldritch2::Hash<Key>, class KeyEqualityComparator = ::Eldritch2::Equals<Key>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
-	class UnorderedMap {
+	class HashMap {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
@@ -42,17 +42,17 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref UnorderedMap instance.
-		ETInlineHint explicit UnorderedMap( AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref UnorderedMap instance.
-		ETInlineHint UnorderedMap( Hasher&& hasher, AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref UnorderedMap instance.
+		//! Constructs this @ref HashMap instance.
+		ETInlineHint explicit HashMap( AllocatorType&& allocatorType = AllocatorType() );
+		//! Constructs this @ref HashMap instance.
+		ETInlineHint HashMap( Hasher&& hasher, AllocatorType&& allocatorType = AllocatorType() );
+		//! Constructs this @ref HashMap instance.
 		template <class AlternateAllocator, int alternateLoadFactor>
-		ETInlineHint UnorderedMap( const ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref UnorderedMap instance.
-		ETInlineHint UnorderedMap( ::Eldritch2::UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource );
+		ETInlineHint HashMap( const ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocatorType = AllocatorType() );
+		//! Constructs this @ref HashMap instance.
+		ETInlineHint HashMap( ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource );
 
-		ETInlineHint ~UnorderedMap() = default;
+		ETInlineHint ~HashMap() = default;
 
 	// - ALGORITHMS --------------------------------------
 
@@ -73,20 +73,20 @@ namespace Eldritch2 {
 
 	// - ELEMENT ITERATION -------------------------------
 
-		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref UnorderedMap.
+		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashMap.
 		ETInlineHint ConstIterator	ConstBegin() const;
 
-		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref UnorderedMap.
+		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashMap.
 		ETInlineHint ConstIterator	Begin() const;
-		//!	Retrieves an @ref Iterator to the first element stored in this @ref UnorderedMap.
+		//!	Retrieves an @ref Iterator to the first element stored in this @ref HashMap.
 		ETInlineHint Iterator		Begin();
 
-		//!	Retrieves a const iterator to one past the end of all elements stored in this UnorderedMap.
+		//!	Retrieves a const iterator to one past the end of all elements stored in this HashMap.
 		ETInlineHint ConstIterator	ConstEnd() const;
 
-		// Retrieves a const iterator to one past the end of all elements stored in this UnorderedMap.
+		// Retrieves a const iterator to one past the end of all elements stored in this HashMap.
 		ETInlineHint ConstIterator	End() const;
-		// Retrieves an iterator to one past the end of all elements stored in this UnorderedMap.
+		// Retrieves an iterator to one past the end of all elements stored in this HashMap.
 		ETInlineHint Iterator		End();
 
 	// - ELEMENT ACCESS ----------------------------------
@@ -96,11 +96,11 @@ namespace Eldritch2 {
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&	operator=( const UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
+		ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&	operator=( const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
 
-		ETInlineHint void	CloneFrom( const UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
+		ETInlineHint void	CloneFrom( const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
 
-		ETInlineHint void	Swap( UnorderedMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& rhs );
+		ETInlineHint void	Swap( HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& rhs );
 
 	// - CONTAINER MANIPULATION --------------------------
 	    
@@ -149,5 +149,5 @@ namespace Eldritch2 {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/Containers/UnorderedMap.inl>
+#include <Utility/Containers/HashMap.inl>
 //------------------------------------------------------------------//

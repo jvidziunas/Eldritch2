@@ -43,7 +43,7 @@ namespace XInput {
 
 // ---------------------------------------------------
 
-	void EngineService::OnServiceTickStarted( WorkerContext& executingContext ) {
+	void EngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "Input", "XInput Controller Sample", 0xFFFFFF );
 
 		for( auto& controller : _controllers ) {

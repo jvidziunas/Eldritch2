@@ -52,7 +52,8 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-		void	operator()( ETFormatStringHint( const ::Eldritch2::UTF8Char* str ), ... );
+		template <typename... Arguments>
+		void	operator()( ETFormatStringHint( const ::Eldritch2::UTF8Char* str ), Arguments&&... arguments );
 
 	// ---------------------------------------------------
 

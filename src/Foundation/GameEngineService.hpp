@@ -171,10 +171,13 @@ namespace Foundation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		// Constructs this @ref GameEngineService instance.
+		/*!	Adds the service to the indicated @ref GameEngine's list of attached services.
+			@param[in] owningEngine @ref GameEngine responsible for updating the new @ref GameEngineService.
+			*/
 		GameEngineService( Foundation::GameEngine& owningEngine );
 
 		// Destroys this @ref GameEngineService instance.
-		~GameEngineService() = default;
+		~GameEngineService();
 
 	// - DATA MEMBERS ------------------------------------
 

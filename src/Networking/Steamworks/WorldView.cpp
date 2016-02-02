@@ -90,7 +90,7 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void WorldView::OnPreScriptTick( WorkerContext& executingContext ) {
+	void WorldView::OnPreScriptTick( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Pull remote state", 0xBBBBBB );
 
 		::CSteamID	senderID;
@@ -108,7 +108,7 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void WorldView::OnPostScriptTick( WorkerContext& executingContext ) {
+	void WorldView::OnPostScriptTick( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Push local state", 0xBBCCBB );
 
 		if( nullptr == _serverNetworking ) {
@@ -132,6 +132,8 @@ namespace Steamworks {
 			gameServer->SetProduct( UTF8_PROJECT_NAME );
 			gameServer->SetGameDescription( UTF8_PROJECT_NAME );
 			gameServer->SetModDir( "" );
+
+			// gameServer->LogOn();
 
 			_steamServersConnected.Register( this, &WorldView::OnSteamServersConnected );
 			_steamServersConnectFailure.Register( this, &WorldView::OnSteamServersConnectFailure );

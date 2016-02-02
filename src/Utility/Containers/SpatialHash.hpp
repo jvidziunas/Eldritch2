@@ -11,7 +11,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Containers/HashMap.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -49,11 +49,11 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Hasher = ::Eldritch2::SpatialHasher, typename Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
-	class SpatialHash : public ::Eldritch2::UnorderedMap<typename Hasher::CellIndex, StoredObject, Hasher, ::Eldritch2::Equals<typename Hasher::CellIndex>, Allocator, loadFactor> {
+	class SpatialHash : public ::Eldritch2::HashMap<typename Hasher::CellIndex, StoredObject, Hasher, ::Eldritch2::Equals<typename Hasher::CellIndex>, Allocator, loadFactor> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using UnderlyingContainer	= ::Eldritch2::UnorderedMap<typename Hasher::CellIndex, StoredObject, Hasher, ::Eldritch2::Equals<typename Hasher::CellIndex>, Allocator, loadFactor>;
+		using UnderlyingContainer	= ::Eldritch2::HashMap<typename Hasher::CellIndex, StoredObject, Hasher, ::Eldritch2::Equals<typename Hasher::CellIndex>, Allocator, loadFactor>;
 
 	public:
 		using CellIndex				= typename Hasher::CellIndex;

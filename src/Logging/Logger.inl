@@ -12,6 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#define FMT_EXCEPTIONS 0
+#include <cppformat/format.h>
+//------------------------------------------------------------------//
 #include <iostream>
 //------------------------------------------------------------------//
 
@@ -47,3 +50,19 @@ namespace std {
 	}
 
 }	// namespace std
+
+namespace Eldritch2 {
+namespace Foundation {
+
+template <typename... Arguments>
+void Logger::operator()( const ::Eldritch2::UTF8Char* str, Arguments&&... arguments ) {
+	::Eldritch2::UTF8Char	formattedString[256u];
+	fmt::ArrayWriter		formatter( formattedString, _countof(formattedString) );
+
+	formatter.write( str, ::std::forward<Arguments>( arguments )... );
+
+	Write( formatter.c_str(), formatter.size() );
+}
+
+}	// namespace Foundation
+}	// namespace Eldritch2

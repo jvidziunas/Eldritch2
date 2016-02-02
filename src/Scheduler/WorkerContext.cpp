@@ -18,6 +18,12 @@
 using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2;
 
+namespace {
+
+	static ETThreadLocal Scheduler::WorkerContext*	activeWorkerContext = nullptr;
+
+}	// anonymous namespace
+
 namespace Eldritch2 {
 namespace Scheduler {
 
@@ -46,6 +52,18 @@ namespace Scheduler {
 		finishCounter.fetch_add( 1, ::std::memory_order_relaxed );
 
 		_completionItems.PushBack( { &finishCounter, workItem } );
+	}
+
+// ---------------------------------------------------
+
+	WorkerContext* WorkerContext::GetActiveWorkerContext() {
+		return activeWorkerContext;
+	}
+
+// ---------------------------------------------------
+
+	void WorkerContext::SetActiveWorkerContext( WorkerContext* const context ) {
+		activeWorkerContext = context;
 	}
 
 // ---------------------------------------------------

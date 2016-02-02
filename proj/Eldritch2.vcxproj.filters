@@ -37,9 +37,6 @@
     <Filter Include="Source Files\Input\XInput">
       <UniqueIdentifier>{8858ab31-2bef-49fb-9899-48100fc782ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Logging">
-      <UniqueIdentifier>{5c43b2a7-da12-4430-93c5-6bffa6ee9612}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Networking">
       <UniqueIdentifier>{b62807a8-8006-4d3c-9c34-10ca15d01416}</UniqueIdentifier>
     </Filter>
@@ -132,9 +129,6 @@
     </Filter>
     <Filter Include="Header Files\Input\XInput">
       <UniqueIdentifier>{2b1b12e8-02dd-4c42-9479-21f2d2ad0495}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Logging">
-      <UniqueIdentifier>{d1a9a9fd-fd2f-4777-a182-87408a62d750}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Networking">
       <UniqueIdentifier>{c028f8ea-db62-4d2d-a511-1a932233a0cb}</UniqueIdentifier>
@@ -229,16 +223,16 @@
     <Filter Include="Header Files\FileSystem\Win32">
       <UniqueIdentifier>{9e86acb3-2d63-40e8-96a9-31efe3bb5ed3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics\PhysX">
+      <UniqueIdentifier>{1d6d41b4-94ba-4e55-b3f4-f749c9dd03af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics\PhysX">
+      <UniqueIdentifier>{d024a9b2-fde1-4961-856d-265b76a49a16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp">
       <Filter>Source Files\Configuration</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp">
-      <Filter>Source Files\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\logging\Logger.cpp">
-      <Filter>Source Files\Logging</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Packages\ResourceView.cpp">
       <Filter>Source Files\Packages</Filter>
@@ -432,12 +426,6 @@
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp">
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterArmatureComponent.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics\Extensions</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp">
       <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
@@ -606,6 +594,27 @@
     <ClCompile Include="..\src\foundation\World.ManagementView.cpp">
       <Filter>Source Files\Foundation</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp">
+      <Filter>Source Files\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\CPPFormatDefinitions.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.ArticulatedBodyComponent.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterControllerComponent.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
@@ -715,12 +724,6 @@
     </ClInclude>
     <ClInclude Include="..\src\configuration\ConfigurationDatabase.hpp">
       <Filter>Header Files\Configuration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Logging\FileAppendingLogger.hpp">
-      <Filter>Header Files\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\logging\Logger.hpp">
-      <Filter>Header Files\Logging</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Animation\AnimationTypes.hpp">
       <Filter>Header Files\Animation</Filter>
@@ -917,9 +920,6 @@
     <ClInclude Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.hpp">
       <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.hpp">
-      <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.hpp">
       <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
     </ClInclude>
@@ -992,22 +992,7 @@
     <ClInclude Include="..\src\Utility\ResultBase.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\FlatOrderedMap.hpp">
-      <Filter>Header Files\Utility\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp">
-      <Filter>Header Files\Utility\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\OrderedMap.hpp">
-      <Filter>Header Files\Utility\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\OrderedSet.hpp">
-      <Filter>Header Files\Utility\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp">
-      <Filter>Header Files\Utility\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp">
@@ -1136,6 +1121,39 @@
     <ClInclude Include="..\src\Utility\Containers\IntrusiveListHook.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\FlatMap.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\FlatSet.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\Map.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\Set.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\HashMap.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Logging\FileAppendingLogger.hpp">
+      <Filter>Header Files\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\logging\Logger.hpp">
+      <Filter>Header Files\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.hpp">
+      <Filter>Header Files\Physics\Bullet Dynamics\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\PhysX\WorldView.hpp">
+      <Filter>Header Files\Physics\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\PhysX\EngineService.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\PhysX\SmartPointers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1260,34 +1278,16 @@
     <None Include="..\src\Utility\ResultBase.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
-    <None Include="..\src\Utility\Containers\FlatOrderedMap.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
-    <None Include="..\src\Utility\Containers\FlatOrderedSet.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
     <None Include="..\src\Utility\Containers\IntrusiveForwardList.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\IntrusiveList.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
-    <None Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
-    <None Include="..\src\Utility\Containers\IntrusiveUnorderedSet.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
     <None Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\List.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
-    <None Include="..\src\Utility\Containers\OrderedMap.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
-    <None Include="..\src\Utility\Containers\OrderedSet.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\Range.inl">
@@ -1297,9 +1297,6 @@
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\SpatialHash.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
-    <None Include="..\src\Utility\Containers\UnorderedMap.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
     <None Include="..\src\Utility\Containers\UTF8String.inl">
@@ -1356,9 +1353,6 @@
     <None Include="..\src\Utility\Greater.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
-    <None Include="..\src\logging\Logger.inl">
-      <Filter>Source Files\Logging</Filter>
-    </None>
     <None Include="..\src\Utility\Containers\SystemString.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
@@ -1370,6 +1364,30 @@
     </None>
     <None Include="..\src\Scripting\ReferenceCountable.inl">
       <Filter>Source Files\Scripting</Filter>
+    </None>
+    <None Include="..\src\Scripting\AngelScript\ObjectGraph.fbc">
+      <Filter>IDL Files</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\FlatMap.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\FlatSet.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\Map.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\Set.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\HashMap.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\logging\Logger.inl">
+      <Filter>Source Files\Foundation</Filter>
+    </None>
+    <None Include="..\src\Physics\PhysX\SmartPointers.inl">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

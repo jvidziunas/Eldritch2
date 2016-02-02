@@ -12,7 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/ArenaAllocator.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
+#include <Utility/Memory/Allocator.hpp>
 #include <Logging/Logger.hpp>
 //------------------------------------------------------------------//
 
@@ -31,7 +32,7 @@ namespace Foundation {
 
 	public:
 		//!	Constructs this @ref FileAppendingLogger instance.
-		FileAppendingLogger( FileSystem::ContentProvider& contentProvider, const ::Eldritch2::UTF8Char* const logName );
+		FileAppendingLogger( FileSystem::ContentProvider& contentProvider, const ::Eldritch2::UTF8Char* const logName, ::Eldritch2::Allocator& allocator );
 
 		//!	Destroys this @ref FileAppendingLogger instance.
 		~FileAppendingLogger();
@@ -43,8 +44,7 @@ namespace Foundation {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::FixedStackAllocator<64u>	_allocator;
-		FileSystem::SynchronousFileAppender&	_appender;
+		::Eldritch2::InstancePointer<FileSystem::SynchronousFileAppender>	_appender;
 	};
 
 }	// namespace Foundation

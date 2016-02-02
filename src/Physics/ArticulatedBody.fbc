@@ -4,8 +4,14 @@ file_extension	"e2articulatedbody";
 namespace Eldritch2.Physics.FlatBuffers;
 
 table Body {
-	BoneIndex	: ushort;
-	Shape		: CollisionShape (required);
+	BoneIndex		: ushort;
+	Shape			: CollisionShape (required);
+	Mass			: float;
+	LinearDamping	: float;
+	AngularDamping	: float;
+	Friction		: float;
+	RollingFriction	: float;
+	Restitution		: float;
 }
 
 table ArticulatedBody {

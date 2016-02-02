@@ -79,5 +79,11 @@ namespace Foundation {
 		GetAttachedServices().PushFront( service );
 	}
 
+// ---------------------------------------------------
+
+	ETInlineHint void GameEngine::NotifyOfServiceDestruction( Foundation::GameEngineService& service ) {
+		GetAttachedServices().Erase( GetAttachedServices().IteratorTo( service ) );
+	}
+
 }	// namespace Foundation
 }	// namespace Eldritch2

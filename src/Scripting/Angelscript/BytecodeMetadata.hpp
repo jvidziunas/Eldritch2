@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
-#include <Utility/Containers/FlatOrderedMap.hpp>
+#include <Utility/Containers/FlatMap.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -91,7 +91,7 @@ namespace AngelScript {
 
 		private:
 			::Eldritch2::ResizableArray<FunctionMetadata>			_methodMetadata;
-			::Eldritch2::FlatOrderedMap<::asUINT, PropertyMetadata>	_propertyMetadata;
+			::Eldritch2::FlatMap<::asUINT, PropertyMetadata>	_propertyMetadata;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -153,7 +153,7 @@ namespace AngelScript {
 		::Eldritch2::ChildAllocator									_rootAllocator;
 		::Eldritch2::ResizableArray<TypeMetadata>					_typeMetadata;
 		::Eldritch2::ResizableArray<FunctionMetadata>				_functionMetadata;
-		::Eldritch2::FlatOrderedMap<const void*, PropertyMetadata>	_propertyMetadata;
+		::Eldritch2::FlatMap<const void*, PropertyMetadata>	_propertyMetadata;
 	};
 
 }	// namespace AngelScript

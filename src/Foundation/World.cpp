@@ -34,7 +34,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Foundation {
 
-	World::World( GameEngine& owningEngine, const UTF8Char* const resourceName ) : _allocator( owningEngine.GetAllocator(), owningEngine.GetWorldArenaSizeInBytes(), Allocator::AllocationDuration::Normal, UTF8L( "World Allocator" ) ),
+	World::World( GameEngine& owningEngine, const UTF8Char* const resourceName ) : _allocator( owningEngine.GetAllocator(), owningEngine.GetWorldArenaSizeInBytes(), Allocator::AllocationDuration::Normal, UTF8L("World Allocator") ),
 																				   _allocationCheckpoint( _allocator.CreateCheckpoint() ),
 																				   _engine( owningEngine ),
 																				   _contentLibrary( owningEngine.GetContentLibrary() ),
@@ -48,7 +48,7 @@ namespace Foundation {
 		owningEngine.NotifyOfNewWorld( *this );
 
 		if( nullptr == _propertyMutex ) {
-			owningEngine.GetLoggerForMessageType( LogMessageType::Error )( UTF8L("Error allocating mutex for world '%p': %s.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), ErrorCode( Error::OutOfMemory ).ToUTF8String() );
+			owningEngine.GetLoggerForMessageType( LogMessageType::Error )( UTF8L("Error allocating mutex for world '{}': {}.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(this), ErrorCode( Error::OutOfMemory ).ToUTF8String() );
 			RaiseFatalError();
 		}
 

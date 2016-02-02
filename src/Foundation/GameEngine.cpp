@@ -39,7 +39,7 @@ namespace Eldritch2 {
 namespace Foundation {
 
 	GameEngine::GameEngine( SystemInterface& systemInterface, ThreadScheduler& scheduler, ContentProvider& contentProvider, Allocator& allocator ) : _allocator( allocator, UTF8L("Game Engine Allocator") ),
-																																					 _logger( contentProvider, UTF8L("Logs") ET_UTF8_DIR_SEPARATOR UTF8L("Eldritch2.log") ),
+																																					 _logger( contentProvider, UTF8L("Logs") ET_UTF8_DIR_SEPARATOR UTF8L("Eldritch2.log"), _allocator ),
 																																					 _systemInterface( systemInterface ),
 																																					 _scheduler( scheduler ),
 																																					 _contentLibrary( contentProvider, scheduler, _allocator ),
@@ -85,7 +85,7 @@ namespace Foundation {
 			_worldCount.fetch_add( 1u, ::std::memory_order_relaxed );
 		}	// End of lock scope.
 		
-		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Attached world %p.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(&world) );
+		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Attached world {}.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(&world) );
 	}
 
 // ---------------------------------------------------
@@ -97,13 +97,7 @@ namespace Foundation {
 			_worldCount.fetch_sub( 1u, ::std::memory_order_acq_rel );
 		}	// End of lock scope.
 
-		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Detached world %p.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(&world) );
-	}
-
-// ---------------------------------------------------
-
-	void GameEngine::ClearAttachedServices() {
-		GetAttachedServices().Clear();
+		GetLoggerForMessageType( LogMessageType::Message )( UTF8L("Detached world {}.") ET_UTF8_NEWLINE_LITERAL, static_cast<void*>(&world) );
 	}
 
 }	// namespace Foundation

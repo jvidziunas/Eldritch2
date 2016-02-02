@@ -38,17 +38,6 @@ namespace Foundation {
 		struct ScriptExecutionPreparationVisitor {};
 		struct DeletionPreparationVisitor {};
 
-	// ---------------------------------------------------
-
-		template <void (WorldView::*TickFunction)( Scheduler::WorkerContext& )>
-		void	InvokeTickFunction( Scheduler::WorkerContext::FinishCounter& finishCounter, Scheduler::WorkerContext& executingContext );
-
-		template <void (WorldView::*TickFunction)( Scheduler::WorkerContext& )>
-		void	InvokeTickFunction( Scheduler::WorkerContext& executingContext );
-
-		template <typename ViewVisitor>
-		void	BroadcastViewVisitor( ViewVisitor&& visitor );
-
 	// - WORLD VIEW SANDBOX METHODS ----------------------
 
 		virtual void	OnFrameTick( Scheduler::WorkerContext& executingContext );
@@ -71,6 +60,15 @@ namespace Foundation {
 	// ---------------------------------------------------
 
 	protected:
+		template <void (WorldView::*TickFunction)( Scheduler::WorkerContext& )>
+		void	InvokeTickFunction( Scheduler::WorkerContext::FinishCounter& finishCounter, Scheduler::WorkerContext& executingContext );
+
+		template <void (WorldView::*TickFunction)( Scheduler::WorkerContext& )>
+		void	InvokeTickFunction( Scheduler::WorkerContext& executingContext );
+
+		template <typename ViewVisitor>
+		void	BroadcastViewVisitor( ViewVisitor&& visitor );
+
 		//!	Retrieves a read-only view of the hosting @ref World.
 		/*!	@returns A const reference to the owning @ref World.
 			@threadsafe

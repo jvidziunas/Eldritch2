@@ -143,7 +143,7 @@ namespace Win32 {
 			return;
 		}
 
-		_workerThreads.Reserve( totalWorkerCount );
+		_workerThreads.SetCapacity( totalWorkerCount );
 
 		WorkerContext::FinishCounter	unused( 0 );
 
@@ -213,7 +213,7 @@ namespace Win32 {
 			THREAD_PRIORITY_TIME_CRITICAL
 		};
 
-		static_assert(_countof(threadPriorityTable) == static_cast<size_t>(ThreadPriority::COUNT), "Thread priority table needs");
+		static_assert(_countof(threadPriorityTable) == static_cast<size_t>(ThreadPriority::COUNT), "Thread priority table needs update!");
 
 	// ---
 
@@ -237,7 +237,7 @@ namespace Win32 {
 		// ---------------------------------------------------
 
 			void Enter() override sealed {
-				if( const auto worker = WorkerThread::GetActiveWorkerThread() ) {
+				if( const auto worker = WorkerThread::GetActiveWorkerContext() ) {
 					while( !TryEnter() ) {
 						// Yield current thread.
 					}
@@ -257,7 +257,7 @@ namespace Win32 {
 		// ---------------------------------------------------
 
 			void EnterAsReader() override sealed {
-				if( const auto worker = WorkerThread::GetActiveWorkerThread() ) {
+				if( const auto worker = WorkerThread::GetActiveWorkerContext() ) {
 					while( !TryEnterAsReader() ) {
 						// Yield current thread.
 					}
@@ -315,7 +315,7 @@ namespace Win32 {
 		// ---------------------------------------------------
 
 			void Acquire() override sealed {
-				if( const auto worker = WorkerThread::GetActiveWorkerThread() ) {
+				if( const auto worker = WorkerThread::GetActiveWorkerContext() ) {
 					while( !TryAcquire() ) {
 
 					}

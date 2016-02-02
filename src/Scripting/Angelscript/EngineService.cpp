@@ -126,7 +126,7 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void EngineService::OnServiceTickStarted( WorkerContext& executingContext ) {
+	void EngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
 		GetScriptEngine().GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
 	}
 
@@ -161,7 +161,7 @@ namespace AngelScript {
 			}
 		}
 
-		GetLogger( messageType )( UTF8L("Angelscript %s in '%s'[%i, %i]: %s.") ET_UTF8_NEWLINE_LITERAL, description, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
+		GetLogger( messageType )( UTF8L("Angelscript {} in '{}'[{}, {}]: {}.") ET_UTF8_NEWLINE_LITERAL, description, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
 	}
 
 }	// namespace AngelScript

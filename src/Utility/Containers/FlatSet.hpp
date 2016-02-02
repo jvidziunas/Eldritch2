@@ -1,5 +1,5 @@
 /*==================================================================*\
-  FlatOrderedSet.hpp
+  FlatSet.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -20,7 +20,7 @@
 namespace Eldritch2 {
 
 	template <typename StoredObject, class OrderingPredicate = ::Eldritch2::Less<StoredObject>, class Allocator = ::Eldritch2::ChildAllocator>
-	class FlatOrderedSet : private ::Eldritch2::ResizableArray<StoredObject, Allocator> {
+	class FlatSet : private ::Eldritch2::ResizableArray<StoredObject, Allocator> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
@@ -37,19 +37,19 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		ETInlineHint explicit FlatOrderedSet( AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref FlatOrderedSet instance.
-		ETInlineHint FlatOrderedSet( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate = OrderingPredicateType(), AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref FlatOrderedSet instance.
+		ETInlineHint explicit FlatSet( AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatSet instance.
+		ETInlineHint FlatSet( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate = OrderingPredicateType(), AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatSet instance.
 		template <typename InputIterator>
-		ETInlineHint FlatOrderedSet( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate = OrderingPredicateType(), AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref FlatOrderedSet instance.
+		ETInlineHint FlatSet( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate = OrderingPredicateType(), AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatSet instance.
 		template <class AlternateAllocator>
-		ETInlineHint FlatOrderedSet( const ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref FlatOrderedSet instance.
-		ETInlineHint FlatOrderedSet( ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>&& moveSource );
+		ETInlineHint FlatSet( const ::Eldritch2::FlatSet<StoredObject, OrderingPredicate, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref FlatSet instance.
+		ETInlineHint FlatSet( ::Eldritch2::FlatSet<StoredObject, OrderingPredicate, Allocator>&& moveSource );
 
-		ETInlineHint ~FlatOrderedSet() = default;
+		ETInlineHint ~FlatSet() = default;
 
 	// - ALGORITHMS --------------------------------------
 
@@ -75,9 +75,9 @@ namespace Eldritch2 {
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint void	CloneFrom( const ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>& containerTemplate );
+		ETInlineHint void	CloneFrom( const ::Eldritch2::FlatSet<StoredObject, OrderingPredicate, Allocator>& containerTemplate );
 
-		ETInlineHint void	Swap( ::Eldritch2::FlatOrderedSet<StoredObject, OrderingPredicate, Allocator>& other );
+		ETInlineHint void	Swap( ::Eldritch2::FlatSet<StoredObject, OrderingPredicate, Allocator>& other );
 
 	// - CONTAINER MANIPULATION --------------------------
 
@@ -125,5 +125,5 @@ namespace Eldritch2 {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/Containers/FlatOrderedSet.inl>
+#include <Utility/Containers/FlatSet.inl>
 //------------------------------------------------------------------//

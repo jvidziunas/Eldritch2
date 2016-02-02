@@ -1,0 +1,24 @@
+namespace Eldritch2.Scripting.AngelScript.FlatBuffers;
+
+struct ObjectReference {
+	ulong index;
+}
+
+union ObjectProperty {
+	long,
+	ulong,
+	double,
+	ObjectReference
+}
+
+table ObjectDefinition {
+	Properties : [ObjectProperty];
+}
+
+table Header {
+	Objects : [ObjectDefinition];
+}
+
+root_type Header;
+file_identifier	"EWDF";
+file_extension	"e2world";

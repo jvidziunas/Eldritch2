@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/Direct3D11/ForwardDeclarations.hpp>
-#include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Containers/HashMap.hpp>
 #include <Packages/ResourceView.hpp>
 #include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//

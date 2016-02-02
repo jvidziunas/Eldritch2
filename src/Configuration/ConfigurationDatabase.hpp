@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Containers/HashMap.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -56,7 +56,7 @@ namespace Configuration {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::UnorderedMap<VariableKey, Configuration::ConfigurableVariable*>	_variableDirectory;
+		::Eldritch2::HashMap<VariableKey, Configuration::ConfigurableVariable*>	_variableDirectory;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

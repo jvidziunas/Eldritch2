@@ -79,13 +79,11 @@ namespace Foundation {
 
 		ETInlineHint void	NotifyOfNewService( Foundation::GameEngineService& service );
 
+		ETInlineHint void	NotifyOfServiceDestruction( Foundation::GameEngineService& service );
+
 		void				NotifyOfNewWorld( Foundation::World& world );
 
 		void				NotifyOfWorldDestruction( Foundation::World& world );
-
-		void				ClearAttachedServices();
-
-		void				ClearAttachedWorlds();
 
 	// - TYPE PUBLISHING ---------------------------------
 

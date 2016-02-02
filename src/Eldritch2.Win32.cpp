@@ -22,6 +22,7 @@
 #include <Scheduler/Win32/FiberScheduler.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <System/Win32/SystemInterface.hpp>
+#include <Physics/PhysX/EngineService.hpp>
 #include <Configuration/EngineService.hpp>
 #include <Sound/XAudio2/EngineService.hpp>
 #include <Input/XInput/EngineService.hpp>
@@ -49,19 +50,15 @@ namespace {
 
 	using namespace ::Eldritch2;
 
-	class Application : public Win32GlobalHeapAllocator,
-						public System::Win32::SystemInterface,
-						public Scheduler::Win32::FiberScheduler,
-						public FileSystem::Win32::ContentProvider,
-						public Foundation::GameEngine {
+	class Application {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref Application instance.
-		Application() : Win32GlobalHeapAllocator( UTF8L("Root Allocator") ),
-						Scheduler::Win32::FiberScheduler( GetSystemInterface(), GetGlobalAllocator() ),
-						FileSystem::Win32::ContentProvider( GetSystemInterface() ),
-						Foundation::GameEngine( GetSystemInterface(), GetScheduler(), GetContentProvider(), GetGlobalAllocator() ),
+		Application() : _allocator( UTF8L("Root Allocator") ),
+						_scheduler( GetSystemInterface(), GetGlobalAllocator() ),
+						_contentProvider( GetSystemInterface() ),
+						_engine( GetSystemInterface(), GetScheduler(), GetContentProvider(), GetGlobalAllocator() ),
 						_configurationService( GetGameEngine(), GetContentProvider() ),
 						_XInputService( GetGameEngine() ),
 						_inputService( GetGameEngine() ),
@@ -71,42 +68,49 @@ namespace {
 						_direct3DRendererService( GetGameEngine() ),
 						_audioRendererService( GetGameEngine() ) {}
 
-		//!	Destroys this @ref Application instance.
-		~Application() {
-			ClearAttachedServices();
-		}
+		~Application() = default;
 
 	// ---------------------------------------------------
 
 		ETForceInlineHint Win32GlobalHeapAllocator& GetGlobalAllocator() {
-			return static_cast<Win32GlobalHeapAllocator&>(*this);
+			return _allocator;
 		}
 
 		ETInlineHint System::Win32::SystemInterface& GetSystemInterface() {
-			return static_cast<System::Win32::SystemInterface&>(*this);
+			return _systemInterface;
 		}
 
 		ETInlineHint Scheduler::Win32::FiberScheduler& GetScheduler() {
-			return static_cast<Scheduler::Win32::FiberScheduler&>(*this);
+			return _scheduler;
 		}
 
 		ETInlineHint FileSystem::Win32::ContentProvider& GetContentProvider() {
-			return static_cast<FileSystem::Win32::ContentProvider&>(*this);
+			return _contentProvider;
 		}
 
 		ETInlineHint Foundation::GameEngine& GetGameEngine() {
-			return static_cast<Foundation::GameEngine&>(*this);
+			return _engine;
 		}
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
+		Win32GlobalHeapAllocator				_allocator;
+		System::Win32::SystemInterface			_systemInterface;
+		Scheduler::Win32::FiberScheduler		_scheduler;
+		FileSystem::Win32::ContentProvider		_contentProvider;
+		Foundation::GameEngine					_engine;
+
 		Configuration::EngineService			_configurationService;
 		Input::XInput::EngineService			_XInputService;
 		Input::Win32::EngineService				_inputService;
 		Networking::Steamworks::EngineService	_networkingService;
 		Scripting::AngelScript::EngineService	_scriptService;
+#if 0
 		Physics::BulletDynamics::EngineService	_physicsService;
+#else
+		Physics::PhysX::EngineService			_physicsService;
+#endif
 		Renderer::Direct3D11::EngineService		_direct3DRendererService;
 		Sound::XAudio2::EngineService			_audioRendererService;
 	};

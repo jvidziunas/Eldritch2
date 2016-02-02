@@ -38,6 +38,12 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
+	GameEngineService::~GameEngineService() {
+		_owningEngine.NotifyOfServiceDestruction( *this );
+	}
+
+// ---------------------------------------------------
+
 	Allocator& GameEngineService::GetEngineAllocator() {
 		return _owningEngine.GetAllocator();
 	}
@@ -46,7 +52,6 @@ namespace Foundation {
 
 	ErrorCode GameEngineService::AllocateWorldView( Allocator& /*allocator*/, World& /*world*/ ) {
 		// Default implementation does nothing.
-
 		return Error::None;
 	}
 

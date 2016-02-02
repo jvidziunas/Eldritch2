@@ -1,5 +1,5 @@
 /*==================================================================*\
-  OrderedSet.inl
+  Set.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -19,13 +19,13 @@
 namespace Eldritch2 {
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
+	ETInlineHint Set<StoredObject, Allocator>::Set( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
 	template <typename InputIterator>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( InputIterator begin, InputIterator end, AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {
+	ETInlineHint Set<StoredObject, Allocator>::Set( InputIterator begin, InputIterator end, AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {
 		while( begin != end ) {
 			this->Insert( *begin++ );
 		}
@@ -35,7 +35,7 @@ namespace Eldritch2 {
 
 	template <typename StoredObject, class Allocator>
 	template <class AlternateAllocator>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( const ::Eldritch2::OrderedSet<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {
+	ETInlineHint Set<StoredObject, Allocator>::Set( const ::Eldritch2::Set<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {
 		for( auto&& value : containerTemplate ) {
 			this->Insert( value );
 		}
@@ -44,19 +44,19 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::OrderedSet( ::Eldritch2::OrderedSet<StoredObject, Allocator>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
+	ETInlineHint Set<StoredObject, Allocator>::Set( ::Eldritch2::Set<StoredObject, Allocator>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::Iterator OrderedSet<StoredObject, Allocator>::Find( const ValueType& itemTemplate ) {
+	ETInlineHint typename Set<StoredObject, Allocator>::Iterator Set<StoredObject, Allocator>::Find( const ValueType& itemTemplate ) {
 		return _underlyingContainer.find( itemTemplate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::ConstIterator OrderedSet<StoredObject, Allocator>::Find( const ValueType& itemTemplate ) const {
+	ETInlineHint typename Set<StoredObject, Allocator>::ConstIterator Set<StoredObject, Allocator>::Find( const ValueType& itemTemplate ) const {
 		return _underlyingContainer.find( itemTemplate );
 	}
 
@@ -64,7 +64,7 @@ namespace Eldritch2 {
 
 	template <typename StoredObject, class Allocator>
 	template <typename Predicate>
-	ETInlineHint void OrderedSet<StoredObject, Allocator>::RemoveIf( Predicate predicate ) {
+	ETInlineHint void Set<StoredObject, Allocator>::RemoveIf( Predicate predicate ) {
 		for( Iterator element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
 			if( predicate( *element ) ) {
 				_underlyingContainer.erase( element++ );
@@ -78,7 +78,7 @@ namespace Eldritch2 {
 
 	template <typename StoredObject, class Allocator>
 	template <typename ExtraArgumentType, typename Predicate>
-	ETInlineHint void OrderedSet<StoredObject, Allocator>::RemoveIf( ExtraArgumentType extraArgument, Predicate predicate ) {
+	ETInlineHint void Set<StoredObject, Allocator>::RemoveIf( ExtraArgumentType extraArgument, Predicate predicate ) {
 		for( Iterator element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
 			if( predicate( *element, extraArgument ) ) {
 				_underlyingContainer.erase( element++ );
@@ -91,49 +91,49 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::Iterator OrderedSet<StoredObject, Allocator>::Begin() {
+	ETInlineHint typename Set<StoredObject, Allocator>::Iterator Set<StoredObject, Allocator>::Begin() {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::ConstIterator OrderedSet<StoredObject, Allocator>::Begin() const {
+	ETInlineHint typename Set<StoredObject, Allocator>::ConstIterator Set<StoredObject, Allocator>::Begin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::ConstIterator OrderedSet<StoredObject, Allocator>::ConstBegin() const {
+	ETInlineHint typename Set<StoredObject, Allocator>::ConstIterator Set<StoredObject, Allocator>::ConstBegin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::Iterator OrderedSet<StoredObject, Allocator>::End() {
+	ETInlineHint typename Set<StoredObject, Allocator>::Iterator Set<StoredObject, Allocator>::End() {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::ConstIterator OrderedSet<StoredObject, Allocator>::End() const {
+	ETInlineHint typename Set<StoredObject, Allocator>::ConstIterator Set<StoredObject, Allocator>::End() const {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::ConstIterator OrderedSet<StoredObject, Allocator>::ConstEnd() const {
+	ETInlineHint typename Set<StoredObject, Allocator>::ConstIterator Set<StoredObject, Allocator>::ConstEnd() const {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint void OrderedSet<StoredObject, Allocator>::CloneFrom( const ::Eldritch2::OrderedSet<StoredObject, Allocator>& containerTemplate ) {
+	ETInlineHint void Set<StoredObject, Allocator>::CloneFrom( const ::Eldritch2::Set<StoredObject, Allocator>& containerTemplate ) {
 		this->Clear();
 		for( auto&& value : containerTemplate ) {
 			this->Insert( value );
@@ -143,28 +143,28 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint void OrderedSet<StoredObject, Allocator>::Swap( ::Eldritch2::OrderedSet<StoredObject, Allocator>& other ) {
+	ETInlineHint void Set<StoredObject, Allocator>::Swap( ::Eldritch2::Set<StoredObject, Allocator>& other ) {
 		_underlyingContainer.swap( other );
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::InsertResult OrderedSet<StoredObject, Allocator>::Insert( const ValueType& valueTemplate ) {
+	ETInlineHint typename Set<StoredObject, Allocator>::InsertResult Set<StoredObject, Allocator>::Insert( const ValueType& valueTemplate ) {
 		return _underlyingContainer.insert( valueTemplate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint void OrderedSet<StoredObject, Allocator>::Erase( Iterator position ) {
+	ETInlineHint void Set<StoredObject, Allocator>::Erase( Iterator position ) {
 		_underlyingContainer.erase( position );
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint void OrderedSet<StoredObject, Allocator>::Erase( Iterator begin, Iterator end ) {
+	ETInlineHint void Set<StoredObject, Allocator>::Erase( Iterator begin, Iterator end ) {
 		while( begin != end ) {
 			_underlyingContainer.erase( begin++ );
 		}
@@ -173,35 +173,35 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint void OrderedSet<StoredObject, Allocator>::Clear() {
+	ETInlineHint void Set<StoredObject, Allocator>::Clear() {
 		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename OrderedSet<StoredObject, Allocator>::SizeType OrderedSet<StoredObject, Allocator>::Size() const {
+	ETInlineHint typename Set<StoredObject, Allocator>::SizeType Set<StoredObject, Allocator>::Size() const {
 		return _underlyingContainer.size();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint bool OrderedSet<StoredObject, Allocator>::Empty() const {
+	ETInlineHint bool Set<StoredObject, Allocator>::Empty() const {
 		return _underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint OrderedSet<StoredObject, Allocator>::operator bool() const {
+	ETInlineHint Set<StoredObject, Allocator>::operator bool() const {
 		return !_underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint typename const OrderedSet<StoredObject, Allocator>::AllocatorType& OrderedSet<StoredObject, Allocator>::GetAllocator() const {
+	ETInlineHint typename const Set<StoredObject, Allocator>::AllocatorType& Set<StoredObject, Allocator>::GetAllocator() const {
 		return _underlyingContainer.get_allocator();
 	}
 
@@ -210,28 +210,28 @@ namespace Eldritch2 {
 namespace std {
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::OrderedSet<StoredObject, Allocator>& collection ) -> decltype(collection.Begin()) {
+	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::Set<StoredObject, Allocator>& collection ) -> decltype(collection.Begin()) {
 		return collection.Begin();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto cbegin( const ::Eldritch2::OrderedSet<StoredObject, Allocator>& collection ) -> decltype(collection.ConstBegin()) {
+	ETInlineHint ETNoAliasHint auto cbegin( const ::Eldritch2::Set<StoredObject, Allocator>& collection ) -> decltype(collection.ConstBegin()) {
 		return collection.ConstBegin();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::OrderedSet<StoredObject, Allocator>& collection ) -> decltype(collection.End()) {
+	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::Set<StoredObject, Allocator>& collection ) -> decltype(collection.End()) {
 		return collection.End();
 	}
 
 // ---------------------------------------------------
 
 	template <typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto cend( const ::Eldritch2::OrderedSet<StoredObject, Allocator>& collection ) -> decltype(collection.ConstEnd()) {
+	ETInlineHint ETNoAliasHint auto cend( const ::Eldritch2::Set<StoredObject, Allocator>& collection ) -> decltype(collection.ConstEnd()) {
 		return collection.ConstEnd();
 	}
 

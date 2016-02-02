@@ -41,8 +41,8 @@ namespace {
 
 	static const UTF8Char	configurationFileName[]					= UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
 	static const UTF8Char	tempConfigurationFileName[]				= UTF8_PROJECT_NAME UTF8L( "." ) UTF8L( CONFIGURATION_EXTENSION );
-	static const UTF8Char	userConfigurationFileFormatString[]		= UTF8L("Profiles") ET_UTF8_DIR_SEPARATOR UTF8L("%s") ET_UTF8_DIR_SEPARATOR UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
-	static const UTF8Char	tempUserConfigurationFileFormatString[]	= UTF8L("Profiles") ET_UTF8_DIR_SEPARATOR UTF8L("%s") ET_UTF8_DIR_SEPARATOR UTF8L(".") UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
+	static const UTF8Char	userConfigurationFileFormatString[]		= UTF8L("Profiles") ET_UTF8_DIR_SEPARATOR UTF8L("{}") ET_UTF8_DIR_SEPARATOR UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
+	static const UTF8Char	tempUserConfigurationFileFormatString[]	= UTF8L("Profiles") ET_UTF8_DIR_SEPARATOR UTF8L("{}") ET_UTF8_DIR_SEPARATOR UTF8L(".") UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
 
 }	// anonymous namespace
 
@@ -68,7 +68,7 @@ namespace Configuration {
 	void EngineService::OnEngineInitializationStarted( WorkerContext& executingContext ) {
 		FixedStackAllocator<64u>	tempAllocator( UTF8L( "EngineService::OnEngineInitializationStarted() Temporary Allocator" ) );
 
-		GetLogger()( UTF8L("Loading configuration from file '%s'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
+		GetLogger()( UTF8L("Loading configuration from file '{}'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
 
 		if( const auto getMappedFileResult = _contentProvider.CreateReadableMemoryMappedFile( tempAllocator, ContentProvider::KnownContentLocation::UserDocuments, configurationFileName ) ) {
 			ConfigurationDatabase&							database( *this );
@@ -88,7 +88,7 @@ namespace Configuration {
 
 			tempAllocator.Delete( *getMappedFileResult.object );
 		} else {
-			GetLogger( LogMessageType::Error )(UTF8L( "Error reading configuration file: %s" ), getMappedFileResult.resultCode.ToUTF8String());
+			GetLogger( LogMessageType::Error )(UTF8L( "Error reading configuration file: {}" ), getMappedFileResult.resultCode.ToUTF8String());
 		}
 
 		InvokeInitializationFunction<&GameEngineService::OnEngineConfigurationBroadcast>( executingContext );

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  btHeightfieldTerrainShapeEx.cpp
+  btHeightfieldTerrainShape2.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,13 +12,12 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/BulletDynamics/btHeightfieldTerrainShapeEx.hpp>
+#include <Physics/BulletDynamics/btHeightfieldTerrainShape2.hpp>
 //------------------------------------------------------------------//
 
-
-btHeightfieldTerrainShapeEx::btHeightfieldTerrainShapeEx( int heightStickWidth, int heightStickLength,
-														  const void* heightfieldData, btScalar heightScale,
-														  btScalar minHeight, btScalar maxHeight,
+btHeightfieldTerrainShape2::btHeightfieldTerrainShape2( int heightStickWidth, int heightStickLength,
+														  const void* heightfieldData, ::btScalar heightScale,
+														  ::btScalar minHeight, ::btScalar maxHeight,
 														  int upAxis, PHY_ScalarType heightDataType,
 														  bool flipQuadEdges ) : ::btHeightfieldTerrainShape( heightStickWidth, heightStickLength,
 																											  heightfieldData, heightScale,
@@ -30,10 +29,10 @@ btHeightfieldTerrainShapeEx::btHeightfieldTerrainShapeEx( int heightStickWidth, 
 
 // ---------------------------------------------------
 
-void btHeightfieldTerrainShapeEx::processAllTriangles( btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax ) const {
+void btHeightfieldTerrainShape2::processAllTriangles( btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax ) const {
 	// scale down the input aabb's so they are in local (non-scaled) coordinates
-	btVector3	localAabbMin = aabbMin*btVector3( 1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2] );
-	btVector3	localAabbMax = aabbMax*btVector3( 1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2] );
+	::btVector3	localAabbMin( aabbMin * ::btVector3( 1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2] ) );
+	::btVector3	localAabbMax( aabbMax * ::btVector3( 1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2] ) );
 
 	// account for local origin
 	localAabbMin += m_localOrigin;

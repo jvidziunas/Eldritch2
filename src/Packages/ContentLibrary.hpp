@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
-#include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Containers/HashMap.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Packages/ResourceViewFactory.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
@@ -132,9 +132,9 @@ namespace FileSystem {
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
 		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>						_resourceViewDirectoryMutex;		
 
-		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*>	_contentPackageDirectory;
-		::Eldritch2::UnorderedMap<ResourceViewKey, const FileSystem::ResourceView*>				_resourceViewDirectory;
-		::Eldritch2::UnorderedMap<const ::Eldritch2::UTF8Char*, ResourceViewFactoryCollection>	_resourceFactoryDirectory;
+		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*>			_contentPackageDirectory;
+		::Eldritch2::HashMap<ResourceViewKey, const FileSystem::ResourceView*>					_resourceViewDirectory;
+		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, ResourceViewFactoryCollection>		_resourceFactoryDirectory;
 
 		ResourceViewFactoryCollection															_nullFactoryCollection;
 

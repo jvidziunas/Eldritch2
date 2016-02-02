@@ -29,28 +29,10 @@ table CapsuleShapeZ {
 	Height	: float;
 }
 
-table ConeShapeX {
-	Radius	: float;
-	Height	: float;
-}
-
-table ConeShapeY {
-	Radius	: float;
-	Height	: float;
-}
-
-table ConeShapeZ {
-	Radius	: float;
-	Height	: float;
-}
-
 union CollisionShape {
 	SphereShape,
 	BoxShape,
 	CapsuleShapeX,
 	CapsuleShapeY,
-	CapsuleShapeZ,
-	ConeShapeX,
-	ConeShapeY,
-	ConeShapeZ
+	CapsuleShapeZ
 }

@@ -50,6 +50,10 @@ namespace Scheduler {
 
 		virtual void		WaitForCounter( FinishCounter& finishCounter, int value = 0 ) abstract;
 
+	// ---------------------------------------------------
+
+		static WorkerContext*	GetActiveWorkerContext();
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
@@ -59,6 +63,10 @@ namespace Scheduler {
 		WorkerContext( WorkerContext&& );
 		//!	Destroys this @ref WorkerContext instance.
 		~WorkerContext() = default;
+
+	// ---------------------------------------------------
+
+		static void	SetActiveWorkerContext( WorkerContext* const context );
 
 	// ---------------------------------------------------
 

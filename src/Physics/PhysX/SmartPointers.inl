@@ -1,26 +1,32 @@
 /*==================================================================*\
-  Logger.cpp
+  SmartPointers.inl
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
+#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/StandardLibrary.hpp>
-#include <Logging/Logger.hpp>
+
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Foundation;
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
-namespace Foundation {
+namespace Physics {
+namespace PhysX {
+namespace Detail {
 
-}	// namespace Foundation
+	template <typename PhysXObject>
+	ETInlineHint void ObjectDeleter<PhysXObject>::operator()( PhysXObject* const object ) {
+		object->release();
+	}
+
+}	// namespace Detail
+}	// namespace PhysX
+}	// namespace Physics
 }	// namespace Eldritch2
+

@@ -72,5 +72,17 @@ namespace Foundation {
 		return 0u != _fatalErrorCount.load( ::std::memory_order_acquire );
 	}
 
+// ---------------------------------------------------
+
+	ETInlineHint bool World::IsLoading() const {
+		return !IsLoaded();
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint bool World::IsRunningGame() const {
+		return !IsPaused();
+	}
+
 }	// namespace Foundation
 }	// namespace Eldritch2

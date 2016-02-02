@@ -14,9 +14,9 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Memory/ObjectPoolAllocator.hpp>
-#include <Utility/Containers/UnorderedMap.hpp>
 #include <Renderer/Direct3D11/SwapChain.hpp>
 #include <Scripting/ReferenceCountable.hpp>
+#include <Utility/Containers/HashMap.hpp>
 #include <Renderer/VisibilitySystem.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
@@ -73,7 +73,7 @@ namespace Direct3D11 {
 
 	// - TYPE PUBLISHING ---------------------------------
 
-		using MaterialUsageCache = ::Eldritch2::UnorderedMap<Direct3D11::HLSLPipelineDefinitionView*, int>;
+		using MaterialUsageCache = ::Eldritch2::HashMap<Direct3D11::HLSLPipelineDefinitionView*, int>;
 
 	// ---
 

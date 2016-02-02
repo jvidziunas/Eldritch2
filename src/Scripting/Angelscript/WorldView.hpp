@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/AngelScript/SmartPointers.hpp>
-#include <Utility/Containers/UnorderedMap.hpp>
+#include <Utility/Containers/HashMap.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Scripting/MessageBus.hpp>
 #include <Foundation/WorldView.hpp>
@@ -44,7 +44,7 @@ namespace AngelScript {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
-			using HandlerCache = ::Eldritch2::UnorderedMap<::Eldritch2::Pair<::asIObjectType*, const char*>, ::asIScriptFunction*>;
+			using HandlerCache = ::Eldritch2::HashMap<::Eldritch2::Pair<::asIObjectType*, const char*>, ::asIScriptFunction*>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

@@ -111,13 +111,13 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void EngineService::OnEngineInitializationStarted( WorkerContext& executingContext ) {
+	void EngineService::OnEngineInitializationStarted( WorkerContext& /*executingContext*/ ) {
 		GetLogger()( UTF8L("Initializing input service.") ET_UTF8_NEWLINE_LITERAL );
 
 		if( const auto result = LaunchThread( _pollingThread ) ) {
 			GetLogger()( UTF8L("Initialized event polling thread.") ET_UTF8_NEWLINE_LITERAL );
 		} else {
-			GetLogger( LogMessageType::Error )( UTF8L("Error initializing input service: %s!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
+			GetLogger( LogMessageType::Error )( UTF8L("Error initializing input service: {}!") ET_UTF8_NEWLINE_LITERAL, result.ToUTF8String() );
 		}
 	}
 
@@ -132,7 +132,7 @@ namespace Win32 {
 			// Allocate a temporary array to hold all the enumerated devices.
 			::RAWINPUTDEVICELIST* const	deviceList( static_cast<::RAWINPUTDEVICELIST*>(_alloca( deviceCount * sizeof(::RAWINPUTDEVICELIST) )) );
 
-			GetLogger()( UTF8L("Input service: Enumerated %u raw input devices.") ET_UTF8_NEWLINE_LITERAL, deviceCount );
+			GetLogger()( UTF8L("Input service: Enumerated {} raw input devices.") ET_UTF8_NEWLINE_LITERAL, deviceCount );
 			_deviceDirectory.Reserve( deviceCount );
 
 			// Fill a temporary array with more detailed information about each device, including its type and an internal handle.
@@ -189,7 +189,7 @@ namespace Win32 {
 
 		switch( deviceInfo.dwType ) {
 			case RIM_TYPEMOUSE: {
-				GetLogger()( UTF8L("Attached mouse (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
+				GetLogger()( UTF8L("Attached mouse (handle {#x}).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
 				new(_allocator, Allocator::AllocationDuration::Normal) EngineService::Mouse( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEMOUSE
@@ -197,7 +197,7 @@ namespace Win32 {
 		// ---
 
 			case RIM_TYPEKEYBOARD: {
-				GetLogger()( UTF8L("Attached keyboard (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle));
+				GetLogger()( UTF8L("Attached keyboard (handle {#x}).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle));
 				new(_allocator, Allocator::AllocationDuration::Normal) EngineService::Keyboard( deviceHandle, *this );
 				break;
 			}	// case RIM_TYPEKEYBOARD
@@ -205,7 +205,7 @@ namespace Win32 {
 		// ---
 
 			default: {
-				GetLogger( LogMessageType::Error )( UTF8L("Received device attach notification for unknown HID type! (handle %lX).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
+				GetLogger( LogMessageType::Error )( UTF8L("Received device attach notification for unknown HID type! (handle {#x}).") ET_UTF8_NEWLINE_LITERAL, reinterpret_cast<unsigned long>(deviceHandle) );
 				break;
 			}	// default
 		};	// switch( deviceInfo.dwType )

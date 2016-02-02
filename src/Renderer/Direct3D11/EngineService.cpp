@@ -84,13 +84,13 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& executingContext ) {
+	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Initialize Direct3D", 0xFFBBBB );
 
 		DeviceBuilder	deviceBuilder;
 		const bool		useDebugLayer( (0 != ::IsDebuggerPresent()) | _forceDebugRuntime );
 
-		GetLogger()( UTF8L("Creating Direct3D %s.") ET_UTF8_NEWLINE_LITERAL, (useDebugLayer ? UTF8L("debug device") : UTF8L("device")) );
+		GetLogger()( UTF8L("Creating Direct3D {}.") ET_UTF8_NEWLINE_LITERAL, (useDebugLayer ? UTF8L("debug device") : UTF8L("device")) );
 
 		deviceBuilder.SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled().SetDriverThreadingOptimizationsEnabled( _allowDriverThreadingOptimizations );
 		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.GetCharacterArray() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
@@ -158,7 +158,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void EngineService::OnServiceTickStarted( WorkerContext& executingContext ) {
+	void EngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Flip swap chains", 0xFABBCB );
 	}
 

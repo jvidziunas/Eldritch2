@@ -1,5 +1,5 @@
 /*==================================================================*\
-  OrderedMap.hpp
+  Set.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -14,50 +14,47 @@
 //==================================================================//
 #include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
-#include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/map.h>
+#include <rdestl/set.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class Allocator = ::Eldritch2::ChildAllocator>
-	class OrderedMap {
+	template <typename StoredObject, class Allocator = ::Eldritch2::ChildAllocator>
+	class Set {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
 		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::map<Key, StoredObject, PrivateAllocator>;
+		using UnderlyingContainer	= ::rde::set<StoredObject, PrivateAllocator>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
-		using KeyType				= typename UnderlyingContainer::key_type;
-		using MappedType			= typename UnderlyingContainer::data_type;
 		using AllocatorType			= Allocator;
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using SizeType				= typename UnderlyingContainer::size_type;
 		using InsertResult			= ::Eldritch2::Pair<Iterator, bool>;
+		using SizeType				= typename AllocatorType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref OrderedMap instance.
-		ETInlineHint explicit OrderedMap( AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref OrderedMap instance.
+		//!	Constructs this @ref Set instance.
+		ETInlineHint explicit Set( AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref Set instance.
 		template <typename InputIterator>
-		ETInlineHint OrderedMap( InputIterator begin, InputIterator end, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref OrderedMap instance.
+		ETInlineHint Set( InputIterator begin, InputIterator end, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref Set instance.
 		template <class AlternateAllocator>
-		ETInlineHint OrderedMap( const ::Eldritch2::OrderedMap<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref OrderedMap instance.
-		ETInlineHint OrderedMap( ::Eldritch2::OrderedMap<Key, StoredObject, Allocator>&& moveSource );
+		ETInlineHint Set( const ::Eldritch2::Set<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref Set instance.
+		ETInlineHint Set( ::Eldritch2::Set<StoredObject, Allocator>&& moveSource );
 
-		ETInlineHint ~OrderedMap() = default;
+		ETInlineHint ~Set() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-		ETInlineHint Iterator		Find( const KeyType& key );
-		ETInlineHint ConstIterator	Find( const KeyType& key ) const;
+		ETInlineHint Iterator		Find( const ValueType& itemTemplate );
+		ETInlineHint ConstIterator	Find( const ValueType& itemTemplate ) const;
 
 		template <typename Predicate>
 		ETInlineHint void			RemoveIf( Predicate predicate );
@@ -76,24 +73,18 @@ namespace Eldritch2 {
 
 		ETInlineHint ConstIterator	ConstEnd() const;
 
-	// - ELEMENT ACCESS ----------------------------------
-
-		ETInlineHint MappedType&	operator[]( const KeyType& key );
-
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint void	CloneFrom( const ::Eldritch2::OrderedMap<Key, StoredObject, Allocator>& containerTemplate );
+		ETInlineHint void	CloneFrom( const ::Eldritch2::Set<StoredObject, Allocator>& containerTemplate );
 
-		ETInlineHint void	Swap( ::Eldritch2::OrderedMap<Key, StoredObject, Allocator>& other );
+		ETInlineHint void	Swap( ::Eldritch2::Set<StoredObject, Allocator>& other );
 
 	// - CONTAINER MANIPULATION --------------------------
 
 		ETInlineHint InsertResult	Insert( const ValueType& v );
-		ETInlineHint InsertResult	Insert( const KeyType& key, const MappedType& value );
 
-		ETInlineHint SizeType	Erase( const KeyType& key );
-		ETInlineHint void		Erase( Iterator position );
-		ETInlineHint void		Erase( Iterator begin, Iterator end );
+		ETInlineHint void	Erase( Iterator position );
+		ETInlineHint void	Erase( Iterator begin, Iterator end );
 
 		ETInlineHint void	Clear();
 
@@ -101,9 +92,9 @@ namespace Eldritch2 {
 
 		ETInlineHint SizeType	Size() const;
 
-		ETInlineHint bool		Empty() const;
+		ETInlineHint bool	Empty() const;
 
-		ETInlineHint			operator bool() const;
+		ETInlineHint	operator bool() const;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
@@ -120,5 +111,5 @@ namespace Eldritch2 {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/Containers/OrderedMap.inl>
+#include <Utility/Containers/Set.inl>
 //------------------------------------------------------------------//

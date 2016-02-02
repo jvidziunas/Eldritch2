@@ -19,16 +19,15 @@
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Containers/IntrusiveListHook.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
-#include <Utility/Containers/UnorderedMap.hpp>
 #include <Utility/Containers/UTF8String.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ReferenceCountable.hpp>
+#include <Utility/Containers/HashMap.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Scripting/ObjectHandle.hpp>
 #include <Foundation/WorldView.hpp>
 #include <Utility/StringHash.hpp>
-#include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
@@ -36,10 +35,6 @@
 namespace Eldritch2 {
 	namespace Foundation {
 		class	GameEngine;
-	}
-
-	namespace FileSystem {
-		class	ContentPackage;
 	}
 
 	namespace Utility {
@@ -56,7 +51,7 @@ namespace Foundation {
 	public:
 		using PropertyKey			= ::Eldritch2::UTF8String<>;
 		using Property				= ::Eldritch2::UTF8String<>;
-		using PropertyCollection	= ::Eldritch2::UnorderedMap<PropertyKey, Property, ::Eldritch2::StringHash<>>;
+		using PropertyCollection	= ::Eldritch2::HashMap<PropertyKey, Property, ::Eldritch2::StringHash<>>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -91,11 +86,17 @@ namespace Foundation {
 		ETInlineHint const ::Eldritch2::Allocator&										GetAllocator() const;
 		ETInlineHint ::Eldritch2::Allocator&											GetAllocator();
 
-		ETInlineHint ::Eldritch2::uint32												EncounteredFatalError() const;
+	// ---------------------------------------------------
 
-		bool																			IsLoaded() const;
+		ETInlineHint ::Eldritch2::uint32	EncounteredFatalError() const;
 
-		bool																			IsPaused() const;
+		bool								IsLoaded() const;
+
+		ETInlineHint bool					IsLoading() const;
+
+		bool								IsPaused() const;
+
+		ETInlineHint bool					IsRunningGame() const;
 
 	// ---------------------------------------------------
 
@@ -108,8 +109,6 @@ namespace Foundation {
 	// ---------------------------------------------------
 
 	protected:
-		void	CreateWorldViews( Foundation::GameEngine& engine );
-
 		void	Dispose() override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
@@ -126,9 +125,9 @@ namespace Foundation {
 
 		// ---------------------------------------------------
 
-			void ExecuteFrame( Scheduler::WorkerContext& executingContext );
+			void	ExecuteFrame( Scheduler::WorkerContext& executingContext );
 
-			void TryFinalizeLoad( Scheduler::WorkerContext& executingContext );
+			void	TryFinalizeLoad( Scheduler::WorkerContext& executingContext );
 
 		// ---------------------------------------------------
 

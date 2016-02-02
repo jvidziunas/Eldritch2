@@ -1,26 +1,17 @@
 /*==================================================================*\
-  Logger.cpp
+  CPPFormatDefinitions.cpp
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/StandardLibrary.hpp>
-#include <Logging/Logger.hpp>
+#define FMT_EXCEPTIONS 0
+#include <cppformat/format.cc>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2::Foundation;
-using namespace ::Eldritch2;
-
-namespace Eldritch2 {
-namespace Foundation {
-
-}	// namespace Foundation
-}	// namespace Eldritch2

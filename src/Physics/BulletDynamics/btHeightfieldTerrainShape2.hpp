@@ -1,5 +1,5 @@
 /*==================================================================*\
-  btHeightfieldTerrainShapeEx.hpp
+  btHeightfieldTerrainShape2.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -15,7 +15,7 @@
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 //------------------------------------------------------------------//
 
-ATTRIBUTE_ALIGNED16(class) btHeightfieldTerrainShapeEx : public ::btHeightfieldTerrainShape {
+ATTRIBUTE_ALIGNED16(class) btHeightfieldTerrainShape2 : public ::btHeightfieldTerrainShape {
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
@@ -27,13 +27,13 @@ public:
 	data types, and allows for a non-zero minimum height value.
 	heightScale is needed for any integer-based heightfield data types.
 	*/
-	btHeightfieldTerrainShapeEx( int heightStickWidth, int heightStickLength,
+	btHeightfieldTerrainShape2( int heightStickWidth, int heightStickLength,
 								 const void* heightfieldData, btScalar heightScale,
 								 btScalar minHeight, btScalar maxHeight,
 								 int upAxis, PHY_ScalarType heightDataType,
 								 bool flipQuadEdges );
 
-	virtual ~btHeightfieldTerrainShapeEx() = default;
+	virtual ~btHeightfieldTerrainShape2() = default;
 
 // ---------------------------------------------------
 

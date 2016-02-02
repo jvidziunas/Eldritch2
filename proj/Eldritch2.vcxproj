@@ -84,7 +84,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -136,8 +136,8 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -193,7 +193,7 @@ call "deploy.x64.bat"
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -273,14 +273,17 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Packages\LoaderThread.cpp" />
     <ClCompile Include="..\src\Packages\ResourceViewFactory.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.CollisionShapeViewFactory.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterArmatureComponent.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.ArticulatedBodyComponent.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterControllerComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.cpp" />
@@ -322,7 +325,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\foundation\Player.cpp" />
     <ClCompile Include="..\src\Foundation\World.cpp" />
     <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp" />
-    <ClCompile Include="..\src\logging\Logger.cpp" />
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp" />
     <ClCompile Include="..\src\Packages\ResourceView.cpp" />
     <ClCompile Include="..\src\physics\PhysicalMaterial.cpp" />
@@ -340,6 +342,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.cpp" />
     <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp" />
     <ClCompile Include="..\src\Utility\Containers\SpatialHash.cpp" />
+    <ClCompile Include="..\src\Utility\CPPFormatDefinitions.cpp" />
     <ClCompile Include="..\src\Utility\DebugController.cpp" />
     <ClCompile Include="..\src\Utility\ErrorCode.cpp" />
     <ClCompile Include="..\src\Utility\FourCCGenerator.cpp" />
@@ -399,12 +402,15 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Packages\ResourceViewFactory.hpp" />
     <ClInclude Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btDiscreteDynamicsMixinWrapper.hpp" />
-    <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShapeEx.hpp" />
+    <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\EngineService.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\WorldView.hpp" />
+    <ClInclude Include="..\src\Physics\PhysX\EngineService.hpp" />
+    <ClInclude Include="..\src\Physics\PhysX\SmartPointers.hpp" />
+    <ClInclude Include="..\src\Physics\PhysX\WorldView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.hpp" />
@@ -449,7 +455,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Concurrency\StripedLock.hpp" />
     <ClInclude Include="..\src\Utility\Concurrency\StripedReaderWriterLock.hpp" />
     <ClInclude Include="..\src\Utility\Concurrency\WaitableUserEvent.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\FlatOrderedSet.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\FlatSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveListHook.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
@@ -508,10 +514,10 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\IntrusiveList.hpp" />
     <ClInclude Include="..\src\Utility\containers\IntrusiveVyukovMPSCQueue.hpp" />
     <ClInclude Include="..\src\Utility\Containers\List.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\FlatOrderedMap.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\OrderedMap.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\OrderedSet.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\UnorderedMap.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\FlatMap.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\Map.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\Set.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\HashMap.hpp" />
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp" />
     <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp" />
     <ClInclude Include="..\src\physics\PhysicalMaterial.hpp" />
@@ -618,6 +624,7 @@ call "deploy.x64.bat"
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
     </CustomBuild>
+    <None Include="..\src\Physics\PhysX\SmartPointers.inl" />
     <None Include="..\src\Renderer\HLSLPipeline.fbc" />
     <None Include="..\src\renderer\VisibilitySystem.inl" />
     <None Include="..\src\Scheduler\PrivateQueueWorker.inl" />
@@ -633,6 +640,7 @@ call "deploy.x64.bat"
     </CustomBuild>
     <None Include="..\src\Scripting\AngelScript\BytecodeMetadata.inl" />
     <None Include="..\src\Scripting\AngelScript\EngineService.inl" />
+    <None Include="..\src\Scripting\AngelScript\ObjectGraph.fbc" />
     <None Include="..\src\Scripting\AngelScript\UserDefinedTypeRegistrar.inl" />
     <None Include="..\src\Scripting\Message.inl" />
     <None Include="..\src\Scripting\MessageBus.inl" />
@@ -650,22 +658,20 @@ call "deploy.x64.bat"
     </CustomBuild>
     <None Include="..\src\Utility\Algorithms.inl" />
     <None Include="..\src\Utility\COMPointer.inl" />
-    <None Include="..\src\Utility\Containers\FlatOrderedMap.inl" />
-    <None Include="..\src\Utility\Containers\FlatOrderedSet.inl" />
+    <None Include="..\src\Utility\Containers\FlatMap.inl" />
+    <None Include="..\src\Utility\Containers\FlatSet.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveForwardList.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveList.inl" />
-    <None Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.inl" />
-    <None Include="..\src\Utility\Containers\IntrusiveUnorderedSet.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.inl" />
     <None Include="..\src\Utility\Containers\List.inl" />
-    <None Include="..\src\Utility\Containers\OrderedMap.inl" />
-    <None Include="..\src\Utility\Containers\OrderedSet.inl" />
+    <None Include="..\src\Utility\Containers\Map.inl" />
+    <None Include="..\src\Utility\Containers\Set.inl" />
     <None Include="..\src\Utility\Containers\Range.inl" />
     <None Include="..\src\Utility\Containers\ResizableArray.inl" />
     <None Include="..\src\Utility\Containers\SpatialHash.inl" />
     <None Include="..\src\Utility\Containers\String.inl" />
     <None Include="..\src\Utility\Containers\SystemString.inl" />
-    <None Include="..\src\Utility\Containers\UnorderedMap.inl" />
+    <None Include="..\src\Utility\Containers\HashMap.inl" />
     <None Include="..\src\Utility\Containers\UTF8String.inl" />
     <None Include="..\src\Utility\Counter.inl" />
     <None Include="..\src\Utility\DisposingResult.inl" />

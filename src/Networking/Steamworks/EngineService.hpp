@@ -14,10 +14,10 @@
 //==================================================================//
 #include <Configuration/ConfigurablePODVariable.hpp>
 #include <Configuration/ConfigurableUTF8String.hpp>
-#include <Utility/Containers/FlatOrderedMap.hpp>
-#include <Utility/Containers/FlatOrderedSet.hpp>
 #include <Utility/Containers/UTF8String.hpp>
 #include <Foundation/GameEngineService.hpp>
+#include <Utility/Containers/FlatMap.hpp>
+#include <Utility/Containers/FlatSet.hpp>
 #include <Utility/Concurrency/Lock.hpp>
 #include <Utility/IdentifierPool.hpp>
 #include <Scripting/ObjectHandle.hpp>
@@ -126,7 +126,7 @@ namespace Steamworks {
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>			_contentDownloadBandwidthLimitInKilobytesPerSecond;
 		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>			_contentUploadBandwidthLimitInKilobytesPerSecond;
 
-		::Eldritch2::FlatOrderedSet<::CSteamID>								_banList;
+		::Eldritch2::FlatSet<::CSteamID>								_banList;
 
 		Scripting::ObjectHandle<Foundation::World>							_lobbyWorld;
 	};

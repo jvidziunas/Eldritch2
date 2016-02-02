@@ -1,5 +1,5 @@
 /*==================================================================*\
-  FlatOrderedMap.inl
+  FlatMap.inl
   ------------------------------------------------------------------
   Purpose:
   
@@ -20,35 +20,35 @@
 namespace Eldritch2 {
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( AllocatorType&& allocator ) : UnderlyingContainer( ::std::move( allocator ) ) {}
+	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( AllocatorType&& allocator ) : UnderlyingContainer( ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( reservedSizeInElements, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {}
+	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( const SizeType reservedSizeInElements, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( reservedSizeInElements, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
 	template <typename InputIterator>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( begin, end, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {
+	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate, AllocatorType&& allocator ) : UnderlyingContainer( begin, end, ::std::move( allocator ) ), _orderingPredicate( ::std::move( orderingPredicate ) ) {
 		UnderlyingContainer::Sort( _orderingPredicate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator ) : UnderlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ), _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
+	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator ) : UnderlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ), _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatOrderedMap( ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource ) : UnderlyingContainer( ::std::move( containerTemplate ) ), _orderingPredicate( ::std::move( moveSource._orderingPredicate ) ) {}
+	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource ) : UnderlyingContainer( ::std::move( containerTemplate ) ), _orderingPredicate( ::std::move( moveSource._orderingPredicate ) ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::LowerBound( const KeyType& key ) {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::LowerBound( const KeyType& key ) {
 		auto&	orderingPredicate( GetOrderingPredicate() );
 
 		return Utility::LowerBound( this->Begin(), this->End(), key, [&orderingPredicate] ( const ValueType& element, const KeyType& key ) mutable {
@@ -59,7 +59,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::ConstIterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::LowerBound( const KeyType& key ) const {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::ConstIterator FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::LowerBound( const KeyType& key ) const {
 		const auto&	orderingPredicate( GetOrderingPredicate() );
 
 		return Utility::LowerBound( this->Begin(), this->End(), key, [&orderingPredicate] ( const ValueType& element, const KeyType& key ) mutable {
@@ -70,7 +70,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::UpperBound( const KeyType& key ) {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::UpperBound( const KeyType& key ) {
 		auto&	orderingPredicate( GetOrderingPredicate() );
 
 		return Utility::UpperBound( this->Begin(), this->End(), key, [&orderingPredicate] ( const ValueType& element, const KeyType& key ) mutable {
@@ -81,7 +81,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::UpperBound( const KeyType& key ) const {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::UpperBound( const KeyType& key ) const {
 		const auto&	orderingPredicate( GetOrderingPredicate() );
 
 		return Utility::UpperBound( this->Begin(), this->End(), key, [&orderingPredicate] ( const ValueType& element, const KeyType& key ) mutable {
@@ -92,7 +92,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key ) {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key ) {
 		auto	location( LowerBound( key ) );
 
 		if( location != this->End() && GetOrderingPredicate()(location->first, key) ) {
@@ -105,7 +105,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::ConstIterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key ) const {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::ConstIterator FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key ) const {
 		auto	location( LowerBound( key ) );
 
 		if( location != this->End() && GetOrderingPredicate()(location->first, key) ) {
@@ -118,7 +118,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::MappedType& FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key, MappedType& defaultValue ) {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::MappedType& FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key, MappedType& defaultValue ) {
 		auto	location( LowerBound( key ) );
 
 		if( location != this->End() ) {
@@ -131,7 +131,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename const FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::MappedType& FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key, const MappedType& defaultValue ) {
+	ETInlineHint typename const FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::MappedType& FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Find( const KeyType& key, const MappedType& defaultValue ) {
 		auto	location( LowerBound( key ) );
 
 		if( location != this->End() ) {
@@ -144,21 +144,21 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint void FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::CloneFrom( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& container ) {
+	ETInlineHint void FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::CloneFrom( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& container ) {
 		UnderlyingContainer::CloneFrom( static_cast<UnderlyingContainer&>(container) );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint void FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Swap( ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& container ) {
+	ETInlineHint void FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Swap( ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& container ) {
 		UnderlyingContainer::Swap( static_cast<UnderlyingContainer&>(container) );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::InsertResult FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Insert( ValueType&& v ) {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::InsertResult FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Insert( ValueType&& v ) {
 		auto	result( LowerBound( v.first ) );
 		bool	found( true );
 
@@ -173,7 +173,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::SizeType FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Erase( const KeyType& key ) {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::SizeType FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Erase( const KeyType& key ) {
 		const auto	_( this->Find( key ) );
 
 		if( this->End() != _ ) {
@@ -186,28 +186,28 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Erase( const Iterator position ) {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Iterator FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Erase( const Iterator position ) {
 		return UnderlyingContainer::Erase( position );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint void FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::Erase( const Iterator begin, const Iterator end ) {
+	ETInlineHint void FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::Erase( const Iterator begin, const Iterator end ) {
 		UnderlyingContainer::Erase( begin, end );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::OrderingPredicateType& FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::GetOrderingPredicate() {
+	ETInlineHint typename FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::OrderingPredicateType& FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::GetOrderingPredicate() {
 		return _orderingPredicate;
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint typename const FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::OrderingPredicateType& FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>::GetOrderingPredicate() const {
+	ETInlineHint typename const FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::OrderingPredicateType& FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::GetOrderingPredicate() const {
 		return _orderingPredicate;
 	}
 
@@ -216,28 +216,28 @@ namespace Eldritch2 {
 namespace std {
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.Begin()) {
+	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.Begin()) {
 		return collection.Begin();
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.ConstBegin()) {
+	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.ConstBegin()) {
 		return collection.ConstBegin();
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.End()) {
+	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.End()) {
 		return collection.End();
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::FlatOrderedMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.ConstEnd()) {
+	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& collection ) -> decltype(collection.ConstEnd()) {
 		return collection.ConstEnd();
 	}
 

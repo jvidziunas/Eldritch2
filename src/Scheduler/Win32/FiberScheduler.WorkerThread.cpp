@@ -22,12 +22,6 @@ using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
 
-namespace {
-
-	static ETThreadLocal Scheduler::Win32::FiberScheduler::WorkerThread*	activeWorkerThread = nullptr;
-
-}	// anonymous namespace
-
 namespace Eldritch2 {
 namespace Scheduler {
 namespace Win32 {
@@ -88,7 +82,7 @@ namespace Win32 {
 
 	// ---
 
-		activeWorkerThread = this;
+		SetActiveWorkerContext( this );
 
 		_counterWaitFiber	= ::CreateFiberEx( 0u, SupportFiberStackSizeInBytes, FIBER_FLAG_FLOAT_SWITCH, [] ( void* workerThread ) {
 			for( ;; ) {
@@ -119,7 +113,9 @@ namespace Win32 {
 
 		_initialFiber	= ::ConvertThreadToFiberEx( this, FIBER_FLAG_FLOAT_SWITCH );
 
-		for( auto fiber( _pooledFibers.Back() ); !_pooledFibers.IsEmpty(); fiber = _pooledFibers.Back() ) {
+		while( !_pooledFibers.IsEmpty() ) {
+			auto	fiber( _pooledFibers.Back() );
+
 			_pooledFibers.PopBack();
 
 			::SwitchToFiber( fiber );
@@ -130,19 +126,13 @@ namespace Win32 {
 
 		::ConvertFiberToThread();
 
-		activeWorkerThread = nullptr;
+		SetActiveWorkerContext( nullptr );
 	}
 
 // ---------------------------------------------------
 
 	void FiberScheduler::WorkerThread::RequestGracefulShutdown() {
 		_executionBehavior.store( ExecutionBehavior::Terminate, ::std::memory_order_release );
-	}
-
-// ---------------------------------------------------
-
-	FiberScheduler::WorkerThread* FiberScheduler::WorkerThread::GetActiveWorkerThread() {
-		return activeWorkerThread;
 	}
 
 // ---------------------------------------------------
@@ -159,8 +149,10 @@ namespace Win32 {
 		// Prepare to receive work.
 		_transferCell.store( BarrierStatus::AwaitingTransfer, ::std::memory_order_relaxed );
 
+		auto&	victimThread( scheduler.GetRandomWorkerThread( *this, _randomWorkerSeed ) );
+
 		// Inform the worker that we could use some more work by writing our address into its transfer cell.
-		if( scheduler.GetRandomWorkerThread( *this, _randomWorkerSeed ).TryBeginWorkSharingWithThief( *this ) ) {
+		if( victimThread.TryBeginWorkSharingWithThief( *this ) ) {
 			do {
 				// Switch over to the other thread on systems with Hyper-Threading technology, as it might be able to respond/share work.
 				::_mm_pause();
@@ -173,7 +165,7 @@ namespace Win32 {
 					// relinquish more processor time to other potentially work-creating threads.
 					thief->_transferCell.store( BarrierStatus::Complete, ::std::memory_order_relaxed );
 				}
-			} while( BarrierStatus::AwaitingTransfer == _transferCell.load( ::std::memory_order_consume ) );
+			} while( BarrierStatus::AwaitingTransfer == _transferCell.load( ::std::memory_order_consume ) && !victimThread.HasCompleted() );
 		}
 	}
 
