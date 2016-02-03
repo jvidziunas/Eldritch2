@@ -42,7 +42,7 @@ namespace BulletDynamics {
 
 		public:
 			//!	Constructs this @ref Body instance.
-			Body( const ::Eldritch2::Physics::FlatBuffers::Body& definition, ::Eldritch2::Allocator& allocator );
+			Body( const Physics::FlatBuffers::Body& definition, ::Eldritch2::Allocator& allocator );
 
 			~Body() = default;
 

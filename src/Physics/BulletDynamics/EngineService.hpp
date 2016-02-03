@@ -53,14 +53,14 @@ namespace BulletDynamics {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		class CollisionShapeViewFactory : public FileSystem::ResourceViewFactory {
+		class ArticulatedBodyViewFactory : public FileSystem::ResourceViewFactory {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref CollisionShapeViewFactory instance.
-			CollisionShapeViewFactory() = default;
+			//!	Constructs this @ref ArticulatedBodyViewFactory instance.
+			ArticulatedBodyViewFactory() = default;
 
-			~CollisionShapeViewFactory() = default;
+			~ArticulatedBodyViewFactory() = default;
 
 		// ---------------------------------------------------
 
@@ -77,7 +77,7 @@ namespace BulletDynamics {
 
 	// - DATA MEMBERS ------------------------------------
 
-		CollisionShapeViewFactory						_collisionShapeFactory;
+		ArticulatedBodyViewFactory						_collisionShapeFactory;
 
 		Configuration::ConfigurablePODVariable<size_t>	_persistentManifoldPoolSizeInElements;
 		Configuration::ConfigurablePODVariable<size_t>	_collisionAlgorithmPoolSizeInElements;

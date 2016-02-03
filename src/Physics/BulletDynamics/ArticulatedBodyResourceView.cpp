@@ -34,14 +34,14 @@ namespace Eldritch2 {
 namespace Physics {
 namespace BulletDynamics {
 
-	ArticulatedBodyResourceView::Body::Body(const FlatBuffers::Body& definition, Allocator& allocator) : boneIndex( definition.BoneIndex() ),
-																										 shape( nullptr ),
-																										 mass( definition.Mass() ),
-																										 linearDamping( definition.LinearDamping() ),
-																										 angularDamping( definition.AngularDamping() ),
-																										 friction( definition.Friction() ),
-																										 rollingFriction( definition.RollingFriction() ),
-																										 restitution( definition.Restitution() ) {
+	ArticulatedBodyResourceView::Body::Body( const FlatBuffers::Body& definition, Allocator& allocator ) : boneIndex( definition.BoneIndex() ),
+																										   shape( nullptr ),
+																										   mass( definition.Mass() ),
+																										   linearDamping( definition.LinearDamping() ),
+																										   angularDamping( definition.AngularDamping() ),
+																										   friction( definition.Friction() ),
+																										   rollingFriction( definition.RollingFriction() ),
+																										   restitution( definition.Restitution() ) {
 		class SphereShape : public ::btSphereShape {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -171,15 +171,17 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	ErrorCode ArticulatedBodyResourceView::UpdateFromByteStream( const Range<const char*> bytes ) {
-		const auto	bodyDefinition( ::Eldritch2::Physics::FlatBuffers::GetArticulatedBody( bytes.first ) );
+		const auto	asset( ::Eldritch2::Physics::FlatBuffers::GetArticulatedBody( bytes.first ) );
 
-		if( !bodyDefinition || !bodyDefinition->Bodies() ) {
+		_bodies.Clear();
+
+		if( !asset || !asset->Bodies() ) {
 			return Error::InvalidParameter;
 		}
 
-		_bodies.Reserve( bodyDefinition->Bodies()->size() );
+		_bodies.Reserve( asset->Bodies()->size() );
 
-		for( auto definition( bodyDefinition->Bodies()->begin() ), end( bodyDefinition->Bodies()->end() ); definition != end; ++definition ) {
+		for( auto definition( asset->Bodies()->begin() ), end( asset->Bodies()->end() ); definition != end; ++definition ) {
 			_bodies.EmplaceBack( **definition, _shapeAllocator );
 		}
 

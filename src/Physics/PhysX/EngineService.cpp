@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Physics/PhysX/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Scheduler/ThreadScheduler.hpp>
@@ -19,7 +20,7 @@
 #include <Physics/PhysX/WorldView.hpp>
 #include <Foundation/GameEngine.hpp>
 //------------------------------------------------------------------//
-#include <extensions/PxDefaultSimulationFilterShader.h>
+#include <characterkinematic/PxControllerManager.h>
 #include <microprofile/microprofile.h>
 #include <common/PxTolerancesScale.h>
 #include <foundation/PxFoundation.h>
@@ -37,11 +38,13 @@
 	ET_LINK_LIBRARY("PhysX3CommonDEBUG_x64.lib")
 	ET_LINK_LIBRARY("PhysX3DEBUG_x64.lib")
 	ET_LINK_LIBRARY("PhysX3GpuDEBUG_x64.lib")
+	ET_LINK_LIBRARY("PhysX3CharacterKinematicDEBUG_x64.lib")
 #else
 	ET_LINK_LIBRARY("PhysX3Extensions.lib")
 	ET_LINK_LIBRARY("PhysX3Common_x64.lib")
 	ET_LINK_LIBRARY("PhysX3_x64.lib")
 	ET_LINK_LIBRARY("PhysX3Gpu_x64.lib")
+	ET_LINK_LIBRARY("PhysX3CharacterKinematic_x64.lib")
 #endif
 //------------------------------------------------------------------//
 
@@ -59,7 +62,7 @@ namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
 
-	EngineService::EngineService( GameEngine& engine ) : GameEngineService( engine ) {}
+	EngineService::EngineService( GameEngine& engine ) : GameEngineService( engine ), _articulatedBodyViewFactory( engine.GetAllocator() ) {}
 
 // ---------------------------------------------------
 
@@ -80,11 +83,14 @@ namespace PhysX {
 
 		PxSceneDesc	sceneDesc( _physics->getTolerancesScale() );
 
-		sceneDesc.filterShader	= &PxDefaultSimulationFilterShader;
+		sceneDesc.filterShader	= &WorldView::FilterShader;
 		sceneDesc.cpuDispatcher = this;
 
-		if( UniquePointer<PxScene> scene { _physics->createScene( sceneDesc ) } ) {
-			return new(allocator, Allocator::AllocationDuration::Normal) PhysX::WorldView( ::std::move( scene ), world ) ? Error::None : Error::OutOfMemory;
+		UniquePointer<PxScene>				scene( _physics->createScene( sceneDesc ) );
+		UniquePointer<PxControllerManager>	controllerManager( PxCreateControllerManager( *scene ) );
+
+		if( scene && controllerManager ) {
+			return new(allocator, Allocator::AllocationDuration::Normal) PhysX::WorldView( ::std::move( scene ), ::std::move( controllerManager ), world ) ? Error::None : Error::OutOfMemory;
 		}
 	
 		return Error::Unspecified;
@@ -119,11 +125,15 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& /*visitor*/ ) {}
+	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
+		_articulatedBodyViewFactory.AcceptInitializationVisitor( visitor );
+	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& /*visitor*/ ) {}
+	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
+		visitor.PublishFactory( ArticulatedBodyViewFactory::GetSerializedDataTag(), _articulatedBodyViewFactory );
+	}
 
 // ---------------------------------------------------
 
@@ -134,11 +144,9 @@ namespace PhysX {
 // ---------------------------------------------------
 
 	void EngineService::deallocate( void* ptr ) {
-		if( !ptr ) {
-			return;
+		if( ptr ) {
+			GetEngineAllocator().Deallocate( ptr, ::Eldritch2::AlignedDeallocationSemantics );
 		}
-
-		GetEngineAllocator().Deallocate( ptr, ::Eldritch2::AlignedDeallocationSemantics );
 	}
 
 // ---------------------------------------------------
@@ -151,6 +159,12 @@ namespace PhysX {
 		if( code & PxErrorCode::Enum::ePERF_WARNING ) {
 			GetLogger( LogMessageType::Warning )( UTF8L("PhysX performance warning ({0}({1}): {2}") ET_UTF8_NEWLINE_LITERAL, file, line, message );
 		}
+	}
+
+// ---------------------------------------------------
+
+	PxU32 EngineService::getWorkerCount() const {
+		return static_cast<PxU32>(GetGameEngine().GetThreadScheduler().GetMaximumTaskParallelism());
 	}
 
 // ---------------------------------------------------
@@ -170,11 +184,7 @@ namespace PhysX {
 		}
 	}
 
-// ---------------------------------------------------
 
-	PxU32 EngineService::getWorkerCount() const {
-		return static_cast<PxU32>(GetGameEngine().GetThreadScheduler().GetMaximumTaskParallelism());
-	}
 
 }	// namespace PhysX
 }	// namespace Eldritch2

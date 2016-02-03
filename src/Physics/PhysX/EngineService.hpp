@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Packages/ResourceViewFactory.hpp>
 #include <Foundation/GameEngineService.hpp>
 #include <Physics/PhysX/SmartPointers.hpp>
 //------------------------------------------------------------------//
@@ -66,21 +67,55 @@ namespace PhysX {
 
 		void	deallocate( void* ptr ) override;
 
-	// ---------------------------------------------------
+	// - PXERRORCALLBACK METHODS -------------------------
 
 		void	reportError( ::physx::PxErrorCode::Enum code, const char* message, const char* file, int line ) override;
 		
-	// ---------------------------------------------------
+	// - PXCPUDISPATCHER METHODS -------------------------
+
+		::physx::PxU32	getWorkerCount() const override;
 
 		void			submitTask( ::physx::PxBaseTask& task ) override;
 
-		::physx::PxU32	getWorkerCount() const override;
+	// ---------------------------------------------------
+
+		class ArticulatedBodyViewFactory : public FileSystem::ResourceViewFactory {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref ArticulatedBodyViewFactory instance.
+			ArticulatedBodyViewFactory( ::Eldritch2::Allocator& allocator );
+
+			~ArticulatedBodyViewFactory() = default;
+
+		// ---------------------------------------------------
+
+			static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
+
+		// ---------------------------------------------------
+
+			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
+
+		// ---------------------------------------------------
+
+			::Eldritch2::ErrorCode	AllocateResourceView( ::Eldritch2::Allocator&				allocator,
+														  FileSystem::ContentLibrary&			contentLibrary,
+														  FileSystem::ContentPackage&			package,
+														  const ::Eldritch2::UTF8Char* const	name,
+														  const ::Eldritch2::Range<const char*>	sourceAsset ) override;
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			::Eldritch2::ChildAllocator	_allocator;
+		};
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		PhysX::UniquePointer<::physx::PxFoundation>	_foundation;
 		PhysX::UniquePointer<::physx::PxPhysics>	_physics;
+
+		ArticulatedBodyViewFactory					_articulatedBodyViewFactory;
 
 		Scheduler::WorkerContext::FinishCounter		_dummyCounter;
 	};

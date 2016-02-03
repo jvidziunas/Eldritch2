@@ -237,9 +237,6 @@
     <ClCompile Include="..\src\Packages\ResourceView.cpp">
       <Filter>Source Files\Packages</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\physics\PhysicalMaterial.cpp">
-      <Filter>Source Files\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\Camera.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
@@ -570,9 +567,6 @@
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.MeshViewFactory.cpp">
       <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.CollisionShapeViewFactory.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\RenderTargetResourceView.cpp">
       <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
@@ -613,6 +607,30 @@
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\PhysX\WorldView.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TerrainColliderComponent.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.ArticulatedBodyViewFactory.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.PhysicalSoftBodyComponent.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TriggerVolumeComponent.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.ArticulatedBodyViewFactory.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.CharacterControllerComponent.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.ArticulatedBodyComponent.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
   </ItemGroup>
@@ -706,9 +724,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp">
       <Filter>Header Files\Utility\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\PhysicalMaterial.hpp">
-      <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\Camera.hpp">
       <Filter>Header Files\Renderer</Filter>
@@ -1149,10 +1164,13 @@
       <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\PhysX\EngineService.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Physics\PhysX\SmartPointers.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Physics\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.hpp">
+      <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1387,7 +1405,10 @@
       <Filter>Source Files\Foundation</Filter>
     </None>
     <None Include="..\src\Physics\PhysX\SmartPointers.inl">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </None>
+    <None Include="..\src\Physics\PhysX\WorldView.inl">
+      <Filter>Header Files\Physics\PhysX</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

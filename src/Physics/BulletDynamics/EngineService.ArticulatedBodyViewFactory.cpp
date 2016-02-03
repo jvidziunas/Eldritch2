@@ -1,5 +1,5 @@
 /*==================================================================*\
-  EngineService.CollisionShapeViewFactory.cpp
+  EngineService.ArticulatedBodyViewFactory.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -27,11 +27,11 @@ namespace Eldritch2 {
 namespace Physics {
 namespace BulletDynamics {
 
-	void EngineService::CollisionShapeViewFactory::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& /*visitor*/ ) {}
+	void EngineService::ArticulatedBodyViewFactory::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& /*visitor*/ ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::CollisionShapeViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> sourceAsset ) {
+	ErrorCode EngineService::ArticulatedBodyViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> sourceAsset ) {
 		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) ArticulatedBodyResourceView( contentLibrary, package, name, allocator ) ) {
 			return view->UpdateFromByteStream( sourceAsset );
 		}

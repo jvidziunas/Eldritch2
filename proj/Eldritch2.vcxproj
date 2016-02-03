@@ -274,7 +274,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Packages\ResourceViewFactory.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.CollisionShapeViewFactory.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.ArticulatedBodyViewFactory.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.ArticulatedBodyComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterControllerComponent.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp" />
@@ -282,8 +282,15 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.ArticulatedBodyViewFactory.cpp" />
     <ClCompile Include="..\src\Physics\PhysX\EngineService.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.ArticulatedBodyComponent.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.CharacterControllerComponent.cpp" />
     <ClCompile Include="..\src\Physics\PhysX\WorldView.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.PhysicalSoftBodyComponent.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TerrainColliderComponent.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TriggerVolumeComponent.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.cpp" />
@@ -327,7 +334,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Logging\FileAppendingLogger.cpp" />
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp" />
     <ClCompile Include="..\src\Packages\ResourceView.cpp" />
-    <ClCompile Include="..\src\physics\PhysicalMaterial.cpp" />
     <ClCompile Include="..\src\renderer\Camera.cpp" />
     <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp" />
     <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp" />
@@ -408,6 +414,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\EngineService.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\WorldView.hpp" />
+    <ClInclude Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.hpp" />
     <ClInclude Include="..\src\Physics\PhysX\EngineService.hpp" />
     <ClInclude Include="..\src\Physics\PhysX\SmartPointers.hpp" />
     <ClInclude Include="..\src\Physics\PhysX\WorldView.hpp" />
@@ -520,7 +527,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Containers\HashMap.hpp" />
     <ClInclude Include="..\src\Utility\math\FrustumUtils.hpp" />
     <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp" />
-    <ClInclude Include="..\src\physics\PhysicalMaterial.hpp" />
     <ClInclude Include="..\src\renderer\Camera.hpp" />
     <ClInclude Include="..\src\Renderer\GPUFormats.hpp" />
     <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp" />
@@ -625,6 +631,7 @@ call "deploy.x64.bat"
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="..\src\Physics\PhysX\SmartPointers.inl" />
+    <None Include="..\src\Physics\PhysX\WorldView.inl" />
     <None Include="..\src\Renderer\HLSLPipeline.fbc" />
     <None Include="..\src\renderer\VisibilitySystem.inl" />
     <None Include="..\src\Scheduler\PrivateQueueWorker.inl" />
