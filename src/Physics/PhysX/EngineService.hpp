@@ -55,7 +55,7 @@ namespace PhysX {
 
 	// ---------------------------------------------------
 
-		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override;
+		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override;
 
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override;
 
@@ -79,14 +79,14 @@ namespace PhysX {
 
 	// ---------------------------------------------------
 
-		class ArticulatedBodyViewFactory : public FileSystem::ResourceViewFactory {
+		class MeshViewFactory : public FileSystem::ResourceViewFactory {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref ArticulatedBodyViewFactory instance.
-			ArticulatedBodyViewFactory( ::Eldritch2::Allocator& allocator );
+			//!	Constructs this @ref MeshViewFactory instance.
+			MeshViewFactory() = default;
 
-			~ArticulatedBodyViewFactory() = default;
+			~MeshViewFactory() = default;
 
 		// ---------------------------------------------------
 
@@ -103,10 +103,34 @@ namespace PhysX {
 														  FileSystem::ContentPackage&			package,
 														  const ::Eldritch2::UTF8Char* const	name,
 														  const ::Eldritch2::Range<const char*>	sourceAsset ) override;
-		// - DATA MEMBERS ------------------------------------
+		};
 
-		private:
-			::Eldritch2::ChildAllocator	_allocator;
+	// ---
+
+		class TerrainViewFactory : public FileSystem::ResourceViewFactory {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref TerrainViewFactory instance.
+			TerrainViewFactory() = default;
+
+			~TerrainViewFactory() = default;
+
+		// ---------------------------------------------------
+
+			static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
+
+		// ---------------------------------------------------
+
+			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
+
+		// ---------------------------------------------------
+
+			::Eldritch2::ErrorCode	AllocateResourceView( ::Eldritch2::Allocator&				allocator,
+														  FileSystem::ContentLibrary&			contentLibrary,
+														  FileSystem::ContentPackage&			package,
+														  const ::Eldritch2::UTF8Char* const	name,
+														  const ::Eldritch2::Range<const char*>	sourceAsset ) override;
 		};
 
 	// - DATA MEMBERS ------------------------------------
@@ -115,7 +139,8 @@ namespace PhysX {
 		PhysX::UniquePointer<::physx::PxFoundation>	_foundation;
 		PhysX::UniquePointer<::physx::PxPhysics>	_physics;
 
-		ArticulatedBodyViewFactory					_articulatedBodyViewFactory;
+		MeshViewFactory								_meshViewFactory;
+		TerrainViewFactory							_terrainViewFactory;
 
 		Scheduler::WorkerContext::FinishCounter		_dummyCounter;
 	};

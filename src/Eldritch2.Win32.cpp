@@ -21,6 +21,7 @@
 #include <Utility/Win32ApplicationHelpers.hpp>
 #include <Scheduler/Win32/FiberScheduler.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
+#include <Renderer/Vulkan/EngineService.hpp>
 #include <System/Win32/SystemInterface.hpp>
 #include <Physics/PhysX/EngineService.hpp>
 #include <Configuration/EngineService.hpp>
@@ -65,7 +66,7 @@ namespace {
 						_networkingService( GetGameEngine() ),
 						_scriptService( GetGameEngine() ),
 						_physicsService( GetGameEngine() ),
-						_direct3DRendererService( GetGameEngine() ),
+						_rendererService( GetGameEngine() ),
 						_audioRendererService( GetGameEngine() ) {}
 
 		~Application() = default;
@@ -108,10 +109,11 @@ namespace {
 		Scripting::AngelScript::EngineService	_scriptService;
 #if 0
 		Physics::BulletDynamics::EngineService	_physicsService;
+		Renderer::Direct3D11::EngineService		_rendererService;
 #else
 		Physics::PhysX::EngineService			_physicsService;
+		Renderer::Vulkan::EngineService			_rendererService;
 #endif
-		Renderer::Direct3D11::EngineService		_direct3DRendererService;
 		Sound::XAudio2::EngineService			_audioRendererService;
 	};
 

@@ -46,6 +46,7 @@
 #	define ETCDecl                       __cdecl
 #	define ETStdCall                     __stdcall
 #	define ETFastCall                    __fastcall
+#	define ETSIMDCall
 	// Compiler optimization hints
 #	define ETInlineHint                  __inline
 #	define ETForceInlineHint             __forceinline
@@ -114,6 +115,11 @@
 #	define ETCDecl                     __cdecl
 #	define ETStdCall                   __stdcall
 #	define ETFastCall                  __fastcall
+#if( _MSC_VER >= 1800 )
+#	define ETSIMDCall                  __vectorcall
+#else
+#	define ETSIMDCall
+#endif
 	// Compiler optimization hints
 #	define ETInlineHint                __inline
 #	define ETForceInlineHint           __forceinline
@@ -207,6 +213,7 @@
 #	define ETCDecl                       __attribute__((cdecl))
 #	define ETStdCall                     __attribute__((stdcall))
 #	define ETFastCall                    __attribute__((fastcall))
+#	define ETSIMDCall
 	// Compiler optimization hints
 #	define ETInlineHint                  inline
 #	define ETForceInlineHint             __attribute__((always_inline))

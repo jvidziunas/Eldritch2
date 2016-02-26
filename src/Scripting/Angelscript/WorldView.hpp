@@ -21,7 +21,7 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 		class	MessageBus;
 	}
 }
@@ -76,7 +76,7 @@ namespace AngelScript {
 
 	// ---------------------------------------------------
 
-		static void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
+		static void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 
 	// ---------------------------------------------------
 

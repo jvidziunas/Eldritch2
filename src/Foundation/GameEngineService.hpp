@@ -38,7 +38,7 @@ namespace Eldritch2 {
 	}
 
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 	}
 
 	namespace Scheduler {
@@ -82,9 +82,9 @@ namespace Foundation {
 		//! Interested service classes should override this method in order to participate in script API setup.
 		/*!	@param[in] visitor The type registrar that will handle publishing the service's types, methods and variables to script objects.
 			@remark The default implementation does nothing.
-			@see @ref Scripting::ScriptAPIRegistrationInitializationVisitor
+			@see @ref Scripting::ScriptApiRegistrationInitializationVisitor
 			*/
-		virtual void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
+		virtual void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 		//! Interested service classes should override this method in order to participate in configurable variable setup.
 		/*!	@remark The default implementation does nothing.
 			@see @ref Configuration::ConfigurationPublishingInitializationVisitor

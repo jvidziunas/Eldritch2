@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Input/Keyboard.hpp>
@@ -37,7 +37,7 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint void Keyboard::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	ETNoAliasHint void Keyboard::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static ETNoAliasHint float32 ETScriptAPICall GetKeyWeight( const Keyboard* thisPointer, const uint8 key ) {
 				return (thisPointer->_keyStates[key]) ? 1.0f : 0.0f;

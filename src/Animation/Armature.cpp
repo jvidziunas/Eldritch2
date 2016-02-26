@@ -23,5 +23,13 @@ namespace Animation {
 
 	const char* const Armature::scriptTypeName	= "Armature";
 
+// ---------------------------------------------------
+
+	void Armature::UpdateCachedKeys( BoneIndex maximumBoneToConsider, uint64 time ) {
+		for( auto& layer : _layers ) {
+			layer.EvaluateCacheForTime( _keyCache, maximumBoneToConsider, time );
+		}
+	}
+
 }	// namespace Animation
 }	// namespace Eldritch2

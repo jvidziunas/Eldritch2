@@ -92,7 +92,7 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	void GameEngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {
+	void GameEngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {
 		// Default implementation should not do anything.
 	}
 

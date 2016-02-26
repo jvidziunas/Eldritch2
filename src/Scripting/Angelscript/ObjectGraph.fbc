@@ -1,3 +1,6 @@
+file_identifier	"ESOG";
+file_extension	"e2serializedobjectgraph";
+
 namespace Eldritch2.Scripting.AngelScript.FlatBuffers;
 
 struct ObjectReference {
@@ -12,13 +15,11 @@ union ObjectProperty {
 }
 
 table ObjectDefinition {
-	Properties : [ObjectProperty];
+	Properties	: [ObjectProperty];
 }
 
-table Header {
-	Objects : [ObjectDefinition];
+table ObjectGraph {
+	Objects		: [ObjectDefinition];
 }
 
-root_type Header;
-file_identifier	"EWDF";
-file_extension	"e2world";
+root_type ObjectGraph;

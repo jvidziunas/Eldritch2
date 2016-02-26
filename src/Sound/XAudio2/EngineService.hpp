@@ -49,7 +49,7 @@ namespace XAudio2 {
 		void	OnEngineConfigurationBroadcast( Scheduler::WorkerContext& executingContext ) override sealed;
 
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) override sealed;
+		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar ) override sealed;
 
 	// ---------------------------------------------------
 

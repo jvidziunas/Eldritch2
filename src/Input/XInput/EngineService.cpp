@@ -37,7 +37,7 @@ namespace XInput {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
 		Controller::ExposeScriptAPI( typeRegistrar );
 	}
 

@@ -1,9 +1,9 @@
-include "CollisionShapes.fbc";
+include			"CollisionShapes.fbc";
 file_extension	"e2articulatedbody";
 
 namespace Eldritch2.Physics.FlatBuffers;
 
-table Body {
+table RigidBody {
 	BoneIndex		: ushort;
 	Shape			: CollisionShape (required);
 	Mass			: float;
@@ -15,7 +15,7 @@ table Body {
 }
 
 table ArticulatedBody {
-	Bodies	: [Body];
+	RigidBodies		: [RigidBody];
 }
 
 root_type ArticulatedBody;

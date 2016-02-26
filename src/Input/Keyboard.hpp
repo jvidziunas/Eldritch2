@@ -18,7 +18,7 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 	}
 }
 
@@ -38,7 +38,7 @@ namespace Input {
 	// - SCRIPT API REFERENCE ----------------------------
 
 		//!	Registers all script-callable methods for the @ref Keyboard type with the specified script type registrar.
-		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 	// - DATA MEMBERS ------------------------------------
 

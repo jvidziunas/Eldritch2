@@ -124,7 +124,7 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*visitor*/ ) {}
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& /*visitor*/ ) {}
 
 // ---------------------------------------------------
 

@@ -48,19 +48,19 @@ namespace BulletDynamics {
 	protected:
 		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
 		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
+		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override sealed;
 
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		class ArticulatedBodyViewFactory : public FileSystem::ResourceViewFactory {
+		class MeshViewFactory : public FileSystem::ResourceViewFactory {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref ArticulatedBodyViewFactory instance.
-			ArticulatedBodyViewFactory() = default;
+			//!	Constructs this @ref MeshViewFactory instance.
+			MeshViewFactory() = default;
 
-			~ArticulatedBodyViewFactory() = default;
+			~MeshViewFactory() = default;
 
 		// ---------------------------------------------------
 
@@ -77,7 +77,7 @@ namespace BulletDynamics {
 
 	// - DATA MEMBERS ------------------------------------
 
-		ArticulatedBodyViewFactory						_collisionShapeFactory;
+		MeshViewFactory									_meshFactory;
 
 		Configuration::ConfigurablePODVariable<size_t>	_persistentManifoldPoolSizeInElements;
 		Configuration::ConfigurablePODVariable<size_t>	_collisionAlgorithmPoolSizeInElements;

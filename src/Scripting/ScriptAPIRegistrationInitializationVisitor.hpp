@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ScriptAPIRegistrationInitializationVisitor.hpp
+  ScriptApiRegistrationInitializationVisitor.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -18,17 +18,17 @@
 namespace Eldritch2 {
 namespace Scripting {
 
-	class ScriptAPIRegistrationInitializationVisitor : public Scripting::AngelScript::UserDefinedTypeRegistrar {
+	class ScriptApiRegistrationInitializationVisitor : public Scripting::AngelScript::UserDefinedTypeRegistrar {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref ScriptAPIRegistrationInitializationVisitor instance.
+		//!	Constructs this @ref ScriptApiRegistrationInitializationVisitor instance.
 		/*!	@param[in] arguments Template parameter pack containing the arguments to be forwarded to the real type registrar constructor.
 			*/
 		template <typename... Arguments>
-		ETInlineHint ScriptAPIRegistrationInitializationVisitor( Arguments&&... arguments );
+		ETInlineHint ScriptApiRegistrationInitializationVisitor( Arguments&&... arguments );
 
-		~ScriptAPIRegistrationInitializationVisitor() = default;
+		~ScriptApiRegistrationInitializationVisitor() = default;
 	};
 
 }	// namespace Scripting
@@ -37,5 +37,5 @@ namespace Scripting {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.inl>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.inl>
 //------------------------------------------------------------------//

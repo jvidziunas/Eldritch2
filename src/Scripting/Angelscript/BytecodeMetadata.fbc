@@ -12,13 +12,13 @@ enum PropertyFlags: uint (bit_flags) {
 }
 
 table FunctionMetadata {
-	Index	: uint (key);
-	Flags	: TypeFlags = Normal;
+	Index		: uint (key);
+	Flags		: TypeFlags = Normal;
 }
 
 table PropertyMetadata {
-	Index	: uint (key);
-	Flags	: PropertyFlags = Normal;
+	Index		: uint (key);
+	Flags		: PropertyFlags = Normal;
 }
 
 table TypeMetadata {

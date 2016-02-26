@@ -14,8 +14,8 @@
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
-#include <Physics/BulletDynamics/ArticulatedBodyResourceView.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
+#include <Physics/BulletDynamics/MeshResourceView.hpp>
 #include <Physics/BulletDynamics/EngineService.hpp>
 #include <Physics/BulletDynamics/WorldView.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
@@ -50,7 +50,7 @@ namespace BulletDynamics {
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( ArticulatedBodyResourceView::GetSerializedDataTag(), _collisionShapeFactory );
+		visitor.PublishFactory( MeshResourceView::GetSerializedDataTag(), _meshFactory );
 	}
 
 // ---------------------------------------------------
@@ -61,12 +61,12 @@ namespace BulletDynamics {
 		visitor.Register( UTF8L("WorldPersistentManifoldPoolSizeInElements"), _persistentManifoldPoolSizeInElements );
 		visitor.Register( UTF8L("WorldCollisionAlgorithmPoolSizeInElements"), _collisionAlgorithmPoolSizeInElements );
 
-		_collisionShapeFactory.AcceptInitializationVisitor( visitor );
+		_meshFactory.AcceptInitializationVisitor( visitor );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
 		WorldView::ExposeScriptAPI( visitor );
 	}
 

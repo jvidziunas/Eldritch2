@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
@@ -24,11 +24,11 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Scripting {
 
-	const char* const StringMarshal::scriptTypeName			= "String";
-	const char* const Float4Marshal::scriptTypeName			= "Float4";
-	const char* const OrientationMarshal::scriptTypeName	= "Orientation";
-
-	static ETThreadLocal	Allocator*	stringAllocator = nullptr;
+	static ETThreadLocal Allocator*	stringAllocator							= nullptr;
+	const char* const				StringMarshal::scriptTypeName			= "String";
+	const char* const				Float4Marshal::scriptTypeName			= "Float4";
+	const char* const				OrientationMarshal::scriptTypeName		= "Orientation";
+	const char* const				RigidTransformMarshal::scriptTypeName	= "RigidTransform";
 
 // ---------------------------------------------------
 
@@ -44,7 +44,9 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint void StringMarshal::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	ETNoAliasHint void StringMarshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
+		using BinaryOperatorClass = ScriptApiRegistrationInitializationVisitor::BinaryOperatorClass;
+
 		struct FunctionHelper {
 			static void ETScriptAPICall Constructor0( void* const thisPointer ) {
 				new(thisPointer) StringMarshal( *stringAllocator );
@@ -71,25 +73,23 @@ namespace Scripting {
 			}
 		};
 
-		using BinaryOperatorClass	= ScriptAPIRegistrationInitializationVisitor::BinaryOperatorClass;
-
 	// ---
 
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L( "StringMarshal::ExposeScriptAPI() Temporary Allocator" ) );
+		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("StringMarshal::ExposeScriptAPI() Temporary Allocator") );
+		const auto					registerResult( typeRegistrar.RegisterUserDefinedValueType<StringMarshal>( temporaryAllocator ) );
+		auto&						typeBuilder( *registerResult.object );
 
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedValueType<StringMarshal>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
+		ETRuntimeAssert( registerResult );
 
-			typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
+		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
 
-			typeBuilder.ExposeVirtualProperty( "Length", &FunctionHelper::GetLength );
+		typeBuilder.ExposeVirtualProperty( "Length", &FunctionHelper::GetLength );
 
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign ).ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign );
+		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign ).ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign );
 
-			/* typeBuilder.ExposeBinaryOperator( BinaryOperatorClasses::COMPARISON, &FunctionHelper::OpCompare ); */
+		/* typeBuilder.ExposeBinaryOperator( BinaryOperatorClasses::COMPARISON, &FunctionHelper::OpCompare ); */
 
-			temporaryAllocator.Delete( typeBuilder );
-		}
+		temporaryAllocator.Delete( typeBuilder );
 	}
 
 // ---------------------------------------------------
@@ -104,15 +104,11 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	Float4Marshal::Float4Marshal( const Float4Marshal& marshal ) : Float4( marshal ) {}
-
-// ---------------------------------------------------
-
 	Float4Marshal::Float4Marshal( const Float4 initializer ) : Float4( initializer ) {}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint void Float4Marshal::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	ETNoAliasHint void Float4Marshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
 		struct FunctionHelper {
 			static void ETScriptAPICall Constructor0( void* const thisPointer, float32 x, float32 y ) {
 				new(thisPointer) Float4Marshal( x, y, 0.0f, 0.0f );
@@ -200,36 +196,36 @@ namespace Scripting {
 			}
 		};
 
-		using BinaryOperatorClass	= ScriptAPIRegistrationInitializationVisitor::BinaryOperatorClass;
+		using BinaryOperatorClass	= ScriptApiRegistrationInitializationVisitor::BinaryOperatorClass;
 
 	// ---
 
 		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("Float4Marshal::ExposeScriptAPI() Temporary Allocator") );
+		const auto					registerResult( visitor.RegisterUserDefinedValueType<Float4Marshal>( temporaryAllocator ) );
+		auto&						typeBuilder( *registerResult.object );
 
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedValueType<Float4Marshal>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
+		ETRuntimeAssert( registerResult );
+			
+		// Constructor registration
+		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 ).ExposeConstructor( &FunctionHelper::Constructor2 ).ExposeConstructor( &FunctionHelper::Constructor3 );
 
-			// Constructor registration
-			typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 ).ExposeConstructor( &FunctionHelper::Constructor2 ).ExposeConstructor( &FunctionHelper::Constructor3 );
+		// Virtual property registration
+		typeBuilder.ExposeVirtualProperty( "SquaredMagnitude", &FunctionHelper::GetSquaredMagnitude ).ExposeVirtualProperty( "InverseMagnitude", &FunctionHelper::GetInverseMagnitude ).ExposeVirtualProperty( "Magnitude", &FunctionHelper::GetMagnitude );
 
-			// Virtual property registration
-			typeBuilder.ExposeVirtualProperty( "SquaredMagnitude", &FunctionHelper::GetSquaredMagnitude ).ExposeVirtualProperty( "InverseMagnitude", &FunctionHelper::GetInverseMagnitude ).ExposeVirtualProperty( "Magnitude", &FunctionHelper::GetMagnitude );
+		// Method registration
+		typeBuilder.ExposeMethod( "Normalize", &FunctionHelper::Normalize );
 
-			// Method registration
-			typeBuilder.ExposeMethod( "Normalize", &FunctionHelper::Normalize );
+		// Operator registration
+		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Addition, &FunctionHelper::OpAdd ).ExposeBinaryOperator( BinaryOperatorClass::Subtraction, &FunctionHelper::OpSubtract );
+		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Multiplication, &FunctionHelper::OpMultiply ).ExposeBinaryOperator( BinaryOperatorClass::Division, &FunctionHelper::OpDivide );
+		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign );
+		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign ).ExposeBinaryOperator( BinaryOperatorClass::SubtractionAssignment, &FunctionHelper::OpSubtractAssign );
+		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::MultiplicationAssignment, &FunctionHelper::OpMultiplyAssign ).ExposeBinaryOperator( BinaryOperatorClass::DivisionAssignment, &FunctionHelper::OpDivideAssign );
 
-			// Operator registration
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Addition, &FunctionHelper::OpAdd ).ExposeBinaryOperator( BinaryOperatorClass::Subtraction, &FunctionHelper::OpSubtract );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Multiplication, &FunctionHelper::OpMultiply ).ExposeBinaryOperator( BinaryOperatorClass::Division, &FunctionHelper::OpDivide );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign ).ExposeBinaryOperator( BinaryOperatorClass::SubtractionAssignment, &FunctionHelper::OpSubtractAssign );
-			typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::MultiplicationAssignment, &FunctionHelper::OpMultiplyAssign ).ExposeBinaryOperator( BinaryOperatorClass::DivisionAssignment, &FunctionHelper::OpDivideAssign );
+		// Global function registration
+		visitor.ExposeFunction( "DotProduct", &FunctionHelper::DotProduct ).ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate ).ExposeFunction( "CrossProduct", &FunctionHelper::CrossProduct );
 
-			// Global function registration
-			typeRegistrar.ExposeFunction( "DotProduct", &FunctionHelper::DotProduct ).ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate ).ExposeFunction( "CrossProduct", &FunctionHelper::CrossProduct );
-
-			temporaryAllocator.Delete( typeBuilder );
-		}
+		temporaryAllocator.Delete( typeBuilder );
 	}
 
 // ---------------------------------------------------
@@ -238,15 +234,11 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	OrientationMarshal::OrientationMarshal( const Scripting::OrientationMarshal& initializer ) : Quaternion( static_cast<const Quaternion&>(initializer) ) {}
-
-// ---------------------------------------------------
-
 	OrientationMarshal::OrientationMarshal( const ::Eldritch2::Quaternion initializer ) : Quaternion( initializer ) {}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint void OrientationMarshal::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	ETNoAliasHint void OrientationMarshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
 		struct FunctionHelper {
 			static void ETScriptAPICall Constructor0( void* const thisPointer ) {
 				new(thisPointer) OrientationMarshal( 1.0f, 0.0f, 0.0f, 0.0f );
@@ -261,53 +253,95 @@ namespace Scripting {
 			}
 
 			static ETInlineHint ETNoAliasHint Float4Marshal	ETScriptAPICall RotateVector( const OrientationMarshal* thisPointer, const Float4Marshal& point ) {
-				return Float4Marshal( thisPointer->RotateVector( point ) );
+				return { thisPointer->RotateVector( point ) };
 			}
 
 			static ETInlineHint ETNoAliasHint OrientationMarshal ETScriptAPICall GetReverse( const OrientationMarshal* thisPointer ) {
-				return OrientationMarshal( thisPointer->GetReverse() );
+				return { thisPointer->GetReverse() };
 			}
 
 			static ETInlineHint ETNoAliasHint Float4Marshal	ETScriptAPICall GetForwardVector( const OrientationMarshal* thisPointer ) {
-				return RotateVector( thisPointer, Float4Marshal( 0.0f, 0.0f, 1.0f, 0.0f ) );
+				return RotateVector( thisPointer, { 0.0f, 0.0f, 1.0f, 0.0f } );
 			}
 
 			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall GetUpVector( const OrientationMarshal* thisPointer ) {
-				return RotateVector( thisPointer, Float4Marshal( 0.0f, 1.0f, 0.0f, 0.0f ) );
+				return RotateVector( thisPointer, { 0.0f, 1.0f, 0.0f, 0.0f } );
 			}
 
 			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall GetRightVector( const OrientationMarshal* thisPointer ) {
-				return RotateVector( thisPointer, Float4Marshal( 1.0f, 0.0f, 0.0f, 0.0f ) );
+				return RotateVector( thisPointer, { 1.0f, 0.0f, 0.0f, 0.0f } );
 			}
 
 			static ETInlineHint ETNoAliasHint OrientationMarshal ETScriptAPICall OrientationFromLookatUpVectors( const Float4Marshal& /*lookAt*/, const Float4Marshal& /*up*/ ) {
-				return OrientationMarshal( 0.0f, 0.0f, 0.0f, 1.0f );
+				return { 0.0f, 0.0f, 0.0f, 1.0f };
 			}
 		};
 
 	// ---
 
 		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("OrientationMarshal::ExposeScriptAPI() Temporary Allocator") );
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedValueType<OrientationMarshal>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
+		const auto					registerResult( visitor.RegisterUserDefinedValueType<OrientationMarshal>( temporaryAllocator ) );
+		auto&						typeBuilder( *registerResult.object );
 
-			typeRegistrar.EnsureValueTypeDeclared<Float4Marshal>();
+		ETRuntimeAssert( registerResult );
+			
+		visitor.EnsureValueTypeDeclared<Float4Marshal>();
 
-			// Constructor registration
-			typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
+		// Constructor registration
+		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
 
-			// Virtual property registration
-			typeBuilder.ExposeVirtualProperty( "Reverse", &FunctionHelper::GetReverse ).ExposeVirtualProperty( "ForwardVector", &FunctionHelper::GetForwardVector );
-			typeBuilder.ExposeVirtualProperty( "UpVector", &FunctionHelper::GetUpVector ).ExposeVirtualProperty( "RightVector", &FunctionHelper::GetRightVector );
+		// Virtual property registration
+		typeBuilder.ExposeVirtualProperty( "Reverse", &FunctionHelper::GetReverse ).ExposeVirtualProperty( "ForwardVector", &FunctionHelper::GetForwardVector );
+		typeBuilder.ExposeVirtualProperty( "UpVector", &FunctionHelper::GetUpVector ).ExposeVirtualProperty( "RightVector", &FunctionHelper::GetRightVector );
 
-			// Method registration
-			typeBuilder.ExposeMethod( "RotateVector", &FunctionHelper::RotateVector );
+		// Method registration
+		typeBuilder.ExposeMethod( "RotateVector", &FunctionHelper::RotateVector );
 
-			// Global function registration
-			typeRegistrar.ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate );
+		// Global function registration
+		visitor.ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate );
 
-			temporaryAllocator.Delete( typeBuilder );
-		}
+		temporaryAllocator.Delete( typeBuilder );
+	}
+
+// ---------------------------------------------------
+
+	RigidTransformMarshal::RigidTransformMarshal( const Float4Marshal& translation, const OrientationMarshal& orientation ) : translation( translation ), orientation( orientation ) {}
+
+// ---------------------------------------------------
+
+	RigidTransformMarshal::RigidTransformMarshal( const RigidTransform& transform ) : translation( transform.translation ), orientation( transform.orientation ) {}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint void RigidTransformMarshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		struct FunctionHelper {
+			static void ETScriptAPICall Constructor0( void* const thisPointer ) {
+				new(thisPointer) RigidTransformMarshal( { 0.0f, 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.0f } );
+			}
+
+			static void ETScriptAPICall Constructor1( void* const thisPointer, const Float4Marshal& translation, const OrientationMarshal& orientation ) {
+				new(thisPointer) RigidTransformMarshal( translation, orientation );
+			}
+		};
+
+	// ---
+
+		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("OrientationMarshal::ExposeScriptAPI() Temporary Allocator") );
+		const auto					registerResult( visitor.RegisterUserDefinedValueType<RigidTransformMarshal>( temporaryAllocator ) );
+		auto&						typeBuilder( *registerResult.object );
+
+		ETRuntimeAssert( registerResult );
+			
+		visitor.EnsureValueTypeDeclared<Float4Marshal>();
+		visitor.EnsureValueTypeDeclared<OrientationMarshal>();
+
+		// Constructor registration
+		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
+
+		// Property registration
+		typeBuilder.ExposeProperty( "translation", &RigidTransformMarshal::translation ).ExposeProperty( "orientation", &RigidTransformMarshal::orientation );
+
+		temporaryAllocator.Delete( typeBuilder );
 	}
 
 }	// namespace Scripting

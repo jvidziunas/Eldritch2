@@ -62,7 +62,7 @@ namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
 
-	EngineService::EngineService( GameEngine& engine ) : GameEngineService( engine ), _articulatedBodyViewFactory( engine.GetAllocator() ) {}
+	EngineService::EngineService( GameEngine& engine ) : GameEngineService( engine ) {}
 
 // ---------------------------------------------------
 
@@ -86,11 +86,10 @@ namespace PhysX {
 		sceneDesc.filterShader	= &WorldView::FilterShader;
 		sceneDesc.cpuDispatcher = this;
 
-		UniquePointer<PxScene>				scene( _physics->createScene( sceneDesc ) );
-		UniquePointer<PxControllerManager>	controllerManager( PxCreateControllerManager( *scene ) );
-
-		if( scene && controllerManager ) {
-			return new(allocator, Allocator::AllocationDuration::Normal) PhysX::WorldView( ::std::move( scene ), ::std::move( controllerManager ), world ) ? Error::None : Error::OutOfMemory;
+		if( UniquePointer<PxScene> scene { _physics->createScene( sceneDesc ) } ) {
+			if( UniquePointer<PxControllerManager> controllerManager { PxCreateControllerManager( *scene ) } ) {
+				return new(allocator, Allocator::AllocationDuration::Normal) PhysX::WorldView( ::std::move( scene ), ::std::move( controllerManager ), world ) ? Error::None : Error::OutOfMemory;
+			}
 		}
 	
 		return Error::Unspecified;
@@ -121,18 +120,20 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*visitor*/ ) {}
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		WorldView::ExposeScriptAPI( visitor );
+	}
 
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
-		_articulatedBodyViewFactory.AcceptInitializationVisitor( visitor );
+		_meshViewFactory.AcceptInitializationVisitor( visitor );
 	}
 
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( ArticulatedBodyViewFactory::GetSerializedDataTag(), _articulatedBodyViewFactory );
+		visitor.PublishFactory( MeshViewFactory::GetSerializedDataTag(), _meshViewFactory );
 	}
 
 // ---------------------------------------------------
@@ -183,8 +184,6 @@ namespace PhysX {
 			ExecuteTask( &task, *workerContext );
 		}
 	}
-
-
 
 }	// namespace PhysX
 }	// namespace Eldritch2

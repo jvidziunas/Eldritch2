@@ -15,7 +15,7 @@
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/Builders/DeviceBuilder.hpp>
 #include <Renderer/Direct3D11/ResourceCommon.hpp>
 #include <Renderer/Direct3D11/EngineService.hpp>
@@ -67,8 +67,7 @@ namespace Direct3D11 {
 															   _preferredAdapterName( GetEngineAllocator() ),
 															   _forceDebugRuntime( false ),
 															   _allowDriverThreadingOptimizations( true ),
-															   _maximumFramesToRenderAhead( 3u ),
-															   _defaultMeshView( nullptr ) {}
+															   _maximumFramesToRenderAhead( 3u ) {}
 
 // ---------------------------------------------------
 
@@ -79,7 +78,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( world, *_defaultMeshView ) ? Error::None : Error::OutOfMemory;
+		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( world ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------
@@ -112,7 +111,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
 		struct FunctionHelper {
 			static SwapChain* ETScriptAPICall GetPrimarySwapChain() {
 				auto&	renderer( *activeRenderer );

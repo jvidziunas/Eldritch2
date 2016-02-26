@@ -95,49 +95,49 @@ struct StencilBehavior {
 }
 
 table RasterizerState {
-	FillMode				: FillMode			= Solid;
-	CullMode				: CullMode			= BackFace;
-	DepthBias				: int				= 0;
-	DepthBiasClamp			: float				= 0.0;
-	SlopeScaledDepthBias	: float				= 0.0;
-	Flags					: RasterizerFlags	= DepthClipEnable;
+	FillMode						: FillMode				= Solid;
+	CullMode						: CullMode				= BackFace;
+	DepthBias						: int					= 0;
+	DepthBiasClamp					: float					= 0.0;
+	SlopeScaledDepthBias			: float					= 0.0;
+	Flags							: RasterizerFlags		= DepthClipEnable;
 }
 
 table DepthStencilState {
-	Flags					: DepthStencilFlags;
-	DepthComparisonFunction	: ComparisonFunction	= PassIfLess;
-	StencilReadMask			: ubyte					= 255;
-	StencilWriteMask		: ubyte					= 255;
+	Flags							: DepthStencilFlags;
+	DepthComparisonFunction			: ComparisonFunction	= PassIfLess;
+	StencilReadMask					: ubyte					= 255;
+	StencilWriteMask				: ubyte					= 255;
 	
-	FrontFaceBehavior		: StencilBehavior;
-	BackFaceBehavior		: StencilBehavior;
+	FrontFaceBehavior				: StencilBehavior;
+	BackFaceBehavior				: StencilBehavior;
 }
 
 table RenderTargetState {
 	Name							: string (required);
 
-	SourceColorBlendFactor			: ColorBlendFactor	= One;
-	DestinationColorBlendFactor		: ColorBlendFactor	= Zero;
-	ColorBlendOperator				: BlendOperator		= Add;
+	SourceColorBlendFactor			: ColorBlendFactor		= One;
+	DestinationColorBlendFactor		: ColorBlendFactor		= Zero;
+	ColorBlendOperator				: BlendOperator			= Add;
 
-	SourceAlphaBlendFactor			: AlphaBlendFactor	= One;
-	DestinationAlphaBlendFactor		: AlphaBlendFactor	= Zero;
-	AlphaBlendOperator				: BlendOperator		= Add;
-	WriteMask						: ubyte				= 255;
+	SourceAlphaBlendFactor			: AlphaBlendFactor		= One;
+	DestinationAlphaBlendFactor		: AlphaBlendFactor		= Zero;
+	AlphaBlendOperator				: BlendOperator			= Add;
+	WriteMask						: ubyte					= 255;
 }
 
 table UnorderedAccessViewState {
-	Name	: string (required);
+	Name							: string (required);
 }
 
 table Usage {
-	RasterizerState			: RasterizerState (required);
-	DepthStencilState		: DepthStencilState (required);
-	RenderTargets			: [RenderTargetState] (required);
-	UnorderedAccessViews	: [UnorderedAccessViewState] (required);
-	VertexShaderIndex		: ushort;
-	HullShaderIndex			: ushort;
-	DomainShaderIndex		: ushort;
-	GeometryShaderIndex		: ushort;
-	PixelShaderIndex		: ushort;
+	RasterizerState					: RasterizerState (required);
+	DepthStencilState				: DepthStencilState (required);
+	RenderTargets					: [RenderTargetState] (required);
+	UnorderedAccessViews			: [UnorderedAccessViewState] (required);
+	VertexShaderIndex				: ushort;
+	HullShaderIndex					: ushort;
+	DomainShaderIndex				: ushort;
+	GeometryShaderIndex				: ushort;
+	PixelShaderIndex				: ushort;
 }

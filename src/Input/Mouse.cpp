@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Input/Mouse.hpp>
@@ -37,7 +37,7 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint void Mouse::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	ETNoAliasHint void Mouse::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
 		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("Mouse::ExposeScriptAPI() Temporary Allocator") );
 
 		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<Mouse>( temporaryAllocator ) ) {

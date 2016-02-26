@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/Builders/SwapChainBuilder.hpp>
 #include <Renderer/Direct3D11/SwapChain.hpp>
 #include <Utility/Win32ApplicationHelpers.hpp>
@@ -145,7 +145,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void SwapChain::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) {
+	void SwapChain::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
 		struct FunctionHelper {
 			static void ETScriptAPICall SetCaption( SwapChain* thisPointer, const StringMarshal& newCaption ) {
 				thisPointer->SetCaption( newCaption.GetCharacterArray() );

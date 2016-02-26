@@ -141,11 +141,11 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	void WorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& visitor ) {
-		CharacterControllerComponent::ExposeScriptAPI( visitor );
-		ArticulatedBodyComponent::ExposeScriptAPI( visitor );
-		TerrainColliderComponent::ExposeScriptAPI( visitor );
-		TriggerVolumeComponent::ExposeScriptAPI( visitor );
+	void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		AnimationDrivenCharacterCollider::ExposeScriptAPI( visitor );
+		MeshCollider::ExposeScriptAPI( visitor );
+		TerrainCollider::ExposeScriptAPI( visitor );
+		TriggerVolume::ExposeScriptAPI( visitor );
 
 		// PhysicalSoftBodyComponent::ExposeScriptAPI( visitor );
 	}

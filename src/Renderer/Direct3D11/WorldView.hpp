@@ -26,7 +26,7 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 	}
 
 	namespace Animation {
@@ -50,13 +50,13 @@ namespace Direct3D11 {
 
 	public:
 		//! Constructs this @ref WorldView instance.
-		WorldView( Foundation::World& owningWorld, const Direct3D11::MeshResourceView& defaultMesh );
+		WorldView( Foundation::World& owningWorld );
 
 		~WorldView() = default;
 
 	// ---------------------------------------------------
 
-		static void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
+		static void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 
 	// ---------------------------------------------------
 
@@ -77,20 +77,20 @@ namespace Direct3D11 {
 
 	// ---
 
-		class SceneCameraComponent : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceCountable, public Renderer::Camera {
+		class SceneCamera : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceCountable, public Renderer::Camera {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this @ref SceneCameraComponent instance.
-			SceneCameraComponent( Direct3D11::SwapChain& swapChain, WorldView& owningView = GetActiveWorldView() );
+			//! Constructs this @ref SceneCamera instance.
+			SceneCamera( Direct3D11::SwapChain& swapChain, WorldView& owningView = GetActiveWorldView() );
 
-			~SceneCameraComponent() = default;
+			~SceneCamera() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
 		public:
-			//! Registers all script-callable methods for the @ref SceneCameraComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//! Registers all script-callable methods for the @ref SceneCamera type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
 
@@ -108,19 +108,19 @@ namespace Direct3D11 {
 
 	// ---
 
-		class MeshComponent : public Scripting::ReferenceCountable {
+		class MeshRenderer : public Scripting::ReferenceCountable {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this @ref MeshComponent instance.
-			MeshComponent( const Direct3D11::MeshResourceView& mesh, Animation::Armature& armature );
+			//! Constructs this @ref MeshRenderer instance.
+			MeshRenderer( Animation::Armature& armature, const Direct3D11::MeshResourceView& mesh );
 
-			~MeshComponent() = default;
+			~MeshRenderer() = default;
 
 		// ---------------------------------------------------
 
-			//! Registers all script-callable methods for the @ref MeshComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//! Registers all script-callable methods for the @ref MeshRenderer type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
 
@@ -134,16 +134,14 @@ namespace Direct3D11 {
 			const Direct3D11::MeshResourceView&						_mesh;
 			mutable Scripting::ObjectHandle<Animation::Armature>	_armature;
 
-			::Eldritch2::uint16										_castsShadows		: 1u;
-			::Eldritch2::uint16										_receivesShadows	: 1u;
-			::Eldritch2::uint16										_visible			: 1u;
+			::Eldritch2::uint16										_castsShadows	: 1u;
+			::Eldritch2::uint16										_visible		: 1u;
 		};
 
 	// - DATA MEMBERS ------------------------------------
 
-		const Direct3D11::MeshResourceView&							_defaultMesh;
-		::Eldritch2::ObjectPoolAllocator							_meshPool;
-		::Eldritch2::IntrusiveForwardList<SceneCameraComponent>		_attachedCameras;
+		::Eldritch2::ObjectPoolAllocator							_meshAllocator;
+		::Eldritch2::IntrusiveForwardList<SceneCamera>				_attachedCameras;
 
 		Renderer::VisibilitySystem<Direct3D11::MeshResourceView>	_visibilitySystem;
 

@@ -15,7 +15,6 @@
 
 //------------------------------------------------------------------//
 
-
 namespace Eldritch2 {
 namespace Animation {
 
@@ -23,20 +22,32 @@ namespace Animation {
 
 // ---------------------------------------------------
 
-	ETInlineHint void Armature::ReplacementKeyframeAnimationLayer::AttachAnimationLayer( Armature::AdditiveKeyframeAnimationLayer& layer ) {
-		_attachedAdditiveAnimationLayers.PushFront( layer );
+	ETInlineHint const Animation::KeyCache& Armature::GetKeyCache() const {
+		return _keyCache;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint void Armature::AttachAnimationLayer( Armature::ReplacementKeyframeAnimationLayer& layer ) {
-		_topLevelAnimations.PushFront( layer );
+	ETInlineHint void Armature::AttachLayer( AnimationLayer& layer ) {
+		layer.AddReference();
+
+		_layers.PushFront( layer );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint void Armature::AttachAnimationLayer( Armature::PostprocessAnimationLayer& layer ) {
-		_postprocessAnimations.PushFront( layer );
+	ETInlineHint void Armature::AttachChildLayer( AnimationLayer& layer, AnimationLayer& parent ) {
+		layer.AddReference();
+
+		_layers.InsertAfter( _layers.IteratorTo( parent ), layer );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint void Armature::DetachLayer( AnimationLayer& layer ) {
+		_layers.EraseAndDispose( _layers.IteratorTo( layer ), [] ( AnimationLayer& disposingLayer ) {
+			disposingLayer.ReleaseReference();
+		} );
 	}
 
 }	// namespace Animation

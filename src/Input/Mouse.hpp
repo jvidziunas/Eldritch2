@@ -18,7 +18,7 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 	}
 
 	class	ErrorCode;
@@ -40,7 +40,7 @@ namespace Input {
 	// - SCRIPT API REFERENCE ----------------------------
 
 		//! Registers all script-callable methods for the @ref Mouse type with the specified script type registrar.
-		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 	// - DATA MEMBERS ------------------------------------
 

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Scripting/Angelscript/ObjectGraphResourceView.hpp>
 #include <Scripting/Angelscript/WorldView.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
@@ -78,7 +78,7 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void WorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
 		auto	Spawn( [] ( const StringMarshal& className ) {
 			if( activeScriptWorldView->Spawn( className.GetCharacterArray() ) ) {
 
@@ -112,7 +112,9 @@ namespace AngelScript {
 		}
 
 		if( !resourceObjectName.IsEmpty() ) {
-			GetContentLibrary().ResolveViewByName( resourceObjectName.GetCharacterArray(), *static_cast<ObjectGraphResourceView*>(nullptr) ).DeserializeIntoWorldView( *this );
+			if( const auto view = GetContentLibrary().ResolveViewByName<ObjectGraphResourceView>( resourceObjectName.GetCharacterArray() ) ) {
+				view->DeserializeIntoWorldView( *this );
+			}
 		}
 	}
 

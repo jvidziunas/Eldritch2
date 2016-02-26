@@ -13,114 +13,69 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
-#include <Utility/Containers/ResizableArray.hpp>
 #include <Scripting/ReferenceCountable.hpp>
+#include <Animation/AnimationLayer.hpp>
 #include <Utility/MPL/FloatTypes.hpp>
+#include <Animation/KeyCache.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 	}
-
-	class	ErrorCode;
-	class	Float4;
 }
 
 namespace Eldritch2 {
 namespace Animation {
 
 	class Armature : public Scripting::ReferenceCountable {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		class AnimationLayer : public Scripting::ReferenceCountable {
-		public:
-			virtual void	EvaluatePoseForTime( const ::Eldritch2::uint16 maximumBoneToConsider, const ::Eldritch2::uint64 time ) abstract;
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		protected:
-			//! Constructs this @ref AnimationLayer instance.
-			AnimationLayer() = default;
-		};
-
-	// ---
-
-		class AdditiveKeyframeAnimationLayer : public ::Eldritch2::IntrusiveForwardListBaseHook, public Armature::AnimationLayer {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		protected:
-			//! Constructs this @ref AdditiveKeyframeAnimationLayer instance.
-			AdditiveKeyframeAnimationLayer() = default;
-		};
-
-	// ---
-
-		class ReplacementKeyframeAnimationLayer : public ::Eldritch2::IntrusiveForwardListBaseHook, public Armature::AnimationLayer {
-		public:
-			virtual ::Eldritch2::Float4	EvaluateRootDisplacementDeltaForTime( const ::Eldritch2::uint64 lastEvalutedTime, const ::Eldritch2::uint64 currentTime ) abstract;
-
-			ETInlineHint void			AttachAnimationLayer( Armature::AdditiveKeyframeAnimationLayer& layer );
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		protected:
-			//! Constructs this @ref ReplacementAnimationLayer instance.
-			ReplacementKeyframeAnimationLayer() = default;
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			::Eldritch2::IntrusiveForwardList<Armature::AdditiveKeyframeAnimationLayer>	_attachedAdditiveAnimationLayers;
-		};
-
-	// ---
-
-		class PostprocessAnimationLayer : public ::Eldritch2::IntrusiveForwardListBaseHook, public Scripting::ReferenceCountable {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		protected:
-			//! Constructs this @ref PostprocessAnimationLayer instance.
-			PostprocessAnimationLayer() = default;
-		};
-
-	// ---------------------------------------------------
-
-	public:
-		ETInlineHint ::Eldritch2::Allocator&	GetAllocator();
-
-	// ---------------------------------------------------
-
-		ETInlineHint void	AttachAnimationLayer( Armature::ReplacementKeyframeAnimationLayer& layer );
-		ETInlineHint void	AttachAnimationLayer( Armature::PostprocessAnimationLayer& layer );
-
-	// - SCRIPT API REFERENCE ----------------------------
-
-		//! Registers all script-callable methods for the @ref Armature type with the specified script type registrar.
-		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
-
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
 		//! Constructs this @ref Armature instance.
+		/*!	@remarks Designed to be called by subclasses.
+			*/
 		Armature( const Animation::Armature& ) = delete;
 		//! Constructs this @ref Armature instance.
+		/*!	@remarks Designed to be called by subclasses.
+			*/
 		Armature() = default;
 
 		//! Destroys this @ref Armature instance.
+		/*!	@remarks Designed to be called by subclasses.
+			*/
 		~Armature() = default;
+
+	// ---------------------------------------------------
+
+	public:
+		ETInlineHint const Animation::KeyCache&	GetKeyCache() const;
+
+	// ---------------------------------------------------
+
+		ETInlineHint void	AttachLayer( Animation::AnimationLayer& layer );
+
+		ETInlineHint void	AttachChildLayer( Animation::AnimationLayer& layer, Animation::AnimationLayer& parent );
+
+		ETInlineHint void	DetachLayer( Animation::AnimationLayer& layer );
+
+	// ---------------------------------------------------
+
+		void	UpdateCachedKeys( Animation::BoneIndex maximumBoneToConsider, ::Eldritch2::uint64 time );
+
+	// - SCRIPT API REFERENCE ----------------------------
+
+		//! Registers all script-callable methods for the @ref Armature type with the specified script type registrar.
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 
 	// - DATA MEMBERS ------------------------------------
 
 	public:
-		static const char* const	scriptTypeName;
+		static const char* const										scriptTypeName;
 
-	// ---------------------------------------------------
-
-	protected:
-		::Eldritch2::IntrusiveForwardList<ReplacementKeyframeAnimationLayer>	_topLevelAnimations;
-		::Eldritch2::IntrusiveForwardList<PostprocessAnimationLayer>			_postprocessAnimations;
+	private:
+		Animation::KeyCache												_keyCache;
+		::Eldritch2::IntrusiveForwardList<Animation::AnimationLayer>	_layers;
 	};
 
 }	// namespace Animation

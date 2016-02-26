@@ -106,7 +106,7 @@ namespace XAudio2 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
 
 // ---------------------------------------------------
 

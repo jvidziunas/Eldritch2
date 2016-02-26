@@ -15,7 +15,7 @@
 // INCLUDES
 //==================================================================//
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <FileSystem/ReadableMemoryMappedFile.hpp>
 #include <FileSystem/SynchronousFileWriter.hpp>
 #include <Utility/Memory/ArenaAllocator.hpp>
@@ -59,7 +59,7 @@ namespace Configuration {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& /*typeRegistrar*/ ) {
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {
 		// register DumpConfigurationToFile() here
 	}
 
@@ -84,11 +84,11 @@ namespace Configuration {
 				database.SetValue( section, name, value );
 			} );
 
-			GetLogger()(UTF8L( "Configuration loaded successfully." ) ET_UTF8_NEWLINE_LITERAL);
+			GetLogger()( UTF8L("Configuration loaded successfully.") ET_UTF8_NEWLINE_LITERAL );
 
 			tempAllocator.Delete( *getMappedFileResult.object );
 		} else {
-			GetLogger( LogMessageType::Error )(UTF8L( "Error reading configuration file: {}" ), getMappedFileResult.resultCode.ToUTF8String());
+			GetLogger( LogMessageType::Error )( UTF8L("Error reading configuration file: {}"), getMappedFileResult.resultCode.ToUTF8String() );
 		}
 
 		InvokeInitializationFunction<&GameEngineService::OnEngineConfigurationBroadcast>( executingContext );

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/WorldView.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
@@ -57,14 +57,13 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	WorldView::WorldView( World& owningWorld, const MeshResourceView& defaultMesh ) : Foundation::WorldView( owningWorld ),
-																					  _defaultMesh( defaultMesh ),
-																					  _meshPool( UTF8L("Mesh Pool Allocator"), sizeof(MeshComponent), 128u, GetWorldAllocator() ),
-																					  _visibilitySystem( { owningWorld.GetPropertyByKey( UTF8L("VisibilityCellLength"), 16.0f ), owningWorld.GetPropertyByKey( UTF8L("VisibilityCellHeight"), 32.0f ) },
-																										 { owningWorld.GetPropertyByKey( UTF8L("VisibilityCellLength"), 16.0f ), owningWorld.GetPropertyByKey( UTF8L("VisibilityCellHeight"), 32.0f ) },
-																										 { GetWorldAllocator(), UTF8L("Shadow Caster Cell Allocator") },
-																										 { GetWorldAllocator(), UTF8L("Mesh Visibility Cell Allocator") } ),
-																					  _shadowMaterialUsageCache( { GetWorldAllocator(), UTF8L("Shadow Material Usage Cache") } ) {}
+	WorldView::WorldView( World& owningWorld ) : Foundation::WorldView( owningWorld ),
+												 _meshAllocator( UTF8L("Mesh Pool Allocator"), sizeof(MeshRenderer), 128u, GetWorldAllocator() ),
+												 _visibilitySystem( { owningWorld.GetPropertyByKey( UTF8L("VisibilityCellLength"), 16.0f ), owningWorld.GetPropertyByKey( UTF8L("VisibilityCellHeight"), 32.0f ) },
+												 					{ owningWorld.GetPropertyByKey( UTF8L("VisibilityCellLength"), 16.0f ), owningWorld.GetPropertyByKey( UTF8L("VisibilityCellHeight"), 32.0f ) },
+												 					{ GetWorldAllocator(), UTF8L("Shadow Caster Cell Allocator") },
+												 					{ GetWorldAllocator(), UTF8L("Mesh Visibility Cell Allocator") } ),
+												 _shadowMaterialUsageCache( { GetWorldAllocator(), UTF8L("Shadow Material Usage Cache") } ) {}
 
 // ---------------------------------------------------
 
@@ -80,9 +79,9 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void WorldView::ExposeScriptAPI( ScriptAPIRegistrationInitializationVisitor& visitor ) {
-		SceneCameraComponent::ExposeScriptAPI( visitor );
-		MeshComponent::ExposeScriptAPI( visitor );
+	void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		SceneCamera::ExposeScriptAPI( visitor );
+		MeshRenderer::ExposeScriptAPI( visitor );
 	}
 
 // ---------------------------------------------------

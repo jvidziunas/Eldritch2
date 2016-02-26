@@ -18,7 +18,7 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 	}
 
 	class	ErrorCode;
@@ -43,7 +43,7 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
-		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 
 	// ---------------------------------------------------
 
@@ -63,7 +63,7 @@ namespace Scripting {
 		//!	Constructs this @ref Float4Marshal instance.
 		Float4Marshal( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
 		//!	Constructs this @ref Float4Marshal instance.
-		Float4Marshal( const Scripting::Float4Marshal& marshal );
+		Float4Marshal( const Scripting::Float4Marshal& marshal ) = default;
 		//!	Constructs this @ref Float4Marshal instance.
 		Float4Marshal( const ::Eldritch2::Float4 initializer );
 
@@ -72,7 +72,7 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
-		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -88,7 +88,7 @@ namespace Scripting {
 		//!	Constructs this @ref OrientationMarshal instance.
 		OrientationMarshal( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
 		//!	Constructs this @ref OrientationMarshal instance.
-		OrientationMarshal( const Scripting::OrientationMarshal& initializer );
+		OrientationMarshal( const Scripting::OrientationMarshal& initializer ) = default;
 		//!	Constructs this @ref OrientationMarshal instance.
 		OrientationMarshal( const ::Eldritch2::Quaternion initializer );
 
@@ -97,11 +97,39 @@ namespace Scripting {
 
 	// ---------------------------------------------------
 
-		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 
 	// - DATA MEMBERS ------------------------------------
 
 		static const char* const	scriptTypeName;
+	};
+
+// ---
+
+	class RigidTransformMarshal {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref RigidTransformMarshal instance.
+		RigidTransformMarshal( const Scripting::Float4Marshal& translation, const Scripting::OrientationMarshal& orientation );
+		//!	Constructs this @ref RigidTransformMarshal instance.
+		RigidTransformMarshal( const Scripting::RigidTransformMarshal& transform ) = default;
+		//!	Constructs this @ref RigidTransformMarshal instance.
+		RigidTransformMarshal( const ::Eldritch2::RigidTransform& transform );
+
+		//!	Destroys this @ref RigidTransformMarshal instance.
+		~RigidTransformMarshal() = default;
+
+	// ---------------------------------------------------
+
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
+
+	// - DATA MEMBERS ------------------------------------
+
+		static const char* const	scriptTypeName;
+
+		Float4Marshal				translation;
+		OrientationMarshal			orientation;
 	};
 
 }	// namespace Scripting

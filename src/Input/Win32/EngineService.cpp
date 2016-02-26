@@ -14,7 +14,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Input/Win32/EngineService.hpp>
 #include <Scheduler/ThreadScheduler.hpp>
@@ -104,9 +104,9 @@ namespace Win32 {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
-		EngineService::Mouse::ExposeScriptAPI( visitor );
-		EngineService::Keyboard::ExposeScriptAPI( visitor );
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		Mouse::ExposeScriptAPI( visitor );
+		Keyboard::ExposeScriptAPI( visitor );
 	}
 
 // ---------------------------------------------------

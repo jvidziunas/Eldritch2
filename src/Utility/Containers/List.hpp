@@ -21,11 +21,11 @@
 namespace Eldritch2 {
 
 	template <typename StoredObject, typename Allocator = ::Eldritch2::ChildAllocator>
-	class List : private ::rde::list<StoredObject, ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>> {
+	class List : private ::rde::list<StoredObject, Detail::RDESTLAllocatorAdapterMixin<Allocator>> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= ::Eldritch2Detail::RDESTLAllocatorAdapterMixin<Allocator>;
+		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
 		using UnderlyingContainer	= ::rde::list<StoredObject, PrivateAllocator>;
 
 	public:
@@ -58,8 +58,6 @@ namespace Eldritch2 {
 
 		template <typename ItemPredicate>
 		ETInlineHint Iterator		RemoveIf( ItemPredicate itemPredicate );
-		template <typename ExtraArgumentType, typename ItemPredicate>
-		ETInlineHint Iterator		RemoveIf( ExtraArgumentType extraArgument, ItemPredicate itemPredicate );
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -89,6 +87,9 @@ namespace Eldritch2 {
 		// Adds a duplicate of the passed-in item to the head of this @ref List.
 		ETInlineHint void			PushFront( ConstReference itemTemplate );
 
+		template <typename... ElementConstructorArguments>
+		ETInlineHint void			EmplaceFront( ElementConstructorArguments&&... elementConstructorArguments );
+
 		// Removes the head element of this @ref List, reducing its size by one element.
 		ETInlineHint void			PopFront();
 
@@ -100,6 +101,9 @@ namespace Eldritch2 {
 		// Adds a duplicate of the passed-in item to the tail of this @ref List.
 		ETInlineHint void			PushBack( ConstReference itemTemplate );
 
+		template <typename... ElementConstructorArguments>
+		ETInlineHint void			EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments );
+
 		// Removes the tail element of this @ref List, reducing its size by one element.
 		ETInlineHint void			PopBack();
 
@@ -107,6 +111,9 @@ namespace Eldritch2 {
 
 		// Inserts an element at the position specified, shifting all antecedent elements down one position.
 		ETInlineHint Iterator	Insert( Iterator location, ConstReference itemTemplate );
+
+		template <typename... ElementConstructorArguments>
+		ETInlineHint Iterator	Emplace( Iterator location, ElementConstructorArguments&&... elementConstructorArguments );
 
 		// Removes an element at the position specified, reducing the size of the @ref List by one element.
 		ETInlineHint Iterator	Erase( Iterator location );

@@ -19,6 +19,18 @@ namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
 
+	ETInlineHint ::physx::PxAggregate& WorldView::PhysicalArmature::GetAggregate() {
+		return _physicsAnimationLayer.GetAggregate();
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ::physx::PxAggregate& WorldView::PhysicalArmature::PhysicsAnimationLayer::GetAggregate() {
+		return *_aggregate.get();
+	}
+
+// ---------------------------------------------------
+
 	ETInlineHint const ::physx::PxControllerManager& WorldView::GetControllerManager() const {
 		return *_controllerManager;
 	}
@@ -37,7 +49,7 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
-	ETInlineHint::physx::PxScene& WorldView::GetScene() {
+	ETInlineHint ::physx::PxScene& WorldView::GetScene() {
 		return *_scene;
 	}
 

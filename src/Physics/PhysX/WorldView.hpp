@@ -12,9 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/ObjectPoolAllocator.hpp>
 #include <Scripting/ReferenceCountable.hpp>
 #include <Physics/PhysX/SmartPointers.hpp>
 #include <Foundation/WorldView.hpp>
+#include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
 #include <PxSimulationEventCallback.h>
 #include <PxContactModifyCallback.h>
@@ -23,13 +25,20 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
+	}
+
+	namespace Physics {
+		namespace PhysX {
+			class	TerrainResourceView;
+			class	MeshResourceView;
+		}
 	}
 }
 
 namespace physx {
 	class	PxControllerManager;
-	class	PxController;
+	class	PxCapsuleController;
 	class	PxScene;
 }
 
@@ -43,6 +52,7 @@ namespace PhysX {
 	public:
 		//!	Constructs this @ref WorldView instance.
 		/*!	@param[in] scene PhysX scene the new @ref WorldView will be responsible for controlling.
+			@param[in] controllerManager PhysX controller manager the new @ref WorldView will use to create character controller instances.
 			@param[in] world @ref World that controls the lifetime of the @ref WorldView.
 			*/
 		WorldView( PhysX::UniquePointer<::physx::PxScene>&& scene, PhysX::UniquePointer<::physx::PxControllerManager>&& controllerManager, Foundation::World& world );
@@ -69,7 +79,7 @@ namespace PhysX {
 
 		void	onTrigger( ::physx::PxTriggerPair* pairs, ::physx::PxU32 count ) override;
 
-	// ---------------------------------------------------
+	// - PXCONTACTMODIFYCALLBACK METHODS -----------------
 
 		void	onContactModify( ::physx::PxContactModifyPair* const pairs, ::physx::PxU32 count ) override;
 
@@ -82,31 +92,129 @@ namespace PhysX {
 
 	// ---------------------------------------------------
 
+		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
+
+	// ---------------------------------------------------
+
 	protected:
+		static ETNoAliasHint ::Eldritch2::float32	GetTickDurationInSeconds();
+
+		static ETNoAliasHint size_t					GetComponentPoolElementSizeInBytes();
+
+		static ETNoAliasHint size_t					GetArmaturePoolElementSizeInBytes();
+
+	// ---------------------------------------------------
+
 		static WorldView&	GetActiveWorldView();
 
 	// - TYPE PUBLISHING ---------------------------------
 
-		class CharacterControllerComponent : public Scripting::ReferenceCountable {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		class PhysicalArmature : public Animation::Armature {
+		// - TYPE PUBLISHING ---------------------------------
 
 		public:
-			//! Constructs this @ref CharacterControllerComponent instance.
-			CharacterControllerComponent( PhysX::UniquePointer<::physx::PxController>&& controller );
+			class PhysicsAnimationLayer : public Animation::AnimationLayer {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Destroys this @ref CharacterControllerComponent instance.
-			~CharacterControllerComponent();
+			public:
+				//!	Constructs this @ref PhysicsAnimationLayer instance.
+				PhysicsAnimationLayer( PhysX::UniquePointer<::physx::PxAggregate>&& aggregate );
+
+				~PhysicsAnimationLayer();
+
+			// ---------------------------------------------------
+
+				ETInlineHint ::physx::PxAggregate&	GetAggregate();
+
+			// ---------------------------------------------------
+
+				void	EvaluateCacheForTime( Animation::KeyCache& keyCache, Animation::BoneIndex maximumBoneToConsider, ::Eldritch2::uint64 time ) override;
+
+			// ---------------------------------------------------
+
+				void	Dispose() override;
+
+			// - DATA MEMBERS ------------------------------------
+
+			private:
+				PhysX::UniquePointer<::physx::PxAggregate>	_aggregate;
+			};
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+			//!	Constructs this @ref PhysicalArmature instance.
+			PhysicalArmature( PhysX::UniquePointer<::physx::PxAggregate>&& aggregate );
+
+			~PhysicalArmature();
 
 		// ---------------------------------------------------
 
-			void	SetEnabled( bool value = true );
+			ETInlineHint ::physx::PxAggregate&	GetAggregate();
+
+		// - SCRIPT API REFERENCE ----------------------------
+
+			//! Registers all script-callable methods for the @ref PhysicalArmature type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
+
+			void						Dispose() override sealed;
+
+		// - DATA MEMBERS ------------------------------------
+
+			static const char* const	scriptTypeName;
+
+		private:
+			PhysicsAnimationLayer		_physicsAnimationLayer;
+		};
+
+	// ---
+
+		class AnimationDrivenCharacterCollider : public Scripting::ReferenceCountable {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//! Constructs this @ref AnimationDrivenCharacterCollider instance.
+			AnimationDrivenCharacterCollider( PhysX::UniquePointer<::physx::PxCapsuleController>&& controller );
+
+			//!	Destroys this @ref AnimationDrivenCharacterCollider instance.
+			~AnimationDrivenCharacterCollider();
+
+		// - SCRIPT API REFERENCE ----------------------------
+
+			//! Registers all script-callable methods for the @ref AnimationDrivenCharacterCollider type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
+
+			void						Dispose() override sealed;
+
+		// - DATA MEMBERS ------------------------------------
+
+			static const char* const							scriptTypeName;
+
+		private:
+			PhysX::UniquePointer<::physx::PxCapsuleController>	_controller;
+		};
+
+	// ---
+
+		class MeshCollider : public Scripting::ReferenceCountable {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//! Constructs this @ref MeshCollider.
+			MeshCollider( PhysicalArmature& armature, const PhysX::MeshResourceView& asset );
+
+			//! Constructs this @ref MeshCollider.
+			~MeshCollider();
+
+		// ---------------------------------------------------
+
+			void	SetEnabled( bool enabled = true );
 
 			bool	GetEnabled() const;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
-			//! Registers all script-callable methods for the @ref CharacterControllerComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//! Registers all script-callable methods for the @ref MeshCollider type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 			void						Dispose() override sealed;
 
@@ -115,54 +223,59 @@ namespace PhysX {
 			static const char* const					scriptTypeName;
 
 		private:
-			PhysX::UniquePointer<::physx::PxController>	_controller;
+			Scripting::ObjectHandle<PhysicalArmature>	_armature;
+			const PhysX::MeshResourceView*				_asset;
+			bool										_enabled;
 		};
 
 	// ---
 
-		class ArticulatedBodyComponent : public Scripting::ReferenceCountable {
+		class TerrainCollider : public Scripting::ReferenceCountable {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this @ref ArticulatedBodyComponent.
-			ArticulatedBodyComponent( PhysX::UniquePointer<::physx::PxArticulation>&& articulation );
+			//! Constructs this @ref TerrainCollider.
+			TerrainCollider( PhysX::UniquePointer<::physx::PxRigidStatic>&& actor, const PhysX::TerrainResourceView& asset );
 
-			//! Constructs this @ref ArticulatedBodyComponent.
-			~ArticulatedBodyComponent();
+			//! Constructs this @ref TerrainCollider.
+			~TerrainCollider();
 
 		// ---------------------------------------------------
 
-			void	SetEnabled( bool value = true );
+			void	SetEnabled( bool enabled = true );
 
 			bool	GetEnabled() const;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
-			//! Registers all script-callable methods for the @ref ArticulatedBodyComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//!	Registers all script-callable methods for the @ref TerrainCollider type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
-			void						Dispose() override sealed;
+		// ---------------------------------------------------
+
+			void	Dispose() override sealed;
 
 		// - DATA MEMBERS ------------------------------------
 
 			static const char* const						scriptTypeName;
 
 		private:
-			PhysX::UniquePointer<::physx::PxArticulation>	_articulation;
+			PhysX::UniquePointer<::physx::PxRigidStatic>	_actor;
+			const PhysX::TerrainResourceView*				_asset;
 			bool											_enabled;
 		};
 
 	// ---
 
-		class TerrainColliderComponent : public Scripting::ReferenceCountable {
+		class TriggerVolume : public Scripting::ReferenceCountable {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this @ref TerrainColliderComponent.
-			TerrainColliderComponent( PhysX::UniquePointer<::physx::PxRigidStatic>&& actor );
+			//!	Constructs this @ref TriggerVolume.
+			TriggerVolume( PhysX::UniquePointer<::physx::PxRigidStatic>&& actor );
 
-			//! Constructs this @ref TerrainColliderComponent.
-			~TerrainColliderComponent();
+			//!	Constructs this @ref TriggerVolume.
+			~TriggerVolume();
 
 		// ---------------------------------------------------
 
@@ -172,8 +285,8 @@ namespace PhysX {
 
 		// - SCRIPT API REFERENCE ----------------------------
 
-			//!	Registers all script-callable methods for the @ref TerrainColliderComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//!	Registers all script-callable methods for the @ref TriggerVolume type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
 
@@ -186,79 +299,6 @@ namespace PhysX {
 		private:
 			PhysX::UniquePointer<::physx::PxRigidStatic>	_actor;
 			bool											_enabled;
-		};
-
-	// ---
-
-		class TriggerVolumeComponent : public Scripting::ReferenceCountable {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref TriggerVolumeComponent.
-			TriggerVolumeComponent( PhysX::UniquePointer<::physx::PxRigidStatic>&& actor );
-
-			//!	Constructs this @ref TriggerVolumeComponent.
-			~TriggerVolumeComponent();
-
-		// ---------------------------------------------------
-
-			void	SetEnabled( bool value = true );
-
-			bool	GetEnabled() const;
-
-		// - SCRIPT API REFERENCE ----------------------------
-
-			//!	Registers all script-callable methods for the @ref TriggerVolumeComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
-
-		// ---------------------------------------------------
-
-			void	Dispose() override sealed;
-
-		// - DATA MEMBERS ------------------------------------
-
-			static const char* const						scriptTypeName;
-
-		private:
-			PhysX::UniquePointer<::physx::PxRigidStatic>	_actor;
-			bool											_enabled;
-		};
-
-	// ---
-
-		class PhysicalSoftBodyComponent : public Scripting::ReferenceCountable {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref PhysicalSoftBodyComponent.
-			PhysicalSoftBodyComponent( PhysX::UniquePointer<::physx::PxCloth>&& actor );
-
-			//!	Constructs this @ref PhysicalSoftBodyComponent.
-			~PhysicalSoftBodyComponent();
-
-		// ---------------------------------------------------
-
-			void	SetEnabled( bool value = true );
-
-			bool	GetEnabled() const;
-
-		// - SCRIPT API REFERENCE ----------------------------
-
-			//!	Registers all script-callable methods for the @ref PhysicalSoftBodyComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
-
-		// ---------------------------------------------------
-
-			void	Dispose() override sealed;
-
-		// - DATA MEMBERS ------------------------------------
-
-		public:
-			static const char* const				scriptTypeName;
-
-		private:
-			PhysX::UniquePointer<::physx::PxCloth>	_actor;
-			bool									_enabled;
 		};
 
 	// ---------------------------------------------------
@@ -272,6 +312,8 @@ namespace PhysX {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
+		::Eldritch2::ObjectPoolAllocator					_armatureAllocator;
+		::Eldritch2::ObjectPoolAllocator					_componentAllocator;
 		PhysX::UniquePointer<::physx::PxScene>				_scene;
 		PhysX::UniquePointer<::physx::PxControllerManager>	_controllerManager;
 	};

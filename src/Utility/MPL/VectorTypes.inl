@@ -40,43 +40,43 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator+( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator+( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 ) {
 		return operand0 += operand1;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator-( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator-( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 ) {
 		return operand0 -= operand1;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint::Eldritch2::Float4 operator*( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall operator*( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 ) {
 		return operand0 *= operand1;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator*( ::Eldritch2::Float4 operand, const ::Eldritch2::float32 scalar ) {
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator*( ::Eldritch2::Float4 operand, ::Eldritch2::float32 scalar ) {
 		return operand *= scalar;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 operator/( ::Eldritch2::Float4 operand0, const ::Eldritch2::Float4& operand1 ) {
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall operator/( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 ) {
 		return operand0 *= operand1;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	operator/( ::Eldritch2::Float4 operand, const ::Eldritch2::float32 scalar ) {
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator/( ::Eldritch2::Float4 operand, ::Eldritch2::float32 scalar ) {
 		return operand /= scalar;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator+=( const ::Eldritch2::Float4& operand ) {
+	ETForceInlineHint::Eldritch2::Float4& ETSIMDCall Float4::operator+=( ::Eldritch2::Float4 operand ) {
 		::_mm_storeu_ps( coefficients, ::_mm_add_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
 
 		return *this;
@@ -84,7 +84,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator-=( const ::Eldritch2::Float4& operand ) {
+	ETForceInlineHint ::Eldritch2::Float4& ETSIMDCall Float4::operator-=( ::Eldritch2::Float4 operand ) {
 		::_mm_storeu_ps( coefficients, ::_mm_sub_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
 
 		return *this;
@@ -92,7 +92,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator*=( const ::Eldritch2::Float4& operand ) {
+	ETForceInlineHint ::Eldritch2::Float4& ETSIMDCall Float4::operator*=( ::Eldritch2::Float4 operand ) {
 		::_mm_storeu_ps( coefficients, ::_mm_mul_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
 
 		return *this;
@@ -100,7 +100,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator*=( const ::Eldritch2::float32 scalar ) {
+	ETForceInlineHint ::Eldritch2::Float4& ETSIMDCall Float4::operator*=( ::Eldritch2::float32 scalar ) {
 		::_mm_storeu_ps( coefficients, ::_mm_mul_ps( ::_mm_loadu_ps( coefficients ), ::_mm_set_ps1( scalar ) ) );
 
 		return *this;
@@ -108,7 +108,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator/=( const ::Eldritch2::Float4& operand ) {
+	ETForceInlineHint ::Eldritch2::Float4& ETSIMDCall Float4::operator/=( ::Eldritch2::Float4 operand ) {
 		::_mm_storeu_ps( coefficients, ::_mm_div_ps( ::_mm_loadu_ps( coefficients ), ::_mm_loadu_ps( operand.coefficients ) ) );
 
 		return *this;
@@ -116,7 +116,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator/=( const ::Eldritch2::float32 scalar ) {
+	ETForceInlineHint ::Eldritch2::Float4& ETSIMDCall Float4::operator/=( ::Eldritch2::float32 scalar ) {
 		::_mm_storeu_ps( coefficients, ::_mm_div_ps( ::_mm_loadu_ps( coefficients ), ::_mm_set_ps1( scalar ) ) );
 
 		return *this;
@@ -124,7 +124,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ::Eldritch2::Float4& Float4::operator=( const ::Eldritch2::Float4& operand ) {
+	ETForceInlineHint ::Eldritch2::Float4& ETSIMDCall Float4::operator=( ::Eldritch2::Float4 operand ) {
 		::_mm_storeu_ps( coefficients, ::_mm_loadu_ps( operand ) );
 
 		return *this;
@@ -154,44 +154,36 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 Ceil( const ::Eldritch2::Float4 vector ) {
-		register ::Eldritch2::Float4	result;
-		
-		::_mm_storeu_ps( result.coefficients, ::_mm_ceil_ps( ::_mm_loadu_ps( vector.coefficients ) ) );
-
-		return result;
+	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall Ceil( ::Eldritch2::Float4 vector ) {
+		return { ::_mm_ceil_ps( ::_mm_loadu_ps( vector.coefficients ) ).m128_f32 };
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 Floor( const ::Eldritch2::Float4 vector ) {
-		register ::Eldritch2::Float4	result;
-
-		::_mm_storeu_ps( result.coefficients, ::_mm_floor_ps( ::_mm_loadu_ps( vector.coefficients ) ) );
-
-		return result;
+	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall Floor( ::Eldritch2::Float4 vector ) {
+		return { ::_mm_floor_ps( ::_mm_loadu_ps( vector.coefficients ) ).m128_f32 };
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::float32 DotProduct( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1 ) {
+	ETInlineHint ETNoAliasHint ::Eldritch2::float32 ETSIMDCall DotProduct( ::Eldritch2::Float4 vector0, ::Eldritch2::Float4 vector1 ) {
 		return ::_mm_cvtss_f32( ::_mm_dp_ps( ::_mm_loadu_ps( vector0 ), ::_mm_loadu_ps( vector1 ), 0xFF ) );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 CrossProduct( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1 ) {
+	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall CrossProduct( ::Eldritch2::Float4 vector0, ::Eldritch2::Float4 vector1 ) {
 		register const __m128	shuffle0( ::_mm_shuffle_ps( ::_mm_loadu_ps( vector0 ), ::_mm_loadu_ps( vector0 ), _MM_SHUFFLE( 3, 0, 2, 1 ) ) );
 		register const __m128	shuffle1( ::_mm_shuffle_ps( ::_mm_loadu_ps( vector1 ), ::_mm_loadu_ps( vector1 ), _MM_SHUFFLE( 3, 0, 2, 1 ) ) );
 		register const __m128	result( ::_mm_sub_ps( ::_mm_mul_ps( ::_mm_loadu_ps( vector1 ), shuffle0 ), ::_mm_mul_ps( ::_mm_loadu_ps( vector0 ), shuffle1 ) ) );
 
-		return Float4( ::_mm_shuffle_ps( result, result, _MM_SHUFFLE( 3, 0, 2, 1 ) ).m128_f32 );
+		return { ::_mm_shuffle_ps( result, result, _MM_SHUFFLE( 3, 0, 2, 1 ) ).m128_f32 };
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 LinearInterpolate( const ::Eldritch2::Float4 vector0, const ::Eldritch2::Float4 vector1, const ::Eldritch2::float32 alpha ) {
-		return Float4( ::_mm_add_ps( ::_mm_loadu_ps( vector0 ), ::_mm_mul_ps( ::_mm_sub_ps( ::_mm_loadu_ps( vector1 ), ::_mm_loadu_ps( vector0 ) ), ::_mm_set_ps1( alpha ) ) ).m128_f32 );
+	ETInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall LinearInterpolate( ::Eldritch2::Float4 vector0, ::Eldritch2::Float4 vector1, ::Eldritch2::float32 alpha ) {
+		return { ::_mm_add_ps( ::_mm_loadu_ps( vector0 ), ::_mm_mul_ps( ::_mm_sub_ps( ::_mm_loadu_ps( vector1 ), ::_mm_loadu_ps( vector0 ) ), ::_mm_set_ps1( alpha ) ) ).m128_f32 };
 	}
 
 // ---------------------------------------------------
@@ -218,16 +210,16 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion Quaternion::GetReverse() const {
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion ETSIMDCall Quaternion::GetReverse() const {
 		return { -coefficients[0], -coefficients[1], -coefficients[2], coefficients[3] };
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 Quaternion::RotateVector( const ::Eldritch2::Float4 point ) const {
-		const ::Eldritch2::Float4	temp( ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), point ) * 2.0f );
+	ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall Quaternion::RotateVector( ::Eldritch2::Float4 point ) const {
+		const register ::Eldritch2::Float4	temp( ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), point ) * 2.0f );
 
-		return ::Eldritch2::Float4( point + (temp * coefficients[3]) + ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), temp ) );
+		return { point + (temp * coefficients[3]) + ::Eldritch2::CrossProduct( ::Eldritch2::Float4( this->coefficients ), temp ) };
 	}
 
 // ---------------------------------------------------
@@ -244,13 +236,13 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::float32 DotProduct( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1 ) {
+	ETInlineHint ETNoAliasHint ::Eldritch2::float32 ETSIMDCall DotProduct( ::Eldritch2::Quaternion quaternion0, ::Eldritch2::Quaternion quaternion1 ) {
 		return ::_mm_cvtss_f32( ::_mm_dp_ps( ::_mm_loadu_ps( quaternion0 ), ::_mm_loadu_ps( quaternion1 ), 0xFF ) );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion LinearInterpolate( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1, const ::Eldritch2::float32 alpha ) {
+	ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion ETSIMDCall LinearInterpolate( ::Eldritch2::Quaternion quaternion0, ::Eldritch2::Quaternion quaternion1, ::Eldritch2::float32 alpha ) {
 		struct AlphaCorrectionWrapper {
 			// Adapted from the original by Jonathan Blow, see http://number-none.com/product/Hacking%20Quaternions/index.html
 			// In particular, the alpha parameter has been changed to take the cosine thereof to exploit the quaternion dot product
@@ -278,7 +270,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion LinearInterpolateNonConstantVelocity( const ::Eldritch2::Quaternion quaternion0, const ::Eldritch2::Quaternion quaternion1, const ::Eldritch2::float32 alpha ) {
+	ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion ETSIMDCall LinearInterpolateNonConstantVelocity( ::Eldritch2::Quaternion quaternion0, ::Eldritch2::Quaternion quaternion1, ::Eldritch2::float32 alpha ) {
 		const register __m128	coeffs1( ::_mm_loadu_ps( quaternion1 ) );
 		register __m128			coeffs0( ::_mm_loadu_ps( quaternion0 ) );
 
@@ -291,8 +283,21 @@ namespace Eldritch2 {
 
 		// Perform a conventional linear interpolation on the coefficients of the quaternion...
 		register const __m128	interpolatedQuaternion( ::_mm_add_ps( coeffs0, ::_mm_mul_ps( ::_mm_sub_ps( coeffs1, coeffs0 ), ::_mm_set_ps1( alpha ) ) ) );
+
 		// ... then normalize the result to remove any undesired scaling.
-		return ::Eldritch2::Quaternion( ::_mm_mul_ps( ::_mm_rsqrt_ps( ::_mm_dp_ps( interpolatedQuaternion, interpolatedQuaternion, 0xFF ) ), interpolatedQuaternion ).m128_f32 );
+		return { ::_mm_mul_ps( ::_mm_rsqrt_ps( ::_mm_dp_ps( interpolatedQuaternion, interpolatedQuaternion, 0xFF ) ), interpolatedQuaternion ).m128_f32 };
 	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint RigidTransform::RigidTransform( ::Eldritch2::Float4 translation, ::Eldritch2::Quaternion orientation ) : translation( translation ), orientation( orientation ) {}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint RigidTransform::RigidTransform( ::Eldritch2::Float4 translation ) : RigidTransform( translation, { 1.0f, 0.0f, 0.0f, 0.0f } ) {}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint RigidTransform::RigidTransform( ::Eldritch2::Quaternion orientation ) : RigidTransform( { 0.0f, 0.0f, 0.0f, 0.0f }, orientation ) {}
 
 }	// namespace Eldritch2

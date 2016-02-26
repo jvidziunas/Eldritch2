@@ -9,8 +9,8 @@ table Cue {
 	Length	: ulong;
 }
 
-table Header {
+table SoundBank {
 	Cues : [Cue];
 }
 
-root_type Header;
+root_type SoundBank;

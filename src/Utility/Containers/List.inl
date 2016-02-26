@@ -58,14 +58,6 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
-	template <typename ExtraArgumentType, typename ItemPredicate>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::RemoveIf( ExtraArgumentType extraArgument, ItemPredicate itemPredicate ) {
-		return ::Eldritch2::Utility::RemoveIf( UnderlyingContainer::begin(), UnderlyingContainer::end(), extraArgument, itemPredicate );
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename Allocator>
 	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Begin() {
 		return UnderlyingContainer::begin();
 	}
@@ -129,6 +121,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
+	template <typename... ElementConstructorArguments>
+	ETInlineHint void List<StoredObject, Allocator>::EmplaceFront( ElementConstructorArguments&&... elementConstructorArguments ) {
+		UnderlyingContainer::emplace_front( ::std::forward<ElementConstructorArguments>( elemenetConstructorArguments )... );
+	}
+
+// ---------------------------------------------------
+
+	template <typename StoredObject, typename Allocator>
 	ETInlineHint void List<StoredObject, Allocator>::PopFront() {
 		UnderlyingContainer::pop_front();
 	}
@@ -157,6 +157,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
+	template <typename... ElementConstructorArguments>
+	ETInlineHint void List<StoredObject, Allocator>::EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments ) {
+		UnderlyingContainer::emplace_back( ::std::forward<ElementConstructorArguments>( elementConstructorArguments )... );
+	}
+
+// ---------------------------------------------------
+
+	template <typename StoredObject, typename Allocator>
 	ETInlineHint void List<StoredObject, Allocator>::PopBack() {
 		UnderlyingContainer::pop_back();
 	}
@@ -166,6 +174,14 @@ namespace Eldritch2 {
 	template <typename StoredObject, typename Allocator>
 	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Insert( Iterator location, ConstReference value ) {
 		return UnderlyingContainer::insert( location, value );
+	}
+
+// ---------------------------------------------------
+
+	template <typename StoredObject, typename Allocator>
+	template <typename... ElementConstructorArguments>
+	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Emplace( Iterator location, ElementConstructorArguments&&... elementConstructorArguments ) {
+		return UnderlyingContainer::emplace( location, ::std::forward<ElementConstructorArguments>( elementConstructorArguments )... );
 	}
 
 // ---------------------------------------------------
@@ -194,7 +210,7 @@ namespace Eldritch2 {
 
 	template <typename StoredObject, typename Allocator>
 	ETInlineHint void List<StoredObject, Allocator>::Clear() {
-		UnderlyingContainer::();
+		UnderlyingContainer::clear();
 	}
 
 // ---------------------------------------------------
@@ -214,7 +230,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename StoredObject, typename Allocator>
-	ETInlineHint const List<StoredObject, Allocator>::AllocatorType& List<StoredObject, Allocator>::GetAllocator() const {
+	ETInlineHint typename const List<StoredObject, Allocator>::AllocatorType& List<StoredObject, Allocator>::GetAllocator() const {
 		return UnderlyingContainer::get_allocator();
 	}
 

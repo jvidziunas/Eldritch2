@@ -19,9 +19,6 @@
     <Filter Include="Source Files\Animation">
       <UniqueIdentifier>{25bd3f99-1047-4b61-a5b0-62a8c9a8ca34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Animation\Animators">
-      <UniqueIdentifier>{3e59f5df-af8f-4e6f-a84e-12d02322f5ad}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Configuration">
       <UniqueIdentifier>{43c3eb69-c1d6-40e3-9573-cc400966712c}</UniqueIdentifier>
     </Filter>
@@ -111,9 +108,6 @@
     </Filter>
     <Filter Include="Header Files\Animation">
       <UniqueIdentifier>{22a8a921-290a-4549-8c34-5cd2055a299b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Animation\Animators">
-      <UniqueIdentifier>{7bac1a07-2e0a-4da9-a6eb-36931195e3f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Configuration">
       <UniqueIdentifier>{b017f59a-b5f1-4b5a-b7cd-d690de2c7c32}</UniqueIdentifier>
@@ -229,6 +223,12 @@
     <Filter Include="Source Files\Physics\PhysX">
       <UniqueIdentifier>{d024a9b2-fde1-4961-856d-265b76a49a16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer\Vulkan">
+      <UniqueIdentifier>{291b1b03-f47a-4268-b6b4-4b39fed526e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\Vulkan">
+      <UniqueIdentifier>{d36fdeb3-6c21-4522-a31c-43031cd7bef8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp">
@@ -306,12 +306,6 @@
     <ClCompile Include="..\src\Animation\Armature.cpp">
       <Filter>Source Files\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Animation\LocalSpaceAnimationLayer.cpp">
-      <Filter>Source Files\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Animation\LocomotionAnimationLayer.cpp">
-      <Filter>Source Files\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\foundation\Window.cpp">
       <Filter>Source Files\Foundation</Filter>
     </ClCompile>
@@ -384,12 +378,6 @@
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.cpp">
       <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshComponent.cpp">
-      <Filter>Source Files\Renderer\Direct3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCameraComponent.cpp">
-      <Filter>Source Files\Renderer\Direct3D11</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp">
       <Filter>Source Files\Renderer\Direct3D</Filter>
     </ClCompile>
@@ -415,12 +403,6 @@
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp">
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp">
@@ -582,9 +564,6 @@
     <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.WorkerThread.cpp">
       <Filter>Source Files\Scheduler\Win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\foundation\World.ManagementView.cpp">
       <Filter>Source Files\Foundation</Filter>
     </ClCompile>
@@ -593,12 +572,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Utility\CPPFormatDefinitions.cpp">
       <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.ArticulatedBodyComponent.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterControllerComponent.cpp">
-      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.cpp">
       <Filter>Source Files\Physics\Bullet Dynamics\Extensions</Filter>
@@ -609,29 +582,89 @@
     <ClCompile Include="..\src\Physics\PhysX\WorldView.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.TerrainColliderComponent.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\PhysX\EngineService.ArticulatedBodyViewFactory.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.PhysicalSoftBodyComponent.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.TriggerVolumeComponent.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.ArticulatedBodyViewFactory.cpp">
+    <ClCompile Include="..\src\Physics\BulletDynamics\MeshResourceView.cpp">
       <Filter>Source Files\Physics\Bullet Dynamics</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.CharacterControllerComponent.cpp">
+    <ClCompile Include="..\src\Physics\PhysX\MeshResourceView.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.ArticulatedBodyComponent.cpp">
+    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.MeshViewFactory.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.MeshViewFactory.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\TerrainResourceView.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.TerrainViewFactory.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Animation\BipedalLocomotionAnimationLayer.cpp">
+      <Filter>Source Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Animation\AnimationTypes.cpp">
+      <Filter>Source Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Animation\KeyframeAnimationLayer.cpp">
+      <Filter>Source Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Animation\KeyframeAnimationResourceView.cpp">
+      <Filter>Source Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.AnimationDrivenCharacterCollider.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\SmartPointers.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.PhysicalArmature.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TerrainCollider.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TriggerVolume.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.MeshCollider.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainCollider.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolume.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.AnimationDrivenCharacterCollider.cpp">
+      <Filter>Source Files\Physics\Bullet Dynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCamera.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.MeshCollider.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshRenderer.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\WorldView.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\HostAllocator.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\VulkanBuilders.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\VulkanProperties.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -786,12 +819,6 @@
       <Filter>Header Files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Animation\Armature.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Animation\LocalSpaceAnimationLayer.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Animation\LocomotionAnimationLayer.hpp">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Concurrency\StripedLock.hpp">
@@ -1130,9 +1157,6 @@
     <ClInclude Include="..\src\Scripting\ReferenceCountable.hpp">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.hpp">
-      <Filter>Header Files\Physics\Bullet Dynamics</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\IntrusiveListHook.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
@@ -1169,8 +1193,53 @@
     <ClInclude Include="..\src\Physics\PhysX\SmartPointers.hpp">
       <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.hpp">
+    <ClInclude Include="..\src\Physics\BulletDynamics\MeshResourceView.hpp">
+      <Filter>Header Files\Physics\Bullet Dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\PhysX\MeshResourceView.hpp">
       <Filter>Header Files\Physics\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Physics\PhysX\TerrainResourceView.hpp">
+      <Filter>Header Files\Physics\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Animation\BipedalLocomotionAnimationLayer.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Animation\AnimationLayer.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Animation\KeyframeAnimationLayer.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Animation\KeyframeAnimationResourceView.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\EngineService.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\SmartPointers.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Animation\KeyCache.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\WorldView.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\HostAllocator.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\VulkanProperties.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\VulkanBuilders.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\VulkanResult.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1409,6 +1478,33 @@
     </None>
     <None Include="..\src\Physics\PhysX\WorldView.inl">
       <Filter>Header Files\Physics\PhysX</Filter>
+    </None>
+    <None Include="..\src\Animation\Armature.fbc">
+      <Filter>IDL Files</Filter>
+    </None>
+    <None Include="..\src\Physics\PhysX\MeshResourceView.inl">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </None>
+    <None Include="..\src\Physics\PhysX\TerrainResourceView.inl">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </None>
+    <None Include="..\src\Animation\Animation.fbc">
+      <Filter>IDL Files</Filter>
+    </None>
+    <None Include="..\src\Renderer\Vulkan\SmartPointers.inl">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </None>
+    <None Include="..\src\Renderer\Vulkan\HostAllocator.inl">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </None>
+    <None Include="..\src\Renderer\Vulkan\VulkanProperties.inl">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </None>
+    <None Include="..\src\Renderer\Vulkan\VulkanBuilders.inl">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </None>
+    <None Include="..\src\Renderer\Vulkan\VulkanResult.inl">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

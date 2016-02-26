@@ -84,7 +84,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -102,6 +102,8 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -111,7 +113,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Bin;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
@@ -136,7 +138,7 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -152,6 +154,8 @@
       <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -160,7 +164,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Bin;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -193,7 +197,7 @@ call "deploy.x64.bat"
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)PhysX\PhysXSDK\Include;$(ExternSrcDir)bullet3\src;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -209,6 +213,8 @@ call "deploy.x64.bat"
       <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -217,7 +223,7 @@ call "deploy.x64.bat"
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)angelscript\sdk\angelscript\lib;$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Bin;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -239,8 +245,10 @@ call "deploy.x64.bat"
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Animation\LocalSpaceAnimationLayer.cpp" />
-    <ClCompile Include="..\src\Animation\LocomotionAnimationLayer.cpp" />
+    <ClCompile Include="..\src\Animation\AnimationTypes.cpp" />
+    <ClCompile Include="..\src\Animation\KeyframeAnimationLayer.cpp" />
+    <ClCompile Include="..\src\Animation\BipedalLocomotionAnimationLayer.cpp" />
+    <ClCompile Include="..\src\Animation\KeyframeAnimationResourceView.cpp" />
     <ClCompile Include="..\src\Build.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurablePODVariable.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.cpp" />
@@ -274,23 +282,25 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Packages\ResourceViewFactory.cpp" />
     <ClCompile Include="..\src\packages\ResourceViewFactoryPublishingInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.ArticulatedBodyViewFactory.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.ArticulatedBodyComponent.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.CharacterControllerComponent.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainColliderComponent.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolumeComponent.cpp" />
-    <ClCompile Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.MeshViewFactory.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.MeshCollider.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.AnimationDrivenCharacterCollider.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TerrainCollider.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.TriggerVolume.cpp" />
+    <ClCompile Include="..\src\Physics\BulletDynamics\MeshResourceView.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\EngineService.cpp" />
     <ClCompile Include="..\src\Physics\BulletDynamics\WorldView.cpp" />
-    <ClCompile Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.cpp" />
-    <ClCompile Include="..\src\Physics\PhysX\EngineService.ArticulatedBodyViewFactory.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.TerrainViewFactory.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\MeshResourceView.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\EngineService.MeshViewFactory.cpp" />
     <ClCompile Include="..\src\Physics\PhysX\EngineService.cpp" />
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.ArticulatedBodyComponent.cpp" />
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.CharacterControllerComponent.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\TerrainResourceView.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.MeshCollider.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.AnimationDrivenCharacterCollider.cpp" />
     <ClCompile Include="..\src\Physics\PhysX\WorldView.cpp" />
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.PhysicalSoftBodyComponent.cpp" />
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.TerrainColliderComponent.cpp" />
-    <ClCompile Include="..\src\Physics\PhysX\WorldView.TriggerVolumeComponent.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.PhysicalArmature.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TerrainCollider.cpp" />
+    <ClCompile Include="..\src\Physics\PhysX\WorldView.TriggerVolume.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\Builders\RenderTargetViewBuilder.cpp" />
@@ -307,9 +317,16 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\SwapChain.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.cpp" />
-    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshComponent.cpp" />
-    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCameraComponent.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshRenderer.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCamera.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\HostAllocator.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\SmartPointers.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\VulkanBuilders.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\VulkanProperties.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\WorldView.cpp" />
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp" />
     <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.cpp" />
     <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.WorkerThread.cpp" />
@@ -375,8 +392,11 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Eldritch2.Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Animation\LocalSpaceAnimationLayer.hpp" />
-    <ClInclude Include="..\src\Animation\LocomotionAnimationLayer.hpp" />
+    <ClInclude Include="..\src\Animation\AnimationLayer.hpp" />
+    <ClInclude Include="..\src\Animation\BipedalLocomotionAnimationLayer.hpp" />
+    <ClInclude Include="..\src\Animation\KeyCache.hpp" />
+    <ClInclude Include="..\src\Animation\KeyframeAnimationLayer.hpp" />
+    <ClInclude Include="..\src\Animation\KeyframeAnimationResourceView.hpp" />
     <ClInclude Include="..\src\Build.hpp" />
     <ClInclude Include="..\src\Configuration\ConfigurationPublishingInitializationVisitor.hpp" />
     <ClInclude Include="..\src\Configuration\INIParser.hpp" />
@@ -411,12 +431,13 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Physics\BulletDynamics\btHeightfieldTerrainShape2.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btMultiBodyWorldMixin.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\btSoftBodyWorldMixin.hpp" />
-    <ClInclude Include="..\src\Physics\BulletDynamics\ArticulatedBodyResourceView.hpp" />
+    <ClInclude Include="..\src\Physics\BulletDynamics\MeshResourceView.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\EngineService.hpp" />
     <ClInclude Include="..\src\Physics\BulletDynamics\WorldView.hpp" />
-    <ClInclude Include="..\src\Physics\PhysX\ArticulatedBodyResourceView.hpp" />
+    <ClInclude Include="..\src\Physics\PhysX\MeshResourceView.hpp" />
     <ClInclude Include="..\src\Physics\PhysX\EngineService.hpp" />
     <ClInclude Include="..\src\Physics\PhysX\SmartPointers.hpp" />
+    <ClInclude Include="..\src\Physics\PhysX\TerrainResourceView.hpp" />
     <ClInclude Include="..\src\Physics\PhysX\WorldView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\BufferBuilder.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\Builders\DeviceBuilder.hpp" />
@@ -435,6 +456,14 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Renderer\Direct3D11\WorldView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp" />
     <ClInclude Include="..\src\renderer\VisibilitySystem.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\EngineService.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\SmartPointers.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\HostAllocator.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\VulkanProperties.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\VulkanBuilders.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\VulkanResult.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\WorldView.hpp" />
     <ClInclude Include="..\src\Scheduler\PrivateQueueWorker.hpp" />
     <ClInclude Include="..\src\Scheduler\Win32\FiberScheduler.hpp" />
     <ClInclude Include="..\src\Scheduler\Win32\ThreadScheduler.hpp" />
@@ -560,6 +589,8 @@ call "deploy.x64.bat"
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\Eldritch2.resources.aps" />
+    <None Include="..\src\Animation\Animation.fbc" />
+    <None Include="..\src\Animation\Armature.fbc" />
     <None Include="..\src\Animation\Armature.inl" />
     <None Include="..\src\Configuration\ConfigurablePODVariable.inl" />
     <None Include="..\src\Configuration\ConfigurationDatabase.inl" />
@@ -630,10 +661,17 @@ call "deploy.x64.bat"
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)_generated.h;%(Outputs)</Outputs>
     </CustomBuild>
+    <None Include="..\src\Physics\PhysX\MeshResourceView.inl" />
     <None Include="..\src\Physics\PhysX\SmartPointers.inl" />
+    <None Include="..\src\Physics\PhysX\TerrainResourceView.inl" />
     <None Include="..\src\Physics\PhysX\WorldView.inl" />
     <None Include="..\src\Renderer\HLSLPipeline.fbc" />
     <None Include="..\src\renderer\VisibilitySystem.inl" />
+    <None Include="..\src\Renderer\Vulkan\HostAllocator.inl" />
+    <None Include="..\src\Renderer\Vulkan\SmartPointers.inl" />
+    <None Include="..\src\Renderer\Vulkan\VulkanBuilders.inl" />
+    <None Include="..\src\Renderer\Vulkan\VulkanProperties.inl" />
+    <None Include="..\src\Renderer\Vulkan\VulkanResult.inl" />
     <None Include="..\src\Scheduler\PrivateQueueWorker.inl" />
     <None Include="..\src\Scheduler\WorkerContext.inl" />
     <CustomBuild Include="..\src\Scripting\Angelscript\BytecodeMetadata.fbc">

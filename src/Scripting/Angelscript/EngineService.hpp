@@ -57,7 +57,7 @@ namespace AngelScript {
 		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
 		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor ) override sealed;
+		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override sealed;
 
 	// ---------------------------------------------------
 		

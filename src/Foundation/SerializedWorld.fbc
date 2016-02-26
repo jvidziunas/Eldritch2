@@ -1,3 +1,6 @@
+file_identifier	"EWDF";
+file_extension	"e2world";
+
 namespace Eldritch2.Foundation.FlatBuffers;
 
 table Property {
@@ -5,11 +8,8 @@ table Property {
 	Value	: string (required);
 }
 
-table Header {
+table WorldDefinition {
 	Properties : [Property];
-
 }
 
-root_type Header;
-file_identifier	"EWDF";
-file_extension	"e2world";
+root_type WorldDefinition;

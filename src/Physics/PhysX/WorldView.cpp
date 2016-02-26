@@ -12,6 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
+#include <Utility/Math/StandardLibrary.hpp>
 #include <Physics/PhysX/WorldView.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
@@ -23,6 +25,7 @@
 
 using namespace ::Eldritch2::Foundation;
 using namespace ::Eldritch2::Scheduler;
+using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Physics;
 using namespace ::Eldritch2;
 
@@ -38,7 +41,17 @@ namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
 
-	WorldView::WorldView( UniquePointer<PxScene>&& scene, UniquePointer<PxControllerManager>&& controllerManager, World& world ) : Foundation::WorldView( world ), _scene( ::std::move( scene ) ), _controllerManager( ::std::move( controllerManager ) ) {
+	WorldView::WorldView( UniquePointer<PxScene>&& scene, UniquePointer<PxControllerManager>&& controllerManager, World& world ) : Foundation::WorldView( world ),
+																																   _scene( ::std::move( scene ) ),
+																																   _controllerManager( ::std::move( controllerManager ) ),
+																																   _armatureAllocator( UTF8L("PhysX World View Armature Pool Allocator"),
+																																					   GetArmaturePoolElementSizeInBytes(),
+																																					   (8192u / GetArmaturePoolElementSizeInBytes()),
+																																					   GetWorldAllocator() ),
+																																   _componentAllocator( UTF8L("PhysX World View Component Pool Allocator"),
+																																						GetComponentPoolElementSizeInBytes(),
+																																						(8192u / GetComponentPoolElementSizeInBytes()),
+																																						GetWorldAllocator() ) {
 		ETRuntimeAssert( nullptr != _scene );
 		ETRuntimeAssert( nullptr != _controllerManager );
 
@@ -77,8 +90,8 @@ namespace PhysX {
 	void WorldView::OnPostScriptTick( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "PhysX Physics Engine", "Begin world tick", 0x22FE22 );
 
-		_controllerManager->computeInteractions( 1.0f / 60.0f );
-		_scene->simulate( 1.0f / 60.0f );
+		_controllerManager->computeInteractions( GetTickDurationInSeconds() );
+		_scene->simulate( GetTickDurationInSeconds() );
 	}
 
 // ---------------------------------------------------
@@ -121,8 +134,36 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
+	ETNoAliasHint void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
+		PhysicalArmature::ExposeScriptAPI( typeRegistrar );
+		AnimationDrivenCharacterCollider::ExposeScriptAPI( typeRegistrar );
+		MeshCollider::ExposeScriptAPI( typeRegistrar );
+		TerrainCollider::ExposeScriptAPI( typeRegistrar );
+		TriggerVolume::ExposeScriptAPI( typeRegistrar );
+	}
+
+// ---------------------------------------------------
+
 	WorldView& WorldView::GetActiveWorldView() {
 		return *activeWorldView;
+	}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint float32 WorldView::GetTickDurationInSeconds() {
+		return ( 1.0f / 60.0f );
+	}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint size_t WorldView::GetComponentPoolElementSizeInBytes() {
+		return Max( sizeof(AnimationDrivenCharacterCollider), Max( sizeof(MeshCollider), Max( sizeof(TerrainCollider), sizeof(TriggerVolume) ) ) );
+	}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint size_t WorldView::GetArmaturePoolElementSizeInBytes() {
+		return sizeof(PhysicalArmature);
 	}
 
 }	// namespace PhysX

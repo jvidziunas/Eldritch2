@@ -1,13 +1,13 @@
 namespace Eldritch2.Physics.FlatBuffers;
 
 struct Float3 {
-	X	: float;
-	Y	: float;
-	Z	: float;
+	X			: float;
+	Y			: float;
+	Z			: float;
 }
 
 table SphereShape {
-	Radius	: float;
+	Radius		: float;
 }
 
 table BoxShape {
@@ -15,18 +15,18 @@ table BoxShape {
 }
 
 table CapsuleShapeX {
-	Radius	: float;
-	Height	: float;
+	Radius		: float;
+	Height		: float;
 }
 
 table CapsuleShapeY {
-	Radius	: float;
-	Height	: float;
+	Radius		: float;
+	Height		: float;
 }
 
 table CapsuleShapeZ {
-	Radius	: float;
-	Height	: float;
+	Radius		: float;
+	Height		: float;
 }
 
 union CollisionShape {

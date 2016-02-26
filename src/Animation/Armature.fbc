@@ -1,0 +1,44 @@
+file_identifier	"EADF";
+file_extension	"E2Armature";
+
+namespace Eldritch2.Animation.FlatBuffers;
+
+struct Bone {
+	X							: float;
+	Y							: float;
+	Z							: float;
+}
+
+BallSocketConstraint {
+	LimitConeAngleX				: float;
+	LimitConeAngleY				: float;
+}
+
+DistanceConstraint {
+	MinimumDistanceInWorldUnits	: float;
+	MaximumDistanceInWorldUnits	: float;
+}
+
+union Constraint {
+	BallSocketConstraint,
+	DistanceConstraint
+}
+
+table Joint {
+	Bone0						: ushort;
+	Bone1						: ushort;
+	PhysicsConstraint			: Constraint (required);
+}
+
+table Socket {
+	Name						: string;
+	BoneIndex					: ushort;
+}
+
+table Armature {
+	Bones						: [Bone] (required);
+	Joints						: [Joint];
+	Sockets						: [Socket];
+}
+
+root_type Armature;

@@ -38,13 +38,13 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 		class	ReferenceCountable;
 	}
 
 	namespace Physics {
 		namespace BulletDynamics {
-			class	ArticulatedBodyResourceView;
+			class	MeshResourceView;
 			class	EngineService;
 		}
 	}
@@ -93,7 +93,7 @@ namespace BulletDynamics {
 
 	// ---------------------------------------------------
 
-		static void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& visitor );
+		static void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
 
 	// ---------------------------------------------------
 
@@ -112,7 +112,7 @@ namespace BulletDynamics {
 
 	// - TYPE PUBLISHING ---------------------------------
 
-		class CharacterControllerComponent : public Scripting::ReferenceCountable {
+		class AnimationDrivenCharacterCollider : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -123,11 +123,11 @@ namespace BulletDynamics {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//! Constructs this @ref CharacterControllerComponent instance.
-			CharacterControllerComponent( WorldView& owningWorldView = GetActiveWorldView() );
+			//! Constructs this @ref AnimationDrivenCharacterCollider instance.
+			AnimationDrivenCharacterCollider( WorldView& owningWorldView = GetActiveWorldView() );
 
-			//!	Destroys this @ref CharacterControllerComponent instance.
-			~CharacterControllerComponent();
+			//!	Destroys this @ref AnimationDrivenCharacterCollider instance.
+			~AnimationDrivenCharacterCollider();
 
 		// ---------------------------------------------------
 
@@ -137,8 +137,8 @@ namespace BulletDynamics {
 
 		// - SCRIPT API REFERENCE ----------------------------
 
-			//! Registers all script-callable methods for the @ref CharacterControllerComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//! Registers all script-callable methods for the @ref AnimationDrivenCharacterCollider type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 			void						Dispose() override sealed;
 
@@ -157,7 +157,7 @@ namespace BulletDynamics {
 
 	// ---
 
-		class ArticulatedBodyComponent : public Scripting::ReferenceCountable {
+		class MeshCollider : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -168,11 +168,11 @@ namespace BulletDynamics {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//! Constructs this @ref ArticulatedBodyComponent.
-			ArticulatedBodyComponent( const ArticulatedBodyResourceView& asset, WorldView& owningView = GetActiveWorldView() );
+			//! Constructs this @ref MeshCollider.
+			MeshCollider( const MeshResourceView& asset, WorldView& owningView = GetActiveWorldView() );
 
-			//! Constructs this @ref ArticulatedBodyComponent.
-			~ArticulatedBodyComponent();
+			//! Constructs this @ref MeshCollider.
+			~MeshCollider();
 
 		// ---------------------------------------------------
 
@@ -182,8 +182,8 @@ namespace BulletDynamics {
 
 		// - SCRIPT API REFERENCE ----------------------------
 
-			//! Registers all script-callable methods for the @ref ArticulatedBodyComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//! Registers all script-callable methods for the @ref MeshCollider type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 			void						Dispose() override sealed;
 
@@ -199,7 +199,7 @@ namespace BulletDynamics {
 
 	// ---
 
-		class TerrainColliderComponent : public Scripting::ReferenceCountable {
+		class TerrainCollider : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -210,17 +210,17 @@ namespace BulletDynamics {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//! Constructs this @ref TerrainColliderComponent.
-			TerrainColliderComponent( WorldView& owningView = GetActiveWorldView() );
+			//! Constructs this @ref TerrainCollider.
+			TerrainCollider( WorldView& owningView = GetActiveWorldView() );
 
-			//! Constructs this @ref TerrainColliderComponent.
-			~TerrainColliderComponent() = default;
+			//! Constructs this @ref TerrainCollider.
+			~TerrainCollider() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
 		public:
-			//!	Registers all script-callable methods for the @ref TerrainColliderComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//!	Registers all script-callable methods for the @ref TerrainCollider type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
 
@@ -238,7 +238,7 @@ namespace BulletDynamics {
 
 	// ---
 
-		class TriggerVolumeComponent : public Scripting::ReferenceCountable {
+		class TriggerVolume : public Scripting::ReferenceCountable {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -249,17 +249,17 @@ namespace BulletDynamics {
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Constructs this @ref TriggerVolumeComponent.
-			TriggerVolumeComponent( WorldView& owningView = GetActiveWorldView() );
+			//!	Constructs this @ref TriggerVolume.
+			TriggerVolume( WorldView& owningView = GetActiveWorldView() );
 
-			//!	Constructs this @ref TriggerVolumeComponent.
-			~TriggerVolumeComponent() = default;
+			//!	Constructs this @ref TriggerVolume.
+			~TriggerVolume() = default;
 
 		// - SCRIPT API REFERENCE ----------------------------
 
 		public:
-			//!	Registers all script-callable methods for the @ref TriggerVolumeComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			//!	Registers all script-callable methods for the @ref TriggerVolume type with the specified script type registrar.
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 		// ---------------------------------------------------
 
@@ -272,44 +272,6 @@ namespace BulletDynamics {
 
 		private:
 			::btPairCachingGhostObject	_ghostObject;
-		};
-
-	// ---
-
-		class PhysicalSoftBodyComponent : public Scripting::ReferenceCountable {
-		// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			enum : short {
-				CollisionFilterGroup	= FilterBehaviors::DefaultFilter,
-				CollisionFilterMask		= (FilterBehaviors::StaticFilter | FilterBehaviors::DefaultFilter)
-			};
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			//!	Constructs this @ref PhysicalSoftBodyComponent.
-			PhysicalSoftBodyComponent( WorldView& owningView = GetActiveWorldView() );
-
-			//!	Constructs this @ref PhysicalSoftBodyComponent.
-			~PhysicalSoftBodyComponent() = default;
-
-		// - SCRIPT API REFERENCE ----------------------------
-
-		public:
-			//!	Registers all script-callable methods for the @ref PhysicalSoftBodyComponent type with the specified script type registrar.
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
-
-		// ---------------------------------------------------
-
-			void	Dispose() override sealed;
-
-		// - DATA MEMBERS ------------------------------------
-
-		public:
-			static const char* const	scriptTypeName;
-
-		private:
-			::btSoftBody				_body;
 		};
 
 	// - DATA MEMBERS ------------------------------------

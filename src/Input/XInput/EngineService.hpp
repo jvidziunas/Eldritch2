@@ -51,7 +51,7 @@ namespace XInput {
 
 		// ---------------------------------------------------
 
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 			void						Dispose() override sealed;
 
@@ -79,7 +79,7 @@ namespace XInput {
 	// ---------------------------------------------------
 
 	protected:
-		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) override sealed;
+		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar ) override sealed;
 
 	// ---------------------------------------------------
 

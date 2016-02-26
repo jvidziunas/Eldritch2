@@ -101,12 +101,11 @@ namespace FileSystem {
 
 		//!	Locates a resource view in the database.
 		/*!	@param[in] name Null-terminated C string containing the name of the resource to search for.
-			@param[in] defaultView A reference to the @ref ResourceView to return in the event the search was unsuccessful.
-			@returns A reference to the found view, if successful, or a reference to _defaultView_ if no compatible views were found in the database.
+			@returns A pointer to the found view, if successful, or null in the event no views were found.
 			@remarks Thread-safe.
 			*/
 		template <typename View>
-		const View&	ResolveViewByName( const ::Eldritch2::UTF8Char* const name, const View& defaultView ) const;
+		const View*	ResolveViewByName( const ::Eldritch2::UTF8Char* const name ) const;
 
 	// ---------------------------------------------------
 
@@ -123,22 +122,22 @@ namespace FileSystem {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator																_allocator;
-		::Eldritch2::ChildAllocator																_deserializationContextAllocator;
-		FileSystem::ContentProvider&															_contentProvider;
+		::Eldritch2::ChildAllocator															_allocator;
+		::Eldritch2::ChildAllocator															_deserializationContextAllocator;
+		FileSystem::ContentProvider&														_contentProvider;
 		
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>						_contentPackageDirectoryMutex;
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_contentPackageDirectoryMutex;
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>						_resourceViewDirectoryMutex;		
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_resourceViewDirectoryMutex;		
 
-		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*>			_contentPackageDirectory;
-		::Eldritch2::HashMap<ResourceViewKey, const FileSystem::ResourceView*>					_resourceViewDirectory;
-		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, ResourceViewFactoryCollection>		_resourceFactoryDirectory;
+		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*>		_contentPackageDirectory;
+		::Eldritch2::HashMap<ResourceViewKey, const FileSystem::ResourceView*>				_resourceViewDirectory;
+		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, ResourceViewFactoryCollection>	_resourceFactoryDirectory;
 
-		ResourceViewFactoryCollection															_nullFactoryCollection;
+		ResourceViewFactoryCollection														_nullFactoryCollection;
 
-		FileSystem::LoaderThread*																_loaderThread;
+		FileSystem::LoaderThread*															_loaderThread;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 

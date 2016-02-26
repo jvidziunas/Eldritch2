@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ScriptAPIRegistrationInitializationVisitor.inl
+  ScriptApiRegistrationInitializationVisitor.inl
   ------------------------------------------------------------------
   Purpose:
 
@@ -19,7 +19,7 @@ namespace Eldritch2 {
 namespace Scripting {
 
 	template <typename... Arguments>
-	ETInlineHint ScriptAPIRegistrationInitializationVisitor::ScriptAPIRegistrationInitializationVisitor( Arguments&&... arguments ) : UnderlyingTypeRegistrar( ::std::forward<Arguments>( arguments )... ) {}
+	ETInlineHint ScriptApiRegistrationInitializationVisitor::ScriptApiRegistrationInitializationVisitor( Arguments&&... arguments ) : UnderlyingTypeRegistrar( ::std::forward<Arguments>( arguments )... ) {}
 
 }	// namespace Scripting
 }	// namespace Eldritch2

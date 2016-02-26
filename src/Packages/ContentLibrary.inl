@@ -24,15 +24,15 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	template <typename View>
-	const View& ContentLibrary::ResolveViewByName( const UTF8Char* const name, const View& defaultView ) const {
+	const View* ContentLibrary::ResolveViewByName( const UTF8Char* const name ) const {
 		static_assert( ::std::is_base_of<FileSystem::ResourceView, View>::value, "ResolveViewByName() must be used to convert to ResourceView-derived types!" );
 
 	// ---
 
 		Utility::ScopedReaderLock	_( *_resourceViewDirectoryMutex );
-		const auto					candidate( _resourceViewDirectory.Find( { name, &typeid(defaultView) } ) );
+		const auto					candidate( _resourceViewDirectory.Find( { name, &typeid(View) } ) );
 
-		return (candidate != _resourceViewDirectory.End()) ? (*static_cast<const View*>(candidate->second)) : defaultView;
+		return static_cast<const View*>(candidate != _resourceViewDirectory.End() ? candidate->second : nullptr);
 	}
 
 // ---------------------------------------------------

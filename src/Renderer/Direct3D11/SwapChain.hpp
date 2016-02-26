@@ -24,7 +24,7 @@
 
 namespace Eldritch2 {
 	namespace Scripting {
-		class	ScriptAPIRegistrationInitializationVisitor;
+		class	ScriptApiRegistrationInitializationVisitor;
 	}
 }
 
@@ -58,7 +58,7 @@ namespace Direct3D11 {
 	// - SCRIPT API REFERENCE ----------------------------
 
 		//!	Registers all script-callable methods for the @ref SwapChain type with the specified script type registrar.
-		static void	ExposeScriptAPI( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar );
+		static void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
 
 	// ---------------------------------------------------
 

@@ -44,7 +44,7 @@ namespace Configuration {
 	protected:
 		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
 
-		void	AcceptInitializationVisitor( Scripting::ScriptAPIRegistrationInitializationVisitor& typeRegistrar ) override sealed;
+		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar ) override sealed;
 
 	// ---------------------------------------------------
 

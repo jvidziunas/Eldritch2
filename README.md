@@ -5,8 +5,16 @@ As of right now most of the project is still in a preliminary stage and most eve
 Additionally, the project is not currently buildable from a direct Git clone; the original makes use of several additional libraries that would exist within `/extern/`. As I do not currently have distribution rights for some of them, I have chosen only to upload the relevant source.
 If you'd like to get a copy of the executable, (currently tested/running under 64-bit Windows only) let me know and I'll send something your way! Be warned, it's pretty boring right now.
 
+
+## What is Eldritch2?
+It's a classic hobby 3D game engine project, written in C++ and Angelscript. Watch out Unreal! Quips aside, there are some interesting things going on here involving pretty cutting-edge work scheduling and cooperative multitasking.
+I can production-test interesting research so your project doesn't have to!
+
+Lots of the architectural decisions here are also centered around shooters and action RPGs, at least out of the box.
+
 ## External Dependencies
-* [Bullet Dynamics Engine] (http://bulletphysics.org/wordpress/), experimental v3, using community multithreading support branch
+* [Bullet Dynamics Engine](http://bulletphysics.org/wordpress/), experimental v3, using community multithreading support branch
+* [PhysX](http://www.geforce.com/hardware/technology/physx)
 * [Angelscript](http://www.angelcode.com/angelscript/)
 * [Microprofile](https://github.com/theunknownxy/microprofile)
 * [Recast Navigation/Detour](https://github.com/memononen/recastnavigation)

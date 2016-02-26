@@ -17,7 +17,8 @@
 #	undef UNICODE
 #endif
 #define MICROPROFILE_USE_THREAD_NAME_CALLBACK 1
-#define MICROPROFILE_GPU_TIMERS_D3D11 1
+// #define MICROPROFILE_GPU_TIMERS_D3D11 1
+#define MICROPROFILE_GPU_TIMERS 0
 #define MICROPROFILE_IMPL
 #if( ET_COMPILER_IS_MSVC )
 //	MSVC complains about macro redefinitions, since a few DirectX components separately
@@ -40,8 +41,10 @@ ET_LINK_LIBRARY( "Ws2_32.lib" )
 #endif
 //------------------------------------------------------------------//
 
-
-#if defined( MICROPROFILE_USE_THREAD_NAME_CALLBACK ) && (0 != MICROPROFILE_USE_THREAD_NAME_CALLBACK)
+#if (0 == MICROPROFILE_GPU_TIMERS)
+void MicroProfileGpuInitD3D11( void* /*pDevice*/, void* /*pDeviceContext*/ ) {}
+#endif
+#if (0 != MICROPROFILE_USE_THREAD_NAME_CALLBACK)
 MICROPROFILE_API const char* MicroProfileGetThreadName() {
 	return "<Unknown>";
 }

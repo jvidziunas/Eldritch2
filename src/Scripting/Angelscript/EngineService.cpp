@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
-#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Scripting/AngelScript/BytecodePackageResourceView.hpp>
 #include <Scripting/AngelScript/ObjectGraphResourceView.hpp>
 #include <Scripting/AngelScript/NativeBindings.hpp>
@@ -75,7 +75,7 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptAPIRegistrationInitializationVisitor& visitor ) {
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
 		WorldView::ExposeScriptAPI( visitor );
 	}
 
@@ -95,14 +95,16 @@ namespace AngelScript {
 		}
 
 		scriptEngine->SetMessageCallback( ::asMETHOD( EngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
+		scriptEngine->SetEngineProperty( ::asEP_ALLOW_UNSAFE_REFERENCES, 1 );
 		// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
 
 		// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
-		{	ScriptAPIRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
+		{	ScriptApiRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
 			
 			StringMarshal::ExposeScriptAPI( registrationVisitor );
 			Float4Marshal::ExposeScriptAPI( registrationVisitor );
 			OrientationMarshal::ExposeScriptAPI( registrationVisitor );
+			RigidTransformMarshal::ExposeScriptAPI( registrationVisitor );
 			
 			BroadcastInitializationVisitor( registrationVisitor );
 		}
