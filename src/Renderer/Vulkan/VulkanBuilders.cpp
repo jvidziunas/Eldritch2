@@ -29,15 +29,15 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
 
-	VulkanBuilder::VulkanBuilder( Allocator& allocator, uint32_t applicationVersion ) : _enabledExtensions( { allocator, UTF8L("Vulkan Builder Enabled Extension Collection Allocator") } ),
-																						_enabledLayers( { allocator, UTF8L("Vulkan Builder Enabled Layer Collection Allocator") } ) {
+	VulkanBuilder::VulkanBuilder( Allocator& allocator, uint32_t vulkanApiVersion ) : _enabledExtensions( { allocator, UTF8L("Vulkan Builder Enabled Extension Collection Allocator") } ),
+																					  _enabledLayers( { allocator, UTF8L("Vulkan Builder Enabled Layer Collection Allocator") } ) {
 		_applicationInfo.sType				= VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		_applicationInfo.pNext				= nullptr;
 		_applicationInfo.pApplicationName	= PROJECT_NAME;
 		_applicationInfo.applicationVersion	= 1;
 		_applicationInfo.pEngineName		= "Eldritch2";
 		_applicationInfo.engineVersion		= 1;
-		_applicationInfo.apiVersion			= applicationVersion;
+		_applicationInfo.apiVersion			= vulkanApiVersion;
 
 		_createInfo.sType					= VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		_createInfo.pNext					= nullptr;
@@ -67,9 +67,12 @@ namespace Vulkan {
 
 	LogicalDeviceBuilder::LogicalDeviceBuilder( Allocator& allocator ) : _enabledExtensions( { allocator, UTF8L("Vulkan Device Builder Enabled Extension Collection Allocator") } ),
 																		 _enabledLayers( { allocator, UTF8L("Vulkan Device Builder Enabled Layer Collection Allocator") } ) {
-		_createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		_createInfo.pNext = nullptr;
-		_createInfo.flags = 0;
+		_createInfo.sType					= VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		_createInfo.pNext					= nullptr;
+		_createInfo.flags					= 0;
+		_createInfo.pEnabledFeatures		= nullptr;
+		_createInfo.queueCreateInfoCount	= 0;
+		_createInfo.pQueueCreateInfos		= nullptr;
 	}
 
 // ---------------------------------------------------
@@ -100,7 +103,7 @@ namespace Vulkan {
 		uint32	physicalDeviceCount( 0u );
 
 		// First, get the number of installed physical devices in the system.
-		if( VK_SUCCESS != ::vkEnumeratePhysicalDevices( instance, &physicalDeviceCount, nullptr ) || 0u == physicalDeviceCount ) {
+		if( VK_SUCCESS > ::vkEnumeratePhysicalDevices( instance, &physicalDeviceCount, nullptr ) || 0u == physicalDeviceCount ) {
 			return;
 		}
 
@@ -108,7 +111,7 @@ namespace Vulkan {
 		const auto	devices( static_cast<VkPhysicalDevice*>( _alloca( physicalDeviceCount * sizeof(VkPhysicalDevice) ) ) );
 
 		// Fill the array with handles.
-		if( VK_SUCCESS != ::vkEnumeratePhysicalDevices( instance, &physicalDeviceCount, devices ) ) {
+		if( VK_SUCCESS > ::vkEnumeratePhysicalDevices( instance, &physicalDeviceCount, devices ) ) {
 			return;
 		}
 
@@ -116,6 +119,16 @@ namespace Vulkan {
 		for( VkPhysicalDevice device : Range<VkPhysicalDevice*>( devices, devices + physicalDeviceCount ) ) {
 			_enumeratedDevices.EmplaceBack( device );
 		}
+	}
+
+// ---------------------------------------------------
+
+	::VkPhysicalDevice PhysicalDeviceEnumerator::GetTopDevice() const {
+		if( _enumeratedDevices.Empty() ) {
+			return nullptr;
+		}
+
+		return _enumeratedDevices.Front().device;
 	}
 
 }	// namespace Vulkan

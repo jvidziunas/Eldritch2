@@ -101,7 +101,7 @@ namespace Direct3D11 {
 
 			::MicroProfileGpuInitD3D11( device.GetUnadornedPointer(), _immediateContext.GetUnadornedPointer() );
 
-			_shaderResourceViewFactory.SetDevice( device );
+			_imageViewFactory.SetDevice( device );
 			_meshResourceViewFactory.SetDevice( device );
 			_pipelineViewFactory.SetDevice( device );
 		} else {
@@ -142,7 +142,7 @@ namespace Direct3D11 {
 			   .Register( UTF8L("ForceDebugRuntime"), _forceDebugRuntime ).Register( UTF8L("MaximumFramesToRenderAhead"), _maximumFramesToRenderAhead );
 
 		// Allow view factories to register their configuration.
-		_shaderResourceViewFactory.AcceptInitializationVisitor( visitor );
+		_imageViewFactory.AcceptInitializationVisitor( visitor );
 		_meshResourceViewFactory.AcceptInitializationVisitor( visitor );
 		_pipelineViewFactory.AcceptInitializationVisitor( visitor );
 	}
@@ -150,7 +150,7 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( ShaderResourceResourceView::GetSerializedDataTag(), _shaderResourceViewFactory )
+		visitor.PublishFactory( ImageResourceView::GetSerializedDataTag(), _imageViewFactory )
 			   .PublishFactory( MeshResourceView::GetSerializedDataTag(), _meshResourceViewFactory )
 			   .PublishFactory( HLSLPipelineDefinitionView::GetSerializedDataTag(), _pipelineViewFactory );
 	}

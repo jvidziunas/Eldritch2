@@ -79,14 +79,14 @@ namespace Direct3D11 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		class ShaderResourceViewFactory : public FileSystem::ResourceViewFactory {
+		class ImageViewFactory : public FileSystem::ResourceViewFactory {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref ShaderResourceViewFactory instance.
-			ShaderResourceViewFactory();
+			//!	Constructs this @ref ImageViewFactory instance.
+			ImageViewFactory();
 
-			~ShaderResourceViewFactory() = default;
+			~ImageViewFactory() = default;
 
 		// ---------------------------------------------------
 
@@ -111,8 +111,8 @@ namespace Direct3D11 {
 
 			Configuration::ConfigurablePODVariable<float>				_adaptiveResolutionMaxAreaFraction;
 			Configuration::ConfigurablePODVariable<float>				_adaptiveResolutionMinAreaFraction;
-			Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_MSAACount;
-			Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_MSAAQuality;
+			Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_MsaaCount;
+			Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_MsaaQuality;
 		};
 
 	// ---
@@ -183,7 +183,7 @@ namespace Direct3D11 {
 
 	// - DATA MEMBERS ------------------------------------
 
-		ShaderResourceViewFactory									_shaderResourceViewFactory;
+		ImageViewFactory											_imageViewFactory;
 		MeshViewFactory												_meshResourceViewFactory;
 		PipelineViewFactory											_pipelineViewFactory;
 

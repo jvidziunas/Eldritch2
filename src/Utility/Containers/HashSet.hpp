@@ -1,10 +1,11 @@
 /*==================================================================*\
-  HashMap.hpp
+  HashSet.hpp
   ------------------------------------------------------------------
   Purpose:
   
+
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -17,23 +18,23 @@
 #include <Utility/Hash.hpp>
 #include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/hash_map.h>
+#include <rdestl/hash_set.h>
 //------------------------------------------------------------------//
+
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class Hasher = ::Eldritch2::Hash<Key>, class KeyEqualityComparator = ::Eldritch2::Equals<Key>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
-	class HashMap {
+	template <typename StoredObject, class Hasher = ::Eldritch2::Hash<StoredObject>, class KeyEqualityComparator = ::Eldritch2::Equals<StoredObject>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
+	class HashSet {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
 		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::hash_map<Key, StoredObject, Hasher, loadFactor, KeyEqualityComparator, PrivateAllocator>;
+		using UnderlyingContainer	= ::rde::hash_set<StoredObject, Hasher, loadFactor, KeyEqualityComparator, PrivateAllocator>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
 		using KeyType				= typename UnderlyingContainer::key_type;
-		using MappedType			= typename UnderlyingContainer::mapped_type;
 		using AllocatorType			= Allocator;
 		using SizeType				= typename UnderlyingContainer::size_type;
 		using Iterator				= typename UnderlyingContainer::iterator;
@@ -42,17 +43,17 @@ namespace Eldritch2 {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref HashMap instance.
-		ETInlineHint explicit HashMap( AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref HashMap instance.
-		ETInlineHint HashMap( Hasher&& hasher, AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref HashMap instance.
+		//! Constructs this @ref HashSet instance.
+		ETInlineHint explicit HashSet( AllocatorType&& allocatorType = AllocatorType() );
+		//! Constructs this @ref HashSet instance.
+		ETInlineHint HashSet( Hasher&& hasher, AllocatorType&& allocatorType = AllocatorType() );
+		//! Constructs this @ref HashSet instance.
 		template <class AlternateAllocator, int alternateLoadFactor>
-		ETInlineHint HashMap( const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref HashMap instance.
-		ETInlineHint HashMap( HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource );
+		ETInlineHint HashSet( const HashSet<StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocatorType = AllocatorType() );
+		//! Constructs this @ref HashSet instance.
+		ETInlineHint HashSet( HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource );
 
-		ETInlineHint ~HashMap() = default;
+		ETInlineHint ~HashSet() = default;
 
 	// - ALGORITHMS --------------------------------------
 
@@ -73,34 +74,29 @@ namespace Eldritch2 {
 
 	// - ELEMENT ITERATION -------------------------------
 
-		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashMap.
+		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
 		ETInlineHint ConstIterator	ConstBegin() const;
 
-		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashMap.
+		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
 		ETInlineHint ConstIterator	Begin() const;
-		//!	Retrieves an @ref Iterator to the first element stored in this @ref HashMap.
+		//!	Retrieves an @ref Iterator to the first element stored in this @ref HashSet.
 		ETInlineHint Iterator		Begin();
 
-		//!	Retrieves a const iterator to one past the end of all elements stored in this HashMap.
+		//!	Retrieves a const iterator to one past the end of all elements stored in this HashSet.
 		ETInlineHint ConstIterator	ConstEnd() const;
 
-		// Retrieves a const iterator to one past the end of all elements stored in this HashMap.
+		// Retrieves a const iterator to one past the end of all elements stored in this HashSet.
 		ETInlineHint ConstIterator	End() const;
-		// Retrieves an iterator to one past the end of all elements stored in this HashMap.
+		// Retrieves an iterator to one past the end of all elements stored in this HashSet.
 		ETInlineHint Iterator		End();
-
-	// - ELEMENT ACCESS ----------------------------------
-
-		ETInlineHint MappedType&	operator[]( KeyType&& key );
-		ETInlineHint MappedType&	operator[]( const KeyType& key );
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&	operator=( const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
+		ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&	operator=( const HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
 
-		ETInlineHint void	CloneFrom( const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
+		ETInlineHint void	CloneFrom( const HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
 
-		ETInlineHint void	Swap( HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& rhs );
+		ETInlineHint void	Swap( HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& rhs );
 
 	// - CONTAINER MANIPULATION --------------------------
 	    
@@ -149,5 +145,8 @@ namespace Eldritch2 {
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/Containers/HashMap.inl>
+#include <Utility/Containers/HashSet.inl>
 //------------------------------------------------------------------//
+
+
+

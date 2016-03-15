@@ -1,36 +1,46 @@
 /*==================================================================*\
-  SPIRVPipelineDefinitionView.hpp
+  ImageResourceView.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
-  ©2010-2016 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Renderer/Vulkan/SmartPointers.hpp>
-#include <Utility/Containers/FlatMap.hpp>
 #include <Packages/ResourceView.hpp>
+#include <Utility/MPL/IntTypes.hpp>
+#include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
-#include <vulkan/vulkan.h>
+#if( ET_COMPILER_IS_MSVC )
+//	MSVC complains about macro redefinitions, since a few DirectX components separately
+//	define some HRESULT values without an include guard. The definitions themselves are consistent,
+//	so just disable the warning.
+#	pragma warning( push )
+#	pragma warning( disable : 4005 )
+#endif
+#include <D3D11.h>
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Renderer {
-namespace Vulkan {
+namespace Direct3D11 {
 
-	class SPIRVPipelineDefinitionView : public FileSystem::ResourceView {
+	class ImageResourceView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref SPIRVPipelineDefinitionView instance.
-		SPIRVPipelineDefinitionView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		//! Constructs this @ref ImageResourceView instance.
+		ImageResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
-		~SPIRVPipelineDefinitionView() = default;
+		~ImageResourceView() = default;
 
 	// ---------------------------------------------------
 
@@ -43,9 +53,9 @@ namespace Vulkan {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::FlatMap<VkDevice, Vulkan::UniquePointer<VkPipeline>> _pipelines;
+		Utility::COMPointer<::ID3D11ShaderResourceView>	_shaderView;
 	};
 
-}	// namespace Vulkan
+}	// namespace Direct3D11
 }	// namespace Renderer
 }	// namespace Eldritch2

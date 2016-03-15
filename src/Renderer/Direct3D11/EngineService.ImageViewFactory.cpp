@@ -1,5 +1,5 @@
 /*==================================================================*\
-  EngineService.ShaderResourceViewFactory.cpp
+  EngineService.ImageViewFactory.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Renderer/Direct3D11/ShaderResourceResourceView.hpp>
+#include <Renderer/Direct3D11/ImageResourceView.hpp>
 #include <Renderer/Direct3D11/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Assert.hpp>
@@ -31,34 +31,34 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	EngineService::ShaderResourceViewFactory::ShaderResourceViewFactory() : _device( nullptr ),
-																			_MSAACount( 1u ),
-																			_MSAAQuality( 0u ),
-																			_adaptiveResolutionMaxAreaFraction( 1.0f ),
-																			_adaptiveResolutionMinAreaFraction( 0.25f ) {}
+	EngineService::ImageViewFactory::ImageViewFactory() : _device( nullptr ),
+														  _MsaaCount( 1u ),
+														  _MsaaQuality( 0u ),
+														  _adaptiveResolutionMaxAreaFraction( 1.0f ),
+														  _adaptiveResolutionMinAreaFraction( 0.25f ) {}
 
 // ---------------------------------------------------
 
-	void EngineService::ShaderResourceViewFactory::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
-		visitor.Register( UTF8L("MSAASamplesPerPixel"), _MSAACount ).Register( UTF8L("MSAAQualityLevel"), _MSAAQuality )
+	void EngineService::ImageViewFactory::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
+		visitor.Register( UTF8L("MsaaSamplesPerPixel"), _MsaaCount ).Register( UTF8L("MsaaQualityLevel"), _MsaaQuality )
 			   .Register( UTF8L("MaximumAdaptiveResolutionScreenFraction"), _adaptiveResolutionMaxAreaFraction ).Register( UTF8L("MinimumAdaptiveResolutionScreenFraction"), _adaptiveResolutionMinAreaFraction );
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::ShaderResourceViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
+	ErrorCode EngineService::ImageViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
 		ETRuntimeAssert( _device );
 
 	// ---
 
 		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Create shader resource view", 0xAAAAAA );
 
-		return new(allocator, Allocator::AllocationDuration::Normal) ShaderResourceResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
+		return new(allocator, Allocator::AllocationDuration::Normal) ImageResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::ShaderResourceViewFactory::SetDevice( const COMPointer<::ID3D11Device>& device ) {
+	void EngineService::ImageViewFactory::SetDevice( const COMPointer<::ID3D11Device>& device ) {
 		_device = device;
 	}
 

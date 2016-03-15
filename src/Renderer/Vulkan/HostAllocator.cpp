@@ -14,6 +14,8 @@
 //==================================================================//
 #include <Renderer/Vulkan/HostAllocator.hpp>
 //------------------------------------------------------------------//
+#include <utility>
+//------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Renderer;
 using namespace ::Eldritch2;
@@ -36,6 +38,10 @@ namespace Vulkan {
 		_allocationCallbacks.pfnInternalAllocation	= [] ( void* /*allocator*/, size_t /*sizeInBytes*/, VkInternalAllocationType /*type*/, VkSystemAllocationScope /*scope*/ ) {};
 		_allocationCallbacks.pfnInternalFree		= [] ( void* /*allocator*/, size_t /*sizeInBytes*/, VkInternalAllocationType /*type*/, VkSystemAllocationScope /*scope*/ ) {};
 	}
+
+// ---------------------------------------------------
+
+	HostAllocator::HostAllocator( HostAllocator&& allocator ) : ChildAllocator( ::std::move( allocator ) ), _allocationCallbacks( ::std::move( allocator._allocationCallbacks ) ) {}
 
 }	// namespace Vulkan
 }	// namespace Renderer

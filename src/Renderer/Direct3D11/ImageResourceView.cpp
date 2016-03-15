@@ -1,5 +1,5 @@
 /*==================================================================*\
-  ShaderResourceResourceView.cpp
+  ImageResourceView.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Renderer/Direct3D11/ShaderResourceResourceView.hpp>
+#include <Renderer/Direct3D11/ImageResourceView.hpp>
 #include <Utility/Containers/Range.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
@@ -33,18 +33,18 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	ShaderResourceResourceView::ShaderResourceResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
+	ImageResourceView::ImageResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode ShaderResourceResourceView::UpdateFromByteStream( const Range<const char*> /*sourceBytes*/ ) {
+	ErrorCode ImageResourceView::UpdateFromByteStream( const Range<const char*> /*sourceBytes*/ ) {
 		return Error::UnsupportedOperation;
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint const UTF8Char* const ShaderResourceResourceView::GetSerializedDataTag() {
-		return UTF8L("ShaderResource");
+	ETNoAliasHint const UTF8Char* const ImageResourceView::GetSerializedDataTag() {
+		return UTF8L("Image");
 	}
 
 }	// namespace Direct3D11

@@ -310,20 +310,26 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.MeshViewFactory.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.PipelineViewFactory.cpp" />
-    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.ShaderResourceViewFactory.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.ImageViewFactory.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\HLSLPipelineDefinitionView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\MeshResourceView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\RenderTargetResourceView.cpp" />
-    <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp" />
+    <ClCompile Include="..\src\Renderer\Direct3D11\ImageResourceView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\SwapChain.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.MeshRenderer.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D11\WorldView.SceneCamera.cpp" />
     <ClCompile Include="..\src\Renderer\Direct3D\FormatHelpers.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\DeviceContext.cpp" />
     <ClCompile Include="..\src\Renderer\Vulkan\EngineService.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.ImageFactory.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.MeshFactory.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.PipelineFactory.cpp" />
     <ClCompile Include="..\src\Renderer\Vulkan\HostAllocator.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\MeshResourceView.cpp" />
     <ClCompile Include="..\src\Renderer\Vulkan\SmartPointers.cpp" />
-    <ClCompile Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionResourceView.cpp" />
+    <ClCompile Include="..\src\Renderer\Vulkan\VirtualTexture.cpp" />
     <ClCompile Include="..\src\Renderer\Vulkan\VulkanBuilders.cpp" />
     <ClCompile Include="..\src\Renderer\Vulkan\VulkanProperties.cpp" />
     <ClCompile Include="..\src\Renderer\Vulkan\WorldView.cpp" />
@@ -352,7 +358,6 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Packages\ContentLibrary.cpp" />
     <ClCompile Include="..\src\Packages\ResourceView.cpp" />
     <ClCompile Include="..\src\renderer\Camera.cpp" />
-    <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp" />
     <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp" />
     <ClCompile Include="..\src\Scheduler\Thread.cpp" />
     <ClCompile Include="..\src\scheduler\ThreadScheduler.cpp" />
@@ -375,7 +380,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp" />
     <ClCompile Include="..\src\Utility\MPL\MatrixTypes.cpp" />
     <ClCompile Include="..\src\Utility\ScopedFPUController.cpp" />
-    <ClCompile Include="..\src\Utility\SurjectiveQueryEngine.cpp" />
+    <ClCompile Include="..\src\Utility\SurjectiveQueryDatabase.cpp" />
     <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp" />
     <ClCompile Include="..\src\Utility\concurrency\Lock.cpp" />
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
@@ -451,15 +456,18 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Renderer\Direct3D11\MeshResourceView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\RenderTargetResourceView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\ResourceCommon.hpp" />
-    <ClInclude Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.hpp" />
+    <ClInclude Include="..\src\Renderer\Direct3D11\ImageResourceView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\SwapChain.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D11\WorldView.hpp" />
     <ClInclude Include="..\src\Renderer\Direct3D\FormatHelpers.hpp" />
     <ClInclude Include="..\src\renderer\VisibilitySystem.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\DeviceContext.hpp" />
     <ClInclude Include="..\src\Renderer\Vulkan\EngineService.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\MeshResourceView.hpp" />
     <ClInclude Include="..\src\Renderer\Vulkan\SmartPointers.hpp" />
-    <ClInclude Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionResourceView.hpp" />
     <ClInclude Include="..\src\Renderer\Vulkan\HostAllocator.hpp" />
+    <ClInclude Include="..\src\Renderer\Vulkan\VirtualTexture.hpp" />
     <ClInclude Include="..\src\Renderer\Vulkan\VulkanProperties.hpp" />
     <ClInclude Include="..\src\Renderer\Vulkan\VulkanBuilders.hpp" />
     <ClInclude Include="..\src\Renderer\Vulkan\VulkanResult.hpp" />
@@ -492,6 +500,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Concurrency\StripedReaderWriterLock.hpp" />
     <ClInclude Include="..\src\Utility\Concurrency\WaitableUserEvent.hpp" />
     <ClInclude Include="..\src\Utility\Containers\FlatSet.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\HashSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveListHook.hpp" />
     <ClInclude Include="..\src\Utility\Containers\SpatialHash.hpp" />
@@ -517,7 +526,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Result.hpp" />
     <ClInclude Include="..\src\Utility\ScopedFPUController.hpp" />
-    <ClInclude Include="..\src\Utility\SurjectiveQueryEngine.hpp" />
+    <ClInclude Include="..\src\Utility\SurjectiveQueryDatabase.hpp" />
     <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp" />
     <ClInclude Include="..\src\Utility\concurrency\Lock.hpp" />
     <ClInclude Include="..\src\Utility\Concurrency\UserSemaphore.hpp" />
@@ -558,7 +567,6 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Utility\math\StandardLibrary.hpp" />
     <ClInclude Include="..\src\renderer\Camera.hpp" />
     <ClInclude Include="..\src\Renderer\GPUFormats.hpp" />
-    <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp" />
     <ClInclude Include="..\src\renderer\textures\TextureHeader.hpp" />
     <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp" />
     <ClInclude Include="..\src\Scheduler\Thread.hpp" />
@@ -666,6 +674,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Physics\PhysX\TerrainResourceView.inl" />
     <None Include="..\src\Physics\PhysX\WorldView.inl" />
     <None Include="..\src\Renderer\HLSLPipeline.fbc" />
+    <None Include="..\src\Renderer\SPIRVPipeline.fbc" />
     <None Include="..\src\renderer\VisibilitySystem.inl" />
     <None Include="..\src\Renderer\Vulkan\HostAllocator.inl" />
     <None Include="..\src\Renderer\Vulkan\SmartPointers.inl" />
@@ -705,6 +714,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\COMPointer.inl" />
     <None Include="..\src\Utility\Containers\FlatMap.inl" />
     <None Include="..\src\Utility\Containers\FlatSet.inl" />
+    <None Include="..\src\Utility\Containers\HashSet.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveForwardList.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveList.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.inl" />
@@ -717,7 +727,6 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\Containers\String.inl" />
     <None Include="..\src\Utility\Containers\SystemString.inl" />
     <None Include="..\src\Utility\Containers\HashMap.inl" />
-    <None Include="..\src\Utility\Containers\UTF8String.inl" />
     <None Include="..\src\Utility\Counter.inl" />
     <None Include="..\src\Utility\DisposingResult.inl" />
     <None Include="..\src\Utility\Equals.inl" />
@@ -737,6 +746,7 @@ call "deploy.x64.bat"
     <None Include="..\src\Utility\Result.inl" />
     <None Include="..\src\Utility\ResultBase.inl" />
     <None Include="..\src\Utility\StringHash.inl" />
+    <None Include="..\src\Utility\SurjectiveQueryDatabase.inl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\resources\Eldritch2.Resources.rc" />

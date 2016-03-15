@@ -1,0 +1,12 @@
+file_identifier	"ESPD";
+file_extension	"E2SpirVPipelineDefinition";
+
+include "PipelineTypes.fbc"
+
+namespace Eldritch2.Renderer.FlatBuffers;
+
+table SpirVPipeline {
+	Usages	: [Usage];
+}
+
+root_type SpirVPipeline;

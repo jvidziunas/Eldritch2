@@ -1,5 +1,5 @@
 /*==================================================================*\
-  VulkanResult.inl
+  DeviceContext.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,27 +12,33 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Renderer/Vulkan/HostAllocator.hpp>
+#include <Renderer/Vulkan/SmartPointers.hpp>
+#include <Renderer/Vulkan/VulkanResult.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
 
-	template <typename VulkanObject>
-	ETInlineHint VulkanResult<VulkanObject>::VulkanResult( Vulkan::UniquePointer<VulkanObject>&& pointer ) : object( ::std::move( pointer ) ), result( VK_SUCCESS ) {}
+	class DeviceContext {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-// ---------------------------------------------------
+	public:
+		DeviceContext( Vulkan::UniquePointer<::VkDevice>&& device, ::Eldritch2::Allocator& allocator );
 
-	template <typename VulkanObject>
-	ETInlineHint VulkanResult<VulkanObject>::VulkanResult( const ::VkResult result ) : object( nullptr ), result( result ) {}
+		~DeviceContext() = default;
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	template <typename VulkanObject>
-	ETInlineHint VulkanResult<VulkanObject>::operator bool() const {
-		return VK_SUCCESS <= result;
-	}
+		Vulkan::VulkanResult<::VkDeviceMemory>	AllocateMemory( ::VkDeviceSize allocationSizeInBytes, ::Eldritch2::uint32 memoryTypeIndex );
+
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		Vulkan::UniquePointer<::VkDevice>	_device;
+		Vulkan::HostAllocator				_allocator;
+	};
 
 }	// namespace Vulkan
 }	// namespace Renderer

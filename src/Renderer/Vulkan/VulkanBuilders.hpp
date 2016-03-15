@@ -27,7 +27,7 @@ namespace Vulkan {
 
 	public:
 		//!	Constructs this @ref InstanceCreateInfo instance.
-		VulkanBuilder( ::Eldritch2::Allocator& allocator, uint32_t applicationVersion = VK_API_VERSION );
+		VulkanBuilder( ::Eldritch2::Allocator& allocator, uint32_t vulkanApiVersion = VK_API_VERSION );
 
 		~VulkanBuilder() = default;
 
@@ -78,6 +78,10 @@ namespace Vulkan {
 		PhysicalDeviceEnumerator( ::VkInstance instance, ::Eldritch2::Allocator& allocator );
 
 		~PhysicalDeviceEnumerator() = default;
+
+	// ---------------------------------------------------
+
+		::VkPhysicalDevice	GetTopDevice() const;
 
 	// ---------------------------------------------------
 

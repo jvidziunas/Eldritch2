@@ -37,10 +37,10 @@ namespace Vulkan {
 // ---------------------------------------------------
 
 	uint32 PhysicalDeviceProperties::GetIndexOfLargestHeapSupportingFlags( ::VkMemoryPropertyFlags flags ) const {
-		VkDeviceSize	selectedHeapSize( 0u );
-		uint32			selectedHeapIndex( static_cast<uint32>(-1) );
+		::VkDeviceSize	selectedHeapSize( 0u );
+		uint32_t		selectedHeapIndex( static_cast<uint32>(-1) );
 
-		for( uint32 heapIndex( 0u ); heapIndex < _memoryProperties.memoryHeapCount; ++heapIndex ) {
+		for( uint32_t heapIndex( 0u ); heapIndex < _memoryProperties.memoryHeapCount; ++heapIndex ) {
 			auto&	heapDescriptor( _memoryProperties.memoryHeaps[heapIndex] );
 
 			if( (flags == (heapDescriptor.flags & flags)) && (heapDescriptor.size > selectedHeapSize) ) {

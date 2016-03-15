@@ -50,8 +50,6 @@ namespace Eldritch2 {
 			if( ::std::align( alignmentInBytes, sizeInBytes, userPointer, allocationSize ) ) {
 				// Store the 'real' pointer that will be internally fed back to the allocator just before what the user sees.
 				static_cast<void**>(userPointer)[-1] = allocation;
-				ETRuntimeAssert( GetAllocationPointerFromAlignedUserPointer( userPointer ) == allocation );
-
 				return userPointer;
 			}
 

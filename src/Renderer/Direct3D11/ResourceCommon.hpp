@@ -13,6 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/Direct3D11/HLSLPipelineDefinitionView.hpp>
-#include <Renderer/Direct3D11/ShaderResourceResourceView.hpp>
+#include <Renderer/Direct3D11/ImageResourceView.hpp>
 #include <Renderer/Direct3D11/MeshResourceView.hpp>
 //------------------------------------------------------------------//

@@ -258,9 +258,6 @@
     <ClCompile Include="..\src\Utility\ScopedFPUController.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Utility\SurjectiveQueryEngine.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Win32ApplicationHelpers.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -357,9 +354,6 @@
     <ClCompile Include="..\src\System\Win32\SystemInterface.cpp">
       <Filter>Source Files\System\Win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Materials\MaterialCommon.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\textures\TextureHeader.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
@@ -367,9 +361,6 @@
       <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\MeshResourceView.cpp">
-      <Filter>Source Files\Renderer\Direct3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.cpp">
       <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\SwapChain.cpp">
@@ -534,9 +525,6 @@
     <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageBus.cpp">
       <Filter>Source Files\Scripting\Angelscript</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.ShaderResourceViewFactory.cpp">
-      <Filter>Source Files\Renderer\Direct3D11</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.PipelineViewFactory.cpp">
       <Filter>Source Files\Renderer\Direct3D11</Filter>
     </ClCompile>
@@ -654,9 +642,6 @@
     <ClCompile Include="..\src\Renderer\Vulkan\WorldView.cpp">
       <Filter>Source Files\Renderer\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.cpp">
-      <Filter>Source Files\Renderer\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Renderer\Vulkan\HostAllocator.cpp">
       <Filter>Source Files\Renderer\Vulkan</Filter>
     </ClCompile>
@@ -665,6 +650,36 @@
     </ClCompile>
     <ClCompile Include="..\src\Renderer\Vulkan\VulkanProperties.cpp">
       <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.PipelineFactory.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.MeshFactory.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionResourceView.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\MeshResourceView.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\DeviceContext.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\ImageResourceView.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Direct3D11\EngineService.ImageViewFactory.cpp">
+      <Filter>Source Files\Renderer\Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\SurjectiveQueryDatabase.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\EngineService.ImageFactory.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\VirtualTexture.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -693,9 +708,6 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\ScopedFPUController.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\SurjectiveQueryEngine.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\Win32ApplicationHelpers.hpp">
@@ -908,9 +920,6 @@
     <ClInclude Include="..\src\renderer\Textures\TextureUtilities.hpp">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\Materials\MaterialCommon.hpp">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\ForwardDeclarations.hpp">
       <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
@@ -921,9 +930,6 @@
       <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\ResourceCommon.hpp">
-      <Filter>Header Files\Renderer\Direct3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Renderer\Direct3D11\ShaderResourceResourceView.hpp">
       <Filter>Header Files\Renderer\Direct3D11</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Direct3D11\SwapChain.hpp">
@@ -1226,9 +1232,6 @@
     <ClInclude Include="..\src\Renderer\Vulkan\WorldView.hpp">
       <Filter>Header Files\Renderer\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionView.hpp">
-      <Filter>Header Files\Renderer\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Renderer\Vulkan\HostAllocator.hpp">
       <Filter>Header Files\Renderer\Vulkan</Filter>
     </ClInclude>
@@ -1240,6 +1243,27 @@
     </ClInclude>
     <ClInclude Include="..\src\Renderer\Vulkan\VulkanResult.hpp">
       <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\DeviceContext.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\SPIRVPipelineDefinitionResourceView.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\MeshResourceView.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Direct3D11\ImageResourceView.hpp">
+      <Filter>Header Files\Renderer\Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\SurjectiveQueryDatabase.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utility\Containers\HashSet.hpp">
+      <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\VirtualTexture.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1386,9 +1410,6 @@
     <None Include="..\src\Utility\Containers\SpatialHash.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
-    <None Include="..\src\Utility\Containers\UTF8String.inl">
-      <Filter>Source Files\Utility\Containers</Filter>
-    </None>
     <None Include="..\src\Utility\Math\StandardLibrary.inl">
       <Filter>Source Files\Utility\Math</Filter>
     </None>
@@ -1505,6 +1526,15 @@
     </None>
     <None Include="..\src\Renderer\Vulkan\VulkanResult.inl">
       <Filter>Source Files\Renderer\Vulkan</Filter>
+    </None>
+    <None Include="..\src\Renderer\SPIRVPipeline.fbc">
+      <Filter>IDL Files</Filter>
+    </None>
+    <None Include="..\src\Utility\SurjectiveQueryDatabase.inl">
+      <Filter>Source Files\Utility</Filter>
+    </None>
+    <None Include="..\src\Utility\Containers\HashSet.inl">
+      <Filter>Source Files\Utility\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

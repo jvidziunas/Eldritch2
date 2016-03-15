@@ -436,6 +436,23 @@ namespace Eldritch2 {
 		return stream;
 	}
 
+// ---------------------------------------------------
+
+	template <typename Character, class StringAllocator>
+	class Hash<::Eldritch2::String<Character, StringAllocator>> : public ::Eldritch2::Hash<Character*> {
+	public:
+		Hash() = default;
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		using ::Eldritch2::Hash<Character*>::operator();
+
+		ETNoAliasHint size_t operator()( const ::Eldritch2::String<Character, StringAllocator>& key, const size_t seed = 0 ) const {
+			return key.GetHashCode( seed );
+		}
+	};
+
 }	// namespace Eldritch2
 
 #if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_GCC )

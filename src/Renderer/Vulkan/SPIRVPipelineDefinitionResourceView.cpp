@@ -1,5 +1,5 @@
 /*==================================================================*\
-  SPIRVPipelineDefinitionView.cpp
+  SPIRVPipelineDefinitionResourceView.cpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,9 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Renderer/Vulkan/SPIRVPipelineDefinitionView.hpp>
+#include <Renderer/Vulkan/SPIRVPipelineDefinitionResourceView.hpp>
 #include <Utility/Containers/Range.hpp>
 #include <Utility/ErrorCode.hpp>
+//------------------------------------------------------------------//
+#include <Renderer/PipelineTypes_generated.h>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::FileSystem;
@@ -25,13 +27,18 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
 
-	SPIRVPipelineDefinitionView::SPIRVPipelineDefinitionView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ),
-																																										   _pipelines( { allocator, UTF8L("SPIR-V Pipeline Definition Allocator") } ) {}
+	SPIRVPipelineDefinitionResourceView::SPIRVPipelineDefinitionResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ), _pipeline( nullptr ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode SPIRVPipelineDefinitionView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
+	ErrorCode SPIRVPipelineDefinitionResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
 		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint const UTF8Char* const SPIRVPipelineDefinitionResourceView::GetSerializedDataTag() {
+		return UTF8L("SPIRVPipelineDefinition");
 	}
 
 }	// namespace Vulkan

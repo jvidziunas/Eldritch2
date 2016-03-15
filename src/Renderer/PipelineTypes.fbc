@@ -1,11 +1,11 @@
 namespace Eldritch2.Renderer.FlatBuffers;
 
-enum FillMode : ubyte {
+enum PolygonFillMode : ubyte {
 	Wireframe,
 	Solid
 }
 
-enum CullMode : ubyte {
+enum FaceCullMode : ubyte {
 	FrontFace,
 	BackFace,
 	None
@@ -95,8 +95,8 @@ struct StencilBehavior {
 }
 
 table RasterizerState {
-	FillMode						: FillMode				= Solid;
-	CullMode						: CullMode				= BackFace;
+	FillMode						: PolygonFillMode		= Solid;
+	CullMode						: FaceCullMode			= BackFace;
 	DepthBias						: int					= 0;
 	DepthBiasClamp					: float					= 0.0;
 	SlopeScaledDepthBias			: float					= 0.0;
@@ -131,8 +131,8 @@ table UnorderedAccessViewState {
 }
 
 table Usage {
-	RasterizerState					: RasterizerState (required);
-	DepthStencilState				: DepthStencilState (required);
+	RasterizerBehavior				: RasterizerState (required);
+	DepthStencilBehavior			: DepthStencilState (required);
 	RenderTargets					: [RenderTargetState] (required);
 	UnorderedAccessViews			: [UnorderedAccessViewState] (required);
 	VertexShaderIndex				: ushort;

@@ -18,32 +18,6 @@
 namespace Eldritch2 {
 
 	template <class Allocator = ::Eldritch2::ChildAllocator>
-	class UTF8String : public String<::Eldritch2::UTF8Char, Allocator> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint UTF8String( AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint UTF8String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref UTF8String instance.
-		template <size_t literalLength>
-		ETInlineHint UTF8String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref UTF8String instance.
-		template <class AlternateAllocator>
-		ETInlineHint UTF8String( const ::Eldritch2::UTF8String<AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint UTF8String( ::Eldritch2::UTF8String<Allocator>&& sourceString );
-		//!	Constructs this @ref UTF8String instance.
-		ETInlineHint explicit UTF8String( const ::Eldritch2::UTF8String<Allocator>& sourceString ) = delete;
-
-		ETInlineHint ~UTF8String() = default;
-	};
+	using UTF8String = ::Eldritch2::String<::Eldritch2::UTF8Char, Allocator>;
 
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Utility/Containers/UTF8String.inl>
-//------------------------------------------------------------------//

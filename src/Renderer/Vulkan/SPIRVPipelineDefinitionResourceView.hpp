@@ -1,49 +1,35 @@
 /*==================================================================*\
-  ShaderResourceResourceView.hpp
+  SPIRVPipelineDefinitionResourceView.hpp
   ------------------------------------------------------------------
   Purpose:
-
+  
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Renderer/Vulkan/SmartPointers.hpp>
 #include <Packages/ResourceView.hpp>
-#include <Utility/MPL/IntTypes.hpp>
-#include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
-#if( ET_COMPILER_IS_MSVC )
-//	MSVC complains about macro redefinitions, since a few DirectX components separately
-//	define some HRESULT values without an include guard. The definitions themselves are consistent,
-//	so just disable the warning.
-#	pragma warning( push )
-#	pragma warning( disable : 4005 )
-#endif
-#include <D3D11.h>
-#if( ET_COMPILER_IS_MSVC )
-#	pragma warning( pop )
-#endif
+#include <vulkan/vulkan.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Renderer {
-namespace Direct3D11 {
+namespace Vulkan {
 
-	class ShaderResourceResourceView : public FileSystem::ResourceView {
+	class SPIRVPipelineDefinitionResourceView : public FileSystem::ResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref ShaderResourceResourceView instance.
-		ShaderResourceResourceView( FileSystem::ContentLibrary&			owningLibrary,
-									FileSystem::ContentPackage&			package,
-									const ::Eldritch2::UTF8Char* const	name,
-									::Eldritch2::Allocator&				allocator );
+		//!	Constructs this @ref SPIRVPipelineDefinitionResourceView instance.
+		SPIRVPipelineDefinitionResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
-		~ShaderResourceResourceView() = default;
+		~SPIRVPipelineDefinitionResourceView() = default;
 
 	// ---------------------------------------------------
 
@@ -56,9 +42,9 @@ namespace Direct3D11 {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		Utility::COMPointer<::ID3D11ShaderResourceView>	_shaderView;
+		Vulkan::UniquePointer<VkPipeline>	_pipeline;
 	};
 
-}	// namespace Direct3D11
+}	// namespace Vulkan
 }	// namespace Renderer
 }	// namespace Eldritch2

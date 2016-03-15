@@ -48,7 +48,9 @@ namespace Vulkan {
 	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
 															   _allocator( GetEngineAllocator(), UTF8L("Vulkan Root Allocator") ),
 															   _vulkan( nullptr, { static_cast<const VkAllocationCallbacks*>(_allocator) } ),
-															   _preferredAdapterNameForSingleGpu( "", GetEngineAllocator() ),
+															   _enabledInstanceLayers( GetEngineAllocator() ),
+															   _enabledDeviceLayers( GetEngineAllocator() ),
+															   _preferredAdapterNameForSingleGpu( GetEngineAllocator() ),
 															   _allowAfrMultiGpu( false ) {}
 
 // ---------------------------------------------------
@@ -91,12 +93,23 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& /*visitor*/ ) {
+	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
+		visitor.PushSection( UTF8L("Vulkan") );
+
+		visitor.Register( UTF8L("EnabledInstanceLayers"), _enabledInstanceLayers ).Register( UTF8L("EnabledDeviceLayers"), _enabledDeviceLayers );
+		visitor.Register( UTF8L("PreferredAdapterNameForSingleGpu"), _preferredAdapterNameForSingleGpu ).Register( UTF8L("AllowAfrMultiGpu"), _allowAfrMultiGpu );
+
+		_pipelineFactory.AcceptInitializationVisitor( visitor );
+		_imageFactory.AcceptInitializationVisitor( visitor );
+		_meshFactory.AcceptInitializationVisitor( visitor );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& /*visitor*/ ) {
+	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
+		visitor.PublishFactory( _pipelineFactory.GetSerializedDataTag(), _pipelineFactory );
+		visitor.PublishFactory( _imageFactory.GetSerializedDataTag(), _imageFactory );
+		visitor.PublishFactory( _meshFactory.GetSerializedDataTag(), _meshFactory );
 	}
 
 // ---------------------------------------------------
@@ -118,6 +131,17 @@ namespace Vulkan {
 			enumerator.FilterDevices( [preferredDeviceName] ( const Vulkan::PhysicalDeviceProperties& deviceProperties ) {
 				return deviceProperties.DescribesNamedDevice( preferredDeviceName );
 			} );
+		}
+
+		if( const auto desiredPhysicalDevice = enumerator.GetTopDevice() ) {
+			auto	createDeviceResult( LogicalDeviceBuilder( _allocator ).Create( desiredPhysicalDevice, _allocator ) );
+
+			if( createDeviceResult ) {
+				const auto	deviceContext( new(_allocator, Allocator::AllocationDuration::Normal) DeviceContext( ::std::move( createDeviceResult.object ), _allocator ) );
+
+				_imageFactory.CreateDeviceResources( *deviceContext );
+				_meshFactory.CreateDeviceResources( *deviceContext );
+			}
 		}
 	}
 

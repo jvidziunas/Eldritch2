@@ -7,7 +7,7 @@
   (preferring the platform's standard implementation, if available)
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -23,23 +23,22 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this MallocAllocator instance.
+		//!	Constructs this @ref MallocAllocator instance.
 		MallocAllocator( const ::Eldritch2::UTF8Char* name );
 
-		//!	Destroys this MallocAllocator instance.
-		~MallocAllocator();
+		~MallocAllocator() = default;
 
 	// ---------------------------------------------------
 
-		ETRestrictHint void*	Allocate( SizeType size, ::Eldritch2::AllocationOptions options = ::Eldritch2::AllocationOption::DEFAULT ) override sealed;
+		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
 
-		ETRestrictHint void*	Reallocate( void* address, SizeType sizeInBytes, ::Eldritch2::ReallocationOptions options = ::Eldritch2::ReallocationOption::DEFAULT ) override sealed;
+		//! Attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size. The contents of the source memory are then copied over into the new region, if appropriate.
+		ETRestrictHint void*	Reallocate( void* const address, const SizeType sizeInBytes, const ReallocationOptions options ) override sealed;
+		//! Attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size. The contents of the source memory are then copied over into the new region, if appropriate.
+		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
 
-		ETRestrictHint void*	Reallocate( void* address, SizeType newSizeInBytes, SizeType alignmentInBytes, ::Eldritch2::ReallocationOptions options = ::Eldritch2::ReallocationOption::DEFAULT ) override sealed;
-
-	// ---------------------------------------------------
-
-		void	Deallocate( void* address ) override sealed;
+		//! Releases a chunk of memory previously allocated by @ref Allocate() or @ref Reallocate().
+		void					Deallocate( void* const address ) override sealed;
 	};
 
 }	// namespace Eldritch2

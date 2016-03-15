@@ -48,8 +48,8 @@ namespace Tools {
 
 	// ---
 
-		visitor.AddArgument(	UTF8L("--import"),		UTF8L("-i"),	::std::bind( &Bakinator::AddImport, this, _1, _2 ) );
-		visitor.AddArgument(	UTF8L("--packageName"),	UTF8L("-n"),	::std::bind( &Bakinator::SetOutputFileName, this, _1, _2 ) );
+		visitor.AddArgument( UTF8L("--import"),			UTF8L("-i"),	::std::bind( &Bakinator::AddImport, this, _1, _2 ) );
+		visitor.AddArgument( UTF8L("--packageName"),	UTF8L("-n"),	::std::bind( &Bakinator::SetOutputFileName, this, _1, _2 ) );
 
 		visitor.AddInputFileHandler( ::std::bind( &Bakinator::AddExport, this, _1, _2 ) );
 	}
@@ -66,7 +66,7 @@ namespace Tools {
 		ResizableArray<Offset<flatbuffers::String>>	pendingImports( { GetAllocator(), UTF8L("Pending Import Collection Allocator") } );
 		ResizableArray<Offset<Export>>				pendingExports( { GetAllocator(), UTF8L("Pending Export Collection Allocator") } );
 		FlatBufferBuilder							builder;
-		HeaderBuilder								headerBuilder( builder );
+		PackageHeaderBuilder						headerBuilder( builder );
 		uint64										dataBlobSize( 0u );
 		auto										outputWriter( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputFileName.GetCharacterArray() ) );
 		auto										dataFileWriter( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputDataBlobName.GetCharacterArray() ) );
@@ -102,10 +102,10 @@ namespace Tools {
 			dataBlobSize += reader->GetAccessibleRegionSizeInBytes();
 		}
 
-		FinishHeaderBuffer( builder,
-							CreateHeader( builder,
-										  pendingImports ? builder.CreateVector( pendingImports.Data(), pendingImports.Size() ) : 0,
-										  pendingExports ? builder.CreateVector( pendingExports.Data(), pendingExports.Size() ) : 0 ) );
+		FinishPackageHeaderBuffer( builder,
+								   CreatePackageHeader( builder,
+								   						pendingImports ? builder.CreateVector( pendingImports.Data(), pendingImports.Size() ) : 0,
+								   						pendingExports ? builder.CreateVector( pendingExports.Data(), pendingExports.Size() ) : 0 ) );
 
 		outputWriter->Write( builder.GetBufferPointer(), builder.GetSize() );
 

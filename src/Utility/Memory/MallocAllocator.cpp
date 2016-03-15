@@ -15,6 +15,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/MallocAllocator.hpp>
+//------------------------------------------------------------------//
+#include <memory>
 #if( ET_COMPILER_IS_MSVC || ET_COMPILER_IS_INTEL )
 #	include <malloc.h>
 #elif( ET_COMPILER_IS_GCC )
@@ -30,30 +32,47 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	MallocAllocator::~MallocAllocator() {}
-
-// ---------------------------------------------------
-
-	ETRestrictHint void* MallocAllocator::Allocate( SizeType sizeInBytes, AllocationOptions ) {
+	ETRestrictHint void* MallocAllocator::Allocate( const SizeType sizeInBytes, const AllocationOptions /*options*/ ) {
 		return malloc( sizeInBytes );
 	}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* MallocAllocator::Reallocate( void* address, SizeType sizeInBytes, ReallocationOptions options ) {
+	ETRestrictHint void* MallocAllocator::Reallocate( void* const address, const SizeType sizeInBytes, const ReallocationOptions options ) {
+		if( ReallocationOption::FailOnMove == (options & ReallocationOption::FailOnMove) ) {
+			return nullptr;
+		}
+
+		return realloc( address, sizeInBytes );
+	}
+
+// ---------------------------------------------------
+
+	ETRestrictHint void* MallocAllocator::Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) {
+		if( ReallocationOption::FailOnMove == (options & ReallocationOption::FailOnMove) ) {
+			return nullptr;
+		}
+
+		SizeType	allocationSize( EstimateActualAllocationSizeInBytes( newSizeInBytes, alignmentInBytes ) );
+
+		if( const auto allocation = realloc( GetAllocationPointerFromAlignedUserPointer( address ), allocationSize ) ) {
+			void*	userPointer( static_cast<void**>(allocation) + 1 );
+
+			if( ::std::align( alignmentInBytes, newSizeInBytes, userPointer, allocationSize ) ) {
+				// Store the 'real' pointer that will be internally fed back to the allocator just before what the user sees.
+				static_cast<void**>(userPointer)[-1] = allocation;
+
+				return userPointer;
+			}
+		}
+
 		return nullptr;
 	}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* MallocAllocator::Reallocate( void* address, SizeType newSizeInBytes, SizeType alignmentInBytes, ReallocationOptions options ) {
-		return nullptr;
-	}
-
-// ---------------------------------------------------
-
-	void MallocAllocator::Deallocate( void* address ) {
-		return free( address );
+	void MallocAllocator::Deallocate( void* const address ) {
+		free( address );
 	}
 
 }	// namespace Eldritch2

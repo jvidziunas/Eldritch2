@@ -160,8 +160,8 @@ namespace Detail {
 
 // ---
 
-	template <typename T>
-	class Hash<T*> {
+	template <>
+	class Hash<void*> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -171,22 +171,43 @@ namespace Detail {
 
 	// ---------------------------------------------------
 
-		ETNoAliasHint size_t operator()( const T* const key, const size_t seed = static_cast<size_t>(0) ) const {
-			// Divide by type alignment in order to improve distributions (low bits are almost always zero otherwise!)
-			return static_cast<size_t>( (reinterpret_cast<::Eldritch2::uintptr>(key) / sizeof(*key)) ^ seed );
+		ETNoAliasHint size_t operator()( const void* const key, const size_t seed = static_cast<size_t>(0) ) const {
+			return static_cast<size_t>( reinterpret_cast<::Eldritch2::uintptr>(key) + seed );
 		}
 	};
 
 // ---
 
-	template <typename T>
-	class Hash<const T*> : public ::Eldritch2::Hash<T*> {
+	template <>
+	class Hash<const void*> : public ::Eldritch2::Hash<void*> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		Hash() = default;
 
 		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		using Hash<void*>::operator();
+	};
+
+// ---
+
+	template <>
+	class Hash<::Eldritch2::uintptr> {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		Hash() = default;
+
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		ETNoAliasHint size_t operator()( const ::Eldritch2::uintptr key, const size_t seed = static_cast<size_t>(0) ) const {
+			return static_cast<size_t>(key + seed);
+		}
 	};
 
 // ---
@@ -209,14 +230,53 @@ namespace Detail {
 
 // ---
 
-	template <typename T1, typename T2>
-	class Hash<const ::Eldritch2::Pair<T1, T2>> : public ::Eldritch2::Hash<::Eldritch2::Pair<T1, T2>> {
+	template <typename T>
+	class Hash<T*> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		Hash() = default;
 
 		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		ETNoAliasHint size_t operator()( const T* const key, const size_t seed = static_cast<size_t>(0) ) const {
+			// Divide by type alignment in order to improve distributions (low bits are almost always zero otherwise!)
+			return static_cast<size_t>( (reinterpret_cast<::Eldritch2::uintptr>(key) / sizeof(*key)) + seed );
+		}
+	};
+
+// ---
+
+	template <typename T>
+	class Hash<const T*> : public ::Eldritch2::Hash<T*> {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		Hash() = default;
+
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		using Hash<T*>::operator();
+	};
+
+// ---
+
+	template <typename T>
+	class Hash<const T> : public ::Eldritch2::Hash<T> {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		Hash() = default;
+
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		using Hash<T>::operator();
 	};
 
 }	// namespace Eldritch2

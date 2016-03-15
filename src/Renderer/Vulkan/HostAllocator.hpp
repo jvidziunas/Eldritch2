@@ -26,6 +26,8 @@ namespace Vulkan {
 
 	public:
 		HostAllocator( ::Eldritch2::Allocator& backingAllocator, const ::Eldritch2::UTF8Char* const name );
+		HostAllocator( const HostAllocator& ) = delete;
+		HostAllocator( HostAllocator&& );
 
 		~HostAllocator() = default;
 

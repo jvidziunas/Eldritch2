@@ -113,6 +113,29 @@ namespace Detail {
 // ---
 
 	template <>
+	class InstanceDeleter<::VkDeviceMemory> : public DeviceChildDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const ::VkDevice device, const ::VkAllocationCallbacks* const callbacks = nullptr ) : DeviceChildDeleterBase( device, callbacks ) {}
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const InstanceDeleter& ) = default;
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter() = default;
+
+		~InstanceDeleter() = default;
+
+	// ---------------------------------------------------
+
+		void operator()( ::VkDeviceMemory deviceMemory ) {
+			::vkFreeMemory( _device, deviceMemory, _allocationCallbacks );
+		}
+	};
+
+// ---
+
+	template <>
 	class InstanceDeleter<::VkPipeline> : public DeviceChildDeleterBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -130,6 +153,121 @@ namespace Detail {
 
 		void operator()( ::VkPipeline pipeline ) {
 			::vkDestroyPipeline( _device, pipeline, _allocationCallbacks );
+		}
+	};
+
+// ---
+
+	template <>
+	class InstanceDeleter<::VkBuffer> : public DeviceChildDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const ::VkDevice device, const ::VkAllocationCallbacks* const callbacks = nullptr ) : DeviceChildDeleterBase( device, callbacks ) {}
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const InstanceDeleter& ) = default;
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter() = default;
+
+		~InstanceDeleter() = default;
+
+	// ---------------------------------------------------
+
+		void operator()( ::VkBuffer buffer ) {
+			::vkDestroyBuffer( _device, buffer, _allocationCallbacks );
+		}
+	};
+
+// ---
+
+	template <>
+	class InstanceDeleter<::VkImage> : public DeviceChildDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const ::VkDevice device, const ::VkAllocationCallbacks* const callbacks = nullptr ) : DeviceChildDeleterBase( device, callbacks ) {}
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const InstanceDeleter& ) = default;
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter() = default;
+
+		~InstanceDeleter() = default;
+
+	// ---------------------------------------------------
+
+		void operator()( ::VkImage image ) {
+			::vkDestroyImage( _device, image, _allocationCallbacks );
+		}
+	};
+
+// ---
+
+	template <>
+	class InstanceDeleter<::VkFence> : public DeviceChildDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const ::VkDevice device, const ::VkAllocationCallbacks* const callbacks = nullptr ) : DeviceChildDeleterBase( device, callbacks ) {}
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const InstanceDeleter& ) = default;
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter() = default;
+
+		~InstanceDeleter() = default;
+
+	// ---------------------------------------------------
+
+		void operator()( ::VkFence fence ) {
+			::vkDestroyFence( _device, fence, _allocationCallbacks );
+		}
+	};
+
+// ---
+
+	template <>
+	class InstanceDeleter<::VkBufferView> : public DeviceChildDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const ::VkDevice device, const ::VkAllocationCallbacks* const callbacks = nullptr ) : DeviceChildDeleterBase( device, callbacks ) {}
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const InstanceDeleter& ) = default;
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter() = default;
+
+		~InstanceDeleter() = default;
+
+	// ---------------------------------------------------
+
+		void operator()( ::VkBufferView view ) {
+			::vkDestroyBufferView( _device, view, _allocationCallbacks );
+		}
+	};
+
+// ---
+
+	template <>
+	class InstanceDeleter<::VkImageView> : public DeviceChildDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const ::VkDevice device, const ::VkAllocationCallbacks* const callbacks = nullptr ) : DeviceChildDeleterBase( device, callbacks ) {}
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const InstanceDeleter& ) = default;
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter() = default;
+
+		~InstanceDeleter() = default;
+
+	// ---------------------------------------------------
+
+		void operator()( ::VkImageView image ) {
+			::vkDestroyImageView( _device, image, _allocationCallbacks );
 		}
 	};
 
