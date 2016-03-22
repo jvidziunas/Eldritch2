@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
+#include <Utility/Memory/InstanceNew.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Physics/PhysX/WorldView.hpp>
 #include <Animation/KeyCache.hpp>
@@ -73,31 +74,27 @@ namespace PhysX {
 // ---------------------------------------------------
 
 	ETNoAliasHint void WorldView::PhysicalArmature::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		struct FunctionHelper {
-			static PhysicalArmature* ETScriptAPICall Factory0( const RigidTransformMarshal& transform, const StringMarshal& resourceName ) {
-				const auto	resource( GetActiveWorldView().GetContentLibrary().ResolveViewByName<FileSystem::ResourceView>( resourceName.GetCharacterArray() ) );
+		auto	builder( typeRegistrar.BeginReferenceTypeRegistration<PhysicalArmature>() );
 
-				if( !resource ) {
-					return nullptr;
-				}
+		// Factory registration
+		builder.ExposeFactory<const RigidTransformMarshal&, const StringMarshal&>( [] ( const RigidTransformMarshal& transform, const StringMarshal& resourceName ) -> PhysicalArmature* {
+			const auto	resource( GetActiveWorldView().GetContentLibrary().ResolveViewByName<FileSystem::ResourceView>( resourceName.AsCString() ) );
 
-				PhysX::UniquePointer<PxAggregate>	aggregate( PxGetPhysics().createAggregate( 70u, false ) );
-
-				return new(GetActiveWorldView()._armatureAllocator, Allocator::AllocationDuration::Normal) PhysicalArmature( ::std::move( aggregate ) );
+			if( !resource ) {
+				return nullptr;
 			}
-		};
 
-	// ---
+			PhysX::UniquePointer<PxAggregate>	aggregate( PxGetPhysics().createAggregate( 70u, false ) );
 
-		FixedStackAllocator<64u>	allocator( UTF8L("PhysicalArmature::ExposeScriptAPI() Temporary Allocator") );
-		auto						typeBuilderResult( typeRegistrar.RegisterUserDefinedReferenceType<PhysicalArmature>( allocator ) );
-		auto&						typeBuilder( *typeBuilderResult.object );
+			return new(GetActiveWorldView()._armatureAllocator, Allocator::AllocationDuration::Normal) PhysicalArmature( ::std::move( aggregate ) );
+		} );
 
-		ETRuntimeAssert( typeBuilderResult );
-
-		typeBuilder.ExposeFactory( &FunctionHelper::Factory0 );
-
-		allocator.Delete( typeBuilder );
+		// Reference cast registration
+		builder.ExposeReferenceCast<Armature>( [] ( PhysicalArmature* armature ) {
+			return static_cast<Armature*>(armature);
+		} ).ExposeReferenceCast<const Armature>( [] ( const PhysicalArmature* armature ) {
+			return static_cast<const Armature*>(armature);
+		} );
 	}
 
 }	// namespace PhysX

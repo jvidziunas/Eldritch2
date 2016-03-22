@@ -69,16 +69,13 @@ namespace PhysX {
 // ---------------------------------------------------
 
 	ETNoAliasHint void WorldView::TriggerVolume::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		FixedStackAllocator<64u>	allocator( UTF8L("TriggerVolume::ExposeScriptAPI() Temporary Allocator") );
-		auto						typeBuilderResult( typeRegistrar.RegisterUserDefinedReferenceType<TriggerVolume>( allocator ) );
+		auto	builder( typeRegistrar.BeginReferenceTypeRegistration<TriggerVolume>() );
 
-		ETRuntimeAssert( typeBuilderResult );
-
-		auto&	typeBuilder( *typeBuilderResult.object );
-
-		typeBuilder.ExposeVirtualProperty( "Enabled", &TriggerVolume::SetEnabled ).ExposeVirtualProperty( "Enabled", &TriggerVolume::GetEnabled );
-
-		allocator.Delete( typeBuilder );
+		builder.ExposeVirtualProperty<bool>( "Enabled", [] ( TriggerVolume* collider, bool value ) {
+			collider->SetEnabled( value );
+		} ).ExposeVirtualProperty<bool>( "Enabled", [] ( TriggerVolume* collider ) {
+			return collider->GetEnabled();
+		} );
 	}
 
 // ---------------------------------------------------

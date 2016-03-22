@@ -15,7 +15,9 @@
 #include <FlatBufferMetadataBuilderVisitor.hpp>
 #include <FileSystem/SynchronousFileWriter.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
+#include <Scripting/AngelScript/ApiExport.hpp>
 #include <Utility/Containers/Range.hpp>
+#include <iostream>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -37,7 +39,14 @@ namespace Tools {
 																			 _fileAccessorFactory(),
 																			 _scriptBuilder(),
 																			 _outputModuleName( { GetAllocator(), UTF8L("Output Module Name String Allocator") } ),
-																			 _inputFiles( { GetAllocator(), UTF8L("Input File Name Collection Allocator") } ) {}
+																			 _engineApiDescriptorPath( { GetAllocator(), UTF8L("Engine API Descriptor Path Allocator") } ),
+																			 _inputFiles( { GetAllocator(), UTF8L("Input File Name Collection Allocator") } ) {
+		auto callback( [] ( const asSMessageInfo* msg, void* /*param*/ ) {
+			::std::cerr << msg->section << '(' << msg->row << ", " << msg->col << "): " << msg->message << ::std::endl;
+		} );
+
+		_engine->SetMessageCallback( asFunctionPtr( static_cast<void (ETStdCall*)(const asSMessageInfo*, void*)>(callback) ), nullptr, ::asECallConvTypes::asCALL_STDCALL );
+	}
 
 // ---------------------------------------------------
 
@@ -83,17 +92,17 @@ namespace Tools {
 		// been associated with the element, and then dispatch out to the visitor if appropriate.
 		{	visitor.BeginTypeMetadataProcessing();
 
-			for( uint32 index( 0u ), typeCount( scriptModule->GetObjectTypeCount() ); index != typeCount; ++index ) {
+			for( uint32 index( 0u ), typeCount( scriptModule->GetObjectTypeCount() ); index < typeCount; ++index ) {
 				const auto	type( scriptModule->GetObjectTypeByIndex( index ) );
 				int			typeID( type->GetTypeId() );
 
-				for( uint32 methodIndex( 0u ), methodCount( type->GetMethodCount() ); index != methodCount; ++methodIndex ) {
+				for( uint32 methodIndex( 0u ), methodCount( type->GetMethodCount() ); methodIndex < methodCount; ++methodIndex ) {
 					if( auto metadata = GetScriptBuilder().GetMetadataStringForTypeMethod( typeID, type->GetMethodByIndex( methodIndex ) ) ) {
-						visitor.ProcessTypePropertyMetadata( methodIndex, metadata );
+						visitor.ProcessTypeMethodMetadata( methodIndex, metadata );
 					}
 				}
 
-				for( uint32 propertyIndex( 0u ), propertyCount( type->GetPropertyCount() ); index != propertyCount; ++propertyIndex ) {
+				for( uint32 propertyIndex( 0u ), propertyCount( type->GetPropertyCount() ); propertyIndex < propertyCount; ++propertyIndex ) {
 					if( auto metadata = GetScriptBuilder().GetMetadataStringForTypeProperty( typeID, static_cast<int>(propertyIndex) ) ) {
 						visitor.ProcessTypePropertyMetadata( propertyIndex, metadata );
 					}
@@ -164,19 +173,27 @@ namespace Tools {
 
 	// ---
 
-		OutputStream	stream( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputModuleName.GetCharacterArray() ) );
+		OutputStream	stream( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputModuleName.AsCString() ) );
 
-		if( !stream.writer || (nullptr == GetScriptBuilder().GetModule()) ) {
+		if( !stream.writer || (!GetScriptBuilder().GetModule()) ) {
 			return -1;
+		}
+
+		if( _engineApiDescriptorPath ) {
+			const auto	apiDescriptorFile( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), _engineApiDescriptorPath.AsCString() ) );
+
+			if( !apiDescriptorFile || !Scripting::AngelScript::ImportScriptApi( GetAllocator(), *_engine.get(), *apiDescriptorFile ) ) {
+				return -1;
+			}
 		}
 
 		// Collate all the source script files together.
 		for( const auto& fileName : _inputFiles ) {
 			// Create a view of the source script file.
-			auto	mappedFile( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), fileName.GetCharacterArray() ) );
+			auto	mappedFile( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), fileName.AsCString() ) );
 
 			// Try to append all the data from source.
-			if( !mappedFile || (0 > GetScriptBuilder().AddSectionFromMemory( fileName.GetCharacterArray(), static_cast<const char*>(mappedFile->GetAddressForFileByteOffset( 0u )), mappedFile->GetAccessibleRegionSizeInBytes() )) ) {
+			if( !mappedFile || (0 > GetScriptBuilder().AddSectionFromMemory( fileName.AsCString(), static_cast<const char*>(mappedFile->GetAddressForFileByteOffset( 0u )), mappedFile->GetAccessibleRegionSizeInBytes() )) ) {
 				return -1;
 			}
 		}
@@ -192,7 +209,7 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
-		const ::Eldritch2::UTF8Char	extensionString[]	= UTF8L(".AngelScriptBytecodeMetadata");
+		const ::Eldritch2::UTF8Char	extensionString[]	= UTF8L(".AngelScriptBytecodePackage");
 
 		_outputModuleName.Assign( argument, argumentEnd );
 
@@ -207,10 +224,23 @@ namespace Tools {
 		}
 
 		// Internally, the module name won't have the extension.
-		GetScriptBuilder().StartNewModule( _engine.get(), _outputModuleName.GetCharacterArray() );
+		GetScriptBuilder().StartNewModule( _engine.get(), _outputModuleName.AsCString() );
 
 		// Add the file extension back on. This is used during the actual processing step to create the output file.
 		_outputModuleName.Append( extensionString );
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	template <class GlobalAllocator, class FileAccessorFactory>
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetApiDescriptorPath( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+		_engineApiDescriptorPath.Assign( argument, argumentEnd );
+
+		if( _engineApiDescriptorPath ) {
+			_engineApiDescriptorPath.EnsureEndsWith( UTF8L(".E2AngelscriptApi") );
+		}
 
 		return 0;
 	}
@@ -241,9 +271,9 @@ namespace Tools {
 
 	// ---
 
-		visitor.AddTypedArgument<int>(	UTF8L( "--optimizationLevel" ),	UTF8L( "-o" ),	::std::bind( &ScriptCompiler::SetOptimizationLevel, this, _1 ) );
+		visitor.AddTypedArgument<int>(	UTF8L("--optimizationLevel"),	UTF8L("-o"),	::std::bind( &ScriptCompiler::SetOptimizationLevel, this, _1 ) );
 		visitor.AddArgument(			UTF8L("--moduleName"),			UTF8L("-m"),	::std::bind( &ScriptCompiler::SetOutputModuleName, this, _1, _2 ) );
-		
+		visitor.AddArgument(			UTF8L("--apiDescriptorPath"),	UTF8L("-a"),	::std::bind( &ScriptCompiler::SetApiDescriptorPath, this, _1, _2 ) );
 
 		visitor.AddInputFileHandler( ::std::bind( &ScriptCompiler::AddInputFile, this, _1, _2 ) );
 		

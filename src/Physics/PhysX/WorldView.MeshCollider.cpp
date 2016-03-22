@@ -19,7 +19,6 @@
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Physics/PhysX/WorldView.hpp>
-#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #include <PxRigidActor.h>
 #include <PxAggregate.h>
@@ -86,30 +85,23 @@ namespace PhysX {
 // ---------------------------------------------------
 
 	ETNoAliasHint void WorldView::MeshCollider::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		struct FunctionHelper {
-			static MeshCollider* ETScriptAPICall Factory0( PhysicalArmature& armature, const StringMarshal& resourceName ) {
-				const auto	resource( GetActiveWorldView().GetContentLibrary().ResolveViewByName<MeshResourceView>( resourceName.GetCharacterArray() ) );
+		auto	builder( typeRegistrar.BeginReferenceTypeRegistration<MeshCollider>() );
 
-				if( !resource ) {
-					return nullptr;
-				}
+		builder.ExposeFactory<PhysicalArmature*, const StringMarshal&>( [] ( PhysicalArmature* armature, const StringMarshal& resourceName ) -> MeshCollider* {
+			const auto	resource( GetActiveWorldView().GetContentLibrary().ResolveViewByName<MeshResourceView>( resourceName.AsCString() ) );
 
-				return new(GetActiveWorldView()._componentAllocator, Allocator::AllocationDuration::Normal) MeshCollider( armature, *resource );
+			if( !resource || !armature ) {
+				return nullptr;
 			}
-		};
 
-	// ---
-
-		FixedStackAllocator<64u>	allocator( UTF8L("MeshCollider::ExposeScriptAPI() Temporary Allocator") );
-		auto						typeBuilderResult( typeRegistrar.RegisterUserDefinedReferenceType<MeshCollider>( allocator ) );
-		auto&						typeBuilder( *typeBuilderResult.object );
-
-		ETRuntimeAssert( typeBuilderResult );
-
-		typeBuilder.ExposeFactory( &FunctionHelper::Factory0 );
-		typeBuilder.ExposeVirtualProperty( "Enabled", &MeshCollider::SetEnabled ).ExposeVirtualProperty( "Enabled", &MeshCollider::GetEnabled );
-
-		allocator.Delete( typeBuilder );
+			return new(GetActiveWorldView()._componentAllocator, Allocator::AllocationDuration::Normal) MeshCollider( *armature, *resource );
+		} );
+		
+		builder.ExposeVirtualProperty<bool>( "Enabled", [] ( MeshCollider* collider, bool value ) {
+			collider->SetEnabled( value );
+		} ).ExposeVirtualProperty<bool>( "Enabled", [] ( const MeshCollider* collider ) {
+			return collider->GetEnabled();
+		} );
 	}
 
 // ---------------------------------------------------

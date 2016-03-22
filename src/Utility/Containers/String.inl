@@ -41,6 +41,11 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
+	ETInlineHint String<Character, Allocator>::String( const CharacterType* const string, AllocatorType&& allocator = AllocatorType() ) : String( string, ::Eldritch2::FindEndOfString( string ), ::std::move( allocator ) ) {}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>::String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator ) : _underlyingContainer( string, static_cast<SizeType>(stringEnd - string), ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
@@ -64,61 +69,111 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::IteratorToFirstInstance( const CharacterType character ) const {
-		return ::Eldritch2::FindFirstInstance( GetCharacterArray(), character );
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindFirstInstance( CharacterType character ) const {
+		return FindFirstInstance( Begin(), character );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::IteratorToFirstInstance( const CharacterType* const needle ) const {
-		return ::Eldritch2::FindFirstInstance( GetCharacterArray(), needle );
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindFirstInstance( const CharacterType* const needle ) const {
+		return FindFirstInstance( Begin(), needle );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::IteratorToFirstInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const {
-		auto	position( IteratorToFirstInstance( needle ) );
-
-		return position ? position + ::Eldritch2::StringLength( needle ) : nullptr;
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindFirstInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics semantics ) const {
+		return FindFirstInstance( Begin(), needle, semantics );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::IteratorToLastInstance( const CharacterType character ) const {
-		return ::Eldritch2::FindLastInstance( GetCharacterArray(), character );
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindFirstInstance( ConstIterator startPosition, CharacterType character ) const {
+		const auto	position( ::Eldritch2::FindFirstInstance( startPosition, character ) );
+
+		return position ? position : End();
+	}
+
+// ---------------------------------------------------
+	
+	template <typename Character, class Allocator>
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle ) const {
+		const auto	position( ::Eldritch2::FindFirstInstance( startPosition, needle ) );
+
+		return position ? position : End();
+	}
+
+// ---------------------------------------------------
+	
+	template <typename Character, class Allocator>
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const {
+		auto	position( ::Eldritch2::FindFirstInstance( startPosition, needle ) );
+
+		return position ? position + ::Eldritch2::StringLength( needle ) : End();
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::IteratorToLastInstance( const CharacterType* const needle ) const {
-		return ::Eldritch2::FindLastInstance( GetCharacterArray(), needle );
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindLastInstance( CharacterType character ) const {
+		return FindLastInstance( Begin(), character );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::IteratorToLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const {
-		auto	position( IteratorToLastInstance( needle ) );
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindLastInstance( const CharacterType* const needle ) const {
+		return FindLastInstance( Begin(), needle );
+	}
 
-		return position ? position + ::Eldritch2::StringLength( needle ) : nullptr;
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics semantics ) const {
+		return FindLastInstance( Begin(), needle, semantics );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindLastInstance( ConstIterator startPosition, CharacterType character ) const {
+		const auto	position( ::Eldritch2::FindLastInstance( startPosition, character ) );
+
+		return position ? position : End();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindLastInstance( ConstIterator startPosition, const CharacterType* const needle ) const {
+		const auto	position( ::Eldritch2::FindLastInstance( startPosition, needle ) );
+
+		return position ? position : End();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
+	ETInlineHint typename String<Character, Allocator>::ConstIterator String<Character, Allocator>::FindLastInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const {
+		const auto	position( ::Eldritch2::FindLastInstance( startPosition, needle ) );
+
+		return position ? position + ::Eldritch2::StringLength( needle ) : End();
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
 	ETInlineHint bool String<Character, Allocator>::Contains( const CharacterType character ) const {
-		return End() != IteratorToFirstInstance( character );
+		return nullptr != FindFirstInstance( character );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
 	ETInlineHint bool String<Character, Allocator>::Contains( const CharacterType* const needle ) const {
-		return End() != IteratorToFirstInstance( needle );
+		return nullptr != FindFirstInstance( needle );
 	}
 
 // ---------------------------------------------------
@@ -148,7 +203,7 @@ namespace Eldritch2 {
 	ETInlineHint bool String<Character, Allocator>::BeginsWith( const CharacterType* const needle ) const {
 		const auto needleLength( ::Eldritch2::StringLength( needle ) );
 
-		return (needleLength <= GetLength()) ? ::Eldritch2::EqualityCompareString( GetCharacterArray(), needle, needleLength ) : false;
+		return (needleLength <= GetLength()) ? ::Eldritch2::EqualityCompareString( AsCString(), needle, needleLength ) : false;
 	}
 
 // ---------------------------------------------------
@@ -170,14 +225,28 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
+	ETInlineHint void String<Character, Allocator>::Erase( ConstIterator position, SizeType characterCount ) {
+		if( position != End() ) {
+			_underlyingContainer.erase( position, characterCount );
+		}
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
+	ETInlineHint void String<Character, Allocator>::Erase( ConstIterator position, ConstIterator end ) {
+		if( position != End() ) {
+			_underlyingContainer.erase( position, end );
+		}
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
 	template <typename Value>
 	bool String<Character, Allocator>::ParseInto( Value&& value ) const {
-		using namespace ::boost::iostreams;
-
-	// ---
-
-		basic_array_source<CharacterType>	source( Begin(), End() );
-		stream<decltype(source)>			inStream( source );
+		::boost::iostreams::basic_array_source<CharacterType>	source( Begin(), End() );
+		::boost::iostreams::stream<decltype(source)>			inStream( source );
 
 		return (inStream >> value).fail();
 	}
@@ -231,7 +300,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Assign( const CharacterType* const begin, const CharacterType* const end ) {
-		_underlyingContainer.assign( begin, static_cast<int>(end - begin) );
+		_underlyingContainer.assign( begin, static_cast<SizeType>(end - begin) );
 
 		return *this;
 	}
@@ -263,7 +332,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint String<Character, Allocator>& String<Character, Allocator>::Append( const CharacterType* const begin, const CharacterType* const end ) {
-		_underlyingContainer.append( begin, end - begin );
+		_underlyingContainer.append( begin, static_cast<SizeType>(end - begin) );
 
 		return *this;
 	}
@@ -316,6 +385,20 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
+	ETInlineHint void String<Character, Allocator>::Trim( const SizeType charactersToAdvanceBeginning, const SizeType charactersToRemoveFromEnd ) {
+		_underlyingContainer.trim( charactersToAdvanceBeginning, charactersToRemoveFromEnd );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
+	ETInlineHint void String<Character, Allocator>::Trim( ConstIterator newBegin, ConstIterator newEnd ) {
+		_underlyingContainer.trim( newBegin, newEnd );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
 	ETInlineHint void String<Character, Allocator>::Resize( const SizeType size ) {
 		_underlyingContainer.resize( size );
 	}
@@ -324,7 +407,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint int String<Character, Allocator>::Compare( const CharacterType* const string ) const {
-		return ::Eldritch2::CompareString( GetCharacterArray(), string );
+		return ::Eldritch2::CompareString( AsCString(), string );
 	}
 
 // ---------------------------------------------------
@@ -332,14 +415,14 @@ namespace Eldritch2 {
 	template <typename Character, class Allocator>
 	template <class AlternateAllocator>
 	ETInlineHint int String<Character, Allocator>::Compare( const String<Character, AlternateAllocator>& rhs ) const {
-		return ::Eldritch2::CompareString( GetCharacterArray(), rhs.GetCharacterArray() );
+		return ::Eldritch2::CompareString( AsCString(), rhs.AsCString() );
 	}
 
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
 	ETInlineHint size_t	String<Character, Allocator>::GetHashCode( const size_t hashSeed ) const {
-		return ::Eldritch2::HashMemory( GetCharacterArray(), (GetLength() * sizeof(CharacterType)), hashSeed );
+		return ::Eldritch2::HashMemory( AsCString(), (GetLength() * sizeof(CharacterType)), hashSeed );
 	}
 
 // ---------------------------------------------------
@@ -352,7 +435,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint const typename String<Character, Allocator>::CharacterType* String<Character, Allocator>::GetCharacterArray() const {
+	ETInlineHint const typename String<Character, Allocator>::CharacterType* String<Character, Allocator>::AsCString() const {
 		return _underlyingContainer.c_str();
 	}
 
@@ -360,7 +443,7 @@ namespace Eldritch2 {
 
 	template <typename Character, class Allocator>
 	ETInlineHint typename String<Character, Allocator>::SizeType String<Character, Allocator>::GetLength() const {
-		return static_cast<SizeType>(::std::distance( _underlyingContainer.begin(), _underlyingContainer.end() ));
+		return _underlyingContainer.length();
 	}
 
 // ---------------------------------------------------
@@ -387,7 +470,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	ETInlineHint typename String<Character, Allocator>::SizeType String<Character, Allocator>::CapacityInBytes() const {
+	ETInlineHint typename String<Character, Allocator>::SizeType String<Character, Allocator>::GetCapacityInBytes() const {
 		return _underlyingContainer.capacity();
 	}
 
@@ -417,6 +500,27 @@ namespace Eldritch2 {
 	template <typename Character, class StringAllocator>
 	ETNoAliasHint bool operator==( const Character* const string0, const String<Character, StringAllocator>& string1 ) {
 		return 0 == string1.Compare( string0 );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Character, class StringAllocator0, class StringAllocator1>
+	ETNoAliasHint bool operator!=( const String<Character, StringAllocator0>& string0, const String<Character, StringAllocator1>& string1 ) {
+		return 0 != string0.Compare( string1 );
+	}
+	
+// ---------------------------------------------------
+
+	template <typename Character, class StringAllocator>
+	ETNoAliasHint bool operator!=( const String<Character, StringAllocator>& string0, const Character* const string1 ) {
+		return 0 != string0.Compare( string1 );
+	}
+	
+// ---------------------------------------------------
+
+	template <typename Character, class StringAllocator>
+	ETNoAliasHint bool operator!=( const Character* const string0, const String<Character, StringAllocator>& string1 ) {
+		return 0 != string1.Compare( string0 );
 	}
 
 // ---------------------------------------------------

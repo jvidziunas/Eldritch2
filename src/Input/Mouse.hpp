@@ -34,8 +34,7 @@ namespace Input {
 		//!	Constructs this @ref Mouse instance.
 		Mouse( ::Eldritch2::uint32 buttonBits = 0u );
 
-		//!	Destroys this @ref Mouse instance.
-		~Mouse();
+		~Mouse() = default;
 
 	// - SCRIPT API REFERENCE ----------------------------
 

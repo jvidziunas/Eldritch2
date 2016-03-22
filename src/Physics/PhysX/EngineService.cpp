@@ -181,7 +181,8 @@ namespace PhysX {
 		if( const auto workerContext = WorkerContext::GetActiveWorkerContext() ) {
 			workerContext->Enqueue( _dummyCounter, { &task, ExecuteTask } );
 		} else {
-			ExecuteTask( &task, *workerContext );
+			task.run();
+			task.release();
 		}
 	}
 

@@ -62,9 +62,9 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	private:
-		void	PopulateDevicesSingleGpu();
+		::Eldritch2::ErrorCode	PopulateDevicesSingleGpu();
 
-		void	PopulateDevicesAfr();
+		::Eldritch2::ErrorCode	PopulateDevicesAfr();
 
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -189,6 +189,7 @@ namespace Vulkan {
 		
 		Configuration::ConfigurableUTF8String			_preferredAdapterNameForSingleGpu;
 		Configuration::ConfigurablePODVariable<bool>	_allowAfrMultiGpu;
+		Configuration::ConfigurablePODVariable<bool>	_installDebugMessageHook;
 	};
 
 }	// namespace Vulkan

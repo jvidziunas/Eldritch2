@@ -149,7 +149,7 @@ namespace Eldritch2 {
 
 	template <typename Iterator>
 	ETForceInlineHint bool Range<Iterator>::IsEmpty() const {
-		return first == onePastLast;
+		return onePastLast == first;
 	}
 
 // ---------------------------------------------------

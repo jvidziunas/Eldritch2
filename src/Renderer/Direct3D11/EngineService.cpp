@@ -92,7 +92,7 @@ namespace Direct3D11 {
 		GetLogger()( UTF8L("Creating Direct3D {}.") ET_UTF8_NEWLINE_LITERAL, (useDebugLayer ? UTF8L("debug device") : UTF8L("device")) );
 
 		deviceBuilder.SetDebuggingEnabled( useDebugLayer ).SetFreeThreadedModeEnabled().SetDriverThreadingOptimizationsEnabled( _allowDriverThreadingOptimizations );
-		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.GetCharacterArray() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
+		deviceBuilder.SetDesiredAdapterName( _preferredAdapterName.AsCString() ).SetMaximumFramesToRenderAhead( _maximumFramesToRenderAhead );
 
 		if( const auto device = deviceBuilder.Build() ) {
 			GetLogger()( UTF8L("Constructed Direct3D device successfully.") ET_UTF8_NEWLINE_LITERAL );
@@ -112,25 +112,8 @@ namespace Direct3D11 {
 // ---------------------------------------------------
 
 	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		struct FunctionHelper {
-			static SwapChain* ETScriptAPICall GetPrimarySwapChain() {
-				auto&	renderer( *activeRenderer );
-
-				if( !renderer._primarySwapChain ) {
-					
-				}
-
-				renderer._primarySwapChain->AddReference();
-				return renderer._primarySwapChain;
-			}
-		};
-
-	// ---
-
 		SwapChain::ExposeScriptAPI( visitor );
 		WorldView::ExposeScriptAPI( visitor );
-
-		visitor.ExposeVirtualProperty( "PrimarySwapChain", &FunctionHelper::GetPrimarySwapChain );
 	}
 
 // ---------------------------------------------------

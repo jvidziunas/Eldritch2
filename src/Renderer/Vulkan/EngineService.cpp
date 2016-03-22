@@ -20,6 +20,7 @@
 #include <Renderer/Vulkan/VulkanBuilders.hpp>
 #include <Renderer/Vulkan/EngineService.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
+#include <Utility/Memory/InstanceNew.hpp>
 #include <Renderer/Vulkan/WorldView.hpp>
 #include <Scheduler/WorkerContext.hpp>
 //------------------------------------------------------------------//
@@ -51,7 +52,8 @@ namespace Vulkan {
 															   _enabledInstanceLayers( GetEngineAllocator() ),
 															   _enabledDeviceLayers( GetEngineAllocator() ),
 															   _preferredAdapterNameForSingleGpu( GetEngineAllocator() ),
-															   _allowAfrMultiGpu( false ) {}
+															   _allowAfrMultiGpu( false ),
+															   _installDebugMessageHook( false ) {}
 
 // ---------------------------------------------------
 
@@ -69,21 +71,33 @@ namespace Vulkan {
 
 	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& /*executingContext*/ ) {
 		GetLogger()( UTF8L("Creating Vulkan core objects.") ET_UTF8_NEWLINE_LITERAL );
+		
+		VulkanBuilder	builder( _allocator );
 
-		{	// Create the core Vulkan instance.
-			auto	createInstanceResult( VulkanBuilder( _allocator ).Create( _allocator ) );
+		// Enable 'standard' extensions we will always need.
+		builder.EnableExtension( "VK_KHR_surface" ).EnableExtension( "VK_KHR_swapchain" );
 
-			if( !createInstanceResult ) {
-				GetLogger( LogMessageType::Error )( UTF8L("Unable to create Vulkan instance!") ET_UTF8_NEWLINE_LITERAL );
-				return;
-			}
-
-			_vulkan = ::std::move( createInstanceResult.object );
+		if( _installDebugMessageHook ) {
+			builder.EnableExtension( "VK_EXT_debug_report" );
 		}
 
-		PopulateDevicesSingleGpu();
+#if( ET_PLATFORM_WINDOWS )
+		builder.EnableExtension( "VK_KHR_win32_surface" );
+#endif
 
-		GetLogger()( UTF8L("Vulkan core objects created successfully.") ET_UTF8_NEWLINE_LITERAL );
+		// Create the core Vulkan instance.
+		auto	createInstanceResult( builder.Create( _allocator ) );
+
+		if( !createInstanceResult ) {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to create Vulkan instance!") ET_UTF8_NEWLINE_LITERAL );
+			return;
+		}
+
+		_vulkan = ::std::move( createInstanceResult.object );
+
+		if( PopulateDevicesSingleGpu() ) {
+			GetLogger()( UTF8L("Vulkan core objects created successfully.") ET_UTF8_NEWLINE_LITERAL );
+		}
 	}
 
 // ---------------------------------------------------
@@ -98,6 +112,7 @@ namespace Vulkan {
 
 		visitor.Register( UTF8L("EnabledInstanceLayers"), _enabledInstanceLayers ).Register( UTF8L("EnabledDeviceLayers"), _enabledDeviceLayers );
 		visitor.Register( UTF8L("PreferredAdapterNameForSingleGpu"), _preferredAdapterNameForSingleGpu ).Register( UTF8L("AllowAfrMultiGpu"), _allowAfrMultiGpu );
+		visitor.Register( UTF8L("InstallDebugMessageHook"), _installDebugMessageHook );
 
 		_pipelineFactory.AcceptInitializationVisitor( visitor );
 		_imageFactory.AcceptInitializationVisitor( visitor );
@@ -119,35 +134,52 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	void EngineService::PopulateDevicesSingleGpu() {
+	ErrorCode EngineService::PopulateDevicesSingleGpu() {
 		GetLogger()( UTF8L("Creating Vulkan logical device.") ET_UTF8_NEWLINE_LITERAL );
 
 		PhysicalDeviceEnumerator	enumerator( _vulkan.get(), _allocator );
 
 		// If the user specifies, filter out all devices not matching the preferred adapter name.
 		if( _preferredAdapterNameForSingleGpu ) {
-			const auto	preferredDeviceName( _preferredAdapterNameForSingleGpu.GetCharacterArray() );
+			const auto	preferredDeviceName( _preferredAdapterNameForSingleGpu.AsCString() );
 
 			enumerator.FilterDevices( [preferredDeviceName] ( const Vulkan::PhysicalDeviceProperties& deviceProperties ) {
 				return deviceProperties.DescribesNamedDevice( preferredDeviceName );
 			} );
 		}
 
-		if( const auto desiredPhysicalDevice = enumerator.GetTopDevice() ) {
-			auto	createDeviceResult( LogicalDeviceBuilder( _allocator ).Create( desiredPhysicalDevice, _allocator ) );
-
-			if( createDeviceResult ) {
-				const auto	deviceContext( new(_allocator, Allocator::AllocationDuration::Normal) DeviceContext( ::std::move( createDeviceResult.object ), _allocator ) );
-
-				_imageFactory.CreateDeviceResources( *deviceContext );
-				_meshFactory.CreateDeviceResources( *deviceContext );
-			}
+		if( !enumerator.HasSuitableDevice() ) {
+			GetLogger( LogMessageType::Error )( UTF8L("No suitable Vulkan physical devices found!") ET_UTF8_NEWLINE_LITERAL );
+			return Error::Unspecified;
 		}
+
+		LogicalDeviceBuilder	builder( _allocator );
+
+		// Enable 'standard' extensions we will always need.
+		builder.EnableExtension( "VK_KHR_swapchain" );
+
+		auto	createDeviceResult( builder.Create( enumerator.GetTopDevice(), _allocator ) );
+
+		if( !createDeviceResult ) {
+			return Error::Unspecified;
+		}
+
+		const auto	deviceContext( new(_allocator, Allocator::AllocationDuration::Normal) DeviceContext( ::std::move( createDeviceResult.object ), _allocator ) );
+
+		if( !deviceContext ) {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to allocate Vulkan logical device object!") ET_UTF8_NEWLINE_LITERAL );
+			return Error::OutOfMemory;
+		}
+
+		_imageFactory.CreateDeviceResources( *deviceContext );
+		_meshFactory.CreateDeviceResources( *deviceContext );
+
+		return Error::None;
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::PopulateDevicesAfr() {
+	ErrorCode EngineService::PopulateDevicesAfr() {
 		GetLogger()( UTF8L("Creating Vulkan logical device (AFR).") ET_UTF8_NEWLINE_LITERAL );
 
 		PhysicalDeviceEnumerator	enumerator( _vulkan.get(), _allocator );
@@ -156,6 +188,8 @@ namespace Vulkan {
 		enumerator.FilterDevices( [] ( const Vulkan::PhysicalDeviceProperties& deviceProperties ) {
 			return deviceProperties.IsDiscreteGpu();
 		} );
+
+		return Error::None;
 	}
 
 }	// namespace Vulkan

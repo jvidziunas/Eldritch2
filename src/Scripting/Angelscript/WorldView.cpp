@@ -25,6 +25,7 @@
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
+#include <angelscript.h>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scheduler;
@@ -78,17 +79,7 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		auto	Spawn( [] ( const StringMarshal& className ) {
-			if( activeScriptWorldView->Spawn( className.GetCharacterArray() ) ) {
-
-			} else {
-				::asGetActiveContext()->SetException( "Invalid class name for Spawn()!" );
-			}
-		} );
-
-		visitor.ExposeFunction( "Spawn", static_cast<void (ETScriptAPICall *)( const StringMarshal& )>(Spawn) );
-	}
+	void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& /*visitor*/ ) {}
 
 // ---------------------------------------------------
 
@@ -108,11 +99,11 @@ namespace AngelScript {
 		const auto	resourceObjectName( GetOwningWorld().GetPropertyByKey( _stringAllocator, UTF8L("Resource"), UTF8L("") ) );
 
 		if( !rulesObjectName.IsEmpty() ) {
-			_rulesEntity = ::std::move( Spawn( rulesObjectName.GetCharacterArray() ) );
+			_rulesEntity = ::std::move( Spawn( rulesObjectName.AsCString() ) );
 		}
 
 		if( !resourceObjectName.IsEmpty() ) {
-			if( const auto view = GetContentLibrary().ResolveViewByName<ObjectGraphResourceView>( resourceObjectName.GetCharacterArray() ) ) {
+			if( const auto view = GetContentLibrary().ResolveViewByName<ObjectGraphResourceView>( resourceObjectName.AsCString() ) ) {
 				view->DeserializeIntoWorldView( *this );
 			}
 		}

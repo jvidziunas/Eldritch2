@@ -33,7 +33,7 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ContentLibrary::ResourceViewKey::ResourceViewKey( const ResourceView& view ) : Pair<const UTF8Char*, const type_info*>( view.GetName().GetCharacterArray(), &typeid(view) ) {}
+	ContentLibrary::ResourceViewKey::ResourceViewKey( const ResourceView& view ) : Pair<const UTF8Char*, const type_info*>( view.GetName().AsCString(), &typeid(view) ) {}
 
 // ---------------------------------------------------
 

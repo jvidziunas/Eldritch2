@@ -13,16 +13,19 @@
 // INCLUDES
 //==================================================================//
 #include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
-#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Scripting/AngelScript/BytecodePackageResourceView.hpp>
+#include <Scripting/AngelScript/UserDefinedTypeRegistrar.hpp>
 #include <Scripting/AngelScript/ObjectGraphResourceView.hpp>
 #include <Scripting/AngelScript/NativeBindings.hpp>
 #include <Configuration/ConfigurationDatabase.hpp>
 #include <Scripting/AngelScript/EngineService.hpp>
 #include <Scripting/Angelscript/WorldView.hpp>
+#include <Scripting/AngelScript/ApiExport.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
+#include <FileSystem/ContentProvider.hpp>
 #include <Foundation/GameEngine.hpp>
+#include <Animation/Armature.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
@@ -44,11 +47,11 @@
 using namespace ::Eldritch2::Configuration;
 using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Foundation;
+using namespace ::Eldritch2::Animation;
 using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Utility;
 using namespace ::Eldritch2;
-using namespace ::std;
 
 #if( ET_COMPILER_IS_MSVC )
 #	pragma warning( push )
@@ -59,7 +62,7 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ) {}
+	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ), _forceScriptApiExport( false ) {}
 
 // ---------------------------------------------------
 
@@ -95,16 +98,16 @@ namespace AngelScript {
 		}
 
 		scriptEngine->SetMessageCallback( ::asMETHOD( EngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
-		scriptEngine->SetEngineProperty( ::asEP_ALLOW_UNSAFE_REFERENCES, 1 );
 		// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
 
 		// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
-		{	ScriptApiRegistrationInitializationVisitor	registrationVisitor( *scriptEngine );
+		{	AngelScript::UserDefinedTypeRegistrar	registrationVisitor( *scriptEngine );
 			
 			StringMarshal::ExposeScriptAPI( registrationVisitor );
 			Float4Marshal::ExposeScriptAPI( registrationVisitor );
 			OrientationMarshal::ExposeScriptAPI( registrationVisitor );
 			RigidTransformMarshal::ExposeScriptAPI( registrationVisitor );
+			Armature::ExposeScriptAPI( registrationVisitor );
 			
 			BroadcastInitializationVisitor( registrationVisitor );
 		}
@@ -113,6 +116,11 @@ namespace AngelScript {
 		RegisterAlgorithmLibrary( scriptEngine.get() );
 
 		scriptEngine->RegisterStringFactory( StringMarshal::scriptTypeName, ::asMETHOD( EngineService, MarshalStringLiteral ), ::asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
+
+		// Export the script API for the compiler tool.
+		if( auto apiWriter = GetEngineContentProvider().CreateSynchronousFileWriter( GetEngineAllocator(), ContentProvider::KnownContentLocation::AppDataLocal, UTF8L("Eldritch2.E2AngelscriptApi") ) ) {
+			AngelScript::ExportScriptApi( GetEngineAllocator(), *scriptEngine.get(), *apiWriter.object );
+		}
 
 		GetLogger()( UTF8L("Script API registered successfully.") ET_UTF8_NEWLINE_LITERAL );
 

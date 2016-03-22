@@ -71,6 +71,8 @@ namespace Tools {
 
 		int	SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd );
 
+		int	SetApiDescriptorPath( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd );
+
 		int	SetOptimizationLevel( const int level );
 
 		int	AddInputFile( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd );
@@ -83,6 +85,7 @@ namespace Tools {
 		FileAccessorFactory										_fileAccessorFactory;
 		::CScriptBuilder										_scriptBuilder;
 		::Eldritch2::UTF8String<>								_outputModuleName;
+		::Eldritch2::UTF8String<>								_engineApiDescriptorPath;
 		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_inputFiles;
 	};
 

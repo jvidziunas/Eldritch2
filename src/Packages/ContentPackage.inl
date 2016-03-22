@@ -55,7 +55,7 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ETInlineHint const ::Eldritch2::UTF8Char* const ContentPackage::GetName() const {
-		return _name.GetCharacterArray();
+		return _name.AsCString();
 	}
 
 // ---------------------------------------------------

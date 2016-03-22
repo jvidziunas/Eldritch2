@@ -67,6 +67,18 @@
     <Filter Include="Source Files\FileSystem\Win32">
       <UniqueIdentifier>{dddc3764-5a97-4d56-820d-04305e04c674}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scripting">
+      <UniqueIdentifier>{8f3242aa-01be-429c-bc57-8401d24cb461}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting">
+      <UniqueIdentifier>{8384d322-b0bf-48a0-b4ff-864e8833fa9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scripting\AngelScript">
+      <UniqueIdentifier>{3f96958f-bdd3-4cfe-9122-786f181966be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting\AngelScript">
+      <UniqueIdentifier>{8bbd1543-6371-4fd8-ba7e-908f12f26306}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\extern\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp">
@@ -122,6 +134,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Scripting\AngelScript\SmartPointers.cpp">
       <Filter>Source Files\AngelScript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\AngelScript\ApiExport.cpp">
+      <Filter>Source Files\Scripting\AngelScript</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\CPPFormatDefinitions.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Utility\Containers\UTF8String.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\AngelScript\ApiExport.hpp">
+      <Filter>Header Files\Scripting\AngelScript</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

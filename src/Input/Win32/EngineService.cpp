@@ -21,6 +21,7 @@
 #include <Scheduler/WorkerContext.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/ErrorCode.hpp>
+#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #include <windowsx.h>
 //------------------------------------------------------------------//

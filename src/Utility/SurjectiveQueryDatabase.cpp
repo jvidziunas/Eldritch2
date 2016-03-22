@@ -73,7 +73,7 @@ namespace Detail {
 
 		// ---------------------------------------------------
 
-			bool operator()( const Fact& fact ) const override sealed {
+			bool operator()( const Fact& /*fact*/ ) const override sealed {
 				return true;
 			}
 		};
@@ -97,7 +97,7 @@ namespace Detail {
 		auto	candidate( _internedStrings.Find( factName ) );
 
 		if( candidate != _internedStrings.End() ) {
-			return static_cast<InternedFactName>(candidate->GetCharacterArray());
+			return static_cast<InternedFactName>(candidate->AsCString());
 		}
 
 		return static_cast<InternedFactName>(nullptr);
@@ -112,7 +112,7 @@ namespace Detail {
 			candidate = _internedStrings.Insert( { factName, FindEndOfString( factName ), { GetAllocator(), UTF8L("Interned String Allocator") } } ).first;
 		}
 
-		return static_cast<InternedFactName>(candidate->GetCharacterArray());
+		return static_cast<InternedFactName>(candidate->AsCString());
 	}
 
 }	// namespace Detail

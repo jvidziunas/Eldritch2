@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Input/Mouse.hpp>
 //------------------------------------------------------------------//
@@ -33,19 +32,7 @@ namespace Input {
 
 // ---------------------------------------------------
 
-	Mouse::~Mouse() {}
-
-// ---------------------------------------------------
-
-	ETNoAliasHint void Mouse::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("Mouse::ExposeScriptAPI() Temporary Allocator") );
-
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<Mouse>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
-
-			temporaryAllocator.Delete( typeBuilder );
-		}
-	}
+	ETNoAliasHint void Mouse::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {}
 
 }	// namespace Input
 }	// namespace Eldritch2

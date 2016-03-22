@@ -139,7 +139,7 @@ namespace FileSystem {
 
 		fileName.Append( GetBoundPackage().GetName() ).Append( suffix ? suffix : UTF8L("") );
 
-		return GetContentLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, ContentProvider::KnownContentLocation::PackageDirectory, fileName.GetCharacterArray() );
+		return GetContentLibrary().GetContentProvider().CreateReadableMemoryMappedFile( allocator, ContentProvider::KnownContentLocation::PackageDirectory, fileName.AsCString() );
 	}
 
 // ---------------------------------------------------

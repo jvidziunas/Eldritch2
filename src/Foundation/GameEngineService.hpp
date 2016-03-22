@@ -34,6 +34,7 @@ namespace Eldritch2 {
 
 	namespace FileSystem {
 		class	ResourceViewFactoryPublishingInitializationVisitor;
+		class	ContentProvider;
 		class	ContentLibrary;
 	}
 
@@ -139,30 +140,32 @@ namespace Foundation {
 		/*!	@param[in] worldResourceName Null-terminated C string containing the name of the root content package for the world. This will be passed to @ref FileSystem::ContentLibrary::ResolvePackageByName()
 			@see @ref FileSystem::ContentPackage, @ref FileSystem::ContentLibrary::ResolvePackageByName()
 			*/
-		::Eldritch2::CountedResult<Foundation::World>		CreateWorld( const ::Eldritch2::UTF8Char* const worldResourceName );
+		::Eldritch2::CountedResult<Foundation::World>	CreateWorld( const ::Eldritch2::UTF8Char* const worldResourceName );
 
 		//! Retrieves a read-only view of the @ref GameEngine instance that owns this @ref GameEngineService.
-		ETInlineHint const Foundation::GameEngine&			GetGameEngine() const;
+		ETInlineHint const Foundation::GameEngine&		GetGameEngine() const;
 
 		//! Retrieves a read-only view of the @ref FileSystem::ContentLibrary instance owned by the @ref GameEngine this @ref GameEngineService is attached to.
 		/*!	@see @ref FileSystem::ContentLibrary
 			*/
-		const FileSystem::ContentLibrary&					GetEngineContentLibrary() const;
+		const FileSystem::ContentLibrary&				GetEngineContentLibrary() const;
+
+		FileSystem::ContentProvider&					GetEngineContentProvider() const;
 
 		//! Retrieves the Scheduler::ThreadScheduler instance used by the @ref GameEngine this @ref GameEngineService is attached to.
 		/*!	@see @ref Scheduler::ThreadScheduler
 			*/
-		Scheduler::ThreadScheduler&							GetEngineThreadScheduler() const;
+		Scheduler::ThreadScheduler&						GetEngineThreadScheduler() const;
 
 		//! Retrieves the 'global' engine allocator.
 		/*!	@see @ref Allocator
 			*/
-		::Eldritch2::Allocator&								GetEngineAllocator();
+		::Eldritch2::Allocator&							GetEngineAllocator();
 
 		//! Instructs the hosting engine's scheduler to create an operating system thread and have it assume ownership/begin execution of the given Thread instance.
 		/*!	@see @ref Scheduler::Thread
 			*/
-		::Eldritch2::ErrorCode								LaunchThread( Scheduler::Thread& thread );
+		::Eldritch2::ErrorCode							LaunchThread( Scheduler::Thread& thread );
 
 	// - LOGGING -----------------------------------------
 

@@ -31,7 +31,7 @@ namespace {
 namespace Eldritch2 {
 namespace Configuration {
 
-	ConfigurableUTF8String::ConfigurableUTF8String( const UTF8Char* const value, Allocator& allocator ) : UTF8String<>( value, FindEndOfString( value ), { allocator, configurableStringAllocatorName } ) {}
+	ConfigurableUTF8String::ConfigurableUTF8String( const UTF8Char* const value, Allocator& allocator ) : UTF8String<>( value, { allocator, configurableStringAllocatorName } ) {}
 
 // ---------------------------------------------------
 
@@ -46,7 +46,7 @@ namespace Configuration {
 // ---------------------------------------------------
 
 	void ConfigurableUTF8String::GetValue( UTF8Char* destinationBuffer, size_t bufferOctetCount ) const {
-		CopyString( destinationBuffer, GetCharacterArray(), bufferOctetCount );
+		CopyString( destinationBuffer, AsCString(), bufferOctetCount );
 	}
 
 }	// namespace Configuration

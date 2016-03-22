@@ -15,6 +15,7 @@
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Physics/PhysX/TerrainResourceView.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
+#include <Utility/Memory/InstanceNew.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Physics/PhysX/WorldView.hpp>
 #include <Utility/Assert.hpp>
@@ -75,36 +76,29 @@ namespace PhysX {
 // ---------------------------------------------------
 
 	ETNoAliasHint void WorldView::TerrainCollider::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		struct FunctionHelper {
-			static TerrainCollider* ETScriptAPICall Factory0( const Float4Marshal& position, const StringMarshal& resourceName ) {
-				const auto	resourceView( GetActiveWorldView().GetContentLibrary().ResolveViewByName<TerrainResourceView>( resourceName.GetCharacterArray() ) );
+		auto	builder( typeRegistrar.BeginReferenceTypeRegistration<TerrainCollider>() );
 
-				if( !resourceView ) {
-					return nullptr;
-				}
+		builder.ExposeFactory<const Float4Marshal&, const StringMarshal&>( [] ( const Float4Marshal& position, const StringMarshal& resourceName ) -> TerrainCollider* {
+			const auto	resourceView( GetActiveWorldView().GetContentLibrary().ResolveViewByName<TerrainResourceView>( resourceName.AsCString() ) );
 
-				if( UniquePointer<PxRigidStatic> physicsObject { PxGetPhysics().createRigidStatic( { position.coefficients[0], position.coefficients[1], position.coefficients[2] } ) } ) {
-					GetActiveWorldView().GetScene().addActor( *physicsObject );
-
-					return new(GetActiveWorldView()._componentAllocator, Allocator::AllocationDuration::Normal) TerrainCollider( ::std::move( physicsObject ), *resourceView );
-				}
-
+			if( !resourceView ) {
 				return nullptr;
 			}
-		};
 
-	// ---
+			if( UniquePointer<PxRigidStatic> physicsObject { PxGetPhysics().createRigidStatic( { position.coefficients[0], position.coefficients[1], position.coefficients[2] } ) } ) {
+				GetActiveWorldView().GetScene().addActor( *physicsObject );
 
-		FixedStackAllocator<64u>	allocator( UTF8L("TerrainCollider::ExposeScriptAPI() Temporary Allocator") );
-		auto						typeBuilderResult( typeRegistrar.RegisterUserDefinedReferenceType<TerrainCollider>( allocator ) );
-		auto&						typeBuilder( *typeBuilderResult.object );
+				return new(GetActiveWorldView()._componentAllocator, Allocator::AllocationDuration::Normal) TerrainCollider( ::std::move( physicsObject ), *resourceView );
+			}
 
-		ETRuntimeAssert( typeBuilderResult );
+			return nullptr;
+		} );
 
-		typeBuilder.ExposeFactory( &FunctionHelper::Factory0 );
-		typeBuilder.ExposeVirtualProperty( "Enabled", &TerrainCollider::SetEnabled ).ExposeVirtualProperty( "Enabled", &TerrainCollider::GetEnabled );
-
-		allocator.Delete( typeBuilder );
+		builder.ExposeVirtualProperty<bool>( "Enabled", [] ( TerrainCollider* collider, bool value ) {
+			collider->SetEnabled( value );
+		} ).ExposeVirtualProperty<bool>( "Enabled", [] ( TerrainCollider* collider ) {
+			return collider->GetEnabled();
+		} );
 	}
 
 // ---------------------------------------------------

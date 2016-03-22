@@ -17,6 +17,7 @@
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
 #include <Utility/ErrorCode.hpp>
+#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #define MICROPROFILE_GPU_TIMERS_D3D11 1
 #include <microprofile/microprofile.h>

@@ -129,7 +129,7 @@ namespace Steamworks {
 // ---------------------------------------------------
 
 	void EngineService::OnEngineInitializationCompleted( WorkerContext& /*executingContext*/ ) {
-		auto	createLobbyWorldResult( CreateWorld( _lobbyWorldName.GetCharacterArray() ) );
+		auto	createLobbyWorldResult( CreateWorld( _lobbyWorldName.AsCString() ) );
 
 		if( !createLobbyWorldResult ) {
 			return;

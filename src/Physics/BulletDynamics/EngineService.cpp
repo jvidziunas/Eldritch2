@@ -19,6 +19,7 @@
 #include <Physics/BulletDynamics/EngineService.hpp>
 #include <Physics/BulletDynamics/WorldView.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
+#include <Utility/Memory/InstanceNew.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;

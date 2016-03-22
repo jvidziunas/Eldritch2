@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Configuration/ConfigurablePODVariable.hpp>
 #include <Scripting/AngelScript/SmartPointers.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 #include <Foundation/GameEngineService.hpp>
@@ -131,10 +132,12 @@ namespace AngelScript {
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator	_allocator;
+		::Eldritch2::ChildAllocator						_allocator;
 
-		BytecodePackageViewFactory	_bytecodePackageFactory;
-		ObjectGraphViewFactory		_objectGraphFactory;
+		Configuration::ConfigurablePODVariable<bool>	_forceScriptApiExport;
+
+		BytecodePackageViewFactory						_bytecodePackageFactory;
+		ObjectGraphViewFactory							_objectGraphFactory;
 	};
 
 }	// namespace AngelScript

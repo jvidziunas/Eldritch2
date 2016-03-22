@@ -16,6 +16,7 @@
 #include <Foundation/GameEngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Scheduler/ThreadScheduler.hpp>
+#include <Packages/ContentLibrary.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Foundation/GameEngine.hpp>
 #include <Utility/CountedResult.hpp>
@@ -70,6 +71,12 @@ namespace Foundation {
 
 	const ContentLibrary& GameEngineService::GetEngineContentLibrary() const {
 		return _owningEngine.GetContentLibrary();
+	}
+
+// ---------------------------------------------------
+
+	ContentProvider& GameEngineService::GetEngineContentProvider() const {
+		return GetEngineContentLibrary().GetContentProvider();
 	}
 
 // ---------------------------------------------------

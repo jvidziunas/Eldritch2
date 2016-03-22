@@ -38,7 +38,7 @@ namespace Steamworks {
 // ---------------------------------------------------
 
 	const UTF8Char* EngineService::Player::GetName() const {
-		return _name.GetCharacterArray();
+		return _name.AsCString();
 	}
 
 }	// namespace Steamworks

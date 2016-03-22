@@ -336,6 +336,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Scheduler\MicroprofileImplementation.cpp" />
     <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.cpp" />
     <ClCompile Include="..\src\Scheduler\Win32\FiberScheduler.WorkerThread.cpp" />
+    <ClCompile Include="..\src\Scripting\AngelScript\ApiExport.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodeMetadata.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.BytecodePackageViewFactory.cpp" />
@@ -345,6 +346,7 @@ call "deploy.x64.bat"
     <ClCompile Include="..\src\Scripting\Angelscript\UserDefinedTypeRegistrar.cpp" />
     <ClCompile Include="..\src\Scripting\Angelscript\EngineService.cpp" />
     <ClCompile Include="..\src\scripting\Angelscript\WorldView.MessageBus.cpp" />
+    <ClCompile Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.cpp" />
     <ClCompile Include="..\src\Scripting\ScriptMarshalTypes.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurableUTF8String.cpp" />
     <ClCompile Include="..\src\Configuration\ConfigurationDatabase.cpp" />
@@ -475,6 +477,7 @@ call "deploy.x64.bat"
     <ClInclude Include="..\src\Scheduler\PrivateQueueWorker.hpp" />
     <ClInclude Include="..\src\Scheduler\Win32\FiberScheduler.hpp" />
     <ClInclude Include="..\src\Scheduler\Win32\ThreadScheduler.hpp" />
+    <ClInclude Include="..\src\Scripting\AngelScript\ApiExport.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodeMetadata.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.hpp" />
     <ClInclude Include="..\src\Scripting\Angelscript\ObjectGraphResourceView.hpp" />

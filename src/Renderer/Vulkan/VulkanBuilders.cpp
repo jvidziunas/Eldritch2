@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Renderer/Vulkan/VulkanBuilders.hpp>
+#include <Utility/Assert.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
 
@@ -49,9 +50,9 @@ namespace Vulkan {
 
 	VulkanResult<::VkInstance> VulkanBuilder::Create( const ::VkAllocationCallbacks* callbacks ) {
 		_createInfo.enabledLayerCount		= static_cast<uint32_t>(_enabledLayers.Size());
-		_createInfo.ppEnabledLayerNames		= _enabledLayers.Data();
+		_createInfo.ppEnabledLayerNames		= _enabledLayers.Begin();
 		_createInfo.enabledExtensionCount	= static_cast<uint32_t>(_enabledExtensions.Size());
-		_createInfo.ppEnabledExtensionNames = _enabledExtensions.Data();
+		_createInfo.ppEnabledExtensionNames = _enabledExtensions.Begin();
 
 		::VkInstance	vulkan( nullptr );
 		const auto		createInstanceResult( ::vkCreateInstance( &_createInfo, callbacks, &vulkan ) );
@@ -61,6 +62,38 @@ namespace Vulkan {
 		}
 
 		return { createInstanceResult };
+	}
+
+// ---------------------------------------------------
+
+	VulkanBuilder& VulkanBuilder::EnableExtension( const char* const name ) {
+		_enabledExtensions.Insert( name );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	VulkanBuilder& VulkanBuilder::DisableExtension( const char* const name ) {
+		_enabledExtensions.Erase( name );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	VulkanBuilder& VulkanBuilder::EnableLayer( const char* const name ) {
+		_enabledLayers.Insert( name );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	VulkanBuilder& VulkanBuilder::DisableLayer( const char* const name ) {
+		_enabledLayers.Erase( name );
+
+		return *this;
 	}
 
 // ---------------------------------------------------
@@ -79,9 +112,9 @@ namespace Vulkan {
 
 	VulkanResult<::VkDevice> LogicalDeviceBuilder::Create( ::VkPhysicalDevice physicalDevice, const ::VkAllocationCallbacks* callbacks ) {
 		_createInfo.enabledLayerCount		= static_cast<uint32_t>(_enabledLayers.Size());
-		_createInfo.ppEnabledLayerNames		= _enabledLayers.Data();
+		_createInfo.ppEnabledLayerNames		= _enabledLayers.Begin();
 		_createInfo.enabledExtensionCount	= static_cast<uint32_t>(_enabledExtensions.Size());
-		_createInfo.ppEnabledExtensionNames = _enabledExtensions.Data();
+		_createInfo.ppEnabledExtensionNames = _enabledExtensions.Begin();
 
 		::VkDevice	device( nullptr );
 		const auto	createDeviceResult( ::vkCreateDevice( physicalDevice, &_createInfo, callbacks, &device ) );
@@ -91,6 +124,38 @@ namespace Vulkan {
 		}
 
 		return { createDeviceResult };
+	}
+
+// ---------------------------------------------------
+
+	LogicalDeviceBuilder& LogicalDeviceBuilder::EnableExtension( const char* const name ) {
+		_enabledExtensions.Insert( name );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	LogicalDeviceBuilder& LogicalDeviceBuilder::DisableExtension( const char* const name ) {
+		_enabledExtensions.Erase( name );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	LogicalDeviceBuilder& LogicalDeviceBuilder::EnableLayer( const char* const name ) {
+		_enabledLayers.Insert( name );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	LogicalDeviceBuilder& LogicalDeviceBuilder::DisableLayer( const char* const name ) {
+		_enabledLayers.Erase( name );
+
+		return *this;
 	}
 
 // ---------------------------------------------------
@@ -124,11 +189,15 @@ namespace Vulkan {
 // ---------------------------------------------------
 
 	::VkPhysicalDevice PhysicalDeviceEnumerator::GetTopDevice() const {
-		if( _enumeratedDevices.Empty() ) {
-			return nullptr;
-		}
+		ETRuntimeAssert( HasSuitableDevice() );
 
 		return _enumeratedDevices.Front().device;
+	}
+
+// ---------------------------------------------------
+
+	bool PhysicalDeviceEnumerator::HasSuitableDevice() const {
+		return !_enumeratedDevices.Empty();
 	}
 
 }	// namespace Vulkan

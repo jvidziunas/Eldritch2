@@ -48,6 +48,8 @@ namespace Detail {
 		//!	Constructs this @ref String instance.
 		ETInlineHint explicit String( AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref String instance.
+		ETInlineHint String( const CharacterType* const string, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref String instance.
 		ETInlineHint String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref String instance.
 		template <size_t literalLength>
@@ -56,21 +58,27 @@ namespace Detail {
 		template <class AlternateAllocator>
 		ETInlineHint String( const String<Character, AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref String instance.
-		ETInlineHint String( String<Character, Allocator>&& sourceString );
+		ETInlineHint String( String<Character, Allocator>&& );
 		//!	Constructs this @ref String instance.
-		ETInlineHint String( const String<Character, Allocator>& sourceString ) = delete;
+		ETInlineHint String( const String<Character, Allocator>& ) = delete;
 
 		ETInlineHint ~String() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-		ETInlineHint ConstIterator	IteratorToFirstInstance( const CharacterType character ) const;
-		ETInlineHint ConstIterator	IteratorToFirstInstance( const CharacterType* const needle ) const;
-		ETInlineHint ConstIterator	IteratorToFirstInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ETInlineHint ConstIterator	FindFirstInstance( CharacterType character ) const;
+		ETInlineHint ConstIterator	FindFirstInstance( const CharacterType* const needle ) const;
+		ETInlineHint ConstIterator	FindFirstInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ETInlineHint ConstIterator	FindFirstInstance( ConstIterator startPosition, CharacterType character ) const;
+		ETInlineHint ConstIterator	FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle ) const;
+		ETInlineHint ConstIterator	FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
 
-		ETInlineHint ConstIterator	IteratorToLastInstance( const CharacterType character ) const;
-		ETInlineHint ConstIterator	IteratorToLastInstance( const CharacterType* const needle ) const;
-		ETInlineHint ConstIterator	IteratorToLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ETInlineHint ConstIterator	FindLastInstance( CharacterType character ) const;
+		ETInlineHint ConstIterator	FindLastInstance( const CharacterType* const needle ) const;
+		ETInlineHint ConstIterator	FindLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ETInlineHint ConstIterator	FindLastInstance( ConstIterator startPosition, CharacterType character ) const;
+		ETInlineHint ConstIterator	FindLastInstance( ConstIterator startPosition, const CharacterType* const needle ) const;
+		ETInlineHint ConstIterator	FindLastInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
 
 		ETInlineHint bool	Contains( const CharacterType character ) const;
 		ETInlineHint bool	Contains( const CharacterType* const needle ) const;
@@ -83,6 +91,13 @@ namespace Detail {
 
 		ETInlineHint bool	EndsWith( const CharacterType character ) const;
 		ETInlineHint bool	EndsWith( const CharacterType* const needle ) const;
+
+	// ---------------------------------------------------
+
+		ETInlineHint void	Erase( ConstIterator position, SizeType characterCount = 1 );
+		ETInlineHint void	Erase( ConstIterator position, ConstIterator end );
+
+	// ---------------------------------------------------
 
 		template <typename Value>
 		bool	ParseInto( Value&& value ) const;
@@ -110,7 +125,6 @@ namespace Detail {
 		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const begin, const CharacterType* const end );
 
 		ETInlineHint String<Character, Allocator>&	Append( const CharacterType character );
-		
 		ETInlineHint String<Character, Allocator>&	Append( const CharacterType* const string );
 		ETInlineHint String<Character, Allocator>&	Append( const CharacterType* const begin, const CharacterType* const end );
 		template <class AlternateAllocator>
@@ -123,6 +137,9 @@ namespace Detail {
 		ETInlineHint String<Character, Allocator>&	operator+=( const String<Character, AlternateAllocator>& rhs );
 
 		ETInlineHint void	Clear();
+
+		ETInlineHint void	Trim( const SizeType charactersToAdvanceBeginning, const SizeType charactersToRemoveFromEnd );
+		ETInlineHint void	Trim( ConstIterator newBegin, ConstIterator newEnd );
 
 		ETInlineHint void	Resize( const SizeType size );
 
@@ -138,7 +155,7 @@ namespace Detail {
 
 		ETInlineHint CharacterType	operator[]( const SizeType indexInBytes ) const;
 
-		ETInlineHint const CharacterType*	GetCharacterArray() const;
+		ETInlineHint const CharacterType*	AsCString() const;
 
 	// - CONTENT QUERY -----------------------------------
 
@@ -152,7 +169,7 @@ namespace Detail {
 
 		ETInlineHint void		Reserve( const SizeType capacityHintInBytes );
 
-		ETInlineHint SizeType	CapacityInBytes() const;
+		ETInlineHint SizeType	GetCapacityInBytes() const;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
@@ -172,6 +189,13 @@ namespace Detail {
 	ETNoAliasHint bool	operator==( const String<Character, StringAllocator>& string0, const Character* const string1 );
 	template <typename Character, class StringAllocator>
 	ETNoAliasHint bool	operator==( const Character* const string0, const String<Character, StringAllocator>& string1 );
+
+	template <typename Character, class StringAllocator0, class StringAllocator1 = StringAllocator0>
+	ETNoAliasHint bool	operator!=( const String<Character, StringAllocator0>& string0, const String<Character, StringAllocator1>& string1 );
+	template <typename Character, class StringAllocator>
+	ETNoAliasHint bool	operator!=( const String<Character, StringAllocator>& string0, const Character* const string1 );
+	template <typename Character, class StringAllocator>
+	ETNoAliasHint bool	operator!=( const Character* const string0, const String<Character, StringAllocator>& string1 );
 
 // ---
 

@@ -78,7 +78,7 @@ namespace Tools {
 
 		// Set the password for protected files, if applicable.
 		if( _password ) {
-			settings->SetStringProp( IMP_FBX_PASSWORD, _password.GetCharacterArray() );
+			settings->SetStringProp( IMP_FBX_PASSWORD, _password.AsCString() );
 			settings->SetBoolProp( IMP_FBX_PASSWORD_ENABLE, true );
 		}
 
@@ -90,7 +90,7 @@ namespace Tools {
 				continue;
 			}
 
-			if( !importer->Initialize( inputName.GetCharacterArray(), -1, settings.Get() ) || importer->Import( scene.Get() ) ) {
+			if( !importer->Initialize( inputName.AsCString(), -1, settings.Get() ) || importer->Import( scene.Get() ) ) {
 				continue;
 			}
 		}

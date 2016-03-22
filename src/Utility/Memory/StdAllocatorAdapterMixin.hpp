@@ -39,10 +39,8 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref StdAllocatorAdapterMixin instance.
-		StdAllocatorAdapterMixin( const UnderlyingAllocatorType& allocatorTemplate );
-		//!	Constructs this @ref StdAllocatorAdapterMixin instance.
-		template<typename U, typename AlternateAllocatorType>
-		StdAllocatorAdapterMixin( const ::Eldritch2::StdAllocatorAdapterMixin<U, AlternateAllocatorType>& other );
+		template <typename... ConstructorArguments>
+		ETInlineHint StdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments );
 
 		//!	Destroys this @ref StdAllocatorAdapterMixin instance.
 		virtual	~StdAllocatorAdapterMixin() = default;
@@ -58,9 +56,9 @@ namespace Eldritch2 {
 
 	// ---------------------------------------------------
 		
-		ETForceInlineHint bool	operator!=( const ::Eldritch2::StdAllocatorAdapterMixin<T, AllocatorType>& other ) const;
+		ETForceInlineHint bool	operator!=( const ::Eldritch2::StdAllocatorAdapterMixin<T, Allocator>& other ) const;
 
-		ETForceInlineHint bool	operator==( const ::Eldritch2::StdAllocatorAdapterMixin<T, AllocatorType>& other ) const;
+		ETForceInlineHint bool	operator==( const ::Eldritch2::StdAllocatorAdapterMixin<T, Allocator>& other ) const;
 
 	// ---------------------------------------------------
 		
@@ -93,10 +91,8 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref AlignedStdAllocatorAdapterMixin instance.
-		AlignedStdAllocatorAdapterMixin( const UnderlyingAllocatorType& allocatorTemplate );
-		//!	Constructs this @ref AlignedStdAllocatorAdapterMixin instance.
-		template<typename U, size_t alignment, typename AlternateAllocatorType>
-		AlignedStdAllocatorAdapterMixin( const ::Eldritch2::AlignedStdAllocatorAdapterMixin<U, alignment, AlternateAllocatorType>& other );
+		template <typename... ConstructorArguments>
+		AlignedStdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments );
 		
 		//!	Destroys this @ref AlignedStdAllocatorAdapterMixin instance.
 		~AlignedStdAllocatorAdapterMixin() = default;

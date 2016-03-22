@@ -14,9 +14,7 @@
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Physics/BulletDynamics/WorldView.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
-#include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -44,7 +42,7 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	void WorldView::AnimationDrivenCharacterCollider::SetEnabled( bool value /*= true */ ) {
+	void WorldView::AnimationDrivenCharacterCollider::SetEnabled( bool value ) {
 		auto&	dynamicsWorld( GetActiveWorldView()._dynamicsWorld );
 
 		if( _enabled == value ) {
@@ -70,33 +68,7 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	void ETNoAliasHint WorldView::AnimationDrivenCharacterCollider::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		struct FunctionHelper {
-			static AnimationDrivenCharacterCollider* ETScriptAPICall Factory0( const StringMarshal& /*resourceName*/ ) {
-				auto&	worldView( GetActiveWorldView() );
-
-				return new(worldView.GetWorldAllocator(), alignof(AnimationDrivenCharacterCollider), Allocator::AllocationDuration::Normal) AnimationDrivenCharacterCollider( worldView );
-			}
-
-			static bool ETScriptAPICall IsOnGround( const AnimationDrivenCharacterCollider* armature ) {
-				return armature->_controller.onGround();
-			}
-		};
-
-	// ---
-
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("WorldView::AnimationDrivenCharacterCollider::ExposeScriptAPI() Temporary Allocator") );
-
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<AnimationDrivenCharacterCollider>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
-
-			typeRegistrar.EnsureReferenceTypeDeclared<Armature>();
-			typeBuilder.ExposeFactory( &FunctionHelper::Factory0 );
-			typeBuilder.ExposeVirtualProperty( "IsOnGround", &FunctionHelper::IsOnGround );
-
-			temporaryAllocator.Delete( typeBuilder );
-		}
-	}
+	void ETNoAliasHint WorldView::AnimationDrivenCharacterCollider::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
 
 // ---------------------------------------------------
 

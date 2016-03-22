@@ -678,8 +678,14 @@
     <ClCompile Include="..\src\Renderer\Vulkan\EngineService.ImageFactory.cpp">
       <Filter>Source Files\Renderer\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Scripting\AngelScript\ApiExport.cpp">
+      <Filter>Source Files\Scripting\Angelscript</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\Renderer\Vulkan\VirtualTexture.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.cpp">
+      <Filter>Source Files\Scripting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1262,8 +1268,11 @@
     <ClInclude Include="..\src\Utility\Containers\HashSet.hpp">
       <Filter>Header Files\Utility\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Scripting\AngelScript\ApiExport.hpp">
+      <Filter>Header Files\Scripting\Angelscript</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Renderer\Vulkan\VirtualTexture.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Renderer\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -30,10 +30,9 @@ namespace Input {
 
 	public:
 		//!	Constructs this @ref Keyboard instance.
-		Keyboard();
+		Keyboard() = default;
 
-		//!	Destroys this @ref Keyboard instance.
-		~Keyboard();
+		~Keyboard() = default;
 
 	// - SCRIPT API REFERENCE ----------------------------
 

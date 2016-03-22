@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <FlatBufferMetadataBuilderVisitor.hpp>
+#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 #include <angelscript.h>
 //------------------------------------------------------------------//
@@ -25,7 +26,6 @@ namespace Tools {
 	FlatBufferMetadataBuilderVisitor::FlatBufferMetadataBuilderVisitor( ::asIBinaryStream& outputStream, Allocator& allocator ) : _pendingFunctionMetadata( { allocator, UTF8L( "Angelscript FlatBuffer Metadata Serializer Pending Function Metadata Allocator" ) } ),
 																																  _pendingPropertyMetadata( { allocator, UTF8L("Angelscript FlatBuffer Metadata Serializer Pending Property Metadata Allocator") } ),
 																																  _pendingTypeMetadata( { allocator, UTF8L("Angelscript FlatBuffer Metadata Serializer Pending Type Metadata Allocator") } ),
-																																  _moduleMetadataBuilder( _builder ),
 																																  _outputStream( outputStream ) {}
 
 // ---------------------------------------------------
@@ -43,7 +43,17 @@ namespace Tools {
 
 	// ---
 
-		FinishModuleMetadataBuffer( _builder, _moduleMetadataBuilder.Finish() );
+		auto propertyOffset( _builder.CreateVector( _pendingPropertyMetadata.Data(), _pendingPropertyMetadata.Size() ) );
+		auto functionOffset( _builder.CreateVector( _pendingFunctionMetadata.Data(), _pendingFunctionMetadata.Size() ) );
+		auto typeOffset( _builder.CreateVector( _pendingTypeMetadata.Data(), _pendingTypeMetadata.Size() ) );
+
+		ModuleMetadataBuilder	moduleMetadataBuilder( _builder );
+
+		moduleMetadataBuilder.add_Properties( propertyOffset );
+		moduleMetadataBuilder.add_Functions( functionOffset );
+		moduleMetadataBuilder.add_Types( typeOffset );
+
+		FinishModuleMetadataBuffer( _builder, moduleMetadataBuilder.Finish() );
 
 		_outputStream.Write( _builder.GetBufferPointer(), _builder.GetSize() );
 
@@ -62,10 +72,7 @@ namespace Tools {
 
 // ---------------------------------------------------
 
-	void FlatBufferMetadataBuilderVisitor::FinishFunctionMetadataProcessing() {
-		_moduleMetadataBuilder.add_functions( _builder.CreateVector( _pendingFunctionMetadata.Data(), _pendingFunctionMetadata.Size() ) );
-		_pendingFunctionMetadata.Clear();
-	}
+	void FlatBufferMetadataBuilderVisitor::FinishFunctionMetadataProcessing() {}
 
 // ---------------------------------------------------
 
@@ -83,14 +90,14 @@ namespace Tools {
 
 // ---------------------------------------------------
 
-	void FlatBufferMetadataBuilderVisitor::FinishPropertyMetadataProcessing() {
-		_moduleMetadataBuilder.add_properties( _builder.CreateVector( _pendingPropertyMetadata.Data(), _pendingPropertyMetadata.Size() ) );
-		_pendingPropertyMetadata.Clear();
-	}
+	void FlatBufferMetadataBuilderVisitor::FinishPropertyMetadataProcessing() {}
 
 // ---------------------------------------------------
 
-	void FlatBufferMetadataBuilderVisitor::BeginTypeMetadataProcessing() {}
+	void FlatBufferMetadataBuilderVisitor::BeginTypeMetadataProcessing() {
+		ETRuntimeAssert( _pendingFunctionMetadata.IsEmpty() );
+		ETRuntimeAssert( _pendingPropertyMetadata.IsEmpty() );
+	}
 
 // ---------------------------------------------------
 
@@ -122,10 +129,7 @@ namespace Tools {
 
 // ---------------------------------------------------
 
-	void FlatBufferMetadataBuilderVisitor::FinishTypeMetadataProcessing() {
-		_moduleMetadataBuilder.add_types( _builder.CreateVector( _pendingTypeMetadata.Data(), _pendingTypeMetadata.Size() ) );
-		_pendingTypeMetadata.Clear();
-	}
+	void FlatBufferMetadataBuilderVisitor::FinishTypeMetadataProcessing() {}
 
 }	// namespace Tools
 }	// namespace Eldritch2

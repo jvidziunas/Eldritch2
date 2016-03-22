@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
 #include <Input/XInput/EngineService.hpp>
 //------------------------------------------------------------------//
 
@@ -54,15 +53,7 @@ namespace XInput {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint void EngineService::Controller::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("EngineService::Controller::ExposeScriptAPI() Temporary Allocator") );
-
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<Controller>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
-
-			temporaryAllocator.Delete( typeBuilder );
-		}
-	}
+	ETNoAliasHint void EngineService::Controller::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
 
 // ---------------------------------------------------
 

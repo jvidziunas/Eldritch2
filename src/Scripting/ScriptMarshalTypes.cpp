@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
 //------------------------------------------------------------------//
@@ -40,56 +39,34 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( const StringMarshal& string, Allocator& allocator ) : StringMarshal( string.GetCharacterArray(), string.GetLength(), allocator ) {}
+	StringMarshal::StringMarshal( const StringMarshal& string, Allocator& allocator ) : StringMarshal( string.AsCString(), string.GetLength(), allocator ) {}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint void StringMarshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
 		using BinaryOperatorClass = ScriptApiRegistrationInitializationVisitor::BinaryOperatorClass;
 
-		struct FunctionHelper {
-			static void ETScriptAPICall Constructor0( void* const thisPointer ) {
-				new(thisPointer) StringMarshal( *stringAllocator );
-			}
-
-			static void ETScriptAPICall Constructor1( void* const thisPointer, const StringMarshal& string ) {
-				new(thisPointer) StringMarshal( string, *stringAllocator );
-			}
-
-			static StringMarshal& ETScriptAPICall OpAssign( StringMarshal* thisPointer, const StringMarshal& otherString ) {
-				return static_cast<StringMarshal&>((*thisPointer).Assign( otherString.Begin(), otherString.End() ));
-			}
-
-			static StringMarshal& ETScriptAPICall OpAddAssign( StringMarshal* thisPointer, const StringMarshal& additionalString ) {
-				return static_cast<StringMarshal&>((*thisPointer) += additionalString);
-			}
-
-			static int ETScriptAPICall OpCompare( const StringMarshal* thisPointer, const StringMarshal& operand ) {
-				return thisPointer->Compare( operand );
-			}
-
-			static StringMarshal::SizeType ETScriptAPICall GetLength( const StringMarshal* thisPointer ) {
-				return thisPointer->GetLength();
-			}
-		};
-
 	// ---
 
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("StringMarshal::ExposeScriptAPI() Temporary Allocator") );
-		const auto					registerResult( typeRegistrar.RegisterUserDefinedValueType<StringMarshal>( temporaryAllocator ) );
-		auto&						typeBuilder( *registerResult.object );
+		auto	builder( typeRegistrar.BeginValueTypeRegistration<StringMarshal>() );
 
-		ETRuntimeAssert( registerResult );
+		builder.ExposeConstructor( [] ( void* thisPointer ) -> void {
+			new(thisPointer) StringMarshal( *stringAllocator );
+		} ).ExposeConstructor<const StringMarshal&>( [] ( void* thisPointer, const StringMarshal& string ) {
+			new(thisPointer) StringMarshal( string, *stringAllocator );
+		} );
 
-		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
+		builder.ExposeVirtualProperty<SizeType>( "Length", [] ( const StringMarshal* thisPointer ) {
+			return thisPointer->GetLength();
+		} );
 
-		typeBuilder.ExposeVirtualProperty( "Length", &FunctionHelper::GetLength );
-
-		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign ).ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign );
+		builder.ExposeBinaryOperator<StringMarshal&, const StringMarshal&>( BinaryOperatorClass::Assignment, [] ( StringMarshal* thisPointer, const StringMarshal& otherString ) -> StringMarshal& {
+			return static_cast<StringMarshal&>((*thisPointer).Assign( otherString.Begin(), otherString.End() ));
+		} ).ExposeBinaryOperator<StringMarshal&, const StringMarshal&>( BinaryOperatorClass::AdditionAssignment, [] ( StringMarshal* thisPointer, const StringMarshal& additionalString ) -> StringMarshal& {
+			return static_cast<StringMarshal&>((*thisPointer) += additionalString);
+		} );
 
 		/* typeBuilder.ExposeBinaryOperator( BinaryOperatorClasses::COMPARISON, &FunctionHelper::OpCompare ); */
-
-		temporaryAllocator.Delete( typeBuilder );
 	}
 
 // ---------------------------------------------------
@@ -109,123 +86,66 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	ETNoAliasHint void Float4Marshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		struct FunctionHelper {
-			static void ETScriptAPICall Constructor0( void* const thisPointer, float32 x, float32 y ) {
-				new(thisPointer) Float4Marshal( x, y, 0.0f, 0.0f );
-			}
-
-			static void ETScriptAPICall Constructor1( void* const thisPointer, float32 x, float32 y, float32 z ) {
-				new(thisPointer) Float4Marshal( x, y, z, 0.0f );
-			}
-
-			static void ETScriptAPICall Constructor2( void* const thisPointer, float32 x, float32 y, float32 z, float32 w ) {
-				new(thisPointer) Float4Marshal( x, y, z, w );
-			}
-
-			static void ETScriptAPICall Constructor3( void* const thisPointer, const Float4Marshal& source ) {
-				new(thisPointer) Float4Marshal( source );
-			}
-
-			static ETInlineHint ETNoAliasHint float32 ETScriptAPICall DotProduct( const Float4Marshal& vector0, const Float4Marshal& vector1 ) {
-				return ::Eldritch2::DotProduct( vector0, vector1 );
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal	ETScriptAPICall LinearInterpolate( const Float4Marshal& vector0, const Float4Marshal& vector1, float32 alpha ) {
-				return ::Eldritch2::LinearInterpolate( vector0, vector1, alpha );
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall CrossProduct( const Float4Marshal& vector0, const Float4Marshal& vector1 ) {
-				return ::Eldritch2::CrossProduct( vector0, vector1 );
-			}
-
-			static ETInlineHint ETNoAliasHint float32 ETScriptAPICall GetSquaredMagnitude( const Float4Marshal* thisPointer ) {
-				return ::Eldritch2::DotProduct( *thisPointer, *thisPointer );
-			}
-
-			static ETInlineHint ETNoAliasHint float32 ETScriptAPICall GetInverseMagnitude( const Float4Marshal* thisPointer ) {
-				return ReciprocalSqrt( GetSquaredMagnitude( thisPointer ) );
-			}
-
-			static ETInlineHint ETNoAliasHint float32 ETScriptAPICall GetMagnitude( const Float4Marshal* thisPointer ) {
-				return Sqrt( GetSquaredMagnitude( thisPointer ) );
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal& ETScriptAPICall Normalize( Float4Marshal* thisPointer ) {
-				// Normalize() returns a reference to itself. This conversion cannot be done implicitly, but is safe in this context.
-				return static_cast<Float4Marshal&>(thisPointer->Normalize());
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall OpAdd( const Float4Marshal* thisPointer, const Float4Marshal& operand ) {
-				return { *thisPointer + operand };
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall OpSubtract( const Float4Marshal* thisPointer, const Float4Marshal& operand ) {
-				return { *thisPointer - operand };
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall OpMultiply( const Float4Marshal* thisPointer, float32 operand ) {
-				return { *thisPointer * operand };
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall OpDivide( const Float4Marshal* thisPointer, float32 operand ) {
-				return { *thisPointer / operand };
-			}
-
-			static Float4Marshal& ETScriptAPICall OpAssign( Float4Marshal* thisPointer, const Float4Marshal& operand ) {
-				return { *thisPointer = operand };
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal& ETScriptAPICall OpAddAssign( Float4Marshal* thisPointer, const Float4Marshal& operand ) {
-				// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
-				return static_cast<Float4Marshal&>((*thisPointer) += operand);
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal& ETScriptAPICall OpSubtractAssign( Float4Marshal* thisPointer, const Float4Marshal& operand ) {
-				// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
-				return static_cast<Float4Marshal&>((*thisPointer) -= operand);
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal& ETScriptAPICall OpMultiplyAssign( Float4Marshal* thisPointer, float32 operand ) {
-				// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
-				return static_cast<Float4Marshal&>((*thisPointer) *= operand);
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal& ETScriptAPICall OpDivideAssign( Float4Marshal* thisPointer, float32 operand ) {
-				// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
-				return static_cast<Float4Marshal&>((*thisPointer) /= operand);
-			}
-		};
-
-		using BinaryOperatorClass	= ScriptApiRegistrationInitializationVisitor::BinaryOperatorClass;
+		using BinaryOperatorClass = ScriptApiRegistrationInitializationVisitor::BinaryOperatorClass;
 
 	// ---
 
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("Float4Marshal::ExposeScriptAPI() Temporary Allocator") );
-		const auto					registerResult( visitor.RegisterUserDefinedValueType<Float4Marshal>( temporaryAllocator ) );
-		auto&						typeBuilder( *registerResult.object );
-
-		ETRuntimeAssert( registerResult );
+		auto	builder( visitor.BeginValueTypeRegistration<Float4Marshal>() );
 			
 		// Constructor registration
-		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 ).ExposeConstructor( &FunctionHelper::Constructor2 ).ExposeConstructor( &FunctionHelper::Constructor3 );
+		builder.ExposeConstructor( [] ( void* thisPointer ) {
+			new(thisPointer) Float4Marshal( 0.0f, 0.0f, 0.0f, 0.0f );
+		} ).ExposeConstructor<float32, float32>( [] ( void* thisPointer, float32 x, float32 y ) {
+			new(thisPointer) Float4Marshal( x, y, 0.0f, 0.0f );
+		} ).ExposeConstructor<float32, float32, float32>( [] ( void* thisPointer, float32 x, float32 y, float32 z ) {
+			new(thisPointer) Float4Marshal( x, y, z, 0.0f );
+		} ).ExposeConstructor<float32, float32, float32, float32>( [] ( void* thisPointer, float32 x, float32 y, float32 z, float32 w ) {
+			new(thisPointer) Float4Marshal( x, y, z, w );
+		} ).ExposeConstructor<const Float4Marshal&>( [] ( void* thisPointer, const Float4Marshal& source ) {
+			new(thisPointer) Float4Marshal( source );
+		} );
 
 		// Virtual property registration
-		typeBuilder.ExposeVirtualProperty( "SquaredMagnitude", &FunctionHelper::GetSquaredMagnitude ).ExposeVirtualProperty( "InverseMagnitude", &FunctionHelper::GetInverseMagnitude ).ExposeVirtualProperty( "Magnitude", &FunctionHelper::GetMagnitude );
+		builder.ExposeVirtualProperty<float32>( "SquaredMagnitude", [] ( const Float4Marshal* thisPointer ) {
+			return ::Eldritch2::DotProduct( *thisPointer, *thisPointer );
+		} ).ExposeVirtualProperty<float32>( "InverseMagnitude", [] ( const Float4Marshal* thisPointer ) {
+			return ::Eldritch2::ReciprocalSqrt( ::Eldritch2::DotProduct( *thisPointer, *thisPointer ) );
+		} ).ExposeVirtualProperty<float32>( "Magnitude", [] ( const Float4Marshal* thisPointer ) {
+			return ::Eldritch2::Sqrt( ::Eldritch2::DotProduct( *thisPointer, *thisPointer ) );
+		} );
 
 		// Method registration
-		typeBuilder.ExposeMethod( "Normalize", &FunctionHelper::Normalize );
+		builder.ExposeMethod<Float4Marshal&>( "Normalize", [] ( Float4Marshal* thisPointer ) -> Float4Marshal& {
+			// Normalize() returns a reference to itself. This conversion cannot be done implicitly, but is safe in this context.
+			return static_cast<Float4Marshal&>(thisPointer->Normalize());
+		} );
 
-		// Operator registration
-		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Addition, &FunctionHelper::OpAdd ).ExposeBinaryOperator( BinaryOperatorClass::Subtraction, &FunctionHelper::OpSubtract );
-		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Multiplication, &FunctionHelper::OpMultiply ).ExposeBinaryOperator( BinaryOperatorClass::Division, &FunctionHelper::OpDivide );
-		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::Assignment, &FunctionHelper::OpAssign );
-		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::AdditionAssignment, &FunctionHelper::OpAddAssign ).ExposeBinaryOperator( BinaryOperatorClass::SubtractionAssignment, &FunctionHelper::OpSubtractAssign );
-		typeBuilder.ExposeBinaryOperator( BinaryOperatorClass::MultiplicationAssignment, &FunctionHelper::OpMultiplyAssign ).ExposeBinaryOperator( BinaryOperatorClass::DivisionAssignment, &FunctionHelper::OpDivideAssign );
+		builder.ExposeBinaryOperator<Float4Marshal, const Float4Marshal&>( BinaryOperatorClass::Addition, [] ( const Float4Marshal* thisPointer, const Float4Marshal& operand ) -> Float4Marshal {
+			return { *thisPointer + operand };
+		} ).ExposeBinaryOperator<Float4Marshal, const Float4Marshal&>( BinaryOperatorClass::Subtraction, [] ( const Float4Marshal* thisPointer, const Float4Marshal& operand ) -> Float4Marshal {
+			return { *thisPointer - operand };
+		} ).ExposeBinaryOperator<Float4Marshal, float32>( BinaryOperatorClass::Multiplication, [] ( const Float4Marshal* thisPointer, float32 operand ) -> Float4Marshal {
+			return { *thisPointer * operand };
+		} ).ExposeBinaryOperator<Float4Marshal, float32>( BinaryOperatorClass::Division, [] ( const Float4Marshal* thisPointer, float32 operand ) -> Float4Marshal {
+			return { *thisPointer / operand };
+		} ).ExposeBinaryOperator<Float4Marshal, const Float4Marshal&>( BinaryOperatorClass::Assignment, [] ( Float4Marshal* thisPointer, const Float4Marshal& operand ) -> Float4Marshal {
+			return { *thisPointer = operand };
+		} ).ExposeBinaryOperator<Float4Marshal&, const Float4Marshal&>( BinaryOperatorClass::AdditionAssignment, [] ( Float4Marshal* thisPointer, const Float4Marshal& operand ) -> Float4Marshal& {
+			// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
+			return static_cast<Float4Marshal&>((*thisPointer) += operand);
+		} ).ExposeBinaryOperator<Float4Marshal&, const Float4Marshal&>( BinaryOperatorClass::SubtractionAssignment, [] ( Float4Marshal* thisPointer, const Float4Marshal& operand ) -> Float4Marshal& {
+			// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
+			return static_cast<Float4Marshal&>((*thisPointer) -= operand);
+		} ).ExposeBinaryOperator<Float4Marshal&, float32>( BinaryOperatorClass::MultiplicationAssignment, [] ( Float4Marshal* thisPointer, float32 operand ) -> Float4Marshal& {
+			// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
+			return static_cast<Float4Marshal&>((*thisPointer) *= operand);
+		} ).ExposeBinaryOperator<Float4Marshal&, float32>( BinaryOperatorClass::DivisionAssignment, [] ( Float4Marshal* thisPointer, float32 operand ) -> Float4Marshal& {
+			// the combo assignment operators return a reference to themselves. This can't be done implicitly, but is safe in this context.
+			return static_cast<Float4Marshal&>((*thisPointer) /= operand);
+		} );
 
 		// Global function registration
-		visitor.ExposeFunction( "DotProduct", &FunctionHelper::DotProduct ).ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate ).ExposeFunction( "CrossProduct", &FunctionHelper::CrossProduct );
-
-		temporaryAllocator.Delete( typeBuilder );
+		// visitor.ExposeFunction( "DotProduct", &FunctionHelper::DotProduct ).ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate ).ExposeFunction( "CrossProduct", &FunctionHelper::CrossProduct );
 	}
 
 // ---------------------------------------------------
@@ -239,68 +159,36 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	ETNoAliasHint void OrientationMarshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		struct FunctionHelper {
-			static void ETScriptAPICall Constructor0( void* const thisPointer ) {
-				new(thisPointer) OrientationMarshal( 1.0f, 0.0f, 0.0f, 0.0f );
-			}
+		visitor.EnsureValueTypeDeclaredToScript<Float4Marshal>();
 
-			static void ETScriptAPICall Constructor1( void* const thisPointer, float32 w, float32 x, float32 y, float32 z ) {
-				new(thisPointer) OrientationMarshal( x, y, z, w );
-			}
-
-			static ETInlineHint ETNoAliasHint OrientationMarshal ETScriptAPICall LinearInterpolate( const OrientationMarshal& orientation0, const OrientationMarshal& orientation1, float32 alpha ) {
-				return ::Eldritch2::LinearInterpolate( orientation0, orientation1, alpha );
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal	ETScriptAPICall RotateVector( const OrientationMarshal* thisPointer, const Float4Marshal& point ) {
-				return { thisPointer->RotateVector( point ) };
-			}
-
-			static ETInlineHint ETNoAliasHint OrientationMarshal ETScriptAPICall GetReverse( const OrientationMarshal* thisPointer ) {
-				return { thisPointer->GetReverse() };
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal	ETScriptAPICall GetForwardVector( const OrientationMarshal* thisPointer ) {
-				return RotateVector( thisPointer, { 0.0f, 0.0f, 1.0f, 0.0f } );
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall GetUpVector( const OrientationMarshal* thisPointer ) {
-				return RotateVector( thisPointer, { 0.0f, 1.0f, 0.0f, 0.0f } );
-			}
-
-			static ETInlineHint ETNoAliasHint Float4Marshal ETScriptAPICall GetRightVector( const OrientationMarshal* thisPointer ) {
-				return RotateVector( thisPointer, { 1.0f, 0.0f, 0.0f, 0.0f } );
-			}
-
-			static ETInlineHint ETNoAliasHint OrientationMarshal ETScriptAPICall OrientationFromLookatUpVectors( const Float4Marshal& /*lookAt*/, const Float4Marshal& /*up*/ ) {
-				return { 0.0f, 0.0f, 0.0f, 1.0f };
-			}
-		};
-
-	// ---
-
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("OrientationMarshal::ExposeScriptAPI() Temporary Allocator") );
-		const auto					registerResult( visitor.RegisterUserDefinedValueType<OrientationMarshal>( temporaryAllocator ) );
-		auto&						typeBuilder( *registerResult.object );
-
-		ETRuntimeAssert( registerResult );
-			
-		visitor.EnsureValueTypeDeclared<Float4Marshal>();
+		auto	builder( visitor.BeginValueTypeRegistration<OrientationMarshal>() );
 
 		// Constructor registration
-		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
+		builder.ExposeConstructor( [] ( void* thisPointer ) {
+			new(thisPointer) OrientationMarshal( 0.0f, 0.0f, 0.0f, 1.0f );
+		} ).ExposeConstructor<float32, float32, float32, float32>( [] ( void* thisPointer, float32 x, float32 y, float32 z, float32 w ) {
+			new(thisPointer) OrientationMarshal( x, y, z, w );
+		} ).ExposeConstructor<const Float4Marshal&, const Float4Marshal&>( [] ( void* thisPointer, const Float4Marshal& lookAt, const Float4Marshal& up ) {
+			new(thisPointer) OrientationMarshal( 0.0f, 0.0f, 0.0f, 1.0f );
+		} );
 
 		// Virtual property registration
-		typeBuilder.ExposeVirtualProperty( "Reverse", &FunctionHelper::GetReverse ).ExposeVirtualProperty( "ForwardVector", &FunctionHelper::GetForwardVector );
-		typeBuilder.ExposeVirtualProperty( "UpVector", &FunctionHelper::GetUpVector ).ExposeVirtualProperty( "RightVector", &FunctionHelper::GetRightVector );
-
-		// Method registration
-		typeBuilder.ExposeMethod( "RotateVector", &FunctionHelper::RotateVector );
+		builder.ExposeVirtualProperty<OrientationMarshal>( "Reverse", [] ( const OrientationMarshal* thisPointer ) -> OrientationMarshal {
+			return { thisPointer->GetReverse() };
+		} ).ExposeVirtualProperty<Float4Marshal>( "ForwardVector", [] ( const OrientationMarshal* thisPointer ) -> Float4Marshal {
+			return { thisPointer->GetReverse().RotateVector( { 0.0f, 0.0f, 1.0f, 0.0f } ) };
+		} ).ExposeVirtualProperty<Float4Marshal>( "UpVector", [] ( const OrientationMarshal* thisPointer ) -> Float4Marshal {
+			return { thisPointer->GetReverse().RotateVector( { 0.0f, 1.0f, 0.0f, 0.0f } ) };
+		} ).ExposeVirtualProperty<Float4Marshal>( "RightVector", [] ( const OrientationMarshal* thisPointer ) -> Float4Marshal {
+			return { thisPointer->GetReverse().RotateVector( { 1.0f, 0.0f, 0.0f, 0.0f } ) };
+		} );
 
 		// Global function registration
-		visitor.ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate );
-
-		temporaryAllocator.Delete( typeBuilder );
+		visitor.ExposeFunction<Float4Marshal, const Float4Marshal&, const OrientationMarshal&>( "RotateWorldToLocal", [] ( const Float4Marshal& point, const OrientationMarshal& localFrame ) -> Float4Marshal {
+			return { localFrame.RotateVector( point ) };
+		} ).ExposeFunction<OrientationMarshal, const OrientationMarshal&, const OrientationMarshal&, float32>( "LinearInterpolate", [] ( const OrientationMarshal& orientation0, const OrientationMarshal& orientation1, float32 alpha ) -> OrientationMarshal {
+			return ::Eldritch2::LinearInterpolate( orientation0, orientation1, alpha );
+		} );
 	}
 
 // ---------------------------------------------------
@@ -314,34 +202,20 @@ namespace Scripting {
 // ---------------------------------------------------
 
 	ETNoAliasHint void RigidTransformMarshal::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		struct FunctionHelper {
-			static void ETScriptAPICall Constructor0( void* const thisPointer ) {
-				new(thisPointer) RigidTransformMarshal( { 0.0f, 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.0f } );
-			}
+		visitor.EnsureValueTypeDeclaredToScript<Float4Marshal>();
+		visitor.EnsureValueTypeDeclaredToScript<OrientationMarshal>();
 
-			static void ETScriptAPICall Constructor1( void* const thisPointer, const Float4Marshal& translation, const OrientationMarshal& orientation ) {
-				new(thisPointer) RigidTransformMarshal( translation, orientation );
-			}
-		};
-
-	// ---
-
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("OrientationMarshal::ExposeScriptAPI() Temporary Allocator") );
-		const auto					registerResult( visitor.RegisterUserDefinedValueType<RigidTransformMarshal>( temporaryAllocator ) );
-		auto&						typeBuilder( *registerResult.object );
-
-		ETRuntimeAssert( registerResult );
-			
-		visitor.EnsureValueTypeDeclared<Float4Marshal>();
-		visitor.EnsureValueTypeDeclared<OrientationMarshal>();
+		auto	builder( visitor.BeginValueTypeRegistration<RigidTransformMarshal>() );
 
 		// Constructor registration
-		typeBuilder.ExposeConstructor( &FunctionHelper::Constructor0 ).ExposeConstructor( &FunctionHelper::Constructor1 );
+		builder.ExposeConstructor( [] ( void* const thisPointer ) {
+			new(thisPointer) RigidTransformMarshal( { 0.0f, 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.0f } );
+		} ).ExposeConstructor<const Float4Marshal&, const OrientationMarshal&>( [] ( void* const thisPointer, const Float4Marshal& translation, const OrientationMarshal& orientation ) {
+			new(thisPointer) RigidTransformMarshal( translation, orientation );
+		} );
 
 		// Property registration
-		typeBuilder.ExposeProperty( "translation", &RigidTransformMarshal::translation ).ExposeProperty( "orientation", &RigidTransformMarshal::orientation );
-
-		temporaryAllocator.Delete( typeBuilder );
+		builder.ExposeProperty( "translation", &RigidTransformMarshal::translation ).ExposeProperty( "orientation", &RigidTransformMarshal::orientation );
 	}
 
 }	// namespace Scripting

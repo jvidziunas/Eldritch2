@@ -84,7 +84,6 @@ namespace Tools {
 		::Eldritch2::ResizableArray<flatbuffers::Offset<TypeMetadata>>		_pendingTypeMetadata;
 
 		flatbuffers::FlatBufferBuilder										_builder;
-		ModuleMetadataBuilder												_moduleMetadataBuilder;
 		::asIBinaryStream&													_outputStream;
 	};
 

@@ -14,9 +14,8 @@
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Renderer/Direct3D11/Builders/SwapChainBuilder.hpp>
-#include <Renderer/Direct3D11/SwapChain.hpp>
 #include <Utility/Win32ApplicationHelpers.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
+#include <Renderer/Direct3D11/SwapChain.hpp>
 #include <utfcpp/v2_0/source/utf8/checked.h>
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Resources/Eldritch2.Resources.h>
@@ -145,27 +144,7 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	void SwapChain::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		struct FunctionHelper {
-			static void ETScriptAPICall SetCaption( SwapChain* thisPointer, const StringMarshal& newCaption ) {
-				thisPointer->SetCaption( newCaption.GetCharacterArray() );
-			}
-		};
-
-	// ---
-
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("SwapChain::ExposeScriptAPI() Temporary Allocator") );
-
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<SwapChain>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
-
-			typeRegistrar.EnsureValueTypeDeclared<StringMarshal>();
-
-			typeBuilder.ExposeVirtualProperty( "Caption", &FunctionHelper::SetCaption );
-
-			temporaryAllocator.Delete( typeBuilder );
-		}
-	}
+	void SwapChain::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
 
 // ---------------------------------------------------
 

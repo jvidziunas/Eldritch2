@@ -12,9 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/ScriptAPIRegistrationInitializationVisitor.hpp>
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
 
+using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Animation;
 using namespace ::Eldritch2;
 
@@ -29,6 +31,12 @@ namespace Animation {
 		for( auto& layer : _layers ) {
 			layer.EvaluateCacheForTime( _keyCache, maximumBoneToConsider, time );
 		}
+	}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint void Armature::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		auto	builder( visitor.BeginReferenceTypeRegistration<Armature>() );
 	}
 
 }	// namespace Animation

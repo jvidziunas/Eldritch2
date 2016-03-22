@@ -14,8 +14,8 @@
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Physics/BulletDynamics/WorldView.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
+#include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/MPL/VectorTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -38,34 +38,7 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	void ETNoAliasHint WorldView::TerrainCollider::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& typeRegistrar ) {
-		struct FunctionHelper {
-			static TerrainCollider* ETScriptAPICall Factory0( const StringMarshal& /*resourceName*/ ) {
-				auto&	worldView( GetActiveWorldView() );
-
-				return new(worldView.GetWorldAllocator(), alignof(TerrainCollider), Allocator::AllocationDuration::Normal) TerrainCollider( worldView );
-			}
-
-			static void ETScriptAPICall SetIsEnabled( TerrainCollider* /*component*/, bool /*enabled*/ ) {}
-
-			static bool ETScriptAPICall GetIsEnabled( const TerrainCollider* /*component*/ ) {
-				return true;
-			}
-		};
-
-	// ---
-
-		FixedStackAllocator<16u>	temporaryAllocator( UTF8L("WorldView::TerrainCollider::ExposeScriptAPI() Temporary Allocator") );
-
-		if( const auto registerResult = typeRegistrar.RegisterUserDefinedReferenceType<TerrainCollider>( temporaryAllocator ) ) {
-			auto&	typeBuilder( *registerResult.object );
-
-			typeBuilder.ExposeFactory( &FunctionHelper::Factory0 );
-			typeBuilder.ExposeVirtualProperty( "IsEnabled", &FunctionHelper::SetIsEnabled ).ExposeVirtualProperty( "IsEnabled", &FunctionHelper::GetIsEnabled );
-
-			temporaryAllocator.Delete( typeBuilder );
-		}
-	}
+	void ETNoAliasHint WorldView::TerrainCollider::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
 
 // ---------------------------------------------------
 

@@ -150,11 +150,13 @@
     <ClCompile Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileReader.cpp" />
     <ClCompile Include="..\src\FileSystem\Win32\SynchronousFileWriter.cpp" />
+    <ClCompile Include="..\src\Scripting\AngelScript\ApiExport.cpp" />
     <ClCompile Include="..\src\Scripting\AngelScript\SmartPointers.cpp" />
     <ClCompile Include="..\src\Tools\ToolCRTPBase.cpp" />
     <ClCompile Include="..\src\Tools\Win32\FileAccessorFactory.cpp" />
     <ClCompile Include="..\src\Utility\Assert.cpp" />
     <ClCompile Include="..\src\Utility\Containers\String.cpp" />
+    <ClCompile Include="..\src\Utility\CPPFormatDefinitions.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp" />
@@ -172,6 +174,7 @@
     <ClInclude Include="..\src\FileSystem\Win32\ReadableMemoryMappedFile.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileReader.hpp" />
     <ClInclude Include="..\src\FileSystem\Win32\SynchronousFileWriter.hpp" />
+    <ClInclude Include="..\src\Scripting\AngelScript\ApiExport.hpp" />
     <ClInclude Include="..\src\Tools\FileAccessorFactory.hpp" />
     <ClInclude Include="..\src\Tools\ToolCRTPBase.hpp" />
     <ClInclude Include="..\src\Tools\Win32\FileAccessorFactory.hpp" />
