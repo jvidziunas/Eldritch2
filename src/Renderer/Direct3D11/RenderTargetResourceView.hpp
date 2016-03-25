@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Packages/ResourceView.hpp>
+#include <Renderer/Direct3D11/ImageResourceView.hpp>
 #include <Utility/COMPointer.hpp>
 //------------------------------------------------------------------//
 #if( ET_COMPILER_IS_MSVC )
@@ -32,21 +32,18 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	class RenderTargetResourceView : public FileSystem::ResourceView {
+	class RenderTargetResourceView : public Direct3D11::ImageResourceView {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref RenderTargetResourceView instance.
-		RenderTargetResourceView( FileSystem::ContentLibrary&			owningLibrary,
-								  FileSystem::ContentPackage&			package,
-								  const ::Eldritch2::UTF8Char* const	name,
-								  ::Eldritch2::Allocator&				allocator );
+		RenderTargetResourceView( const ::Eldritch2::UTF8Char* const name );
 
 		~RenderTargetResourceView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
+		::Eldritch2::ErrorCode	AttachToPackage( const ::Eldritch2::Range<const char*> bytes, FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) override;
 
 	// - DATA MEMBERS ------------------------------------
 

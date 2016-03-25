@@ -43,12 +43,12 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::PipelineFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*>	sourceAsset ) {
-		if( const auto view = new(allocator, Allocator::AllocationDuration::Normal) SPIRVPipelineDefinitionResourceView( contentLibrary, package, name, allocator ) ) {
-			return view->UpdateFromByteStream( sourceAsset );
+	Result<ResourceView> EngineService::PipelineFactory::AllocateResourceView( Allocator& allocator, const UTF8Char* const name ) const {
+		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) SPIRVPipelineDefinitionResourceView( name ) ) {
+			return { ::std::move( view ) };
 		}
 
-		return Error::OutOfMemory;
+		return { Error::OutOfMemory };
 	}
 
 }	// namespace Vulkan

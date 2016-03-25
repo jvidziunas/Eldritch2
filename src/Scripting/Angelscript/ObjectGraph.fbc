@@ -1,5 +1,5 @@
 file_identifier	"ESOG";
-file_extension	"e2serializedobjectgraph";
+file_extension	".E2SerializedObjectGraph";
 
 namespace Eldritch2.Scripting.AngelScript.FlatBuffers;
 

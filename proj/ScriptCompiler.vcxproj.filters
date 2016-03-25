@@ -267,7 +267,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\src\Scripting\AngelScript\BytecodeMetadata.fbc">
+    <CustomBuild Include="..\src\Scripting\Angelscript\BytecodePackage.fbc">
       <Filter>IDL Files</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -12,15 +12,17 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/IntrusiveVyukovMPSCQueue.hpp>
-#include <Utility/Containers/IntrusiveForwardList.hpp>
-#include <Packages/PackageDeserializationContext.hpp>
+#include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
-#include <Utility/Memory/ChildAllocator.hpp>
+#include <Scripting/ObjectHandle.hpp>
 #include <Scheduler/Thread.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+	namespace FileSystem {
+		class	ContentPackage;
+	}
+
 	namespace Utility {
 		class	UserSemaphore;
 	}
@@ -70,10 +72,10 @@ namespace FileSystem {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator															_allocator;
-		::Eldritch2::IntrusiveVyukovMPSCQueue<FileSystem::PackageDeserializationContext>	_initializationQueue;
-		::Eldritch2::IntrusiveForwardList<FileSystem::PackageDeserializationContext>		_outstandingLoadList;
+		::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>	_initializationQueue;
+		::Eldritch2::ResizableArray<Scripting::ObjectHandle<FileSystem::ContentPackage>>	_outstandingLoadList;
 		::Eldritch2::AlignedInstancePointer<Utility::UserSemaphore>							_loadSemaphore;
+		::Eldritch2::AlignedInstancePointer<Utility::UserMutex>								_initializationMutex;
 		::std::atomic<ExecutionBehavior>													_executionBehavior;
 	};
 

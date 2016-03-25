@@ -31,7 +31,7 @@ namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
 
-	TerrainResourceView::TerrainResourceView( ContentLibrary& library, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( library, package, name, allocator ) {}
+	TerrainResourceView::TerrainResourceView( const UTF8Char* const name ) : ResourceView( name ) {}
 
 // ---------------------------------------------------
 
@@ -39,18 +39,25 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
-	ErrorCode TerrainResourceView::UpdateFromByteStream( const Range<const char*> bytes ) {
+	ErrorCode TerrainResourceView::AttachToPackage( const Range<const char*> /*bytes*/, ContentPackage& /*package*/, ContentLibrary& library ) {
 		PxHeightFieldDesc	descriptor;
 
-		return Error::UnsupportedOperation;
+		PublishToLibraryAs<decltype(*this)>( library );
+
+		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void TerrainResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<decltype(*this)>( library );
 	}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint const UTF8Char* const TerrainResourceView::GetSerializedDataTag() {
-		return UTF8L("e2Terrain");
+		return UTF8L("E2Terrain");
 	}
-
 }	// namespace PhysX
 }	// namespace Physics
 }	// namespace Eldritch2

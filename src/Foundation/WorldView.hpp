@@ -91,6 +91,8 @@ namespace Foundation {
 			*/
 		void									SetPaused( bool paused = true );
 
+		void									RequestWorldShutdown() const;
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref WorldView instance.

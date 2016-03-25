@@ -60,14 +60,12 @@ namespace PhysX {
 		_scene->userData = this;
 		_scene->setSimulationEventCallback( this, PX_DEFAULT_CLIENT );
 		_scene->setContactModifyCallback( this );
+		_scene->simulate( 0.0f );
 	}
 
 // ---------------------------------------------------
 
-	WorldView::~WorldView() {
-		_scene->checkResults( true );
-		_scene->flushSimulation();
-	}
+	WorldView::~WorldView() {}
 
 // ---------------------------------------------------
 

@@ -43,7 +43,7 @@ namespace Foundation {
 																				   _properties( { _allocator, UTF8L("World Key-Value Pair Table Allocator") } ),
 																				   _isPaused( 1u ),
 																				   _isLoaded( 0u ),
-																				   _fatalErrorCount( 0u ),
+																				   _executeFlag( true ),
 																				   _managementView( *this ) {
 		owningEngine.NotifyOfNewWorld( *this );
 
@@ -52,7 +52,7 @@ namespace Foundation {
 			RaiseFatalError();
 		}
 
-		if( !EncounteredFatalError() ) {
+		if( CanExecute() ) {
 			SetProperty( GetMainPackageKey(), resourceName );
 
 			if( auto initiateLoadResult = _contentLibrary.ResolvePackageByName( resourceName ) ) {
@@ -125,19 +125,32 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void World::QueueUpdateTasks( WorkerContext& executingContext, WorkerContext::FinishCounter& finishCounter ) {
+		// Add a reference that will be released by the update functions below when they complete/exit scope.
 		AddReference();
 
 		if( IsLoaded() ) {
-			executingContext.Enqueue( finishCounter, { &_managementView, [] ( void* view, WorkerContext& executingContext ) {
-				static_cast<ManagementView*>(view)->ExecuteFrame( executingContext );
+			executingContext.Enqueue( finishCounter, { this, [] ( void* world, WorkerContext& executingContext ) {
+				// This handle ensures the world will not be deleted until the task has finished executing.
+				ObjectHandle<World>	worldReference( *static_cast<World*>(world), ::Eldritch2::PassthroughReferenceCountingSemantics );
+
+				static_cast<World*>(world)->_managementView.ExecuteFrame( executingContext );
 			} } );
 
 			return;
 		}
 
-		executingContext.Enqueue( finishCounter, { &_managementView, [] ( void* view, WorkerContext& executingContext ) {
-			static_cast<ManagementView*>(view)->TryFinalizeLoad( executingContext );
+		executingContext.Enqueue( finishCounter, { this, [] ( void* world, WorkerContext& executingContext ) {
+			// This handle ensures the world will not be deleted until the task has finished executing.
+			ObjectHandle<World>	worldReference( *static_cast<World*>(world), ::Eldritch2::PassthroughReferenceCountingSemantics );
+
+			static_cast<World*>(world)->_managementView.TryFinalizeLoad( executingContext );
 		} } );
+	}
+
+// ---------------------------------------------------
+
+	Logger& World::GetLogger( LogMessageType type ) const {
+		return _engine.GetLoggerForMessageType( type );
 	}
 
 // ---------------------------------------------------
@@ -154,8 +167,14 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint const ::Eldritch2::UTF8Char* const World::GetMainPackageKey() {
+	ETNoAliasHint const UTF8Char* const World::GetMainPackageKey() {
 		return UTF8L("PackageName");
+	}
+
+// ---------------------------------------------------
+
+	ETNoAliasHint const UTF8Char* const World::GetRulesKey() {
+		return UTF8L("Rules");
 	}
 
 // ---------------------------------------------------

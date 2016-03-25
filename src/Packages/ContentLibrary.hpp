@@ -13,9 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
-#include <Utility/Containers/HashMap.hpp>
 #include <Utility/Memory/InstanceDeleters.hpp>
 #include <Packages/ResourceViewFactory.hpp>
+#include <Logging/FileAppendingLogger.hpp>
+#include <Utility/Containers/HashMap.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
 #include <Utility/CountedResult.hpp>
 #include <Utility/Result.hpp>
@@ -26,7 +27,6 @@
 namespace Eldritch2 {
 	namespace FileSystem {
 		class	ResourceViewFactoryPublishingInitializationVisitor;
-		class	PackageDeserializationContext;
 		class	ContentProvider;
 		class	ContentPackage;
 		class	LoaderThread;
@@ -48,31 +48,9 @@ namespace Eldritch2 {
 namespace FileSystem {
 
 	class ContentLibrary : private Utility::Noncopyable {
-	// - TYPE PUBLISHING ---------------------------------
-		
-	public:
-		using ResourceViewFactoryCollection = ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceViewFactory>;
-
-		class ResourceViewKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref ResourceViewKey instance.
-			/*!	@param[in] resourceName The name of the @ref ResourceView to find.
-				@param[in] resourceType The concrete polymorphic type of the @ref ResourceView
-				*/
-			ETInlineHint ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType );
-			//! Constructs this @ref ResourceViewKey instance.
-			/*! @param[in] view @ref ResourceView to create a key for.
-				*/
-			ResourceViewKey( const FileSystem::ResourceView& view );
-
-			//! Constructs this @ref ResourceViewKey instance.
-			ETInlineHint ResourceViewKey() = default;
-		};
-
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
+	public:
 		//! Constructs this @ref ContentLibrary instance.
 		/*! @param[in] contentProvider @ref ContentProvider that will translate package names into operating system file objects.
 			@param[in] scheduler @ref ThreadScheduler instance that will be responsible for running the internal @ref LoaderThread instance.
@@ -117,27 +95,79 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
-		ETInlineHint ::Eldritch2::Range<ResourceViewFactoryCollection::Iterator>	GetFactoriesForResourceType( const ::Eldritch2::UTF8Char* const resourceTypeName );
+		ETInlineHint const ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceViewFactory>&	GetFactoriesForResourceType( const ::Eldritch2::UTF8Char* const resourceTypeName ) const;
+
+	// - TYPE PUBLISHING ---------------------------------
+
+	private:
+		using ResourceViewKey = ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*>;
+
+	// ---
+
+		class OrphanContentNotifier : public FileSystem::ResourceViewFactory {
+		// - TYPE PUBLISHING ---------------------------------
+
+		public:
+			//!	Constructs this @ref OrphanContentNotifier instance.
+			/*!	@param[in] contentProvider @ref ContentProvider that the new @ref OrphanContentNotifier will create logging files for.
+				@param[in] allocator @ref Allocator the new @ref OrphanContentProvider will use to perform internal allocations.
+				*/
+			OrphanContentNotifier( FileSystem::ContentProvider& contentProvider, ::Eldritch2::Allocator& allocator );
+
+			~OrphanContentNotifier() = default;
+
+		// ---------------------------------------------------
+
+			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			mutable Foundation::FileAppendingLogger	_logger;
+		};
+
+	// ---
+
+		struct NameEqual {
+			ETInlineHint bool	operator()( const ::Eldritch2::UTF8Char* const name0, const ::Eldritch2::UTF8Char* const name1 ) const;
+		};
+
+	// ---
+
+		struct ViewKeyEqual {
+			//! Tests two @ref ResourceViewKey instances for equality.
+			/*! @returns _True_ if the two keys describe the same view, _false_ if they reference different types.
+				*/
+			ETInlineHint bool	operator()( const ResourceViewKey& key0, const ResourceViewKey& key1 ) const;
+		};
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		::Eldritch2::ChildAllocator															_allocator;
-		::Eldritch2::ChildAllocator															_deserializationContextAllocator;
-		FileSystem::ContentProvider&														_contentProvider;
-		
+		::Eldritch2::ChildAllocator																	_allocator;
+		FileSystem::ContentProvider&																_contentProvider;
+
 		//! User-space mutex guarding the global content package library. _Not_ responsible for protecting the actual resource views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_contentPackageDirectoryMutex;
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>							_contentPackageDirectoryMutex;
 		//! User-space mutex guarding the global resource view library. _Not_ responsible for protecting the packages that own the views.
-		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>					_resourceViewDirectoryMutex;		
+		::Eldritch2::AlignedInstancePointer<Utility::ReaderWriterUserMutex>							_resourceViewDirectoryMutex;
 
-		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, FileSystem::ContentPackage*>		_contentPackageDirectory;
-		::Eldritch2::HashMap<ResourceViewKey, const FileSystem::ResourceView*>				_resourceViewDirectory;
-		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*, ResourceViewFactoryCollection>	_resourceFactoryDirectory;
+		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*,
+							 FileSystem::ContentPackage*,
+							 ::Eldritch2::Hash<const ::Eldritch2::UTF8Char*>,
+							 NameEqual>																_contentPackageDirectory;
+		::Eldritch2::HashMap<ResourceViewKey,
+							 const void*,
+							 ::Eldritch2::Hash<ResourceViewKey>,
+							 ViewKeyEqual>															_resourceViewDirectory;
+		::Eldritch2::HashMap<const ::Eldritch2::UTF8Char*,
+							 ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceViewFactory>,
+							 ::Eldritch2::Hash<const ::Eldritch2::UTF8Char*>,
+							 NameEqual>																_resourceFactoryDirectory;
 
-		ResourceViewFactoryCollection														_nullFactoryCollection;
+		::Eldritch2::IntrusiveForwardList<FileSystem::ResourceViewFactory>							_orphanContentFactories;
+		OrphanContentNotifier																		_orphanContentNotifier;
 
-		FileSystem::LoaderThread*															_loaderThread;
+		FileSystem::LoaderThread*																	_loaderThread;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 
@@ -145,15 +175,6 @@ namespace FileSystem {
 		friend class ::Eldritch2::FileSystem::ContentPackage;
 		friend class ::Eldritch2::FileSystem::ResourceView;
 	};
-
-// ---------------------------------------------------
-
-	ETInlineHint ETNoAliasHint size_t	GetHashCode( const ContentLibrary::ResourceViewKey& key, const size_t seed );
-
-	//! Tests two @ref ResourceViewKey instances for equality.
-	/*! @returns _True_ if the two keys describe the same view, _false_ if they reference different types.
-	*/
-	ETInlineHint ETNoAliasHint bool		operator==( const ContentLibrary::ResourceViewKey& left, const ContentLibrary::ResourceViewKey& right );
 
 }	// namespace FileSystem
 }	// namespace Eldritch2

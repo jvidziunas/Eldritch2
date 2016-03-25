@@ -35,7 +35,7 @@ namespace Eldritch2 {
 
 	template <typename StoredObject, typename Allocator>
 	template <class AlternateAllocator>
-	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ) {}
+	ETInlineHint ResizableArray<StoredObject, Allocator>::ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate, ::std::move( allocator ) ) {}
 
 // ---------------------------------------------------
 

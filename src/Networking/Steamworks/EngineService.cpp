@@ -62,6 +62,7 @@ namespace Steamworks {
 															   _queryPort( 6692u ),
 															   _versionString( UTF8_VERSION_STRING, _allocator ),
 															   _lobbyWorldName( UTF8_PROJECT_NAME UTF8L("Lobby"), _allocator ),
+															   _lobbyRulesName( UTF8_PROJECT_NAME UTF8L("LobbyRules@") UTF8_PROJECT_NAME, _allocator ),
 															   _useVACAuthentication( true ),
 															   _useSteamworks( false ),
 															   _replicationUploadBandwidthLimitInKilobytesPerSecond( 1024u ),
@@ -119,19 +120,22 @@ namespace Steamworks {
 		visitor.Register( UTF8L("ContentUploadBandwidthLimitInKilobytesPerSecond"), _contentUploadBandwidthLimitInKilobytesPerSecond );
 
 		visitor.PushSection( UTF8_PROJECT_NAME );
-		visitor.Register( UTF8L("LobbyWorldName"), _lobbyWorldName );
+		visitor.Register( UTF8L("LobbyWorldName"), _lobbyWorldName ).Register( UTF8L("LobbyRulesName"), _lobbyRulesName );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& /*visitor*/ ) {}
+	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		WorldView::ExposeScriptApi( visitor );
+	}
 
 // ---------------------------------------------------
 
 	void EngineService::OnEngineInitializationCompleted( WorkerContext& /*executingContext*/ ) {
-		auto	createLobbyWorldResult( CreateWorld( _lobbyWorldName.AsCString() ) );
+		auto	createLobbyWorldResult( CreateWorld( _lobbyWorldName.AsCString(), _lobbyRulesName.AsCString() ) );
 
 		if( !createLobbyWorldResult ) {
+			GetLogger( LogMessageType::Error )( UTF8L("Unable to create lobby world!") ET_UTF8_NEWLINE_LITERAL );
 			return;
 		}
 
@@ -148,7 +152,7 @@ namespace Steamworks {
 		::SteamAPI_RunCallbacks();
 		::SteamGameServer_RunCallbacks();
 
-		if( _lobbyWorld && (_lobbyWorld->EncounteredFatalError()) ) {
+		if( _lobbyWorld && !( _lobbyWorld->CanExecute() ) ) {
 			_lobbyWorld = nullptr;
 		}
 	}

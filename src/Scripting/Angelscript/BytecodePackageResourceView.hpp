@@ -26,13 +26,19 @@ namespace AngelScript {
 
 	public:
 		//! Constructs this @ref BytecodePackageResourceView instance.
-		BytecodePackageResourceView( ModuleHandle&& moduleHandle, FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		BytecodePackageResourceView( const ::Eldritch2::UTF8Char* const name, ModuleHandle&& module, ::Eldritch2::Allocator& allocator );
 
 		~BytecodePackageResourceView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
+		ETInlineHint const ModuleHandle&	GetScriptModule() const;
+
+	// ---------------------------------------------------
+
+		::Eldritch2::ErrorCode	AttachToPackage( const ::Eldritch2::Range<const char*> bytes, FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) override;
+
+		void					DetachFromPackage( FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) const override;
 
 	// ---------------------------------------------------
 
@@ -47,3 +53,9 @@ namespace AngelScript {
 }	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Scripting/AngelScript/BytecodePackageResourceView.inl>
+//------------------------------------------------------------------//

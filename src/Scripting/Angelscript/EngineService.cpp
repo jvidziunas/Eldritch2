@@ -143,7 +143,7 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	StringMarshal EngineService::MarshalStringLiteral( const unsigned int literalLengthInOctets, const UTF8Char* const stringLiteral ) {
-		return StringMarshal( stringLiteral, literalLengthInOctets, _allocator );
+		return StringMarshal( stringLiteral, literalLengthInOctets );
 	}
 
 // ---------------------------------------------------

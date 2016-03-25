@@ -31,9 +31,9 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::MeshViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> sourceAsset ) {
-		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) MeshResourceView( contentLibrary, package, name, allocator ) ) {
-			return view->UpdateFromByteStream( sourceAsset );
+	Result<ResourceView> EngineService::MeshViewFactory::AllocateResourceView( Allocator& allocator, const UTF8Char* const name ) const {
+		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) MeshResourceView( name, allocator ) ) {
+			return { ::std::move( view ) };
 		}
 
 		return Error::OutOfMemory;

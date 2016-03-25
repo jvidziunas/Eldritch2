@@ -51,6 +51,11 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Character, class Allocator>
+	ETInlineHint String<Character, Allocator>::String( SizeType reservedLength, AllocatorType&& allocator ) : _underlyingContainer( reservedLength, ::std::move( allocator ) ) {}
+
+// ---------------------------------------------------
+
+	template <typename Character, class Allocator>
 	template <size_t literalLength>
 	// Remember to subtract 1 here to account for the terminating null character.
 	ETInlineHint String<Character, Allocator>::String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator ) : _underlyingContainer( stringLiteral, static_cast<SizeType>(literalLength)-1, ::std::move( allocator ) ) {}

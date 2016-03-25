@@ -140,7 +140,7 @@ namespace Foundation {
 		/*!	@param[in] worldResourceName Null-terminated C string containing the name of the root content package for the world. This will be passed to @ref FileSystem::ContentLibrary::ResolvePackageByName()
 			@see @ref FileSystem::ContentPackage, @ref FileSystem::ContentLibrary::ResolvePackageByName()
 			*/
-		::Eldritch2::CountedResult<Foundation::World>	CreateWorld( const ::Eldritch2::UTF8Char* const worldResourceName );
+		::Eldritch2::CountedResult<Foundation::World>	CreateWorld( const ::Eldritch2::UTF8Char* const worldResourceName, const ::Eldritch2::UTF8Char* const rulesName );
 
 		//! Retrieves a read-only view of the @ref GameEngine instance that owns this @ref GameEngineService.
 		ETInlineHint const Foundation::GameEngine&		GetGameEngine() const;

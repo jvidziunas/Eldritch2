@@ -27,13 +27,15 @@ namespace Vulkan {
 
 	public:
 		//!	Constructs this @ref SPIRVPipelineDefinitionResourceView instance.
-		SPIRVPipelineDefinitionResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		SPIRVPipelineDefinitionResourceView( const ::Eldritch2::UTF8Char* const name );
 
 		~SPIRVPipelineDefinitionResourceView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
+		::Eldritch2::ErrorCode	AttachToPackage( const ::Eldritch2::Range<const char*> bytes, FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) override;
+
+		void					DetachFromPackage( FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) const override;
 
 	// ---------------------------------------------------
 

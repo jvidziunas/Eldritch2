@@ -16,6 +16,7 @@
 #include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
 #include <type_traits>
+#include <typeinfo>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -206,9 +207,42 @@ namespace Detail {
 	// ---------------------------------------------------
 
 		ETNoAliasHint size_t operator()( const ::Eldritch2::uintptr key, const size_t seed = static_cast<size_t>(0) ) const {
-			return static_cast<size_t>(key + seed);
+			return static_cast<size_t>(key) + seed;
 		}
 	};
+
+// ---
+
+	template <>
+	class Hash<::Eldritch2::intptr> {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		Hash() = default;
+
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		ETNoAliasHint size_t operator()( const ::Eldritch2::intptr key, const size_t seed = static_cast<size_t>(0) ) const {
+			return static_cast<size_t>(key) + seed;
+		}
+	};
+
+// ---
+
+	template <>
+	class Hash<::Eldritch2::uint8> : public ::Eldritch2::Hash<::Eldritch2::uintptr> {};
+	template <>
+	class Hash<::Eldritch2::int8> : public ::Eldritch2::Hash<::Eldritch2::intptr> {};
+	template <>
+	class Hash<::Eldritch2::uint16> : public ::Eldritch2::Hash<::Eldritch2::uintptr> {};
+	template <>
+	class Hash<::Eldritch2::int16> : public ::Eldritch2::Hash<::Eldritch2::intptr> {};
+	template <>
+	class Hash<::Eldritch2::uint32> : public ::Eldritch2::Hash<::Eldritch2::uintptr> {};
+	template <>
+	class Hash<::Eldritch2::int32> : public ::Eldritch2::Hash<::Eldritch2::intptr> {};
 
 // ---
 
@@ -225,6 +259,24 @@ namespace Detail {
 
 		ETNoAliasHint size_t operator()( const ::Eldritch2::Pair<T1, T2>& key, const size_t seed = static_cast<size_t>(0) ) const {
 			return ::Eldritch2::Hash<T2>()( key.second, ::Eldritch2::Hash<T1>()( key.first, seed ) );
+		}
+	};
+
+// ---
+
+	template <>
+	class Hash<::std::type_info*> {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		Hash() = default;
+
+		~Hash() = default;
+
+	// ---------------------------------------------------
+
+		ETNoAliasHint size_t operator()( const ::std::type_info* const key, const size_t seed = static_cast<size_t>(0) ) const {
+			return key->hash_code() + seed;
 		}
 	};
 

@@ -73,7 +73,7 @@ namespace Foundation {
 
 		static NullLogger	nullLogger;
 
-		return (_logEchoThreshold <= type) ? static_cast<Logger&>(_logger) : static_cast<Logger&>(nullLogger);
+		return (static_cast<LogMessageType>(_logEchoThreshold) <= type) ? static_cast<Logger&>(_logger) : static_cast<Logger&>(nullLogger);
 	}
 
 // ---------------------------------------------------

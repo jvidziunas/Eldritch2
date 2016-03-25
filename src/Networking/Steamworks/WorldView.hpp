@@ -49,6 +49,10 @@ namespace Steamworks {
 
 	// ---------------------------------------------------
 
+		static void	ExposeScriptApi( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
+
+	// ---------------------------------------------------
+
 	protected:
 		void	OnPreScriptTick( Scheduler::WorkerContext& executingContext ) override sealed;
 

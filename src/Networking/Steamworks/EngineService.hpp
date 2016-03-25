@@ -116,6 +116,7 @@ namespace Steamworks {
 
 		Configuration::ConfigurableUTF8String						_versionString;
 		Configuration::ConfigurableUTF8String						_lobbyWorldName;
+		Configuration::ConfigurableUTF8String						_lobbyRulesName;
 
 		Configuration::ConfigurablePODVariable<bool>				_useVACAuthentication;
 		Configuration::ConfigurablePODVariable<bool>				_useSteamworks;

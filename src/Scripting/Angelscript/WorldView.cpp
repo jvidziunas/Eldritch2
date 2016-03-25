@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
+#include <Scripting/Angelscript/BytecodePackageResourceView.hpp>
 #include <Scripting/Angelscript/ObjectGraphResourceView.hpp>
 #include <Scripting/Angelscript/WorldView.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
@@ -22,19 +23,41 @@
 #include <Packages/ContentLibrary.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Foundation/World.hpp>
+#include <Logging/Logger.hpp>
 #include <Utility/Assert.hpp>
+#include <Build.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
 #include <angelscript.h>
 //------------------------------------------------------------------//
 
+using namespace ::Eldritch2::Foundation;
+using namespace ::Eldritch2::FileSystem;
 using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2;
 
 namespace {
 
-	static ETThreadLocal Scripting::AngelScript::WorldView*	activeScriptWorldView = nullptr;
+	static ETThreadLocal AngelScript::WorldView*	activeScriptWorldView = nullptr;
+
+	static const ::asITypeInfo*	TryLocateClass( const ContentLibrary& library, const UTF8Char* const classPath ) {
+		FixedStackAllocator<64u>	tempAllocator( UTF8L("TryLocateClass() Temporary Allocator") );
+		const auto					moduleName( FindFirstInstance( classPath, '@' ) );
+
+		if( nullptr == moduleName ) {
+			return nullptr;
+		}
+
+		const auto	package( library.ResolveViewByName<AngelScript::BytecodePackageResourceView>( moduleName + 1 ) );
+		if( nullptr == package ) {
+			return nullptr;
+		}
+
+		UTF8String<>	className( classPath, moduleName, { tempAllocator, UTF8L("Class Name Allocator")} );
+
+		return package->GetScriptModule()->GetTypeInfoByName( className.AsCString() );
+	}
 
 }	// anonymous namespace
 
@@ -42,9 +65,9 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	WorldView::WorldView( Foundation::World& owningWorld, ::asIScriptEngine& scriptEngine ) : Foundation::WorldView( owningWorld ),
-																							  _stringAllocator( { GetWorldAllocator(), UTF8L("World String Root Allocator") } ),
-																							  _scriptEngine( (scriptEngine.AddRef(), scriptEngine) ) {}
+	WorldView::WorldView( World& owningWorld, ::asIScriptEngine& scriptEngine ) : Foundation::WorldView( owningWorld ),
+																				  _stringAllocator( { GetWorldAllocator(), UTF8L("World String Root Allocator") } ),
+																				  _scriptEngine( (scriptEngine.AddRef(), scriptEngine) ) {}
 
 // ---------------------------------------------------
 
@@ -74,12 +97,25 @@ namespace AngelScript {
 // ---------------------------------------------------
 
 	void WorldView::AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) {
+		activeScriptWorldView = this;
 		StringMarshal::AttachWorldAllocator( _stringAllocator );
 	}
 
 // ---------------------------------------------------
 
-	void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& /*visitor*/ ) {}
+	void WorldView::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& visitor ) {
+		visitor.ExposeFunction<void, const StringMarshal&>( "Spawn", [] ( const StringMarshal& className ) {
+			activeScriptWorldView->Spawn( TryLocateClass( activeScriptWorldView->GetContentLibrary(), className.AsCString() ) );
+		} ).ExposeFunction<void, const StringMarshal&>( "RequestWorldShutdown", [] ( const StringMarshal& reason ) {
+			activeScriptWorldView->GetOwningWorld().GetLogger( LogMessageType::Message )( UTF8L("Script has requested world shutdown: {}.") ET_UTF8_NEWLINE_LITERAL, reason.AsCString() );
+			activeScriptWorldView->RequestWorldShutdown();
+		} ).ExposeFunction<void>( "RequestWorldShutdown", [] () {
+			activeScriptWorldView->GetOwningWorld().GetLogger( LogMessageType::Message )( UTF8L("Script has requested world shutdown.") ET_UTF8_NEWLINE_LITERAL );
+			activeScriptWorldView->RequestWorldShutdown();
+		} ).ExposeFunction<StringMarshal, const StringMarshal&>( "GetWorldProperty", [] ( const StringMarshal& propertyName ) -> StringMarshal {
+			return { ::std::move( activeScriptWorldView->GetOwningWorld().GetPropertyByKey( activeScriptWorldView->GetWorldAllocator(), propertyName.AsCString() ) ) };
+		} );
+	}
 
 // ---------------------------------------------------
 
@@ -95,11 +131,21 @@ namespace AngelScript {
 	void WorldView::OnGameStart( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "Angelscript Virtual Machine", "Process game start", 0xCDCDCD );
 
-		const auto	rulesObjectName( GetOwningWorld().GetPropertyByKey( _stringAllocator, UTF8L("GameRulesClass"), UTF8L("") ) );
+		const auto	rulesClassName( GetOwningWorld().GetPropertyByKey( _stringAllocator, World::GetRulesKey() ) );
 		const auto	resourceObjectName( GetOwningWorld().GetPropertyByKey( _stringAllocator, UTF8L("Resource"), UTF8L("") ) );
 
-		if( !rulesObjectName.IsEmpty() ) {
-			_rulesEntity = ::std::move( Spawn( rulesObjectName.AsCString() ) );
+		// Prepare to execute script code.
+		BroadcastViewVisitor( ScriptExecutionPreparationVisitor() );
+
+		if( !rulesClassName.IsEmpty() ) {
+			auto	rulesEntity( Spawn( TryLocateClass( GetContentLibrary(), rulesClassName.AsCString() ) ) );
+
+			if( !rulesEntity ) {
+				GetOwningWorld().GetLogger( LogMessageType::Error )( UTF8L("Unable to create rules entity '{}'!") ET_UTF8_NEWLINE_LITERAL, rulesClassName.AsCString() );
+				GetOwningWorld().RaiseFatalError();
+			}
+				
+			_rulesEntity = ::std::move( rulesEntity );
 		}
 
 		if( !resourceObjectName.IsEmpty() ) {
@@ -111,14 +157,12 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	AngelScript::ObjectHandle WorldView::Spawn( const char* const className ) {
-		const auto	objectType( _scriptEngine.GetTypeInfoByName( className ) );
-
-		if( objectType && (objectType->GetFlags() & ::asOBJ_SCRIPT_OBJECT) ) {
-			return { static_cast<::asIScriptObject*>(_scriptEngine.CreateScriptObject( objectType )), {} };
+	ObjectHandle WorldView::Spawn( const ::asITypeInfo* typeInfo ) {
+		if( !typeInfo || !(typeInfo->GetFlags() & ::asOBJ_SCRIPT_OBJECT) ) {
+			return { nullptr };
 		}
 
-		return { nullptr };
+		return ObjectHandle( static_cast<::asIScriptObject*>( _scriptEngine.CreateScriptObject( typeInfo ) ) );
 	}
 
 }	// namespace AngelScript

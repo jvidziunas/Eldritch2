@@ -13,13 +13,14 @@
 // INCLUDES
 //==================================================================//
 #include <Physics/BulletDynamics/MeshResourceView.hpp>
-#include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <Utility/Memory/InstanceNew.hpp>
 #include <Utility/Containers/Range.hpp>
+#include <Packages/ContentPackage.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #include <Physics/ArticulatedBody_generated.h>
 //------------------------------------------------------------------//
+#include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <BulletCollision/CollisionShapes/btCapsuleShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletCollision/CollisionShapes/btConeShape.h>
@@ -148,9 +149,9 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	MeshResourceView::MeshResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ),
-																																					 _shapeAllocator( allocator, UTF8L("Bullet Mesh View Rigid Body Collision Shape Allocator") ),
-																																					 _rigidBodies( { allocator, UTF8L("Bullet Mesh View Rigid Body Collection Allocator") } ) {}
+	MeshResourceView::MeshResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name ),
+																							 _shapeAllocator( allocator, UTF8L("Bullet Mesh View Rigid Body Collision Shape Allocator") ),
+																							 _rigidBodies( { allocator, UTF8L("Bullet Mesh View Rigid Body Collection Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -170,8 +171,8 @@ namespace BulletDynamics {
 
 // ---------------------------------------------------
 
-	ErrorCode MeshResourceView::UpdateFromByteStream( const Range<const char*> bytes ) {
-		const auto	asset( ::Eldritch2::Physics::FlatBuffers::GetArticulatedBody( bytes.first ) );
+	ErrorCode MeshResourceView::AttachToPackage( const Range<const char*> bytes, ContentPackage& /*package*/, ContentLibrary& library ) {
+		const auto	asset( FlatBuffers::GetArticulatedBody( bytes.first ) );
 
 		_rigidBodies.Clear();
 
@@ -185,7 +186,15 @@ namespace BulletDynamics {
 			_rigidBodies.EmplaceBack( **definition, _shapeAllocator );
 		}
 
+		PublishToLibraryAs<decltype(*this)>( library );
+
 		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void MeshResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<decltype(*this)>( library );
 	}
 
 // ---------------------------------------------------

@@ -15,9 +15,11 @@
 #include <Scripting/Angelscript/BytecodePackageResourceView.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
+#include <Packages/ContentPackage.hpp>
 #include <Utility/ErrorCode.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
+#include <Scripting/AngelScript/BytecodePackage_generated.h>
 #include <angelscript.h>
 //------------------------------------------------------------------//
 #include <utility>
@@ -32,19 +34,17 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	BytecodePackageResourceView::BytecodePackageResourceView( ModuleHandle&& moduleHandle, ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ),
-																																																		BytecodeMetadata( allocator ),
-																																																		_module( ::std::move( moduleHandle ) ) {}
+	BytecodePackageResourceView::BytecodePackageResourceView( const UTF8Char* const name, ModuleHandle&& module, Allocator& allocator ) : ResourceView( name ), BytecodeMetadata( allocator ), _module( ::std::move( module ) ) {}
 
 // ---------------------------------------------------
 
 	ETNoAliasHint const UTF8Char* const BytecodePackageResourceView::GetSerializedDataTag() {
-		return UTF8L("AngelscriptBytecodePackage");
+		return FlatBuffers::ModuleMetadataExtension();
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode BytecodePackageResourceView::UpdateFromByteStream( const Range<const char*> bytes ) {
+	ErrorCode BytecodePackageResourceView::AttachToPackage( const Range<const char*> bytes, ContentPackage& /*package*/, ContentLibrary& library ) {
 		struct Reader : public ::asIBinaryStream {
 			ETInlineHint Reader( const Range<const char*>& sourceData ) : remainingData( sourceData ) {}
 
@@ -67,7 +67,23 @@ namespace AngelScript {
 
 		Reader	reader( bytes );
 
-		return (::asSUCCESS == _module->LoadByteCode( &reader )) ? BindToModule( *_module, reader.remainingData ) : Error::InvalidParameter;
+		if( ::asSUCCESS != _module->LoadByteCode( &reader ) ) {
+			return Error::InvalidParameter;
+		}
+
+		if( !BindToModule( *_module, reader.remainingData ) ) {
+			return Error::InvalidParameter;
+		}
+
+		PublishToLibraryAs<BytecodePackageResourceView>( library );
+
+		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void BytecodePackageResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<BytecodePackageResourceView>( library );
 	}
 
 }	// namespace AngelScript

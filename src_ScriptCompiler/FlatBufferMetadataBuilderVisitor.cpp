@@ -118,6 +118,8 @@ namespace Tools {
 
 	// ---
 
+
+
 		_pendingTypeMetadata.PushBack( CreateTypeMetadata( _builder,
 														   index,
 														   _builder.CreateVector( _pendingFunctionMetadata.Data(), _pendingFunctionMetadata.Size() ),

@@ -38,12 +38,12 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator ) : UnderlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ), _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
+	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator ) : UnderlyingContainer( containerTemplate, ::std::move( allocator ) ), _orderingPredicate( containerTemplate.GetOrderingPredicate() ) {}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename StoredObject, typename OrderingPredicate, class Allocator>
-	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource ) : UnderlyingContainer( ::std::move( containerTemplate ) ), _orderingPredicate( ::std::move( moveSource._orderingPredicate ) ) {}
+	ETInlineHint FlatMap<Key, StoredObject, OrderingPredicate, Allocator>::FlatMap( ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource ) : UnderlyingContainer( ::std::move( moveSource ) ), _orderingPredicate( ::std::move( moveSource._orderingPredicate ) ) {}
 
 // ---------------------------------------------------
 

@@ -78,7 +78,7 @@ namespace Tools {
 			const auto			extensionPosition( exportName.FindLastInstance( UTF8L('.') ) );
 			const auto			fileNamePosition( exportName.FindLastInstance( ET_UTF8_DIR_SEPARATOR ) );
 			const UTF8String<>	inPackageName( (fileNamePosition != exportName.End() ? fileNamePosition + 1 : exportName.Begin()), extensionPosition, { GetAllocator(), UTF8L("Export In-Package Name Allocator") } );
-			const UTF8String<>	typeName( (extensionPosition != exportName.End() ? extensionPosition + 1 : extensionPosition), exportName.End(), { GetAllocator(), UTF8L("Export Type Name Allocator") } );
+			const UTF8String<>	typeName( extensionPosition, exportName.End(), { GetAllocator(), UTF8L("Export Type Name Allocator") } );
 			auto				reader( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), exportName.AsCString() ) );
 
 			// Ensure the file was opened.
@@ -115,7 +115,7 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	int	Bakinator<GlobalAllocator, FileAccessorFactory>::SetOutputFileName( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd ) {
-		_outputFileName.Assign( name, nameEnd ).EnsureEndsWith( UTF8L(".e2toc") );
+		_outputFileName.Assign( name, nameEnd ).EnsureEndsWith( FileSystem::FlatBuffers::PackageHeaderExtension() );
 		_outputDataBlobName.Assign( _outputFileName.Begin(), _outputFileName.FindLastInstance( UTF8L('.') ) );
 
 		return 0;

@@ -1,5 +1,5 @@
 file_identifier	"EWDF";
-file_extension	"e2world";
+file_extension	".E2World";
 
 namespace Eldritch2.Foundation.FlatBuffers;
 

@@ -39,6 +39,27 @@ namespace Detail {
 
 // ---
 
+	class InstanceChildDeleterBase : public InstanceDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceChildDeleterBase instance.
+		InstanceChildDeleterBase( const ::VkInstance instance, const ::VkAllocationCallbacks* const callbacks = nullptr ) : InstanceDeleterBase( callbacks ), _instance( instance ) {}
+		//!	Constructs this @ref InstanceChildDeleterBase instance.
+		InstanceChildDeleterBase( const InstanceChildDeleterBase& ) = default;
+		//!	Constructs this @ref InstanceChildDeleterBase instance.
+		InstanceChildDeleterBase() = default;
+
+		~InstanceChildDeleterBase() = default;
+
+	// - DATA MEMBERS ------------------------------------
+
+	protected:
+		::VkInstance	_instance;
+	};
+
+// ---
+
 	class DeviceChildDeleterBase : public InstanceDeleterBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -268,6 +289,29 @@ namespace Detail {
 
 		void operator()( ::VkImageView image ) {
 			::vkDestroyImageView( _device, image, _allocationCallbacks );
+		}
+	};
+
+// ---
+
+	template <>
+	class InstanceDeleter<::VkSurfaceKHR> : public InstanceChildDeleterBase {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const ::VkInstance instance, const ::VkAllocationCallbacks* const callbacks = nullptr ) : InstanceChildDeleterBase( instance, callbacks ) {}
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter( const InstanceDeleter& ) = default;
+		//!	Constructs this @ref InstanceDeleter instance.
+		InstanceDeleter() = default;
+
+		~InstanceDeleter() = default;
+
+	// ---------------------------------------------------
+
+		void operator()( ::VkSurfaceKHR surface ) {
+			::vkDestroySurfaceKHR( _instance, surface, _allocationCallbacks );
 		}
 	};
 

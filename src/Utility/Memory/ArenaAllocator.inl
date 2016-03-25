@@ -21,6 +21,16 @@
 
 namespace Eldritch2 {
 
+	ETInlineHint ArenaAllocatorBase::ScopedCheckpoint::ScopedCheckpoint( ArenaAllocatorBase& allocator ) : _allocator( allocator ), _checkpoint( allocator.CreateCheckpoint() ) {}
+
+// ---------------------------------------------------
+
+	ETInlineHint ArenaAllocatorBase::ScopedCheckpoint::~ScopedCheckpoint() {
+		_allocator.RestoreCheckpoint( _checkpoint );
+	}
+
+// ---------------------------------------------------
+
 	template <size_t arenaSizeInBytes>
 	FixedStackAllocator<arenaSizeInBytes>::FixedStackAllocator( const ::Eldritch2::UTF8Char* const name ) : ::Eldritch2::ArenaAllocatorBase( _arena, sizeof(_arena), name ) {}
 

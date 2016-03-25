@@ -197,7 +197,7 @@
     <ClInclude Include="..\src_ScriptCompiler\ScriptCompiler.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\src\Scripting\AngelScript\BytecodeMetadata.fbc">
+    <CustomBuild Include="..\src\Scripting\Angelscript\BytecodePackage.fbc">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">"$(SolutionDir)tools\flatc.exe" -c --scoped-enums -o %(RelativeDir) %(Identity)</Command>

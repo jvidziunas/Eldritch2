@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Containers/FlatMap.hpp>
+#include <Utility/Containers/HashMap.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -69,11 +70,8 @@ namespace AngelScript {
 			/*! @param[in] allocator @ref Allocator the @ref TypeMetadata instance should use to perform allocations.
 				*/
 			TypeMetadata( ::Eldritch2::Allocator& allocator );
-			//! Constructs this @ref TypeMetadata instance.
-			/*! @remarks @parblock This overload is provided only for container compatibility. _Always_ use
-					TypeMetadata(Allocator&) when constructing real instances of the type. @endparblock
-				*/
-			TypeMetadata();
+			TypeMetadata( TypeMetadata&& metadata );
+			TypeMetadata() = delete;
 
 		// ---------------------------------------------------
 
@@ -90,7 +88,7 @@ namespace AngelScript {
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::Eldritch2::ResizableArray<FunctionMetadata>			_methodMetadata;
+			::Eldritch2::ResizableArray<FunctionMetadata>		_methodMetadata;
 			::Eldritch2::FlatMap<::asUINT, PropertyMetadata>	_propertyMetadata;
 		};
 
@@ -150,10 +148,10 @@ namespace AngelScript {
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator									_rootAllocator;
-		::Eldritch2::ResizableArray<TypeMetadata>					_typeMetadata;
-		::Eldritch2::ResizableArray<FunctionMetadata>				_functionMetadata;
-		::Eldritch2::FlatMap<const void*, PropertyMetadata>	_propertyMetadata;
+		::Eldritch2::ChildAllocator							_rootAllocator;
+		::Eldritch2::ResizableArray<TypeMetadata>			_typeMetadata;
+		::Eldritch2::ResizableArray<FunctionMetadata>		_functionMetadata;
+		::Eldritch2::HashMap<const void*, PropertyMetadata>	_propertyMetadata;
 	};
 
 }	// namespace AngelScript

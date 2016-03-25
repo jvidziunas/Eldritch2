@@ -1,5 +1,5 @@
 file_identifier	"EADF";
-file_extension	"E2Armature";
+file_extension	".E2Armature";
 
 namespace Eldritch2.Animation.FlatBuffers;
 
@@ -9,12 +9,12 @@ struct Bone {
 	Z							: float;
 }
 
-BallSocketConstraint {
+table BallSocketConstraint {
 	LimitConeAngleX				: float;
 	LimitConeAngleY				: float;
 }
 
-DistanceConstraint {
+table DistanceConstraint {
 	MinimumDistanceInWorldUnits	: float;
 	MaximumDistanceInWorldUnits	: float;
 }

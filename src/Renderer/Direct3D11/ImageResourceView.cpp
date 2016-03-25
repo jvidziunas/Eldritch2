@@ -33,12 +33,20 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	ImageResourceView::ImageResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
+	ImageResourceView::ImageResourceView( const UTF8Char* const name ) : ResourceView( name ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode ImageResourceView::UpdateFromByteStream( const Range<const char*> /*sourceBytes*/ ) {
-		return Error::UnsupportedOperation;
+	ErrorCode ImageResourceView::AttachToPackage( const Range<const char*> /*bytes*/, ContentPackage& /*package*/, ContentLibrary& library ) {
+		PublishToLibraryAs<ImageResourceView>( library );
+
+		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void ImageResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<ImageResourceView>( library );
 	}
 
 // ---------------------------------------------------

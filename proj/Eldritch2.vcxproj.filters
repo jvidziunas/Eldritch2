@@ -330,9 +330,6 @@
     <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp">
       <Filter>Source Files\Utility\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Packages\PackageDeserializationContext.cpp">
-      <Filter>Source Files\Packages</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp">
       <Filter>Source Files\Utility\Memory</Filter>
     </ClCompile>
@@ -687,6 +684,12 @@
     <ClCompile Include="..\src\Scripting\ScriptAPIRegistrationInitializationVisitor.cpp">
       <Filter>Source Files\Scripting</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Renderer\Vulkan\SwapChain.cpp">
+      <Filter>Source Files\Renderer\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\packages\ContentLibrary.OrphanContentNotifier.cpp">
+      <Filter>Source Files\Packages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Packages\ResourceView.hpp">
@@ -870,9 +873,6 @@
       <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Packages\LoaderThread.hpp">
-      <Filter>Header Files\Packages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Packages\PackageDeserializationContext.hpp">
       <Filter>Header Files\Packages</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Utility\memory\InstanceDeleters.hpp">
@@ -1274,6 +1274,9 @@
     <ClInclude Include="..\src\Renderer\Vulkan\VirtualTexture.hpp">
       <Filter>Header Files\Renderer\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Renderer\Vulkan\SwapChain.hpp">
+      <Filter>Header Files\Renderer\Vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\Eldritch2.ico">
@@ -1336,9 +1339,6 @@
       <Filter>Source Files\Packages</Filter>
     </None>
     <None Include="..\src\Packages\ContentPackage.inl">
-      <Filter>Source Files\Packages</Filter>
-    </None>
-    <None Include="..\src\Packages\PackageDeserializationContext.inl">
       <Filter>Source Files\Packages</Filter>
     </None>
     <None Include="..\src\Packages\ResourceView.inl">
@@ -1473,9 +1473,6 @@
     <None Include="..\src\Utility\Containers\SystemString.inl">
       <Filter>Source Files\Utility\Containers</Filter>
     </None>
-    <None Include="..\src\Renderer\HLSLPipeline.fbc">
-      <Filter>IDL Files</Filter>
-    </None>
     <None Include="..\src\Scheduler\PrivateQueueWorker.inl">
       <Filter>Source Files\Scheduler</Filter>
     </None>
@@ -1509,17 +1506,11 @@
     <None Include="..\src\Physics\PhysX\WorldView.inl">
       <Filter>Header Files\Physics\PhysX</Filter>
     </None>
-    <None Include="..\src\Animation\Armature.fbc">
-      <Filter>IDL Files</Filter>
-    </None>
     <None Include="..\src\Physics\PhysX\MeshResourceView.inl">
       <Filter>Source Files\Physics\PhysX</Filter>
     </None>
     <None Include="..\src\Physics\PhysX\TerrainResourceView.inl">
       <Filter>Source Files\Physics\PhysX</Filter>
-    </None>
-    <None Include="..\src\Animation\Animation.fbc">
-      <Filter>IDL Files</Filter>
     </None>
     <None Include="..\src\Renderer\Vulkan\SmartPointers.inl">
       <Filter>Source Files\Renderer\Vulkan</Filter>
@@ -1536,14 +1527,14 @@
     <None Include="..\src\Renderer\Vulkan\VulkanResult.inl">
       <Filter>Source Files\Renderer\Vulkan</Filter>
     </None>
-    <None Include="..\src\Renderer\SPIRVPipeline.fbc">
-      <Filter>IDL Files</Filter>
-    </None>
     <None Include="..\src\Utility\SurjectiveQueryDatabase.inl">
       <Filter>Source Files\Utility</Filter>
     </None>
     <None Include="..\src\Utility\Containers\HashSet.inl">
       <Filter>Source Files\Utility\Containers</Filter>
+    </None>
+    <None Include="..\src\Scripting\Angelscript\BytecodePackageResourceView.inl">
+      <Filter>Header Files\Scripting\Angelscript</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1553,9 +1544,6 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\src\Packages\PackageHeader.fbc">
-      <Filter>IDL Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\src\Scripting\Angelscript\BytecodeMetadata.fbc">
       <Filter>IDL Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\src\Physics\ArticulatedBody.fbc">
@@ -1571,6 +1559,21 @@
       <Filter>IDL Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\src\Renderer\PipelineTypes.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Animation\Animation.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Animation\Armature.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Scripting\AngelScript\BytecodePackage.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Renderer\Direct3D\HLSLPipeline.fbc">
+      <Filter>IDL Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\src\Renderer\Vulkan\SPIRVPipeline.fbc">
       <Filter>IDL Files</Filter>
     </CustomBuild>
   </ItemGroup>

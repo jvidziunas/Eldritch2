@@ -13,8 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
-#include <Utility/Containers/UTF8String.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
+#include <Utility/MPL/CharTypes.hpp>
+//------------------------------------------------------------------//
+#include <typeinfo>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -35,37 +37,48 @@ namespace FileSystem {
 	// ---------------------------------------------------
 
 	public:
-		virtual ::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) abstract;
+		virtual ::Eldritch2::ErrorCode	AttachToPackage( const ::Eldritch2::Range<const char*> bytes, FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) abstract;
+
+		virtual void					DetachFromPackage( FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) const abstract;
 
 	// ---------------------------------------------------
 
 		//! Gets the path/unique identifier describing this resource.
-		/*! @returns A const reference to a @ref UTF8String containing the name of the resource.
-			@remarks While no two @ref ResourceView instances will refer to the same @ref UTF8String, note that it _is_ possible that two of the actual strings will compare equal to one another.
+		/*! @returns UTF-8-encoded character sequence containing the name of the resource this @ref ResourceView describes.
 			@remarks Thread-safe.
 			*/
-		ETInlineHint const ::Eldritch2::UTF8String<>&	GetName() const;
+		ETInlineHint const ::Eldritch2::UTF8Char* const	GetName() const;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
 		//! Constructs this @ref ResourceView instance.
-		/*!	@param[in] owningLibrary Reference to the @ref ContentLibrary that will own/index the @ref ResourceView.
-			@param[in] package Reference to the @ref ContentPackage that will manage the lifetime of the @ref ResourceView
-			@param[in] name Null-terminated C string containing the name of the resource the @ref ResourceView will be describing.
-			@param[in] nameAllocator The @ref Allocator that the @ref ResourceView should use to allocate memory for the internal name copy.
+		/*!	@param[in] name UTF-8-encoded character sequence containing the name of the resource the @ref ResourceView will be describing.
 			@remarks Designed to be called only from subclasses.
 			*/
-		ResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& nameAllocator );
+		ResourceView( const ::Eldritch2::UTF8Char* const name );
 
 	public:
 		//! Destroys this @ref ResourceView instance.
 		virtual ~ResourceView() = default;
 
-	// - DATA MEMBERS ------------------------------------
+	// ---------------------------------------------------
+
+	protected:
+		template <typename PublicType>
+		const ResourceView&	PublishToLibraryAs( FileSystem::ContentLibrary& owningLibrary ) const;
+
+		template <typename PublicType>
+		const ResourceView&	RemoveFromLibraryAs( FileSystem::ContentLibrary& owningLibrary ) const;
 
 	private:
-		const ::Eldritch2::UTF8String<>	_name;
+		const ResourceView&	PublishToLibrary( FileSystem::ContentLibrary& owningLibrary, const ::std::type_info& publicType ) const;
+
+		const ResourceView&	RemoveFromLibrary( FileSystem::ContentLibrary& owningLibrary, const ::std::type_info& publicType ) const;
+
+	// - DATA MEMBERS ------------------------------------
+
+		const ::Eldritch2::UTF8Char* const	_name;
 	};
 
 }	// namespace FileSystem

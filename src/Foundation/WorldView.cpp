@@ -44,6 +44,12 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
+	void WorldView::RequestWorldShutdown() const {
+		_owningWorld.Terminate();
+	}
+
+// ---------------------------------------------------
+
 	void WorldView::OnFrameTick( WorkerContext& /*executingContext*/ ) {
 		// Default implementation should not do anything.
 	}

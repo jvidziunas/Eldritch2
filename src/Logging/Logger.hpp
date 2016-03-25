@@ -28,8 +28,8 @@ namespace Foundation {
 #	define CLEANUP_ERROR
 #endif
 
-	enum LogMessageType : ::Eldritch2::uint32 {
-		VerboseWarning = 0u,
+	enum class LogMessageType {
+		VerboseWarning = 0,
 		Warning,
 		Error,
 		Message

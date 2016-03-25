@@ -40,8 +40,8 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::ImageFactory::AllocateResourceView( Allocator& /*allocator*/, ContentLibrary& /*contentLibrary*/, ContentPackage& /*package*/, const UTF8Char* const /*name*/, const Range<const char*> /*sourceAsset*/ ) {
-		return Error::UnsupportedOperation;
+	Result<ResourceView> EngineService::ImageFactory::AllocateResourceView( Allocator& allocator, const UTF8Char* const name ) const {
+		return { nullptr };
 	}
 
 // ---------------------------------------------------

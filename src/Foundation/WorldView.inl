@@ -48,7 +48,7 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	ETInlineHint const Foundation::World& WorldView::GetOwningWorld() const {
+	ETInlineHint const World& WorldView::GetOwningWorld() const {
 		return _owningWorld;
 	}
 

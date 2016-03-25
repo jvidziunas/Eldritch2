@@ -16,7 +16,7 @@
 #include <Utility/Memory/NullAllocator.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
-#include <Scripting/AngelScript/BytecodeMetadata_generated.h>
+#include <Scripting/AngelScript/BytecodePackage_generated.h>
 //------------------------------------------------------------------//
 #include <angelscript.h>
 //------------------------------------------------------------------//
@@ -48,24 +48,35 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	BytecodeMetadata::TypeMetadata::TypeMetadata() : TypeMetadata( NullAllocator::GetInstance() ) {}
+	BytecodeMetadata::TypeMetadata::TypeMetadata( TypeMetadata&& metadata ) : _methodMetadata( ::std::move( metadata._methodMetadata ) ), _propertyMetadata( ::std::move( metadata._propertyMetadata ) ) {}
 
 // ---------------------------------------------------
 
 	ErrorCode BytecodeMetadata::TypeMetadata::Bind( ::asITypeInfo& scriptType, const FlatBuffers::TypeMetadata& metadata ) {
-		for( auto methodMetadata( metadata.Methods()->begin() ), end( metadata.Methods()->end() ); methodMetadata != end; ++methodMetadata ) {
-			auto	scriptFunction( scriptType.GetMethodByIndex( methodMetadata->Index() ) );
+		const auto	methods( metadata.Methods() );
+		const auto	properties( metadata.Properties() );
 
-			if( !scriptFunction ) {
-				return Error::InvalidParameter;
+		if( methods && (0 != methods->size()) ) {
+			_methodMetadata.SetCapacity( methods->size() );
+
+			for( auto methodMetadata( methods->begin() ), end( methods->end() ); methodMetadata != end; ++methodMetadata ) {
+				auto	scriptFunction( scriptType.GetMethodByIndex( methodMetadata->Index() ) );
+
+				if( !scriptFunction ) {
+					return Error::InvalidParameter;
+				}
+
+				_methodMetadata.PushBack();
+				_methodMetadata.Back().Bind( *scriptFunction, **methodMetadata );
 			}
-
-			_methodMetadata.PushBack();
-			_methodMetadata.Back().Bind( *scriptFunction, **methodMetadata );
 		}
 
-		for( auto propertyMetadata( metadata.Properties()->begin() ), end( metadata.Properties()->end() ); propertyMetadata != end; ++propertyMetadata ) {
-			_propertyMetadata.Insert( { propertyMetadata->Index(), PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
+		if( properties && 0 != properties->size() ) {
+			_propertyMetadata.SetCapacity( properties->size() );
+
+			for( auto propertyMetadata( properties->begin() ), end( properties->end() ); propertyMetadata != end; ++propertyMetadata ) {
+				_propertyMetadata.Insert( { propertyMetadata->Index(), PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
+			}
 		}
 
 		SetMetadata( scriptType, *this );
@@ -160,7 +171,7 @@ namespace AngelScript {
 
 	ErrorCode BytecodeMetadata::LoadTypeMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
 		// Early out if there is no type metadata stored in the module.
-		if( !sourceData.Types() ) {
+		if( !sourceData.Types() || (0 == sourceData.Types()->size()) ) {
 			return Error::None;
 		}
 
@@ -186,7 +197,7 @@ namespace AngelScript {
 
 	ErrorCode BytecodeMetadata::LoadFunctionMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
 		// Early out if there is no free function metadata stored in the module.
-		if( !sourceData.Functions() ) {
+		if( !sourceData.Functions() || (0 == sourceData.Functions()->size()) ) {
 			return Error::None;
 		}
 
@@ -212,12 +223,12 @@ namespace AngelScript {
 
 	ErrorCode BytecodeMetadata::LoadPropertyMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
 		// Early out if there is no global property metadata stored in the module.
-		if( !sourceData.Properties() ) {
+		if( !sourceData.Properties() || (0 == sourceData.Properties()->size()) ) {
 			return Error::None;
 		}
 
 		// Minimize repeated allocations.
-		_propertyMetadata.SetCapacity( sourceData.Properties()->size() );
+		_propertyMetadata.Reserve( sourceData.Properties()->size() );
 
 		for( auto metadata( sourceData.Properties()->begin() ), end( sourceData.Properties()->end() ); metadata != end; ++metadata ) {
 			auto	scriptProperty( module.GetAddressOfGlobalVar( metadata->Index() ) );

@@ -24,31 +24,13 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint ContentPackage::DependencyCollection& ContentPackage::GetDependencies() {
-		return _referencedPackages;
-	}
-
-// ---------------------------------------------------
-
 	ETInlineHint const ContentPackage::ExportCollection& ContentPackage::GetExports() const {
 		return _exportedResources;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ContentPackage::ExportCollection& ContentPackage::GetExports() {
-		return _exportedResources;
-	}
-
-// ---------------------------------------------------
-
 	ETInlineHint const FileSystem::ContentLibrary& ContentPackage::GetContentLibrary() const {
-		return _owningLibrary;
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint FileSystem::ContentLibrary& ContentPackage::GetContentLibrary() {
 		return _owningLibrary;
 	}
 

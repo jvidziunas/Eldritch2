@@ -34,7 +34,9 @@
 
 namespace Eldritch2 {
 	namespace Foundation {
-		class	GameEngine;
+		enum class	LogMessageType;
+		class		GameEngine;
+		class		Logger;
 	}
 
 	namespace Utility {
@@ -88,23 +90,31 @@ namespace Foundation {
 
 	// ---------------------------------------------------
 
-		ETInlineHint ::Eldritch2::uint32	EncounteredFatalError() const;
+		Foundation::Logger&	GetLogger( Foundation::LogMessageType type ) const;
 
-		bool								IsLoaded() const;
+	// ---------------------------------------------------
 
-		ETInlineHint bool					IsLoading() const;
+		ETInlineHint bool	CanExecute() const;
 
-		bool								IsPaused() const;
+		bool				IsLoaded() const;
 
-		ETInlineHint bool					IsRunningGame() const;
+		ETInlineHint bool	IsLoading() const;
+
+		bool				IsPaused() const;
+
+		ETInlineHint bool	IsRunningGame() const;
 
 	// ---------------------------------------------------
 
 		ETInlineHint void	RaiseFatalError() const;
 
+		ETInlineHint void	Terminate() const;
+
 	// ---------------------------------------------------
 
 		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetMainPackageKey();
+
+		static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetRulesKey();
 
 	// ---------------------------------------------------
 
@@ -150,7 +160,7 @@ namespace Foundation {
 		::Eldritch2::uint32													_isPaused : 1;
 		::Eldritch2::uint32													_isLoaded : 1;
 
-		mutable ::std::atomic<::Eldritch2::uint32>							_fatalErrorCount;
+		mutable ::std::atomic<bool>											_executeFlag;
 
 		::Eldritch2::IntrusiveForwardList<Foundation::WorldView>			_attachedViews;
 		ManagementView														_managementView;

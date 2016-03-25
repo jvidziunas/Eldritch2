@@ -12,8 +12,6 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/StandardLibrary.hpp>
-#include <Utility/Concurrency/Lock.hpp>
 #include <Packages/ContentLibrary.hpp>
 #include <Packages/ContentPackage.hpp>
 #include <Packages/ResourceView.hpp>
@@ -26,12 +24,26 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ResourceView::ResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& nameAllocator ) : _name( name, FindEndOfString( name ), { nameAllocator, UTF8L("Resource View Name Allocator") } ) {
-		package.GetExports().PushFront( *this );
+	const ResourceView& ResourceView::PublishToLibrary( ContentLibrary& owningLibrary, const ::std::type_info& publicType ) const {
+		ScopedLock	_( *owningLibrary._resourceViewDirectoryMutex );
 
-		{	ScopedLock	_( *owningLibrary._resourceViewDirectoryMutex );
-			owningLibrary._resourceViewDirectory.Insert( { { *this }, this } );
-		}	// End of lock scope.
+		owningLibrary._resourceViewDirectory.Insert( { { GetName(), &publicType }, static_cast<const void*>(this) } );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	const ResourceView& ResourceView::RemoveFromLibrary( ContentLibrary& owningLibrary, const ::std::type_info& publicType ) const {
+		ScopedLock	_( *owningLibrary._resourceViewDirectoryMutex );
+		auto&		directory( owningLibrary._resourceViewDirectory );
+		const auto	candidate( directory.Find( { GetName(), &publicType } ) );
+
+		// Remove ourselves from the library ONLY if the stored entry actually refers to us.
+		if( candidate != directory.End() && candidate->second == this ) {
+			directory.Erase( candidate );
+		}
+		return *this;
 	}
 
 }	// namespace FileSystem

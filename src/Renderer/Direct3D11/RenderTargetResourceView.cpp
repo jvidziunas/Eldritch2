@@ -25,12 +25,12 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	RenderTargetResourceView::RenderTargetResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
+	RenderTargetResourceView::RenderTargetResourceView( const UTF8Char* const name ) : ImageResourceView( name ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode RenderTargetResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
-		return Error::None;
+	ErrorCode RenderTargetResourceView::AttachToPackage( const Range<const char*> bytes, ContentPackage& package, ContentLibrary& library ) {
+		return ImageResourceView::AttachToPackage( bytes, package, library );
 	}
 
 }	// namespace Direct3D11

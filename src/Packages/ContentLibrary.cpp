@@ -33,32 +33,31 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ContentLibrary::ResourceViewKey::ResourceViewKey( const ResourceView& view ) : Pair<const UTF8Char*, const type_info*>( view.GetName().AsCString(), &typeid(view) ) {}
-
-// ---------------------------------------------------
-
 	ContentLibrary::ContentLibrary( ContentProvider& contentProvider, ThreadScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, UTF8L("Content Library Package Data Allocator") ),
-																														 _deserializationContextAllocator( allocator, UTF8L("Content Library Package Data Allocator") ),
-																														 _contentProvider( contentProvider ),
-																														 _contentPackageDirectoryMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
-																														 _resourceViewDirectoryMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
-																														 _contentPackageDirectory( { allocator, UTF8L("Content Library Package Bucket Allocator") } ),
-																														 _resourceViewDirectory( { allocator, UTF8L("Content Library Resource View Bucket Allocator") } ),
-																														 _resourceFactoryDirectory( { allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") } ),
-																														 _loaderThread( new(_allocator, Allocator::AllocationDuration::Normal) LoaderThread( scheduler, _allocator ) ) {
+																														   _contentProvider( contentProvider ),
+																														   _contentPackageDirectoryMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
+																														   _resourceViewDirectoryMutex( scheduler.AllocateReaderWriterUserMutex( _allocator ).object, { _allocator } ),
+																														   _contentPackageDirectory( { allocator, UTF8L("Content Library Package Bucket Allocator") } ),
+																														   _resourceViewDirectory( { allocator, UTF8L("Content Library Resource View Bucket Allocator") } ),
+																														   _resourceFactoryDirectory( { allocator, UTF8L("Content Library Resource View Factory Bucket Allocator") } ),
+																														   _orphanContentNotifier( contentProvider, _allocator ),
+																														   _loaderThread( new(_allocator, Allocator::AllocationDuration::Normal) LoaderThread( scheduler, _allocator ) ) {
 		// Launch the thread if we have synchronization mechanisms.
 		if( ETBranchLikelyHint( _contentPackageDirectoryMutex && _resourceViewDirectoryMutex && _loaderThread ) ) {
 			scheduler.Enqueue( *_loaderThread );
 		}
 
+		_orphanContentFactories.PushFront( _orphanContentNotifier );
+
 		_contentPackageDirectory.Reserve( 64u );
 		_resourceViewDirectory.Reserve( 1024u );
-		_resourceFactoryDirectory.Reserve( 32u );
 	}
 
 // ---------------------------------------------------
 
 	ContentLibrary::~ContentLibrary() {
+		_orphanContentFactories.Clear();
+
 		if( auto thread = _loaderThread ) {
 			thread->EnsureTerminated();
 			_allocator.Delete( *thread );
@@ -78,8 +77,8 @@ namespace FileSystem {
 
 		public:
 			//! Constructs this @ref DeserializedContentPackage instance.
-			ETInlineHint DeserializedContentPackage( const UTF8Char* const name, ContentLibrary& owner, Allocator& allocator ) : ContentPackage( name, owner, allocator ) {
-				owner._contentPackageDirectory.Insert( { GetName(), this } );
+			ETInlineHint DeserializedContentPackage( const UTF8Char* const name, ContentLibrary& library, Allocator& allocator ) : ContentPackage( name, library, allocator ) {
+				library._contentPackageDirectory.Insert( { GetName(), this } );
 			}
 
 			~DeserializedContentPackage() = default;
@@ -87,7 +86,7 @@ namespace FileSystem {
 		// ---------------------------------------------------
 
 			void Dispose() override {
-				GetContentLibrary()._allocator.Delete( *this );
+				_owningLibrary._allocator.Delete( *this );
 			}
 		};
 
@@ -129,7 +128,7 @@ namespace FileSystem {
 
 		public:
 			//!	Constructs this @ref EditorPackage instance.
-			ETInlineHint EditorPackage( ContentLibrary& owningLibrary, Allocator& allocator ) : ContentPackage( UTF8L("<Editor Package>"), owningLibrary, allocator ) {
+			ETInlineHint EditorPackage( ContentLibrary& library, Allocator& allocator ) : ContentPackage( UTF8L("<Editor Package>"), library, allocator ) {
 				// No content to load, so just skip directly to the published state.
 				UpdateResidencyStateOnLoaderThread( ResidencyState::Published );
 			}
@@ -139,7 +138,7 @@ namespace FileSystem {
 		// ---------------------------------------------------
 
 			void Dispose() override sealed {
-				GetContentLibrary()._allocator.Delete( *this );
+				_owningLibrary._allocator.Delete( *this );
 			}
 		};
 

@@ -55,12 +55,20 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	HLSLPipelineDefinitionView::HLSLPipelineDefinitionView( const COMPointer<::ID3D11Device>& device, ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ), _device( device ) {}
+	HLSLPipelineDefinitionView::HLSLPipelineDefinitionView( const UTF8Char* const name, const COMPointer<::ID3D11Device>& device ) : ResourceView( name ), _device( device ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode HLSLPipelineDefinitionView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
-		return Error::UnsupportedOperation;
+	ErrorCode HLSLPipelineDefinitionView::AttachToPackage( const Range<const char*> /*bytes*/, ContentPackage& /*package*/, ContentLibrary& library ) {
+		PublishToLibraryAs<HLSLPipelineDefinitionView>( library );
+
+		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void HLSLPipelineDefinitionView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<HLSLPipelineDefinitionView>( library );
 	}
 
 // ---------------------------------------------------

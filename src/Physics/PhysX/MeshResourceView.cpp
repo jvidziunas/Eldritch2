@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Physics/PhysX/MeshResourceView.hpp>
 #include <Utility/Containers/Range.hpp>
+#include <Packages/ContentPackage.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #include <Physics/ArticulatedBody_generated.h>
@@ -46,13 +47,13 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
-	MeshResourceView::MeshResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ),
-																																					 _rigidBodies( { allocator, UTF8L("PhysX Mesh Resource View Rigid Body Definition Allocator") } ),
-																																					 _softBodies( { allocator, UTF8L("PhysX Mesh Resource View Soft Body Definition Allocator") } ) {}
+	MeshResourceView::MeshResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name ),
+																							 _rigidBodies( { allocator, UTF8L("PhysX Mesh Resource View Rigid Body Definition Allocator") } ),
+																							 _softBodies( { allocator, UTF8L("PhysX Mesh Resource View Soft Body Definition Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode MeshResourceView::UpdateFromByteStream( const Range<const char*> bytes ) {
+	ErrorCode MeshResourceView::AttachToPackage( const Range<const char*> bytes, ContentPackage& package, ContentLibrary& library ) {
 		class CapsuleGeometry : public PxCapsuleGeometry {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -73,6 +74,8 @@ namespace PhysX {
 			~CapsuleGeometry() = default;
 		};
 
+	// ---
+
 		class SphereGeometry : public PxSphereGeometry {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -84,6 +87,8 @@ namespace PhysX {
 
 			~SphereGeometry() = default;
 		};
+
+	// ---
 
 		class BoxGeometry : public PxBoxGeometry {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -161,7 +166,14 @@ namespace PhysX {
 			_rigidBodies.EmplaceBack( definition->BoneIndex(), ::std::move( shape ) );
 		}
 
+		PublishToLibraryAs<decltype(*this)>( library );
 		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void MeshResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<decltype(*this)>( library );
 	}
 
 // ---------------------------------------------------

@@ -1,32 +1,32 @@
 /*==================================================================*\
-  PackageDeserializationContext.inl
+  SwapChain.cpp
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
-#pragma once
+
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Renderer/Vulkan/SwapChain.hpp>
 //------------------------------------------------------------------//
 
+using namespace ::Eldritch2::Renderer;
+using namespace ::Eldritch2;
+
 namespace Eldritch2 {
-namespace FileSystem {
+namespace Renderer {
+namespace Vulkan {
 
-	ETInlineHint const FileSystem::ContentPackage& PackageDeserializationContext::GetBoundPackage() const {
-		return *_packageReference;
-	}
+	SwapChain::SwapChain( Vulkan::UniquePointer<::VkSurfaceKHR>&& surface ) : _systemSurface( ::std::move( surface ) ) {}
 
-// ---------------------------------------------------
-
-	ETInlineHint FileSystem::ContentPackage& PackageDeserializationContext::GetBoundPackage() {
-		return *_packageReference;
-	}
-
-}	// namespace FileSystem
+}	// namespace Vulkan
+}	// namespace Renderer
 }	// namespace Eldritch2
+
+
+

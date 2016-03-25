@@ -25,6 +25,23 @@ namespace Eldritch2 {
 	public:
 		using Checkpoint	= const void*;
 
+	// ---
+
+		class ScopedCheckpoint {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			ETInlineHint ScopedCheckpoint( ArenaAllocatorBase& allocator );
+
+			ETInlineHint ~ScopedCheckpoint();
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			ArenaAllocatorBase&	_allocator;
+			const Checkpoint	_checkpoint;
+		};
+
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
 		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
@@ -121,6 +138,8 @@ namespace Eldritch2 {
 
 	template <size_t arenaSizeInBytes>
 	class FixedStackAllocator : public ::Eldritch2::ArenaAllocatorBase {
+	// - TYPE PUBLISHING ---------------------------------
+
 	public:
 		enum : size_t {
 			ReservedSizeInBytes = arenaSizeInBytes
@@ -131,14 +150,14 @@ namespace Eldritch2 {
 		//! Constructs this @ref FixedStackAllocator instance.
 		FixedStackAllocator( const ::Eldritch2::UTF8Char* const name );
 		//!	Constructs this @ref FixedStackAllocator instance.
-		FixedStackAllocator( const FixedStackAllocator<arenaSizeInBytes>& ) = delete;
+		FixedStackAllocator( const FixedStackAllocator& ) = delete;
 
 		//! Destroys this @ref FixedStackAllocator instance.
 		~FixedStackAllocator() = default;
 
 	// ---------------------------------------------------
 
-		FixedStackAllocator<arenaSizeInBytes>&	operator=(const FixedStackAllocator<arenaSizeInBytes>&) = delete;
+		FixedStackAllocator&	operator=(const FixedStackAllocator&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 

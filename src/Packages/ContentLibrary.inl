@@ -19,7 +19,15 @@
 namespace Eldritch2 {
 namespace FileSystem {
 
-	ETInlineHint ContentLibrary::ResourceViewKey::ResourceViewKey( const ::Eldritch2::UTF8Char* const resourceName, const ::std::type_info* resourceType ) : Pair<const ::Eldritch2::UTF8Char*, const ::std::type_info*>( resourceName, resourceType ) {}
+	ETInlineHint bool ContentLibrary::NameEqual::operator()( const ::Eldritch2::UTF8Char* const name0, const ::Eldritch2::UTF8Char* const name1 ) const {
+		return ::Eldritch2::EqualityCompareString( name0, name1 );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint bool ContentLibrary::ViewKeyEqual::operator()( const ResourceViewKey& left, const ResourceViewKey& right ) const {
+		return ( *left.second == *right.second ) && ::Eldritch2::EqualityCompareString( left.first, right.first );
+	}
 
 // ---------------------------------------------------
 
@@ -43,26 +51,10 @@ namespace FileSystem {
 
 // ---------------------------------------------------
 
-	ETInlineHint ::Eldritch2::Range<ContentLibrary::ResourceViewFactoryCollection::Iterator> ContentLibrary::GetFactoriesForResourceType( const ::Eldritch2::UTF8Char* const resourceTypeName ) {
+	ETInlineHint const ::Eldritch2::IntrusiveForwardList<FileSystem::ResourceViewFactory>& ContentLibrary::GetFactoriesForResourceType( const ::Eldritch2::UTF8Char* const resourceTypeName ) const {
 		const auto	factoryCollectionCandidate( _resourceFactoryDirectory.Find( resourceTypeName ) );
 		
-		if( factoryCollectionCandidate != _resourceFactoryDirectory.End() ) {
-			return { factoryCollectionCandidate->second.Begin(), factoryCollectionCandidate->second.End() };
-		}
-
-		return { _nullFactoryCollection.Begin(), _nullFactoryCollection.End() };
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint ETNoAliasHint size_t GetHashCode( const ContentLibrary::ResourceViewKey& key, const size_t seed ) {
-		return key.second->hash_code() * ::Eldritch2::Hash<const ::Eldritch2::UTF8Char*>()( key.first, seed );
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint ETNoAliasHint bool operator==( const ContentLibrary::ResourceViewKey& left, const ContentLibrary::ResourceViewKey& right ) {
-		return (*left.second == *right.second) && ::Eldritch2::EqualityCompareString( left.first, right.first );
+		return factoryCollectionCandidate != _resourceFactoryDirectory.End() ? factoryCollectionCandidate->second : _orphanContentFactories;
 	}
 
 }	// namespace FileSystem

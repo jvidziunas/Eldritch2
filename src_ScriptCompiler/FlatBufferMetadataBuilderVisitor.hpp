@@ -14,7 +14,7 @@
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
 //------------------------------------------------------------------//
-#include <Scripting/AngelScript/BytecodeMetadata_generated.h>
+#include <Scripting/AngelScript/BytecodePackage_generated.h>
 //------------------------------------------------------------------//
 
 class	asIBinaryStream;

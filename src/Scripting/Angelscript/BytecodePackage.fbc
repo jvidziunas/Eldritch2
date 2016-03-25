@@ -1,5 +1,5 @@
-file_identifier	"ASBM";
-file_extension	"AngelScriptBytecodeMetadata";
+file_identifier	"ASBP";
+file_extension	".AngelScriptBytecodePackage";
 
 namespace Eldritch2.Scripting.AngelScript.FlatBuffers;
 

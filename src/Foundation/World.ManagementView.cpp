@@ -30,9 +30,6 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	void World::ManagementView::ExecuteFrame( WorkerContext& executingContext ) {
-		// This handle ensures the world will not be deleted until the task has finished executing.
-		ObjectHandle<World>	worldReference( _owningWorld, ::Eldritch2::PassthroughReferenceCountingSemantics );
-
 		InvokeTickFunction<&WorldView::OnFrameTick>( executingContext );
 	}
 
@@ -43,12 +40,9 @@ namespace Foundation {
 
 	// ---
 
-		// This handle ensures the world will not be deleted until the task has finished executing.
-		ObjectHandle<World>	worldReference( _owningWorld, ::Eldritch2::PassthroughReferenceCountingSemantics );
-
-		switch( worldReference->GetRootPackage().GetResidencyState() ) {
+		switch( GetOwningWorld().GetRootPackage().GetResidencyState() ) {
 			case ResidencyState::Failed: {
-				worldReference->RaiseFatalError();
+				_owningWorld.RaiseFatalError();
 				break;
 			}	// case ResidencyState::Failed
 
@@ -61,8 +55,8 @@ namespace Foundation {
 					}
 				}
 
-				if( !worldReference->EncounteredFatalError() ) {
-					worldReference->_isLoaded = 1u;
+				if( GetOwningWorld().CanExecute() ) {
+					_owningWorld._isLoaded = 1u;
 					InvokeTickFunction<&WorldView::OnGameStart>( executingContext );
 				}
 				

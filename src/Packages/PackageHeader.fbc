@@ -1,5 +1,5 @@
 file_identifier	"ECRF";
-file_extension	"e2toc";
+file_extension	".e2toc";
 
 namespace Eldritch2.FileSystem.FlatBuffers;
 

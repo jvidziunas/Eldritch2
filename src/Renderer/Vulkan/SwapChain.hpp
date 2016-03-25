@@ -1,5 +1,5 @@
 /*==================================================================*\
-  KeyframeAnimationResourceView.hpp
+  SwapChain.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,26 +12,27 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Packages/ResourceView.hpp>
+#include <Renderer/Vulkan/SmartPointers.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Animation {
+namespace Renderer {
+namespace Vulkan {
 
-	class KeyframeAnimationResourceView : public FileSystem::ResourceView {
+	class SwapChain {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		KeyframeAnimationResourceView( const ::Eldritch2::UTF8Char* const name );
+		SwapChain( Vulkan::UniquePointer<::VkSurfaceKHR>&& surface );
 
-		~KeyframeAnimationResourceView() = default;
+		~SwapChain() = default;
 
-	// ---------------------------------------------------
+	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ErrorCode	AttachToPackage( const ::Eldritch2::Range<const char*> bytes, FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) override;
-
-		void					DetachFromPackage( FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) const override;
+	private:
+		Vulkan::UniquePointer<::VkSurfaceKHR>	_systemSurface;
 	};
 
-}	// namespace Animation
+}	// namespace Vulkan
+}	// namespace Renderer
 }	// namespace Eldritch2

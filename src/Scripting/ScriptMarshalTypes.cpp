@@ -15,6 +15,7 @@
 #include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Scripting/ScriptMarshalTypes.hpp>
 #include <Utility/Math/StandardLibrary.hpp>
+#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scripting;
@@ -31,15 +32,29 @@ namespace Scripting {
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( Allocator& allocator ) : UTF8String<>( { allocator, UTF8L("String Allocator") } ) {}
+	StringMarshal::StringMarshal( const UTF8Char* const string, const size_t stringLengthInOctets ) : UTF8String<>( string, (string + stringLengthInOctets), { *stringAllocator, UTF8L("String Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( const UTF8Char* const string, const size_t stringLengthInOctets, Allocator& allocator ) : UTF8String<>( string, (string + stringLengthInOctets), { allocator, UTF8L("String Allocator") } ) {}
+	StringMarshal::StringMarshal( const UTF8Char* const string ) : StringMarshal( string, StringLength( string ) ) {}
 
 // ---------------------------------------------------
 
-	StringMarshal::StringMarshal( const StringMarshal& string, Allocator& allocator ) : StringMarshal( string.AsCString(), string.GetLength(), allocator ) {}
+	StringMarshal::StringMarshal( const StringMarshal& string ) : StringMarshal( string.AsCString(), string.GetLength() ) {}
+
+// ---------------------------------------------------
+
+	StringMarshal::StringMarshal( StringMarshal&& string ) : UTF8String<>( ::std::move( string ) ) {}
+
+// ---------------------------------------------------
+
+	StringMarshal::StringMarshal( UTF8String<>&& string ) : UTF8String<>( ::std::move( string ) ) {
+		ETRuntimeAssert( &string.GetAllocator().GetParent() == stringAllocator );
+	}
+
+// ---------------------------------------------------
+
+	StringMarshal::StringMarshal() : UTF8String<>( { *stringAllocator, UTF8L("String Allocator") } ) {}
 
 // ---------------------------------------------------
 
@@ -51,9 +66,13 @@ namespace Scripting {
 		auto	builder( typeRegistrar.BeginValueTypeRegistration<StringMarshal>() );
 
 		builder.ExposeConstructor( [] ( void* thisPointer ) -> void {
-			new(thisPointer) StringMarshal( *stringAllocator );
+			ETRuntimeAssert( nullptr != stringAllocator );
+
+			new(thisPointer) StringMarshal();
 		} ).ExposeConstructor<const StringMarshal&>( [] ( void* thisPointer, const StringMarshal& string ) {
-			new(thisPointer) StringMarshal( string, *stringAllocator );
+			ETRuntimeAssert( nullptr != stringAllocator );
+
+			new(thisPointer) StringMarshal( string );
 		} );
 
 		builder.ExposeVirtualProperty<SizeType>( "Length", [] ( const StringMarshal* thisPointer ) {
@@ -145,7 +164,13 @@ namespace Scripting {
 		} );
 
 		// Global function registration
-		// visitor.ExposeFunction( "DotProduct", &FunctionHelper::DotProduct ).ExposeFunction( "LinearInterpolate", &FunctionHelper::LinearInterpolate ).ExposeFunction( "CrossProduct", &FunctionHelper::CrossProduct );
+		visitor.ExposeFunction<float32, const Float4Marshal&, const Float4Marshal&>( "DotProduct", [] ( const Float4Marshal& vector0, const Float4Marshal& vector1 ) {
+			return DotProduct( vector0, vector1 );
+		} ).ExposeFunction<Float4Marshal, const Float4Marshal&, const Float4Marshal&, float32>( "LinearInterpolate", [] ( const Float4Marshal& vector0, const Float4Marshal& vector1, float32 alpha ) -> Float4Marshal {
+			return { LinearInterpolate( vector0, vector1, alpha ) };
+		} ).ExposeFunction<Float4Marshal, const Float4Marshal&, const Float4Marshal&>( "CrossProduct", [] ( const Float4Marshal& vector0, const Float4Marshal& vector1 ) -> Float4Marshal {
+			return { CrossProduct( vector0, vector1 ) };
+		} );
 	}
 
 // ---------------------------------------------------
@@ -184,7 +209,9 @@ namespace Scripting {
 		} );
 
 		// Global function registration
-		visitor.ExposeFunction<Float4Marshal, const Float4Marshal&, const OrientationMarshal&>( "RotateWorldToLocal", [] ( const Float4Marshal& point, const OrientationMarshal& localFrame ) -> Float4Marshal {
+		visitor.ExposeFunction<float32, const OrientationMarshal&, const OrientationMarshal&>( "DotProduct", [] ( const OrientationMarshal& orientation0, const OrientationMarshal& orientation1 ) {
+			return DotProduct( orientation0, orientation1 );
+		} ).ExposeFunction<Float4Marshal, const Float4Marshal&, const OrientationMarshal&>( "RotateWorldToLocal", [] ( const Float4Marshal& point, const OrientationMarshal& localFrame ) -> Float4Marshal {
 			return { localFrame.RotateVector( point ) };
 		} ).ExposeFunction<OrientationMarshal, const OrientationMarshal&, const OrientationMarshal&, float32>( "LinearInterpolate", [] ( const OrientationMarshal& orientation0, const OrientationMarshal& orientation1, float32 alpha ) -> OrientationMarshal {
 			return ::Eldritch2::LinearInterpolate( orientation0, orientation1, alpha );
@@ -209,7 +236,7 @@ namespace Scripting {
 
 		// Constructor registration
 		builder.ExposeConstructor( [] ( void* const thisPointer ) {
-			new(thisPointer) RigidTransformMarshal( { 0.0f, 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.0f } );
+			new(thisPointer) RigidTransformMarshal( { 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f } );
 		} ).ExposeConstructor<const Float4Marshal&, const OrientationMarshal&>( [] ( void* const thisPointer, const Float4Marshal& translation, const OrientationMarshal& orientation ) {
 			new(thisPointer) RigidTransformMarshal( translation, orientation );
 		} );

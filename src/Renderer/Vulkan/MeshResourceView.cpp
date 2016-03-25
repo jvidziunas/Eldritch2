@@ -25,7 +25,7 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
 
-	MeshResourceView::MeshResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& nameAllocator ) : ResourceView( owningLibrary, package, name, nameAllocator ), _vertexBuffer( nullptr ) {}
+	MeshResourceView::MeshResourceView( const UTF8Char* const name ) : ResourceView( name ), _vertexBuffer( nullptr ) {}
 
 // ---------------------------------------------------
 
@@ -50,10 +50,17 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	ErrorCode MeshResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
+	ErrorCode MeshResourceView::AttachToPackage( const Range<const char*> /*bytes*/, ContentPackage& /*package*/, ContentLibrary& library ) {
 		_submeshes.Clear();
 
-		return Error::UnsupportedOperation;
+		PublishToLibraryAs<MeshResourceView>( library );
+		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void MeshResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<MeshResourceView>( library );
 	}
 
 // ---------------------------------------------------

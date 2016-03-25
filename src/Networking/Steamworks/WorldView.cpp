@@ -90,6 +90,12 @@ namespace Steamworks {
 
 // ---------------------------------------------------
 
+	void WorldView::ExposeScriptApi( ScriptApiRegistrationInitializationVisitor& /*visitor*/ ) {
+		
+	}
+
+// ---------------------------------------------------
+
 	void WorldView::OnPreScriptTick( WorkerContext& /*executingContext*/ ) {
 		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Pull remote state", 0xBBBBBB );
 

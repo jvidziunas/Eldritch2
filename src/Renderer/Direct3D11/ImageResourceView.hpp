@@ -38,13 +38,15 @@ namespace Direct3D11 {
 
 	public:
 		//! Constructs this @ref ImageResourceView instance.
-		ImageResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const ::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		ImageResourceView( const ::Eldritch2::UTF8Char* const name );
 
 		~ImageResourceView() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
+		::Eldritch2::ErrorCode	AttachToPackage( const ::Eldritch2::Range<const char*> bytes, FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) override;
+
+		void					DetachFromPackage( FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) const override;
 
 	// ---------------------------------------------------
 

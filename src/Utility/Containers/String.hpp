@@ -52,6 +52,8 @@ namespace Detail {
 		//!	Constructs this @ref String instance.
 		ETInlineHint String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref String instance.
+		ETInlineHint String( SizeType reservedLength, AllocatorType&& allocator = AllocatorType() );
+		//!	Constructs this @ref String instance.
 		template <size_t literalLength>
 		ETInlineHint String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator = AllocatorType() );
 		//!	Constructs this @ref String instance.

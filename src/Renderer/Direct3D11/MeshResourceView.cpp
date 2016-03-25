@@ -15,6 +15,7 @@
 #include <Renderer/Direct3D11/HLSLPipelineDefinitionView.hpp>
 #include <Renderer/Direct3D11/MeshResourceView.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
+#include <Packages/ContentPackage.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
 #if( ET_COMPILER_IS_MSVC )
@@ -45,12 +46,20 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Direct3D11 {
 
-	MeshResourceView::MeshResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ), _submeshes( { allocator, UTF8L("Direct3D11 Mesh View Submesh Allocator") } ) {}
+	MeshResourceView::MeshResourceView( const UTF8Char* const name, Allocator& allocator ) : ResourceView( name ), _submeshes( { allocator, UTF8L("Direct3D11 Mesh View Submesh Allocator") } ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode MeshResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
-		return Error::UnsupportedOperation;
+	ErrorCode MeshResourceView::AttachToPackage( const Range<const char*> /*bytes*/, ContentPackage& /*package*/, ContentLibrary& library ) {
+		PublishToLibraryAs<decltype(*this)>( library );
+
+		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void MeshResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<decltype(*this)>( library );
 	}
 
 // ---------------------------------------------------

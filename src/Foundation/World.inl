@@ -63,13 +63,19 @@ namespace Foundation {
 // ---------------------------------------------------
 
 	ETInlineHint void World::RaiseFatalError() const {
-		_fatalErrorCount.fetch_add( 1u, ::std::memory_order_acq_rel );
+		_executeFlag.store( false, ::std::memory_order_release );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint ::Eldritch2::uint32 World::EncounteredFatalError() const {
-		return 0u != _fatalErrorCount.load( ::std::memory_order_acquire );
+	ETInlineHint void World::Terminate() const {
+		_executeFlag.store( false, ::std::memory_order_release );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint bool World::CanExecute() const {
+		return _executeFlag.load( ::std::memory_order_acquire );
 	}
 
 // ---------------------------------------------------

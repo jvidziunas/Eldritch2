@@ -46,14 +46,12 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::ImageViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
-		ETRuntimeAssert( _device );
+	Result<ResourceView> EngineService::ImageViewFactory::AllocateResourceView( Allocator& allocator, const UTF8Char* const name ) const {
+		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) ImageResourceView( name ) ) {
+			return { ::std::move( view ) };
+		}
 
-	// ---
-
-		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Create shader resource view", 0xAAAAAA );
-
-		return new(allocator, Allocator::AllocationDuration::Normal) ImageResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
+		return { Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------

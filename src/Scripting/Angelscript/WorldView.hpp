@@ -30,7 +30,7 @@ class	asIScriptFunction;
 class	asIScriptContext;
 class	asIScriptObject;
 class	asIScriptEngine;
-class	asIObjectType;
+class	asITypeInfo;
 
 namespace Eldritch2 {
 namespace Scripting {
@@ -44,7 +44,7 @@ namespace AngelScript {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
-			using HandlerCache = ::Eldritch2::HashMap<::Eldritch2::Pair<::asIObjectType*, const char*>, ::asIScriptFunction*>;
+			using HandlerCache = ::Eldritch2::HashMap<::Eldritch2::Pair<::asITypeInfo*, const char*>, ::asIScriptFunction*>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -72,7 +72,7 @@ namespace AngelScript {
 
 	// ---------------------------------------------------
 
-		AngelScript::ObjectHandle	Spawn( const char* const className );
+		AngelScript::ObjectHandle	Spawn( const ::asITypeInfo* typeInfo );
 
 	// ---------------------------------------------------
 
@@ -89,6 +89,8 @@ namespace AngelScript {
 
 		void	AcceptViewVisitor( const ScriptExecutionPreparationVisitor ) override sealed;
 		void	AcceptViewVisitor( const DeletionPreparationVisitor ) override sealed;
+
+	// ---------------------------------------------------
 
 		void	OnGameStart( Scheduler::WorkerContext& executingContext ) override sealed;
 

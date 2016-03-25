@@ -71,13 +71,10 @@ namespace PhysX {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//!	Constructs this @ref MeshResourceView instance.
-		/*!	@param[in] owningLibrary @ref ContentLibrary the new @ref ResourceView will register itself into.
-			@param[in] package @ref ContentPackage responsible for managing the lifespan of the new @ref ResourceView.
-			@param[in] name @parblock Null-terminated C string containing the name of the resource. The referenced memory does not need
-				to exist past the end of the constructor, as the view will maintain an internal copy. @endparblock
-			@param[in] nameAllocator @ref Allocator instance to provide memory for internal allocations.
+		/*!	@param[in] name UTF-8 encoded string containing the name of the resource.
+			@param[in] allocator @ref Allocator the new @ref MeshResourceView should use to perform internal allocations.
 			*/
-		MeshResourceView( FileSystem::ContentLibrary& owningLibrary, FileSystem::ContentPackage& package, const::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
+		MeshResourceView( const::Eldritch2::UTF8Char* const name, ::Eldritch2::Allocator& allocator );
 
 		~MeshResourceView() = default;
 
@@ -89,7 +86,9 @@ namespace PhysX {
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	UpdateFromByteStream( const ::Eldritch2::Range<const char*> bytes ) override;
+		::Eldritch2::ErrorCode	AttachToPackage( const ::Eldritch2::Range<const char*> bytes, FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) override;
+
+		void					DetachFromPackage( FileSystem::ContentPackage& package, FileSystem::ContentLibrary& library ) const override;
 
 	// ---------------------------------------------------
 

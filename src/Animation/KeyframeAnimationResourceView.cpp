@@ -24,12 +24,19 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Animation {
 
-	KeyframeAnimationResourceView::KeyframeAnimationResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
+	KeyframeAnimationResourceView::KeyframeAnimationResourceView( const UTF8Char* const name ) : ResourceView( name ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode KeyframeAnimationResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
+	ErrorCode KeyframeAnimationResourceView::AttachToPackage( const Range<const char*> /*bytes*/, ContentPackage& /*package*/, ContentLibrary& library ) {
+		PublishToLibraryAs<KeyframeAnimationResourceView>( library );
 		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void KeyframeAnimationResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<KeyframeAnimationResourceView>( library );
 	}
 
 }	// namespace Animation

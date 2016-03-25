@@ -209,14 +209,7 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
-		const ::Eldritch2::UTF8Char	extensionString[]	= UTF8L(".AngelScriptBytecodePackage");
-
-		_outputModuleName.Assign( argument, argumentEnd );
-
-		// Trim off the extension string if specified on the command line. We'll add it back in later.
-		if( _outputModuleName.EndsWith( extensionString ) ) {
-			_outputModuleName.Resize( _outputModuleName.GetLength() - (_countof( extensionString ) - 1) );
-		}
+		_outputModuleName.Assign( argument, argumentEnd ).EnsureEndsWith( Scripting::AngelScript::FlatBuffers::ModuleMetadataExtension() );
 
 		// Ensure we don't leak resources.
 		if( auto existingModule = GetScriptBuilder().GetModule() ) {
@@ -224,10 +217,11 @@ namespace Tools {
 		}
 
 		// Internally, the module name won't have the extension.
-		GetScriptBuilder().StartNewModule( _engine.get(), _outputModuleName.AsCString() );
-
-		// Add the file extension back on. This is used during the actual processing step to create the output file.
-		_outputModuleName.Append( extensionString );
+		const UTF8String<>	moduleName( _outputModuleName.Begin(),
+										_outputModuleName.FindFirstInstance( Scripting::AngelScript::FlatBuffers::ModuleMetadataExtension() ),
+										{ _outputModuleName.GetAllocator().GetParent(), UTF8L("Script Module Name Temp Allocator") } );
+		
+		GetScriptBuilder().StartNewModule( _engine.get(), moduleName.AsCString() );
 
 		return 0;
 	}

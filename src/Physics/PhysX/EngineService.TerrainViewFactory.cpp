@@ -40,12 +40,12 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::TerrainViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> sourceAsset ) {
-		if( const auto view = new(allocator, Allocator::AllocationDuration::Normal) TerrainResourceView( contentLibrary, package, name, allocator ) ) {
-			return view->UpdateFromByteStream( sourceAsset );
+	Result<ResourceView> EngineService::TerrainViewFactory::AllocateResourceView( Allocator& allocator, const UTF8Char* const name ) const {
+		if( const auto view = new(allocator, Allocator::AllocationDuration::Normal) TerrainResourceView( name ) ) {
+			return { ::std::move( view ) };
 		}
 
-		return Error::OutOfMemory;
+		return { Error::OutOfMemory };
 	}
 
 }	// namespace PhysX

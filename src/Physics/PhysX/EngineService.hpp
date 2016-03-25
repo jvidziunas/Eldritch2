@@ -98,11 +98,7 @@ namespace PhysX {
 
 		// ---------------------------------------------------
 
-			::Eldritch2::ErrorCode	AllocateResourceView( ::Eldritch2::Allocator&				allocator,
-														  FileSystem::ContentLibrary&			contentLibrary,
-														  FileSystem::ContentPackage&			package,
-														  const ::Eldritch2::UTF8Char* const	name,
-														  const ::Eldritch2::Range<const char*>	sourceAsset ) override;
+			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
 		};
 
 	// ---
@@ -126,11 +122,7 @@ namespace PhysX {
 
 		// ---------------------------------------------------
 
-			::Eldritch2::ErrorCode	AllocateResourceView( ::Eldritch2::Allocator&				allocator,
-														  FileSystem::ContentLibrary&			contentLibrary,
-														  FileSystem::ContentPackage&			package,
-														  const ::Eldritch2::UTF8Char* const	name,
-														  const ::Eldritch2::Range<const char*>	sourceAsset ) override;
+			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
 		};
 
 	// - DATA MEMBERS ------------------------------------

@@ -29,7 +29,14 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
+		static void	ExposeScriptApi( Scripting::ScriptApiRegistrationInitializationVisitor& visitor );
+
+	// ---------------------------------------------------
+
 		void	OnPreScriptTick( Scheduler::WorkerContext& executingContext ) override;
+
+
+	private:
 
 	// - DATA MEMBERS ------------------------------------
 

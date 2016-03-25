@@ -50,7 +50,7 @@ namespace Eldritch2 {
 		template <typename InputIterator>
 		ETInlineHint FlatMap( InputIterator begin, InputIterator end, OrderingPredicateType&& orderingPredicate = OrderingPredicate(), AllocatorType&& allocator = AllocatorType() );
 		//! Constructs this @ref FlatMap instance.
-		ETInlineHint FlatMap( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
+		ETInlineHint explicit FlatMap( const ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
 		//! Constructs this @ref FlatMap instance.
 		ETInlineHint FlatMap( ::Eldritch2::FlatMap<Key, StoredObject, OrderingPredicate, Allocator>&& moveSource );
 

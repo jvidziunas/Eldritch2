@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Containers/ResizableArray.hpp>
+#include <Utility/Memory/InstanceDeleters.hpp>
 #include <Utility/Containers/UTF8String.hpp>
 #include <Scripting/ReferenceCountable.hpp>
 #include <Utility/MPL/Noncopyable.hpp>
@@ -25,6 +26,7 @@
 
 namespace Eldritch2 {
 	namespace FileSystem {
+		class	ReadableMemoryMappedFile;
 		class	ContentLibrary;
 	}
 
@@ -54,7 +56,7 @@ namespace FileSystem {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		//! Constructs this @ref ContentPackage instance.
-		/*!	@param[in] name Null-terminated C string containing the name of the package. A copy of this will be kept internally, and there are no additional lifetime requirements after the constructor call.
+		/*!	@param[in] name UTF-8 encoded C string containing the name of the package. A copy of this will be kept internally, and there are no additional lifetime requirements after the constructor call.
 			@param[in] owningLibrary The @ref ContentLibrary instance that owns this @ref ContentPackage. The @ref ContentPackage will route additional load requests through this @ref ContentLibrary.
 			@param[in] allocator The @ref Allocator instance the @ref ContentPackage will use to allocate memory.
 			*/
@@ -65,23 +67,26 @@ namespace FileSystem {
 
 	// ---------------------------------------------------
 
+		::Eldritch2::ErrorCode	DeserializeDependencies();
+
+		::Eldritch2::ErrorCode	DeserializeContent();
+
+	// ---------------------------------------------------
+
 		//!	Gets the base name of the package.
 		/*!	@returns A null-terminated C string containing the name of the package. Both the address and contents are guaranteed to remain constant throughout the life of the package.
 			*/
 		ETInlineHint const ::Eldritch2::UTF8Char* const	GetName() const;
 
 		ETInlineHint const FileSystem::ContentLibrary&	GetContentLibrary() const;
-		ETInlineHint FileSystem::ContentLibrary&		GetContentLibrary();
 
-		//!	Returns the set of @ref ContentPackage instances the @ref ResourceView instances of the @ref ContentPackage require to be fully resident.
-		/*!	@returns A const @ref ResizeableArray reference to the internal list of referenced packages.
+		//!	Returns the set of additional @ref ContentPackage instances the @ref ResourceView instances this @ref ContentPackage owns require to be fully resident.
+		/*!	@returns A const @ref ResizableArray reference to the internal list of referenced packages.
 			@remarks Not thread-safe.
 			*/
 		ETInlineHint const DependencyCollection&		GetDependencies() const;
-		ETInlineHint DependencyCollection&				GetDependencies();
 
 		ETInlineHint const ExportCollection&			GetExports() const;
-		ETInlineHint ExportCollection&					GetExports();
 
 		ETInlineHint ::Eldritch2::Allocator&			GetAllocator();
 
@@ -99,12 +104,22 @@ namespace FileSystem {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator		_allocator;
-		const ::Eldritch2::UTF8String<>	_name;
-		FileSystem::ContentLibrary&		_owningLibrary;
-		::std::atomic<ResidencyState>	_residencyState;
-		ExportCollection				_exportedResources;
-		DependencyCollection			_referencedPackages;
+		::Eldritch2::ChildAllocator											_allocator;
+
+		const ::Eldritch2::UTF8String<>										_name;
+
+	protected:
+		FileSystem::ContentLibrary&											_owningLibrary;
+
+	private:
+		::std::atomic<ResidencyState>										_residencyState;
+
+		ExportCollection													_exportedResources;
+		DependencyCollection												_referencedPackages;
+
+		// Ensure this is placed after the allocator for the destructors to fire in the correct order.
+		::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	_tableOfContentsFile;
+		::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	_streamingDataFile;
 	};
 
 }	// namespace FileSystem

@@ -15,9 +15,6 @@
 #include <Renderer/Direct3D11/MeshResourceView.hpp>
 #include <Renderer/Direct3D11/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Utility/Assert.hpp>
-//------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
@@ -40,14 +37,12 @@ namespace Direct3D11 {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::MeshViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
-		ETRuntimeAssert( _device );
+	Result<ResourceView> EngineService::MeshViewFactory::AllocateResourceView( Allocator& allocator, const UTF8Char* const name ) const {
+		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) MeshResourceView( name, allocator ) ) {
+			return { ::std::move( view ) };
+		}
 
-	// ---
-
-		MICROPROFILE_SCOPEI( "Direct3D11 Renderer", "Create mesh resource view", 0xACBACC );
-
-		return new(allocator, Allocator::AllocationDuration::Normal) MeshResourceView( contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
+		return{ Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------

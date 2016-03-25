@@ -58,8 +58,9 @@ namespace Foundation {
 
 // ---------------------------------------------------
 
-	CountedResult<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName ) {
+	CountedResult<World> GameEngineService::CreateWorld( const UTF8Char* const worldResourceName, const UTF8Char* const rulesName ) {
 		if( ObjectHandle<World>	world{ new(GetEngineAllocator(), Allocator::AllocationDuration::Normal) World( _owningEngine, worldResourceName ), ::Eldritch2::PassthroughReferenceCountingSemantics } ) {
+			world->SetProperty( World::GetRulesKey(), rulesName );
 			// Transfer ownership of the world to the result object and thus to outer code.
 			return { ::std::move( world ) };
 		}

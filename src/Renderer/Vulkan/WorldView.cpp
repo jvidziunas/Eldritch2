@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Renderer/Vulkan/WorldView.hpp>
 #include <Scheduler/WorkerContext.hpp>
 //------------------------------------------------------------------//
@@ -19,6 +20,7 @@
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Foundation;
+using namespace ::Eldritch2::Scripting;
 using namespace ::Eldritch2::Scheduler;
 using namespace ::Eldritch2::Renderer;
 using namespace ::Eldritch2;
@@ -28,6 +30,12 @@ namespace Renderer {
 namespace Vulkan {
 
 	WorldView::WorldView( World& owningWorld ) : Foundation::WorldView( owningWorld ) {}
+
+// ---------------------------------------------------
+
+	void WorldView::ExposeScriptApi( ScriptApiRegistrationInitializationVisitor& /*visitor*/ ) {
+
+	}
 
 // ---------------------------------------------------
 

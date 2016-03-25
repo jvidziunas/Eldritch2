@@ -16,7 +16,6 @@
 #include <Scripting/Angelscript/EngineService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
 #include <angelscript.h>
 //------------------------------------------------------------------//
 
@@ -33,14 +32,18 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::BytecodePackageViewFactory::AllocateResourceView( Allocator& allocator, ContentLibrary& contentLibrary, ContentPackage& package, const UTF8Char* const name, const Range<const char*> /*sourceAsset*/ ) {
-		MICROPROFILE_SCOPEI( "Angelscript Virtual Machine", "Create bytecode package resource view", 0xAAAAAB );
+	Result<ResourceView> EngineService::BytecodePackageViewFactory::AllocateResourceView( Allocator& allocator, const UTF8Char* const name ) const {
+		ModuleHandle	module( _scriptEngine->GetModule( name, asEGMFlags::asGM_CREATE_IF_NOT_EXISTS ) );
 
-		if( ModuleHandle newModule { _scriptEngine->GetModule( name, ::asGM_CREATE_IF_NOT_EXISTS ) } ) {
-			return new(allocator, Allocator::AllocationDuration::Normal) BytecodePackageResourceView( ::std::move( newModule ), contentLibrary, package, name, allocator ) ? Error::None : Error::OutOfMemory;
+		if( !module ) {
+			return{ Error::Unspecified };
 		}
 
-		return Error::InvalidParameter;
+		if( auto view = new(allocator, Allocator::AllocationDuration::Normal) BytecodePackageResourceView( name, ::std::move( module ), allocator ) ) {
+			return { ::std::move( view ) };
+		}
+
+		return { Error::OutOfMemory };
 	}
 
 // ---------------------------------------------------

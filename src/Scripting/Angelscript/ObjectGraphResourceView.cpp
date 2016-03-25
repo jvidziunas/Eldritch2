@@ -27,7 +27,7 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	ObjectGraphResourceView::ObjectGraphResourceView( ContentLibrary& owningLibrary, ContentPackage& package, const UTF8Char* const name, Allocator& allocator ) : ResourceView( owningLibrary, package, name, allocator ) {}
+	ObjectGraphResourceView::ObjectGraphResourceView( const UTF8Char* const name ) : ResourceView( name ) {}
 
 // ---------------------------------------------------
 
@@ -43,8 +43,16 @@ namespace AngelScript {
 
 // ---------------------------------------------------
 
-	ErrorCode ObjectGraphResourceView::UpdateFromByteStream( const Range<const char*> /*bytes*/ ) {
+	ErrorCode ObjectGraphResourceView::AttachToPackage( const Range<const char*> /*bytes*/, ContentPackage& /*package*/, ContentLibrary& library ) {
+		PublishToLibraryAs<ObjectGraphResourceView>( library );
+
 		return Error::None;
+	}
+
+// ---------------------------------------------------
+
+	void ObjectGraphResourceView::DetachFromPackage( ContentPackage& /*package*/, ContentLibrary& library ) const {
+		RemoveFromLibraryAs<ObjectGraphResourceView>( library );
 	}
 
 }	// namespace AngelScript

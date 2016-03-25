@@ -28,7 +28,13 @@ namespace FileSystem {
 // ---------------------------------------------------
 
 	ResourceViewFactoryPublishingInitializationVisitor& ResourceViewFactoryPublishingInitializationVisitor::PublishFactory( const UTF8Char* className, ResourceViewFactory& factory ) {
-		_contentLibrary._resourceFactoryDirectory[::std::move( className )].PushFront( factory );
+		auto candidate( _contentLibrary._resourceFactoryDirectory.Find( className ) );
+
+		if( candidate == _contentLibrary._resourceFactoryDirectory.End() ) {
+			candidate = _contentLibrary._resourceFactoryDirectory.Insert( { std::move( className ), IntrusiveForwardList<ResourceViewFactory>() } ).first;
+		}
+
+		candidate->second.PushFront( factory );
 
 		return *this;
 	}
