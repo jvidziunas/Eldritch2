@@ -1,0 +1,25 @@
+include			"Eldritch2Types.fbc";
+file_identifier	"E2RP";
+file_extension	".E2RenderPipeline";
+
+namespace Eldritch2.Renderer.FlatBuffers;
+
+table ColorAttachmentDescriptor {
+	ResourceName		: string (required);
+}
+
+table DepthAttachmentDescriptor {
+	ResourceName		: string (required);
+}
+
+table PassDescriptor {
+	UsageName			: string (required);
+	ColorAttachments	: [ColorAttachmentDescriptor] (required);
+	DepthAttachment		: DepthAttachmentDescriptor;
+}
+
+table RenderPipeline {
+	Passes				: [PassDescriptor] (required);
+}
+
+root_type RenderPipeline;

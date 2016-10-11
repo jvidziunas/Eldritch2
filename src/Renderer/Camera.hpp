@@ -13,11 +13,10 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/MPL/VectorTypes.hpp>
+#include <Utility/MPL/AngleTypes.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	class	RadianMeasure;
-	class	DegreeMeasure;
 	class	Float4x4;
 }
 
@@ -25,90 +24,60 @@ namespace Eldritch2 {
 namespace Renderer {
 
 	class Camera {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		struct Viewport {
-			::Eldritch2::float32	offsetX;
-			::Eldritch2::float32	offsetY;
-			::Eldritch2::float32	width;
-			::Eldritch2::float32	height;
-		};
-
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref Camera instance.
-		Camera();
-		//!	Constructs this @ref Camera instance.
+	public:
+	//!	Constructs this @ref Camera instance.
+		Camera( Eldritch2::RigidTransform transform, Eldritch2::RadianMeasure horizontalFovAngle, Eldritch2::float32 aspectRatio );
+	//!	Constructs this @ref Camera instance.
 		Camera( const Camera& ) = default;
 
 		~Camera() = default;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::RadianMeasure	GetHorizontalFOV() const;
+	public:
+		Eldritch2::RigidTransform ETSimdCall	GetTransform() const;
 
-		void						SetHorizontalFOV( const ::Eldritch2::DegreeMeasure newFOV );
-		void						SetHorizontalFOV( const ::Eldritch2::RadianMeasure newFOV );
-
-		::Eldritch2::RadianMeasure	GetVerticalFOV() const;
-
-		void						SetVerticalFOV( const ::Eldritch2::DegreeMeasure newFOV );
-		void						SetVerticalFOV( const ::Eldritch2::RadianMeasure newFOV );
+		void ETSimdCall							SetTransform( Eldritch2::RigidTransform transform );
 
 	// ---------------------------------------------------
 
-		void	GetHorizontalAndVerticalFOV( ::Eldritch2::RadianMeasure& horizontalFOV, ::Eldritch2::RadianMeasure& verticalFOV ) const;
-		void	GetHorizontalAndVerticalFOV( ::Eldritch2::DegreeMeasure& horizontalFOV, ::Eldritch2::DegreeMeasure& verticalFOV ) const;
+	public:
+		Eldritch2::RadianMeasure	GetHorizontalFov() const;
 
-		void	SetHorizontalAndVerticalFOV( const ::Eldritch2::RadianMeasure horizontalFOV, const ::Eldritch2::RadianMeasure verticalFOV );
-		void	SetHorizontalAndVerticalFOV( const ::Eldritch2::DegreeMeasure horizontalFOV, const ::Eldritch2::DegreeMeasure verticalFOV );
-		void	SetHorizontalAndVerticalFOV( const ::Eldritch2::RadianMeasure horizontalFOV, const ::Eldritch2::float32 aspectRatio );
-		void	SetHorizontalAndVerticalFOV( const ::Eldritch2::DegreeMeasure horizontalFOV, const ::Eldritch2::float32 aspectRatio );
+		void						SetHorizontalFov( Eldritch2::DegreeMeasure angle );
+		void						SetHorizontalFov( Eldritch2::RadianMeasure angle );
 
-	// ---------------------------------------------------
+		Eldritch2::RadianMeasure	GetVerticalFov() const;
 
-		::Eldritch2::Float4	GetPosition() const;
-
-		void				SetPosition( const ::Eldritch2::Float4 newPosition );
+		void						SetVerticalFov( Eldritch2::DegreeMeasure angle );
+		void						SetVerticalFov( Eldritch2::RadianMeasure angle );
 
 	// ---------------------------------------------------
 
-		::Eldritch2::Quaternion	GetOrientation() const;
-
-		void					SetOrientation( const ::Eldritch2::Quaternion newOrientation );
-
-	// ---------------------------------------------------
-
-		void					SetNearPlane( const ::Eldritch2::float32 newDepth );
-
-		::Eldritch2::float32	GetNearPlane() const;
-
-		void					SetFarPlane( const ::Eldritch2::float32 newDepth );
-
-		::Eldritch2::float32	GetFarPlane() const;
+	public:
+		void	SetHorizontalAndVerticalFov( Eldritch2::RadianMeasure horizontalAngle, Eldritch2::float32 aspectRatio );
+		void	SetHorizontalAndVerticalFov( Eldritch2::DegreeMeasure horizontalAngle, Eldritch2::float32 aspectRatio );
 
 	// ---------------------------------------------------
 
-		::Eldritch2::Float4x4	ComputeViewMatrix() const;
+	public:
+		Eldritch2::Float4x4	ETSimdCall GetInverseViewProjectionMatrix( Eldritch2::float32 nearPlane, Eldritch2::float32 farPlane ) const;
 
-		::Eldritch2::Float4x4	ComputePerspectiveProjectionMatrix() const;
-		::Eldritch2::Float4x4	ComputePerspectiveProjectionMatrix( const ::Eldritch2::float32 nearPlaneOverride, const ::Eldritch2::float32 farPlaneOverride ) const;
+		Eldritch2::Float4x4	ETSimdCall GetViewProjectionMatrix( Eldritch2::float32 nearPlane, Eldritch2::float32 farPlane ) const;
 
-		::Eldritch2::Float4x4	ComputePerspectiveViewProjectionMatrix() const;
-		::Eldritch2::Float4x4	ComputePerspectiveViewProjectionMatrix( const ::Eldritch2::float32 nearPlaneOverride, const ::Eldritch2::float32 farPlaneOverride ) const;
+		Eldritch2::Float4x4	ETSimdCall GetInverseViewMatrix() const;
 
-	// ---------------------------------------------------
+		Eldritch2::Float4x4	ETSimdCall GetViewMatrix() const;
+
+	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::Float4		_position;
-		::Eldritch2::Quaternion	_orientation;
+		Eldritch2::RigidTransform	_transform;
 
-		::Eldritch2::float32	_nearDepth;
-		::Eldritch2::float32	_farDepth;
-
-		::Eldritch2::float32	_horizontalFOVInRadians;
-		::Eldritch2::float32	_verticalFOVInRadians;
+		Eldritch2::RadianMeasure	_horizontalFov;
+		Eldritch2::RadianMeasure	_verticalFov;
 	};
 
 }	// namespace Renderer

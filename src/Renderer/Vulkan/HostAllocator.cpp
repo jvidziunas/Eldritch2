@@ -12,36 +12,71 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Memory/StandardLibrary.hpp>
 #include <Renderer/Vulkan/HostAllocator.hpp>
 //------------------------------------------------------------------//
-#include <utility>
+#include <EASTL/utility.h>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Renderer;
-using namespace ::Eldritch2;
+#ifdef CopyMemory
+#	undef CopyMemory
+#endif
 
 namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
+namespace {
 
-	HostAllocator::HostAllocator( Allocator& backingAllocator, const UTF8Char* const name ) : ChildAllocator( backingAllocator, name ) {
+	static ETPureFunctionHint ETRestrictHint void* VKAPI_CALL VulkanAllocate( void* allocator, size_t sizeInBytes, size_t alignmentInBytes, VkSystemAllocationScope /*allocationScope*/ ) {
+		size_t*	result( static_cast<size_t*>(static_cast<HostAllocator*>(allocator)->Allocate( sizeInBytes + sizeof( size_t ), alignmentInBytes, sizeof( size_t ), AllocationDuration::Normal )) );
+
+		if( result ) {
+			*result = sizeInBytes + sizeof(size_t);
+		}
+
+		return result + 1;
+	}
+
+// ---------------------------------------------------
+
+	static ETPureFunctionHint void VKAPI_CALL VulkanFree( void* allocator, void* memory ) {
+		if( nullptr == memory ) {
+			return;
+		}
+
+		size_t* const	realAllocation( static_cast<size_t*>(memory)-1 );
+
+		static_cast<HostAllocator*>(allocator)->Deallocate( realAllocation, *realAllocation );
+	}
+
+// ---------------------------------------------------
+
+	static ETPureFunctionHint ETRestrictHint void* VKAPI_CALL VulkanReallocate( void* allocator, void* originalMemory, size_t sizeInBytes, size_t alignmentInBytes, VkSystemAllocationScope allocationScope ) {
+		auto	result( VulkanAllocate( allocator, sizeInBytes, alignmentInBytes, allocationScope ) );
+
+		if( result && originalMemory ) {
+			CopyMemory( result, originalMemory, static_cast<size_t*>( originalMemory )[-1] );
+		}
+
+		VulkanFree( allocator, originalMemory );
+
+		return result;
+	}
+
+}	// anonymous namespace
+
+	HostAllocator::HostAllocator( Allocator& backingAllocator, const Utf8Char* const name ) : ChildAllocator( backingAllocator, name ) {
 		_allocationCallbacks.pUserData				= this;
-		_allocationCallbacks.pfnAllocation			= [] ( void* allocator, size_t sizeInBytes, size_t alignmentInBytes, VkSystemAllocationScope /*allocationScope*/ ) -> void* {
-			return static_cast<HostAllocator*>(allocator)->Allocate( sizeInBytes, alignmentInBytes, Allocator::AllocationDuration::Normal );
-		};
-		_allocationCallbacks.pfnReallocation		= [] ( void* allocator, void* originalMemory, size_t sizeInBytes, size_t alignmentInBytes, VkSystemAllocationScope /*allocationScope*/ ) -> void* {
-			return static_cast<HostAllocator*>(allocator)->Reallocate( originalMemory, sizeInBytes, alignmentInBytes, Allocator::AllocationDuration::Normal );
-		};
-		_allocationCallbacks.pfnFree				= [] ( void* allocator, void* memory ) {
-			static_cast<HostAllocator*>(allocator)->Deallocate( memory, AlignedDeallocationSemantics );
-		};
+		_allocationCallbacks.pfnAllocation			= &VulkanAllocate; 
+		_allocationCallbacks.pfnReallocation		= &VulkanReallocate;
+		_allocationCallbacks.pfnFree				= &VulkanFree;
 		_allocationCallbacks.pfnInternalAllocation	= [] ( void* /*allocator*/, size_t /*sizeInBytes*/, VkInternalAllocationType /*type*/, VkSystemAllocationScope /*scope*/ ) {};
 		_allocationCallbacks.pfnInternalFree		= [] ( void* /*allocator*/, size_t /*sizeInBytes*/, VkInternalAllocationType /*type*/, VkSystemAllocationScope /*scope*/ ) {};
 	}
 
 // ---------------------------------------------------
 
-	HostAllocator::HostAllocator( HostAllocator&& allocator ) : ChildAllocator( ::std::move( allocator ) ), _allocationCallbacks( ::std::move( allocator._allocationCallbacks ) ) {}
+	HostAllocator::HostAllocator( HostAllocator&& allocator ) : ChildAllocator( eastl::forward<ChildAllocator>( allocator ) ), _allocationCallbacks( eastl::move( allocator._allocationCallbacks ) ) {}
 
 }	// namespace Vulkan
 }	// namespace Renderer

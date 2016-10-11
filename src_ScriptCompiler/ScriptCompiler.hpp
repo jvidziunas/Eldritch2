@@ -15,7 +15,7 @@
 #include <Scripting/AngelScript/SmartPointers.hpp>
 #include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Containers/SystemString.hpp>
-#include <Utility/Containers/UTF8String.hpp>
+#include <Utility/Containers/Utf8String.hpp>
 #include <Tools/ToolCRTPBase.hpp>
 //------------------------------------------------------------------//
 #include <angelscript/sdk/add_on/scriptbuilder/scriptbuilder.h>
@@ -69,24 +69,24 @@ namespace Tools {
 
 	// ---------------------------------------------------
 
-		int	SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd );
+		int	SetOutputModuleName( const Eldritch2::Utf8Char* const argument, const Eldritch2::Utf8Char* const argumentEnd );
 
-		int	SetApiDescriptorPath( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd );
+		int	SetApiDescriptorPath( const Eldritch2::Utf8Char* const argument, const Eldritch2::Utf8Char* const argumentEnd );
 
 		int	SetOptimizationLevel( const int level );
 
-		int	AddInputFile( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd );
+		int	AddInputFile( const Eldritch2::Utf8Char* const argument, const Eldritch2::Utf8Char* const argumentEnd );
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		Scripting::AngelScript::EngineHandle					_engine;
-		GlobalAllocator											_globalAllocator;
-		FileAccessorFactory										_fileAccessorFactory;
-		::CScriptBuilder										_scriptBuilder;
-		::Eldritch2::UTF8String<>								_outputModuleName;
-		::Eldritch2::UTF8String<>								_engineApiDescriptorPath;
-		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_inputFiles;
+		Scripting::AngelScript::EngineHandle				_engine;
+		GlobalAllocator										_globalAllocator;
+		FileAccessorFactory									_fileAccessorFactory;
+		::CScriptBuilder									_scriptBuilder;
+		Eldritch2::Utf8String<>								_outputModuleName;
+		Eldritch2::Utf8String<>								_engineApiDescriptorPath;
+		Eldritch2::ResizableArray<Eldritch2::Utf8String<>>	_inputFiles;
 	};
 
 }	// namespace Tools

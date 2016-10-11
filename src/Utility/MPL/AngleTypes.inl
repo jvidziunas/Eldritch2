@@ -31,103 +31,115 @@
 
 namespace Eldritch2 {
 
-	ETForceInlineHint RadianMeasure::RadianMeasure( ::Eldritch2::float32 value ) : _measure( value ) {}
+	ETForceInlineHint RadianMeasure::RadianMeasure( Eldritch2::float32 value ) : _measure( value ) {}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint RadianMeasure::RadianMeasure( const ::Eldritch2::DegreeMeasure& value ) : _measure( DEG2RAD( static_cast<::Eldritch2::float32>( value ) ) ) {}
+	ETForceInlineHint RadianMeasure::RadianMeasure( const Eldritch2::DegreeMeasure& value ) : _measure( DEG2RAD( static_cast<Eldritch2::float32>( value ) ) ) {}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint RadianMeasure::RadianMeasure( const Eldritch2::RadianMeasure& value ) : _measure( value._measure ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint RadianMeasure::operator ::Eldritch2::float32() const {
+	ETForceInlineHint RadianMeasure::operator Eldritch2::float32() const {
 		return _measure;
 	}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint const Eldritch2::RadianMeasure& RadianMeasure::operator=( ::Eldritch2::float32 value ) {
+	ETForceInlineHint RadianMeasure& RadianMeasure::operator *=( Eldritch2::float32 scalar ) {
+		_measure *= scalar;
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint RadianMeasure& RadianMeasure::operator /=( Eldritch2::float32 scalar ) {
+		_measure /= scalar;
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETPureFunctionHint Eldritch2::RadianMeasure operator*( Eldritch2::RadianMeasure measure, Eldritch2::float32 scalar ) {
+		return measure *= scalar;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETPureFunctionHint Eldritch2::RadianMeasure operator/( Eldritch2::RadianMeasure measure, Eldritch2::float32 scalar ) {
+		return measure /= scalar;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint Eldritch2::RadianMeasure& RadianMeasure::operator=( Eldritch2::float32 value ) {
+		_measure = value;
+
+		return *this;
+	}
+	
+// ---------------------------------------------------
+
+	ETForceInlineHint Eldritch2::RadianMeasure& RadianMeasure::operator=( const Eldritch2::DegreeMeasure& value ) {
+		_measure = DEG2RAD( static_cast<Eldritch2::float32>( value ) );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint DegreeMeasure::DegreeMeasure( Eldritch2::float32 value ) : _measure( value ) {}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint DegreeMeasure::DegreeMeasure( const Eldritch2::RadianMeasure& value ) : _measure( RAD2DEG( static_cast<Eldritch2::float32>( value ) ) ) {}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint DegreeMeasure::operator Eldritch2::float32() const{
+		return _measure;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint DegreeMeasure& DegreeMeasure::operator *=( Eldritch2::float32 scalar ) {
+		_measure *= scalar;
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint DegreeMeasure& DegreeMeasure::operator /=( Eldritch2::float32 scalar ) {
+		_measure *= scalar;
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETPureFunctionHint Eldritch2::DegreeMeasure operator*( Eldritch2::DegreeMeasure measure, Eldritch2::float32 scalar ) {
+		return measure *= scalar;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETPureFunctionHint Eldritch2::DegreeMeasure operator/( Eldritch2::DegreeMeasure measure, Eldritch2::float32 scalar ) {
+		return measure /= scalar;
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint Eldritch2::DegreeMeasure& DegreeMeasure::operator=( Eldritch2::float32 value ) {
 		_measure = value;
 		return( *this );
 	}
 	
 // ---------------------------------------------------
 
-	ETForceInlineHint const Eldritch2::RadianMeasure& RadianMeasure::operator=( const ::Eldritch2::DegreeMeasure& value ) {
-		_measure = DEG2RAD( static_cast<::Eldritch2::float32>( value ) );
-		return( *this );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint const Eldritch2::RadianMeasure& RadianMeasure::operator=( const ::Eldritch2::RadianMeasure& value ) {
-		_measure = value._measure;
-		return( *this );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint bool RadianMeasure::operator==( const ::Eldritch2::RadianMeasure& other ) const {
-		return( _measure == other._measure );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint bool RadianMeasure::operator==( const ::Eldritch2::DegreeMeasure& other ) const {
-		return( *this == ::Eldritch2::RadianMeasure( other ) );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint DegreeMeasure::DegreeMeasure( ::Eldritch2::float32 value ) : _measure( value ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint DegreeMeasure::DegreeMeasure( const ::Eldritch2::DegreeMeasure& value ) : _measure( value._measure ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint DegreeMeasure::DegreeMeasure( const ::Eldritch2::RadianMeasure& value ) : _measure( RAD2DEG( static_cast<::Eldritch2::float32>( value ) ) ) {}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint DegreeMeasure::operator ::Eldritch2::float32() const{
-		return _measure;
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint const Eldritch2::DegreeMeasure& DegreeMeasure::operator=( ::Eldritch2::float32 value ) {
-		_measure = value;
-		return( *this );
-	}
-	
-// ---------------------------------------------------
-
-	ETForceInlineHint const Eldritch2::DegreeMeasure& DegreeMeasure::operator=( const ::Eldritch2::RadianMeasure& value ) {
-		return ( *this = ::Eldritch2::DegreeMeasure( value ) );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint const Eldritch2::DegreeMeasure& DegreeMeasure::operator=( const ::Eldritch2::DegreeMeasure& value ) {
-		_measure = value._measure;
-		return( *this );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint bool DegreeMeasure::operator==( const ::Eldritch2::RadianMeasure& other ) const {
-		return( *this == ::Eldritch2::DegreeMeasure( other ) );
-	}
-
-// ---------------------------------------------------
-
-	ETForceInlineHint bool DegreeMeasure::operator==( const ::Eldritch2::DegreeMeasure& other ) const {
-		return( _measure == other._measure );
+	ETForceInlineHint Eldritch2::DegreeMeasure& DegreeMeasure::operator=( const Eldritch2::RadianMeasure& value ) {
+		return ( *this = Eldritch2::DegreeMeasure( value ) );
 	}
 
 }	// namespace Eldritch2

@@ -17,73 +17,61 @@
 
 namespace Eldritch2 {
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename SourceIterator>
-	ETInlineHint IntrusiveForwardList<StoredObject>::IntrusiveForwardList( SourceIterator elementBegin, SourceIterator elementEnd ) {
-		auto	current( Begin() );
+	ETInlineHint IntrusiveForwardList<Value>::IntrusiveForwardList( SourceIterator elementBegin, SourceIterator elementEnd ) : _underlyingContainer( elementBegin, elementEnd ) {}
 
-		while( elementBegin != elementEnd ) {
-			current = InsertAfter( current, elementBegin++ );
-		}
+// ---------------------------------------------------
+
+	template <class Value>
+	ETInlineHint IntrusiveForwardList<Value>::IntrusiveForwardList( Eldritch2::IntrusiveForwardList<Value>&& sourceContainer ) : _underlyingContainer( eastl::move( sourceContainer._underlyingContainer ) ) {
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint IntrusiveForwardList<StoredObject>::IntrusiveForwardList( ::Eldritch2::IntrusiveForwardList<StoredObject>&& sourceContainer ) {
-		auto&	thisContainer( *this );
-		auto	current( Begin() );
-
-		sourceContainer.ClearAndDispose( [&current, &thisContainer] ( Reference newElement ) {
-			current = thisContainer.InsertAfter( current, newElement );
-		} );
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject>
+	template <class Value>
 	template <typename Predicate>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::Find( Predicate predicate ) {
-		return ::Eldritch2::Utility::Find( _container.begin(), _container.end(), predicate );
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Find( Predicate predicate, Iterator searchHint ) {
+		return Eldritch2::Utility::Find( searchHint, _underlyingContainer.end(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Predicate>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::Find( Predicate predicate, Iterator searchHint ) {
-		return ::Eldritch2::Utility::Find( searchHint, _container.end(), predicate );
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Find( Predicate predicate ) {
+		return Eldritch2::Utility::Find( _underlyingContainer.begin(), _underlyingContainer.end(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Predicate>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::ConstIterator IntrusiveForwardList<StoredObject>::Find( Predicate predicate ) const {
-		return ::Eldritch2::Utility::Find( _container.begin(), _container.end(), predicate );
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::Find( Predicate predicate, ConstIterator searchHint ) const {
+		return Eldritch2::Utility::Find( searchHint, _underlyingContainer.end(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Predicate>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::ConstIterator IntrusiveForwardList<StoredObject>::Find( Predicate predicate, ConstIterator searchHint ) const {
-		return ::Eldritch2::Utility::Find( searchHint, _container.end(), predicate );
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::Find( Predicate predicate ) const {
+		return Eldritch2::Utility::Find( _underlyingContainer.begin(), _underlyingContainer.end(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Predicate>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::RemoveIf( Predicate predicate ) {
+	ETInlineHint void IntrusiveForwardList<Value>::RemoveIf( Predicate predicate ) {
 		RemoveAndDisposeIf( predicate, [] ( Reference /*unused*/ ) {} );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Predicate, typename Disposer>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::RemoveAndDisposeIf( Predicate predicate, Disposer disposer ) {
+	ETInlineHint void IntrusiveForwardList<Value>::RemoveAndDisposeIf( Predicate predicate, Disposer disposer ) {
 		for( Iterator current( Begin() ), end( End() ); current != end; ) {
 			if( predicate( *current ) ) {
 				current = EraseAndDispose( current, disposer );
@@ -96,156 +84,157 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Predicate>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::Sort( Predicate predicate ) {
-		::Eldritch2::Utility::Sort( Begin(), End(), predicate );
+	ETInlineHint void IntrusiveForwardList<Value>::Sort( Predicate predicate ) {
+		_underlyingContainer.sort( predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::Begin() {
-		return _container.begin();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::ConstBegin() const {
+		return _underlyingContainer.cbegin();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::ConstIterator IntrusiveForwardList<StoredObject>::Begin() const {
-		return _container.begin();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::ConstEnd() const {
+		return _underlyingContainer.cend();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::ConstIterator IntrusiveForwardList<StoredObject>::ConstBegin() const {
-		return _container.begin();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::Begin() const {
+		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::End() {
-		return _container.end();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Begin() {
+		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::ConstIterator IntrusiveForwardList<StoredObject>::End() const {
-		return _container.end();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::End() const {
+		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::ConstIterator IntrusiveForwardList<StoredObject>::ConstEnd() const {
-		return _container.end();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::End() {
+		return _underlyingContainer.end();
+	}
+
+// ---------------------------------------------------
+	
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::IteratorTo( Reference element ) {
+		return _underlyingContainer.locate( element );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::IteratorTo( Reference element ) {
-		return UnderlyingContainer::get_iterator( &element );
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::IteratorTo( ConstReference element ) const {
+		return _underlyingContainer.locate( element );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::ConstIterator IntrusiveForwardList<StoredObject>::IteratorTo( ConstReference element ) const {
-		return UnderlyingContainer::get_iterator( &element );
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::ConstReference IntrusiveForwardList<Value>::Front() const {
+		return _underlyingContainer.front();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::Reference IntrusiveForwardList<StoredObject>::Front() {
-		return *_container.front();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Reference IntrusiveForwardList<Value>::Front() {
+		return _underlyingContainer.front();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	typename IntrusiveForwardList<StoredObject>::ConstReference IntrusiveForwardList<StoredObject>::Front() const {
-		return *_container.front();
+	template <class Value>
+	ETInlineHint void IntrusiveForwardList<Value>::PushFront( Reference item ) {
+		_underlyingContainer.push_front( item );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	void IntrusiveForwardList<StoredObject>::PushFront( Reference item ) {
-		_container.push_front( &item );
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject>
+	template <class Value>
 	template <typename Disposer>
-	void IntrusiveForwardList<StoredObject>::PopFrontAndDispose( Disposer disposer ) {
-		auto&	front( Front() );
-		_container.pop_front();
+	ETInlineHint void IntrusiveForwardList<Value>::PopFrontAndDispose( Disposer disposer ) {
+		auto&	front( _underlyingContainer.front() );
+
+		_underlyingContainer.pop_front();
 
 		disposer( front );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	template <typename Disposer, typename ElementCloner>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::CloneFrom( const ::Eldritch2::IntrusiveForwardList<StoredObject>& containerTemplate, Disposer disposer, ElementCloner cloner ) {
-		ClearAndDispose( disposer );
-
-		Iterator	current( Begin() );
-
-		for( const auto& sourceElement : containerTemplate ) {
-			current = InsertAfter( current, cloner( sourceElement ) );
-		}
+	template <class Value>
+	ETInlineHint void IntrusiveForwardList<Value>::Swap( Eldritch2::IntrusiveForwardList<Value>& other ) {
+		_underlyingContainer.swap( other );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::Swap( ::Eldritch2::IntrusiveForwardList<StoredObject>& other ) {
-		_container.swap( other );
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Insert( Iterator location, Reference item ) {
+		return _underlyingContainer.insert( location, item );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::Insert( const Iterator location, Reference item ) {
-		return _container.insert( location, &item );
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::InsertAfter( Iterator location, Reference item ) {
+		return _underlyingContainer.insert_after( location, item );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::InsertAfter( const Iterator location, Reference item ) {
-		return _container.insert_after( location, &item );
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Erase( Iterator begin, Iterator end ) {
+		return _underlyingContainer.erase( begin, end );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::Erase( const Iterator position ) {
-		return EraseAndDispose( position, [] ( Reference /*unused*/ ) {} );
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Erase( Iterator position ) {
+		return _underlyingContainer.erase( position );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::Erase( const Iterator begin, const Iterator end ) {
-		_container.erase( begin, end );
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAfter( Iterator beforeBegin, Iterator end ) {
+		return _underlyingContainer.erase_after( beforeBegin, end );
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAfter( Iterator position ) {
+		return _underlyingContainer.erase_after( position );
+	}
+
+// ---------------------------------------------------
+
+	template <class Value>
 	template <typename Disposer>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::Iterator IntrusiveForwardList<StoredObject>::EraseAndDispose( const Iterator position, Disposer disposer ) {
+	ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAndDispose( Iterator position, Disposer disposer ) {
 		auto&	element( *position );
-		auto	result( _container.erase( position ) );
+		auto	result( _underlyingContainer.erase( position ) );
 
 		disposer( element );
 
@@ -254,15 +243,15 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Disposer>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::EraseAndDispose( const Iterator begin, const Iterator end, Disposer disposer ) {
+	ETInlineHint void IntrusiveForwardList<Value>::EraseAndDispose( Iterator begin, Iterator end, Disposer disposer ) {
 		if( begin != end ) {
 			while( begin.next() != end.node() ) {
 				EraseAfterAndDispose( first, disposer );
 			}
 				
-			EraseAfterAndDispose( _container.previous( first ), disposer );
+			EraseAfterAndDispose( _underlyingContainer.previous( first ), disposer );
 		}
 
 		return begin;
@@ -270,89 +259,40 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::EraseAfter( const Iterator location ) {
-		EraseAfterAndDispose( location, [] ( Reference /*unused*/ ) {} );
+	template <class Value>
+	ETInlineHint void IntrusiveForwardList<Value>::Clear() {
+		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
+	template <class Value>
 	template <typename Disposer>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::EraseAfterAndDispose( const Iterator location, Disposer disposer ) {
-		auto&	elementToDispose( location->next );
-
-		_container.erase_after( location );
-
-		disposer( elementToDispose );
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::Clear() {
-		ClearAndDispose( [] ( Reference /*unused*/ ) {} );
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject>
-	template <typename Disposer>
-	ETInlineHint void IntrusiveForwardList<StoredObject>::ClearAndDispose( Disposer disposer ) {
-		while( !Empty() ) {
+	ETInlineHint void IntrusiveForwardList<Value>::ClearAndDispose( Disposer disposer ) {
+		while( !_underlyingContainer.empty() ) {
 			PopFrontAndDispose( disposer );
 		}
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint typename IntrusiveForwardList<StoredObject>::SizeType IntrusiveForwardList<StoredObject>::Size() const {
-		return _container.size();
+	template <class Value>
+	ETInlineHint typename IntrusiveForwardList<Value>::SizeType IntrusiveForwardList<Value>::GetSize() const {
+		return _underlyingContainer.size();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint bool IntrusiveForwardList<StoredObject>::Empty() const {
-		return _container.empty();
+	template <class Value>
+	ETInlineHint bool IntrusiveForwardList<Value>::IsEmpty() const {
+		return _underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject>
-	ETInlineHint IntrusiveForwardList<StoredObject>::operator bool() const {
-		return !this->Empty();
+	template <class Value>
+	ETInlineHint IntrusiveForwardList<Value>::operator bool() const {
+		return !_underlyingContainer.empty();
 	}
 
 }	// namespace Eldritch2
-
-namespace std {
-
-	template <class StoredObject>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::IntrusiveForwardList<StoredObject>& collection ) -> decltype(collection.Begin()) {
-		return collection.Begin();
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject>
-	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::IntrusiveForwardList<StoredObject>& collection ) -> decltype(collection.ConstBegin()) {
-		return collection.ConstBegin();
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::IntrusiveForwardList<StoredObject>& collection ) -> decltype(collection.End()) {
-		return collection.End();
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject>
-	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::IntrusiveForwardList<StoredObject>& collection ) -> decltype(collection.ConstEnd()) {
-		return collection.ConstEnd();
-	}
-
-}	// namespace std

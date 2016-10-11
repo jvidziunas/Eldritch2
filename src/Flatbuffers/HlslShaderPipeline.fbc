@@ -1,0 +1,14 @@
+include			"ShaderPipelineTypes.fbc";
+file_identifier	"EHPD";
+file_extension	".E2HlslShaderPipeline";
+
+namespace Eldritch2.Renderer.Direct3D.FlatBuffers;
+
+table UsageDescriptor {
+}
+
+table HlslShaderPipeline {
+	Usages	: [UsageDescriptor];
+}
+
+root_type HlslShaderPipeline;

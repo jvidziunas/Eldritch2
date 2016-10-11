@@ -12,12 +12,16 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <boost/intrusive/list_hook.hpp>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/intrusive_list.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	using IntrusiveListBaseHook = ::boost::intrusive::list_base_hook<>;
+	using IntrusiveListBaseHook = eastl::intrusive_list_node;
 
 }	// namespace Eldritch2
 

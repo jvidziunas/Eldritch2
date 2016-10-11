@@ -12,10 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Foundation/GameEngineService.hpp>
-#include <Scripting/ReferenceCountable.hpp>
+#include <Core/EngineService.hpp>
 //------------------------------------------------------------------//
-#ifdef ET_PLATFORM_WINDOWS
+#if ET_PLATFORM_WINDOWS
 #	define WIN32_LEAN_AND_MEAN
 #	include <Windows.h>
 #endif
@@ -23,67 +22,79 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+	namespace Core {
+		class	Engine;
+	}
+}
+
+namespace Eldritch2 {
 namespace Input {
 namespace XInput {
 
-	class EngineService : public Foundation::GameEngineService {
+	class EngineService : public Core::EngineService {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class Controller : public Scripting::ReferenceCountable {
+		class Controller {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
-			enum : ::DWORD {
-				InvalidControllerIndex = static_cast<::DWORD>(-1)
+			enum : DWORD {
+				InvalidControllerIndex = static_cast<DWORD>(-1)
 			};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Constructs this @ref Controller instance.
-			Controller( const ::DWORD controllerIndex = Controller::InvalidControllerIndex );
+		public:
+		//!	Constructs this @ref Controller instance.
+			Controller( DWORD index = Controller::InvalidControllerIndex );
+		//!	Constructs this @ref Controller instance.
+			Controller( const Controller& ) = default;
 
 			~Controller() = default;
 
 		// ---------------------------------------------------
 
-			void	ReadInput();
+		public:
+			void	SampleInput();
 
 		// ---------------------------------------------------
 
-			static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
-
-			void						Dispose() override sealed;
+		public:
+			Controller&	operator=( const Controller& ) = default;
 
 		// - DATA MEMBERS ------------------------------------
 
-			static const char* const	scriptTypeName;
-
 		private:
-			::DWORD			_controllerIndex;
-			::XINPUT_STATE	_state;
+			DWORD			_controllerIndex;
+			XINPUT_STATE	_state;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref EngineService instance.
-		EngineService( Foundation::GameEngine& owningEngine );
+	public:
+	//!	Constructs this @ref EngineService instance.
+		EngineService( const Core::Engine& engine );
+	//!	Disable copying.
+		EngineService( const EngineService& ) = delete;
 
-		//!	Destroys this @ref EngineService instance.
 		~EngineService() = default;
 
 	// ---------------------------------------------------
 
-		const ::Eldritch2::UTF8Char* const	GetName() const override sealed;
+	public:
+		Eldritch2::Utf8Literal	GetName() const override;
 
 	// ---------------------------------------------------
 
 	protected:
-		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar ) override sealed;
+		void	AcceptVisitor( Scripting::ApiRegistrar& typeRegistrar ) override;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const ServiceTickVisitor ) override;
 
 	// ---------------------------------------------------
 
-		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
+	//!	Disable assignment.
+		EngineService&	operator=( const EngineService& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 	

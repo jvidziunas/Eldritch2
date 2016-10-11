@@ -13,262 +13,252 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Algorithms.hpp>
-#include <type_traits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint List<StoredObject, Allocator>::List( AllocatorType&& allocator ) : UnderlyingContainer( ::std::move( allocator ) ) {}
+	template <typename Value, typename Allocator>
+	ETInlineHint List<Value, Allocator>::List( const AllocatorType& allocator ) : _underlyingContainer( allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
+	template <typename Value, typename Allocator>
 	template <typename InputIterator>
-	ETInlineHint List<StoredObject, Allocator>::List( InputIterator first, InputIterator last, AllocatorType&& allocator ) : UnderlyingContainer( first, last, ::std::move( allocator ) ) {}
+	ETInlineHint List<Value, Allocator>::List( InputIterator first, InputIterator last, const AllocatorType& allocator ) : _underlyingContainer( first, last, allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	template <typename AlternateAllocator>
-	ETInlineHint List<StoredObject, Allocator>::List( const ::Eldritch2::List<StoredObject, AlternateAllocator>& listTemplate, AllocatorType&& allocator ) : List<StoredObject, Allocator>( listTemplate.Begin(), listTemplate.End(), ::std::move( allocator ) ) {}
+	template <typename Value, typename Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint List<Value, Allocator>::List( const List<Value, Allocator>& other, const AllocatorType& allocator ) : _underlyingContainer( other._underlyingContainer, allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Find( ConstReference itemTemplate, Iterator searchHint ) {
-		return ::Eldritch2::Utility::Find( searchHint, UnderlyingContainer::end(), itemTemplate, IsEquivalent() );
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::ConstIterator List<Value, Allocator>::Find( ConstReference itemTemplate, ConstIterator searchHint ) const {
+		return Eldritch2::Utility::Find( searchHint, _underlyingContainer.end(), itemTemplate, IsEquivalent() );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::ConstIterator List<StoredObject, Allocator>::Find( ConstReference itemTemplate, ConstIterator searchHint ) const {
-		return ::Eldritch2::Utility::Find( searchHint, UnderlyingContainer::end(), itemTemplate, IsEquivalent() );
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::Find( ConstReference itemTemplate, Iterator searchHint ) {
+		return Eldritch2::Utility::Find( searchHint, _underlyingContainer.end(), itemTemplate, IsEquivalent() );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
+	template <typename Value, typename Allocator>
 	template <typename ItemPredicate>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::RemoveIf( ItemPredicate itemPredicate ) {
-		return ::Eldritch2::Utility::RemoveIf( UnderlyingContainer::begin(), UnderlyingContainer::end(), itemPredicate );
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::RemoveIf( ItemPredicate itemPredicate ) {
+		return Eldritch2::Utility::RemoveIf( _underlyingContainer.begin(), _underlyingContainer.end(), itemPredicate );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Begin() {
-		return UnderlyingContainer::begin();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::Begin() {
+		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::ConstIterator List<StoredObject, Allocator>::Begin() const {
-		return UnderlyingContainer::begin();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::ConstIterator List<Value, Allocator>::Begin() const {
+		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::ConstIterator List<StoredObject, Allocator>::ConstBegin() const {
-		return UnderlyingContainer::begin();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::ConstIterator List<Value, Allocator>::ConstBegin() const {
+		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::End() {
-		return UnderlyingContainer::end();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::End() {
+		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::ConstIterator List<StoredObject, Allocator>::End() const {
-		return UnderlyingContainer::end();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::ConstIterator List<Value, Allocator>::End() const {
+		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::ConstIterator List<StoredObject, Allocator>::ConstEnd() const {
-		return UnderlyingContainer::end();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::ConstIterator List<Value, Allocator>::ConstEnd() const {
+		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Reference List<StoredObject, Allocator>::Front() {
-		return UnderlyingContainer::front();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::Reference List<Value, Allocator>::Front() {
+		return _underlyingContainer.front();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::ConstReference List<StoredObject, Allocator>::Front() const {
-		return UnderlyingContainer::front();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::ConstReference List<Value, Allocator>::Front() const {
+		return _underlyingContainer.front();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint void List<StoredObject, Allocator>::PushFront( ConstReference value ) {
-		UnderlyingContainer::push_front( value );
+	template <typename Value, typename Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint void List<Value, Allocator>::PushFront( ConstReference value ) {
+		_underlyingContainer.push_front( value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
+	template <typename Value, typename Allocator>
 	template <typename... ElementConstructorArguments>
-	ETInlineHint void List<StoredObject, Allocator>::EmplaceFront( ElementConstructorArguments&&... elementConstructorArguments ) {
-		UnderlyingContainer::emplace_front( ::std::forward<ElementConstructorArguments>( elemenetConstructorArguments )... );
+	ETInlineHint void List<Value, Allocator>::EmplaceFront( ElementConstructorArguments&&... elementConstructorArguments ) {
+		_underlyingContainer.emplace_front( eastl::forward<ElementConstructorArguments>( elemenetConstructorArguments )... );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint void List<StoredObject, Allocator>::PopFront() {
-		UnderlyingContainer::pop_front();
+	template <typename Value, typename Allocator>
+	ETInlineHint void List<Value, Allocator>::PopFront() {
+		_underlyingContainer.pop_front();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Reference List<StoredObject, Allocator>::Back() {
-		return UnderlyingContainer::back();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::Reference List<Value, Allocator>::Back() {
+		return _underlyingContainer.back();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::ConstReference List<StoredObject, Allocator>::Back() const {
-		return UnderlyingContainer::back();
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::ConstReference List<Value, Allocator>::Back() const {
+		return _underlyingContainer.back();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint void List<StoredObject, Allocator>::PushBack( ConstReference value ) {
-		UnderlyingContainer::push_back( value );
+	template <typename Value, typename Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint void List<Value, Allocator>::PushBack( ConstReference value ) {
+		_underlyingContainer.push_back( value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
+	template <typename Value, typename Allocator>
 	template <typename... ElementConstructorArguments>
-	ETInlineHint void List<StoredObject, Allocator>::EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments ) {
-		UnderlyingContainer::emplace_back( ::std::forward<ElementConstructorArguments>( elementConstructorArguments )... );
+	ETInlineHint void List<Value, Allocator>::EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments ) {
+		_underlyingContainer.emplace_back( eastl::forward<ElementConstructorArguments>( elementConstructorArguments )... );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint void List<StoredObject, Allocator>::PopBack() {
-		UnderlyingContainer::pop_back();
+	template <typename Value, typename Allocator>
+	ETInlineHint void List<Value, Allocator>::PopBack() {
+		_underlyingContainer.pop_back();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Insert( Iterator location, ConstReference value ) {
-		return UnderlyingContainer::insert( location, value );
+	template <typename Value, typename Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::Insert( Iterator location, ConstReference value ) {
+		return _underlyingContainer.insert( location, value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
+	template <typename Value, typename Allocator>
 	template <typename... ElementConstructorArguments>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Emplace( Iterator location, ElementConstructorArguments&&... elementConstructorArguments ) {
-		return UnderlyingContainer::emplace( location, ::std::forward<ElementConstructorArguments>( elementConstructorArguments )... );
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::Emplace( Iterator location, ElementConstructorArguments&&... elementConstructorArguments ) {
+		return _underlyingContainer.emplace( location, eastl::forward<ElementConstructorArguments>( elementConstructorArguments )... );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Erase( Iterator location ) {
-		return this->erase( location );
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::Erase( Iterator first, Iterator last ) {
+		return _underlyingContainer.erase( first, last );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::Iterator List<StoredObject, Allocator>::Erase( Iterator first, Iterator last ) {
-		return UnderlyingContainer::erase( first, last );
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::Iterator List<Value, Allocator>::Erase( Iterator location ) {
+		return _underlyingContainer.erase( location );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	template <typename InputIterator>
-	ETInlineHint void List<StoredObject, Allocator>::Assign( InputIterator first, InputIterator last ) {
-		UnderlyingContainer::assign( first, last );
+	template <typename Value, typename Allocator>
+	ETInlineHint void List<Value, Allocator>::Clear() {
+		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint void List<StoredObject, Allocator>::Clear() {
-		UnderlyingContainer::clear();
+	template <typename Value, typename Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint List<Value, Allocator>& List<Value, Allocator>::operator=( const List<Value, Allocator>& other ) {
+		_underlyingContainer = other._underlyingContainer;
+
+		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint bool List<StoredObject, Allocator>::Empty() const {
-		return UnderlyingContainer::empty();
+	template <typename Value, typename Allocator>
+	ETInlineHint List<Value, Allocator>& List<Value, Allocator>::operator=( List<Value, Allocator>&& other ) {
+		_underlyingContainer = eastl::move( other._underlyingContainer );
+
+		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename List<StoredObject, Allocator>::SizeType List<StoredObject, Allocator>::Size() const {
-		return UnderlyingContainer::size();
+	template <typename Value, typename Allocator>
+	ETInlineHint void List<Value, Allocator>::Swap( List<Value, Allocator>& other ) {
+		_underlyingContainer.swap( other._underlyingContainer );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint typename const List<StoredObject, Allocator>::AllocatorType& List<StoredObject, Allocator>::GetAllocator() const {
-		return UnderlyingContainer::get_allocator();
+	template <typename Value, typename Allocator>
+	ETInlineHint bool List<Value, Allocator>::IsEmpty() const {
+		return _underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint void List<StoredObject, Allocator>::SetAllocator( const AllocatorType& allocator ) {
-		UnderlyingContainer::set_allocator( PrivateAllocator( allocator ) );
+	template <typename Value, typename Allocator>
+	ETInlineHint List<Value, Allocator>::operator bool() const {
+		return !_underlyingContainer.empty();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value, typename Allocator>
+	ETInlineHint typename List<Value, Allocator>::SizeType List<Value, Allocator>::GetSize() const {
+		return _underlyingContainer.size();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value, typename Allocator>
+	ETInlineHint typename const List<Value, Allocator>::AllocatorType& List<Value, Allocator>::GetAllocator() const {
+		return _underlyingContainer.get_allocator();
 	}
 
 }	// namespace Eldritch2
-
-namespace std {
-
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::List<StoredObject, Allocator>& collection ) -> decltype(collection.Begin()) {
-		return collection.Begin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::List<StoredObject, Allocator>& collection ) -> decltype(collection.ConstBegin()) {
-		return collection.ConstBegin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::List<StoredObject, Allocator>& collection ) -> decltype(collection.End()) {
-		return collection.End();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename Allocator>
-	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::List<StoredObject, Allocator>& collection ) -> decltype(collection.ConstEnd()) {
-		return collection.ConstEnd();
-	}
-
-}	// namespace std

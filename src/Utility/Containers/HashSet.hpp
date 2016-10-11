@@ -12,127 +12,153 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
+#include <Utility/Memory/EaStlAllocatorAdapterMixin.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
-#include <Utility/Equals.hpp>
+#include <Utility/EqualTo.hpp>
 #include <Utility/Hash.hpp>
 #include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/hash_set.h>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/hash_set.h>
 //------------------------------------------------------------------//
-
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, class Hasher = ::Eldritch2::Hash<StoredObject>, class KeyEqualityComparator = ::Eldritch2::Equals<StoredObject>, class Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
+	template <typename Value, class HashPredicate = Eldritch2::Hash<Value>, class EqualityPredicate = Eldritch2::EqualTo<Value>, class Allocator = Eldritch2::ChildAllocator, bool cacheHashCode = false>
 	class HashSet {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::hash_set<StoredObject, Hasher, loadFactor, KeyEqualityComparator, PrivateAllocator>;
+		using UnderlyingContainer	= eastl::hash_set<Value, HashPredicate, EqualityPredicate, Detail::EaStlAllocatorAdapterMixin<Allocator>, cacheHashCode>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
-		using KeyType				= typename UnderlyingContainer::key_type;
-		using AllocatorType			= Allocator;
+		using AllocatorType			= typename UnderlyingContainer::allocator_type::PublicType;
 		using SizeType				= typename UnderlyingContainer::size_type;
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using InsertResult			= ::Eldritch2::Pair<Iterator, bool>;
+		using LocalIterator			= typename UnderlyingContainer::local_iterator;
+		using ConstLocalIterator	= typename UnderlyingContainer::const_local_iterator;
+		using HashPredicateType		= HashPredicate;
+		using EqualityPredicateType = EqualityPredicate;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref HashSet instance.
-		ETInlineHint explicit HashSet( AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref HashSet instance.
-		ETInlineHint HashSet( Hasher&& hasher, AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref HashSet instance.
-		template <class AlternateAllocator, int alternateLoadFactor>
-		ETInlineHint HashSet( const HashSet<StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref HashSet instance.
-		ETInlineHint HashSet( HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource );
+	public:
+	//! Constructs this @ref HashSet instance.
+		HashSet( const HashPredicate& hashPredicate, const EqualityPredicate& equalityPredicate, const AllocatorType& allocatorType );
+	//! Constructs this @ref HashSet instance.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		HashSet( const HashSet&, const AllocatorType& allocatorType );
+	//! Constructs this @ref HashSet instance.
+		explicit HashSet( const AllocatorType& allocatorType );
+	//! Constructs this @ref HashSet instance.
+		HashSet( HashSet&& );
 
-		ETInlineHint ~HashSet() = default;
+		~HashSet() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-		//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-		ETInlineHint ConstIterator	Find( const KeyType& key ) const;
-		//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-		template <typename AlternateKey>
-		ETInlineHint ConstIterator	Find( const AlternateKey& key ) const;
-		//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-		ETInlineHint Iterator		Find( const KeyType& key );
-		//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-		template <typename AlternateKey>
-		ETInlineHint Iterator		Find( const AlternateKey& key );
+	public:
+	//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
+		template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
+		ConstIterator	Find( const AlternateValue& value, const AlternateHashPredicate& hashPredicate, const AlternateEqualityPredicate& equalityPredicate ) const;
+	//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
+		template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
+		Iterator		Find( const AlternateValue& value, const AlternateHashPredicate& hashPredicate, const AlternateEqualityPredicate& equalityPredicate );
+	//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
+		ConstIterator	Find( const ValueType& value ) const;
+	//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
+		Iterator		Find( const ValueType& value );
 
-		//! Erases all elements for which the result of the predicate returns true.
+		bool			Contains( const ValueType& value ) const;
+
+	//! Erases all elements for which the result of the predicate returns true.
 		template <typename Predicate>
-		ETInlineHint void	RemoveIf( Predicate predicate );
+		void			RemoveIf( Predicate predicate );
 
 	// - ELEMENT ITERATION -------------------------------
 
-		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
-		ETInlineHint ConstIterator	ConstBegin() const;
+	public:
+	//!	Retrieves a @ref ConstLocalIterator to the first element stored in the specified bucket of this @ref HashSet.
+		ConstLocalIterator	ConstBegin( SizeType bucketIndex ) const;
+	//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
+		ConstIterator		ConstBegin() const;
+	
+	//!	Retrieves a @ref ConstLocalIterator to one past the end of all elements stored in this @ref HashSet.
+		ConstLocalIterator	ConstEnd( SizeType bucketIndex ) const;
+	//!	Retrieves a @ref ConstIterator to one past the end of all elements stored in this @ref HashSet.
+		ConstIterator		ConstEnd() const;
 
-		//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
-		ETInlineHint ConstIterator	Begin() const;
-		//!	Retrieves an @ref Iterator to the first element stored in this @ref HashSet.
-		ETInlineHint Iterator		Begin();
+	//!	Retrieves a @ref ConstLocalIterator to the first element stored in this @ref HashSet.
+		ConstLocalIterator	Begin( SizeType bucketIndex ) const;
+	//!	Retrieves a @ref LocalIterator to the first element stored in this @ref HashSet.
+		LocalIterator		Begin( SizeType bucketIndex );
+	//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
+		ConstIterator		Begin() const;
+	//!	Retrieves an @ref Iterator to the first element stored in this @ref HashSet.
+		Iterator			Begin();
 
-		//!	Retrieves a const iterator to one past the end of all elements stored in this HashSet.
-		ETInlineHint ConstIterator	ConstEnd() const;
-
-		// Retrieves a const iterator to one past the end of all elements stored in this HashSet.
-		ETInlineHint ConstIterator	End() const;
-		// Retrieves an iterator to one past the end of all elements stored in this HashSet.
-		ETInlineHint Iterator		End();
+	//! Retrieves a @ref ConstLocalIterator to one past the end of all elements stored in this @ref HashSet.
+		ConstIterator		End( SizeType bucketIndex ) const;
+	//!	Retrieves an @ref LocalIterator to one past the end of all elements stored in this @ref HashSet.
+		Iterator			End( SizeType bucketIndex );
+	//! Retrieves a @ref ConstIterator to one past the end of all elements stored in this @ref HashSet.
+		ConstIterator		End() const;
+	//!	Retrieves an @ref Iterator to one past the end of all elements stored in this @ref HashSet.
+		Iterator			End();
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&	operator=( const HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
+	public:
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		HashSet&	operator=( const HashSet& );
+		HashSet&	operator=( HashSet&& );
 
-		ETInlineHint void	CloneFrom( const HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate );
-
-		ETInlineHint void	Swap( HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& rhs );
+		void		Swap( HashSet& rhs );
 
 	// - CONTAINER MANIPULATION --------------------------
 	    
-		ETInlineHint InsertResult	Insert( ValueType&& value );
-		ETInlineHint InsertResult	Insert( const ValueType& value );
+	public:
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Eldritch2::Pair<Iterator, bool>	Insert( const ValueType& value );
+		Eldritch2::Pair<Iterator, bool>	Insert( ValueType&& value );
 
-		ETInlineHint SizeType		Erase( const KeyType& key );
-		ETInlineHint void			Erase( Iterator position );
-		ETInlineHint void			Erase( Iterator begin, Iterator end );
+		template <typename... Args, class = eastl::enable_if<eastl::is_constructible<ValueType, Args...>::value>::type>
+		Eldritch2::Pair<Iterator, bool>	Emplace( Args&&... args );
+		
+		Iterator						Erase( Iterator begin, Iterator end );
+		Iterator						Erase( Iterator position );
+		SizeType						Erase( const ValueType& key );
 
-		ETInlineHint void	Clear();
-
-		template <typename Disposer>
-		ETInlineHint void	ClearAndDispose( Disposer disposer );
+		void							Clear();
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint SizeType	Size() const;
+	public:
+		SizeType			GetSize() const;
 
-		ETInlineHint SizeType	Empty() const;
+		SizeType			IsEmpty() const;
 
-		ETInlineHint			operator bool() const;
+		explicit operator	bool() const;
 
 	// - CAPACITY QUERY ----------------------------------
 
-		ETInlineHint void		Reserve( const SizeType minimumSizeHint );
-
-		ETInlineHint SizeType	BucketCount() const;
-		
-		ETInlineHint SizeType	NonemptyBucketCount() const;
-
-		ETInlineHint SizeType	UsedMemory() const;
+	public:
+		void	Reserve( SizeType minimumSizeHint );
 
 	// - ALLOCATOR ACCESS --------------------------------
 
-		ETInlineHint const AllocatorType&	GetAllocator() const;
+	public:
+		const EqualityPredicateType&	GetEqualityPredicate() const;
+
+		const HashPredicateType&		GetHashPredicate() const;
+
+		const AllocatorType&			GetAllocator() const;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -147,6 +173,3 @@ namespace Eldritch2 {
 //==================================================================//
 #include <Utility/Containers/HashSet.inl>
 //------------------------------------------------------------------//
-
-
-

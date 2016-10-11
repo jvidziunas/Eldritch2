@@ -5,7 +5,7 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -13,132 +13,145 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardListHook.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
+#include <Utility/MPL/Compiler.hpp>
+//------------------------------------------------------------------//
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/bonus/intrusive_slist.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <class StoredObject>
+	template <class Value>
 	class IntrusiveForwardList {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		using UnderlyingContainer	= ::rde::intrusive_slist<StoredObject>;
+		using UnderlyingContainer	= eastl::intrusive_slist<Value>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
-		using Reference				= ValueType&;
-		using ConstReference		= const ValueType&;
+		using Reference				= typename UnderlyingContainer::reference;
+		using ConstReference		= typename UnderlyingContainer::const_reference;
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using SizeType				= size_t;
+		using SizeType				= typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref IntrusiveForwardList instance.
-		ETInlineHint IntrusiveForwardList( ::Eldritch2::IntrusiveForwardList<StoredObject>&& sourceContainer );
-		//! Constructs this @ref IntrusiveForwardList instance.
-		ETInlineHint IntrusiveForwardList( const ::Eldritch2::IntrusiveForwardList<StoredObject>& ) = delete;
-		//! Constructs this @ref IntrusiveForwardList instance.
+	public:
+	//! Constructs this @ref IntrusiveForwardList instance.
 		template <typename SourceIterator>
-		ETInlineHint IntrusiveForwardList( SourceIterator elementBegin, SourceIterator elementEnd );
-		//! Constructs this @ref IntrusiveForwardList instance.
-		ETInlineHint IntrusiveForwardList() = default;
+		IntrusiveForwardList( SourceIterator elementBegin, SourceIterator elementEnd );
+	//! Constructs this @ref IntrusiveForwardList instance.
+		IntrusiveForwardList( IntrusiveForwardList&& );
+	//! Constructs this @ref IntrusiveForwardList instance.
+		IntrusiveForwardList( const IntrusiveForwardList& ) = delete;
+	//! Constructs this @ref IntrusiveForwardList instance.
+		IntrusiveForwardList() = default;
 
-		ETInlineHint ~IntrusiveForwardList() = default;
+		~IntrusiveForwardList() = default;
 
 	// - ALGORITHMS --------------------------------------
 
+	public:
 		template <typename Predicate>
-		ETInlineHint ConstIterator	Find( Predicate predicate, ConstIterator searchHint ) const;
+		ConstIterator	Find( Predicate predicate, ConstIterator searchHint ) const;
 		template <typename Predicate>
-		ETInlineHint ConstIterator	Find( Predicate predicate ) const;
+		ConstIterator	Find( Predicate predicate ) const;
 		template <typename Predicate>
-		ETInlineHint Iterator		Find( Predicate predicate, Iterator searchHint );
+		Iterator		Find( Predicate predicate, Iterator searchHint );
 		template <typename Predicate>
-		ETInlineHint Iterator		Find( Predicate predicate );
+		Iterator		Find( Predicate predicate );
 
 		template <typename Predicate>
-		ETInlineHint void	RemoveIf( Predicate predicate );
+		void			RemoveIf( Predicate predicate );
 
 		template <typename Predicate, typename Disposer>
-		ETInlineHint void	RemoveAndDisposeIf( Predicate predicate, Disposer disposer );
+		void			RemoveAndDisposeIf( Predicate predicate, Disposer disposer );
 
 		template <typename Predicate>
-		ETInlineHint void	Sort( Predicate predicate );
+		void			Sort( Predicate predicate );
 
 	// - ELEMENT ITERATION -------------------------------
+		
+	public:
+		ConstIterator	ConstBegin() const;
+		ConstIterator	ConstEnd() const;
 
 		ConstIterator	Begin() const;
 		Iterator		Begin();
 
-		ConstIterator	ConstBegin() const;
-
 		ConstIterator	End() const;
 		Iterator		End();
-
-		ConstIterator	ConstEnd() const;
 		
 		ConstIterator	IteratorTo( ConstReference element ) const;
 		Iterator		IteratorTo( Reference element );
 
 	// - END POINT MANIPULATION --------------------------
 
-		//! Retrieves a reference to the first element stored in this @ref IntrusiveForwardList.
+	public:
+	//! Retrieves a reference to the first element stored in this @ref IntrusiveForwardList.
 		ConstReference	Front() const;
-		//! Retrieves a reference to the first element stored in this @ref IntrusiveForwardList.
+	//! Retrieves a reference to the first element stored in this @ref IntrusiveForwardList.
 		Reference		Front();
 
-		//! Removes the head element of this @ref IntrusiveForwardList, reducing its size by one element.
+	//! Adds the passed-in item to the head of this @ref IntrusiveForwardList.
+		void			PushFront( Reference item );
+
+	//! Removes the head element of this @ref IntrusiveForwardList, reducing its size by one element.
 		template <typename Disposer>
 		void			PopFrontAndDispose( Disposer disposer );
 
-		//! Adds the passed-in item to the head of this @ref IntrusiveForwardList.
-		void			PushFront( Reference item );
-
 	// - CONTAINER DUPLICATION ---------------------------
 
-		template <typename Disposer, typename ElementCloner>
-		ETInlineHint void	CloneFrom( const ::Eldritch2::IntrusiveForwardList<StoredObject>& containerTemplate, Disposer disposer, ElementCloner cloner );
+	public:
+		IntrusiveForwardList&	operator=( IntrusiveForwardList&& );
+		IntrusiveForwardList&	operator=( const IntrusiveForwardList& ) = delete;
 
-		ETInlineHint void	Swap( ::Eldritch2::IntrusiveForwardList<StoredObject>& other );
+		void					Swap( IntrusiveForwardList& other );
 
 	// - CONTAINER MANIPULATION --------------------------
 
-		//! Inserts an element, shifting all antecedent elements down one position.
-		ETInlineHint Iterator	Insert( const Iterator location, Reference item );
+	public:
+	//! Inserts an element, shifting all antecedent elements down one position.
+		Iterator	Insert( Iterator location, Reference item );
 
-		ETInlineHint Iterator	InsertAfter( const Iterator location, Reference item );
+		Iterator	InsertAfter( Iterator location, Reference item );
 
-		ETInlineHint Iterator	Erase( const Iterator position );
-		ETInlineHint void		Erase( const Iterator begin, const Iterator end );
+		Iterator	Erase( Iterator begin, Iterator end );
+		Iterator	Erase( Iterator position );
 
-		template <typename Disposer>
-		ETInlineHint Iterator	EraseAndDispose( const Iterator position, Disposer disposer );
-		template <typename Disposer>
-		ETInlineHint void		EraseAndDispose( const Iterator begin, const Iterator end, Disposer disposer );
-
-		ETInlineHint void		EraseAfter( const Iterator location );
+		Iterator	EraseAfter( Iterator beforeBegin, Iterator end );
+		Iterator	EraseAfter( Iterator position );
 
 		template <typename Disposer>
-		ETInlineHint void		EraseAfterAndDispose( const Iterator location, Disposer disposer );
-
-		ETInlineHint void		Clear();
+		void		EraseAndDispose( Iterator begin, Iterator end, Disposer disposer );
 
 		template <typename Disposer>
-		ETInlineHint void		ClearAndDispose( Disposer disposer );
+		Iterator	EraseAndDispose( Iterator position, Disposer disposer );
+
+		void		Clear();
+
+		template <typename Disposer>
+		void		ClearAndDispose( Disposer disposer );
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint operator	bool() const;
+	public:
+		SizeType			GetSize() const;
 
-		ETInlineHint SizeType	Size() const;
+		bool				IsEmpty() const;
 
-		ETInlineHint bool		Empty() const;
+		explicit operator	bool() const;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		UnderlyingContainer	_container;
+		UnderlyingContainer	_underlyingContainer;
 	};
 
 }	// namespace Eldritch2

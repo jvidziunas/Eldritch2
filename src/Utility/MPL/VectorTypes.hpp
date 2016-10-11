@@ -17,6 +17,10 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+	class	Float4x4;
+}
+
+namespace Eldritch2 {
 
 	class Float4 {
 	// - TYPE PUBLISHING ---------------------------------
@@ -24,76 +28,73 @@ namespace Eldritch2 {
 	public:
 		enum VectorSwizzleComponent {
 			X = 0,
-			Y = 1,
-			Z = 2,
-			W = 3
+			Y,
+			Z,
+			W
 		};
 
 	// ---
 
-		using CoefficientSet	= ::Eldritch2::float32[4];
+		using CoefficientSet	= Eldritch2::float32[4];
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref Float4 instance.
-		ETForceInlineHint Float4( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		//!	Constructs this @ref Float4 instance.
-		ETForceInlineHint Float4( const ::Eldritch2::float32* const values );
-		//!	Constructs this @ref Float4 instance.
-		ETForceInlineHint Float4( const ::Eldritch2::Float4& ) = default;
-		//!	Constructs this @ref Float4 instance.
-		ETForceInlineHint Float4() = default;
+	public:
+	//!	Constructs this @ref Float4 instance.
+		Float4( const Eldritch2::float32 x, const Eldritch2::float32 y, const Eldritch2::float32 z, const Eldritch2::float32 w );
+	//!	Constructs this @ref Float4 instance.
+		Float4( const Eldritch2::float32* const values );
+	//!	Constructs this @ref Float4 instance.
+		Float4( const Float4& ) = default;
+	//!	Constructs this @ref Float4 instance.
+		Float4() = default;
 
-		ETForceInlineHint ~Float4() = default;
+		~Float4() = default;
 
 	// ---------------------------------------------------
 
+	public:
 		template <VectorSwizzleComponent component0, VectorSwizzleComponent component1, VectorSwizzleComponent component2, VectorSwizzleComponent component3>
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4&	Swizzle();
+		Eldritch2::Float4&	Swizzle();
+
+		Eldritch2::float32	operator[]( size_t index ) const;
 
 	// ---------------------------------------------------
 
-		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator+( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 );
-		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator-( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 );
-		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator*( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 );
-		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator*( ::Eldritch2::Float4 operand0, ::Eldritch2::float32 scalar );
-		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator/( ::Eldritch2::Float4 operand0, ::Eldritch2::Float4 operand1 );
-		friend ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall operator/( ::Eldritch2::Float4 operand0, ::Eldritch2::float32 scalar );
+	public:
+		Eldritch2::Float4&	ETSimdCall operator+=( Eldritch2::Float4 operand );
+		Eldritch2::Float4&	ETSimdCall operator-=( Eldritch2::Float4 operand );
+		Eldritch2::Float4&	ETSimdCall operator*=( Eldritch2::Float4 operand );
+		Eldritch2::Float4&	ETSimdCall operator*=( Eldritch2::float32 scalar );
+		Eldritch2::Float4&	ETSimdCall operator/=( Eldritch2::Float4 operand );
+		Eldritch2::Float4&	ETSimdCall operator/=( Eldritch2::float32 scalar );
 
-		ETForceInlineHint ::Eldritch2::Float4&						ETSIMDCall operator+=( ::Eldritch2::Float4 operand );
-		ETForceInlineHint ::Eldritch2::Float4&						ETSIMDCall operator-=( ::Eldritch2::Float4 operand );
-		ETForceInlineHint ::Eldritch2::Float4&						ETSIMDCall operator*=( ::Eldritch2::Float4 operand );
-		ETForceInlineHint ::Eldritch2::Float4&						ETSIMDCall operator*=( ::Eldritch2::float32 scalar );
-		ETForceInlineHint ::Eldritch2::Float4&						ETSIMDCall operator/=( ::Eldritch2::Float4 operand );
-		ETForceInlineHint ::Eldritch2::Float4&						ETSIMDCall operator/=( ::Eldritch2::float32 scalar );
-
-		ETForceInlineHint ::Eldritch2::Float4&						ETSIMDCall operator=( ::Eldritch2::Float4 operand );
+		Eldritch2::Float4&	ETSimdCall operator=( Eldritch2::Float4 operand );
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint ::Eldritch2::Float4&	Normalize();
+	public:
+		Eldritch2::Float4&	Normalize();
 
 	// ---------------------------------------------------
 
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall Ceil( ::Eldritch2::Float4 vector );
+	public:
+		friend ETPureFunctionHint Eldritch2::Float4	ETSimdCall	Ceil( Eldritch2::Float4 vector );
 
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall Floor( ::Eldritch2::Float4 vector );
-
-	// ---------------------------------------------------
-
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::float32	ETSIMDCall DotProduct( ::Eldritch2::Float4 vector0, ::Eldritch2::Float4 vector1 );
-
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall CrossProduct( ::Eldritch2::Float4 vector0, ::Eldritch2::Float4 vector1 );
-
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::Float4	ETSIMDCall LinearInterpolate( ::Eldritch2::Float4 vector0, ::Eldritch2::Float4 vector1, ::Eldritch2::float32 alpha );
+		friend ETPureFunctionHint Eldritch2::Float4	ETSimdCall	Floor( Eldritch2::Float4 vector );
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint operator	const CoefficientSet&() const;
-		ETForceInlineHint operator	CoefficientSet&();
+	public:
+		friend ETPureFunctionHint Eldritch2::Float4 ETSimdCall	LinearInterpolate( Eldritch2::Float4 vector0, Eldritch2::Float4 vector1, Eldritch2::float32 alpha );
+
+		friend ETPureFunctionHint Eldritch2::Float4 ETSimdCall	CrossProduct( Eldritch2::Float4 vector0, Eldritch2::Float4 vector1 );
+
+		friend ETPureFunctionHint Eldritch2::float32 ETSimdCall	DotProduct( Eldritch2::Float4 vector0, Eldritch2::Float4 vector1 );
 
 	// - DATA MEMBERS ------------------------------------
 
+	public:
 		CoefficientSet	coefficients;
 	};
 
@@ -103,48 +104,54 @@ namespace Eldritch2 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using CoefficientSet	= ::Eldritch2::float32[4];
+		using CoefficientSet	= Eldritch2::float32[4];
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 		
-		//!	Constructs this @ref Quaternion instance.
-		ETForceInlineHint Quaternion( const ::Eldritch2::float32 x, const ::Eldritch2::float32 y, const ::Eldritch2::float32 z, const ::Eldritch2::float32 w );
-		//!	Constructs this @ref Quaternion instance.
-		ETForceInlineHint Quaternion( const ::Eldritch2::float32* const values );
-		//!	Constructs this @ref Quaternion instance.
-		ETForceInlineHint Quaternion( const ::Eldritch2::Quaternion& ) = default;
-		//!	Constructs this @ref Quaternion instance.
-		ETForceInlineHint Quaternion() = default;
+	public:
+	//!	Constructs this @ref Quaternion instance.
+		Quaternion( Eldritch2::float32 x, Eldritch2::float32 y, Eldritch2::float32 z, Eldritch2::float32 w );
+	//!	Constructs this @ref Quaternion instance.
+		Quaternion( const Eldritch2::float32* const values );
+	//!	Constructs this @ref Quaternion instance.
+		Quaternion( const Quaternion& ) = default;
+	//!	Constructs this @ref Quaternion instance.
+		Quaternion() = default;
 
-		ETForceInlineHint ~Quaternion() = default;
-
-	// ---------------------------------------------------
-
-		ETForceInlineHint ::Eldritch2::Quaternion&	Normalize();
+		~Quaternion() = default;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Quaternion	ETSIMDCall GetReverse() const;
+	public:
+		Eldritch2::float32	operator[]( size_t index ) const;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint ETNoAliasHint ::Eldritch2::Float4 ETSIMDCall RotateVector( ::Eldritch2::Float4 point ) const;
+	public:
+		Quaternion&	Normalize();
 
 	// ---------------------------------------------------
 
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::float32		ETSIMDCall DotProduct( ::Eldritch2::Quaternion quaternion0, ::Eldritch2::Quaternion quaternion1 );
-
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion	ETSIMDCall LinearInterpolate( ::Eldritch2::Quaternion quaternion0, ::Eldritch2::Quaternion quaternion1, ::Eldritch2::float32 alpha );
-
-		friend ETInlineHint ETNoAliasHint ::Eldritch2::Quaternion	ETSIMDCall LinearInterpolateNonConstantVelocity( ::Eldritch2::Quaternion quaternion0, ::Eldritch2::Quaternion quaternion1, ::Eldritch2::float32 alpha );
+	public:
+		ETPureFunctionHint Quaternion ETSimdCall	GetReverse() const;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint operator	const CoefficientSet&() const;
-		ETForceInlineHint operator	CoefficientSet&();
+	public:
+		ETPureFunctionHint Eldritch2::Float4 ETSimdCall	RotateVector( Eldritch2::Float4 point ) const;
+
+	// ---------------------------------------------------
+
+	public:
+		friend ETPureFunctionHint Eldritch2::Quaternion ETSimdCall		LinearInterpolateNonConstantVelocity( Eldritch2::Quaternion quaternion0, Eldritch2::Quaternion quaternion1, Eldritch2::float32 alpha );
+
+		friend ETPureFunctionHint Eldritch2::Quaternion ETSimdCall		LinearInterpolate( Eldritch2::Quaternion quaternion0, Eldritch2::Quaternion quaternion1, Eldritch2::float32 alpha );
+
+		friend ETPureFunctionHint Eldritch2::float32 ETSimdCall			DotProduct( Eldritch2::Quaternion quaternion0, Eldritch2::Quaternion quaternion1 );
 
 	// - DATA MEMBERS ------------------------------------
 
+	public:
 		CoefficientSet	coefficients;
 	};
 
@@ -154,21 +161,22 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref RigidTransform instance.
-		ETForceInlineHint RigidTransform( Float4 translation, Quaternion orientation );
-		//!	Constructs this @ref RigidTransform instance.
-		ETForceInlineHint RigidTransform( Float4 translation );
-		//!	Constructs this @ref RigidTransform instance.
-		ETForceInlineHint RigidTransform( Quaternion orientation );
-		//!	Constructs this @ref RigidTransform instance.
-		ETForceInlineHint RigidTransform() = default;
+	//!	Constructs this @ref RigidTransform instance.
+		RigidTransform( Eldritch2::Float4 translation, Eldritch2::Quaternion orientation );
+	//!	Constructs this @ref RigidTransform instance.
+		RigidTransform( Eldritch2::Float4 translation );
+	//!	Constructs this @ref RigidTransform instance.
+		RigidTransform( Eldritch2::Quaternion orientation );
+	//!	Constructs this @ref RigidTransform instance.
+		RigidTransform() = default;
 
-		ETForceInlineHint ~RigidTransform() = default;
+		~RigidTransform() = default;
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::Float4		translation;
-		::Eldritch2::Quaternion	orientation;
+	public:
+		Eldritch2::Float4		translation;
+		Eldritch2::Quaternion	orientation;
 	};
 
 }	// namespace Eldritch2

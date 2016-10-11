@@ -18,13 +18,7 @@
 
 namespace Eldritch2 {
 
-	SpatialHasher::SpatialHasher( const float32 cellLengthInMeters, const float32 cellHeightInMeters ) : _inverseResolution( ::Eldritch2::Reciprocal( cellLengthInMeters ),
-																															 ::Eldritch2::Reciprocal( cellHeightInMeters ),
-																															 ::Eldritch2::Reciprocal( cellLengthInMeters ),
-																															 1.0f ),
-																										 _resolution( cellLengthInMeters,
-																													  cellHeightInMeters,
-																													  cellLengthInMeters,
-																													  1.0f ) {}
+	SpatialHasher::SpatialHasher( float32 cellLengthInMeters, float32 cellHeightInMeters ) : _inverseResolution( Eldritch2::Reciprocal( cellLengthInMeters ), Eldritch2::Reciprocal( cellHeightInMeters ), Eldritch2::Reciprocal( cellLengthInMeters ), 1.0f ),
+																							 _resolution( cellLengthInMeters, cellHeightInMeters, cellLengthInMeters, 1.0f ) {}
 
 }	// namespace Eldritch2

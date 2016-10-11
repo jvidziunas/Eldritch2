@@ -12,24 +12,13 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/ResizableArray.hpp>
-#include <Utility/Containers/FlatMap.hpp>
 #include <Utility/Containers/HashMap.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Scripting {
-		namespace AngelScript {
-			namespace FlatBuffers {
-				struct	FunctionMetadata;
-				struct	PropertyMetadata;
-				struct	ModuleMetadata;
-				struct	TypeMetadata;
-			}
-		}
-	}
-
 	class	ErrorCode;
+	template <typename>
+	class	Range;
 }
 
 class	asIScriptFunction;
@@ -46,18 +35,25 @@ namespace AngelScript {
 	// - TYPE PUBLISHING ---------------------------------
 	
 	public:
-		using ModuleMetadata	= AngelScript::BytecodeMetadata;
-
 		class FunctionMetadata {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		public:
-			::Eldritch2::ErrorCode Bind( ::asIScriptFunction& function, const FlatBuffers::FunctionMetadata& metadata );
+		//!	Constructs this @ref FunctionMetadata instance.
+			FunctionMetadata() = default;
+
+			~FunctionMetadata() = default;
 		};
 
 	// ---
 
 		class PropertyMetadata {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 		public:
-			::Eldritch2::ErrorCode Bind( const FlatBuffers::PropertyMetadata& metadata );
+		//!	Constructs this @ref PropertyMetadata instance.
+			PropertyMetadata() = default;
+
+			~PropertyMetadata() = default;
 		};
 
 	// ---
@@ -66,92 +62,53 @@ namespace AngelScript {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this @ref TypeMetadata instance.
-			/*! @param[in] allocator @ref Allocator the @ref TypeMetadata instance should use to perform allocations.
-				*/
-			TypeMetadata( ::Eldritch2::Allocator& allocator );
-			TypeMetadata( TypeMetadata&& metadata );
-			TypeMetadata() = delete;
+		//! Constructs this @ref TypeMetadata instance.
+			TypeMetadata() = default;
 
-		// ---------------------------------------------------
-
-			::Eldritch2::ErrorCode	Bind( ::asITypeInfo& scriptType, const FlatBuffers::TypeMetadata& metadata );
-
-		// ---------------------------------------------------
-
-			//!	Extracts metadata for an an object property, if any has been previously associated.
-			/*!	@param[in] propertyIndex Zero-based index identifying the property to be inspected.
-				@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the property.
-				*/
-			const PropertyMetadata*	GetPropertyMetadata( const ::asUINT propertyIndex ) const;
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			::Eldritch2::ResizableArray<FunctionMetadata>		_methodMetadata;
-			::Eldritch2::FlatMap<::asUINT, PropertyMetadata>	_propertyMetadata;
+			~TypeMetadata() = default;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref BytecodeMetadata instance.
-		/*! @param[in] allocator @ref Allocator instance this @ref BytecodeMetadata should use to perform internal allocations.
-			*/
-		BytecodeMetadata( ::Eldritch2::Allocator& allocator );
+	//! Constructs this @ref BytecodeMetadata instance.
+	/*! @param[in] allocator @ref Allocator instance this @ref BytecodeMetadata should use to perform internal allocations. */
+		BytecodeMetadata( Eldritch2::Allocator& allocator );
+	//! Constructs this @ref BytecodeMetadata instance.
+		BytecodeMetadata( BytecodeMetadata&& );
 
-		//! Destroys this @ref BytecodeMetadata instance.
 		~BytecodeMetadata() = default;
 
 	// ---------------------------------------------------
 
-		//!	Extracts metadata for an AngelScript function, if any has been previously associated.
-		/*!	@param[in] function The AngelScript function to inspect.
-			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the function.
-			*/
-		static const FunctionMetadata*	GetMetadata( const ::asIScriptFunction& function );
-		//!	Extracts metadata for an AngelScript module, if any has been previously associated.
-		/*!	@param[in] module The AngelScript module to inspect.
-			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the module.
-			*/
-		static const ModuleMetadata*	GetMetadata( const ::asIScriptModule& module );
-		//!	Extracts metadata for an AngelScript type, if any has been previously associated.
-		/*!	@param[in] type The AngelScript type to inspect.
-			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the type.
-			*/
-		static const TypeMetadata*		GetMetadata( const ::asITypeInfo& type );
+	public:
+	//!	Extracts metadata for an AngelScript function, if any has been previously associated.
+	/*!	@param[in] function The AngelScript function to inspect.
+		@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the function. */
+		const FunctionMetadata*	GetMetadata( const asIScriptFunction* function ) const;
+	//!	Extracts metadata for an AngelScript type, if any has been previously associated.
+	/*!	@param[in] type The AngelScript type to inspect.
+		@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the type. */
+		const TypeMetadata*		GetMetadata( const asITypeInfo* type ) const;
 
-		//!	Extracts metadata for an an object property, if any has been previously associated.
-		/*!	@param[in] propertyIndex Zero-based index identifying the property to be inspected.
-			@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the property.
-			*/
-		static const PropertyMetadata*	GetPropertyMetadata( const ::asITypeInfo& objectType, const ::asUINT propertyIndex );
-		static const PropertyMetadata*	GetPropertyMetadata( const ::asIScriptModule& module, const void* propertyAddress );
+	//!	Extracts metadata for an an object property, if any has been previously associated.
+	/*!	@param[in] propertyIndex Zero-based index identifying the property to be inspected.
+		@returns A pointer to the metadata structure, if found, or a null pointer if no metadata was associated with the property. */
+		const PropertyMetadata*	GetPropertyMetadata( const asITypeInfo* objectType, asUINT propertyIndex ) const;
+		const PropertyMetadata*	GetPropertyMetadata( const void* propertyAddress ) const;
 
 	// ---------------------------------------------------
 
-	protected:
-		static void	SetMetadata( ::asIScriptFunction& function, const FunctionMetadata& metadata );
-		static void	SetMetadata( ::asIScriptModule& module, const ModuleMetadata& metadata );
-		static void	SetMetadata( ::asITypeInfo& objectType, const TypeMetadata& metadata );
-
-	// ---------------------------------------------------
-
-		::Eldritch2::ErrorCode	BindToModule( ::asIScriptModule& module, ::Eldritch2::Range<const char*> sourceBytes );
-
-	private:
-		::Eldritch2::ErrorCode	LoadTypeMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData );
-
-		::Eldritch2::ErrorCode	LoadFunctionMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData );
-
-		::Eldritch2::ErrorCode	LoadPropertyMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData );
+	public:
+		Eldritch2::ErrorCode	BindToModule( asIScriptModule& module, Eldritch2::Range<const char*> sourceBytes );
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator							_rootAllocator;
-		::Eldritch2::ResizableArray<TypeMetadata>			_typeMetadata;
-		::Eldritch2::ResizableArray<FunctionMetadata>		_functionMetadata;
-		::Eldritch2::HashMap<const void*, PropertyMetadata>	_propertyMetadata;
+	private:
+		Eldritch2::HashMap<const asITypeInfo*, TypeMetadata>								_typeMetadata;
+		Eldritch2::HashMap<const asIScriptFunction*, FunctionMetadata>						_functionMetadata;
+		Eldritch2::HashMap<Eldritch2::Pair<const asITypeInfo*, asUINT>, PropertyMetadata>	_typePropertyMetadata;
+		Eldritch2::HashMap<const void*, PropertyMetadata>									_moduleGlobalPropertyMetadata;
 	};
 
 }	// namespace AngelScript

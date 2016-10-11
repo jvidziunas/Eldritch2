@@ -12,19 +12,20 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Configuration/ConfigurablePODVariable.hpp>
 #include <Scripting/AngelScript/SmartPointers.hpp>
+#include <Utility/Containers/Utf8String.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
-#include <Foundation/GameEngineService.hpp>
-#include <Packages/ResourceViewFactory.hpp>
+#include <Core/EngineService.hpp>
+#include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Scripting {
-		class	StringMarshal;
+	namespace Core {
+		class	Engine;
 	}
 }
 
+class	asIScriptContext;
 class	asIScriptEngine;
 struct	asSMessageInfo;
 
@@ -32,112 +33,67 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	class EngineService : public Foundation::GameEngineService {
+	class EngineService : public Core::EngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref EngineService instance.
-		EngineService( Foundation::GameEngine& owningEngine );
+	//! Constructs this @ref EngineService instance.
+		EngineService( const Core::Engine& engine );
+	//!	Disable copying.
+		EngineService( const EngineService& );
 
-		//! Destroys this @ref EngineService instance.
 		~EngineService() = default;
 
+	// - DEBUG/LOGGING INFORMATION -----------------------
+
+	public:
+		Eldritch2::Utf8Literal	GetName() const override;
+
 	// ---------------------------------------------------
 
-		const ::Eldritch2::UTF8Char* const	GetName() const override sealed;
-
-		ETInlineHint ::asIScriptEngine&		GetScriptEngine() const;
-
-	// ---------------------------------------------------
-
-		::Eldritch2::ErrorCode	AllocateWorldView( ::Eldritch2::Allocator& allocator, Foundation::World& world ) override;
+	public:
+		Eldritch2::Result<Eldritch2::UniquePointer<Core::WorldService>>	CreateWorldService( Eldritch2::Allocator& allocator, const Core::World& world ) override;
 
 	// ---------------------------------------------------
 
 	protected:
-		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
-
-		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override sealed;
-
-	// ---------------------------------------------------
-		
-		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const BeginInitializationVisitor ) override;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const InitializationCompleteVisitor ) override;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const ServiceTickVisitor ) override;
+		void	AcceptVisitor( Assets::AssetViewFactoryRegistrar& registrar ) override;
+		void	AcceptVisitor( Core::ServiceBlackboard& blackboard ) override;
+		void	AcceptVisitor( Scripting::ApiRegistrar& registrar ) override;
 
 	// - SCRIPT MARSHALING -------------------------------
 
-		Scripting::StringMarshal	MarshalStringLiteral( const unsigned int literalLengthInOctets, const ::Eldritch2::UTF8Char* const stringLiteral );
+	protected:
+		Eldritch2::Utf8String<>	MarshalStringLiteral( const unsigned int literalLengthInOctets, const Eldritch2::Utf8Char* const literal );
 
-		void						MessageCallback( const ::asSMessageInfo* messageInfo );
+		void					MessageCallback( const asSMessageInfo* messageInfo );
 
-	// - TYPE PUBLISHING ---------------------------------
+	// ---------------------------------------------------
 
-	private:
-		class BytecodePackageViewFactory : public FileSystem::ResourceViewFactory {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	protected:
+		asIScriptContext*	GetContext();
 
-		public:
-			//!	Constructs this @ref BytecodePackageViewFactory instance.
-			BytecodePackageViewFactory();
+		void				ReturnContext( asIScriptContext* context );
 
-			~BytecodePackageViewFactory() = default;
+	// ---------------------------------------------------
 
-		// ---------------------------------------------------
-
-			ETInlineHint ::asIScriptEngine&	GetScriptEngine() const;
-
-			ETInlineHint void				SetScriptEngine( AngelScript::EngineHandle&& engine );
-
-		// ---------------------------------------------------
-
-			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
-
-		// ---------------------------------------------------
-
-			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			AngelScript::EngineHandle	_scriptEngine;
-		};
-
-	// ---
-
-		class ObjectGraphViewFactory : public FileSystem::ResourceViewFactory {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref ObjectGraphViewFactory instance.
-			ObjectGraphViewFactory() = default;
-
-			~ObjectGraphViewFactory() = default;
-
-		// ---------------------------------------------------
-
-			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
-
-		// ---------------------------------------------------
-			
-			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-		};
+	//!	Disable assignment.
+		EngineService&	operator=( const EngineService& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator						_allocator;
+	private:
+		mutable Eldritch2::ChildAllocator				_allocator;
+		mutable Logging::ChildLog						_log;
 
-		Configuration::ConfigurablePODVariable<bool>	_forceScriptApiExport;
+		bool											_forceExport;
 
-		BytecodePackageViewFactory						_bytecodePackageFactory;
-		ObjectGraphViewFactory							_objectGraphFactory;
+		AngelScript::UniquePointer<asIScriptEngine>		_scriptEngine;
 	};
 
 }	// namespace AngelScript
 }	// namespace Scripting
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Scripting/AngelScript/EngineService.inl>
-//------------------------------------------------------------------//

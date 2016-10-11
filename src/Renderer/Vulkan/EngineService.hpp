@@ -12,174 +12,117 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Configuration/ConfigurablePODVariable.hpp>
-#include <Configuration/ConfigurableUTF8String.hpp>
-#include <Renderer/Vulkan/DeviceContext.hpp>
+#include <Renderer/Vulkan/SparseImageManager.hpp>
+#include <Renderer/Vulkan/DeviceMemoryPool.hpp>
+#include <Utility/Containers/Utf8String.hpp>
 #include <Renderer/Vulkan/SmartPointers.hpp>
 #include <Renderer/Vulkan/HostAllocator.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
-#include <Foundation/GameEngineService.hpp>
-#include <Packages/ResourceViewFactory.hpp>
+#include <Platform/UserReadWriteMutex.hpp>
+#include <Utility/Containers/ArraySet.hpp>
+#include <Utility/Containers/HashMap.hpp>
+#include <Utility/Containers/HashSet.hpp>
+#include <Renderer/Vulkan/Device.hpp>
+#include <Core/EngineService.hpp>
+#include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 {
+	namespace Renderer {
+		namespace Vulkan {
+			class	SwapChain;
+		}
+	}
+
+	namespace Core {
+		class	Engine;
+	}
+}
 
 namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
 
-	class EngineService : public Foundation::GameEngineService {
+	class EngineService : public Core::EngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref EngineService instance.
-		/*!	@param[in] owningEngine @ref GameEngine instance that will manage the lifetime of the new @ref EngineService.
-			*/
-		EngineService( Foundation::GameEngine& owningEngine );
+	//!	Constructs this @ref EngineService instance.
+	/*!	@param[in] engine @ref Engine instance that will manage the lifetime of the new @ref EngineService. */
+		EngineService( const Core::Engine& engine );
+	//!	Disable copying.
+		EngineService( const EngineService& ) = delete;
 
 		~EngineService() = default;
 
-	// ---------------------------------------------------
+	// - DEBUG/LOGGING INFORMATION -----------------------
 
-		const ::Eldritch2::UTF8Char* const	GetName() const override;
-
-	// ---------------------------------------------------
-
-		::Eldritch2::ErrorCode	AllocateWorldView( ::Eldritch2::Allocator& allocator, Foundation::World& world ) override;
+	public:
+		Eldritch2::Utf8Literal	GetName() const override;
 
 	// ---------------------------------------------------
 
-		void	OnEngineConfigurationBroadcast( Scheduler::WorkerContext& executingContext ) override;
-
-		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override;
-
-		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override;
-
-		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override;
+	public:
+		Eldritch2::Result<Eldritch2::UniquePointer<Core::WorldService>>	CreateWorldService( Eldritch2::Allocator& allocator, const Core::World& world ) override;
 
 	// ---------------------------------------------------
 
-		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override;
+	public:
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const ConfigurationBroadcastVisitor ) override;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const ServiceTickVisitor ) override;
+		void	AcceptVisitor( Configuration::ConfigurationRegistrar& registrar ) override;
+		void	AcceptVisitor( Assets::AssetViewFactoryRegistrar& registrar ) override;
+		void	AcceptVisitor( Core::ServiceBlackboard& serviceBlackboard ) override;
+		void	AcceptVisitor( Scripting::ApiRegistrar& registrar ) override;
 
 	// ---------------------------------------------------
 
-	private:
-		::Eldritch2::ErrorCode	PopulateDevicesSingleGpu();
+	public:
+		Vulkan::HostAllocator&	GetVulkanAllocator() const;
 
-		::Eldritch2::ErrorCode	PopulateDevicesAfr();
+		Eldritch2::Allocator&	GetAllocator() const;
 
-	// - TYPE PUBLISHING ---------------------------------
+		Vulkan::Device&			GetDeviceForCurrentFrame() const;
 
-		class PipelineFactory : public FileSystem::ResourceViewFactory {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		Vulkan::Device&			GetDeviceForNextFrame() const;
 
-		public:
-			//!	Constructs this @ref PipelineFactory instance.
-			PipelineFactory();
+		VkInstance				GetVulkan() const;
 
-			~PipelineFactory() = default;
+	// ---------------------------------------------------
 
-		// ---------------------------------------------------
-
-			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-
-		// ---------------------------------------------------
-
-			static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
-
-		// ---------------------------------------------------
-
-			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
-		};
-
-	// ---
-
-		class ImageFactory : public FileSystem::ResourceViewFactory {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref PipelineFactory instance.
-			ImageFactory();
-
-			~ImageFactory() = default;
-
-		// ---------------------------------------------------
-
-			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-
-		// ---------------------------------------------------
-
-			static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
-
-		// ---------------------------------------------------
-
-			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
-
-		// ---------------------------------------------------
-
-			void	CreateDeviceResources( Vulkan::DeviceContext& deviceContext );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			Configuration::ConfigurablePODVariable<::VkDeviceSize>	_devicePoolSize;
-			Vulkan::UniquePointer<::VkDeviceMemory>					_devicePool;
-			Vulkan::UniquePointer<::VkDeviceMemory>					_stagingPool;
-		};
-
-	// ---
-
-		class MeshFactory : public FileSystem::ResourceViewFactory {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref MeshFactory instance.
-			MeshFactory();
-
-			~MeshFactory() = default;
-
-		// ---------------------------------------------------
-
-			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-
-		// ---------------------------------------------------
-
-			static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
-
-		// ---------------------------------------------------
-
-			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
-
-		// ---------------------------------------------------
-
-			void	CreateDeviceResources( Vulkan::DeviceContext& deviceContext );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			Configuration::ConfigurablePODVariable<::VkDeviceSize>	_devicePoolSize;
-			Vulkan::UniquePointer<::VkDeviceMemory>					_devicePool;
-			Vulkan::UniquePointer<::VkDeviceMemory>					_stagingPool;
-			void*													_mappedStagingPool;
-		};
+	//!	Disable assignment.
+		EngineService&	operator=( const EngineService& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
-		Vulkan::HostAllocator							_allocator;
-		Vulkan::UniquePointer<::VkInstance>				_vulkan;
+	private:
+	//!	Top-level allocator for use by rendering-related operations.
+		mutable Vulkan::HostAllocator											_allocator;
+	//!	Top-level log for rendering-related operations.
+		mutable Logging::ChildLog												_log;
 
-		PipelineFactory									_pipelineFactory;
-		ImageFactory									_imageFactory;
-		MeshFactory										_meshFactory;
+	//	Configuration.
+		Eldritch2::HashSet<Eldritch2::Utf8String<>>								_instanceLayers;
+		Eldritch2::HashSet<Eldritch2::Utf8String<>>								_deviceLayers;
+		Eldritch2::Utf8String<>													_preferredAdapterName;
+		bool																	_allowAfrMultiGpu;
+		bool																	_installDebugMessageHook;
 
-		Vulkan::UniquePointer<::VkFence>				_copyFence;
+		Vulkan::UniquePointer<VkInstance>										_vulkan;
+		Eldritch2::UniquePointer<Vulkan::Device>								_device;
+		Vulkan::UniquePointer<VkDebugReportCallbackEXT>							_debugCallback;
 
-		Configuration::ConfigurableUTF8String			_enabledInstanceLayers;
-		Configuration::ConfigurableUTF8String			_enabledDeviceLayers;
-		
-		Configuration::ConfigurableUTF8String			_preferredAdapterNameForSingleGpu;
-		Configuration::ConfigurablePODVariable<bool>	_allowAfrMultiGpu;
-		Configuration::ConfigurablePODVariable<bool>	_installDebugMessageHook;
+		Eldritch2::HashMap<Eldritch2::Utf8String<>, Vulkan::DeviceMemoryPool>	_imagePools;
+		Eldritch2::HashMap<Eldritch2::Utf8String<>, Vulkan::DeviceMemoryPool>	_meshPools;
+
+		Vulkan::SparseImageManager												_sparseImageManager;
 	};
 
 }	// namespace Vulkan
 }	// namespace Renderer
 }	// namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Renderer/Vulkan/EngineService.inl>
+//------------------------------------------------------------------//

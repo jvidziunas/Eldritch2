@@ -13,15 +13,15 @@ I can production-test interesting research so your project doesn't have to!
 Lots of the architectural decisions here are also centered around shooters and action RPGs, at least out of the box.
 
 ## External Dependencies
-* [Bullet Dynamics Engine](http://bulletphysics.org/wordpress/), experimental v3, using community multithreading support branch
 * [PhysX](http://www.geforce.com/hardware/technology/physx)
 * [Angelscript](http://www.angelcode.com/angelscript/)
 * [Microprofile](https://github.com/theunknownxy/microprofile)
 * [Recast Navigation/Detour](https://github.com/memononen/recastnavigation)
-* [Boost](http://www.boost.org/), version 1.59
+* [Boost](http://www.boost.org/), version 1.60
 * [Steamworks](https://partner.steamgames.com/)
 * [My RDESTL fork](https://github.com/jvidziunas/rdestl)
 * [SimpleOpt](https://github.com/brofield/simpleopt)
+* [Nuklear](https://github.com/vurtun/nuklear)
 
 ## Project Structure
 At a high level, project directories are arranged in a hierarchy. Shared or engine-related files live in the `/src/` subdirectory, and the current set of planned tools each have their own special sibling folder named according to the pattern `/src_<Tool Name>/`.

@@ -12,54 +12,79 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/ResizableArray.hpp>
 #include <Utility/Containers/SpatialHash.hpp>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 {
+	namespace Animation {
+		class	Armature;
+	}
+}
 
 namespace Eldritch2 {
 namespace Renderer {
 namespace Detail {
 
-	class VisibilityCellBase {
+	class VisibilityCell {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 	public:
-		using BoundingSphereOffsetAndRadius	= ::Eldritch2::float16[4];
+	//!	Constructs this @ref VisibilityCell instance.
+		VisibilityCell() = default;
+
+		~VisibilityCell() = default;
 
 	// - DATA MEMBERS ------------------------------------
 
 	protected:
-		BoundingSphereOffsetAndRadius	_boundingSphereOffsetAndRadius;
+		Eldritch2::float16	_boundingSphereOffset[3];
+		Eldritch2::float16	_boundingSphereRadius;
 	};
 
 }	// namespace Detail
 
-	template <typename Renderable, class Hasher = ::Eldritch2::SpatialHasher, class HashAllocator = ::Eldritch2::ChildAllocator>
+	template <class MeshAsset>
 	class VisibilitySystem {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class VisibilityCell : public Detail::VisibilityCellBase {
-			
-		};
+		class VisibilityCell : public Detail::VisibilityCell {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	// ---
+		public:
+		//!	Constructs this @ref VisibilityCell instance.
+			VisibilityCell( Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref VisibilityCell instance.
+			VisibilityCell( VisibilityCell&& ) = default;
 
-		class ShadowCasterCell {
+			~VisibilityCell() = default;
 
+		// ---------------------------------------------------
+
+		public:
+			void	AddElement( const Eldritch2::Pair<const MeshAsset*, const Animation::Armature*>& element );
+
+			void	RemoveElement( const Eldritch2::Pair<const MeshAsset*, const Animation::Armature*>& element );
+
+		// - DATA MEMBERS ------------------------------------
+
+		private:
+			Eldritch2::ResizableArray<Eldritch2::Pair<const MeshAsset*, const Animation::Armature*>>	_renderElements;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref VisibilitySystem instance.
-		VisibilitySystem( Hasher&& shadowCasterHasher, Hasher&& hasher, HashAllocator&& shadowCasterAllocator, HashAllocator&& allocator );
-		//!	Constructs this @ref VisibilitySystem instance.
-		VisibilitySystem( HashAllocator&& shadowCasterAllocator, HashAllocator&& allocator );
+	public:
+	//!	Constructs this @ref VisibilitySystem instance.
+		VisibilitySystem( Eldritch2::Allocator& allocator );
 
 		~VisibilitySystem() = default;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::SpatialHash<ShadowCasterCell, Hasher, HashAllocator>	_shadowCasterCells;
-		::Eldritch2::SpatialHash<VisibilityCell, Hasher, HashAllocator>		_visibilityCells;
+		Eldritch2::SpatialHash<VisibilityCell>	_cells;
 	};
 
 }	// namespace Renderer

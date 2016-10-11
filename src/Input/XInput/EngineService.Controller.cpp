@@ -12,7 +12,6 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
 #include <Input/XInput/EngineService.hpp>
 //------------------------------------------------------------------//
 
@@ -27,37 +26,24 @@
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2::Input;
-using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Input {
 namespace XInput {
 
-	const char* const EngineService::Controller::scriptTypeName = "XInputController";
-
-// ---------------------------------------------------
-
-	EngineService::Controller::Controller( const ::DWORD controllerIndex ) : _controllerIndex( controllerIndex ) {
-		if( Controller::InvalidControllerIndex != controllerIndex ) {
-			::XInputGetState( controllerIndex, &_state );
-		}
+	EngineService::Controller::Controller( DWORD controllerIndex ) : _controllerIndex( controllerIndex ) {
+		SampleInput();
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::Controller::ReadInput() {
-		if( (Controller::InvalidControllerIndex != _controllerIndex) && (ERROR_DEVICE_NOT_CONNECTED != ::XInputGetState( _controllerIndex, &_state )) ) {
+	void EngineService::Controller::SampleInput() {
+		if( Controller::InvalidControllerIndex == _controllerIndex ) {
+			return;
 		}
+
+		XInputGetState( _controllerIndex, &_state );
 	}
-
-// ---------------------------------------------------
-
-	ETNoAliasHint void EngineService::Controller::ExposeScriptAPI( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {}
-
-// ---------------------------------------------------
-
-	void EngineService::Controller::Dispose() {}
 
 }	// namespace XInput
 }	// namespace Input

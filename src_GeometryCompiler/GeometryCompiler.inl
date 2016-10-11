@@ -101,7 +101,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int GeometryCompiler<GlobalAllocator, FileAccessorFactory>::SetPassword( const ::Eldritch2::UTF8Char* const password, const ::Eldritch2::UTF8Char* const passwordEnd ) {
+	int GeometryCompiler<GlobalAllocator, FileAccessorFactory>::SetPassword( const Eldritch2::Utf8Char* const password, const Eldritch2::Utf8Char* const passwordEnd ) {
 		_password.Assign( password, passwordEnd );
 
 		return 0;
@@ -110,7 +110,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int	GeometryCompiler<GlobalAllocator, FileAccessorFactory>::AddInputFile( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd ) {
+	int	GeometryCompiler<GlobalAllocator, FileAccessorFactory>::AddInputFile( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd ) {
 		_inputNames.PushBack( { name, nameEnd, { GetAllocator(), UTF8L("Input File Name Allocator") } } );
 
 		return 0;

@@ -12,18 +12,22 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
+#include <Physics/PhysX/AssetViews/SkeletalColliderView.hpp>
+#include <Physics/PhysX/AssetViews/ArmatureView.hpp>
+#include <Configuration/ConfigurationRegistrar.hpp>
+#include <Physics/PhysX/AssetViews/TerrainView.hpp>
+#include <Assets/AssetViewFactoryRegistrar.hpp>
 #include <Physics/PhysX/EngineService.hpp>
+#include <Physics/PhysX/WorldService.hpp>
 #include <Utility/Memory/InstanceNew.hpp>
-#include <Scheduler/ThreadScheduler.hpp>
-#include <Scheduler/WorkerContext.hpp>
-#include <Physics/PhysX/WorldView.hpp>
-#include <Foundation/GameEngine.hpp>
+#include <Scheduling/ThreadScheduler.hpp>
+#include <Scheduling/JobFiber.hpp>
+#include <Core/Engine.hpp>
 //------------------------------------------------------------------//
 #include <characterkinematic/PxControllerManager.h>
 #include <microprofile/microprofile.h>
 #include <common/PxTolerancesScale.h>
-#include <foundation/PxFoundation.h>
+#include <cooking/PxCooking.h>
 #include <pxtask/PxTask.h>
 #include <PxSceneDesc.h>
 #include <PxPhysics.h>
@@ -36,6 +40,7 @@
 #if( ET_DEBUG_MODE_ENABLED )
 	ET_LINK_LIBRARY("PhysX3ExtensionsDEBUG.lib")
 	ET_LINK_LIBRARY("PhysX3CommonDEBUG_x64.lib")
+	ET_LINK_LIBRARY("PhysX3CookingDEBUG_x64.lib")
 	ET_LINK_LIBRARY("PhysX3DEBUG_x64.lib")
 	ET_LINK_LIBRARY("PhysX3GpuDEBUG_x64.lib")
 	ET_LINK_LIBRARY("PhysX3CharacterKinematicDEBUG_x64.lib")
@@ -43,26 +48,33 @@
 	ET_LINK_LIBRARY("PhysX3Extensions.lib")
 	ET_LINK_LIBRARY("PhysX3Common_x64.lib")
 	ET_LINK_LIBRARY("PhysX3_x64.lib")
+	ET_LINK_LIBRARY("PhysX3Cooking_x64.lib")
 	ET_LINK_LIBRARY("PhysX3Gpu_x64.lib")
 	ET_LINK_LIBRARY("PhysX3CharacterKinematic_x64.lib")
 #endif
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
-using namespace ::Eldritch2::FileSystem;
-using namespace ::Eldritch2::Foundation;
-using namespace ::Eldritch2::Scheduler;
+using namespace ::Eldritch2::Scheduling;
 using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2::Physics;
-using namespace ::Eldritch2;
-
+using namespace ::Eldritch2::Logging;
+using namespace ::Eldritch2::Assets;
+using namespace ::Eldritch2::Core;
 using namespace ::physx;
 
 namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
+namespace {
 
-	EngineService::EngineService( GameEngine& engine ) : GameEngineService( engine ) {}
+	enum : size_t {
+		RequiredAlignment	= 16u,
+		PaddingInBytes		= RequiredAlignment
+	};
+
+}	// anonymous namespace
+
+	EngineService::EngineService( const Engine& engine ) : Core::EngineService( engine.GetServiceBlackboard() ), _allocator( engine.GetAllocator(), "PhysX Root Allocator" ), _log( engine.GetLog() ) {}
 
 // ---------------------------------------------------
 
@@ -70,120 +82,155 @@ namespace PhysX {
 
 // ---------------------------------------------------
 
-	const UTF8Char* const EngineService::GetName() const {
-		return UTF8L("PhysX Engine");
+	Utf8Literal EngineService::GetName() const {
+		return "PhysX Engine";
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		if( !_physics ) {
-			return Error::InvalidObjectState;
+	Result<Eldritch2::UniquePointer<Core::WorldService>> EngineService::CreateWorldService( Allocator& allocator, const World& world ) {
+		PxSceneDesc	descriptor( _physics->getTolerancesScale() );
+
+		descriptor.filterShader		= &WorldService::FilterShader;
+		descriptor.cpuDispatcher	= this;
+
+	//	Create the core PhysX scene object, responsible for simulation and communication across the various actors, etc. in the physics scene.
+		UniquePointer<PxScene>	scene( _physics->createScene( descriptor ) );
+		if( !scene ) {
+			return Error::Unspecified;
 		}
 
-		PxSceneDesc	sceneDesc( _physics->getTolerancesScale() );
+	//	PxControllerManagers are used to create and simulate PhysX character controllers.
+		UniquePointer<PxControllerManager>	controllerManager( PxCreateControllerManager( *scene ) );
+		if( !controllerManager ) {
+			return Error::Unspecified;
+		}
 
-		sceneDesc.filterShader	= &WorldView::FilterShader;
-		sceneDesc.cpuDispatcher = this;
-
-		if( UniquePointer<PxScene> scene { _physics->createScene( sceneDesc ) } ) {
-			if( UniquePointer<PxControllerManager> controllerManager { PxCreateControllerManager( *scene ) } ) {
-				return new(allocator, Allocator::AllocationDuration::Normal) PhysX::WorldView( ::std::move( scene ), ::std::move( controllerManager ), world ) ? Error::None : Error::OutOfMemory;
-			}
+		auto result( MakeUnique<PhysX::WorldService>( allocator, eastl::move( scene ), eastl::move( controllerManager ), world ) );
+		if( !result ) {
+			return Error::OutOfMemory;
 		}
 	
-		return Error::Unspecified;
+		return eastl::move( result );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& /*executingContext*/ ) {
-		GetLogger()( UTF8L("Creating PhysX SDK objects.") ET_UTF8_NEWLINE_LITERAL );
+	void EngineService::AcceptVisitor( JobFiber& /*fiber*/, const ConfigurationBroadcastVisitor ) {
+		_log( MessageSeverity::Message, "Creating PhysX SDK objects." ET_UTF8_NEWLINE_LITERAL );
 
-		_foundation.reset( ::PxCreateFoundation( PX_PHYSICS_VERSION, *this, *this ) );
-
-		if( !_foundation ) {
-			GetLogger( LogMessageType::Error )( UTF8L("Error creating PhysX foundation object!") ET_UTF8_NEWLINE_LITERAL );
+	//	Create the PxFoundation loader object responsible for loading the various PhysX modules.
+		UniquePointer<PxFoundation>	foundation( PxCreateFoundation( PX_PHYSICS_VERSION, *this, *this ) );
+		if( !foundation ) {
+			_log( MessageSeverity::Error, "Error creating PhysX foundation object!" ET_UTF8_NEWLINE_LITERAL );
 			return;
 		}
 
-		_physics.reset( ::PxCreatePhysics( PX_PHYSICS_VERSION, ::PxGetFoundation(), PxTolerancesScale() ) );
-		
-		if( !_physics ) {
-			GetLogger( LogMessageType::Error )( UTF8L("Error creating PhysX object!") ET_UTF8_NEWLINE_LITERAL );
-
+	//	Create the core PhysX object used to create scenes, actors, shapes, etc.
+		UniquePointer<PxPhysics>	physics( PxCreatePhysics( PX_PHYSICS_VERSION, *foundation, PxTolerancesScale() ) );
+		if( !physics ) {
+			_log( MessageSeverity::Error, "Error creating PhysX object!" ET_UTF8_NEWLINE_LITERAL );
 			return;
 		}
 
-		GetLogger()( UTF8L("PhysX SDK objects created successfully.") ET_UTF8_NEWLINE_LITERAL );
+	//	We will additionally need to create a PxCooking instance to load heightfield shapes.
+		PxCookingParams	cookingParameters( physics->getTolerancesScale() );
+
+		UniquePointer<PxCooking>	cooking( PxCreateCooking( PX_PHYSICS_VERSION, physics->getFoundation(), cookingParameters ) );
+		if( !cooking ) {
+			_log( MessageSeverity::Error, "Error creating PhysX cooking object!" ET_UTF8_NEWLINE_LITERAL );
+			return;
+		}
+
+		_log( MessageSeverity::Message, "PhysX SDK objects created successfully." ET_UTF8_NEWLINE_LITERAL );
+
+	//	Commit changes to the service.
+		_foundation = eastl::move( foundation );
+		_physics	= eastl::move( physics );
+		_cooking	= eastl::move( cooking );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		WorldView::ExposeScriptAPI( visitor );
+	void EngineService::AcceptVisitor( ApiRegistrar& registrar ) {
+		WorldService::RegisterScriptApi( registrar );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
-		_meshViewFactory.AcceptInitializationVisitor( visitor );
+	void EngineService::AcceptVisitor( ConfigurationRegistrar& registrar ) {
+		registrar.BeginSection( "PhysX" )
+			.Register( "MaximumTaskCount", _taskCount );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( MeshViewFactory::GetSerializedDataTag(), _meshViewFactory );
+	void EngineService::AcceptVisitor( AssetViewFactoryRegistrar& registrar ) {
+		registrar.Publish( AssetViews::ArmatureView::GetExtension(), [] ( Allocator& allocator, const AssetLibrary& library, const Utf8Char* const name, Range<const char*> rawBytes ) {
+				return AssetViews::ArmatureView::CreateView( allocator, library, name, rawBytes );
+			} )
+			.Publish( AssetViews::SkeletalColliderView::GetExtension(), [this] ( Allocator& allocator, const AssetLibrary& library, const Utf8Char* const name, Range<const char*> rawBytes ) {
+				return AssetViews::SkeletalColliderView::CreateView( allocator, *_physics, library, name, rawBytes );
+			} )
+			.Publish( AssetViews::TerrainView::GetExtension(), [this] ( Allocator& allocator, const AssetLibrary& library, const Utf8Char* const name, Range<const char*> rawBytes ) {
+				return AssetViews::TerrainView::CreateView( allocator, *_cooking, *_physics, library, name, rawBytes );
+			} );
 	}
 
 // ---------------------------------------------------
 
 	void* EngineService::allocate( size_t sizeInBytes, const char* /*typeName*/, const char* /*filename*/, int /*line*/ ) {
-		return GetEngineAllocator().Allocate( sizeInBytes, 16u, Allocator::AllocationDuration::Normal );
+		void* const	result( _allocator.Allocate( sizeInBytes + PaddingInBytes, RequiredAlignment, 0u, AllocationDuration::Normal ) );
+
+		if( !result ) {
+			return nullptr;
+		}
+
+		static_cast<size_t*>(result)[PaddingInBytes/sizeof(size_t) - 1] = sizeInBytes;
+
+		return static_cast<char*>(result) + PaddingInBytes;
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::deallocate( void* ptr ) {
-		if( ptr ) {
-			GetEngineAllocator().Deallocate( ptr, ::Eldritch2::AlignedDeallocationSemantics );
+	void EngineService::deallocate( void* memory ) {
+		if( ETBranchUnlikelyHint( !memory ) ) {
+			return;
 		}
+
+		_allocator.Deallocate( static_cast<char*>(memory) - PaddingInBytes, static_cast<size_t*>(memory)[-1] );
 	}
 
 // ---------------------------------------------------
 
 	void EngineService::reportError( PxErrorCode::Enum code, const char* message, const char* file, int line ) {
 		if( code & PxErrorCode::Enum::eDEBUG_WARNING ) {
-			GetLogger( LogMessageType::VerboseWarning )( UTF8L("PhysX debug warning ({0}({1}): {2}") ET_UTF8_NEWLINE_LITERAL, file, line, message );
+			_log( MessageSeverity::Warning, "PhysX debug warning ({}({}): {}" ET_UTF8_NEWLINE_LITERAL, file, line, message );
+			return;
 		}
 
 		if( code & PxErrorCode::Enum::ePERF_WARNING ) {
-			GetLogger( LogMessageType::Warning )( UTF8L("PhysX performance warning ({0}({1}): {2}") ET_UTF8_NEWLINE_LITERAL, file, line, message );
+			_log( MessageSeverity::Warning, "PhysX performance warning ({}({}): {}" ET_UTF8_NEWLINE_LITERAL, file, line, message );
+			return;
 		}
+
+		_log( MessageSeverity::Error, "PhysX error ({}{}): {}" ET_UTF8_NEWLINE_LITERAL, file, line, message );
 	}
 
 // ---------------------------------------------------
 
 	PxU32 EngineService::getWorkerCount() const {
-		return static_cast<PxU32>(GetGameEngine().GetThreadScheduler().GetMaximumTaskParallelism());
+		return _taskCount;
 	}
 
 // ---------------------------------------------------
 
 	void EngineService::submitTask( PxBaseTask& task ) {
-		auto	ExecuteTask( [] ( void* task, WorkerContext& /*executingContext*/ ) {
-			MICROPROFILE_SCOPEI( "PhysX Physics Engine", "Scene update task", 0x22FF22 );
-
-			static_cast<PxBaseTask*>(task)->run();
-			static_cast<PxBaseTask*>(task)->release();
-		} );
-
-		if( const auto workerContext = WorkerContext::GetActiveWorkerContext() ) {
-			workerContext->Enqueue( _dummyCounter, { &task, ExecuteTask } );
-		} else {
+		GetActiveJobFiber().Enqueue( _simulateBarrier, [&task] ( JobFiber& /*fiber*/ ) {
+			MICROPROFILE_SCOPEI( "PhysX", task.getName(), 0x76b900 );
 			task.run();
 			task.release();
-		}
+		} );
 	}
 
 }	// namespace PhysX

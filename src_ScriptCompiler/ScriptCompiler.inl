@@ -14,9 +14,10 @@
 //==================================================================//
 #include <FlatBufferMetadataBuilderVisitor.hpp>
 #include <FileSystem/SynchronousFileWriter.hpp>
-#include <Utility/Memory/InstanceDeleters.hpp>
+#include <Utility/Memory/InstanceDeleter.hpp>
 #include <Scripting/AngelScript/ApiExport.hpp>
 #include <Utility/Containers/Range.hpp>
+//------------------------------------------------------------------//
 #include <iostream>
 //------------------------------------------------------------------//
 
@@ -42,7 +43,7 @@ namespace Tools {
 																			 _engineApiDescriptorPath( { GetAllocator(), UTF8L("Engine API Descriptor Path Allocator") } ),
 																			 _inputFiles( { GetAllocator(), UTF8L("Input File Name Collection Allocator") } ) {
 		auto callback( [] ( const asSMessageInfo* msg, void* /*param*/ ) {
-			::std::cerr << msg->section << '(' << msg->row << ", " << msg->col << "): " << msg->message << ::std::endl;
+			std::cerr << msg->section << '(' << msg->row << ", " << msg->col << "): " << msg->message << std::endl;
 		} );
 
 		_engine->SetMessageCallback( asFunctionPtr( static_cast<void (ETStdCall*)(const asSMessageInfo*, void*)>(callback) ), nullptr, ::asECallConvTypes::asCALL_STDCALL );
@@ -147,28 +148,28 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::Process() {
-		class OutputStream : public ::asIBinaryStream {
+		class OutputStream : public asIBinaryStream {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref OutputStream instance.
-			ETInlineHint OutputStream( ::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>&& writer ) : writer( ::std::move( writer ) ) {}
+		//!	Constructs this @ref OutputStream instance.
+			ETInlineHint OutputStream( Eldritch2::UniquePointer<FileSystem::SynchronousFileWriter>&& writer ) : writer( std::move( writer ) ) {}
 
 			~OutputStream() = default;
 
 		// ---------------------------------------------------
 
-			void Read( void* /*destination*/, ::asUINT /*sizeInBytes*/ ) override {
-				// This space intentionally left blank.
+			void Read( void* /*destination*/, asUINT /*sizeInBytes*/ ) override {
+			//	This space intentionally blank.
 			}
 
-			void Write( const void* source, ::asUINT sizeInBytes ) override {
+			void Write( const void* source, asUINT sizeInBytes ) override {
 				writer->Write( source, sizeInBytes );
 			}
 
 		// - DATA MEMBERS ------------------------------------
 
-			::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>	writer;
+			Eldritch2::UniquePointer<FileSystem::SynchronousFileWriter>	writer;
 		};
 
 	// ---
@@ -187,18 +188,18 @@ namespace Tools {
 			}
 		}
 
-		// Collate all the source script files together.
+	//	Collate all the source script files together.
 		for( const auto& fileName : _inputFiles ) {
-			// Create a view of the source script file.
+		//	Create a view of the source script file.
 			auto	mappedFile( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), fileName.AsCString() ) );
 
-			// Try to append all the data from source.
+		//	Try to append all the data from source.
 			if( !mappedFile || (0 > GetScriptBuilder().AddSectionFromMemory( fileName.AsCString(), static_cast<const char*>(mappedFile->GetAddressForFileByteOffset( 0u )), mappedFile->GetAccessibleRegionSizeInBytes() )) ) {
 				return -1;
 			}
 		}
 
-		if( (::asSUCCESS != GetScriptBuilder().BuildModule()) || (::asSUCCESS != GetScriptBuilder().GetModule()->SaveByteCode( &stream )) ) {
+		if( (asERetCodes::asSUCCESS != GetScriptBuilder().BuildModule()) || (asERetCodes::asSUCCESS != GetScriptBuilder().GetModule()->SaveByteCode( &stream )) ) {
 			return -1;
 		}
 
@@ -208,16 +209,16 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetOutputModuleName( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetOutputModuleName( const Eldritch2::Utf8Char* const argument, const Eldritch2::Utf8Char* const argumentEnd ) {
 		_outputModuleName.Assign( argument, argumentEnd ).EnsureEndsWith( Scripting::AngelScript::FlatBuffers::ModuleMetadataExtension() );
 
-		// Ensure we don't leak resources.
+	//	Ensure we don't leak resources.
 		if( auto existingModule = GetScriptBuilder().GetModule() ) {
 			existingModule->Discard();
 		}
 
-		// Internally, the module name won't have the extension.
-		const UTF8String<>	moduleName( _outputModuleName.Begin(),
+	//	Internally, the module name won't have the extension.
+		const Utf8String<>	moduleName( _outputModuleName.Begin(),
 										_outputModuleName.FindFirstInstance( Scripting::AngelScript::FlatBuffers::ModuleMetadataExtension() ),
 										{ _outputModuleName.GetAllocator().GetParent(), UTF8L("Script Module Name Temp Allocator") } );
 		
@@ -229,7 +230,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetApiDescriptorPath( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::SetApiDescriptorPath( const Eldritch2::Utf8Char* const argument, const Eldritch2::Utf8Char* const argumentEnd ) {
 		_engineApiDescriptorPath.Assign( argument, argumentEnd );
 
 		if( _engineApiDescriptorPath ) {
@@ -251,7 +252,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::AddInputFile( const ::Eldritch2::UTF8Char* const argument, const ::Eldritch2::UTF8Char* const argumentEnd ) {
+	int ScriptCompiler<GlobalAllocator, FileAccessorFactory>::AddInputFile( const Eldritch2::Utf8Char* const argument, const Eldritch2::Utf8Char* const argumentEnd ) {
 		_inputFiles.PushBack( { argument, argumentEnd, { GetAllocator(), UTF8L("Input File Name Allocator") } } );
 
 		return 0;
@@ -261,15 +262,15 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	void ScriptCompiler<GlobalAllocator, FileAccessorFactory>::RegisterOptions( OptionRegistrationVisitor& visitor ) {
-		using namespace ::std::placeholders;
+		using namespace std::placeholders;
 
 	// ---
 
-		visitor.AddTypedArgument<int>(	UTF8L("--optimizationLevel"),	UTF8L("-o"),	::std::bind( &ScriptCompiler::SetOptimizationLevel, this, _1 ) );
-		visitor.AddArgument(			UTF8L("--moduleName"),			UTF8L("-m"),	::std::bind( &ScriptCompiler::SetOutputModuleName, this, _1, _2 ) );
-		visitor.AddArgument(			UTF8L("--apiDescriptorPath"),	UTF8L("-a"),	::std::bind( &ScriptCompiler::SetApiDescriptorPath, this, _1, _2 ) );
+		visitor.AddTypedArgument<int>(	"--optimizationLevel",	"-o",	std::bind( &ScriptCompiler::SetOptimizationLevel, this, _1 ) );
+		visitor.AddArgument(			"--moduleName",			"-m",	std::bind( &ScriptCompiler::SetOutputModuleName, this, _1, _2 ) );
+		visitor.AddArgument(			"--apiDescriptorPath",	"-a",	std::bind( &ScriptCompiler::SetApiDescriptorPath, this, _1, _2 ) );
 
-		visitor.AddInputFileHandler( ::std::bind( &ScriptCompiler::AddInputFile, this, _1, _2 ) );
+		visitor.AddInputFileHandler( std::bind( &ScriptCompiler::AddInputFile, this, _1, _2 ) );
 		
 	}
 

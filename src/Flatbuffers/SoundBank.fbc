@@ -1,0 +1,16 @@
+file_identifier	"ESBF";
+file_extension	".E2SoundBank";
+
+namespace Eldritch2.Sound.FlatBuffers;
+
+table Cue {
+	Name	: string (required, key);
+	Offset	: ulong;
+	Length	: ulong;
+}
+
+table SoundBank {
+	Cues	: [Cue];
+}
+
+root_type SoundBank;

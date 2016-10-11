@@ -13,18 +13,18 @@
 // INCLUDES
 //==================================================================//
 #include <FileSystem/ReadableMemoryMappedFile.hpp>
-#include <Packages/PackageHeader_generated.h>
+#include <Assets/PackageHeader_generated.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	Bakinator<GlobalAllocator, FileAccessorFactory>::Bakinator() : _allocator( UTF8L("Root Allocator") ),
-																   _outputFileName( { GetAllocator(), UTF8L("Output File Name Allocator") } ),
-																   _outputDataBlobName( { GetAllocator(), UTF8L("Output Data Blob File Name Allocator") } ),
-																   _importNames( { GetAllocator(), UTF8L("Imported Package Name Collection Allocator") } ),
-																   _exportNames( { GetAllocator(), UTF8L("Export File Name Collection Allocator") } ) {}
+	Bakinator<GlobalAllocator, FileAccessorFactory>::Bakinator() : _allocator( "Root Allocator" ),
+																   _outputFileName( { GetAllocator(), "Output File Name Allocator" } ),
+																   _outputDataBlobName( { GetAllocator(), "Output Data Blob File Name Allocator" } ),
+																   _importNames( { GetAllocator(), "Imported Package Name Collection Allocator" } ),
+																   _exportNames( { GetAllocator(), "Export File Name Collection Allocator" } ) {}
 
 // ---------------------------------------------------
 
@@ -44,14 +44,14 @@ namespace Tools {
 
 	template <class GlobalAllocator, class FileAccessorFactory>
 	void Bakinator<GlobalAllocator, FileAccessorFactory>::RegisterOptions( OptionRegistrationVisitor& visitor ) {
-		using namespace ::std::placeholders;
+		using namespace std::placeholders;
 
 	// ---
 
-		visitor.AddArgument( UTF8L("--import"),			UTF8L("-i"),	::std::bind( &Bakinator::AddImport, this, _1, _2 ) );
-		visitor.AddArgument( UTF8L("--packageName"),	UTF8L("-n"),	::std::bind( &Bakinator::SetOutputFileName, this, _1, _2 ) );
+		visitor.AddArgument( "--import",		"-i",	std::bind( &Bakinator::AddImport, this, _1, _2 ) );
+		visitor.AddArgument( "--packageName",	"-n",	std::bind( &Bakinator::SetOutputFileName, this, _1, _2 ) );
 
-		visitor.AddInputFileHandler( ::std::bind( &Bakinator::AddExport, this, _1, _2 ) );
+		visitor.AddInputFileHandler( std::bind( &Bakinator::AddExport, this, _1, _2 ) );
 	}
 
 // ---------------------------------------------------
@@ -63,8 +63,8 @@ namespace Tools {
 
 	// ---
 
-		ResizableArray<Offset<flatbuffers::String>>	pendingImports( { GetAllocator(), UTF8L("Pending Import Collection Allocator") } );
-		ResizableArray<Offset<Export>>				pendingExports( { GetAllocator(), UTF8L("Pending Export Collection Allocator") } );
+		ResizableArray<Offset<flatbuffers::String>>	pendingImports( { GetAllocator(), "Pending Import Collection Allocator" } );
+		ResizableArray<Offset<Export>>				pendingExports( { GetAllocator(), "Pending Export Collection Allocator" } );
 		FlatBufferBuilder							builder;
 		uint64										dataBlobSize( 0u );
 		auto										outputWriter( GetFileAccessorFactory().CreateWriter( GetAllocator(), _outputFileName.AsCString() ) );
@@ -76,9 +76,9 @@ namespace Tools {
 
 		for( const auto& exportName : _exportNames ) {
 			const auto			extensionPosition( exportName.FindLastInstance( UTF8L('.') ) );
-			const auto			fileNamePosition( exportName.FindLastInstance( ET_UTF8_DIR_SEPARATOR ) );
-			const UTF8String<>	inPackageName( (fileNamePosition != exportName.End() ? fileNamePosition + 1 : exportName.Begin()), extensionPosition, { GetAllocator(), UTF8L("Export In-Package Name Allocator") } );
-			const UTF8String<>	typeName( extensionPosition, exportName.End(), { GetAllocator(), UTF8L("Export Type Name Allocator") } );
+			const auto			fileNamePosition( exportName.FindLastInstance( ET_DIR_SEPARATOR ) );
+			const Utf8String<>	inPackageName( (fileNamePosition != exportName.End() ? fileNamePosition + 1 : exportName.Begin()), extensionPosition, { GetAllocator(), "Export In-Package Name Allocator" } );
+			const Utf8String<>	typeName( extensionPosition, exportName.End(), { GetAllocator(), "Export Type Name Allocator" } );
 			auto				reader( GetFileAccessorFactory().CreateReadableMemoryMappedFile( GetAllocator(), exportName.AsCString() ) );
 
 			// Ensure the file was opened.
@@ -103,8 +103,8 @@ namespace Tools {
 
 		FinishPackageHeaderBuffer( builder,
 								   CreatePackageHeader( builder,
-								   						pendingImports ? builder.CreateVector( pendingImports.Data(), pendingImports.Size() ) : 0,
-								   						pendingExports ? builder.CreateVector( pendingExports.Data(), pendingExports.Size() ) : 0 ) );
+								   						pendingImports ? builder.CreateVector( pendingImports.Data(), pendingImports.GetSize() ) : 0,
+								   						pendingExports ? builder.CreateVector( pendingExports.Data(), pendingExports.GetSize() ) : 0 ) );
 
 		outputWriter->Write( builder.GetBufferPointer(), builder.GetSize() );
 
@@ -114,9 +114,9 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int	Bakinator<GlobalAllocator, FileAccessorFactory>::SetOutputFileName( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd ) {
+	int	Bakinator<GlobalAllocator, FileAccessorFactory>::SetOutputFileName( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd ) {
 		_outputFileName.Assign( name, nameEnd ).EnsureEndsWith( FileSystem::FlatBuffers::PackageHeaderExtension() );
-		_outputDataBlobName.Assign( _outputFileName.Begin(), _outputFileName.FindLastInstance( UTF8L('.') ) );
+		_outputDataBlobName.Assign( _outputFileName.Begin(), _outputFileName.FindLastInstance( '.' ) );
 
 		return 0;
 	}
@@ -124,8 +124,8 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int	Bakinator<GlobalAllocator, FileAccessorFactory>::AddImport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd ) {
-		_importNames.PushBack( { name, nameEnd, { GetAllocator(), UTF8L("Import Name Allocator") } } );
+	int	Bakinator<GlobalAllocator, FileAccessorFactory>::AddImport( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd ) {
+		_importNames.PushBack( { name, nameEnd, { GetAllocator(), "Import Name Allocator" } } );
 
 		return 0;
 	}
@@ -133,8 +133,8 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int	Bakinator<GlobalAllocator, FileAccessorFactory>::AddExport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd ) {
-		_exportNames.PushBack( { name, nameEnd, { GetAllocator(), UTF8L("Export Name Allocator") } } );
+	int	Bakinator<GlobalAllocator, FileAccessorFactory>::AddExport( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd ) {
+		_exportNames.PushBack( { name, nameEnd, { GetAllocator(), "Export Name Allocator" } } );
 
 		return 0;
 	}

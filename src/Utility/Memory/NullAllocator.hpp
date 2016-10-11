@@ -17,34 +17,29 @@
 
 namespace Eldritch2 {
 
-	class NullAllocator : public ::Eldritch2::Allocator {
+	class NullAllocator : public Eldritch2::Allocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
-		//!	Constructs this @ref NullAllocator instance.
+	protected:
+	//!	Constructs this @ref NullAllocator instance.
+		NullAllocator( const NullAllocator& ) = delete;
+	//!	Constructs this @ref NullAllocator instance.
 		NullAllocator();
 
-		//!	Destroys this @ref NullAllocator instance.
 		~NullAllocator() = default;
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) override sealed;
+	public:
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal ) override sealed;
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) override sealed;
 
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType sizeInBytes, const ReallocationOptions options ) override sealed;
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
-
-		void					Deallocate( void* const address ) override sealed;
-		void					Deallocate( void* const address, const AlignedDeallocationSemanticsTag ) override sealed;
-
-	// - ALLOCATION STATISTICS ---------------------------
-
-		SizeType	EstimateActualAllocationSizeInBytes( const SizeType allocationSizeInBytes, const SizeType alignmentInBytes ) const override sealed;
+		void					Deallocate( void* const address, SizeType sizeInBytes ) override sealed;
 
 	// ---------------------------------------------------
 
-		static ::Eldritch2::NullAllocator&	GetInstance();
+	public:
+		static Eldritch2::NullAllocator&	GetInstance();
 	};
 
 }	// namespace Eldritch2

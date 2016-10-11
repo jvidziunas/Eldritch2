@@ -46,7 +46,7 @@ namespace AngelScript {
 
 	// ---
 
-		auto&	rootAllocator( _rootAllocator );
+		auto&	rootAllocator( _allocator );
 
 		return archive( Archive::AdaptMap( _typeMetadata, [&rootAllocator] () -> TypeMetadataCollection::ValueType { return { 0u, { rootAllocator } }; } ),
 						Archive::AdaptMap( _functionMetadata ) );

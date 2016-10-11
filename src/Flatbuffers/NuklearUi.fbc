@@ -1,0 +1,105 @@
+file_identifier	"NKUI";
+file_extension	".NuklearUI";
+
+struct Color {
+	Red				: ubyte;
+	Green			: ubyte;
+	Blue			: ubyte;
+	Alpha			: ubyte;
+}
+
+table ImageReference {
+	Path			: string (required);
+}
+
+table TextElement {
+	TextLiteral		: string;
+	BindingPath		: string;
+}
+
+table ImageElement {
+	Image			: ImageReference (required);
+}
+
+table TextButton {
+	TextLiteral		: string (required);
+	BindingPath		: string (required);
+	ClickEventName	: string;
+}
+
+table ColorButton {
+	ColorLiteral	: Color;
+	BindingPath		: string;
+	ClickEventName	: string;
+}
+
+table ImageButton {
+	Image			: ImageReference (required);
+	ClickEventName	: string;
+}
+
+table Checkbox {
+	BindingPath		: string (required);
+}
+
+table RadioElement {
+	BindingPath		: string (required);
+}
+
+table RadioSelector {
+	BindingPath		: string;
+	Elements		: [RadioElement] (required);
+}
+
+table FloatSlider {
+	StepValue		: float;
+	MinimumValue	: float;
+	MaximumValue	: float;
+	BindingPath		: string (required);
+}
+
+table IntSlider {
+	StepValue		: int;
+	MinimumValue	: int;
+	MaximumValue	: int;
+	BindingPath		: string (required);
+}
+
+table LdrColorPicker {
+	BindingPath		: string (required);
+}
+
+table TextEditor {
+	BindingPath		: string (required);
+}
+
+union Widget {
+	TextElement,
+	ImageElement,
+	TextButton,
+	ColorButton,
+	ImageButton,
+	Checkbox,
+	RadioSelector,
+	FloatSlider,
+	IntSlider,
+	LdrColorPicker,
+	TextEditor
+}
+
+enum WindowBehaviors : uint (bit_flags) {
+	Border,
+	BorderHeader,
+	Movable,
+	Scalable,
+	Closable,
+	Minimizable,
+	Dynamic,
+	NoScrollbar,
+	Title
+}
+
+enum PopupType : uint {
+	Static,
+	Dynamic
+}

@@ -16,26 +16,19 @@
 
 namespace Eldritch2 {
 
-	ETInlineHint size_t SpatialHasher::operator()( const CellIndex cellIndex ) const {
+	ETInlineHint size_t ETSimdCall SpatialHasher::operator()( CellIndex cellIndex ) const {
 		return (cellIndex.coordinates[0] * 73856093u) ^ (cellIndex.coordinates[1] * 19349663u) ^ (cellIndex.coordinates[2] * 83492791u);
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint size_t SpatialHasher::operator()( const ::Eldritch2::Float4 position ) const {
-		const ::Eldritch2::Float4	cellCoordinates( ::Eldritch2::Floor( position * _inverseResolution ) );
-
-		return (*this)( cellCoordinates );
+	ETInlineHint size_t ETSimdCall SpatialHasher::operator()( Eldritch2::Float4 position ) const {
+		return (*this)( Eldritch2::Floor( position * _inverseResolution ) );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, typename Allocator, int loadFactor>
-	ETInlineHint SpatialHash<StoredObject, Hasher, Allocator, loadFactor>::SpatialHash( Hasher&& hasher, AllocatorType&& allocator ) : UnderlyingContainer( ::std::forward<Hasher>( hasher ), ::std::forward<AllocatorType>( allocator ) ) {}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, typename Allocator, int loadFactor>
-	ETInlineHint SpatialHash<StoredObject, Hasher, Allocator, loadFactor>::SpatialHash( AllocatorType&& allocator ) : UnderlyingContainer( ::std::forward<AllocatorType>( allocator ) ) {}
+	template <typename Value, class Hasher, typename Allocator>
+	ETInlineHint SpatialHash<Value, Hasher, Allocator>::SpatialHash( const HashPredicateType& hashPredicate, const AllocatorType& allocator ) : UnderlyingContainer( hashPredicate, allocator ) {}
 
 }	// namespace Eldritch2

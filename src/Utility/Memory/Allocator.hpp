@@ -24,118 +24,59 @@
 
 namespace Eldritch2 {
 
+	enum AllocationDuration {
+		Temporary = 0,
+		Normal = 1,
+		Permanent = 2
+	};
+
+// ---
+
 	class ETPureAbstractHint Allocator {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		typedef size_t					SizeType;
-		typedef ::Eldritch2::ptrdiff	DifferenceType;
-		typedef ::Eldritch2::uint32		AllocationOptions;
-		typedef ::Eldritch2::uint32		ReallocationOptions;
-
-	// ---
-
-		enum AllocationDuration : AllocationOptions {
-			Temporary	= 0,
-			Normal		= 1
-		};
-
-	// ---
-
-		enum ReallocationOption : ReallocationOptions {
-			FailOnMove	= 2u
-		};
-
-	// ---
-
-		struct AlignedDeallocationSemanticsTag {};
-
-	// - MEMORY ALLOCATION/DEALLOCATION ------------------
-
-		//! Allocates a contiguous chunk of memory with the specified length using the passed-in allocation behavior options.
-		virtual ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) abstract;
-		//! Allocates a contiguous chunk of memory with the specified length and alignment using the passed-in allocation behavior options.
-		virtual ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options );
-
-		//! Attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size. The contents of the source memory are then copied over into the new region, if appropriate.
-		virtual ETRestrictHint void*	Reallocate( void* const address, const SizeType sizeInBytes, const ReallocationOptions options ) abstract;
-		//! Attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size. The contents of the source memory are then copied over into the new region, if appropriate.
-		virtual ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) abstract;
-
-		//! Releases a chunk of memory previously allocated by @ref Allocate() or @ref Reallocate().
-		virtual void					Deallocate( void* const address ) abstract;
-		//! Releases a chunk of memory previously allocated by @ref Allocate() or @ref Reallocate() WITH aligned semantics.
-		virtual void					Deallocate( void* const address, const AlignedDeallocationSemanticsTag );
-
-	// ---------------------------------------------------
-
-		//! Given an object known to have been allocated from this @ref Allocator, calls the destructor for the given object and then releases its memory back to the @ref Allocator for later use.
-		template <typename Object>
-		ETForceInlineHint void	Delete( Object& object );
-		//!	Given an object known to have been allocated from this @ref Allocator, calls the destructor for the given object and then releases its memory back to the @ref Allocator for later use.
-		template <typename Object>
-		ETForceInlineHint void	Delete( Object* const object );
-		//!	Given an object known to have been allocated from this @ref Allocator, calls the destructor for the given object and then releases its memory back to the @ref Allocator for later use.
-		template <typename Object>
-		ETForceInlineHint void	Delete( Object& object, const AlignedDeallocationSemanticsTag );
-		//!	Given an object known to have been allocated from this @ref Allocator, calls the destructor for the given object and then releases its memory back to the @ref Allocator for later use.
-		template <typename Object>
-		ETForceInlineHint void	Delete( Object* const object, const AlignedDeallocationSemanticsTag );
-
-	// - DEBUG INFORMATION -------------------------------
-
-		//! Gets a human-readable string identifying the allocator.
-		const ::Eldritch2::UTF8Char*	GetName() const;
+		using DifferenceType	= Eldritch2::ptrdiff;
+		using SizeType			= size_t;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//! Constructs this @ref Allocator instance.
-		Allocator( const ::Eldritch2::UTF8Char*	const name );
-		//! Constructs this @ref Allocator instance.
-		Allocator( ::Eldritch2::Allocator&& allocator );
+	//! Constructs this @ref Allocator instance.
+		Allocator( const Eldritch2::Utf8Char* const name );
+	//! Constructs this @ref Allocator instance.
+		Allocator( const Allocator& ) = default;
 		
-		//! Destroys this @ref Allocator instance.
 		~Allocator() = default;
 
-	// - ALLOCATION STATISTICS ---------------------------
+	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
-		static ETNoAliasHint void*	GetAllocationPointerFromAlignedUserPointer( void* userPointer );
+	public:
+	//! Allocates a contiguous chunk of memory with the specified length and alignment using the passed-in allocation behavior duration.
+		virtual ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal ) abstract;
+	//! Allocates a contiguous chunk of memory with the specified length using the passed-in allocation behavior duration.
+		virtual ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) abstract;
 
-		//! Provides a conservative estimate for the amount of space that will actually be requested for accommodating an aligned allocation request.
-		virtual SizeType			EstimateActualAllocationSizeInBytes( const SizeType allocationSizeInBytes, const SizeType alignmentInBytes ) const;
+	//! Releases a chunk of memory previously allocated by @ref Allocate().
+		virtual void					Deallocate( void* const address, SizeType sizeInBytes ) abstract;
 
-	// - DATA MEMBERS ------------------------------------
+	// - DEBUG INFORMATION -------------------------------
 
-		const ::Eldritch2::UTF8Char*	_name;
+	public:
+	//! Gets a human-readable string identifying the allocator.
+		const Eldritch2::Utf8Char*	GetName() const;
+
+		void						SetName( const Eldritch2::Utf8Char* const name );
 
 	// ---------------------------------------------------
 
+	public:
+		Allocator&	operator=( const Allocator& ) = default;
+
+	// - DATA MEMBERS ------------------------------------
+
 	private:
-		//! Disable assignment.
-		::Eldritch2::Allocator&	operator=( const ::Eldritch2::Allocator& ) = delete;
+		const Eldritch2::Utf8Char*	_name;
 	};
 
-// ---------------------------------------------------
-
-	template <typename ObjectType>
-	ETForceInlineHint ETNoAliasHint ObjectType*	AllocateTemporaryArray( ::Eldritch2::Allocator& allocator, size_t arraySizeInObjects );
-	template <typename ObjectType>
-	ETForceInlineHint ETNoAliasHint ObjectType*	AllocateTemporaryArray( ::Eldritch2::Allocator& allocator, size_t arraySizeInObjects, size_t arrayAlignmentInBytes );
-
-	template <typename ObjectType>
-	ETForceInlineHint void						DeleteTemporaryArray( ::Eldritch2::Allocator& allocator, ObjectType* const allocatedArray );
-	template <typename ObjectType>
-	ETForceInlineHint void						DeleteTemporaryArray( ::Eldritch2::Allocator& allocator, ObjectType* const allocatedArray, const ::Eldritch2::Allocator::AlignedDeallocationSemanticsTag );
-
-// ---------------------------------------------------
-
-	extern const Allocator::AlignedDeallocationSemanticsTag	AlignedDeallocationSemantics;
-
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Utility/Memory/Allocator.inl>
-//------------------------------------------------------------------//

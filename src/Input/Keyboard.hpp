@@ -12,40 +12,25 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scripting/ReferenceCountable.hpp>
-#include <Utility/MPL/IntTypes.hpp>
+#include <Utility/Mpl/IntTypes.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-	namespace Scripting {
-		class	ScriptApiRegistrationInitializationVisitor;
-	}
-}
 
 namespace Eldritch2 {
 namespace Input {
 
-	class Keyboard : public Scripting::ReferenceCountable {
+	class Keyboard {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Keyboard instance.
+	//!	Constructs this @ref Keyboard instance.
 		Keyboard() = default;
 
 		~Keyboard() = default;
 
-	// - SCRIPT API REFERENCE ----------------------------
-
-		//!	Registers all script-callable methods for the @ref Keyboard type with the specified script type registrar.
-		static ETNoAliasHint void	ExposeScriptAPI( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar );
-
 	// - DATA MEMBERS ------------------------------------
 
-	public:
-		static const char* const	scriptTypeName;
-
 	protected:
-		unsigned char	_keyStates[256];
+		unsigned char	_keyStates[256u];
 	};
 
 }	// namespace Input

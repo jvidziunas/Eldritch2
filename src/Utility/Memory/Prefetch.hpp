@@ -12,22 +12,22 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/Compiler.hpp>
+#include <Utility/MPL/Platform.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
 	template<typename T>
-	ETForceInlineHint void	Level0Prefetch( const T& data );
+	void	Level0Prefetch( const T& data );
 
 	template<typename T>
-	ETForceInlineHint void	Level1Prefetch( const T& data );
+	void	Level1Prefetch( const T& data );
 
 	template<typename T>
-	ETForceInlineHint void	Level2Prefetch( const T& data );
+	void	Level2Prefetch( const T& data );
 
 	template<typename T>
-	ETForceInlineHint void	NonTemporalWrite( T& destination, const T& data );
+	void	NonTemporalWrite( T& destination, const T& data );
 
 }	// namespace Eldritch2
 

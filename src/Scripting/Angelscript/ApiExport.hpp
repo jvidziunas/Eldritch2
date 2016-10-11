@@ -16,9 +16,9 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace FileSystem {
-		class	ReadableMemoryMappedFile;
+	namespace Platform {
 		class	SynchronousFileWriter;
+		class	MemoryMappedFile;
 	}
 
 	class	Allocator;
@@ -31,9 +31,9 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	::Eldritch2::ErrorCode	ExportScriptApi( ::Eldritch2::Allocator& allocator, ::asIScriptEngine& engine, FileSystem::SynchronousFileWriter& writer );
+	Eldritch2::ErrorCode	ExportScriptApi( Eldritch2::Allocator& allocator, asIScriptEngine& engine, Platform::SynchronousFileWriter& writer );
 
-	::Eldritch2::ErrorCode	ImportScriptApi( ::Eldritch2::Allocator& allocator, ::asIScriptEngine& engine, const FileSystem::ReadableMemoryMappedFile& file );
+	Eldritch2::ErrorCode	ImportScriptApi( Eldritch2::Allocator& allocator, asIScriptEngine& engine, const Platform::MemoryMappedFile& file );
 
 }	// namespace AngelScript
 }	// namespace Scripting

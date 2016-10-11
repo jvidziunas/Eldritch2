@@ -11,291 +11,322 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Containers/Range.hpp>
-#include <Utility/Algorithms.hpp>
-#include <type_traits>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashMap( AllocatorType&& allocator ) : HashMap( Hasher(), ::std::move( allocator ) ) {}
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashMap( const HashPredicateType& hashPredicate, const KeyEqualityPredicateType& keyEqualityPredicate, const AllocatorType& allocator ) : _underlyingContainer( hashPredicate, keyEqualityPredicate, allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashMap( Hasher&& hasher, AllocatorType&& allocator ) : _underlyingContainer( 0u, ::std::move( hasher ), ::std::move( allocator ) ) {}
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashMap( const Eldritch2::HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>& containerTemplate ) : _underlyingContainer( containerTemplate._underlyingContainer ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <class AlternateAllocator, int alternateLoadFactor>
-	ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashMap( const ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate, ::std::move( allocator ) ) {}
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashMap( SizeType sizeHint, const AllocatorType& allocator ) : _underlyingContainer( sizeHint, HashPredicateType(), KeyEqualityPredicateType(), allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashMap( ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashMap( const AllocatorType& allocator ) : _underlyingContainer( allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const KeyType& key ) {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashMap( Eldritch2::HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>&& moveSource ) : _underlyingContainer( eastl::move( moveSource._underlyingContainer ) ) {}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Find( const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate ) const {
+		return _underlyingContainer.find_as( key, hashPredicate, keyEqualityPredicate );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Find( const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate ) {
+		return _underlyingContainer.find_as( key, hashPredicate, keyEqualityPredicate );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Find( const KeyType& key ) {
 		return _underlyingContainer.find( key );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <typename AlternateKey>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const AlternateKey& key ) {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Find( const KeyType& key ) const {
 		return _underlyingContainer.find( key );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const KeyType& key ) const {
-		return _underlyingContainer.find( key );
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <typename AlternateKey>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const AlternateKey& key ) const {
-		return _underlyingContainer.find( key );
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
 	template <typename Predicate>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::RemoveIf( Predicate predicate ) {
+	ETInlineHint void HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::RemoveIf( Predicate predicate ) {
 		for( Iterator element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
 			if( predicate( *element ) ) {
-				Erase( element++ );
-			} else {
-				++element;
+				element = _underlyingContainer.erase( element );
+				continue;
 			}
+
+			++element;
 		}
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Begin() {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
+	ETInlineHint bool HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ContainsKey( const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate ) const {
+		return this->Find( key, hashPredicate, keyEqualityPredicate ) != this->End();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint bool HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ContainsKey( const KeyType& key ) const {
+		return this->Find( key ) != this->End();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstBegin( SizeType bucketIndex ) const {
+		return _underlyingContainer.begin( bucketIndex );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstBegin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Begin() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstEnd( SizeType bucketIndex ) const {
+		return _underlyingContainer.end( bucketIndex );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstEnd() const {
+		return _underlyingContainer.end();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Begin( SizeType bucketIndex ) const {
+		return _underlyingContainer.begin( bucketIndex );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::LocalIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Begin( SizeType bucketIndex ) {
+		return _underlyingContainer.begin( bucketIndex );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Begin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstBegin() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Begin() {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::End() {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::End( SizeType bucketIndex ) const {
+		return _underlyingContainer.end( bucketIndex );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::LocalIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::End( SizeType bucketIndex ) {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::End() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::End() const {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstEnd() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::End() {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::MappedType& HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::operator[]( KeyType&& key ) {
-		return _underlyingContainer[::std::move( key )];
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::MappedType& HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::operator[]( const KeyType& key ) {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::MappedType& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::operator[]( const KeyType& key ) {
 		return _underlyingContainer[key];
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::operator=( const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate ) {
-		_underlyingContainer = containerTemplate;
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::MappedType& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::operator[]( KeyType&& key ) {
+		return _underlyingContainer[eastl::forward<KeyType>( key )];
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::operator=( const HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>& containerTemplate ) {
+		_underlyingContainer = containerTemplate._underlyingContainer;
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::CloneFrom( const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate ) {
-		_underlyingContainer = containerTemplate._underlyingContainer;
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::operator=( HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>&& containerTemplate ) {
+		_underlyingContainer = eastl::move( containerTemplate._underlyingContainer );
+		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Swap( HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& rhs ) {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint void HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Swap( HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>& rhs ) {
 		_underlyingContainer.swap( rhs );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::InsertResult HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Insert( ValueType&& value ) {
-		return _underlyingContainer.insert( ::std::move( value ) );
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::InsertResult HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Insert( const ValueType& value ) {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint Eldritch2::Pair<typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Insert( const ValueType& value ) {
 		return _underlyingContainer.insert( value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Erase( const KeyType& key ) {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint Eldritch2::Pair<typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Insert( ValueType&& value ) {
+		return _underlyingContainer.insert( eastl::forward<ValueType>( value ) );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	template <typename... Arguments>
+	ETInlineHint Eldritch2::Pair<typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Emplace( Arguments&&... arguments ) {
+		return _underlyingContainer.emplace( eastl::forward<Arguments>( arguments )... );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::SizeType HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Erase( const KeyType& key ) {
 		return _underlyingContainer.erase( key );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Erase( Iterator position ) {
-		_underlyingContainer.erase( position );
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Erase( Iterator begin, Iterator end ) {
+		return _underlyingContainer.erase( begin, end );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Erase( Iterator begin, Iterator end ) {
-		_underlyingContainer.erase( begin, end );
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Iterator HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Erase( Iterator position ) {
+		return _underlyingContainer.erase( position );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Clear() {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint void HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::Clear() {
 		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
 	template <typename Disposer>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ClearAndDispose( Disposer disposer ) {
-		for( auto&& value : _underlyingContainer ) {
+	ETInlineHint void HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::ClearAndDispose( Disposer disposer ) {
+		for( auto& value : _underlyingContainer ) {
 			disposer( value );
 		}
+
 		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Size() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::SizeType HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::GetSize() const {
 		return _underlyingContainer.size();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Empty() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::SizeType HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::IsEmpty() const {
 		return _underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::operator bool() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::operator bool() const {
 		return !_underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Reserve( const SizeType minimumSizeHint ) {
-		_underlyingContainer.reserve( minimumSizeHint );
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename const HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::KeyEqualityPredicateType& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::GetKeyEqualityPredicate() const {
+		return _underlyingContainer.key_eq();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::BucketCount() const {
-		return _underlyingContainer.bucket_count();
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename const HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashPredicateType& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::GetHashPredicate() const {
+		return _underlyingContainer.hash_predicate();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::NonemptyBucketCount() const {
-		return _underlyingContainer.nonempty_bucket_count();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UsedMemory() const {
-		return _underlyingContainer.used_memory();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename const HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::AllocatorType& HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::GetAllocator() const {
+	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename const HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::AllocatorType& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::GetAllocator() const {
 		return _underlyingContainer.get_allocator();
 	}
 
 }	// namespace Eldritch2
-
-namespace std {
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.Begin()) {
-		return collection.Begin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.ConstBegin()) {
-		return collection.ConstBegin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.End()) {
-		return collection.End();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::HashMap<Key, StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.ConstEnd()) {
-		return collection.ConstEnd();
-	}
-
-}	// namespace std

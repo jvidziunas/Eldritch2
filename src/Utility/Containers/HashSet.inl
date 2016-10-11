@@ -14,276 +14,246 @@
 //==================================================================//
 #include <Utility/Containers/Range.hpp>
 #include <Utility/Algorithms.hpp>
-#include <type_traits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashSet( AllocatorType&& allocator ) : HashSet( Hasher(), ::std::move( allocator ) ) {}
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet( const HashPredicate& hashPredicate, const EqualityPredicate& equalityPredicate, const AllocatorType& allocator ) : _underlyingContainer( hashPredicate, equalityPredicate, allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashSet( Hasher&& hasher, AllocatorType&& allocator ) : _underlyingContainer( 0u, ::std::move( hasher ), ::std::move( allocator ) ) {}
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet( const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& containerTemplate, const AllocatorType& allocator ) : _underlyingContainer( containerTemplate._underlyingContainer, allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <class AlternateAllocator, int alternateLoadFactor>
-	ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashSet( const ::Eldritch2::HashSet<StoredObject, Hasher, KeyEqualityComparator, AlternateAllocator, alternateLoadFactor>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate, ::std::move( allocator ) ) {}
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet( const AllocatorType& allocator ) : _underlyingContainer( allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::HashSet( ::Eldritch2::HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet( HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&& moveSource ) : _underlyingContainer( eastl::move( moveSource._underlyingContainer ) ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const KeyType& key ) {
-		return _underlyingContainer.find( key );
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Find( const AlternateValue& value, const AlternateHashPredicate& alternateHashPredicate, const AlternateEqualityPredicate& alternateEqualityPredicate ) const {
+		return _underlyingContainer.find_as( value, alternateHashPredicate, alternateEqualityPredicate );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <typename AlternateKey>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const AlternateKey& key ) {
-		return _underlyingContainer.find( key );
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Find( const AlternateValue& value, const AlternateHashPredicate& alternateHashPredicate, const AlternateEqualityPredicate& alternateEqualityPredicate ) {
+		return _underlyingContainer.find_as( value, alternateHashPredicate, alternateEqualityPredicate );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const KeyType& key ) const {
-		return _underlyingContainer.find( key );
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Find( const ValueType& value ) {
+		return _underlyingContainer.find( value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <typename AlternateKey>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Find( const AlternateKey& key ) const {
-		return _underlyingContainer.find( key );
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Find( const ValueType& value ) const {
+		return _underlyingContainer.find( value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint bool HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Contains( const ValueType& value ) const {
+		return _underlyingContainer.find( value ) != _underlyingContainer.end();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
 	template <typename Predicate>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::RemoveIf( Predicate predicate ) {
-		for( Iterator element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
+	ETInlineHint void HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::RemoveIf( Predicate predicate ) {
+		for( auto element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
 			if( predicate( *element ) ) {
-				Erase( element++ );
-			} else {
-				++element;
+				element = _underlyingContainer.erase( element );
+				continue;
 			}
+
+			++element;	
 		}
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Begin() {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Begin() {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Begin() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Begin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstBegin() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstBegin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Iterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::End() {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::End() {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::End() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::End() const {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstIterator HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ConstEnd() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstEnd() const {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::operator=( const HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate ) {
-		_underlyingContainer = containerTemplate;
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::operator=( const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& other ) {
+		_underlyingContainer = other._underlyingContainer;
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::CloneFrom( const HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& containerTemplate ) {
-		_underlyingContainer = containerTemplate._underlyingContainer;
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::operator=( HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&& other ) {
+		_underlyingContainer = eastl::move( other._underlyingContainer );
+		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Swap( HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& rhs ) {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint void HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Swap( HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& rhs ) {
 		_underlyingContainer.swap( rhs );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::InsertResult HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Insert( ValueType&& value ) {
-		return _underlyingContainer.insert( ::std::move( value ) );
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint Eldritch2::Pair<typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Insert( ValueType&& value ) {
+		return _underlyingContainer.insert( eastl::forward<ValueType>( value ) );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::InsertResult HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Insert( const ValueType& value ) {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	template <typename... Args, class /*SFINAE*/>
+	ETInlineHint Eldritch2::Pair<typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Emplace( Args&&... args ) {
+		return _underlyingContainer.emplace( eastl::forward<Args>( args )... );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	template <class /*SFINAE*/>
+	ETInlineHint Eldritch2::Pair<typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Insert( const ValueType& value ) {
 		return _underlyingContainer.insert( value );
 	}
 
 // ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Erase( const KeyType& key ) {
-		return _underlyingContainer.erase( key );
+	
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase( Iterator begin, Iterator end ) {
+		return _underlyingContainer.erase( begin, end );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Erase( Iterator position ) {
-		_underlyingContainer.erase( position );
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase( Iterator position ) {
+		return _underlyingContainer.erase( position );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Erase( Iterator begin, Iterator end ) {
-		_underlyingContainer.erase( begin, end );
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::SizeType HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase( const ValueType& value ) {
+		return _underlyingContainer.erase( value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Clear() {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint void HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Clear() {
 		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	template <typename Disposer>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::ClearAndDispose( Disposer disposer ) {
-		for( auto&& value : _underlyingContainer ) {
-			disposer( value );
-		}
-		_underlyingContainer.clear();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Size() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::SizeType HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetSize() const {
 		return _underlyingContainer.size();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Empty() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::SizeType HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::IsEmpty() const {
 		return _underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::operator bool() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::operator bool() const {
 		return !_underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint void HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::Reserve( const SizeType minimumSizeHint ) {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint void HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Reserve( SizeType minimumSizeHint ) {
 		_underlyingContainer.reserve( minimumSizeHint );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::BucketCount() const {
-		return _underlyingContainer.bucket_count();
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EqualityPredicateType& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetEqualityPredicate() const {
+		return _underlyingContainer.key_eq();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::NonemptyBucketCount() const {
-		return _underlyingContainer.nonempty_bucket_count();
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashPredicateType& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetHashPredicate() const {
+		return _underlyingContainer.hash_function();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::SizeType HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::UsedMemory() const {
-		return _underlyingContainer.used_memory();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint typename const HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::AllocatorType& HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>::GetAllocator() const {
+	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	ETInlineHint typename const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::AllocatorType& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetAllocator() const {
 		return _underlyingContainer.get_allocator();
 	}
 
 }	// namespace Eldritch2
-
-namespace std {
-
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.Begin()) {
-		return collection.Begin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.ConstBegin()) {
-		return collection.ConstBegin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.End()) {
-		return collection.End();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, class Hasher, class KeyEqualityComparator, class Allocator, int loadFactor>
-	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::HashSet<StoredObject, Hasher, KeyEqualityComparator, Allocator, loadFactor>& collection ) -> decltype(collection.ConstEnd()) {
-		return collection.ConstEnd();
-	}
-
-}	// namespace std
 

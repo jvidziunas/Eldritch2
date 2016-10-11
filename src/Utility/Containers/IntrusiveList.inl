@@ -5,347 +5,318 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2013 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Algorithms.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, typename NodeTraits>
-	IntrusiveList<StoredObject, NodeTraits>::IntrusiveList( const UnderlyingValueTraits& valueTraits ) : _underlyingContainer( valueTraits ) {}
+	template <typename Value>
+	ETInlineHint IntrusiveList<Value>::IntrusiveList( IntrusiveList&& moveSource ) : _underlyingContainer( eastl::move( moveSource._underlyingContainer ) ) {}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	IntrusiveList<StoredObject, NodeTraits>::~IntrusiveList() {}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Predicate>
-	typename IntrusiveList<StoredObject, NodeTraits>::Iterator IntrusiveList<StoredObject, NodeTraits>::Find( Predicate predicate ) {
-		return this->Find( predicate, this->Begin() );
+	ETInlineHint typename IntrusiveList<Value>::ConstIterator IntrusiveList<Value>::Find( ConstIterator searchHint, Predicate predicate ) const {
+		return eastl::find_if( searchHint, _underlyingContainer.end(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Predicate>
-	typename IntrusiveList<StoredObject, NodeTraits>::Iterator IntrusiveList<StoredObject, NodeTraits>::Find( Predicate predicate, Iterator searchHint ) {
-		return ::Eldritch2::Utility::Find( searchHint, this->End(), predicate );
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::Find( Iterator searchHint, Predicate predicate ) {
+		return eastl::find_if( searchHint, _underlyingContainer.end(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Predicate>
-	typename IntrusiveList<StoredObject, NodeTraits>::ConstIterator IntrusiveList<StoredObject, NodeTraits>::Find( Predicate predicate ) const {
-		return this->Find( predicate, this->Begin() );
+	ETInlineHint typename IntrusiveList<Value>::ConstIterator IntrusiveList<Value>::Find( Predicate predicate ) const {
+		return Find( _underlyingContainer.begin(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Predicate>
-	typename IntrusiveList<StoredObject, NodeTraits>::ConstIterator IntrusiveList<StoredObject, NodeTraits>::Find( Predicate predicate, ConstIterator searchHint ) const {
-		return ::Eldritch2::Utility::Find( searchHint, this->End(), predicate );
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::Find( Predicate predicate ) {
+		return Find( _underlyingContainer.begin(), predicate );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Predicate>
-	void IntrusiveList<StoredObject, NodeTraits>::RemoveIf( Predicate predicate ) {
-		_underlyingContainer.remove_if( predicate );
+	ETInlineHint void IntrusiveList<Value>::RemoveIf( Predicate predicate ) {
+		RemoveAndDisposeIf( predicate, [] ( Reference /*unused*/ ) {} );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Predicate, typename Disposer>
-	void IntrusiveList<StoredObject, NodeTraits>::RemoveAndDisposeIf( Predicate predicate, Disposer disposer ) {
-		_underlyingContainer.remove_and_dispose_if( predicate, [&disposer] ( ValueType* const value ) mutable {
-			disposer( *value );
-		} );
+	ETInlineHint void IntrusiveList<Value>::RemoveAndDisposeIf( Predicate predicate, Disposer disposer ) {
+		for( auto element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
+			if( predicate( *element ) ) {
+				auto&	object( *element );
+
+				element = _underlyingContainer.erase( element );
+				disposer( object );
+
+				continue;
+			}
+
+			++element;
+		}
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::Iterator IntrusiveList<StoredObject, NodeTraits>::Begin() {
-		return _underlyingContainer.begin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::ConstIterator IntrusiveList<StoredObject, NodeTraits>::Begin() const {
+	template <class Value>
+	ETInlineHint typename IntrusiveList<Value>::ConstIterator IntrusiveList<Value>::ConstBegin() const {
 		return _underlyingContainer.cbegin();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject, class ValueTraits>
-	typename IntrusiveList<StoredObject, ValueTraits>::ConstIterator IntrusiveList<StoredObject, ValueTraits>::ConstBegin() const {
-		return _underlyingContainer.cbegin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::Iterator IntrusiveList<StoredObject, NodeTraits>::End() {
-		return _underlyingContainer.end();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::ConstIterator IntrusiveList<StoredObject, NodeTraits>::End() const {
-		return _underlyingContainer.end();
-	}
-
-// ---------------------------------------------------
-
-	template <class StoredObject, class ValueTraits>
-	typename IntrusiveList<StoredObject, ValueTraits>::ConstIterator IntrusiveList<StoredObject, ValueTraits>::ConstEnd() const {
+	template <class Value>
+	ETInlineHint typename IntrusiveList<Value>::ConstIterator IntrusiveList<Value>::ConstEnd() const {
 		return _underlyingContainer.cend();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject, class ValueTraits>
-	typename IntrusiveList<StoredObject, ValueTraits>::Iterator IntrusiveList<StoredObject, ValueTraits>::IteratorTo( Reference element ) {
-		return _underlyingContainer.iterator_to( element );
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::ConstIterator IntrusiveList<Value>::Begin() const {
+		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <class StoredObject, class ValueTraits>
-	typename IntrusiveList<StoredObject, ValueTraits>::ConstIterator IntrusiveList<StoredObject, ValueTraits>::IteratorTo( ConstReference element ) const {
-		return _underlyingContainer.iterator_to( element );
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::Begin() {
+		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::Reference IntrusiveList<StoredObject, NodeTraits>::Front() {
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::ConstIterator IntrusiveList<Value>::End() const {
+		return _underlyingContainer.end();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::End() {
+		return _underlyingContainer.end();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::ConstIterator IntrusiveList<Value>::IteratorTo( ConstReference element ) const {
+		return _underlyingContainer.locate( element );
+	}
+
+// ---------------------------------------------------
+	
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::IteratorTo( Reference element ) {
+		return _underlyingContainer.locate( element );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::ConstReference IntrusiveList<Value>::Front() const {
 		return _underlyingContainer.front();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::ConstReference IntrusiveList<StoredObject, NodeTraits>::Front() const {
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Reference IntrusiveList<Value>::Front() {
 		return _underlyingContainer.front();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::PushFront( Reference item ) {
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::ConstReference IntrusiveList<Value>::Back() const {
+		return _underlyingContainer.back();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Reference IntrusiveList<Value>::Back() {
+		return _underlyingContainer.back();
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint void IntrusiveList<Value>::PushFront( Reference item ) {
 		_underlyingContainer.push_front( item );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::PopFront() {
+	template <typename Value>
+	ETInlineHint void IntrusiveList<Value>::PopFront() {
 		_underlyingContainer.pop_front();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	template <typename Disposer>
-	void IntrusiveList<StoredObject, NodeTraits>::PopFrontAndDispose( Disposer disposer ) {
-		_underlyingContainer.pop_front_and_dispose( [disposer] ( ValueType* const value ) {
-			disposer( *value );
-		} );
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::Reference IntrusiveList<StoredObject, NodeTraits>::Back() {
-		return _underlyingContainer.back();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::ConstReference IntrusiveList<StoredObject, NodeTraits>::Back() const {
-		return _underlyingContainer.back();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::PushBack( Reference item ) {
+	template <typename Value>
+	ETInlineHint void IntrusiveList<Value>::PushBack( Reference item ) {
 		_underlyingContainer.push_back( item );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::PopBack() {
+	template <typename Value>
+	ETInlineHint void IntrusiveList<Value>::PopBack() {
 		_underlyingContainer.pop_back();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Disposer>
-	void IntrusiveList<StoredObject, NodeTraits>::PopBackAndDispose( Disposer disposer ) {
-		_underlyingContainer.pop_back_and_dispose( [disposer] ( ValueType* const value ) {
-			disposer( *value );
-		} );
+	ETInlineHint void IntrusiveList<Value>::PopFrontAndDispose( Disposer disposer ) {
+		auto&	element( _underlyingContainer.front() );
+
+		_underlyingContainer.pop_front();
+
+		disposer( element );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	template <typename AlternateNodeTraits, typename Disposer, typename ElementCloner>
-	void IntrusiveList<StoredObject, NodeTraits>::CloneFrom( const ::Eldritch2::IntrusiveList<StoredObject, AlternateNodeTraits>& containerTemplate, Disposer disposer, ElementCloner cloner ) {
-		_underlyingContainer.clone_from( containerTemplate, cloner, [disposer] ( ValueType* const existingElement ) mutable {
-			disposer( *existingElement );
-		} );
+	template <typename Value>
+	template <typename Disposer>
+	ETInlineHint void IntrusiveList<Value>::PopBackAndDispose( Disposer disposer ) {
+		auto&	element( _underlyingContainer.back() );
+
+		_underlyingContainer.pop_back();
+
+		disposer( element );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::Swap( ::Eldritch2::IntrusiveList<StoredObject, NodeTraits>& other ) {
+	template <typename Value>
+	template <typename Disposer, typename ElementCloner>
+	ETInlineHint void IntrusiveList<Value>::CloneFrom( const IntrusiveList<Value>& containerTemplate, Disposer disposer, ElementCloner cloner ) {
+		ClearAndDispose( disposer );
+
+		for( const auto& element : containerTemplate._underlyingContainer ) {
+			_underlyingContainer.push_back( cloner( element ) );
+		}
+	}
+
+// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint void IntrusiveList<Value>::Swap( IntrusiveList<Value>& other ) {
 		_underlyingContainer.swap( other );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::Iterator IntrusiveList<StoredObject, NodeTraits>::Insert( Iterator location, Reference item ) {
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::Insert( Iterator location, Reference item ) {
 		return _underlyingContainer.insert( location, item );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::Iterator IntrusiveList<StoredObject, NodeTraits>::InsertAfter( Iterator location, Reference item ) {
-		return _underlyingContainer.insert_after( location, item );
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::Erase( Iterator position ) {
+		return _underlyingContainer.erase( position );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::Erase( Iterator position ) {
-		_underlyingContainer.erase( position );
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::Erase( Iterator begin, Iterator end ) {
+		return _underlyingContainer.erase( begin, end );
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::Erase( Iterator begin, Iterator end ) {
-		_underlyingContainer.erase( begin, end );
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Disposer>
-	void IntrusiveList<StoredObject, NodeTraits>::EraseAndDispose( Reference item, Disposer disposer ) {
-		this->EraseAndDispose( _underlyingContainer.iterator_to( item ), disposer );
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::EraseAndDispose( Iterator position, Disposer disposer ) {
+		auto&	element( *position );
+
+		position = _underlyingContainer.erase( position );
+
+		disposer( element );
+
+		return position;
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Disposer>
-	void IntrusiveList<StoredObject, NodeTraits>::EraseAndDispose( Iterator position, Disposer disposer ) {
-		_underlyingContainer.erase_and_dispose( position, [disposer] ( ValueType* const value ) mutable {
-			disposer( *value );
-		} );
+	ETInlineHint typename IntrusiveList<Value>::Iterator IntrusiveList<Value>::EraseAndDispose( Iterator begin, Iterator end, Disposer disposer ) {
+		while( begin != end ) {
+			begin = EraseAndDispose( begin, disposer );
+		}
+
+		return begin;
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	template <typename Disposer>
-	void IntrusiveList<StoredObject, NodeTraits>::EraseAndDispose( Iterator begin, Iterator end, Disposer disposer ) {
-		_underlyingContainer.erase_and_dispose( begin, end, [disposer] ( ValueType* const value ) mutable {
-			disposer( *value );
-		} );
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	void IntrusiveList<StoredObject, NodeTraits>::Clear() {
+	template <typename Value>
+	ETInlineHint void IntrusiveList<Value>::Clear() {
 		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
+	template <typename Value>
 	template <typename Disposer>
-	void IntrusiveList<StoredObject, NodeTraits>::ClearAndDispose( Disposer disposer ) {
-		_underlyingContainer.clear_and_dispose( [disposer] ( ValueType* const value ) mutable {
-			disposer( *value );
-		} );
+	ETInlineHint void IntrusiveList<Value>::ClearAndDispose( Disposer disposer ) {
+		while( !_underlyingContainer.empty() ) {
+			PopFrontAndDispose( disposer );
+		}
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	typename IntrusiveList<StoredObject, NodeTraits>::SizeType IntrusiveList<StoredObject, NodeTraits>::Size() const {
+	template <typename Value>
+	ETInlineHint typename IntrusiveList<Value>::SizeType IntrusiveList<Value>::GetSize() const {
 		return _underlyingContainer.size();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	bool IntrusiveList<StoredObject, NodeTraits>::Empty() const {
+	template <typename Value>
+	ETInlineHint bool IntrusiveList<Value>::IsEmpty() const {
 		return _underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, typename NodeTraits>
-	IntrusiveList<StoredObject, NodeTraits>::operator bool() const {
-		return !Empty();
+	template <typename Value>
+	ETInlineHint IntrusiveList<Value>::operator bool() const {
+		return !_underlyingContainer.empty();
 	}
 
 }	// namespace Eldritch2
-
-namespace std {
-
-	template <typename StoredObject, typename NodeTraits>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::IntrusiveList<StoredObject, NodeTraits>& collection ) -> decltype(collection.Begin()) {
-		return collection.Begin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::IntrusiveList<StoredObject, NodeTraits>& collection ) -> decltype(collection.ConstBegin()) {
-		return collection.ConstBegin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::IntrusiveList<StoredObject, NodeTraits>& collection ) -> decltype(collection.End()) {
-		return collection.End();
-	}
-
-// ---------------------------------------------------
-
-	template <typename StoredObject, typename NodeTraits>
-	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::IntrusiveList<StoredObject, NodeTraits>& collection ) -> decltype(collection.ConstEnd()) {
-		return collection.ConstEnd();
-	}
-
-}	// namespace std

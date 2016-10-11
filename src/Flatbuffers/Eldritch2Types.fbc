@@ -1,0 +1,23 @@
+namespace Eldritch2.FlatBuffers;
+
+struct Float2 {
+	X	: float;
+	Y	: float;
+}
+
+struct Float3 {
+	X	: float;
+	Y	: float;
+	Z	: float;
+}
+
+struct Quaternion {
+	X	: float;
+	Y	: float;
+	Z	: float;
+	W	: float;
+}
+
+struct CompressedUnitQuaternion {
+	Bits	: uint;
+}

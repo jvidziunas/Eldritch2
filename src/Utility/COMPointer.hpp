@@ -1,5 +1,5 @@
 /*==================================================================*\
-  COMPointer.hpp
+  ComPointer.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -16,66 +16,69 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Utility {
 
 	template <class Interface>
-	class COMPointer : public ::Eldritch2::IntrusivePointerBase {
+	class ComPointer : public Eldritch2::IntrusivePointerBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref COMPointer instance.
+	//!	Constructs this @ref ComPointer instance.
 		template <class CompatibleInterface>
-		ETInlineHint COMPointer( CompatibleInterface* const pointer, const PassthroughReferenceCountingSemantics );
-		//!	Constructs this @ref COMPointer instance.
+		ComPointer( CompatibleInterface* const pointer, const PassthroughReferenceCountingSemantics );
+	//!	Constructs this @ref ComPointer instance.
 		template <class CompatibleInterface>
-		ETInlineHint COMPointer( CompatibleInterface* const pointer );
-		//!	Constructs this @ref COMPointer instance.
+		ComPointer( CompatibleInterface* const pointer );
+	//!	Constructs this @ref ComPointer instance.
 		template <class CompatibleInterface>
-		ETInlineHint COMPointer( CompatibleInterface& reference, const PassthroughReferenceCountingSemantics );
-		//!	Constructs this @ref COMPointer instance.
+		ComPointer( CompatibleInterface& reference, const PassthroughReferenceCountingSemantics );
+	//!	Constructs this @ref ComPointer instance.
 		template <class CompatibleInterface>
-		ETInlineHint COMPointer( CompatibleInterface& reference );
-		//!	Constructs this @ref COMPointer instance.
+		ComPointer( CompatibleInterface& reference );
+	//!	Constructs this @ref ComPointer instance.
 		template <class CompatibleInterface>
-		ETInlineHint COMPointer( const COMPointer<CompatibleInterface>& handle );
-		//!	Constructs this @ref COMPointer instance.
+		ComPointer( const ComPointer<CompatibleInterface>& handle );
+	//!	Constructs this @ref ComPointer instance.
 		template <class CompatibleInterface>
-		ETInlineHint COMPointer( COMPointer<CompatibleInterface>&& handle );
-		//!	Constructs this @ref COMPointer instance.
-		ETInlineHint COMPointer( const COMPointer<Interface>& source );
-		//!	Constructs this @ref COMPointer instance.
-		ETInlineHint COMPointer( decltype(nullptr) );
-		//!	Constructs this @ref COMPointer instance.
-		ETInlineHint COMPointer();
+		ComPointer( ComPointer<CompatibleInterface>&& handle );
+	//!	Constructs this @ref ComPointer instance.
+		ComPointer( const ComPointer& );
+	//!	Constructs this @ref ComPointer instance.
+		ComPointer( decltype(nullptr) );
+	//!	Constructs this @ref ComPointer instance.
+		ComPointer();
 
-		//!	Destroys this @ref COMPointer instance.
-		ETInlineHint ~COMPointer();
+	//!	Destroys this @ref ComPointer instance.
+		~ComPointer();
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint ETNoThrowHint Interface*	GetUnadornedPointer() const throw();
+	public:
+		ETNoThrowHint Interface*	Get() const throw();
 
-		ETForceInlineHint ETNoThrowHint void		Reset() throw();
+		ETNoThrowHint void			Reset() throw();
 
-		ETNoThrowHint void							Acquire( Interface* const pointer, const PassthroughReferenceCountingSemantics ) throw();
-		ETNoThrowHint void							Acquire( Interface* const pointer ) throw();
-
-	// ---------------------------------------------------
-
-		ETInlineHint COMPointer<Interface>&	operator=( const COMPointer<Interface>& other );
-		template <class CompatibleInterface>
-		ETInlineHint COMPointer<Interface>&	operator=( const COMPointer<CompatibleInterface>& other );
-		template <class CompatibleInterface>
-		ETInlineHint COMPointer<Interface>&	operator=( COMPointer<CompatibleInterface>&& handle );
-		template <class CompatibleInterface>
-		ETInlineHint COMPointer<Interface>&	operator=( CompatibleInterface* const object );
+		ETNoThrowHint void			Acquire( Interface* const pointer, const PassthroughReferenceCountingSemantics ) throw();
+		ETNoThrowHint void			Acquire( Interface* const pointer ) throw();
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint Interface*		operator->() const; // never throws
-		ETForceInlineHint					operator bool() const; // never throws
+	public:
+		ComPointer&	operator=( const ComPointer<Interface>& other );
+		template <class CompatibleInterface>
+		ComPointer&	operator=( const ComPointer<CompatibleInterface>& other );
+		template <class CompatibleInterface>
+		ComPointer&	operator=( ComPointer<CompatibleInterface>&& handle );
+		template <class CompatibleInterface>
+		ComPointer&	operator=( CompatibleInterface* const object );
 
-		ETForceInlineHint Interface**		GetInterfacePointer();
+	// ---------------------------------------------------
+
+	public:
+		Interface**			GetInterfacePointer();
+
+		Interface*			operator->() const;
+
+		explicit operator	bool() const;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -83,12 +86,10 @@ namespace Utility {
 		Interface*	_pointer;
 	};
 
-}	// namespace Utility
 }	// namespace Eldritch2
-
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Utility/COMPointer.inl>
+#include <Utility/ComPointer.inl>
 //------------------------------------------------------------------//

@@ -12,9 +12,14 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Containers/RangeAdapters.hpp>
 #include <Utility/MPL/Compiler.hpp>
-#include <type_traits>
-#include <utility>
+//------------------------------------------------------------------//
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/iterator.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -25,78 +30,75 @@ namespace Eldritch2 {
 
 	public:
 		using IteratorType	= Iterator;
-		using Reference		= decltype(*::std::declval<Iterator>());
-		using ValueType		= typename ::std::remove_reference<Reference>::type;
+		using ValueType		= typename eastl::iterator_traits<Iterator>::value_type;
+		using Reference		= typename eastl::iterator_traits<Iterator>::reference;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref Range instance.
-		ETForceInlineHint Range( Iterator rangeBegin, Iterator rangeEnd );
-		//! Constructs this @ref Range instance.
-		ETForceInlineHint Range( const ::Eldritch2::Range<Iterator>& rangeTemplate );
+	public:
+	//! Constructs this @ref Range instance.
+	/*!	@param[in] begin Beginning of the elements contained by the new @ref Range.
+		@param[in] end One past the last valid element contained by the new @ref Range. */
+		Range( Iterator begin, Iterator end );
+	//! Constructs this @ref Range instance.
+		Range( const Range& ) = default;
 
-		ETForceInlineHint ~Range() = default;
-
-	// ---------------------------------------------------
-
-		// Finds the first element contained within the Range that compares equal to the passed-in value, or the Range end iterator in the event no match was found.
-		ETForceInlineHint Iterator		Find( const ValueType& value ) const;
-		// Find the first element with a 'true' return value for the operator() function on the Predicate object.
-		template <typename Predicate>
-		ETForceInlineHint Iterator		Find( Predicate predicate ) const;
-
-		template <typename Predicate, typename InputIterator>
-		ETForceInlineHint const ::Eldritch2::Range<Iterator>&	TransformFrom( const ::Eldritch2::Range<InputIterator>& source, Predicate predicate ) const;
-
-		template <typename Predicate>
-		ETForceInlineHint const ::Eldritch2::Range<Iterator>&	GenerateFrom( Predicate predicate ) const;
-
-		template <typename Predicate, typename Return>
-		ETForceInlineHint Return	ValidateElements( Predicate elementValidator, Return defaultValue ) const;
-
-		template <typename Predicate, typename Return>
-		ETForceInlineHint Return	Accumulate( Predicate elementSummator, Return defaultValue ) const;
+		~Range() = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint ::Eldritch2::Range<Iterator>&	operator=( const ::Eldritch2::Range<Iterator>& rangeTemplate );
+	public:
+		Range&	operator=( const Range& ) = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint static ::Eldritch2::Range<Iterator>	EmptySet();
+	public:
+		static Range	CreateEmptySet();
 
 	// ---------------------------------------------------
 
-		//! Checks to see if this @ref Range contains any elements (begin and end do not point to the same element)
-		ETForceInlineHint operator	bool() const;
+	public:
+	//! Checks to see if this @ref Range contains any elements (begin and end do not point to the same element)
+		explicit operator	bool() const;
 
-		//! Checks to see if this @ref Range is the empty set (begin and end point to the same element)
-		ETForceInlineHint bool		IsEmpty() const;
+	//! Checks to see if this @ref Range is the empty set (begin and end point to the same element)
+		bool				IsEmpty() const;
 
-		ETForceInlineHint size_t	Size() const;
+		size_t				GetSize() const;
 
 	// ---------------------------------------------------
 
-		// Tests to see if the passed-in @ref Range is a subset of this @ref Range instance.
-		ETForceInlineHint bool	Contains( const ::Eldritch2::Range<Iterator>& range ) const;
-		// Tests to see if the passed in @ref Iterator references an element within the bounds specified by this @ref Range.
-		ETForceInlineHint bool	Contains( Iterator element ) const;
+	public:
+		Iterator	Begin() const;
 
-		// Tests to see if this passed-in @ref Range is *not* a subset of this @ref Range instance.
-		ETForceInlineHint bool	DoesNotContain( const ::Eldritch2::Range<Iterator>& range ) const;
-		// Tests to see if the passed in @ref Iterator *does not reference* an element within the bounds specified by this @ref Range.
-		ETForceInlineHint bool	DoesNotContain( Iterator element ) const;
+		Iterator	End() const;
 
-		// Optimized containment check if the end of both @ref Range instances is known beforehand.
-		ETForceInlineHint bool	ContainsBegin( const ::Eldritch2::Range<Iterator>& range ) const;
+	// ---------------------------------------------------
 
-		// Optimized containment check if the beginning of both @ref Range instances is known beforehand.
-		ETForceInlineHint bool	ContainsEnd( const ::Eldritch2::Range<Iterator>& range ) const;
+	public:
+		void	SetBegin( Iterator newValue );
+
+		void	SetEnd( Iterator newValue );
+
+	// ---------------------------------------------------
+
+	public:
+	// Tests to see if the passed-in @ref Range is a subset of this @ref Range instance.
+		bool	IsSupersetOf( const Range& range ) const;
+	// Tests to see if the passed in @ref Iterator references an element within the bounds specified by this @ref Range.
+		bool	ContainsIterator( Iterator element ) const;
+
+	// Optimized containment check if the end of both @ref Range instances is known beforehand.
+		bool	ContainsBegin( const Range& range ) const;
+
+	// Optimized containment check if the beginning of both @ref Range instances is known beforehand.
+		bool	ContainsEnd( const Range& range ) const;
 
 	// - DATA MEMBERS ------------------------------------
 
-		Iterator	first;
-		Iterator	onePastLast;
+	private:
+		Iterator	_begin;
+		Iterator	_end;
 	};
 
 }	// namespace Eldritch2

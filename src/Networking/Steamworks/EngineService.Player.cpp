@@ -13,32 +13,20 @@
 // INCLUDES
 //==================================================================//
 #include <Networking/Steamworks/EngineService.hpp>
-#include <Foundation/World.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Networking;
-using namespace ::Eldritch2::Foundation;
-using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2;
+using namespace ::Eldritch2::Core;
 
 namespace Eldritch2 {
 namespace Networking {
 namespace Steamworks {
 
-	EngineService::Player::Player( const ObjectHandle<World>& world, EngineService& service, Allocator& allocator ) : _name( { allocator, UTF8L("Player Name Allocator") } ),
-																													  _service( service ),
-																													  _world( world ) {}
+	EngineService::Player::Player( EngineService& service, Allocator& allocator ) : _name( { allocator, "Player Name Allocator" } ), _service( service ) {}
 
 // ---------------------------------------------------
 
-	void EngineService::Player::Dispose() {
-		_service._allocator.Delete( *this );
-	}
-
-// ---------------------------------------------------
-
-	const UTF8Char* EngineService::Player::GetName() const {
-		return _name.AsCString();
+	const Utf8Char* EngineService::Player::GetName() const {
+		return _name;
 	}
 
 }	// namespace Steamworks

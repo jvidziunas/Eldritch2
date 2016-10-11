@@ -12,48 +12,51 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Configuration/ConfigurationDatabase.hpp>
-#include <Foundation/GameEngineService.hpp>
+#include <Utility/Memory/ChildAllocator.hpp>
+#include <Core/EngineService.hpp>
+#include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace FileSystem {
-		class	ContentProvider;
+	namespace Core {
+		class	Engine;
 	}
 }
 
 namespace Eldritch2 {
 namespace Configuration {
 
-	class EngineService : public Foundation::GameEngineService, private Configuration::ConfigurationDatabase {
+	class EngineService : public Core::EngineService {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref EngineService instance.
-		EngineService( Foundation::GameEngine& owningEngine, FileSystem::ContentProvider& contentProvider );
+	//! Constructs this @ref EngineService instance.
+		EngineService( const Core::Engine& engine );
+	//!	Disable copying.
+		EngineService( const EngineService& ) = delete;
 
-		//! Destroys this @ref EngineService instance.
 		~EngineService() = default;
 
 	// - DEBUG/LOGGING INFORMATION -----------------------
 
-		const ::Eldritch2::UTF8Char* const	GetName() const override sealed;
+	public:
+		Eldritch2::Utf8Literal	GetName() const override sealed;
 
 	// ---------------------------------------------------
 
 	protected:
-		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
-
-		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& typeRegistrar ) override sealed;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const BeginInitializationVisitor ) override;
 
 	// ---------------------------------------------------
 
-		void	DumpConfigurationToFile() const;
+	//!	Disable assignment.
+		EngineService&	operator=( const EngineService& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		FileSystem::ContentProvider&	_contentProvider;
+		mutable Eldritch2::ChildAllocator	_allocator;
+		mutable Logging::ChildLog			_log;
 	};
 
 }	// namespace Configuration

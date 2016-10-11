@@ -16,29 +16,59 @@
 //==================================================================//
 #include <Utility/Memory/Allocator.hpp>
 //------------------------------------------------------------------//
+#include <atomic>
+//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	class MallocAllocator : public ::Eldritch2::Allocator {
+	class MallocAllocator : public Eldritch2::Allocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref MallocAllocator instance.
-		MallocAllocator( const ::Eldritch2::UTF8Char* name );
+	//!	Constructs this @ref MallocAllocator instance.
+		MallocAllocator( const Eldritch2::Utf8Char* name );
+	//!	Constructs this @ref MallocAllocator instance.
+		MallocAllocator( const MallocAllocator& );
 
 		~MallocAllocator() = default;
 
 	// ---------------------------------------------------
 
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
+	public:
+	//! Allocates a contiguous chunk of memory with the specified length and alignment using the passed-in allocation behavior duration.
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal ) override;
+	//! Allocates a contiguous chunk of memory with the specified length using the passed-in allocation behavior duration.
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) override;
 
-		//! Attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size. The contents of the source memory are then copied over into the new region, if appropriate.
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType sizeInBytes, const ReallocationOptions options ) override sealed;
-		//! Attempts to expand or separately allocate a new chunk with size greater than or equal to the requested size. The contents of the source memory are then copied over into the new region, if appropriate.
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
+	//! Releases a chunk of memory previously allocated by @ref Allocate().
+		void					Deallocate( void* const address, SizeType sizeInBytes ) override;
 
-		//! Releases a chunk of memory previously allocated by @ref Allocate() or @ref Reallocate().
-		void					Deallocate( void* const address ) override sealed;
+	// ---------------------------------------------------
+
+	public:
+		size_t	GetPeakAllocationAmountInBytes() const;
+
+	// ---------------------------------------------------
+
+	public:
+		MallocAllocator&	operator=( const MallocAllocator& );
+
+	// ---------------------------------------------------
+
+	public:
+		void	Swap( MallocAllocator& allocator );
+
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		std::atomic<size_t>		_allocatedAmount;
+		std::atomic<size_t>		_peakAllocatedAmount;
 	};
 
 }	// namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Utility/Memory/MallocAllocator.inl>
+//------------------------------------------------------------------//

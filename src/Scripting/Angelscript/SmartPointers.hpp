@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <memory>
+#include <Utility/UniquePointer.hpp>
 //------------------------------------------------------------------//
 
 class	asIScriptObject;
@@ -24,36 +24,27 @@ namespace Scripting {
 namespace AngelScript {
 namespace Detail {
 
-	struct ScriptObjectDeleter {
+	class ScriptObjectDeleter {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+	//!	Constructs this @ref ScriptObjectDeleter instance.
 		ScriptObjectDeleter() = default;
+
 		~ScriptObjectDeleter() = default;
 
-		void	operator()( ::asIScriptObject* const object );
-	};
+	// ---------------------------------------------------
 
-// ---------------------------------------------------
-
-	struct ScriptEngineDeleter {
-		ScriptEngineDeleter() = default;
-		~ScriptEngineDeleter() = default;
-
-		void	operator()( ::asIScriptEngine* const engine );
-	};
-
-// ---------------------------------------------------
-
-	struct ScriptModuleDeleter {
-		ScriptModuleDeleter() = default;
-		~ScriptModuleDeleter() = default;
-
-		void	operator()( ::asIScriptModule* const module );
+	public:
+		void	operator()( asIScriptObject* const object );
+		void	operator()( asIScriptEngine* const engine );
+		void	operator()( asIScriptModule* const module );
 	};
 	
 }	// namespace Detail
 
-	using ObjectHandle	= ::std::unique_ptr<::asIScriptObject, Detail::ScriptObjectDeleter>;
-	using EngineHandle	= ::std::unique_ptr<::asIScriptEngine, Detail::ScriptEngineDeleter>;
-	using ModuleHandle	= ::std::unique_ptr<::asIScriptModule, Detail::ScriptModuleDeleter>;
+	template <typename AngelscriptObject>
+	using UniquePointer = Eldritch2::UniquePointer<AngelscriptObject, Detail::ScriptObjectDeleter>;
 
 }	// namespace AngelScript
 }	// namespace Scripting

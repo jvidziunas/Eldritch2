@@ -20,7 +20,7 @@ namespace Renderer {
 namespace Vulkan {
 namespace Detail {
 
-	InstanceDeleterBase::InstanceDeleterBase( const ::VkAllocationCallbacks* const callbacks ) : _allocationCallbacks( callbacks ) {}
+	DeleterBase::DeleterBase( const VkAllocationCallbacks* const callbacks ) : _allocationCallbacks( callbacks ) {}
 
 }	// namespace Detail
 }	// namespace Vulkan

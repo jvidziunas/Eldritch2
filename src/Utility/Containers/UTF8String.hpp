@@ -1,5 +1,5 @@
 /*==================================================================*\
-  UTF8String.hpp
+  Utf8String.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -17,7 +17,7 @@
 
 namespace Eldritch2 {
 
-	template <class Allocator = ::Eldritch2::ChildAllocator>
-	using UTF8String = ::Eldritch2::String<::Eldritch2::UTF8Char, Allocator>;
+	template <class Allocator = Eldritch2::ChildAllocator>
+	using Utf8String = Eldritch2::String<Eldritch2::Utf8Char, Allocator>;
 
 }	// namespace Eldritch2

@@ -1,0 +1,36 @@
+file_identifier	"ASBP";
+file_extension	".AngelScriptBytecodePackage";
+
+namespace Eldritch2.Scripting.AngelScript.FlatBuffers;
+
+enum TypeFlags : uint (bit_flags) {
+	Normal	= 0
+}
+
+enum PropertyFlags: uint (bit_flags) {
+	Normal	= 0
+}
+
+table FunctionMetadataDescriptor {
+	Index		: uint (key);
+	Flags		: TypeFlags = Normal;
+}
+
+table PropertyMetadataDescriptor {
+	Index		: uint (key);
+	Flags		: PropertyFlags = Normal;
+}
+
+table TypeMetadataDescriptor {
+	Index		: uint (key);
+	Methods		: [FunctionMetadataDescriptor];
+	Properties	: [PropertyMetadataDescriptor];
+}
+
+table ModuleMetadata {
+	Functions	: [FunctionMetadataDescriptor];
+	Types		: [TypeMetadataDescriptor];
+	Properties	: [PropertyMetadataDescriptor];
+}
+
+root_type ModuleMetadata;

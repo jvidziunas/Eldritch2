@@ -22,19 +22,31 @@ namespace Scripting {
 namespace AngelScript {
 namespace Detail {
 
-	void ScriptObjectDeleter::operator()( ::asIScriptObject* const object ) {
+	void ScriptObjectDeleter::operator()( asIScriptObject* const object ) {
+		if( nullptr == object ) {
+			return;
+		}
+
 		object->GetEngine()->ReleaseScriptObject( object, object->GetObjectType() );
 	}
 
 // ---------------------------------------------------
 
-	void ScriptEngineDeleter::operator()( ::asIScriptEngine* const engine ) {
+	void ScriptObjectDeleter::operator()( asIScriptEngine* const engine ) {
+		if( nullptr == engine ) {
+			return;
+		}
+
 		engine->ShutDownAndRelease();
 	}
 
 // ---------------------------------------------------
 
-	void ScriptModuleDeleter::operator()( ::asIScriptModule* const module ) {
+	void ScriptObjectDeleter::operator()( asIScriptModule* const module ) {
+		if( nullptr == module ) {
+			return;
+		}
+
 		module->Discard();
 	}
 	

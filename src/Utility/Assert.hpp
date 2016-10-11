@@ -21,7 +21,7 @@
 
 namespace Eldritch2 {
 
-	enum AssertionFailure : ::Eldritch2::uint8 {
+	enum AssertionFailure : Eldritch2::uint8 {
 		Fatal		= 0,
 		NonFatal	= 1
 	};
@@ -38,37 +38,29 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	AssertionFailure	ReportFailure( const char* condition, const char* file, ::Eldritch2::uint32 line, const char* message, ... );
+	AssertionFailure	ReportFailure( const char* condition, const char* file, Eldritch2::uint32 line, const char* message, ... );
 
 #if( ET_DEBUG_MODE_ENABLED || defined( ET_FORCE_ASSERTIONS ) )
-#	define ETRuntimeAssert(cond)	ET_MULTILINE_MACRO_BEGIN \
-									if( !(cond) ) { \
-										if( !Eldritch2::ReportFailure( #cond, __FILE__, static_cast<::Eldritch2::uint32>(__LINE__), nullptr ) ) \
-											ET_TRIGGER_DEBUGBREAK(); \
-									} \
-									ET_MULTILINE_MACRO_END
+#	define ETRuntimeAssertWithMessage(cond, message)	ET_MULTILINE_MACRO_BEGIN \
+														if( !(cond) ) { \
+															if( !Eldritch2::ReportFailure( #cond, __FILE__, static_cast<Eldritch2::uint32>(__LINE__), message ) ) \
+																ET_TRIGGER_DEBUGBREAK(); \
+																																} \
+														ET_MULTILINE_MACRO_END
+#	define ETRuntimeAssert(cond) ETRuntimeAssertWithMessage(cond, nullptr)	
 #else
-#	if defined( ET_COMPILER_IS_MSVC )
-#		define ETRuntimeAssert(cond)	static_cast<void>(sizeof((cond)));
-#	else
-#		define ETRuntimeAssert(cond)	ET_MULTILINE_MACRO_BEGIN \
-										static_cast<void>(sizeof((cond))); \
-										ET_MULTILINE_MACRO_END
-#	endif
+#	define ETRuntimeAssertWithMessage(cond, message)	static_cast<void>(sizeof((cond)));
+#	define ETRuntimeAssert(cond)						static_cast<void>(sizeof((cond)));
 #endif
 
-#define ETRuntimeVerification(cond)	ET_MULTILINE_MACRO_BEGIN \
-									if( !(cond) ) { \
-										if( !Eldritch2::ReportFailure( #cond, __FILE__, static_cast<::Eldritch2::uint32>(__LINE__), nullptr ) ) \
-											ET_DEBUG_MODE_ENABLED ? ET_TRIGGER_DEBUGBREAK() : ::std::exit(1); \
-									} \
-									ET_MULTILINE_MACRO_END
+#define ETRuntimeVerificationWithMessage(cond, msg)	ET_MULTILINE_MACRO_BEGIN \
+													if( !(cond) ) { \
+														if( !Eldritch2::ReportFailure( #cond, __FILE__, static_cast<Eldritch2::uint32>(__LINE__), msg ) ) \
+															ET_DEBUG_MODE_ENABLED ? ET_TRIGGER_DEBUGBREAK() : std::exit(1); \
+																									} \
+													ET_MULTILINE_MACRO_END
+#define ETRuntimeVerification(cond)					ETRuntimeVerificationWithMessage(cond, nullptr)
 
-#define ETRuntimeVerificationWithMsg(cond, msg)	ET_MULTILINE_MACRO_BEGIN \
-												if( !(cond) ) { \
-													if( !Eldritch2::ReportFailure( #cond, __FILE__, static_cast<::Eldritch2::uint32>(__LINE__), msg ) ) \
-														ET_DEBUG_MODE_ENABLED ? ET_TRIGGER_DEBUGBREAK() : ::std::exit(1); \
-												} \
-												ET_MULTILINE_MACRO_END
+
 
 }	// namespace Eldritch2

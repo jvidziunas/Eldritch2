@@ -12,13 +12,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/Compiler.hpp>
-//------------------------------------------------------------------//
-#include <rdestl/intrusive_slist.h>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/bonus/intrusive_slist.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	using IntrusiveForwardListBaseHook = ::rde::intrusive_slist_node;
+	using IntrusiveForwardListBaseHook = eastl::intrusive_slist_node;
 
 }	// namespace Eldritch2

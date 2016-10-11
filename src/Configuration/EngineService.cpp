@@ -14,107 +14,66 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
-#include <Scripting/ScriptApiRegistrationInitializationVisitor.hpp>
-#include <FileSystem/ReadableMemoryMappedFile.hpp>
-#include <FileSystem/SynchronousFileWriter.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
+#include <Configuration/ConfigurationRegistrar.hpp>
+#include <Configuration/ConfigurationDatabase.hpp>
+#include <Configuration/IniParserMixin.hpp>
 #include <Configuration/EngineService.hpp>
-#include <Utility/Memory/InstanceNew.hpp>
-#include <FileSystem/ContentProvider.hpp>
-#include <Configuration/INIParser.hpp>
-#include <Foundation/GameEngine.hpp>
-#include <Utility/ErrorCode.hpp>
-#include <Build.hpp>
+#include <Platform/MemoryMappedFile.hpp>
+#include <Platform/ContentProvider.hpp>
+#include <Scripting/ApiRegistrar.hpp>
+#include <Scheduling/JobFiber.hpp>
+#include <Utility/Result.hpp>
+#include <Core/Engine.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Configuration;
-using namespace ::Eldritch2::Foundation;
-using namespace ::Eldritch2::FileSystem;
+using namespace ::Eldritch2::Scheduling;
 using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2::Scheduler;
-using namespace ::Eldritch2;
-
-#define CONFIGURATION_EXTENSION ".cfg"
-
-namespace {
-
-	static const UTF8Char	configurationFileName[]					= UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
-	static const UTF8Char	tempConfigurationFileName[]				= UTF8_PROJECT_NAME UTF8L( "." ) UTF8L( CONFIGURATION_EXTENSION );
-	static const UTF8Char	userConfigurationFileFormatString[]		= UTF8L("Profiles") ET_UTF8_DIR_SEPARATOR UTF8L("{}") ET_UTF8_DIR_SEPARATOR UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
-	static const UTF8Char	tempUserConfigurationFileFormatString[]	= UTF8L("Profiles") ET_UTF8_DIR_SEPARATOR UTF8L("{}") ET_UTF8_DIR_SEPARATOR UTF8L(".") UTF8_PROJECT_NAME UTF8L( CONFIGURATION_EXTENSION );
-
-}	// anonymous namespace
+using namespace ::Eldritch2::Platform;
+using namespace ::Eldritch2::Logging;
+using namespace ::Eldritch2::Core;
 
 namespace Eldritch2 {
 namespace Configuration {
+namespace {
 
-	EngineService::EngineService( GameEngine& owningEngine, ContentProvider& contentProvider ) : GameEngineService( owningEngine ), ConfigurationDatabase( GetEngineAllocator() ), _contentProvider( contentProvider ) {}
+	static const Utf8Char	configurationFileName[] = "Eldritch2.ini";
+
+}	// anonymous namespace
+
+	EngineService::EngineService( const Engine& engine ) : Core::EngineService( engine.GetServiceBlackboard() ), _allocator( engine.GetAllocator(), "Configuration Service Root Allocator" ), _log( engine.GetLog() ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const EngineService::GetName() const {
-		return UTF8L("Configuration Service");
+	Utf8Literal EngineService::GetName() const {
+		return "Configuration Service";
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& /*typeRegistrar*/ ) {
-		// register DumpConfigurationToFile() here
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnEngineInitializationStarted( WorkerContext& executingContext ) {
-		FixedStackAllocator<64u>	tempAllocator( UTF8L( "EngineService::OnEngineInitializationStarted() Temporary Allocator" ) );
-
-		GetLogger()( UTF8L("Loading configuration from file '{}'.") ET_UTF8_NEWLINE_LITERAL, configurationFileName );
-
-		if( const auto getMappedFileResult = _contentProvider.CreateReadableMemoryMappedFile( tempAllocator, ContentProvider::KnownContentLocation::UserDocuments, configurationFileName ) ) {
-			ConfigurationDatabase&							database( *this );
-			ConfigurationPublishingInitializationVisitor	visitor( database );
-			ReadableMemoryMappedFile&						mappedFile( *getMappedFileResult.object );
-
-			// Haul the whole file into memory.
-			mappedFile.PrefetchRange( 0u, mappedFile.GetAccessibleRegionSizeInBytes() );
-			// While we're waiting for the disk to do its thing, register all the variables from the game engine we're attached to.
-			BroadcastInitializationVisitor( visitor );
-
-			ParseINI( mappedFile.TryGetStructureArrayAtOffset<UTF8Char>( 0u, mappedFile.GetAccessibleRegionSizeInBytes() ), [&database] ( const Range<const UTF8Char*>& section, const Range<const UTF8Char*>& name, const Range<const UTF8Char*>& value ) {
-				database.SetValue( section, name, value );
-			} );
-
-			GetLogger()( UTF8L("Configuration loaded successfully.") ET_UTF8_NEWLINE_LITERAL );
-
-			tempAllocator.Delete( *getMappedFileResult.object );
-		} else {
-			GetLogger( LogMessageType::Error )( UTF8L("Error reading configuration file: {}"), getMappedFileResult.resultCode.ToUTF8String() );
+	void EngineService::AcceptVisitor( JobFiber& executor, const BeginInitializationVisitor ) {
+		const Result<MemoryMappedFile>	getConfigurationFileResult( LocateService<ContentProvider>().OpenMemoryMappedFile( WellKnownDirectory::UserDocuments, configurationFileName ) );
+		if( !getConfigurationFileResult ) {
+			_log( MessageSeverity::Error, "Error opening configuration file '{}': {}", configurationFileName, GetErrorString( getConfigurationFileResult ) );
+			return;
 		}
 
-		InvokeInitializationFunction<&GameEngineService::OnEngineConfigurationBroadcast>( executingContext );
-	}
+		Engine&	engine( LocateService<Engine>() );
 
-// ---------------------------------------------------
+		IniParserMixin<ConfigurationDatabase>	database( [&] ( const Utf8Char* const sectionName, const Utf8Char* const valueName, const Range<const Utf8Char*>& /*value*/ ) {
+			_log( MessageSeverity::Error, "Unknown configuration key '[{}] {}'." ET_UTF8_NEWLINE_LITERAL, sectionName, valueName );
+		}, _allocator );
 
-	void EngineService::DumpConfigurationToFile() const {
-		using FileOverwriteBehavior	= ContentProvider::FileOverwriteBehavior;
-		using KnownContentLocation	= ContentProvider::KnownContentLocation;
+	//	Haul the whole file into memory.
+		getConfigurationFileResult->PrefetchRange( 0u, getConfigurationFileResult->GetMappedRegionSizeInBytes() );
 
-	// ---
+	//	While we're waiting for the disk to do its thing, register all the variables from the game engine we're attached to.
+		engine.VisitServices( ConfigurationRegistrar( database ) );
 
-		// Try to create a file writer for the temporary settings file.
-		FixedStackAllocator<64u>	temporaryAllocator( UTF8L("EngineService::DumpConfigurationToFile() Temporary Allocator") );
+		database.ApplyIni( getConfigurationFileResult->TryGetStructureArrayAtOffset<const Utf8Char>( 0u, getConfigurationFileResult->GetMappedRegionSizeInBytes() ) );
 
-		if( const auto getWriterResult = _contentProvider.CreateSynchronousFileWriter( temporaryAllocator, KnownContentLocation::UserDocuments, tempConfigurationFileName, FileOverwriteBehavior::OverwriteIfFileExists ) ) {
-			// Dump configuration
+		_log( MessageSeverity::Error, "Configuration loaded successfully." ET_UTF8_NEWLINE_LITERAL );
 
-			// Commit the temporary settings file by copying the temporary one over the actual.
-			_contentProvider.CopyFreeFile( KnownContentLocation::UserDocuments, configurationFileName, tempConfigurationFileName, FileOverwriteBehavior::OverwriteIfFileExists );
-			// Destroy the file writer...
-			temporaryAllocator.Delete( *getWriterResult.object );
-			// ... then destroy the temporary file since we no longer need it.
-			_contentProvider.DeleteFreeFile( KnownContentLocation::UserDocuments, tempConfigurationFileName );
-		}
+		engine.VisitServices( executor, ConfigurationBroadcastVisitor() );
 	}
 
 }	// namespace Configuration

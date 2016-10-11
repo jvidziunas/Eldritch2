@@ -23,7 +23,7 @@ namespace Eldritch2 {
 namespace Utility {
 
 #if 0
-	ETNoThrowHint ETNoAliasHint FrustumPlaneCollection ExtractFrustumPlanes( const Float4x4& cameraMatrix ) {
+	ETNoThrowHint ETPureFunctionHint FrustumPlaneCollection ExtractFrustumPlanes( const Float4x4& cameraMatrix ) {
 		FrustumPlaneCollection	result;
 
 		result[FrustumPlanes::LEFT]		= cameraMatrix.col( 4 ) + cameraMatrix.col( 1 );
@@ -38,9 +38,9 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	ETNoThrowHint ETNoAliasHint FrustumPlaneCollection ExtractNormalizedFrustumPlanes( const Float4x4& cameraMatrix ) {
+	ETNoThrowHint ETPureFunctionHint FrustumPlaneCollection ExtractNormalizedFrustumPlanes( const Float4x4& cameraMatrix ) {
 		struct NormalizePredicate {
-			ETNoAliasHint ETNoThrowHint static void Apply( Float4& plane ) {
+			ETPureFunctionHint ETNoThrowHint static void Apply( Float4& plane ) {
 				plane /= plane.block<3, 1>( 0, 0 ).norm();
 			}
 		};
@@ -56,7 +56,7 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	ETNoThrowHint ETNoAliasHint StructureOfArraysFrustumPlaneCollection ExtractStructureOfArraysFrustumPlanes( const Float4x4& cameraMatrix ) {
+	ETNoThrowHint ETPureFunctionHint StructureOfArraysFrustumPlaneCollection ExtractStructureOfArraysFrustumPlanes( const Float4x4& cameraMatrix ) {
 		StructureOfArraysFrustumPlaneCollection	resultPlanes;
 		const FrustumPlaneCollection			frustumPlanes( ExtractFrustumPlanes( cameraMatrix ) );
 
@@ -75,7 +75,7 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	ETNoThrowHint ETNoAliasHint StructureOfArraysFrustumPlaneCollection ExtractStructureOfArraysNormalizedFrustumPlanes( const Float4x4& cameraMatrix ) {
+	ETNoThrowHint ETPureFunctionHint StructureOfArraysFrustumPlaneCollection ExtractStructureOfArraysNormalizedFrustumPlanes( const Float4x4& cameraMatrix ) {
 		StructureOfArraysFrustumPlaneCollection	resultPlanes;
 		const FrustumPlaneCollection			frustumPlanes( ExtractNormalizedFrustumPlanes( cameraMatrix ) );
 

@@ -23,28 +23,25 @@
 #include <simpleopt/SimpleOpt.h>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Tools;
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
 namespace Tools {
 namespace Detail {
 
-	ToolBase::OptionRegistrationVisitor::OptionRegistrationVisitor( Allocator& allocator ) : _allocator( allocator, UTF8L("Tool Allocator") ), _knownOptions( { _allocator, UTF8L("Tool Option Registry Allocator") } ) {}
+	ToolBase::OptionRegistrationVisitor::OptionRegistrationVisitor( Allocator& allocator ) : _allocator( allocator, "Tool Allocator" ), _knownOptions( { _allocator, "Tool Option Registry Allocator" } ) {}
 
 // ---------------------------------------------------
 
-	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddArgument( const UTF8Char* const name, const Handler& handler ) {
-		_knownOptions.PushBack( { name, handler } );
+	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddArgument( const Utf8Char* const name, const Handler& handler ) {
+		_knownOptions.EmplaceBack( name, handler );
 
 		return *this;
 	}
 
 // ---------------------------------------------------
 
-	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddArgument( const UTF8Char* const name, const UTF8Char* const shortName, const Handler& handler ) {
-		_knownOptions.PushBack( { name, handler } );
-		_knownOptions.PushBack( { shortName, handler } );
+	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddArgument( const Utf8Char* const name, const Utf8Char* const shortName, const Handler& handler ) {
+		_knownOptions.EmplaceBack( name, handler );
+		_knownOptions.EmplaceBack( shortName, handler );
 
 		return *this;
 	}
@@ -59,27 +56,27 @@ namespace Detail {
 
 // ---------------------------------------------------
 
-	int ToolBase::OptionRegistrationVisitor::DispatchProgramArguments( const Range<UTF8Char**> programArguments ) {
-		using OptionGlobber = ::CSimpleGlobTempl<UTF8Char>;
-		using OptionParser	= ::CSimpleOptTempl<UTF8Char>;
+	int ToolBase::OptionRegistrationVisitor::DispatchProgramArguments( const Range<Utf8Char**> programArguments ) {
+		using OptionGlobber = CSimpleGlobTempl<Utf8Char>;
+		using OptionParser	= CSimpleOptTempl<Utf8Char>;
 
 	// ---
 
-		ResizableArray<OptionParser::SOption>	convertedOptions( _knownOptions.Size() + 1, { _allocator, UTF8L("OptionRegistrationVisitor::DispatchProgramArguments() Converted Option Allocator") } );
+		ResizableArray<OptionParser::SOption>	convertedOptions( _knownOptions.GetSize() + 1, { _allocator, "OptionRegistrationVisitor::DispatchProgramArguments() Converted Option Allocator" } );
 		int										convertedOptionIndex( -1 );
 
 		for( const auto& option : _knownOptions ) {
-			convertedOptions.PushBack( { ++convertedOptionIndex, option.first, ::SO_REQ_SEP } );
+			convertedOptions.PushBack( { ++convertedOptionIndex, option.first, SO_REQ_SEP } );
 		}
 
-		// Terminate the list to be handed off to the option parser.
+	//	Terminate the list to be handed off to the option parser.
 		convertedOptions.PushBack( SO_END_OF_OPTIONS );
 
-		{	OptionParser	parser { static_cast<int>(programArguments.onePastLast - programArguments.first), programArguments.first, convertedOptions.Data(), 0 };
+		{	OptionParser	parser { static_cast<int>(programArguments._end - programArguments._begin), programArguments._begin, convertedOptions.Data(), 0 };
 			OptionGlobber	globber;
 
 			while( parser.Next() ) {
-				if( parser.LastError() != ::SO_SUCCESS ) {
+				if( parser.LastError() != SO_SUCCESS ) {
 					return -1;
 				}
 
@@ -90,12 +87,12 @@ namespace Detail {
 				}
 			}
 
-			// Add all input files to the globber
-			for( UTF8Char** inputFile{ parser.Files() }, **end{ inputFile + parser.FileCount() }; inputFile != end; ++inputFile ) {
+		//	Add all input files to the globber.
+			for( Utf8Char** inputFile{ parser.Files() }, **end{ inputFile + parser.FileCount() }; inputFile != end; ++inputFile ) {
 				globber.Add( *inputFile );
 			}
 
-			for( UTF8Char** expandedFile{ globber.Files() }, **end{ expandedFile + globber.FileCount() }; expandedFile != end; ++expandedFile ) {
+			for( Utf8Char** expandedFile{ globber.Files() }, **end{ expandedFile + globber.FileCount() }; expandedFile != end; ++expandedFile ) {
 				_inputFileHandler( *expandedFile, FindEndOfString( *expandedFile ) );
 			}
 		}
@@ -106,7 +103,7 @@ namespace Detail {
 // ---------------------------------------------------
 
 	void ToolBase::RegisterOptions( OptionRegistrationVisitor& /*visitor*/ ) {
-		// Default implementation does nothing.
+	//	Default implementation does nothing.
 	}
 
 }	// namespace Detail

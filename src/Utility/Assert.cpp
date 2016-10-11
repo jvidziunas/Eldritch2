@@ -55,7 +55,7 @@ namespace {
 		}
 
 #		if( ET_PLATFORM_WINDOWS )
-		::OutputDebugStringA( debugOutputString );
+		OutputDebugStringA( debugOutputString );
 #		endif
 
 		return AssertionFailure::Fatal;
@@ -86,7 +86,7 @@ namespace Eldritch2 {
 			va_list	args;
 
 			va_start( args, message );
-				::Eldritch2::PrintFormatted( formattedMessage, message, args );
+				Eldritch2::PrintFormatted( formattedMessage, message, args );
 			va_end( args );
 		}
 

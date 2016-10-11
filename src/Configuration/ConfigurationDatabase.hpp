@@ -13,13 +13,18 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/HashMap.hpp>
+#include <Utility/StringLiteral.hpp>
+//------------------------------------------------------------------//
+#include <functional>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Configuration {
-		class	ConfigurationPublishingInitializationVisitor;
-		class	ConfigurableVariable;
+		class	ConfigurationRegistrar;
 	}
+
+	template <typename>
+	class	Range;
 }
 
 namespace Eldritch2 {
@@ -29,45 +34,53 @@ namespace Configuration {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		struct VariableKey : public ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, const ::Eldritch2::UTF8Char*> {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//! Constructs this @ref VariableKey instance.
-			ETInlineHint VariableKey( const ::Eldritch2::UTF8Char* const section = "", const ::Eldritch2::UTF8Char* const name = "" );
-
-			~VariableKey() = default;
-		};
+		using UnknownKeyHandler	= std::function<void ( Eldritch2::Utf8Literal /*sectionName*/, Eldritch2::Utf8Literal /*valueName*/, Eldritch2::Range<const Eldritch2::Utf8Char*> /*value*/ )>;
+		using DynamicKeySetter	= std::function<void ( Eldritch2::Utf8Literal /*valueName*/, Eldritch2::Range<const Eldritch2::Utf8Char*> /*value*/ )>;
+		using PropertySetter	= std::function<void ( Eldritch2::Range<const Eldritch2::Utf8Char*> /*value*/ )>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref ConfigurationDatabase instance.
-		/*! @param[in] allocator The @ref Allocator instance the @ref ConfigurationDatabase should use to perform sub-allocations.
-			*/
-		ConfigurationDatabase( ::Eldritch2::Allocator& allocator );
+	public:
+	//! Constructs this @ref ConfigurationDatabase instance.
+	/*! @param[in] unknownKeyHandler Handler function the ConfigurationDatabase should use to report unknown keys.
+		@param[in] allocator The @ref Allocator instance the @ref ConfigurationDatabase should use to perform sub-allocations. */
+		ConfigurationDatabase( const UnknownKeyHandler& unknownKeyHandler, Eldritch2::Allocator& allocator );
+	//! Constructs this @ref ConfigurationDatabase instance.
+	/*! @param[in] allocator The @ref Allocator instance the @ref ConfigurationDatabase should use to perform sub-allocations.
+		@remarks The default key handler will be set to a no-op function. */
+		ConfigurationDatabase( Eldritch2::Allocator& allocator );
+	//!	Disable copying.
+		ConfigurationDatabase( const ConfigurationDatabase& ) = delete;
 
-		//! Destroys this @ref ConfigurationDatabase instance.
 		~ConfigurationDatabase() = default;
 
 	// ---------------------------------------------------
 
-		void	SetValue( const ::Eldritch2::Range<const ::Eldritch2::UTF8Char*>& section, const ::Eldritch2::Range<const ::Eldritch2::UTF8Char*>& name, const ::Eldritch2::Range<const ::Eldritch2::UTF8Char*>& value );
+	public:
+		void	SetProperty( Eldritch2::Range<const Eldritch2::Utf8Char*> section, Eldritch2::Range<const Eldritch2::Utf8Char*> name, Eldritch2::Range<const Eldritch2::Utf8Char*> value );
+
+	// ---------------------------------------------------
+
+	public:
+		void	SetUnknownKeyHandler( const UnknownKeyHandler& handler );
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		ConfigurationDatabase&	operator=( const ConfigurationDatabase& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::HashMap<VariableKey, Configuration::ConfigurableVariable*>	_variableDirectory;
+		Eldritch2::HashMap<Eldritch2::Pair<Eldritch2::Utf8Literal, Eldritch2::Utf8Literal>, PropertySetter>	_propertySetters;
+		Eldritch2::HashMap<Eldritch2::Utf8Literal, DynamicKeySetter>										_dynamicKeySetters;
+
+		UnknownKeyHandler																					_unknownKeyHandler;
 
 	// - FRIEND CLASS DECLARATION ------------------------
 
-		friend class ConfigurationPublishingInitializationVisitor;
+		friend class Eldritch2::Configuration::ConfigurationRegistrar;
 	};
-
-// ---------------------------------------------------
-
-	ETInlineHint ETNoAliasHint size_t	GetHashCode( const ConfigurationDatabase::VariableKey& key, const size_t seed );
-
-	ETInlineHint ETNoAliasHint bool		operator==( const ConfigurationDatabase::VariableKey& left, const ConfigurationDatabase::VariableKey& right );
 
 }	// namespace Configuration
 }	// namespace Eldritch2

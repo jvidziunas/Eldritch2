@@ -12,12 +12,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
+#include <Utility/Memory/EaStlAllocatorAdapterMixin.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/basic_string.h>
-//------------------------------------------------------------------//
-#include <iterator>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/string.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -29,175 +32,182 @@ namespace Detail {
 
 }	// namespace Detail
 
-	template <typename Character, class Allocator = ::Eldritch2::ChildAllocator>
+	template <typename Character, class Allocator = Eldritch2::ChildAllocator>
 	class String : public Detail::StringBase {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::basic_string<Character, PrivateAllocator>;
+		using UnderlyingContainer	= eastl::basic_string<Character, Detail::EaStlAllocatorAdapterMixin<Allocator>>;
 
 	public:
+		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
 		using SizeType				= typename UnderlyingContainer::size_type;
 		using CharacterType			= typename UnderlyingContainer::value_type;
-		using AllocatorType			= Allocator;
+		using AllocatorType			= typename UnderlyingContainer::allocator_type::PublicType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref String instance.
-		ETInlineHint explicit String( AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref String instance.
-		ETInlineHint String( const CharacterType* const string, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref String instance.
-		ETInlineHint String( const CharacterType* const string, const CharacterType* const stringEnd, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref String instance.
-		ETInlineHint String( SizeType reservedLength, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref String instance.
-		template <size_t literalLength>
-		ETInlineHint String( const CharacterType (&stringLiteral)[literalLength], AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref String instance.
-		template <class AlternateAllocator>
-		ETInlineHint String( const String<Character, AlternateAllocator>& string, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref String instance.
-		ETInlineHint String( String<Character, Allocator>&& );
-		//!	Constructs this @ref String instance.
-		ETInlineHint String( const String<Character, Allocator>& ) = delete;
+	public:
+	//!	Constructs this @ref String instance.
+		String( const CharacterType* const string, const CharacterType* const stringEnd, const AllocatorType& allocator );
+	//!	Constructs this @ref String instance.
+		explicit String( const CharacterType* const string, const AllocatorType& allocator );
+	//!	Constructs this @ref String instance.
+		explicit String( SizeType reservedLength, const AllocatorType& allocator );
+	//!	Constructs this @ref String instance.
+		String( const String& string, const AllocatorType& allocator );
+	//!	Constructs this @ref String instance.
+		explicit String( const AllocatorType& allocator );
+	//!	Constructs this @ref String instance.
+		String( const String& );
+	//!	Constructs this @ref String instance.
+		String( String&& );
 
-		ETInlineHint ~String() = default;
+		~String() = default;
 
 	// - ALGORITHMS --------------------------------------
+		
+	public:
+		ConstIterator	FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ConstIterator	FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle ) const;
+		ConstIterator	FindFirstInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ConstIterator	FindFirstInstance( const CharacterType* const needle ) const;
+		ConstIterator	FindFirstInstance( ConstIterator startPosition, CharacterType character ) const;
+		ConstIterator	FindFirstInstance( CharacterType character ) const;
+		
+		ConstIterator	FindLastInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ConstIterator	FindLastInstance( ConstIterator startPosition, const CharacterType* const needle ) const;
+		ConstIterator	FindLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		ConstIterator	FindLastInstance( const CharacterType* const needle ) const;
+		ConstIterator	FindLastInstance( ConstIterator startPosition, CharacterType character ) const;
+		ConstIterator	FindLastInstance( CharacterType character ) const;
 
-		ETInlineHint ConstIterator	FindFirstInstance( CharacterType character ) const;
-		ETInlineHint ConstIterator	FindFirstInstance( const CharacterType* const needle ) const;
-		ETInlineHint ConstIterator	FindFirstInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
-		ETInlineHint ConstIterator	FindFirstInstance( ConstIterator startPosition, CharacterType character ) const;
-		ETInlineHint ConstIterator	FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle ) const;
-		ETInlineHint ConstIterator	FindFirstInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
+		bool			Contains( const CharacterType* const needle ) const;
+		bool			Contains( const CharacterType character ) const;
 
-		ETInlineHint ConstIterator	FindLastInstance( CharacterType character ) const;
-		ETInlineHint ConstIterator	FindLastInstance( const CharacterType* const needle ) const;
-		ETInlineHint ConstIterator	FindLastInstance( const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
-		ETInlineHint ConstIterator	FindLastInstance( ConstIterator startPosition, CharacterType character ) const;
-		ETInlineHint ConstIterator	FindLastInstance( ConstIterator startPosition, const CharacterType* const needle ) const;
-		ETInlineHint ConstIterator	FindLastInstance( ConstIterator startPosition, const CharacterType* const needle, const ReturnEndOfNeedleSemantics ) const;
-
-		ETInlineHint bool	Contains( const CharacterType character ) const;
-		ETInlineHint bool	Contains( const CharacterType* const needle ) const;
-
-		ETInlineHint void	MakeLower();
-		ETInlineHint void	MakeUpper();
-
-		ETInlineHint bool	BeginsWith( const CharacterType character ) const;
-		ETInlineHint bool	BeginsWith( const CharacterType* const needle ) const;
-
-		ETInlineHint bool	EndsWith( const CharacterType character ) const;
-		ETInlineHint bool	EndsWith( const CharacterType* const needle ) const;
+		bool			BeginsWith( const CharacterType* const needle ) const;
+		bool			BeginsWith( const CharacterType character ) const;
+		
+		bool			EndsWith( const CharacterType* const needle ) const;
+		bool			EndsWith( const CharacterType character ) const;
 
 	// ---------------------------------------------------
 
-		ETInlineHint void	Erase( ConstIterator position, SizeType characterCount = 1 );
-		ETInlineHint void	Erase( ConstIterator position, ConstIterator end );
+	public:
+		void	MakeLowerCase();
+
+		void	MakeUpperCase();
 
 	// ---------------------------------------------------
 
-		template <typename Value>
-		bool	ParseInto( Value&& value ) const;
+	public:
+		ConstIterator	Erase( ConstIterator position, ConstIterator end );
+		ConstIterator	Erase( ConstIterator position );
+
+		void			Trim( SizeType charactersToAdvanceBeginning, SizeType charactersToRemoveFromEnd );
+		void			Trim( ConstIterator newBegin, ConstIterator newEnd );
 
 	// - ELEMENT ITERATION -------------------------------
 
-		ETInlineHint ConstIterator	Begin() const;
+	public:
+		ConstIterator	Begin() const;
 
-		ETInlineHint ConstIterator	End() const;
+		ConstIterator	End() const;
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		template <class AlternateAllocator>
-		ETInlineHint String<Character, Allocator>&	operator=( const String<Character, AlternateAllocator>& rhs );
-		ETInlineHint String<Character, Allocator>&	operator=( const CharacterType* const string );
+	public:
+		template <typename AlternateCharacter>
+		String&	Assign( const AlternateCharacter* const begin, const AlternateCharacter* const end );
+		String&	Assign( const CharacterType* const begin, const CharacterType* const end );
+		template <typename AlternateCharacter>
+		String&	Assign( const AlternateCharacter* const string );
+		String&	Assign( const CharacterType* const string );
+		template <typename AlternateCharacter, typename AlternateAllocator>
+		String&	Assign( const String<AlternateCharacter, AlternateAllocator>& string );
+		String&	Assign( const String& );
+		String&	Assign( String&& );
+
+		String&	operator=( const CharacterType* const string );
+		String&	operator=( const String& );
+		String&	operator=( String&& );
+
+		void	Swap( String& other );
 
 	// - CONTAINER MANIPULATION --------------------------
 
-		template <class AlternateAllocator>
-		ETInlineHint String<Character, AlternateAllocator>	CreateSubstring( AlternateAllocator&& allocator, const ConstIterator begin, const ConstIterator end );
-		template <class AlternateAllocator>
-		ETInlineHint String<Character, AlternateAllocator>	CreateSubstring( AlternateAllocator&& allocator, const ConstIterator begin );
+	public:
+		String&	EnsureEndsWith( const CharacterType* const string );
+		String&	EnsureEndsWith( CharacterType character );
 
-		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const string );
-		ETInlineHint String<Character, Allocator>&	Assign( const CharacterType* const begin, const CharacterType* const end );
+		template <typename AlternateCharacter>
+		String&	Append( const AlternateCharacter* const begin, const AlternateCharacter* const end );
+		String&	Append( const CharacterType* const begin, const CharacterType* const end );
+		template <typename AlternateCharacter>
+		String&	Append( const AlternateCharacter* const string );
+		String&	Append( const CharacterType* const string );
+		template <typename AlternateCharacter, typename AlternateAllocator>
+		String&	Append( const String<AlternateCharacter, AlternateAllocator>& string );
+		String&	Append( const String& string );
+		String&	Append( CharacterType character );
 
-		ETInlineHint String<Character, Allocator>&	Append( const CharacterType character );
-		ETInlineHint String<Character, Allocator>&	Append( const CharacterType* const string );
-		ETInlineHint String<Character, Allocator>&	Append( const CharacterType* const begin, const CharacterType* const end );
-		template <class AlternateAllocator>
-		ETInlineHint String<Character, Allocator>&	Append( const String<Character, AlternateAllocator>& string );
+		template <typename AlternateCharacter>
+		String&	operator+=( const AlternateCharacter* const string );
+		String&	operator+=( const CharacterType* const string );
+		template <typename AlternateCharacter, typename AlternateAllocator>
+		String&	operator+=( const String<AlternateCharacter, AlternateAllocator>& string );
+		String&	operator+=( const String& rhs );
+		String&	operator+=( CharacterType character );
 
-		ETInlineHint String<Character, Allocator>&	EnsureEndsWith( const CharacterType character );
-		ETInlineHint String<Character, Allocator>&	EnsureEndsWith( const CharacterType* const string );
+	// ---------------------------------------------------
 
-		template <class AlternateAllocator>
-		ETInlineHint String<Character, Allocator>&	operator+=( const String<Character, AlternateAllocator>& rhs );
+	public:
+		void	Resize( SizeType size );
 
-		ETInlineHint void	Clear();
-
-		ETInlineHint void	Trim( const SizeType charactersToAdvanceBeginning, const SizeType charactersToRemoveFromEnd );
-		ETInlineHint void	Trim( ConstIterator newBegin, ConstIterator newEnd );
-
-		ETInlineHint void	Resize( const SizeType size );
+		void	Clear();
 
 	// - CONTAINER COMPARISON ----------------------------
 
-		ETInlineHint int	Compare( const CharacterType* const string ) const;
-		template <class AlternateAllocator>
-		ETInlineHint int	Compare( const String<Character, AlternateAllocator>& rhs ) const;
-
-		ETInlineHint size_t	GetHashCode( const size_t hashSeed = static_cast<size_t>(0) ) const;
+	public:
+		int	Compare( const CharacterType* const string ) const;
+		int	Compare( const String& rhs ) const;
 
 	// - ELEMENT ACCESS ----------------------------------
 
-		ETInlineHint CharacterType	operator[]( const SizeType indexInBytes ) const;
+	public:
+		operator				const CharacterType*() const;
 
-		ETInlineHint const CharacterType*	AsCString() const;
+		const CharacterType*	AsCString() const;
+
+		CharacterType			operator[]( SizeType indexInCharacters ) const;
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint SizeType	GetLength() const;
+	public:
+		SizeType			GetLength() const;
 
-		ETInlineHint bool		IsEmpty() const;
+		bool				IsEmpty() const;
 
-		ETInlineHint operator bool();
+		explicit operator	bool() const;
 
 	// - CAPACITY QUERY ----------------------------------
 
-		ETInlineHint void		Reserve( const SizeType capacityHintInBytes );
+	public:
+		SizeType	GetCapacityInCharacters() const;
 
-		ETInlineHint SizeType	GetCapacityInBytes() const;
+		void		Reserve( SizeType capacityInCharacters );
 
 	// - ALLOCATOR ACCESS --------------------------------
 
-		ETInlineHint const AllocatorType&	GetAllocator() const;
+	public:
+		const AllocatorType&	GetAllocator() const;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		UnderlyingContainer	_underlyingContainer;
 	};
-
-// ---
-
-	template <typename Character, class StringAllocator0, class StringAllocator1 = StringAllocator0>
-	ETNoAliasHint bool	operator==( const String<Character, StringAllocator0>& string0, const String<Character, StringAllocator1>& string1 );
-	template <typename Character, class StringAllocator>
-	ETNoAliasHint bool	operator==( const String<Character, StringAllocator>& string0, const Character* const string1 );
-	template <typename Character, class StringAllocator>
-	ETNoAliasHint bool	operator==( const Character* const string0, const String<Character, StringAllocator>& string1 );
-
-	template <typename Character, class StringAllocator0, class StringAllocator1 = StringAllocator0>
-	ETNoAliasHint bool	operator!=( const String<Character, StringAllocator0>& string0, const String<Character, StringAllocator1>& string1 );
-	template <typename Character, class StringAllocator>
-	ETNoAliasHint bool	operator!=( const String<Character, StringAllocator>& string0, const Character* const string1 );
-	template <typename Character, class StringAllocator>
-	ETNoAliasHint bool	operator!=( const Character* const string0, const String<Character, StringAllocator>& string1 );
 
 // ---
 

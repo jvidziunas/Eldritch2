@@ -12,7 +12,8 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/HashMap.hpp>
-#include <Utility/MPL/VectorTypes.hpp>
+#include <Utility/Mpl/VectorTypes.hpp>
+#include <Utility/Mpl/Compiler.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -22,38 +23,40 @@ namespace Eldritch2 {
 
 	public:
 		struct CellIndex {
-			::Eldritch2::int32	coordinates[3];
+			Eldritch2::int32	coordinates[3];
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref SpatialHasher instance.
-		SpatialHasher( const ::Eldritch2::float32 cellLengthInMeters, const ::Eldritch2::float32 cellHeightInMeters );
-		//!	Constructs this @ref SpatialHasher instance.
+	public:
+	//!	Constructs this @ref SpatialHasher instance.
+		SpatialHasher( Eldritch2::float32 cellLengthInMeters, Eldritch2::float32 cellHeightInMeters );
+	//!	Constructs this @ref SpatialHasher instance.
 		SpatialHasher( const SpatialHasher& ) = default;
 
 		~SpatialHasher() = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint size_t	operator()( const CellIndex cellIndex ) const;
-		ETInlineHint size_t	operator()( const ::Eldritch2::Float4 position ) const;
+	public:
+		size_t ETSimdCall	operator()( Eldritch2::Float4 position ) const;
+		size_t ETSimdCall	operator()( CellIndex cellIndex ) const;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		const ::Eldritch2::Float4	_inverseResolution;
-		const ::Eldritch2::Float4	_resolution;
+		const Eldritch2::Float4	_inverseResolution;
+		const Eldritch2::Float4	_resolution;
 	};
 
 // ---------------------------------------------------
 
-	template <typename StoredObject, class Hasher = ::Eldritch2::SpatialHasher, typename Allocator = ::Eldritch2::ChildAllocator, int loadFactor = 6>
-	class SpatialHash : public ::Eldritch2::HashMap<typename Hasher::CellIndex, StoredObject, Hasher, ::Eldritch2::Equals<typename Hasher::CellIndex>, Allocator, loadFactor> {
+	template <typename Value, class Hasher = Eldritch2::SpatialHasher, class Allocator = Eldritch2::ChildAllocator>
+	class SpatialHash : public Eldritch2::HashMap<typename Hasher::CellIndex, Value, Hasher, Eldritch2::EqualTo<typename Hasher::CellIndex>, Allocator> {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using UnderlyingContainer	= ::Eldritch2::HashMap<typename Hasher::CellIndex, StoredObject, Hasher, ::Eldritch2::Equals<typename Hasher::CellIndex>, Allocator, loadFactor>;
+		using UnderlyingContainer	= Eldritch2::HashMap<typename Hasher::CellIndex, Value, Hasher, Eldritch2::EqualTo<typename Hasher::CellIndex>, Allocator>;
 
 	public:
 		using CellIndex				= typename Hasher::CellIndex;
@@ -61,12 +64,10 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref SpatialHash instance.
-		ETInlineHint SpatialHash( Hasher&& hasher, AllocatorType&& allocator );
-		//! Constructs this @ref SpatialHash instance.
-		ETInlineHint explicit SpatialHash( AllocatorType&& allocator = AllocatorType() );
+	//! Constructs this @ref SpatialHash instance.
+		SpatialHash( const HashPredicateType& hashPredicate, const AllocatorType& allocator = AllocatorType() );
 
-		ETInlineHint ~SpatialHash() = default;
+		~SpatialHash() = default;
 	};
 
 }	// namespace Eldritch2

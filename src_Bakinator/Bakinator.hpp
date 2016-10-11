@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
-#include <Utility/Containers/UTF8String.hpp>
+#include <Utility/Containers/Utf8String.hpp>
 #include <Tools/ToolCRTPBase.hpp>
 //------------------------------------------------------------------//
 
@@ -25,7 +25,7 @@ namespace Tools {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Bakinator instance.
+	//!	Constructs this @ref Bakinator instance.
 		Bakinator();
 
 		~Bakinator() = default;
@@ -34,9 +34,8 @@ namespace Tools {
 
 		ETInlineHint FileAccessorFactory&	GetFileAccessorFactory();
 
-		//!	Retrieves the @ref GlobalAllocator the tool uses to perform internal memory allocations.
-		/*!	@returns A reference to the @ref GlobalAllocator the tool should use to make memory allocations.
-			*/
+	//!	Retrieves the @ref GlobalAllocator the tool uses to perform internal memory allocations.
+	/*!	@returns A reference to the @ref GlobalAllocator the tool should use to make memory allocations. */
 		ETInlineHint GlobalAllocator&		GetAllocator();
 
 	// ---------------------------------------------------
@@ -48,22 +47,22 @@ namespace Tools {
 	// ---------------------------------------------------
 
 	protected:
-		int	SetOutputFileName( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
+		int	SetOutputFileName( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd );
 
-		int	AddImport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
+		int	AddImport( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd );
 
-		int	AddExport( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
+		int	AddExport( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd );
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		GlobalAllocator											_allocator;
-		FileAccessorFactory										_fileAccessorFactory;
+		GlobalAllocator										_allocator;
+		FileAccessorFactory									_fileAccessorFactory;
 
-		::Eldritch2::UTF8String<>								_outputFileName;
-		::Eldritch2::UTF8String<>								_outputDataBlobName;
-		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_importNames;
-		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_exportNames;
+		Eldritch2::Utf8String<>								_outputFileName;
+		Eldritch2::Utf8String<>								_outputDataBlobName;
+		Eldritch2::ResizableArray<Eldritch2::Utf8String<>>	_importNames;
+		Eldritch2::ResizableArray<Eldritch2::Utf8String<>>	_exportNames;
 	};
 
 }	// namespace Tools

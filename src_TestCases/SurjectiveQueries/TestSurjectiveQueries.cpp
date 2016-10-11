@@ -36,7 +36,7 @@ TEST_CASE( "Basic SurjectiveQueryDatabase functionality", "[SurjectiveQueries]" 
 	};
 
 	GIVEN( "A SurjectiveQueryDatabase" ) {
-		MallocAllocator	allocator( UTF8L("Database Test Allocator") );
+		MallocAllocator	allocator( "Database Test Allocator" );
 		Database		database( allocator );
 
 		database.AddRule( 0 ).AddCriterion( "Fact0", [] ( const Fact& fact ) {
@@ -79,7 +79,7 @@ TEST_CASE( "Basic SurjectiveQueryDatabase functionality", "[SurjectiveQueries]" 
 			} );
 
 			THEN( "the database selects the most specific response" ) {
-				// While there are more criteria in the third rule, the comparison should fail in one of the conditions.
+			//	While there are more criteria in the third rule, the comparison should fail in one of the conditions.
 				REQUIRE( selectedRule == 2 );
 			}
 		}

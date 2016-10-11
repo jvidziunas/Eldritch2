@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
-#include <Utility/Containers/UTF8String.hpp>
+#include <Utility/Containers/Utf8String.hpp>
 #include <Tools/ToolCRTPBase.hpp>
 //------------------------------------------------------------------//
 
@@ -48,9 +48,9 @@ namespace Tools {
 	// ---------------------------------------------------
 
 	protected:
-		int	SetPassword( const ::Eldritch2::UTF8Char* const password, const ::Eldritch2::UTF8Char* const passwordEnd );
+		int	SetPassword( const Eldritch2::Utf8Char* const password, const Eldritch2::Utf8Char* const passwordEnd );
 
-		int	AddInputFile( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const nameEnd );
+		int	AddInputFile( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const nameEnd );
 
 		int SetSkipTextureCoordinates( const bool value );
 
@@ -59,13 +59,13 @@ namespace Tools {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		GlobalAllocator											_allocator;
-		FileAccessorFactory										_fileAccessorFactory;
+		GlobalAllocator										_allocator;
+		FileAccessorFactory									_fileAccessorFactory;
 
-		::Eldritch2::UTF8String<>								_password;
-		::Eldritch2::ResizableArray<::Eldritch2::UTF8String<>>	_inputNames;
-		bool													_skipTextureCoordinates;
-		bool													_skipOrientation;
+		Eldritch2::Utf8String<>								_password;
+		Eldritch2::ResizableArray<Eldritch2::Utf8String<>>	_inputNames;
+		bool												_skipTextureCoordinates;
+		bool												_skipOrientation;
 	};
 
 }	// namespace Tools

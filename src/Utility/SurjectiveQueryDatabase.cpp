@@ -15,86 +15,48 @@
 #include <Utility/SurjectiveQueryDatabase.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Utility;
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
 namespace Utility {
 namespace Detail {
 
-	SurjectiveQueryDatabase::Query::Query( const SurjectiveQueryDatabase& database, Allocator& allocator ) : _database( database ), _facts( { allocator, UTF8L("Surjective Query Fact Collection Allocator") } ) {}
+	SurjectiveQueryDatabase::Query::Query( const SurjectiveQueryDatabase& database, Allocator& allocator ) : _database( database ), _facts( { allocator, "Surjective Query Fact Collection Allocator" } ) {}
 
 // ---------------------------------------------------
 
-	size_t SurjectiveQueryDatabase::Query::EvaluateRuleMatchWeight( const Rule& rule ) const {
-		size_t	matchedFacts( 0u );
+	SurjectiveQueryDatabase::Rule::Rule( SurjectiveQueryDatabase& database ) : _database( database ), _criteria( { database.GetAllocator(), "Rule Criteria Allocator" } ) {}
 
-		for( const auto& criterion : rule.GetCriteria() ) {
-			const auto	matchedFact( _facts.Find( criterion.GetTargetFactName() ) );
+// ---------------------------------------------------
 
-			if( matchedFact == _facts.End() || !criterion( matchedFact->second ) ) {
+	SurjectiveQueryDatabase::Rule::Rule( Rule&& rule ) : _database( rule._database ), _criteria( eastl::move( rule._criteria ) ) {}
+
+// ---------------------------------------------------
+
+	size_t SurjectiveQueryDatabase::Rule::EvaluateMatchWeight( const Query& query ) const {
+		for( const auto& criterion : _criteria ) {
+			const auto& fact( query.TryGetFactByName( criterion.first ) );
+
+			if( !fact || !criterion.second( *fact ) ) {
 				return 0;
 			}
-
-			++matchedFacts;
 		}
 
-		return matchedFacts;
+		return _criteria.GetSize();
 	}
 
 // ---------------------------------------------------
 
-	SurjectiveQueryDatabase::Rule::Rule( SurjectiveQueryDatabase& database ) : _database( database ) {}
-
-// ---------------------------------------------------
-
-	SurjectiveQueryDatabase::Rule::Rule( Rule&& rule ) : _database( rule._database ), _criteria( ::std::move( rule._criteria ) ) {}
-
-// ---------------------------------------------------
-
-	SurjectiveQueryDatabase::Rule::~Rule() {
-		auto&	allocator( _database.GetAllocator() );
-
-		_criteria.ClearAndDispose( [&allocator] ( Criterion& criterion ) {
-			allocator.Delete( criterion );
-		} );
+	SurjectiveQueryDatabase::Rule& SurjectiveQueryDatabase::Rule::AddTagCriterion( const Utf8Char* const tagFactName ) {
+		return AddCriterion( tagFactName, [] ( const Fact& /*fact*/ ) { return true; } );
 	}
 
 // ---------------------------------------------------
 
-	SurjectiveQueryDatabase::Rule& SurjectiveQueryDatabase::Rule::AddTagCriterion( const UTF8Char* const tagFactName ) {
-		class TagCriterion : public Criterion {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			TagCriterion( InternedFactName targetFactName ) : Criterion( targetFactName ) {}
-
-			~TagCriterion() = default;
-
-		// ---------------------------------------------------
-
-			bool operator()( const Fact& /*fact*/ ) const override sealed {
-				return true;
-			}
-		};
-
-	// ---
-
-		if( const auto criterion = new(_database.GetAllocator(), Allocator::AllocationDuration::Normal) TagCriterion( _database.InternFactName( tagFactName ) ) ) {
-			_criteria.PushFront( *criterion );
-		}
-		
-		return *this;
-	}
+	SurjectiveQueryDatabase::SurjectiveQueryDatabase( Allocator& allocator ) : _allocator( allocator, "Surjective Query Database Root Allocator" ), _internedStrings( { _allocator, "Surjective Query Database Interned String Collection Allocator" } ) {}
 
 // ---------------------------------------------------
 
-	SurjectiveQueryDatabase::SurjectiveQueryDatabase( Allocator& allocator ) : _allocator( allocator, UTF8L("Surjective Query Database Root Allocator") ), _internedStrings( { _allocator, UTF8L("Surjective Query Database Interned String Collection Allocator") } ) {}
-
-// ---------------------------------------------------
-
-	SurjectiveQueryDatabase::InternedFactName SurjectiveQueryDatabase::TryInternFactName( const UTF8Char* const factName ) const {
-		auto	candidate( _internedStrings.Find( factName ) );
+	SurjectiveQueryDatabase::InternedFactName SurjectiveQueryDatabase::TryInternFactName( const Utf8Char* const factName ) const {
+		const auto	candidate( _internedStrings.Find( factName, Eldritch2::Hash<const Utf8Char*>(), eastl::equal_to_2<Utf8String<>, const Utf8Char*>() ) );
 
 		if( candidate != _internedStrings.End() ) {
 			return static_cast<InternedFactName>(candidate->AsCString());
@@ -105,11 +67,11 @@ namespace Detail {
 
 // ---------------------------------------------------
 
-	SurjectiveQueryDatabase::InternedFactName SurjectiveQueryDatabase::InternFactName( const UTF8Char* const factName ) {
-		auto	candidate( _internedStrings.Find( factName ) );
+	SurjectiveQueryDatabase::InternedFactName SurjectiveQueryDatabase::InternFactName( const Utf8Char* const factName ) {
+		auto	candidate( _internedStrings.Find( factName, Eldritch2::Hash<const Utf8Char*>(), eastl::equal_to_2<Utf8String<>, const Utf8Char*>() ) );
 
 		if( candidate == _internedStrings.End() ) {
-			candidate = _internedStrings.Insert( { factName, FindEndOfString( factName ), { GetAllocator(), UTF8L("Interned String Allocator") } } ).first;
+			candidate = _internedStrings.Insert( { factName, FindEndOfString( factName ), { GetAllocator(), "Interned String Allocator" } } ).first;
 		}
 
 		return static_cast<InternedFactName>(candidate->AsCString());

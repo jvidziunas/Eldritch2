@@ -117,6 +117,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CHAR16T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -157,6 +158,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CHAR16T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -171,6 +173,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CHAR16T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -180,28 +183,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Utility\Assert.cpp" />
-    <ClCompile Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.cpp" />
-    <ClCompile Include="..\src\Utility\Containers\RDESTLDefinitions.cpp" />
+    <ClCompile Include="..\src\Utility\Containers\EastlDefinitions.cpp" />
+    <ClCompile Include="..\src\Utility\containers\IntrusiveMPSCQueue.cpp" />
     <ClCompile Include="..\src\Utility\Containers\ResizableArray.cpp" />
     <ClCompile Include="..\src\Utility\Containers\SpatialHash.cpp" />
     <ClCompile Include="..\src\Utility\Containers\String.cpp" />
     <ClCompile Include="..\src\Utility\Memory\Allocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ArenaAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\ChildAllocator.cpp" />
+    <ClCompile Include="..\src\Utility\Memory\EastlAllocatorAdapterMixin.cpp" />
     <ClCompile Include="..\src\Utility\Memory\InstanceNew.cpp" />
     <ClCompile Include="..\src\Utility\Memory\MallocAllocator.cpp" />
     <ClCompile Include="..\src\Utility\Memory\NullAllocator.cpp" />
-    <ClCompile Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.cpp" />
     <ClCompile Include="..\src\Utility\Memory\StandardLibrary.cpp" />
     <ClCompile Include="..\src\Utility\SurjectiveQueryDatabase.cpp" />
+    <ClCompile Include="..\src_TestCases\Experiments\LambdaDeduction.cpp" />
     <ClCompile Include="..\src_TestCases\SurjectiveQueries\TestSurjectiveQueries.cpp" />
     <ClCompile Include="..\src_TestCases\TestCases.cpp" />
     <ClCompile Include="..\src_TestCases\StandardLibrary\TestResizableArray.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Utility\Assert.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\FlatMap.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\FlatSet.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\ArrayMap.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\ArraySet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\HashMap.hpp" />
     <ClInclude Include="..\src\Utility\Containers\HashSet.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveForwardList.hpp" />
@@ -209,8 +213,8 @@
     <ClInclude Include="..\src\Utility\Containers\IntrusiveList.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveListHook.hpp" />
     <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveUnorderedSet.hpp" />
-    <ClInclude Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.hpp" />
+    <ClInclude Include="..\src\Utility\Containers\IntrusiveHashSet.hpp" />
+    <ClInclude Include="..\src\Utility\containers\IntrusiveMPSCQueue.hpp" />
     <ClInclude Include="..\src\Utility\Containers\List.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Map.hpp" />
     <ClInclude Include="..\src\Utility\Containers\Range.hpp" />
@@ -224,23 +228,23 @@
     <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ArenaAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\EastlAllocatorAdapterMixin.hpp" />
     <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp" />
     <ClInclude Include="..\src\Utility\Memory\MallocAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.hpp" />
     <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />
     <ClInclude Include="..\src\Utility\SurjectiveQueryDatabase.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\Utility\Containers\FlatMap.inl" />
-    <None Include="..\src\Utility\Containers\FlatSet.inl" />
+    <None Include="..\src\Utility\Containers\ArrayMap.inl" />
+    <None Include="..\src\Utility\Containers\ArraySet.inl" />
     <None Include="..\src\Utility\Containers\HashMap.inl" />
     <None Include="..\src\Utility\Containers\HashSet.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveForwardList.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveList.inl" />
     <None Include="..\src\Utility\Containers\IntrusiveUnorderedMultiset.inl" />
-    <None Include="..\src\Utility\Containers\IntrusiveUnorderedSet.inl" />
-    <None Include="..\src\Utility\Containers\IntrusiveVyukovMPSCQueue.inl" />
+    <None Include="..\src\Utility\Containers\IntrusiveHashSet.inl" />
+    <None Include="..\src\Utility\Containers\IntrusiveMPSCQueue.inl" />
     <None Include="..\src\Utility\Containers\List.inl" />
     <None Include="..\src\Utility\Containers\Map.inl" />
     <None Include="..\src\Utility\Containers\Range.inl" />
@@ -253,7 +257,8 @@
     <None Include="..\src\Utility\Memory\Allocator.inl" />
     <None Include="..\src\Utility\Memory\ArenaAllocator.inl" />
     <None Include="..\src\Utility\Memory\ChildAllocator.inl" />
-    <None Include="..\src\Utility\Memory\RDESTLAllocatorAdapterMixin.inl" />
+    <None Include="..\src\Utility\Memory\EastlAllocatorAdapterMixin.inl" />
+    <None Include="..\src\Utility\Memory\MallocAllocator.inl" />
     <None Include="..\src\Utility\SurjectiveQueryDatabase.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

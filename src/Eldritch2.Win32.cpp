@@ -12,27 +12,23 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/BulletDynamics/EngineService.hpp>
 #include <Networking/Steamworks/EngineService.hpp>
 #include <Scripting/Angelscript/EngineService.hpp>
-#include <Renderer/Direct3D11/EngineService.hpp>
 #include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <FileSystem/Win32/ContentProvider.hpp>
-#include <Utility/Win32ApplicationHelpers.hpp>
-#include <Scheduler/Win32/FiberScheduler.hpp>
+#include <Scheduling/Win32/FiberScheduler.hpp>
 #include <Utility/Memory/StandardLibrary.hpp>
 #include <Renderer/Vulkan/EngineService.hpp>
-#include <System/Win32/SystemInterface.hpp>
 #include <Physics/PhysX/EngineService.hpp>
 #include <Configuration/EngineService.hpp>
-#include <Sound/XAudio2/EngineService.hpp>
+#include <Audio/XAudio2/EngineService.hpp>
+#include <Platform/PlatformInterface.hpp>
 #include <Input/XInput/EngineService.hpp>
 #include <Input/Win32/EngineService.hpp>
-#include <Foundation/GameEngine.hpp>
+#include <Platform/ContentProvider.hpp>
 #include <Utility/Assert.hpp>
+#include <Core/Engine.hpp>
 //------------------------------------------------------------------//
-#define BOOST_ERROR_CODE_HEADER_ONLY
-#include <boost/system/error_code.hpp>
+#include <microprofile/microprofile.h>
 #include <shellapi.h>
 #include <windows.h>
 #include <Shlwapi.h>
@@ -55,66 +51,66 @@ namespace {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Application instance.
-		Application() : _allocator( UTF8L("Root Allocator") ),
-						_scheduler( GetSystemInterface(), GetGlobalAllocator() ),
-						_contentProvider( GetSystemInterface() ),
-						_engine( GetSystemInterface(), GetScheduler(), GetContentProvider(), GetGlobalAllocator() ),
-						_configurationService( GetGameEngine(), GetContentProvider() ),
-						_XInputService( GetGameEngine() ),
-						_inputService( GetGameEngine() ),
-						_networkingService( GetGameEngine() ),
-						_scriptService( GetGameEngine() ),
-						_physicsService( GetGameEngine() ),
-						_rendererService( GetGameEngine() ),
-						_audioRendererService( GetGameEngine() ) {}
+	//!	Constructs this @ref Application instance.
+		Application() : _allocator( "Root Allocator" ),
+						_platformInterface(),
+						_scheduler( _allocator ),
+						_contentProvider( _allocator ),
+						_engine( _platformInterface, _scheduler, _allocator ),
+						_managementService( _engine ),
+						_configurationService( _engine ),
+						_xinputService( _engine ),
+						_win32InputService( _engine ),
+						_steamworksService( _engine ),
+						_angelscriptService( _engine ),
+						_physxService( _engine ),
+						_vulkanService( _engine ),
+						_xaudio2Service( _engine ) {}
 
 		~Application() = default;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint Win32GlobalHeapAllocator& GetGlobalAllocator() {
-			return _allocator;
+		ETPureFunctionHint ETInlineHint size_t GetThreadCount() const {
+			return Max<size_t>( _platformInterface.GetThreadCount() - 1u, 1u );
 		}
 
-		ETInlineHint System::Win32::SystemInterface& GetSystemInterface() {
-			return _systemInterface;
-		}
+		int ApplicationEntryPoint() {
+			MicroProfileSetForceEnable( true );
+			MicroProfileSetEnableAllGroups( true );
+			MicroProfileSetForceMetaCounters( true );
 
-		ETInlineHint Scheduler::Win32::FiberScheduler& GetScheduler() {
-			return _scheduler;
-		}
+		//	Perform the initial flip so we can get profile data for the initialization process.
+			MicroProfileFlip( nullptr );
 
-		ETInlineHint FileSystem::Win32::ContentProvider& GetContentProvider() {
-			return _contentProvider;
-		}
+			_scheduler.Bootstrap( GetThreadCount(), [this] ( Scheduling::JobFiber& executor ) {
+				_engine.InitializeWithServices( executor, { _managementService, _configurationService, _xinputService, _win32InputService, _steamworksService, _angelscriptService, _physxService, _vulkanService, _xaudio2Service } );
+				_engine.EnterMainLoopOnCaller( executor );
 
-		ETInlineHint Foundation::GameEngine& GetGameEngine() {
-			return _engine;
+				_scheduler.ShutDown();
+			} );
+
+			return 0;
 		}
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		Win32GlobalHeapAllocator				_allocator;
-		System::Win32::SystemInterface			_systemInterface;
-		Scheduler::Win32::FiberScheduler		_scheduler;
-		FileSystem::Win32::ContentProvider		_contentProvider;
-		Foundation::GameEngine					_engine;
+		Platform::PlatformInterface				_platformInterface;
+		Scheduling::Win32::FiberScheduler		_scheduler;
+		Platform::ContentProvider				_contentProvider;
+		Core::Engine							_engine;
 
+		Core::Engine::ManagementService			_managementService;
 		Configuration::EngineService			_configurationService;
-		Input::XInput::EngineService			_XInputService;
-		Input::Win32::EngineService				_inputService;
-		Networking::Steamworks::EngineService	_networkingService;
-		Scripting::AngelScript::EngineService	_scriptService;
-#if 0
-		Physics::BulletDynamics::EngineService	_physicsService;
-		Renderer::Direct3D11::EngineService		_rendererService;
-#else
-		Physics::PhysX::EngineService			_physicsService;
-		Renderer::Vulkan::EngineService			_rendererService;
-#endif
-		Sound::XAudio2::EngineService			_audioRendererService;
+		Input::XInput::EngineService			_xinputService;
+		Input::Win32::EngineService				_win32InputService;
+		Networking::Steamworks::EngineService	_steamworksService;
+		Scripting::AngelScript::EngineService	_angelscriptService;
+		Physics::PhysX::EngineService			_physxService;
+		Renderer::Vulkan::EngineService			_vulkanService;
+		Audio::XAudio2::EngineService			_xaudio2Service;
 	};
 
 // ---------------------------------------------------
@@ -123,10 +119,8 @@ namespace {
 
 }	// anonymous namespace
 
- int WINAPI wWinMain( __in ::HINSTANCE hInstance, __in_opt ::HINSTANCE /*hPrevInstance*/, __in ::LPWSTR /*lpCmdLine*/, __in int nCmdShow ) {
-	::Eldritch2::Utility::StoreMainArguments( hInstance, nCmdShow );
-
-	const int	returnValue( (new(applicationObjectMemory) Application())->GetGameEngine().ApplicationEntryPoint() );
+ int WINAPI wWinMain( __in HINSTANCE /*hInstance*/, __in_opt HINSTANCE /*hPrevInstance*/, __in LPWSTR /*lpCmdLine*/, __in int /*nCmdShow*/ ) {
+	const int	returnValue( (new(applicationObjectMemory) Application())->ApplicationEntryPoint() );
 
 	reinterpret_cast<Application*>(applicationObjectMemory)->~Application();
 	

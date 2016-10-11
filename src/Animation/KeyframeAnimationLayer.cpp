@@ -12,21 +12,18 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/KeyframeAnimationResourceView.hpp>
+#include <Animation/AssetViews/KeyframeAnimationView.hpp>
 #include <Animation/KeyframeAnimationLayer.hpp>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2::Animation;
-using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 namespace Animation {
 
-	KeyframeAnimationLayer::KeyframeAnimationLayer( KeyframeAnimationResourceView& asset ) : _asset( &asset ) {}
+	KeyframeAnimationLayer::KeyframeAnimationLayer( AssetViews::KeyframeAnimationView& asset ) : _asset( &asset ) {}
 
 // ---------------------------------------------------
 
-	void KeyframeAnimationLayer::EvaluateCacheForTime( KeyCache& /*cache*/, BoneIndex /*maximumBoneToConsider*/, uint64 /*time*/ ) {}
+	void KeyframeAnimationLayer::EvaluateCacheForAlphaFactor( KeyCache& /*cache*/, BoneIndex /*maximumBoneToConsider*/, uint64 /*time*/ ) {}
 
 }	// namespace Animation
 }	// namespace Eldritch2

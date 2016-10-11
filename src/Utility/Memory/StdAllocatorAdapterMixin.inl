@@ -32,7 +32,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <typename T, typename Allocator>
-	ETForceInlineHint typename ::Eldritch2::StdAllocatorAdapterMixin<T, Allocator>::size_type StdAllocatorAdapterMixin<T, Allocator>::max_size() const {
+	ETForceInlineHint typename Eldritch2::StdAllocatorAdapterMixin<T, Allocator>::size_type StdAllocatorAdapterMixin<T, Allocator>::max_size() const {
 		// The following has been carefully written to be independent of
 		// the definition of size_t and to avoid signed/unsigned warnings.
 		return static_cast<size_type>(this->GetAllocationLimitInBytes()) / sizeof(T);
@@ -75,7 +75,7 @@ namespace Eldritch2 {
 
 	template <typename T, typename Allocator>
 	template <typename... ConstructorArguments>
-	StdAllocatorAdapterMixin<T, Allocator>::StdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments ) : UnderlyingAllocator( ::std::forward<ConstructorArguments>(constructorArguments)... ) {}
+	StdAllocatorAdapterMixin<T, Allocator>::StdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments ) : UnderlyingAllocator( eastl::forward<ConstructorArguments>(constructorArguments)... ) {}
 
 // ---------------------------------------------------
 
@@ -110,7 +110,7 @@ namespace Eldritch2 {
 
 	template <typename T, size_t alignment, typename Allocator>
 	template <typename... ConstructorArguments>
-	ETInlineHint AlignedStdAllocatorAdapterMixin<T, alignment, Allocator>::AlignedStdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments ) : StdAllocatorAdapterMixin<T, Allocator>( ::std::forward<ConstructorArguments>( constructorArguments )... ) {}
+	ETInlineHint AlignedStdAllocatorAdapterMixin<T, alignment, Allocator>::AlignedStdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments ) : StdAllocatorAdapterMixin<T, Allocator>( eastl::forward<ConstructorArguments>( constructorArguments )... ) {}
 
 // ---------------------------------------------------
 

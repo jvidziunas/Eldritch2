@@ -12,102 +12,119 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
+#include <Utility/Memory/EaStlAllocatorAdapterMixin.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
+#include <Utility/LessThan.hpp>
 #include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/map.h>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/map.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class Allocator = ::Eldritch2::ChildAllocator>
+	template <typename Key, typename Value, typename OrderingPredicate = Eldritch2::LessThan<Key>, class Allocator = Eldritch2::ChildAllocator>
 	class Map {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::map<Key, StoredObject, PrivateAllocator>;
+		using UnderlyingContainer	= eastl::map<Key, Value, OrderingPredicate, Detail::EaStlAllocatorAdapterMixin<Allocator>>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
 		using KeyType				= typename UnderlyingContainer::key_type;
 		using MappedType			= typename UnderlyingContainer::data_type;
-		using AllocatorType			= Allocator;
+		using AllocatorType			= typename UnderlyingContainer::allocator_type::PublicType;
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
 		using SizeType				= typename UnderlyingContainer::size_type;
-		using InsertResult			= ::Eldritch2::Pair<Iterator, bool>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref Map instance.
-		ETInlineHint explicit Map( AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref Map instance.
+	public:
+	//!	Constructs this @ref Map instance.
+		explicit Map( const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref Map instance.
 		template <typename InputIterator>
-		ETInlineHint Map( InputIterator begin, InputIterator end, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref Map instance.
-		template <class AlternateAllocator>
-		ETInlineHint Map( const ::Eldritch2::Map<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref Map instance.
-		ETInlineHint Map( ::Eldritch2::Map<Key, StoredObject, Allocator>&& moveSource );
+		Map( InputIterator begin, InputIterator end, const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref Map instance.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Map( const Map&, const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref Map instance.
+		Map( Map&& );
 
-		ETInlineHint ~Map() = default;
+		~Map() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-		ETInlineHint Iterator		Find( const KeyType& key );
-		ETInlineHint ConstIterator	Find( const KeyType& key ) const;
+	public:
+		ConstIterator	Find( const KeyType& key ) const;
+		Iterator		Find( const KeyType& key );
 
 		template <typename Predicate>
-		ETInlineHint void			RemoveIf( Predicate predicate );
-		template <typename ExtraArgumentType, typename Predicate>
-		ETInlineHint void			RemoveIf( ExtraArgumentType extraArgument, Predicate predicate );
+		void			RemoveIf( Predicate predicate );
 
 	// - ELEMENT ITERATION -------------------------------
 
-		ETInlineHint Iterator		Begin();
-		ETInlineHint ConstIterator	Begin() const;
+	public:
+		ConstIterator	ConstBegin() const;
 
-		ETInlineHint ConstIterator	ConstBegin() const;
+		ConstIterator	ConstEnd() const;
 
-		ETInlineHint Iterator		End();
-		ETInlineHint ConstIterator	End() const;
-
-		ETInlineHint ConstIterator	ConstEnd() const;
+		ConstIterator	Begin() const;
+		Iterator		Begin();
+		
+		ConstIterator	End() const;
+		Iterator		End();
 
 	// - ELEMENT ACCESS ----------------------------------
 
-		ETInlineHint MappedType&	operator[]( const KeyType& key );
+	public:
+		template <class = eastl::is_default_constructible<ValueType>::value>
+		MappedType&	operator[]( const KeyType& key );
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint void	CloneFrom( const ::Eldritch2::Map<Key, StoredObject, Allocator>& containerTemplate );
+	public:
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Map&	operator=( const Map& );
+		Map&	operator=( Map&& );
 
-		ETInlineHint void	Swap( ::Eldritch2::Map<Key, StoredObject, Allocator>& other );
+		void	Swap( Map& other );
 
 	// - CONTAINER MANIPULATION --------------------------
 
-		ETInlineHint InsertResult	Insert( const ValueType& v );
-		ETInlineHint InsertResult	Insert( const KeyType& key, const MappedType& value );
+	public:
+		template <typename... ConstructorArguments>
+		Eldritch2::Pair<Iterator, bool>	Emplace( ConstructorArguments&&... constructorArguments );
 
-		ETInlineHint SizeType	Erase( const KeyType& key );
-		ETInlineHint void		Erase( Iterator position );
-		ETInlineHint void		Erase( Iterator begin, Iterator end );
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Eldritch2::Pair<Iterator, bool>	Insert( const ValueType& value );
+		Eldritch2::Pair<Iterator, bool>	Insert( ValueType&& value );
 
-		ETInlineHint void	Clear();
+		Iterator						Erase( Iterator begin, Iterator end );
+		Iterator						Erase( Iterator position );
+		SizeType						Erase( const KeyType& key );
+
+		void							Clear();
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint SizeType	Size() const;
+	public:
+		SizeType			GetSize() const;
 
-		ETInlineHint bool		Empty() const;
+		bool				IsEmpty() const;
 
-		ETInlineHint			operator bool() const;
+		explicit operator	bool() const;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
-		ETInlineHint const AllocatorType&	GetAllocator() const;
+	public:
+		const AllocatorType&	GetAllocator() const;
 
 	// - DATA MEMBERS ------------------------------------
 

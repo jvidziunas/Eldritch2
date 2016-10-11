@@ -19,13 +19,13 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
 
-	ETInlineHint HostAllocator::operator const ::VkAllocationCallbacks*() const {
+	ETInlineHint const VkAllocationCallbacks* HostAllocator::AsAllocationCallbacks() const {
 		return &_allocationCallbacks;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint HostAllocator::operator ::VkAllocationCallbacks*() {
+	ETInlineHint HostAllocator::operator const VkAllocationCallbacks*() const {
 		return &_allocationCallbacks;
 	}
 

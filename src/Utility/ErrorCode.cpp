@@ -21,27 +21,25 @@
 #include <cstdlib>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
 
-	const UTF8Char* ErrorCode::ToUTF8String() const {
-		static const UTF8Char*	errorStrings[] = {
-			UTF8L( "Operation successful" )
-			UTF8L( "Unspecified error" ),
-			UTF8L( "Insufficient free memory" ),
-			UTF8L( "Invalid parameter sent as argument to function" ),
-			UTF8L( "Null pointer argument sent to function expecting a valid target" ),
-			UTF8L( "Invalid or nonexistent file path" ),
-			UTF8L( "Invalid object internal state" ),
-			UTF8L( "Access denied" ),
-			UTF8L( "Operation not supported for this object" ),
-			UTF8L( "<Undefined>" )
+	ETPureFunctionHint const Utf8Char* GetErrorString( const ErrorCode& errorCode ) {
+		static const Utf8Char*	errorStrings[] = {
+			"Operation successful",
+			"Unspecified error",
+			"Insufficient free memory",
+			"Invalid parameter sent as argument to function",
+			"Null pointer argument sent to function expecting a valid target",
+			"Invalid or nonexistent file path",
+			"Invalid object internal state",
+			"Access denied",
+			"Operation not supported for this object",
+			"<Undefined>"
 		};
 
 	// ---
 
-		return errorStrings[Clamp( -_value, 0, static_cast<int32>(_countof(errorStrings)) )];
+		return errorStrings[Clamp( -errorCode._value, 0, static_cast<int32>(_countof(errorStrings)) )];
 	}
 
 }	// namespace Eldritch2

@@ -1,0 +1,19 @@
+include			"Eldritch2Types.fbc";
+file_identifier	"E2AD";
+file_extension	".E2Animation";
+
+namespace Eldritch2.Animation.FlatBuffers;
+
+struct Float3Knot {
+	StartValue	: Eldritch2.FlatBuffers.Float3;
+}
+
+table TrackDescriptor {
+	Target	: string (required);
+}
+
+table Animation {
+	Tracks	: [TrackDescriptor] (required);
+}
+
+root_type Animation;

@@ -22,14 +22,16 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Hash instance.
+	//!	Constructs this @ref Hash instance.
+		Hash( const Hash& ) = default;
+	//!	Constructs this @ref Hash instance.
 		Hash() = default;
 
 		~Hash() = default;
 
 	// ---------------------------------------------------
 
-		ETNoAliasHint size_t	operator()( const T& object, const size_t seed = static_cast<size_t>(0) ) const;
+		ETPureFunctionHint size_t	operator()( const T& object, size_t seed = 0u ) const;
 	};
 
 }	// namespace Eldritch2

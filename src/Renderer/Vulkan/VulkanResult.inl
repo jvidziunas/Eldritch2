@@ -20,18 +20,58 @@ namespace Renderer {
 namespace Vulkan {
 
 	template <typename VulkanObject>
-	ETInlineHint VulkanResult<VulkanObject>::VulkanResult( Vulkan::UniquePointer<VulkanObject>&& pointer ) : object( ::std::move( pointer ) ), result( VK_SUCCESS ) {}
+	ETInlineHint VulkanResult<VulkanObject>::VulkanResult( Vulkan::UniquePointer<VulkanObject> object ) : _object( eastl::move( object ) ), _result( VkResult::VK_SUCCESS ) {}
 
 // ---------------------------------------------------
 
 	template <typename VulkanObject>
-	ETInlineHint VulkanResult<VulkanObject>::VulkanResult( const ::VkResult result ) : object( nullptr ), result( result ) {}
+	ETInlineHint VulkanResult<VulkanObject>::VulkanResult( VkResult result ) : _object( nullptr ), _result( result ) {}
+
+// ---------------------------------------------------
+
+	template <typename VulkanObject>
+	ETInlineHint VulkanResult<VulkanObject>::VulkanResult( VulkanResult<VulkanObject>&& source ) : _object( eastl::move( source._object ) ), _result( source._result ) {}
+
+// ---------------------------------------------------
+
+	template <typename VulkanObject>
+	ETInlineHint const Vulkan::UniquePointer<VulkanObject>& VulkanResult<VulkanObject>::operator*() const {
+		return _object;
+	}
+
+// ---------------------------------------------------
+
+	template <typename VulkanObject>
+	ETInlineHint Vulkan::UniquePointer<VulkanObject>& VulkanResult<VulkanObject>::operator*() {
+		return _object;
+	}
+
+// ---------------------------------------------------
+
+	template <typename VulkanObject>
+	ETInlineHint const Vulkan::UniquePointer<VulkanObject>* VulkanResult<VulkanObject>::operator->() const {
+		return &_object;
+	}
+
+// ---------------------------------------------------
+
+	template <typename VulkanObject>
+	ETInlineHint Vulkan::UniquePointer<VulkanObject>* VulkanResult<VulkanObject>::operator->() {
+		return &_object;
+	}
+
+// ---------------------------------------------------
+
+	template <typename VulkanObject>
+	ETInlineHint VulkanResult<VulkanObject>::operator VkResult() const {
+		return _result;
+	}
 
 // ---------------------------------------------------
 
 	template <typename VulkanObject>
 	ETInlineHint VulkanResult<VulkanObject>::operator bool() const {
-		return VK_SUCCESS <= result;
+		return VkResult::VK_SUCCESS <= _result;
 	}
 
 }	// namespace Vulkan

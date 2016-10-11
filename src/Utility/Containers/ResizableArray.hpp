@@ -12,13 +12,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
+#include <Utility/Memory/EaStlAllocatorAdapterMixin.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
-#include <Utility/Containers/Range.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/vector.h>
-//------------------------------------------------------------------//
-#include <iterator>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/vector.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -31,234 +33,206 @@ namespace Detail {
 
 }	// namespace Detail
 
-	template <typename StoredObject, typename Allocator = ::Eldritch2::ChildAllocator>
+	template <typename Value, typename Allocator = Eldritch2::ChildAllocator>
 	class ResizableArray : public Detail::ResizableArrayBase {
 	// - TYPE PUBLISHING ---------------------------------
 
-	protected:
-		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::vector<StoredObject, PrivateAllocator>;
+	private:
+		using UnderlyingContainer	= eastl::vector<Value, Detail::EaStlAllocatorAdapterMixin<Allocator>>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
-		using Pointer				= ValueType*;
-		using ConstPointer			= const ValueType*;
-		using Reference				= ValueType&;
-		using ConstReference		= const ValueType&;
-		using AllocatorType			= Allocator;
-		using Iterator				= typename UnderlyingContainer::iterator;
+		using ConstPointer			= typename UnderlyingContainer::const_pointer;
+		using Pointer				= typename UnderlyingContainer::pointer;
+		using ConstReference		= typename UnderlyingContainer::const_reference;
+		using Reference				= typename UnderlyingContainer::reference;
+		using AllocatorType			= typename UnderlyingContainer::allocator_type::PublicType;
+		using ConstReverseIterator	= typename UnderlyingContainer::const_reverse_iterator;
+		using ReverseIterator		= typename UnderlyingContainer::reverse_iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using ReverseIterator		= ::std::reverse_iterator<Iterator>;
-		using ReverseConstIterator	= ::std::reverse_iterator<ConstIterator>;
+		using Iterator				= typename UnderlyingContainer::iterator;
 		using SizeType				= typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref ResizableArray instance.
-		/*!	@param[in] initialSize Initial capacity hint, in elements.
-			@param[in] allocator Movable reference to an allocator to be moved into the container.
-			*/
-		ETInlineHint ResizableArray( AllocatorType&& allocator = Allocator() );
-		//! Constructs this @ref ResizableArray instance.
-		ETInlineHint ResizableArray( ::Eldritch2::ResizableArray<StoredObject, Allocator>&& moveSource );
-		//! Constructs this @ref ResizableArray instance.
-		/*!	@param[in] initialSize Initial capacity hint, in elements.
-			@param[in] allocator Movable reference to an allocator to be moved into the container.
-			*/
-		ETInlineHint ResizableArray( const SizeType initialSize, AllocatorType&& allocator = Allocator() );
-		//! Constructs this @ref ResizableArray instance.
-		/*!	@param[in] first Pointer to the beginning element in a continuous array of objects the container will copy into itself.
-			@param[in] last Pointer to one past the end of the array headed by the _first_ parameter. May be equal to _first_.
-			@param[in] allocator Movable reference to an allocator to be moved into the container.
-			*/
-		ETInlineHint ResizableArray( const StoredObject* first, const StoredObject* last, AllocatorType&& allocator = Allocator() );
-		//! Constructs this @ref ResizableArray instance.
-		/*!	@param[in] containerTemplate Reference to a ResizableArray whose elements will be copy constructed into the container.
-			@param[in] allocator Movable reference to an allocator to be moved into the container.
-			*/
-		template <class AlternateAllocator>
-		ETInlineHint ResizableArray( const ::Eldritch2::ResizableArray<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = Allocator() );
+	public:
+	//! Constructs this @ref ResizableArray instance.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		ResizableArray( const ResizableArray& containerTemplate, const AllocatorType& allocator = Allocator() );
+	//! Constructs this @ref ResizableArray instance.
+	/*!	@param[in] first Pointer to the beginning element in a continuous array of objects the container will copy into itself.
+		@param[in] last Pointer to one past the end of the array headed by the _first_ parameter. May be equal to _first_.
+		@param[in] allocator Movable reference to an allocator to be moved into the container. */
+		ResizableArray( ConstPointer first, ConstPointer last, const AllocatorType& allocator = Allocator() );
+	//! Constructs this @ref ResizableArray instance.
+	/*!	@param[in] initialSize Initial capacity hint, in elements.
+		@param[in] allocator Movable reference to an allocator to be moved into the container. */
+		ResizableArray( SizeType initialSize, const AllocatorType& allocator = Allocator() );
+	//! Constructs this @ref ResizableArray instance.
+	/*!	@param[in] initialSize Initial capacity hint, in elements.
+		@param[in] allocator Movable reference to an allocator to be moved into the container. */
+		ResizableArray( const AllocatorType& allocator = Allocator() );
+	//! Constructs this @ref ResizableArray instance.
+		ResizableArray( ResizableArray&& );
 
-		//! Destroys this @ref ResizableArray instance.
-		ETInlineHint ~ResizableArray() = default;
+		~ResizableArray() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-		//! Locates the first element in the container that compares equal to the passed-in reference.
-		/*!	@param[in] itemTemplate The item to search for.
-			@param[in] searchHint Optional offset in the container to begin the search. Defaults to 0, or the first element in the container.
-			@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container.
-			*/
-		ETInlineHint SizeType		IndexOf( ConstReference itemTemplate, const SizeType searchHint = static_cast<SizeType>(0) ) const;
+	public:
+	//! Locates the first element in the container that compares equal to the passed-in reference.
+	/*!	@param[in] itemTemplate The item to search for.
+		@param[in] searchHint Iterator to the first element in the container to compare. The iterator must belong to this container.
+		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container. */
+		ConstIterator	Find( ConstReference itemTemplate, ConstIterator searchHint ) const;
+	//! Locates the first element in the container that compares equal to the passed-in reference.
+	/*!	@param[in] itemTemplate The item to search for.
+		@param[in] searchHint Iterator to the first element in the container to compare. The iterator must belong to this container.
+		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container. */
+		Iterator		Find( ConstReference itemTemplate, Iterator searchHint );
+	//! Locates the first element in the container that compares equal to the passed-in reference.
+	/*!	@param[in] itemTemplate The item to search for.
+		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container. */
+		ConstIterator	Find( ConstReference itemTemplate ) const;
+	//! Locates the first element in the container that compares equal to the passed-in reference.
+	/*!	@param[in] itemTemplate The item to search for.
+		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container. */
+		Iterator		Find( ConstReference itemTemplate );
 
-		//! Locates the first element in the container that compares equal to the passed-in reference.
-		/*!	@param[in] itemTemplate The item to search for.
-			@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container.
-			*/
-		ETInlineHint Iterator		Find( ConstReference itemTemplate );
-		//! Locates the first element in the container that compares equal to the passed-in reference.
-		/*!	@param[in] itemTemplate The item to search for.
-			@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container.
-			*/
-		ETInlineHint ConstIterator	Find( ConstReference itemTemplate ) const;
-		//! Locates the first element in the container that compares equal to the passed-in reference.
-		/*!	@param[in] itemTemplate The item to search for.
-			@param[in] searchHint Iterator to the first element in the container to compare. The iterator must belong to this container.
-			@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container.
-			*/
-		ETInlineHint Iterator		Find( ConstReference itemTemplate, Iterator searchHint );
-		//! Locates the first element in the container that compares equal to the passed-in reference.
-		/*!	@param[in] itemTemplate The item to search for.
-			@param[in] searchHint Iterator to the first element in the container to compare. The iterator must belong to this container.
-			@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator to the first such element. Otherwise, it returns the end iterator for the container.
-			*/
-		ETInlineHint ConstIterator	Find( ConstReference itemTemplate, ConstIterator searchHint ) const;
+	//! Examines the elements in the ResizableArray to determine if any are equivalent to the argument.
+	/*!	@param[in] itemTemplate The item to search for.
+		@returns *true* if an item equal to the template was found, *false* if none exist in the container. */
+		bool			Contains( ConstReference itemTemplate ) const;
 
-		//! Examines the elements in the ResizableArray to determine if any are equivalent to the argument.
-		/*!	@param[in] itemTemplate The item to search for.
-			@returns *true* if an item equal to the template was found, *false* if none exist in the container.
-			*/
-		ETInlineHint bool	Contains( ConstReference itemTemplate ) const;
-
-		//! Rearranges the elements within this ResizeableArray such that all that satisfy the given predicate are situated before any that do not.
-		/*!	@remark Note that there are no guarantees placed on ordering beyond the passed/did not pass distinction.
-			@param[in] predicate The filter predicate to be run. This method uses operator() on the predicate, which should take a single argument of type ConstReference and return a bool indicating if the element passed the check.
-			@returns An iterator to the beginning of the now-segregated range, or the end iterator for the container if all elements passed the check.
-			*/
+	//! Rearranges the elements within this ResizeableArray such that all that satisfy the given predicate are situated before any that do not.
+	/*!	@remark Note that there are no guarantees placed on ordering beyond the passed/did not pass distinction.
+		@param[in] predicate The filter predicate to be run. This method uses operator() on the predicate, which should take a single argument of type ConstReference and return a bool indicating if the element passed the check.
+		@returns An iterator to the beginning of the now-segregated range, or the end iterator for the container if all elements passed the check. */
 		template <typename Predicate>
-		ETInlineHint Iterator	RemoveIf( Predicate predicate );
+		Iterator		RemoveIf( Predicate predicate );
 
-		//! Rearranges the elements within this ResizeableArray according to a customizable ordering.
-		/*!	@param[in] predicate The ordering predicate to use. This method invokes operator() on the predicate, which should take two arguments of type ConstReference and return a book indicating if the element in the first argument should be placed before the element in the second.
-			*/
+	//! Rearranges the elements within this ResizeableArray according to a customizable ordering.
+	/*!	@param[in] predicate The ordering predicate to use. This method invokes operator() on the predicate, which should take two arguments of type ConstReference and return a book indicating if the element in the first argument should be placed before the element in the second. */
 		template <typename ComparisonPredicate>
-		ETInlineHint void	Sort( ComparisonPredicate predicate );
+		void			Sort( ComparisonPredicate predicate );
 		
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint ::Eldritch2::ResizableArray<StoredObject, Allocator>&	operator=( const ::Eldritch2::ResizableArray<StoredObject, Allocator>& containerTemplate );
-	    
-		ETInlineHint void	CloneFrom( const ::Eldritch2::ResizableArray<StoredObject, Allocator>& containerTemplate );
+	public:
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		ResizableArray&	operator=( const ResizableArray& );
+		ResizableArray&	operator=( ResizableArray&& );
 
-		ETInlineHint void	Swap( ::Eldritch2::ResizableArray<StoredObject, Allocator>& container );
+		void			Swap( ResizableArray& container );
 
 	// - ELEMENT ITERATION -------------------------------
 
-		ETInlineHint Iterator		Begin();
-		ETInlineHint ConstIterator	Begin() const;
+	public:
+		ConstIterator			ConstBegin() const;
 
-		ETInlineHint Iterator		End();
-		ETInlineHint ConstIterator	End() const;
+		ConstIterator			ConstEnd() const;
 
-		ETInlineHint ConstIterator	ConstBegin() const;
+		ConstReverseIterator	ConstReverseBegin() const;
 
-		ETInlineHint ConstIterator	ConstEnd() const;
+		ConstReverseIterator	ConstReverseEnd() const;
 
-		ETInlineHint ReverseIterator		ReverseBegin();
-		ETInlineHint ReverseConstIterator	ReverseBegin() const;
+		ConstReverseIterator	ReverseBegin() const;
+		ReverseIterator			ReverseBegin();
+		
+		ConstReverseIterator	ReverseEnd() const;
+		ReverseIterator			ReverseEnd();
 
-		ETInlineHint ReverseIterator		ReverseEnd();
-		ETInlineHint ReverseConstIterator	ReverseEnd() const;
+		ConstIterator			Begin() const;
+		Iterator				Begin();
+		
+		ConstIterator			End() const;
+		Iterator				End();
 
 	// - END POINT MANIPULATION --------------------------
 
-		ETInlineHint Reference		Front();
-		ETInlineHint ConstReference	Front() const;
+	public:
+		ConstReference	Front() const;
+		Reference		Front();
+		
+		ConstReference	Back() const;
+		Reference		Back();
 
-		ETInlineHint Reference		Back();
-		ETInlineHint ConstReference	Back() const;
-
-		ETInlineHint void	PushBack( ConstReference itemTemplate );
-		ETInlineHint void	PushBack( ValueType&& itemTemplate );
-		ETInlineHint void	PushBack();
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		void			PushBack( const ValueType& item );
+		void			PushBack( ValueType&& item );
 
 		template <typename... ElementConstructorArguments>
-		ETInlineHint void	EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments );
+		void			EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments );
 
-		ETInlineHint void	PopBack();
+		void			PopBack();
 
 	// - ELEMENT ACCESS ----------------------------------
 
-		ETInlineHint Reference		operator[]( const SizeType elementIndex );
-		ETInlineHint ConstReference	operator[]( const SizeType elementIndex ) const;
+	public:
+		ConstReference	operator[]( SizeType elementIndex ) const;
+		Reference		operator[]( SizeType elementIndex );
+		
+		ConstReference	At( SizeType elementIndex ) const;
+		Reference		At( SizeType elementIndex );
 
-		ETInlineHint Reference		At( const SizeType elementIndex );
-		ETInlineHint ConstReference	At( const SizeType elementIndex ) const;
-
-		ETInlineHint Pointer		Data();
-		ETInlineHint ConstPointer	Data() const;
+		ConstPointer	Data() const;
+		Pointer			Data();
 
 	// - CONTAINER MANIPULATION --------------------------
 
-		ETInlineHint void	Assign( ConstPointer first, ConstPointer last );
+	public:
+		void		Assign( ConstPointer first, ConstPointer last );
 
-		ETInlineHint void		Insert( const SizeType initialIndex, const SizeType itemCount, ConstReference itemTemplate );
-		ETInlineHint void		Insert( Iterator position, const SizeType itemCount, ConstReference itemTemplate );
-		ETInlineHint Iterator	Insert( Iterator position, ConstReference itemTemplate );
-		ETInlineHint Iterator	Insert( Iterator position, ValueType&& itemTemplate );
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		void		Insert( Iterator position, SizeType itemCount, const ValueType& itemTemplate );
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Iterator	Insert( Iterator position, const ValueType& itemTemplate );
+		Iterator	Insert( Iterator position, ValueType&& itemTemplate );
 
 		template <typename... ElementConstructorArguments>
-		ETInlineHint void		Emplace( const SizeType initialIndex, const SizeType itemCount, ElementConstructorArguments&&... elementConstructorArguments );
-		template <typename... ElementConstructorArguments>
-		ETInlineHint void		Emplace( Iterator position, const SizeType itemCount, ElementConstructorArguments&&... elementConstructorArguments );
-		template <typename... ElementConstructorArguments>
-		ETInlineHint Iterator	Emplace( Iterator position, ElementConstructorArguments&&... elementConstructorArguments );
+		Iterator	Emplace( Iterator position, ElementConstructorArguments&&... elementConstructorArguments );
 
-		ETInlineHint Iterator	Erase( Iterator position );
-		ETInlineHint void		Erase( Iterator position, const UnorderedSemantics );
-		ETInlineHint Iterator	Erase( Iterator first, Iterator last );
+		SizeType	Erase( const ValueType& value );
+		void		Erase( Iterator position, const UnorderedSemantics );
+		Iterator	Erase( Iterator first, Iterator last );
+		Iterator	Erase( Iterator position );
 
-		template <typename DisposerPredicate>
-		ETInlineHint Iterator	EraseAndDispose( const Iterator position, DisposerPredicate disposer );
-		template <typename DisposerPredicate>
-		ETInlineHint void		EraseAndDispose( const Iterator position, DisposerPredicate disposer, const UnorderedSemantics );
+		void		Clear( const ReleaseMemorySemantics );
+	//! Removes all elements from this vector and calls their destructors.
+	/*!	@remarks Doesn't release memory. */
+		void		Clear();
 
-		template <typename DisposerPredicate>
-		ETInlineHint Iterator	EraseAndDispose( Iterator beginPosition, Iterator endPosition, DisposerPredicate disposer );
-
-		//! Removes all elements from this vector and calls their destructors.
-		/*!	@remarks Doesn't release memory.
-			*/
-		ETInlineHint void	Clear();
-		// EA STL concept.
-		// Resets container to an initialized, unallocated state.
-		// Safe only for value types with trivial destructor.
-		ETInlineHint void	Clear( const ReleaseMemorySemantics );
-
-		template <typename Disposer>
-		ETInlineHint void	ClearAndDispose( Disposer disposer );
-		template <typename Disposer>
-		ETInlineHint void	ClearAndDispose( Disposer disposer, const ReleaseMemorySemantics );
-
-		ETInlineHint void	Resize( const SizeType elementCount );
-		ETInlineHint void	Resize( const SizeType elementCount, ConstReference value );
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		void		Resize( SizeType elementCount, const ValueType& value );
+		void		Resize( SizeType elementCount );
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint SizeType	Size() const;
+	public:
+		SizeType			GetSize() const;
 
-		ETInlineHint bool	IsEmpty() const;
+		bool				IsEmpty() const;
 
-		ETInlineHint	operator bool() const;
+		explicit operator	bool() const;
 
 	// - CAPACITY QUERY ----------------------------------
 
-		ETInlineHint SizeType	GetCapacity() const;
+	public:
+		SizeType	GetCapacity() const;
 
-		// Extension: allows to limit amount of allocated memory.
-		ETInlineHint void		SetCapacity( const SizeType newCapacity );
+		void		SetCapacity( SizeType capacityInElements );
 
-		ETInlineHint void		Reserve( const SizeType elementCountHint );
-
-		ETInlineHint SizeType	GetHighWatermark() const;		
+		void		Reserve( SizeType capacityInElementsHint );
 
 	// - ALLOCATOR ACCESS --------------------------------
 
-		ETInlineHint const AllocatorType&	GetAllocator() const;
+	public:
+		const AllocatorType&	GetAllocator() const;
 
 	// - ITERATOR DEBUGGING ------------------------------
 
-		ETInlineHint bool	ValidateIterator( ConstIterator iterator ) const;
+	public:
+		bool	ValidateIterator( ConstIterator iterator ) const;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -268,8 +242,8 @@ namespace Detail {
 
 // ---------------------------------------------------
 
-	extern const Detail::ResizableArrayBase::UnorderedSemantics		UnorderedSemantics;
 	extern const Detail::ResizableArrayBase::ReleaseMemorySemantics	ReleaseMemorySemantics;
+	extern const Detail::ResizableArrayBase::UnorderedSemantics		UnorderedSemantics;
 
 }	// namespace Eldritch2
 

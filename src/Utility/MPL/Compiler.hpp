@@ -46,7 +46,7 @@
 #	define ETCDecl                       __cdecl
 #	define ETStdCall                     __stdcall
 #	define ETFastCall                    __fastcall
-#	define ETSIMDCall
+#	define ETSimdCall
 	// Compiler optimization hints
 #	define ETInlineHint                  __inline
 #	define ETForceInlineHint             __forceinline
@@ -55,7 +55,7 @@
 #	define ETNoReturnHint                __declspec(noreturn)
 #	define ETNoThrowHint                 __declspec(nothrow)
 #	define ETRestrictHint                __declspec(restrict)
-#	define ETNoAliasHint                 __declspec(noalias)
+#	define ETPureFunctionHint                 __declspec(noalias)
 #	define ETPureAbstractHint            __declspec(novtable)
 #	define ETDeprecatedHint(x)           __declspec(deprecated(x))
 #	define ETThreadLocal                 __declspec(thread)
@@ -116,9 +116,9 @@
 #	define ETStdCall                   __stdcall
 #	define ETFastCall                  __fastcall
 #if( _MSC_VER >= 1800 )
-#	define ETSIMDCall                  __vectorcall
+#	define ETSimdCall                  __vectorcall
 #else
-#	define ETSIMDCall
+#	define ETSimdCall
 #endif
 	// Compiler optimization hints
 #	define ETInlineHint                __inline
@@ -128,7 +128,7 @@
 #	define ETNoReturnHint              __declspec(noreturn)
 #	define ETNoThrowHint               __declspec(nothrow)
 #	define ETRestrictHint              __declspec(restrict)
-#	define ETNoAliasHint               __declspec(noalias)
+#	define ETPureFunctionHint          __declspec(noalias)
 #	define ETPureAbstractHint          __declspec(novtable)
 #	define ETDeprecatedHint(x)         __declspec(deprecated(x))
 #	define ETThreadLocal               __declspec(thread)
@@ -213,7 +213,7 @@
 #	define ETCDecl                       __attribute__((cdecl))
 #	define ETStdCall                     __attribute__((stdcall))
 #	define ETFastCall                    __attribute__((fastcall))
-#	define ETSIMDCall
+#	define ETSimdCall
 	// Compiler optimization hints
 #	define ETInlineHint                  inline
 #	define ETForceInlineHint             __attribute__((always_inline))
@@ -222,7 +222,7 @@
 #	define ETNoReturnHint                __attribute__((noreturn))
 #	define ETNoThrowHint                 __attribute__((nothrow))
 #	define ETRestrictHint                __attribute__((malloc))
-#	define ETNoAliasHint                 __attribute__((pure))
+#	define ETPureFunctionHint            __attribute__((pure))
 #	define ETPureAbstractHint            _ET_NULL_DEFINE
 #	define ETDeprecatedHint(x)           __attribute__((deprecated(x)))
 #	define ETThreadLocal                 __thread
@@ -303,59 +303,9 @@
 #define ETIsReleaseModeEnabled()	   ET_RELEASE_MODE_ENABLED
 //-------------------------------------------------------
 
-#if defined( _UNICODE ) || defined( UNICODE )
-#	define ET_BUILD_UNICODE            1
-#	define ET_STRING_LITERAL(_Literal) L ## _Literal
-#else
-#	define ET_BUILD_UNICODE            0
-#	define ET_STRING_LITERAL(_Literal) _Literal
-#endif
+#define ETCacheLineAligned             ET16ByteAligned
 
-#if( ET_COMPILER_SUPPORTS_CPP11 )
-#	define ET_UTF8_LITERAL(_Literal)                                      _Literal ## u8
-#	define ET_UTF16_LITERAL(_Literal)                                     _Literal ## u16
-#	define ET_UTF32_LITERAL(_Literal)                                     _Literal ## u32
-#	define ETPODConstructorHint                                           = delete
-#	define ETPODDestructorHint                                            = delete
-#	define ET_POD_CONSTRUCTOR_IMPLEMENTATION( _QualifiedConstructorDecl ) _ET_NULL_DEFINE
-#	define ET_POD_DESTRUCTOR_IMPLEMENTATION( _QualifiedDestructorDecl )   _ET_NULL_DEFINE
-#else
-#	define ET_UTF8_LITERAL(_Literal)                                      _Literal
-#	if( ET_PLATFORM_WINDOWS )
-#		define ET_UTF16_LITERAL(_Literal)                                 L ## _Literal
-#	else
-#		define ET_UTF16_LITERAL(_Literal)                                 _Literal
-#	endif
-#	if( ET_PLATFORM_LINUX )
-#		define ET_UTF32_LITERAL(_Literal)                                 L ## _Literal
-#	else
-#		define ET_UTF32_LITERAL(_Literal)                                 _Literal
-#	endif
-#	define ETPODConstructorHint                                           _ET_NULL_DEFINE
-#	define ETPODDestructorHint                                            _ET_NULL_DEFINE
-#	define ET_POD_CONSTRUCTOR_IMPLEMENTATION( _QualifiedConstructorDecl ) _QualifiedConstructorDecl ## { }
-#	define ET_POD_DESTRUCTOR_IMPLEMENTATION( _QualifiedDestructorDecl )   _QualifiedDestructorDecl ## { }
-#endif
-
-#define SL(_Literal)                   ET_STRING_LITERAL(_Literal)
-#define UTF8L(_Literal)                ET_UTF8_LITERAL(_Literal)
-#define UTF16L(_Literal)               ET_UTF16_LITERAL(_Literal)
-#define UTF32L(_Literal)               ET_UTF32_LITERAL(_Literal)
-#define ETIsBuildUnicode()             ET_BUILD_UNICODE
-
-typedef int                            ETPostfixOperatorHint;
-
-//==================================================================//
-// LANGUAGE EXTENSIONS
-//==================================================================//
-#include <Utility/MPL/alignof.hpp>
-//------------------------------------------------------------------//
-
-//==================================================================//
-// PLATFORM-SPECIFIC BEHAVIOR
-//==================================================================//
-#include <Utility/MPL/Platform.hpp>
-//------------------------------------------------------------------//
+using ETPostfixOperatorHint = int;
 
 //==================================================================//
 // STATIC ANALYSIS

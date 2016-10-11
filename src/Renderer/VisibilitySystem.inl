@@ -18,14 +18,22 @@
 namespace Eldritch2 {
 namespace Renderer {
 
-	template <typename Renderable, class Hasher, class HashAllocator>
-	VisibilitySystem<Renderable, Hasher, HashAllocator>::VisibilitySystem( Hasher&& shadowCasterHasher, Hasher&& hasher, HashAllocator&& shadowCasterAllocator, HashAllocator&& allocator ) : _shadowCasterCells( ::std::forward<Hasher>( shadowCasterHasher ), ::std::forward<HashAllocator>( shadowCasterAllocator ) ),
-																																															  _visibilityCells( ::std::forward<Hasher>( hasher ), ::std::forward<HashAllocator>( allocator ) ) {}
+	template <class MeshAsset>
+	ETInlineHint void VisibilitySystem<MeshAsset>::VisibilityCell::AddElement( const Eldritch2::Pair<const MeshAsset*, const Animation::Armature*>& element ) {
+		_renderElements.PushBack( element );
+	}
 
 // ---------------------------------------------------
 
-	template <typename Renderable, class Hasher, class HashAllocator>
-	VisibilitySystem<Renderable, Hasher, HashAllocator>::VisibilitySystem( HashAllocator&& allocator, HashAllocator&& shadowCasterAllocator ) : _shadowCasterCells( ::std::forward<HashAllocator>( shadowCasterAllocator ) ), _visibilityCells( ::std::forward<HashAllocator>( allocator ) ) {}
+	template <class MeshAsset>
+	ETInlineHint void VisibilitySystem<MeshAsset>::VisibilityCell::RemoveElement( const Eldritch2::Pair<const MeshAsset*, const Animation::Armature*>& element ) {
+		_renderElements.Erase( _renderElements.Find( element ), Eldritch2::UnorderedSemantics );
+	}
+
+// ---------------------------------------------------
+
+	template <class MeshAsset>
+	ETInlineHint VisibilitySystem<MeshAsset>::VisibilitySystem( Eldritch2::Allocator& allocator ) : _cells( { allocator, "Visibility System Cell Allocator" } ) {}
 
 }	// namespace Renderer
 }	// namespace Eldritch2

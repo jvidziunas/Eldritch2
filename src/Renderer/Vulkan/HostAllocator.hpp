@@ -21,25 +21,33 @@ namespace Eldritch2 {
 namespace Renderer {
 namespace Vulkan {
 
-	class HostAllocator : public ::Eldritch2::ChildAllocator {
+	class HostAllocator : public Eldritch2::ChildAllocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		HostAllocator( ::Eldritch2::Allocator& backingAllocator, const ::Eldritch2::UTF8Char* const name );
+	//!	Constructs this @ref HostAllocator instance.
+		HostAllocator( Eldritch2::Allocator& backingAllocator, const Eldritch2::Utf8Char* const name );
+	//!	Disable copying.
 		HostAllocator( const HostAllocator& ) = delete;
+	//!	Constructs this @ref HostAllocator instance.
 		HostAllocator( HostAllocator&& );
 
 		~HostAllocator() = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint operator const ::VkAllocationCallbacks*() const;
-		ETInlineHint operator ::VkAllocationCallbacks*();
+	public:
+		const VkAllocationCallbacks*	AsAllocationCallbacks() const;
+
+	// ---------------------------------------------------
+
+	public:
+		operator	const VkAllocationCallbacks*() const;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::VkAllocationCallbacks	_allocationCallbacks;
+		VkAllocationCallbacks	_allocationCallbacks;
 	};
 
 }	// namespace Vulkan

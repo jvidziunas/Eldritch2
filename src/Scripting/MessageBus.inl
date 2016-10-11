@@ -5,41 +5,26 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/InstanceNew.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Scripting {
 
-	template <typename DispatchedMessage>
-	void MessageBus::SendMessage( const MessageTarget target, DispatchedMessage&& message ) {
-		class MessageWrapper : public Scripting::Message {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			ETForceInlineHint MessageWrapper( DispatchedMessage&& message ) : Scripting::Message(), _message( ::std::move( message ) ) {}
-
-			MessageWrapper() = default;
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			DispatchedMessage	_message;
-		};
-
-	// ---
-
-		if( const auto wrappedMessage = new(allocator, Allocator::AllocationDuration::Temporary) MessageWrapper( ::std::move( message ) ) ) {
-			SendMessage( target, *static_cast<Scripting::Message*>(wrappedMessage) );
-		}
+	template <typename Message>
+	ETInlineHint void MessageBus::Dispatch( ScriptTypeToken<Message> typeToken, ObjectId destinationId, ObjectId senderId, Eldritch2::uint64 time, const Message& message ) {
+		SendMessage( static_cast<TypeId>(typeToken), destinationId, senderId, time, &message );
 	}
 
 }	// namespace Scripting
 }	// namespace Eldritch2
+
+
+

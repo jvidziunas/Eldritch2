@@ -20,6 +20,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextureCompressor", "proj\TextureCompressor.vcxproj", "{12DDB58D-BF15-4807-B66E-94B3858C5B93}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F6360FC-1495-47D5-8820-535240C23C2F}"
+	ProjectSection(SolutionItems) = preProject
+		Eldritch2Types.natvis = Eldritch2Types.natvis
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "angelscript", "extern\angelscript\sdk\angelscript\projects\msvc2013\angelscript.vcxproj", "{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}"
 EndProject

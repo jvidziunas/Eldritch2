@@ -16,13 +16,13 @@
 #include <Utility/MPL/MatrixTypes.hpp>
 #include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//
-#include <boost/array.hpp>
+#include <eastl/array.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Utility {
 
-	enum class FrustumPlane : ::Eldritch2::uint8 {
+	enum class FrustumPlane : Eldritch2::uint8 {
 		Left	= 0,
 		Right	= 1,
 		Top		= 2,
@@ -33,18 +33,18 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	using FrustumPlaneCollection					= ::boost::array<::Eldritch2::Float4, 6>;
-	using StructureOfArraysFrustumPlaneCollection	= ::boost::array<::Eldritch2::Float4, 8>;
+	using FrustumPlaneCollection					= eastl::array<Eldritch2::Float4, 6>;
+	using StructureOfArraysFrustumPlaneCollection	= eastl::array<Eldritch2::Float4, 8>;
 
 // ---------------------------------------------------
 
-	ETNoThrowHint ETNoAliasHint Utility::FrustumPlaneCollection						ExtractFrustumPlanes( const ::Eldritch2::Float4x4& cameraMatrix );
+	ETNoThrowHint ETPureFunctionHint Utility::FrustumPlaneCollection					ExtractFrustumPlanes( const Eldritch2::Float4x4& cameraMatrix );
 
-	ETNoThrowHint ETNoAliasHint Utility::FrustumPlaneCollection						ExtractNormalizedFrustumPlanes( const ::Eldritch2::Float4x4& cameraMatrix );
+	ETNoThrowHint ETPureFunctionHint Utility::FrustumPlaneCollection					ExtractNormalizedFrustumPlanes( const Eldritch2::Float4x4& cameraMatrix );
 
-	ETNoThrowHint ETNoAliasHint Utility::StructureOfArraysFrustumPlaneCollection	ExtractStructureOfArraysFrustumPlanes( const ::Eldritch2::Float4x4& cameraMatrix );
+	ETNoThrowHint ETPureFunctionHint Utility::StructureOfArraysFrustumPlaneCollection	ExtractStructureOfArraysFrustumPlanes( const Eldritch2::Float4x4& cameraMatrix );
 
-	ETNoThrowHint ETNoAliasHint Utility::StructureOfArraysFrustumPlaneCollection	ExtractStructureOfArraysNormalizedFrustumPlanes( const ::Eldritch2::Float4x4& cameraMatrix );
+	ETNoThrowHint ETPureFunctionHint Utility::StructureOfArraysFrustumPlaneCollection	ExtractStructureOfArraysNormalizedFrustumPlanes( const Eldritch2::Float4x4& cameraMatrix );
 
 }	// namespace Utility
 }	// namespace Eldritch2

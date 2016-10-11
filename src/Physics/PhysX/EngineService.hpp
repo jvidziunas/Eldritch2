@@ -12,129 +12,102 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Packages/ResourceViewFactory.hpp>
-#include <Foundation/GameEngineService.hpp>
 #include <Physics/PhysX/SmartPointers.hpp>
+#include <Scheduling/JobFiber.hpp>
+#include <Core/EngineService.hpp>
+#include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 #include <foundation/PxAllocatorCallback.h>
 #include <foundation/PxErrorCallback.h>
+#include <foundation/PxFoundation.h>
 #include <pxtask/PxCpuDispatcher.h>
+#include <cooking/PxCooking.h>
+#include <PxPhysics.h>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 {
+	namespace Core {
+		class	Engine;
+	}
+}
 
 namespace physx {
 	class	PxFoundation;
 	class	PxPhysics;
-}	// namespace physx
+}
 
 namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
 
-	class EngineService : public Foundation::GameEngineService, public ::physx::PxAllocatorCallback, public ::physx::PxErrorCallback, public ::physx::PxCpuDispatcher {
+	class EngineService : public Core::EngineService, public physx::PxAllocatorCallback, public physx::PxErrorCallback, public physx::PxCpuDispatcher {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref EngineService instance.
-		/*!	@param[in] engine Engine responsible for managing the lifetime of the new @ref EngineService instance.
-			*/
-		EngineService( Foundation::GameEngine& engine );
+	//!	Constructs this @ref EngineService instance.
+	/*!	@param[in] engine Engine responsible for managing the lifetime of the new @ref EngineService instance. */
+		EngineService( const Core::Engine& engine );
+	//!	Disable copying.
+		EngineService( const EngineService& ) = delete;
 
 		~EngineService();
 
-	// ---------------------------------------------------
+	// - DEBUG/LOGGING INFORMATION -----------------------
 
-		const ::Eldritch2::UTF8Char* const	GetName() const override;
-
-	// ---------------------------------------------------
-
-		::Eldritch2::ErrorCode	AllocateWorldView( ::Eldritch2::Allocator& allocator, Foundation::World& world ) override;
+	public:
+		Eldritch2::Utf8Literal	GetName() const override;
 
 	// ---------------------------------------------------
 
-		void	OnEngineConfigurationBroadcast( Scheduler::WorkerContext& executingContext ) override;
+	public:
+		Eldritch2::Result<Eldritch2::UniquePointer<Core::WorldService>>	CreateWorldService( Eldritch2::Allocator& allocator, const Core::World& world ) override;
 
 	// ---------------------------------------------------
 
-		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override;
-
-		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override;
-
-		void	AcceptInitializationVisitor( FileSystem::ResourceViewFactoryPublishingInitializationVisitor& visitor ) override;
+	public:
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const ConfigurationBroadcastVisitor ) override;
+		void	AcceptVisitor( Scripting::ApiRegistrar& registrar ) override;
+		void	AcceptVisitor( Configuration::ConfigurationRegistrar& registrar ) override;
+		void	AcceptVisitor( Assets::AssetViewFactoryRegistrar& registrar ) override;
 
 	// - PXALLOCATORCALLBACK METHODS ---------------------
 
+	public:
 		void*	allocate( size_t sizeInBytes, const char* typeName, const char* filename, int line ) override;
 
 		void	deallocate( void* ptr ) override;
 
 	// - PXERRORCALLBACK METHODS -------------------------
 
-		void	reportError( ::physx::PxErrorCode::Enum code, const char* message, const char* file, int line ) override;
+	public:
+		void	reportError( physx::PxErrorCode::Enum code, const char* message, const char* file, int line ) override;
 		
 	// - PXCPUDISPATCHER METHODS -------------------------
 
-		::physx::PxU32	getWorkerCount() const override;
+	public:
+		physx::PxU32	getWorkerCount() const override;
 
-		void			submitTask( ::physx::PxBaseTask& task ) override;
+		void			submitTask( physx::PxBaseTask& task ) override;
 
 	// ---------------------------------------------------
 
-		class MeshViewFactory : public FileSystem::ResourceViewFactory {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref MeshViewFactory instance.
-			MeshViewFactory() = default;
-
-			~MeshViewFactory() = default;
-
-		// ---------------------------------------------------
-
-			static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
-
-		// ---------------------------------------------------
-
-			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-
-		// ---------------------------------------------------
-
-			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
-		};
-
-	// ---
-
-		class TerrainViewFactory : public FileSystem::ResourceViewFactory {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref TerrainViewFactory instance.
-			TerrainViewFactory() = default;
-
-			~TerrainViewFactory() = default;
-
-		// ---------------------------------------------------
-
-			static ETNoAliasHint const ::Eldritch2::UTF8Char* const	GetSerializedDataTag();
-
-		// ---------------------------------------------------
-
-			void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor );
-
-		// ---------------------------------------------------
-
-			::Eldritch2::Result<FileSystem::ResourceView>	AllocateResourceView( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const name ) const override;
-		};
+	//!	Disable assignment.
+		EngineService&	operator=( const EngineService& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		PhysX::UniquePointer<::physx::PxFoundation>	_foundation;
-		PhysX::UniquePointer<::physx::PxPhysics>	_physics;
+	//!	Mutable as objects allocated from the allocator are not directly part of the object's state.
+		mutable Eldritch2::ChildAllocator			_allocator;
+	//	Mutable so logs can be written even in const methods.
+		mutable Logging::ChildLog					_log;
 
-		MeshViewFactory								_meshViewFactory;
-		TerrainViewFactory							_terrainViewFactory;
+		PhysX::UniquePointer<physx::PxFoundation>	_foundation;
+		PhysX::UniquePointer<physx::PxPhysics>		_physics;
+		PhysX::UniquePointer<physx::PxCooking>		_cooking;
 
-		Scheduler::WorkerContext::FinishCounter		_dummyCounter;
+		physx::PxU32								_taskCount;
+		Scheduling::JobBarrier						_simulateBarrier;
 	};
 
 }	// namespace PhysX

@@ -23,9 +23,9 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Tools {
 
-	FlatBufferMetadataBuilderVisitor::FlatBufferMetadataBuilderVisitor( ::asIBinaryStream& outputStream, Allocator& allocator ) : _pendingFunctionMetadata( { allocator, UTF8L( "Angelscript FlatBuffer Metadata Serializer Pending Function Metadata Allocator" ) } ),
-																																  _pendingPropertyMetadata( { allocator, UTF8L("Angelscript FlatBuffer Metadata Serializer Pending Property Metadata Allocator") } ),
-																																  _pendingTypeMetadata( { allocator, UTF8L("Angelscript FlatBuffer Metadata Serializer Pending Type Metadata Allocator") } ),
+	FlatBufferMetadataBuilderVisitor::FlatBufferMetadataBuilderVisitor( ::asIBinaryStream& outputStream, Allocator& allocator ) : _pendingFunctionMetadata( { allocator, "Angelscript FlatBuffer Metadata Serializer Pending Function Metadata Allocator" } ),
+																																  _pendingPropertyMetadata( { allocator, "Angelscript FlatBuffer Metadata Serializer Pending Property Metadata Allocator" } ),
+																																  _pendingTypeMetadata( { allocator, "Angelscript FlatBuffer Metadata Serializer Pending Type Metadata Allocator" } ),
 																																  _outputStream( outputStream ) {}
 
 // ---------------------------------------------------
@@ -43,9 +43,9 @@ namespace Tools {
 
 	// ---
 
-		auto propertyOffset( _builder.CreateVector( _pendingPropertyMetadata.Data(), _pendingPropertyMetadata.Size() ) );
-		auto functionOffset( _builder.CreateVector( _pendingFunctionMetadata.Data(), _pendingFunctionMetadata.Size() ) );
-		auto typeOffset( _builder.CreateVector( _pendingTypeMetadata.Data(), _pendingTypeMetadata.Size() ) );
+		auto propertyOffset( _builder.CreateVector( _pendingPropertyMetadata.Data(), _pendingPropertyMetadata.GetSize() ) );
+		auto functionOffset( _builder.CreateVector( _pendingFunctionMetadata.Data(), _pendingFunctionMetadata.GetSize() ) );
+		auto typeOffset( _builder.CreateVector( _pendingTypeMetadata.Data(), _pendingTypeMetadata.GetSize() ) );
 
 		ModuleMetadataBuilder	moduleMetadataBuilder( _builder );
 
@@ -118,12 +118,10 @@ namespace Tools {
 
 	// ---
 
-
-
 		_pendingTypeMetadata.PushBack( CreateTypeMetadata( _builder,
 														   index,
-														   _builder.CreateVector( _pendingFunctionMetadata.Data(), _pendingFunctionMetadata.Size() ),
-														   _builder.CreateVector( _pendingPropertyMetadata.Data(), _pendingPropertyMetadata.Size() ) ) );
+														   _builder.CreateVector( _pendingFunctionMetadata.Data(), _pendingFunctionMetadata.GetSize() ),
+														   _builder.CreateVector( _pendingPropertyMetadata.Data(), _pendingPropertyMetadata.GetSize() ) ) );
 
 		_pendingFunctionMetadata.Clear();
 		_pendingPropertyMetadata.Clear();

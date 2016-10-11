@@ -17,7 +17,7 @@
 #include <TextureCompressor.hpp>
 //------------------------------------------------------------------//
 
-int main( int argc, ::Eldritch2::UTF8Char** argv ) {
+int main( int argc, Eldritch2::UTF8Char** argv ) {
 	using namespace ::Eldritch2;
 
 // ---

@@ -12,5 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Utility/Mpl/Compiler.hpp>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <EABase/eabase.h>
 #include <catch/include/catch_with_main.hpp>
 //------------------------------------------------------------------//

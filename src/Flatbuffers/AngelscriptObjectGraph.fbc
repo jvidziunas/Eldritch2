@@ -1,0 +1,19 @@
+file_identifier	"ESOG";
+file_extension	".E2AngelscriptObjectGraph";
+
+namespace Eldritch2.Scripting.AngelScript.FlatBuffers;
+
+table TypeDescriptor {
+	QualifiedName	: string (required);
+}
+
+table ObjectDescriptor {
+	Type		: TypeDescriptor (required);
+}
+
+table AngelscriptObjectGraph {
+	Types		: [TypeDescriptor];
+	Objects		: [ObjectDescriptor];
+}
+
+root_type AngelscriptObjectGraph;

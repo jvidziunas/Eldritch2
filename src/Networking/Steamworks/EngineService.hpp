@@ -12,26 +12,32 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Configuration/ConfigurablePODVariable.hpp>
-#include <Configuration/ConfigurableUTF8String.hpp>
-#include <Utility/Containers/UTF8String.hpp>
-#include <Foundation/GameEngineService.hpp>
-#include <Utility/Containers/FlatMap.hpp>
-#include <Utility/Containers/FlatSet.hpp>
-#include <Utility/Concurrency/Lock.hpp>
+#include <Networking/Steamworks/SteamTypeHelpers.hpp>
+#include <Utility/Containers/Utf8String.hpp>
+#include <Platform/UserReadWriteMutex.hpp>
+#include <Utility/Containers/HashSet.hpp>
+#include <Utility/CountedPointer.hpp>
 #include <Utility/IdentifierPool.hpp>
-#include <Scripting/ObjectHandle.hpp>
-#include <Foundation/Player.hpp>
-#include <Utility/Result.hpp>
+#include <Core/EngineService.hpp>
+#include <Logging/ChildLog.hpp>
+#include <Core/Player.hpp>
 //------------------------------------------------------------------//
-#include <steamclientpublic.h>
+#if( ET_COMPILER_IS_MSVC )
+//	Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
+#	pragma warning( push )
+#	pragma warning( disable : 6340 )
+#endif
+#include <isteamclient.h>
+#if( ET_COMPILER_IS_MSVC )
+#	pragma warning( pop )
+#endif
 //------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Networking {
-		class	WorldView;
+	namespace Core {
+		class	Engine;
 	}
 }
 
@@ -39,97 +45,104 @@ namespace Eldritch2 {
 namespace Networking {
 namespace Steamworks {
 
-	class EngineService : public Foundation::GameEngineService {
+	class EngineService : public Core::EngineService {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class Player : public Foundation::Player {
+		class Player : public Core::Player {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref Player instance.
-			Player( const Scripting::ObjectHandle<Foundation::World>& world, EngineService& service, ::Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref Player instance.
+			Player( EngineService& service, Eldritch2::Allocator& allocator );
+		//!	Disable copying.
+			Player( const Player& ) = delete;
 
-			//!	Destroys this @ref Player instance.
 			~Player() = default;
-		
-		// ---------------------------------------------------
-
-			void	Dispose() override sealed;
 
 		// ---------------------------------------------------
 
-			const ::Eldritch2::UTF8Char*	GetName() const override sealed;
+		public:
+			const Eldritch2::Utf8Char*	GetName() const override sealed;
 
-			void							NotifyPersonaNameChange( const ::Eldritch2::UTF8Char* const newName );
+			void						NotifyPersonaNameChange( const Eldritch2::Utf8Char* const newName );
+
+		// ---------------------------------------------------
+
+		//!	Disable assignment.
+			Player&	operator=( const Player& ) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::Eldritch2::UTF8String<>					_name;
-			EngineService&								_service;
-			Scripting::ObjectHandle<Foundation::World>	_world;
+			CSteamID				_steamId;
+			Eldritch2::Utf8String<>	_name;
+			EngineService&			_service;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref EngineService instance.
-		EngineService( Foundation::GameEngine& owningEngine );
+	public:
+	//! Constructs this @ref EngineService instance.
+		EngineService( const Core::Engine& engine );
+	//!	Disable copying.
+		EngineService( const EngineService& ) = delete;
 
-		//! Destroys this @ref EngineService instance.
+	//! Destroys this @ref EngineService instance.
 		~EngineService();
 
 	// ---------------------------------------------------
 
-		const ::Eldritch2::UTF8Char* const	GetName() const override sealed;
+	public:
+		Eldritch2::Result<Eldritch2::UniquePointer<Core::WorldService>>	CreateWorldService( Eldritch2::Allocator& allocator, const Core::World& world ) override;
 
 	// ---------------------------------------------------
 
-		::Eldritch2::ErrorCode	AllocateWorldView( ::Eldritch2::Allocator& allocator, Foundation::World& world ) override;
+	public:
+		Eldritch2::Utf8Literal	GetName() const override sealed;
 
 	// ---------------------------------------------------
 
 	protected:
-		void	OnEngineConfigurationBroadcast( Scheduler::WorkerContext& executingContext ) override sealed;
-
-		void	AcceptInitializationVisitor( Configuration::ConfigurationPublishingInitializationVisitor& visitor ) override sealed;
-		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override sealed;
-
-		void	OnEngineInitializationCompleted( Scheduler::WorkerContext& executingContext ) override sealed;
-
-	// ---------------------------------------------------
-
-		void	OnServiceTickStarted( Scheduler::WorkerContext& executingContext ) override sealed;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const ConfigurationBroadcastVisitor ) override;
+		void	AcceptVisitor( Configuration::ConfigurationRegistrar& registrar ) override;
+		void	AcceptVisitor( Core::ServiceBlackboard& serviceBlackboard ) override;
+		void	AcceptVisitor( Scripting::ApiRegistrar& registrar ) override;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const InitializationCompleteVisitor ) override;
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const ServiceTickVisitor ) override;
 
 	// ---------------------------------------------------
 
+	protected:
 		void	OnPlayerConnected();
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		EngineService&	operator=( const EngineService& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator									_allocator;
+		mutable Eldritch2::ChildAllocator				_allocator;
+		mutable Logging::ChildLog						_log;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_steamPort;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_gamePort;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint16>	_queryPort;
+		Eldritch2::uint16								_steamPort;
 
-		Configuration::ConfigurableUTF8String						_versionString;
-		Configuration::ConfigurableUTF8String						_lobbyWorldName;
-		Configuration::ConfigurableUTF8String						_lobbyRulesName;
+		Eldritch2::IdentifierPool<Eldritch2::uint16>	_networkPortPool;
 
-		Configuration::ConfigurablePODVariable<bool>				_useVACAuthentication;
-		Configuration::ConfigurablePODVariable<bool>				_useSteamworks;
+		Eldritch2::Utf8String<>							_versionString;
+		Eldritch2::Utf8String<>							_lobbyWorldName;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_replicationUploadBandwidthLimitInKilobytesPerSecond;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_replicationDownloadBandwidthLimitInKilobytesPerSecond;
+		bool											_useVacAuthentication;
 
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_contentDownloadBandwidthLimitInKilobytesPerSecond;
-		Configuration::ConfigurablePODVariable<::Eldritch2::uint32>	_contentUploadBandwidthLimitInKilobytesPerSecond;
+		Eldritch2::uint32								_replicationUploadBandwidthLimitInKilobytesPerSecond;
+		Eldritch2::uint32								_replicationDownloadBandwidthLimitInKilobytesPerSecond;
 
-		::Eldritch2::FlatSet<::CSteamID>							_banList;
+		Eldritch2::uint32								_contentDownloadBandwidthLimitInKilobytesPerSecond;
+		Eldritch2::uint32								_contentUploadBandwidthLimitInKilobytesPerSecond;
 
-		Scripting::ObjectHandle<Foundation::World>					_lobbyWorld;
+		Eldritch2::HashSet<CSteamID>					_banList;
 	};
 
 }	// namespace Steamworks

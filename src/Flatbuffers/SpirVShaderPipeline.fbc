@@ -1,0 +1,29 @@
+include			"ShaderPipelineTypes.fbc";
+file_identifier	"ESSP";
+file_extension	".E2SpirVShaderPipeline";
+
+namespace Eldritch2.Renderer.Vulkan.FlatBuffers;
+
+enum EnabledStageFlags : ubyte (bit_flags) {
+	VertexShader,
+	HullShader,
+	DomainShader,
+	GeometryShader,
+	FragmentShader
+}
+
+table UsageDescriptor {
+	Name					: string (required, key);
+	EnabledStages			: EnabledStageFlags;
+	RasterizerBehavior		: Eldritch2.Renderer.FlatBuffers.RasterizerState (required);
+	DepthStencilBehavior	: Eldritch2.Renderer.FlatBuffers.DepthStencilState (required);
+	RenderTargets			: [Eldritch2.Renderer.FlatBuffers.RenderTargetState];
+	UnorderedAccessViews	: [Eldritch2.Renderer.FlatBuffers.UnorderedAccessViewState];
+}
+
+table SpirVShaderPipeline {
+	ShaderBytecode			: [uint];
+	Usages					: [UsageDescriptor] (required);
+}
+
+root_type SpirVShaderPipeline;

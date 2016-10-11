@@ -21,9 +21,9 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	void	RegisterCMathLibrary( ::asIScriptEngine* const engine );
+	void	RegisterCMath( asIScriptEngine* const engine );
 
-	void	RegisterAlgorithmLibrary( ::asIScriptEngine* const engine );
+	void	RegisterAlgorithms( asIScriptEngine* const engine );
 
 }	// namespace AngelScript
 }	// namespace Scripting

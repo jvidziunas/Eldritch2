@@ -24,29 +24,46 @@ namespace Vulkan {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref VulkanResult instance.
-		/*! Use this overload when object construction was performed successfully.
-			@param[in] pointer Unique pointer that the @ref VulkanResult will assume responsibility for.
-			*/
-		ETInlineHint VulkanResult( Vulkan::UniquePointer<VulkanObject>&& pointer );
-		//!	Constructs this @ref VulkanResult instance.
-		/*!	Use this overload when object construction was not performed successfully.
-			The constructor parameter will indicate to the outside function why construction failed.
-			@param[in] result <Parameter Description>
-			@returns <Return Value Description>
-			*/
-		ETInlineHint VulkanResult( const ::VkResult result );
+	//!	Constructs this @ref VulkanResult instance.
+	/*! Use this overload when object construction was performed successfully.
+		@param[in] object Vulkan object that the @ref VulkanResult will assume responsibility for.
+		@param[in] deleter Vulkan deleter that will handle cleanup when the Vulkan object leaves scope. */
+		VulkanResult( Vulkan::UniquePointer<VulkanObject> object );
+	//!	Constructs this @ref VulkanResult instance.
+	/*!	Use this overload when object construction was not performed successfully.
+		The constructor parameter will indicate to the outside function why construction failed.
+		@param[in] result Vulkan result code containing information on why the operation failed. */
+		VulkanResult( VkResult result );
+	//!	Constructs this @ref VulkanResult instance.
+		VulkanResult( VulkanResult&& );
+	//!	Disable copying.
+		VulkanResult( const VulkanResult& ) = delete;
 
 		~VulkanResult() = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint operator bool() const;
+	public:
+		const Vulkan::UniquePointer<VulkanObject>&	operator*() const;
+		Vulkan::UniquePointer<VulkanObject>&		operator*();
+
+		const Vulkan::UniquePointer<VulkanObject>*	operator->() const;
+		Vulkan::UniquePointer<VulkanObject>*		operator->();
+
+		operator									VkResult() const;
+
+		explicit operator							bool() const;
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		VulkanResult&	operator=( const VulkanResult& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
-		Vulkan::UniquePointer<VulkanObject>	object;
-		::VkResult							result;
+	private:
+		Vulkan::UniquePointer<VulkanObject>	_object;
+		VkResult							_result;
 	};
 
 }	// namespace Vulkan

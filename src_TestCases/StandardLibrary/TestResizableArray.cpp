@@ -13,24 +13,25 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
-#include <Utility/Memory/ArenaAllocator.hpp>
+#include <Utility/Memory/MallocAllocator.hpp>
 //------------------------------------------------------------------//
 #include <catch/include/catch.hpp>
 //------------------------------------------------------------------//
 
 TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" ) {
 	GIVEN( "A ResizableArray" ) {
-		::Eldritch2::ResizableArray<unsigned int, ::Eldritch2::ExternalArenaAllocator>	testArray( 5, { _alloca( 128u ), 128u, UTF8L("ResizableArray Test Allocator") } );
+		Eldritch2::ResizableArray<unsigned int, Eldritch2::MallocAllocator>	testArray( { "Test Allocator" } );
 
-		REQUIRE( testArray.Size() == 0 );
-		REQUIRE( testArray.GetCapacity() >= 5 );
+		REQUIRE( testArray.GetSize() == 0 );
 		REQUIRE( testArray.IsEmpty() );
+
+		testArray.Reserve( 5 );
 
 		WHEN( "the size is increased" ) {
 			testArray.Resize( 10 );
 
 			THEN( "the size and capacity change" ) {
-				REQUIRE( testArray.Size() == 10 );
+				REQUIRE( testArray.GetSize() == 10 );
 				REQUIRE( testArray.GetCapacity() >= 10 );
 			}
 
@@ -43,7 +44,7 @@ TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" 
 			testArray.Reserve( 10 );
 
 			THEN( "the capacity changes but not the size" ) {
-				REQUIRE( testArray.Size() == 0 );
+				REQUIRE( testArray.GetSize() == 0 );
 				REQUIRE( testArray.GetCapacity() >= 10 );
 			}
 
@@ -56,7 +57,7 @@ TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" 
 			testArray.Reserve( 0 );
 
 			THEN( "neither size nor capacity are changed" ) {
-				REQUIRE( testArray.Size() == 0 );
+				REQUIRE( testArray.GetSize() == 0 );
 				REQUIRE( testArray.GetCapacity() >= 5 );
 			}
 		}
@@ -64,7 +65,7 @@ TEST_CASE( "Basic ResizableArray functionality", "[Containers][ResizableArray]" 
 			testArray.PushBack( 5u );
 
 			THEN( "the size changes" ) {
-				REQUIRE( testArray.Size() == 1 );
+				REQUIRE( testArray.GetSize() == 1 );
 			}
 
 			AND_THEN( "the back element is updated" ) {

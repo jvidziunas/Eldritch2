@@ -18,21 +18,21 @@
 #include <Utility/Memory/Allocator.hpp>
 //------------------------------------------------------------------//
 
-ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::AllocationOptions options ) throw();
-ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::AllocationOptions options, const char* file, int line ) throw();
+ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, Eldritch2::Allocator& allocator, Eldritch2::AllocationDuration duration, const char* file, int line ) throw();
+ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, Eldritch2::Allocator& allocator, Eldritch2::AllocationDuration duration ) throw();
 
-ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::SizeType alignmentInBytes, const Eldritch2::Allocator::AllocationOptions options ) throw();
-ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::SizeType alignmentInBytes, const Eldritch2::Allocator::AllocationOptions options, const char* file, int line ) throw();
+ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, Eldritch2::Allocator& allocator, size_t alignmentInBytes, Eldritch2::AllocationDuration duration, const char* file, int line ) throw();
+ETRestrictHint ETNoThrowHint void*	operator new( size_t sizeInBytes, Eldritch2::Allocator& allocator, size_t alignmentInBytes, Eldritch2::AllocationDuration duration ) throw();
 
 // ---------------------------------------------------
 
-ETNoThrowHint void					operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::AllocationOptions options ) throw();
-ETNoThrowHint void					operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::AllocationOptions options, const char* file, int line ) throw();
+ETNoThrowHint void					operator delete( void* allocatedMemory, Eldritch2::Allocator& allocator, Eldritch2::AllocationDuration duration, const char* file, int line ) throw();
+ETNoThrowHint void					operator delete( void* allocatedMemory, Eldritch2::Allocator& allocator, Eldritch2::AllocationDuration duration ) throw();
 
-ETNoThrowHint void					operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::SizeType alignmentInBytes, const ::Eldritch2::Allocator::AllocationOptions options ) throw();
-ETNoThrowHint void					operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::SizeType alignmentInBytes, const ::Eldritch2::Allocator::AllocationOptions options, const char* file, int line ) throw();
+ETNoThrowHint void					operator delete( void* allocatedMemory, Eldritch2::Allocator& allocator, size_t alignmentInBytes, Eldritch2::AllocationDuration duration, const char* file, int line ) throw();
+ETNoThrowHint void					operator delete( void* allocatedMemory, Eldritch2::Allocator& allocator, size_t alignmentInBytes, Eldritch2::AllocationDuration duration ) throw();
 
-#define ETDefineClassInstanceNew() ETInlineHint void*	operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::AllocationOptions options ) { return ::operator new( sizeInBytes, allocator, options ); } \
-								   ETInlineHint void*	operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::SizeType alignmentInBytes, const ::Eldritch2::Allocator::AllocationOptions options ) { return ::operator new( sizeInBytes, allocator, alignmentInBytes, options ); } \
-								   ETInlineHint void	operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::AllocationOptions options ) { ::operator delete( allocatedMemory, allocator, options ); } \
-								   ETInlineHint void	operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, const ::Eldritch2::Allocator::SizeType alignmentInBytes, const ::Eldritch2::Allocator::AllocationOptions options ) { ::operator delete( allocatedMemory, allocator, alignmentInBytes, options ); }
+#define ETDefineClassInstanceNew() ETInlineHint void*	operator new( size_t sizeInBytes, Eldritch2::Allocator& allocator, Eldritch2::AllocationDuration duration ) throw() { return ::operator new( sizeInBytes, allocator, options ); } \
+								   ETInlineHint void*	operator new( size_t sizeInBytes, Eldritch2::Allocator& allocator, size_t alignmentInBytes, Eldritch2::AllocationDuration duration ) throw() { return ::operator new( sizeInBytes, allocator, alignmentInBytes, options ); } \
+								   ETInlineHint void	operator delete( void* allocatedMemory, Eldritch2::Allocator& allocator, Eldritch2::AllocationDuration duration ) throw() { ::operator delete( allocatedMemory, allocator, options ); } \
+								   ETInlineHint void	operator delete( void* allocatedMemory, Eldritch2::Allocator& allocator, size_t alignmentInBytes, Eldritch2::AllocationDuration duration ) throw() { ::operator delete( allocatedMemory, allocator, alignmentInBytes, options ); }

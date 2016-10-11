@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(MainSrcDir);$(ExternSrcDir);$(ProjectSrcDir);$(SolutionDir);L:\Boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MainSrcDir);$(ExternSrcDir);$(ProjectSrcDir);$(SolutionDir);$(ExternSrcDir)\eastl\include\;$(ExternSrcDir)\eastl\test\packages\EABase\include\Common\;L:\Boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

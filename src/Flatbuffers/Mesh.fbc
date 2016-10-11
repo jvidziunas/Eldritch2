@@ -1,0 +1,41 @@
+include			"Eldritch2Types.fbc";
+file_identifier	"E2MD";
+file_extension	".E2Mesh";
+
+namespace Eldritch2.Renderer.FlatBuffers;
+
+enum AttributeStreamFormat : ushort {
+	R32G32B32A32Float,
+	R32G32B32A32Int,
+	R32G32B32A32UInt,
+	R32G32B32A32UNorm,
+	R16G16B16A16Float,
+	R16G16B16A16Int,
+	R16G16B16A16UInt,
+	R16G16B16A16UNorm,
+	R8G8B8A8Int,
+	R8G8B8A8UInt,
+	R8G8B8A8UNorm,
+	R8G8B8A8UNorm_sRGB
+}
+
+table SubmeshDescriptor {
+	ShaderPipeline			: string (required);
+	ShaderPipelineResources	: [string];
+	IndexCount				: ushort;
+	MaximumUsedBone			: ushort;
+}
+
+table AttributeDescriptor {
+	Name				: string (required);
+	StrideInBytes		: ushort;
+	Format				: AttributeStreamFormat;
+}
+
+table Mesh {
+	CollisionData		: [ubyte];
+	Submeshes			: [SubmeshDescriptor] (required);
+	AttributeStreams	: [AttributeDescriptor];
+}
+
+root_type Mesh;

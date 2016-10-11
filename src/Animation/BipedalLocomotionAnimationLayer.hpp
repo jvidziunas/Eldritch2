@@ -23,33 +23,33 @@ namespace Animation {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		struct FootstepState {
-			::Eldritch2::uint64		endTime;
-			::Eldritch2::Float4		centerOfMassPosition;
-			::Eldritch2::float16	centerOfMassVelocity[3];
+		enum : size_t {
+			FootCount	= 2u
 		};
 
 	// ---
 
-		enum ActiveFoot : bool {
-			Left,
-			Right
+	public:
+		struct FootstepState {
+			Eldritch2::uint64	endTime;
+			Eldritch2::Float4	centerOfMassPosition;
+			Eldritch2::float16	centerOfMassVelocity[3];
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref BipedalLocomotionAnimationLayer instance.
+	public:
+	//!	Constructs this @ref BipedalLocomotionAnimationLayer instance.
 		BipedalLocomotionAnimationLayer();
-		//!	Constructs this @ref BipedalLocomotionAnimationLayer instance.
-		BipedalLocomotionAnimationLayer( const Animation::BipedalLocomotionAnimationLayer& ) = delete;
+	//!	Constructs this @ref BipedalLocomotionAnimationLayer instance.
+		BipedalLocomotionAnimationLayer( const BipedalLocomotionAnimationLayer& ) = delete;
 
-		//!	Destroys this @ref BipedalLocomotionAnimationLayer instance.
 		~BipedalLocomotionAnimationLayer() = default;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		FootstepState	_footStates[2];
+		FootstepState	_footStates[FootCount];
 	};
 
 }	// namespace Animation

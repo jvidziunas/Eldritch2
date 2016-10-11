@@ -24,46 +24,19 @@
 #endif
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
 
-	MallocAllocator::MallocAllocator( const UTF8Char* name ) : Allocator( name ) {}
+	MallocAllocator::MallocAllocator( const Utf8Char* name ) : Allocator( name ), _peakAllocatedAmount( 0u ), _allocatedAmount( 0u ) {}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* MallocAllocator::Allocate( const SizeType sizeInBytes, const AllocationOptions /*options*/ ) {
-		return malloc( sizeInBytes );
-	}
+	MallocAllocator::MallocAllocator( const MallocAllocator& other ) : Allocator( other ), _peakAllocatedAmount( 0u ), _allocatedAmount( 0u ) {}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* MallocAllocator::Reallocate( void* const address, const SizeType sizeInBytes, const ReallocationOptions options ) {
-		if( ReallocationOption::FailOnMove == (options & ReallocationOption::FailOnMove) ) {
-			return nullptr;
-		}
-
-		return realloc( address, sizeInBytes );
-	}
-
-// ---------------------------------------------------
-
-	ETRestrictHint void* MallocAllocator::Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) {
-		if( ReallocationOption::FailOnMove == (options & ReallocationOption::FailOnMove) ) {
-			return nullptr;
-		}
-
-		SizeType	allocationSize( EstimateActualAllocationSizeInBytes( newSizeInBytes, alignmentInBytes ) );
-
-		if( const auto allocation = realloc( GetAllocationPointerFromAlignedUserPointer( address ), allocationSize ) ) {
-			void*	userPointer( static_cast<void**>(allocation) + 1 );
-
-			if( ::std::align( alignmentInBytes, newSizeInBytes, userPointer, allocationSize ) ) {
-				// Store the 'real' pointer that will be internally fed back to the allocator just before what the user sees.
-				static_cast<void**>(userPointer)[-1] = allocation;
-
-				return userPointer;
-			}
+	ETRestrictHint void* MallocAllocator::Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration ) {
+		if( ((offsetInBytes % alignmentInBytes) == 0) && (alignmentInBytes < 16u) ) {
+			return Allocate( sizeInBytes, duration );
 		}
 
 		return nullptr;
@@ -71,8 +44,27 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	void MallocAllocator::Deallocate( void* const address ) {
+	ETRestrictHint void* MallocAllocator::Allocate( SizeType sizeInBytes, AllocationDuration /*duration*/ ) {
+		return malloc( sizeInBytes );
+	}
+
+// ---------------------------------------------------
+
+	void MallocAllocator::Deallocate( void* const address, SizeType /*sizeInBytes*/ ) {
 		free( address );
+	}
+
+// ---------------------------------------------------
+
+	MallocAllocator& MallocAllocator::operator=( const MallocAllocator& /*other*/ ) {
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	void MallocAllocator::Swap( MallocAllocator& allocator ) {
+		_allocatedAmount.store( _allocatedAmount.exchange( _allocatedAmount.load( std::memory_order_relaxed ), std::memory_order_consume ), std::memory_order_release );
+		_peakAllocatedAmount.store( _peakAllocatedAmount.exchange( _peakAllocatedAmount.load( std::memory_order_relaxed ), std::memory_order_consume ), std::memory_order_release );
 	}
 
 }	// namespace Eldritch2

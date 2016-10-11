@@ -13,86 +13,71 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Memory/ChildAllocator.hpp>
-#include <Utility/Memory/NullAllocator.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
-#include <utility>
+#include <eastl/utility.h>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2;
-
-namespace {
-
-	static const UTF8Char	anonymousAllocatorName[] = UTF8L("Anonymous Child Allocator");
-
-}	// anonymous namespace
 
 namespace Eldritch2 {
 
-	ChildAllocator::ChildAllocator( Allocator& allocator, const UTF8Char* const name ) : Allocator( name ), _parent( allocator ) {}
+	ChildAllocator::ChildAllocator( Allocator& allocator, const Utf8Char* const name ) : Allocator( name ), _parent( &allocator ), _allocatedAmount( 0u ), _peakAllocatedAmount( 0u ) {}
 
 // ---------------------------------------------------
 
-#if( ET_DEBUG_MODE_ENABLED )
-	ChildAllocator::ChildAllocator( ChildAllocator& allocator, const ::Eldritch2::UTF8Char* const name ) : Allocator( name ), _parent( allocator ) {
-		ETRuntimeAssert( !allocator.IsAnonymous() );
-	}
-#endif
+	ChildAllocator::ChildAllocator( const ChildAllocator& allocator ) : Allocator( allocator ), _parent( allocator._parent ), _allocatedAmount( 0u ), _peakAllocatedAmount( 0u ) {}
 
 // ---------------------------------------------------
 
-	ChildAllocator::ChildAllocator( const ChildAllocator& allocator ) : Allocator( allocator.GetName() ), _parent( allocator.GetParent() ) {}
-
-// ---------------------------------------------------
-
-	ChildAllocator::ChildAllocator( ChildAllocator&& allocator ) : Allocator( ::std::move( allocator ) ), _parent( allocator._parent ) {}
-
-// ---------------------------------------------------
-
-	ChildAllocator::ChildAllocator() : Allocator( anonymousAllocatorName ), _parent( NullAllocator::GetInstance() ) {}
-
-// ---------------------------------------------------
-		
-	ETRestrictHint void* ChildAllocator::Allocate( const SizeType sizeInBytes, const AllocationOptions options ) {
-		return _parent.Allocate( sizeInBytes, options );
-	}
-
-// ---------------------------------------------------
-
-	ETRestrictHint void* ChildAllocator::Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) {
-		return _parent.Allocate( sizeInBytes, alignmentInBytes, options );
+	ChildAllocator::ChildAllocator() : Allocator( "Anonymous Child Allocator" ) {
+	//	Default construction of child allocators is dangerous and is provided because many containers (unfortunately) require a default constructor.
+		ETRuntimeAssert( false );
 	}
 
 // ---------------------------------------------------
 		
-	ETRestrictHint void* ChildAllocator::Reallocate( void* const address, const SizeType newSizeInBytes, const ReallocationOptions options ) {
-		return _parent.Reallocate( address, newSizeInBytes, options );
+	ETRestrictHint void* ChildAllocator::Allocate( SizeType sizeInBytes, AllocationDuration duration ) {
+		return ChildAllocator::Allocate( sizeInBytes, 1u, 0u, duration );
 	}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* ChildAllocator::Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) {
-		return _parent.Reallocate( address, newSizeInBytes, alignmentInBytes, options );
+	ETRestrictHint void* ChildAllocator::Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration ) {
+		const auto	result( _parent->Allocate( sizeInBytes, alignmentInBytes, offsetInBytes, duration ) );
+
+		if( result ) {
+			const SizeType	effectiveSize( _allocatedAmount.fetch_add( sizeInBytes, std::memory_order_relaxed ) );
+			SizeType		peakSize;
+			do {
+				peakSize = _peakAllocatedAmount.load( std::memory_order_relaxed );
+			} while( peakSize < effectiveSize && _allocatedAmount.compare_exchange_weak( peakSize, effectiveSize, std::memory_order_relaxed ) );
+		}
+
+		return result;
 	}
 
 // ---------------------------------------------------
-		
-	void ChildAllocator::Deallocate( void* const address ) {
-		_parent.Deallocate( address );
+
+	void ChildAllocator::Deallocate( void* const address, SizeType sizeInBytes ) {
+		_parent->Deallocate( address, sizeInBytes );
 	}
 
 // ---------------------------------------------------
 
-	void ChildAllocator::Deallocate( void* const address, const AlignedDeallocationSemanticsTag semantics ) {
-		_parent.Deallocate( address, semantics );
+	ChildAllocator&	ChildAllocator::operator=( const ChildAllocator& allocator ) {
+		ETRuntimeAssert( 0u == _allocatedAmount.load( std::memory_order_relaxed ) );
+
+		_parent = allocator._parent;
+
+		return *this;
 	}
 
 // ---------------------------------------------------
 
-#if( ET_DEBUG_MODE_ENABLED )
-	bool ChildAllocator::IsAnonymous() const {
-		return (anonymousAllocatorName == _name) && (&NullAllocator::GetInstance() == &_parent);
+	void ChildAllocator::Swap( ChildAllocator& allocator ) {
+		_allocatedAmount.store( _allocatedAmount.exchange( _allocatedAmount.load( std::memory_order_relaxed ), std::memory_order_consume ), std::memory_order_release );
+		_peakAllocatedAmount.store( _peakAllocatedAmount.exchange( _peakAllocatedAmount.load( std::memory_order_relaxed ), std::memory_order_consume ), std::memory_order_release );
+
+		eastl::swap( _parent, allocator._parent );
 	}
-#endif
 
 }	// namespace Eldritch2

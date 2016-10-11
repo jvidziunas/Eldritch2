@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Greater.hpp>
-#include <Utility/Equals.hpp>
-#include <Utility/Less.hpp>
+#include <Utility/GreaterThan.hpp>
+#include <Utility/LessThan.hpp>
+#include <Utility/EqualTo.hpp>
 //------------------------------------------------------------------//

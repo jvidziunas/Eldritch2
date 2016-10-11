@@ -15,49 +15,25 @@
 #include <Utility/Memory/NullAllocator.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
 
-	NullAllocator::NullAllocator() : Allocator( UTF8L("<Null Allocator>" ) ) {}
+	NullAllocator::NullAllocator() : Allocator( "<Null Allocator>" ) {}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* NullAllocator::Allocate( const SizeType /*sizeInBytes*/, const AllocationOptions /*options*/ ) {
+	ETRestrictHint void* NullAllocator::Allocate( SizeType /*sizeInBytes*/, SizeType /*alignmentInBytes*/, SizeType /*offsetInBytes*/, AllocationDuration /*duration*/ ) {
 		return nullptr;
 	}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* NullAllocator::Allocate( const SizeType /*sizeInBytes*/, const SizeType /*alignmentInBytes*/, const AllocationOptions /*options*/ ) {
+	ETRestrictHint void* NullAllocator::Allocate( SizeType /*sizeInBytes*/, AllocationDuration /*duration*/ ) {
 		return nullptr;
 	}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* NullAllocator::Reallocate( void* const /*address*/, const SizeType /*sizeInBytes*/, const ReallocationOptions /*options*/ ) {
-		return nullptr;
-	}
-
-// ---------------------------------------------------
-
-	ETRestrictHint void* NullAllocator::Reallocate( void* const /*address*/, const SizeType /*newSizeInBytes*/, const SizeType /*alignmentInBytes*/, const ReallocationOptions /*options*/ ) {
-		return nullptr;
-	}
-
-// ---------------------------------------------------
-
-	void NullAllocator::Deallocate( void* /*address*/ ) {}
-
-// ---------------------------------------------------
-
-	void NullAllocator::Deallocate( void* /*address*/, const AlignedDeallocationSemanticsTag ) {}
-
-// ---------------------------------------------------
-
-	NullAllocator::SizeType NullAllocator::EstimateActualAllocationSizeInBytes( const SizeType /*allocationSizeInBytes*/, const SizeType /*alignmentInBytes*/ ) const {
-		return 0u;
-	}
+	void NullAllocator::Deallocate( void* /*address*/, SizeType	/*sizeInBytes*/ ) {}
 
 // ---------------------------------------------------
 

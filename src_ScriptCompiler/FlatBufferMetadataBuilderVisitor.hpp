@@ -37,7 +37,7 @@ namespace Tools {
 		/*!	@param[in] outputStream An binary stream interface that will handle committing generated metadata to external storage.
 			@param[in] allocator The @ref Allocator the new @ref FlatBufferMetadataBuilderVisitor instance should use to perform internal allocations.
 			*/
-		FlatBufferMetadataBuilderVisitor( ::asIBinaryStream& outputStream, ::Eldritch2::Allocator& allocator );
+		FlatBufferMetadataBuilderVisitor( ::asIBinaryStream& outputStream, Eldritch2::Allocator& allocator );
 
 		//!	Destroys this @ref FlatBufferMetadataBuilderVisitor instance.
 		~FlatBufferMetadataBuilderVisitor() = default;
@@ -52,7 +52,7 @@ namespace Tools {
 
 		void	BeginFunctionMetadataProcessing();
 
-		void	ProcessFunctionMetadata( const ::Eldritch2::uint32 index, const char* metadataString );
+		void	ProcessFunctionMetadata( const Eldritch2::uint32 index, const char* metadataString );
 
 		void	FinishFunctionMetadataProcessing();
 
@@ -60,7 +60,7 @@ namespace Tools {
 
 		void	BeginPropertyMetadataProcessing();
 
-		void	ProcessPropertyMetadata( const ::Eldritch2::uint32 index, const char* metadataString );
+		void	ProcessPropertyMetadata( const Eldritch2::uint32 index, const char* metadataString );
 
 		void	FinishPropertyMetadataProcessing();
 
@@ -68,20 +68,20 @@ namespace Tools {
 
 		void	BeginTypeMetadataProcessing();
 
-		void	ProcessTypePropertyMetadata( const ::Eldritch2::uint32 propertyIndex, const char* metadataString );
+		void	ProcessTypePropertyMetadata( const Eldritch2::uint32 propertyIndex, const char* metadataString );
 
-		void	ProcessTypeMethodMetadata( const ::Eldritch2::uint32 methodIndex, const char* metadataString );
+		void	ProcessTypeMethodMetadata( const Eldritch2::uint32 methodIndex, const char* metadataString );
 
-		void	ProcessTypeMetadata( const ::Eldritch2::uint32 index, const char* metadataString );
+		void	ProcessTypeMetadata( const Eldritch2::uint32 index, const char* metadataString );
 
 		void	FinishTypeMetadataProcessing();
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ResizableArray<flatbuffers::Offset<FunctionMetadata>>	_pendingFunctionMetadata;
-		::Eldritch2::ResizableArray<flatbuffers::Offset<PropertyMetadata>>	_pendingPropertyMetadata;
-		::Eldritch2::ResizableArray<flatbuffers::Offset<TypeMetadata>>		_pendingTypeMetadata;
+		Eldritch2::ResizableArray<flatbuffers::Offset<FunctionMetadata>>	_pendingFunctionMetadata;
+		Eldritch2::ResizableArray<flatbuffers::Offset<PropertyMetadata>>	_pendingPropertyMetadata;
+		Eldritch2::ResizableArray<flatbuffers::Offset<TypeMetadata>>		_pendingTypeMetadata;
 
 		flatbuffers::FlatBufferBuilder										_builder;
 		::asIBinaryStream&													_outputStream;

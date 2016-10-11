@@ -22,4 +22,4 @@
 #	define	ET_PLATFORM_PLAYSTATION3 0
 #	define	ET_DIR_SEPARATOR         "/"
 #	define	ET_WDIR_SEPARATOR        L"/"
-#	define	ET_UTF8_DIR_SEPARATOR    UTF8L( "/" )
+#	define	ET_UTF8_DIR_SEPARATOR    "/"

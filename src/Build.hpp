@@ -35,10 +35,6 @@
 #	define PROJECT_NAME_LIT SL( PROJECT_NAME )
 #endif
 
-#if !defined( UTF8_PROJECT_NAME )
-#	define UTF8_PROJECT_NAME UTF8L( PROJECT_NAME )
-#endif
-
 #if !defined( UTF16_PROJECT_NAME )
 #	define UTF16_PROJECT_NAME UTF16L( PROJECT_NAME )
 #endif
@@ -49,10 +45,6 @@
 
 #if !defined( VERSION_STRING_LIT )
 #	define VERSION_STRING_LIT SL( VERSION_STRING )
-#endif
-
-#if !defined( UTF8_VERSION_STRING )
-#	define UTF8_VERSION_STRING UTF8L( VERSION_STRING )
 #endif
 
 #if !defined( UTF16_VERSION_STRING )
@@ -85,10 +77,6 @@
 #	define ARCHITECTURE_STRING_LIT SL( ARCHITECTURE_STRING )
 #endif
 
-#if !defined( UTF8_ARCHITECTURE_STRING )
-#	define UTF8_ARCHITECTURE_STRING UTF8L( ARCHITECTURE_STRING )
-#endif
-
 #if !defined( UTF16_ARCHITECTURE_STRING )
 #	define UTF16_ARCHITECTURE_STRING UTF16L( ARCHITECTURE_STRING )
 #endif
@@ -97,5 +85,5 @@
 #	define UTF32_ARCHITECTURE_STRING UTF32L( ARCHITECTURE_STRING )
 #endif
 
-extern const ::Eldritch2::UTF8Char* const	buildDateStamp;
-extern const wchar_t* const					wideBuildDateStamp;
+extern const Eldritch2::Utf8Char* const	buildDateStamp;
+extern const wchar_t* const				wideBuildDateStamp;

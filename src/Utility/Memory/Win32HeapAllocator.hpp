@@ -21,37 +21,40 @@ typedef void*	HANDLE;
 namespace Eldritch2 {
 namespace Detail {
 
-	class Win32HeapAllocatorBase : public ::Eldritch2::Allocator {
-	// - MEMORY ALLOCATION/DEALLOCATION ------------------
-
-	public:
-		using Allocator::Allocate;
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
-
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const ReallocationOptions options ) override sealed;
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
-
-		using Allocator::Deallocate;
-		void					Deallocate( void* const address ) override sealed;
-
-	// - NATIVE HANDLE ACCESS ----------------------------
-
-		//! Retrieves the handle to the Win32 heap used for servicing allocations.
-		::HANDLE	GetHeapHandle() const;
-
+	class Win32HeapAllocatorBase : public Eldritch2::Allocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//! Constructs this @ref Win32HeapAllocatorBase instance.
-		Win32HeapAllocatorBase( const ::HANDLE heapHandle, const ::Eldritch2::UTF8Char* const name );
+	//! Constructs this @ref Win32HeapAllocatorBase instance.
+		Win32HeapAllocatorBase( HANDLE heapHandle, const Eldritch2::Utf8Char* const name );
+	//!	Disable copying.
+		Win32HeapAllocatorBase( const Win32HeapAllocatorBase& ) = delete;
 
-		//! Destroys this @ref Win32HeapAllocatorBase instance.
 		~Win32HeapAllocatorBase() = default;
+
+	// - MEMORY ALLOCATION/DEALLOCATION ------------------
+
+	public:
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration options = AllocationDuration::Normal ) override sealed;
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) override sealed;
+
+		void					Deallocate( void* const address, SizeType sizeInBytes ) override sealed;
+
+	// - NATIVE HANDLE ACCESS ----------------------------
+
+	public:
+	//! Retrieves the handle to the Win32 heap used for servicing allocations.
+		HANDLE	GetHeapHandle() const;
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		Win32HeapAllocatorBase&	operator=( const Win32HeapAllocatorBase& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		const ::HANDLE	_heap;
+		const HANDLE	_heap;
 	};
 
 }	// namespace Detail
@@ -60,11 +63,17 @@ namespace Detail {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref Win32GlobalHeapAllocator instance.
-		Win32GlobalHeapAllocator( const ::Eldritch2::UTF8Char* const name );
+	//! Constructs this @ref Win32GlobalHeapAllocator instance.
+		Win32GlobalHeapAllocator( const Eldritch2::Utf8Char* const name );
+	//!	Constructs this @ref Win32GlobalHeapAllocator instance.
+		Win32GlobalHeapAllocator( const Win32GlobalHeapAllocator& );
 
-		//! Destroys this @ref Win32GlobalHeapAllocator instance.
 		~Win32GlobalHeapAllocator() = default;
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		Win32GlobalHeapAllocator&	operator=( const Win32GlobalHeapAllocator& ) = delete;
 	};
 
 // ---------------------------------------------------
@@ -73,11 +82,17 @@ namespace Detail {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref Win32PrivateHeapAllocator instance.
-		Win32PrivateHeapAllocator( const SizeType allocationLimit, const ::Eldritch2::UTF8Char* const name );
+	//! Constructs this @ref Win32PrivateHeapAllocator instance.
+		Win32PrivateHeapAllocator( SizeType allocationLimitInBytes, const Eldritch2::Utf8Char* const name );
+	//!	Disable copying.
+		Win32PrivateHeapAllocator( const Win32PrivateHeapAllocator& ) = delete;
 
-		//! Destroys this @ref Win32PrivateHeapAllocator instance.
 		~Win32PrivateHeapAllocator();
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		Win32PrivateHeapAllocator&	operator=( const Win32PrivateHeapAllocator& ) = delete;
 	};
 
 }	// namespace Eldritch2

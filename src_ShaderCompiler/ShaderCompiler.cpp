@@ -17,7 +17,7 @@
 //------------------------------------------------------------------//
 
 #if( ET_PLATFORM_WINDOWS )
-int main( int argc, ::Eldritch2::UTF8Char** argv ) {
+int main( int argc, Eldritch2::Utf8Char** argv ) {
 	return 0;
 }
 #endif

@@ -24,14 +24,14 @@ namespace Tools {
 namespace Detail {
 
 	template <typename Argument>
-	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddTypedArgument( const ::Eldritch2::UTF8Char* const name, const ::std::function<int (const Argument)>& handler ) {
-		using namespace ::std::placeholders;
+	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddTypedArgument( const Eldritch2::Utf8Char* const name, const std::function<int (const Argument)>& handler ) {
+		using namespace std::placeholders;
 		using namespace ::boost::iostreams;
 
 	// ---
 
-		_knownOptions.PushBack( { name, [handler] ( const ::Eldritch2::UTF8Char* const begin, const ::Eldritch2::UTF8Char* const end ) -> int {
-			basic_array_source<::Eldritch2::UTF8Char>	source( begin, end );
+		_knownOptions.PushBack( { name, [handler] ( const Eldritch2::Utf8Char* const begin, const Eldritch2::Utf8Char* const end ) -> int {
+			basic_array_source<Eldritch2::Utf8Char>	source( begin, end );
 			stream<decltype(source)>					stream( source );
 			Argument									optionValue;
 
@@ -46,7 +46,7 @@ namespace Detail {
 // ---------------------------------------------------
 
 	template <typename Argument>
-	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddTypedArgument( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const shortName, const ::std::function<int (const Argument)>& handler ) {
+	ToolBase::OptionRegistrationVisitor& ToolBase::OptionRegistrationVisitor::AddTypedArgument( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const shortName, const std::function<int (const Argument)>& handler ) {
 		AddTypedArgument( name, handler );
 		return AddTypedArgument( shortName, handler );
 	}
@@ -54,7 +54,7 @@ namespace Detail {
 }	// namespace Detail
 
 	template <typename ImplementingType>
-	int	ToolCRTPBase<ImplementingType>::Run( const Range<UTF8Char**> options ) {
+	int	ToolCRTPBase<ImplementingType>::Run( const Range<Utf8Char**> options ) {
 		{	OptionRegistrationVisitor	visitor( static_cast<ImplementingType&>(*this).GetAllocator() );
 
 			// Register tool options.

@@ -12,93 +12,105 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
+#include <Utility/Memory/EaStlAllocatorAdapterMixin.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/set.h>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/set.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, class Allocator = ::Eldritch2::ChildAllocator>
+	template <typename Value, class Allocator = Eldritch2::ChildAllocator>
 	class Set {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::set<StoredObject, PrivateAllocator>;
+		using UnderlyingContainer	= eastl::set<Value, Detail::EaStlAllocatorAdapterMixin<Allocator>>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
-		using AllocatorType			= Allocator;
+		using AllocatorType			= typename UnderlyingContainer::allocator_type::PublicType;
 		using Iterator				= typename UnderlyingContainer::iterator;
 		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using InsertResult			= ::Eldritch2::Pair<Iterator, bool>;
 		using SizeType				= typename AllocatorType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref Set instance.
-		ETInlineHint explicit Set( AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref Set instance.
+	public:
+	//!	Constructs this @ref Set instance.
 		template <typename InputIterator>
-		ETInlineHint Set( InputIterator begin, InputIterator end, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref Set instance.
-		template <class AlternateAllocator>
-		ETInlineHint Set( const ::Eldritch2::Set<StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator = AllocatorType() );
-		//!	Constructs this @ref Set instance.
-		ETInlineHint Set( ::Eldritch2::Set<StoredObject, Allocator>&& moveSource );
+		Set( InputIterator begin, InputIterator end, const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref Set instance.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Set( const Set& containerTemplate, const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref Set instance.
+		explicit Set( const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref Set instance.
+		Set( Set&& );
 
-		ETInlineHint ~Set() = default;
+		~Set() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-		ETInlineHint Iterator		Find( const ValueType& itemTemplate );
-		ETInlineHint ConstIterator	Find( const ValueType& itemTemplate ) const;
+	public:
+		ConstIterator	Find( const ValueType& itemTemplate ) const;
+		Iterator		Find( const ValueType& itemTemplate );
 
 		template <typename Predicate>
-		ETInlineHint void			RemoveIf( Predicate predicate );
-		template <typename ExtraArgumentType, typename Predicate>
-		ETInlineHint void			RemoveIf( ExtraArgumentType extraArgument, Predicate predicate );
+		void			RemoveIf( Predicate predicate );
 
 	// - ELEMENT ITERATION -------------------------------
 
-		ETInlineHint Iterator		Begin();
-		ETInlineHint ConstIterator	Begin() const;
+	public:
+		ConstIterator	ConstBegin() const;
 
-		ETInlineHint ConstIterator	ConstBegin() const;
+		ConstIterator	ConstEnd() const;
 
-		ETInlineHint Iterator		End();
-		ETInlineHint ConstIterator	End() const;
-
-		ETInlineHint ConstIterator	ConstEnd() const;
+		ConstIterator	Begin() const;
+		Iterator		Begin();
+		
+		ConstIterator	End() const;
+		Iterator		End();
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		ETInlineHint void	CloneFrom( const ::Eldritch2::Set<StoredObject, Allocator>& containerTemplate );
+	public:
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Set&	operator=( const Set& );
+		Set&	operator=( Set&& );
 
-		ETInlineHint void	Swap( ::Eldritch2::Set<StoredObject, Allocator>& other );
+		void	Swap( Set& other );
 
 	// - CONTAINER MANIPULATION --------------------------
 
-		ETInlineHint InsertResult	Insert( const ValueType& v );
+	public:
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Eldritch2::Pair<Iterator, bool>	Insert( const ValueType& value );
+		Eldritch2::Pair<Iterator, bool>	Insert( ValueType&& value );
 
-		ETInlineHint void	Erase( Iterator position );
-		ETInlineHint void	Erase( Iterator begin, Iterator end );
+		Iterator						Erase( Iterator begin, Iterator end );
+		Iterator						Erase( Iterator position );
 
-		ETInlineHint void	Clear();
+		void							Clear();
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint SizeType	Size() const;
+	public:
+		SizeType			GetSize() const;
 
-		ETInlineHint bool	Empty() const;
+		bool				IsEmpty() const;
 
-		ETInlineHint	operator bool() const;
+		explicit operator	bool() const;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
-		ETInlineHint const AllocatorType&	GetAllocator() const;
+	public:
+		const AllocatorType&	GetAllocator() const;
 
 	// - DATA MEMBERS ------------------------------------
 

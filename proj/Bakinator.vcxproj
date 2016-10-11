@@ -42,7 +42,7 @@
     <ClInclude Include="..\src\Tools\Win32\FileAccessorFactory.hpp" />
     <ClInclude Include="..\src\Utility\Memory\Allocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\ChildAllocator.hpp" />
-    <ClInclude Include="..\src\Utility\Memory\InstanceDeleters.hpp" />
+    <ClInclude Include="..\src\Utility\Memory\InstanceDeleter.hpp" />
     <ClInclude Include="..\src\Utility\Memory\InstanceNew.hpp" />
     <ClInclude Include="..\src\Utility\Memory\NullAllocator.hpp" />
     <ClInclude Include="..\src\Utility\Memory\StandardLibrary.hpp" />

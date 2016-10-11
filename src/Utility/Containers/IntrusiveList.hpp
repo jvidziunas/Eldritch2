@@ -5,7 +5,7 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -13,137 +13,148 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/IntrusiveListHook.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
 //------------------------------------------------------------------//
-#include <boost/intrusive/list.hpp>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/intrusive_list.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, typename NodeTraits = ::boost::intrusive::base_hook<::Eldritch2::IntrusiveListBaseHook>>
+	template <typename Value>
 	class IntrusiveList {
 	// - TYPE PUBLISHING ---------------------------------
 
-		typedef ::boost::intrusive::list<StoredObject, NodeTraits, ::boost::intrusive::cache_last<true>>	UnderlyingContainer;
+	private:
+		using UnderlyingContainer	= eastl::intrusive_list<Value>;
 
 	public:
-		typedef typename UnderlyingContainer::value_traits				UnderlyingValueTraits;
-		typedef typename UnderlyingContainer::value_type				ValueType;
-		typedef	typename UnderlyingContainer::reference					Reference;
-		typedef	typename UnderlyingContainer::const_reference			ConstReference;
-		typedef typename UnderlyingContainer::iterator					Iterator;
-		typedef typename UnderlyingContainer::reverse_iterator			ReverseIterator;
-		typedef typename UnderlyingContainer::const_iterator			ConstIterator;
-		typedef typename UnderlyingContainer::const_reverse_iterator	ConstReverseIterator;
-		typedef size_t													SizeType;
+		using ValueType				= typename UnderlyingContainer::value_type;
+		using Reference				= typename UnderlyingContainer::reference;
+		using ConstReference		= typename UnderlyingContainer::const_reference;
+		using Iterator				= typename UnderlyingContainer::iterator;
+		using ReverseIterator		= typename UnderlyingContainer::reverse_iterator;
+		using ConstIterator			= typename UnderlyingContainer::const_iterator;
+		using ConstReverseIterator	= typename UnderlyingContainer::const_reverse_iterator;
+		using SizeType				= typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		// Constructs this IntrusiveList instance.
-		IntrusiveList( const UnderlyingValueTraits& valueTraits = UnderlyingValueTraits() );
+	public:
+	//!	Constructs this @ref IntrusiveList instance.
+		IntrusiveList( IntrusiveList&& );
+	//!	Constructs this @ref IntrusiveList instance.
+		IntrusiveList( const IntrusiveList& ) = delete;
+	//!	Constructs this @ref IntrusiveList instance.
+		IntrusiveList() = default;
 
-		// Destroys this IntrusiveList instance.
-		~IntrusiveList();
+		~IntrusiveList() = default;
 
 	// - ALGORITHMS --------------------------------------
 
+	public:
 		template <typename Predicate>
-		ETInlineHint Iterator		Find( Predicate predicate );
+		ConstIterator	Find( ConstIterator searchHint, Predicate predicate ) const;
 		template <typename Predicate>
-		ETInlineHint Iterator		Find( Predicate predicate, Iterator searchHint );
+		Iterator		Find( Iterator searchHint, Predicate predicate );
 		template <typename Predicate>
-		ETInlineHint ConstIterator	Find( Predicate predicate ) const;
+		ConstIterator	Find( Predicate predicate ) const;
 		template <typename Predicate>
-		ETInlineHint ConstIterator	Find( Predicate predicate, ConstIterator searchHint ) const;
+		Iterator		Find( Predicate predicate );
 
 		template <typename Predicate>
-		ETInlineHint void	RemoveIf( Predicate predicate );
+		void			RemoveIf( Predicate predicate );
 
 		template <typename Predicate, typename Disposer>
-		ETInlineHint void	RemoveAndDisposeIf( Predicate predicate, Disposer disposer );
+		void			RemoveAndDisposeIf( Predicate predicate, Disposer disposer );
 
 	// - ELEMENT ITERATION -------------------------------
 
-		Iterator		Begin();
-		ConstIterator	Begin() const;
-
+	public:
 		ConstIterator	ConstBegin() const;
-
-		Iterator		End();
-		ConstIterator	End() const;
 
 		ConstIterator	ConstEnd() const;
 
-		Iterator		IteratorTo( Reference element );
+		ConstIterator	Begin() const;
+		Iterator		Begin();
+		
+		ConstIterator	End() const;
+		Iterator		End();
+
 		ConstIterator	IteratorTo( ConstReference element ) const;
+		Iterator		IteratorTo( Reference element );
 
 	// - END POINT MANIPULATION --------------------------
 
-		// Retrieves a reference to the first element stored in this IntrusiveList.
-		Reference		Front();
-		// Retrieves a reference to the first element stored in this IntrusiveList.
+	public:
+	//	Retrieves a reference to the first element stored in this @ref IntrusiveList.
 		ConstReference	Front() const;
+	//	Retrieves a reference to the first element stored in this @ref IntrusiveList.
+		Reference		Front();
 
-		// Adds the passed-in item to the head of this IntrusiveList.
+	//	Retrieves a reference to the last element stored in this @ref IntrusiveList.
+		ConstReference	Back() const;
+	//	Retrieves a reference to the last element stored in this @ref IntrusiveList.
+		Reference		Back();
+	
+	//	Adds the passed-in item to the head of this @ref IntrusiveList.
 		void			PushFront( Reference item );
 
-		// Removes the head element of this IntrusiveList, reducing its size by one element.
+	//	Adds the passed-in item to the tail of this @ref IntrusiveList.
+		void			PushBack( Reference item );
+
+	//	Removes the head element of this @ref IntrusiveList, reducing its size by one element.
 		void			PopFront();
 
-		// Removes the head element of this IntrusiveList, reducing its size by one element.
+	//	Removes the tail element of this @ref IntrusiveList, reducing its size by one element.
+		void			PopBack();
+
+	//	Removes the head element of this @ref IntrusiveList, reducing its size by one element.
 		template <typename Disposer>
 		void			PopFrontAndDispose( Disposer disposer );
 
-		// Retrieves a reference to the last element stored in this IntrusiveList.
-		Reference		Back();
-		// Retrieves a reference to the last element stored in this IntrusiveList.
-		ConstReference	Back() const;
-
-		// Adds the passed-in item to the tail of this IntrusiveList.
-		void			PushBack( Reference item );
-
-		// Removes the tail element of this IntrusiveList, reducing its size by one element.
-		void			PopBack();
-
-		// Removes the tail element of this IntrusiveList, reducing its size by one element. Operator() is invoked on the specified disposer, with the popped element passed in as the sole parameter.
+	//	Removes the tail element of this @ref IntrusiveList, reducing its size by one element. Operator() is invoked on the specified disposer, with the popped element passed in as the sole parameter.
 		template <typename Disposer>
 		void			PopBackAndDispose( Disposer disposer );
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-		template <typename AlternateNodeTraits, typename Disposer, typename ElementCloner>
-		ETInlineHint void	CloneFrom( const ::Eldritch2::IntrusiveList<StoredObject, AlternateNodeTraits>& containerTemplate, Disposer disposer, ElementCloner cloner );
+	public:
+		template <typename Disposer, typename ElementCloner>
+		void	CloneFrom( const IntrusiveList& containerTemplate, Disposer disposer, ElementCloner cloner );
 
-		ETInlineHint void	Swap( ::Eldritch2::IntrusiveList<StoredObject, NodeTraits>& other );
+		void	Swap( IntrusiveList& other );
 
 	// - CONTAINER MANIPULATION --------------------------
 
-		// Inserts an element at the position specified, shifting all antecedent elements down one position.
-		ETInlineHint Iterator	Insert( Iterator location, Reference item );
+	public:
+	//	Inserts an element at the position specified, shifting all antecedent elements down one position.
+		Iterator	Insert( Iterator location, Reference item );
 
-		ETInlineHint Iterator	InsertAfter( Iterator location, Reference item );
-
-		ETInlineHint void	Erase( Iterator position );
-		ETInlineHint void	Erase( Iterator begin, Iterator end );
-
-		template <typename Disposer>
-		ETInlineHint void	EraseAndDispose( Reference item, Disposer disposer );
-		template <typename Disposer>
-		ETInlineHint void	EraseAndDispose( Iterator position, Disposer disposer );
-		template <typename Disposer>
-		ETInlineHint void	EraseAndDispose( Iterator begin, Iterator end, Disposer disposer );
-
-		ETInlineHint void	Clear();
+		Iterator	Erase( Iterator begin, Iterator end );
+		Iterator	Erase( Iterator position );
 
 		template <typename Disposer>
-		ETInlineHint void	ClearAndDispose( Disposer disposer );
+		Iterator	EraseAndDispose( Iterator begin, Iterator end, Disposer disposer );
+		template <typename Disposer>
+		Iterator	EraseAndDispose( Iterator position, Disposer disposer );
+
+		template <typename Disposer>
+		void		ClearAndDispose( Disposer disposer );
+
+		void		Clear();
 
 	// - CONTENT QUERY -----------------------------------
 
-		ETInlineHint SizeType	Size() const;
+	public:
+		SizeType			GetSize() const;
 
-		ETInlineHint bool	Empty() const;
+		bool				IsEmpty() const;
 
-		ETInlineHint	operator bool() const;
+		explicit operator	bool() const;
 
 	// - DATA MEMBERS ------------------------------------
 

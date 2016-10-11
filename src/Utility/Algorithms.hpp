@@ -17,7 +17,6 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Utility {
 
 	class InvokeDestructor {
 	public:
@@ -41,43 +40,22 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	class IsEquivalent {
-	public:
-		template <typename ObjectType>
-		ETForceInlineHint bool	operator()( const ObjectType& object0, const ObjectType& object1 ) const { return object0 == object1; }
-	};
-
-// ---------------------------------------------------
-
 	template <typename InputIterator, typename Predicate>
 	InputIterator	Find( InputIterator begin, InputIterator end, Predicate predicate );
-
-	template <typename InputIterator, typename Predicate>
-	InputIterator	FindInPlace( InputIterator begin, InputIterator end, Predicate& predicate );
 
 	template <typename InputIterator>
 	InputIterator	FindElement( InputIterator begin, InputIterator end, decltype(*begin) element );
 
 // ---------------------------------------------------
 
-	// Applies the operator() method of the specified predicate to each element in the specified range.
-	// Returns a copy of the predicate after all operations have been performed.
+//	Applies the operator() method of the specified predicate to each element in the specified range.
+//	Returns a copy of the predicate after all operations have been performed.
 	template <typename InputIterator, typename Predicate>
-	Predicate			ForEach( InputIterator begin, InputIterator end, Predicate predicate );
-	// Applies the operator() method of the specified predicate to each element in the specified array.
-	// Returns a copy of the predicate after all operations have been performed.
+	Predicate	ForEach( InputIterator begin, InputIterator end, Predicate predicate );
+//	Applies the operator() method of the specified predicate to each element in the specified array.
+//	Returns a copy of the predicate after all operations have been performed.
 	template <typename ObjectType, size_t arraySize, typename Predicate>
-	Predicate			ForEach( ObjectType (&range)[arraySize], Predicate predicate );
-
-	// Applies the operator() method of the specified predicate to each element in the specified range.
-	// Returns a reference to the passed-in predicate.
-	template <typename InputIterator, typename Predicate>
-	Predicate&			ForEachInPlace( InputIterator begin, InputIterator end, Predicate& predicate );
-	// Applies the operator() method of the specified predicate to each element in the specified range.
-	// Returns a reference to the passed-in predicate.
-	// Note that operator() of the predicate object *must* be callable when the target object is const!
-	template <typename InputIterator, typename Predicate>
-	const Predicate&	ForEachInPlace( InputIterator begin, InputIterator end, const Predicate& predicate );
+	Predicate	ForEach( ObjectType (&range)[arraySize], Predicate predicate );
 
 // ---------------------------------------------------
 
@@ -127,7 +105,6 @@ namespace Utility {
 	template <typename InputIterator>
 	void	TrivialConstructRange( InputIterator rangeStart, InputIterator rangeEnd );
 
-}	// namespace Utility
 }	// namespace Eldritch2
 
 //==================================================================//

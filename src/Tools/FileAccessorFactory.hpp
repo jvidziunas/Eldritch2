@@ -12,15 +12,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/InstanceDeleters.hpp>
+#include <Utility/UniquePointer.hpp>
 #include <Utility/MPL/CharTypes.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace FileSystem {
-		class	ReadableMemoryMappedFile;
+	namespace Platform {
 		class	SynchronousFileReader;
 		class	SynchronousFileWriter;
+		class	MemoryMappedFile;
 	}
 }
 
@@ -28,25 +28,24 @@ namespace Eldritch2 {
 namespace Tools {
 
 	class ETPureAbstractHint FileAccessorFactory {
-	// ---------------------------------------------------
-
-	public:
-		virtual ::Eldritch2::InstancePointer<FileSystem::ReadableMemoryMappedFile>	CreateReadableMemoryMappedFile( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const fileName ) abstract;
-
-		virtual ::Eldritch2::InstancePointer<FileSystem::SynchronousFileReader>		CreateReader( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const fileName ) abstract;
-
-		virtual ::Eldritch2::InstancePointer<FileSystem::SynchronousFileWriter>		CreateWriter( ::Eldritch2::Allocator& allocator, const ::Eldritch2::UTF8Char* const fileName ) abstract;
-
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//!	Constructs this @ref FileAccessorFactory instance.
+	//!	Constructs this @ref FileAccessorFactory instance.
 		FileAccessorFactory( const FileAccessorFactory& ) = delete;
-		//!	Constructs this @ref FileAccessorFactory instance.
+	//!	Constructs this @ref FileAccessorFactory instance.
 		FileAccessorFactory() = default;
 
-		//!	Destroys this @ref FileAccessorFactory instance.
 		~FileAccessorFactory() = default;
+
+	// ---------------------------------------------------
+
+	public:
+		virtual Eldritch2::UniquePointer<Platform::MemoryMappedFile>			CreateReadableMemoryMappedFile( Eldritch2::Allocator& allocator, const Eldritch2::Utf8Char* const fileName ) abstract;
+
+		virtual Eldritch2::UniquePointer<Platform::SynchronousFileReader>		CreateReader( Eldritch2::Allocator& allocator, const Eldritch2::Utf8Char* const fileName ) abstract;
+
+		virtual Eldritch2::UniquePointer<Platform::SynchronousFileWriter>		CreateWriter( Eldritch2::Allocator& allocator, const Eldritch2::Utf8Char* const fileName ) abstract;
 	};
 
 }	// namespace Tools

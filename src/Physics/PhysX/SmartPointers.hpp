@@ -12,9 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/Compiler.hpp>
-//------------------------------------------------------------------//
-#include <memory>
+#include <Utility/UniquePointer.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -39,7 +37,7 @@ namespace Detail {
 }	// namespace Detail
 
 	template <typename Object>
-	using UniquePointer = ::std::unique_ptr<Object, Detail::ObjectDeleter<Object>>;
+	using UniquePointer = Eldritch2::UniquePointer<Object, Detail::ObjectDeleter<Object>>;
 
 }	// namespace PhysX
 }	// namespace Physics

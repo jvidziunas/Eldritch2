@@ -34,7 +34,7 @@ namespace Tools {
 // ---------------------------------------------------
 
 	template <class GlobalAllocator, class FileAccessorFactory>
-	int	TextureCompressor<GlobalAllocator, FileAccessorFactory>::ProcessInputFiles( ::Eldritch2::Range<const UTF8Char**> inputFiles ) {
+	int	TextureCompressor<GlobalAllocator, FileAccessorFactory>::ProcessInputFiles( Eldritch2::Range<const UTF8Char**> inputFiles ) {
 		for( const UTF8Char* file : inputFiles ) {
 
 		}

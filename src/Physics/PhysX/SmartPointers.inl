@@ -22,6 +22,10 @@ namespace Detail {
 
 	template <typename PhysXObject>
 	ETInlineHint void ObjectDeleter<PhysXObject>::operator()( PhysXObject* const object ) {
+		if( ETBranchUnlikelyHint( nullptr == object ) ) {
+			return;
+		}
+
 		object->release();
 	}
 

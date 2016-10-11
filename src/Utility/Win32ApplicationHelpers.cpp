@@ -32,26 +32,20 @@
 ET_LINK_LIBRARY( "Shlwapi.lib" )
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Utility;
-using namespace ::Eldritch2;
-
 #if defined( GetCommandLine )
 #	undef GetCommandLine
 #endif
 
+namespace Eldritch2 {
+namespace Utility {
 namespace {
 
-	static ::HINSTANCE	instance = nullptr;
-	static int			cmdShow = 0;
+	static int	cmdShow = 0;
 
 }	// anonymous namespace
 
-namespace Eldritch2 {
-namespace Utility {
-
-	void StoreMainArguments( ::HINSTANCE hInstance, int nCmdShow ) {
-		instance	= hInstance;
-		cmdShow		= nCmdShow;
+	void StoreMainArguments( HINSTANCE /*hInstance*/, int nCmdShow ) {
+		cmdShow = nCmdShow;
 	}
 
 // ---------------------------------------------------
@@ -68,25 +62,33 @@ namespace Utility {
 
 // ---------------------------------------------------
 
-	::HINSTANCE GetInstance() {
+	HINSTANCE GetInstance( void* addressOfItemInModule ) {
+		HINSTANCE	instance( nullptr );
+
+		if( !addressOfItemInModule ) {
+			addressOfItemInModule = reinterpret_cast<void*>( &GetInstance );
+		}
+
+		GetModuleHandleExW( GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, static_cast<LPWSTR>(addressOfItemInModule), &instance );
+
 		return instance;
 	}
 
 // ---------------------------------------------------
 	
 	const char* GetCommandLine() {
-		return ::GetCommandLineA();
+		return GetCommandLineA();
 	}
 
 // ---------------------------------------------------
 
 	const wchar_t* GetWideCommandLine() {
-		return ::GetCommandLineW();
+		return GetCommandLineW();
 	}
 
 // ---------------------------------------------------
 
-	int ETNoAliasHint ETNoThrowHint GetCmdShow() {
+	int ETPureFunctionHint ETNoThrowHint GetCmdShow() {
 		return cmdShow;
 	}
 

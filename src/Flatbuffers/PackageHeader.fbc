@@ -1,0 +1,18 @@
+file_identifier	"ECRF";
+file_extension	".e2toc";
+
+namespace Eldritch2.FileSystem.FlatBuffers;
+
+table ExportDescriptor {
+	Name	: string (required);
+	Type	: string (required);
+	Offset	: ulong;
+	Length	: ulong;
+}
+
+table PackageHeader {
+	Imports : [string];
+	Exports : [ExportDescriptor];
+}
+
+root_type PackageHeader;

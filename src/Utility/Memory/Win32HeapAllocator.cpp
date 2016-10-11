@@ -21,12 +21,8 @@
 #	define WIN32_LEAN_AND_MEAN
 #endif
 #include <Windows.h>
+#include <malloc.h>
 //------------------------------------------------------------------//
-#include <algorithm>
-//------------------------------------------------------------------//
-
-using namespace ::Eldritch2;
-using namespace ::std;
 
 // There are a few combo assignment/conditional expressions in
 // the heap manipulation functions here. All are intentional.
@@ -39,91 +35,69 @@ using namespace ::std;
 #	undef CopyMemory
 #endif
 
+namespace Eldritch2 {
 namespace {
 
-	enum : ::DWORD {
-		HEAP_INIT_FLAGS	= ETIsDebugModeEnabled() ? HEAP_CREATE_ENABLE_TRACING : 0u
+	enum : DWORD {
+		HeapInitFlags	= ETIsDebugModeEnabled() ? HEAP_CREATE_ENABLE_TRACING : 0u
 	};
 
 }	// anonymous namespace
 
-namespace Eldritch2 {
 namespace Detail {
 
-	Win32HeapAllocatorBase::Win32HeapAllocatorBase( const ::HANDLE heapHandle, const UTF8Char* const name ) : Allocator( name ), _heap( heapHandle ) {
+	Win32HeapAllocatorBase::Win32HeapAllocatorBase( HANDLE heapHandle, const Utf8Char* const name ) : Allocator( name ), _heap( heapHandle ) {
 		ETRuntimeAssert( nullptr != _heap );
 	}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* Win32HeapAllocatorBase::Allocate( const SizeType sizeInBytes, const AllocationOptions ) {
-		return ::HeapAlloc( _heap, 0, sizeInBytes );
-	}
-
-// ---------------------------------------------------
-
-	ETRestrictHint void* Win32HeapAllocatorBase::Reallocate( void* const address, const SizeType newSizeInBytes, const AllocationOptions options ) {
-		if( !address ) {
-			return this->Allocate( newSizeInBytes, options );
-		}
-
-		return ::HeapReAlloc( _heap, (options & ReallocationOption::FailOnMove) ? HEAP_REALLOC_IN_PLACE_ONLY : 0u, address, newSizeInBytes );
-	}
-
-// ---------------------------------------------------
-
-	ETRestrictHint void* Win32HeapAllocatorBase::Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) {
-		if( !address ) {
-			return this->Allocate( newSizeInBytes, alignmentInBytes, options );
-		}
-
-		if( void* const returnPointer = ::HeapReAlloc( _heap, HEAP_REALLOC_IN_PLACE_ONLY, address, this->EstimateActualAllocationSizeInBytes( newSizeInBytes, alignmentInBytes ) ) ) {
-			return returnPointer;
-		}
-
-		if( options & ReallocationOption::FailOnMove ) {
+	ETRestrictHint void* Win32HeapAllocatorBase::Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration /*duration*/ ) {
+		if( ETBranchUnlikelyHint( ( alignmentInBytes > 16u ) | (offsetInBytes % alignmentInBytes != 0u) ) ) {
 			return nullptr;
 		}
 
-		if( void* const newAllocation = this->Allocate( this->EstimateActualAllocationSizeInBytes( newSizeInBytes, alignmentInBytes ), alignmentInBytes, options ) ) {
-			const size_t	overheadInBytes( static_cast<size_t>(static_cast<char*>(address) - static_cast<char*>(GetAllocationPointerFromAlignedUserPointer( address )) ) );
-
-			::Eldritch2::CopyMemory( newAllocation, address, ::HeapSize( _heap, 0, GetAllocationPointerFromAlignedUserPointer( address ) ) - overheadInBytes );
-			this->Deallocate( address, ::Eldritch2::AlignedDeallocationSemantics );
-
-			return newAllocation;
-		}
-
-		return nullptr;
+		return HeapAlloc( _heap, 0, sizeInBytes );
 	}
 
 // ---------------------------------------------------
 
-	void Win32HeapAllocatorBase::Deallocate( void* const address ) {
-		// HeapSize barfs horribly if we feed it a null by accident.
-		if( ETBranchLikelyHint( nullptr != address ) ) {
-			::HeapFree( _heap, 0, address );
-		}
+	ETRestrictHint void* Win32HeapAllocatorBase::Allocate( SizeType sizeInBytes, AllocationDuration duration ) {
+		return Win32HeapAllocatorBase::Allocate( sizeInBytes, 1u, 0u, duration ); 
 	}
 
 // ---------------------------------------------------
 
-	::HANDLE Win32HeapAllocatorBase::GetHeapHandle() const {
+	void Win32HeapAllocatorBase::Deallocate( void* const address, SizeType /*sizeInBytes*/ ) {
+		if( ETBranchUnlikelyHint( nullptr == address ) ) {
+			return;
+		}
+
+		HeapFree( _heap, 0, address );
+	}
+
+// ---------------------------------------------------
+
+	HANDLE Win32HeapAllocatorBase::GetHeapHandle() const {
 		return _heap;
 	}
 
 }	// namespace Detail
 
-	Win32GlobalHeapAllocator::Win32GlobalHeapAllocator( const ::Eldritch2::UTF8Char* const name ) : Detail::Win32HeapAllocatorBase( reinterpret_cast<::HANDLE>(::_get_heap_handle()), name ) {}
+	Win32GlobalHeapAllocator::Win32GlobalHeapAllocator( const Utf8Char* const name ) : Detail::Win32HeapAllocatorBase( reinterpret_cast<HANDLE>(_get_heap_handle()), name ) {}
 
 // ---------------------------------------------------
 
-	Win32PrivateHeapAllocator::Win32PrivateHeapAllocator( const SizeType allocationLimit, const ::Eldritch2::UTF8Char* const name ) : Detail::Win32HeapAllocatorBase( ::HeapCreate( HEAP_INIT_FLAGS, static_cast<SIZE_T>(0u), static_cast<SIZE_T>(allocationLimit)), name ) {}
+	Win32GlobalHeapAllocator::Win32GlobalHeapAllocator( const Win32GlobalHeapAllocator& allocator ) : Detail::Win32HeapAllocatorBase( reinterpret_cast<HANDLE>( _get_heap_handle() ), allocator.GetName() ) {}
+
+// ---------------------------------------------------
+
+	Win32PrivateHeapAllocator::Win32PrivateHeapAllocator( SizeType allocationLimit, const Utf8Char* const name ) : Detail::Win32HeapAllocatorBase( HeapCreate( HeapInitFlags, static_cast<SIZE_T>( 0u ), static_cast<SIZE_T>( allocationLimit ) ), name ) {}
 	
 // ---------------------------------------------------
 
 	Win32PrivateHeapAllocator::~Win32PrivateHeapAllocator() {
-		::HeapDestroy( this->GetHeapHandle() );
+		HeapDestroy( Win32HeapAllocatorBase::GetHeapHandle() );
 	}
 
 }	// namespace Eldritch2

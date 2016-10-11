@@ -15,9 +15,6 @@
 #include <Animation/BipedalLocomotionAnimationLayer.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Animation;
-using namespace ::Eldritch2;
-
 namespace Eldritch2 {
 namespace Animation {
 

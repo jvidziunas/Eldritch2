@@ -12,25 +12,29 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/RDESTLAllocatorAdapterMixin.hpp>
+#include <Utility/Memory/EaStlAllocatorAdapterMixin.hpp>
+#include <Utility/Containers/RangeAdapters.hpp>
 #include <Utility/Memory/ChildAllocator.hpp>
 //------------------------------------------------------------------//
-#include <rdestl/list.h>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/list.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, typename Allocator = ::Eldritch2::ChildAllocator>
-	class List : private ::rde::list<StoredObject, Detail::RDESTLAllocatorAdapterMixin<Allocator>> {
+	template <typename Value, typename Allocator = Eldritch2::ChildAllocator>
+	class List {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using PrivateAllocator		= Detail::RDESTLAllocatorAdapterMixin<Allocator>;
-		using UnderlyingContainer	= ::rde::list<StoredObject, PrivateAllocator>;
+		using UnderlyingContainer	= eastl::list<Value, Detail::EaStlAllocatorAdapterMixin<Allocator>>;
 
 	public:
 		using ValueType				= typename UnderlyingContainer::value_type;
-		using AllocatorType			= Allocator;
+		using AllocatorType			= typename UnderlyingContainer::allocator_type::PublicType;
 		using Reference				= ValueType&;
 		using ConstReference		= const ValueType&;
 		using Iterator				= typename UnderlyingContainer::iterator;
@@ -38,108 +42,129 @@ namespace Eldritch2 {
 		using SizeType				= typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		//! Constructs this @ref List instance.
-		ETInlineHint explicit List( AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref List instance.
+		
+	public:
+	//! Constructs this @ref List instance.
+		explicit List( const AllocatorType& allocator = AllocatorType() );
+	//! Constructs this @ref List instance.
 		template <typename InputIterator>
-		ETInlineHint List( InputIterator first, InputIterator last, AllocatorType&& allocatorType = AllocatorType() );
-		//! Constructs this @ref List instance.
-		template <typename AlternateAllocator>
-		ETInlineHint List( const ::Eldritch2::List<StoredObject, AlternateAllocator>& listTemplate, AllocatorType&& allocatorType = AllocatorType() );
+		List( InputIterator first, InputIterator last, const AllocatorType& allocator = AllocatorType() );
+	//! Constructs this @ref List instance.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		List( const List&, const AllocatorType& allocator = AllocatorType() );
+	//! Constructs this @ref List instance.
+		List( List&& );
 
-		//! Destroys this @ref List instance.
-		ETInlineHint ~List() = default;
+		~List() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-		ETInlineHint Iterator		Find( ConstReference itemTemplate, Iterator searchHint );
-		ETInlineHint ConstIterator	Find( ConstReference itemTemplate, ConstIterator searchHint ) const;
+	public:
+		ConstIterator	Find( ConstReference itemTemplate, ConstIterator searchHint ) const;
+		Iterator		Find( ConstReference itemTemplate, Iterator searchHint );
 
 		template <typename ItemPredicate>
-		ETInlineHint Iterator		RemoveIf( ItemPredicate itemPredicate );
+		Iterator		RemoveIf( ItemPredicate itemPredicate );
 
 	// - ELEMENT ITERATION -------------------------------
 
-		// Retrieves an @ref Iterator pointing to the first element stored in this @ref List.
-		Iterator		Begin();
-		// Retrieves an @ref Iterator pointing to the first element stored in this @ref List.
-		ConstIterator	Begin() const;
-
-		// Retrieves an @ref Iterator pointing to the first element stored in this @ref List.
+	public:
+	//! Retrieves a @ref ConstIterator pointing to the first element stored in this @ref List.
 		ConstIterator	ConstBegin() const;
 
-		// Retrieves an @ref Iterator pointing one position after the last element stored in this @ref List.
-		Iterator		End();
-		// Retrieves an @ref Iterator pointing one position after the last element stored in this @ref List.
-		ConstIterator	End() const;
-
-		// Retrieves an @ref Iterator pointing one position after the last element stored in this @ref List.
+	//!	Retrieves a @ref ConstIterator pointing one position after the last element stored in this @ref List.
 		ConstIterator	ConstEnd() const;
+
+	//!	Retrieves a @ref ConstIterator pointing to the first element stored in this @ref List.
+		ConstIterator	Begin() const;
+	//!	Retrieves an @ref Iterator pointing to the first element stored in this @ref List.
+		Iterator		Begin();
+
+	//!	Retrieves a @ref ConstIterator pointing one position after the last element stored in this @ref List.
+		ConstIterator	End() const;
+	//!	Retrieves an @ref Iterator pointing one position after the last element stored in this @ref List.
+		Iterator		End();
 
 	// - END POINT MANIPULATION --------------------------
 
-		// Retrieves a reference to the first element stored in this @ref List.
-		ETInlineHint Reference		Front();
-		// Retrieves a reference to the first element stored in this @ref List.
-		ETInlineHint ConstReference	Front() const;
+	public:
+	//!	Retrieves a reference to the first element stored in this @ref List.
+		ConstReference	Front() const;
+	//!	Retrieves a reference to the first element stored in this @ref List.
+		Reference		Front();
 
-		// Adds a duplicate of the passed-in item to the head of this @ref List.
-		ETInlineHint void			PushFront( ConstReference itemTemplate );
+	//!	Retrieves a reference to the last element stored in this @ref List.
+		ConstReference	Back() const;
+	//!	Retrieves a reference to the last element stored in this @ref List.
+		Reference		Back();
 
-		template <typename... ElementConstructorArguments>
-		ETInlineHint void			EmplaceFront( ElementConstructorArguments&&... elementConstructorArguments );
+	//!	Adds a duplicate of the passed-in item to the head of this @ref List.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		void			PushFront( ConstReference itemTemplate );
 
-		// Removes the head element of this @ref List, reducing its size by one element.
-		ETInlineHint void			PopFront();
-
-		// Retrieves a reference to the last element stored in this @ref List.
-		ETInlineHint Reference		Back();
-		// Retrieves a reference to the last element stored in this @ref List.
-		ETInlineHint ConstReference	Back() const;
-
-		// Adds a duplicate of the passed-in item to the tail of this @ref List.
-		ETInlineHint void			PushBack( ConstReference itemTemplate );
+	//!	Adds a duplicate of the passed-in item to the tail of this @ref List.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		void			PushBack( ConstReference itemTemplate );
 
 		template <typename... ElementConstructorArguments>
-		ETInlineHint void			EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments );
+		void			EmplaceFront( ElementConstructorArguments&&... elementConstructorArguments );
 
-		// Removes the tail element of this @ref List, reducing its size by one element.
-		ETInlineHint void			PopBack();
+		template <typename... ElementConstructorArguments>
+		void			EmplaceBack( ElementConstructorArguments&&... elementConstructorArguments );
+
+	//!	Removes the head element of this @ref List, reducing its size by one element.
+		void			PopFront();
+
+	//!	Removes the tail element of this @ref List, reducing its size by one element.
+		void			PopBack();
 
 	// - CONTAINER MANIPULATION --------------------------
 
-		// Inserts an element at the position specified, shifting all antecedent elements down one position.
-		ETInlineHint Iterator	Insert( Iterator location, ConstReference itemTemplate );
+	public:
+	//!	Inserts an element at the position specified, shifting all antecedent elements down one position.
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		Iterator	Insert( Iterator location, ConstReference itemTemplate );
 
 		template <typename... ElementConstructorArguments>
-		ETInlineHint Iterator	Emplace( Iterator location, ElementConstructorArguments&&... elementConstructorArguments );
+		Iterator	Emplace( Iterator location, ElementConstructorArguments&&... elementConstructorArguments );
 
-		// Removes an element at the position specified, reducing the size of the @ref List by one element.
-		ETInlineHint Iterator	Erase( Iterator location );
-		// Removes a range of elements in the range [first, last), reducing the size of the @ref List by <<distance( first, last )>>
-		ETInlineHint Iterator	Erase( Iterator first, Iterator last );
+	//!	Removes a range of elements in the range [first, last), reducing the size of the @ref List by <<distance( first, last )>>
+		Iterator	Erase( Iterator first, Iterator last );
+	//!	Removes an element at the position specified, reducing the size of the @ref List by one element.
+		Iterator	Erase( Iterator location );
 
-		// Removes the current contents of this @ref List and duplicates each element in the range [first, last) into the container.
-		template <typename InputIterator>
-		ETInlineHint void		Assign( InputIterator first, InputIterator last );
+	//!	Removes all elements from the @ref List.
+		void		Clear();
 
-		// Removes all elements from the List.
-		ETInlineHint void		Clear();
+	// - CONTAINER DUPLICATION ---------------------------
+
+	public:
+		template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
+		List&	operator=( const List& );
+		List&	operator=( List&& );
+
+		void	Swap( List& container );
 
 	// - CONTENT QUERY -----------------------------------
 
-		// Returns a bool indicating whether or not there are any elements contained in this List.
-		ETInlineHint bool		Empty() const;
+	public:
+	//!	Counts the number of elements contained within this @ref List.
+		SizeType	GetSize() const;
 
-		// Counts the number of elements contained within this List.
-		ETInlineHint SizeType	Size() const;
+	//!	Returns a bool indicating whether or not there are any elements contained in this @ref List.
+		bool		IsEmpty() const;
+
+		explicit	operator bool() const;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
-		ETInlineHint const AllocatorType&	GetAllocator() const;
+	public:
+		const AllocatorType&	GetAllocator() const;
 
-		ETInlineHint void					SetAllocator( const AllocatorType& allocator );
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		UnderlyingContainer	_underlyingContainer;
 	};
 
 }	// namespace Eldritch2

@@ -36,39 +36,39 @@ namespace Detail {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
-			using Handler		= ::std::function<int (const ::Eldritch2::UTF8Char* const, const ::Eldritch2::UTF8Char* const)>;
-			using KnownOption	= ::Eldritch2::Pair<const ::Eldritch2::UTF8Char*, Handler>;
+			using Handler		= std::function<int (const Eldritch2::Utf8Char* const, const Eldritch2::Utf8Char* const)>;
+			using KnownOption	= Eldritch2::Pair<const Eldritch2::Utf8Char*, Handler>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Constructs this @ref OptionRegistrationVisitor instance.
-			/*!	@param[in] allocator @ref Allocator the @ref OptionRegistrationVisitor should use to perform internal allocations.
-				*/
-			OptionRegistrationVisitor( ::Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref OptionRegistrationVisitor instance.
+		/*!	@param[in] allocator @ref Allocator the @ref OptionRegistrationVisitor should use to perform internal allocations. */
+			OptionRegistrationVisitor( Eldritch2::Allocator& allocator );
 
 			~OptionRegistrationVisitor() = default;
 
 		// ---------------------------------------------------
 
-			OptionRegistrationVisitor&	AddArgument( const ::Eldritch2::UTF8Char* const name, const Handler& handler );
-			OptionRegistrationVisitor&	AddArgument( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const shortName, const Handler& handler );
+			OptionRegistrationVisitor&	AddArgument( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const shortName, const Handler& handler );
+			OptionRegistrationVisitor&	AddArgument( const Eldritch2::Utf8Char* const name, const Handler& handler );
+			
 			template <typename Argument>
-			OptionRegistrationVisitor&	AddTypedArgument( const ::Eldritch2::UTF8Char* const name, const ::std::function<int ( const Argument )>& handler );
+			OptionRegistrationVisitor&	AddTypedArgument( const Eldritch2::Utf8Char* const name, const Eldritch2::Utf8Char* const shortName, const std::function<int( const Argument )>& handler );
 			template <typename Argument>
-			OptionRegistrationVisitor&	AddTypedArgument( const ::Eldritch2::UTF8Char* const name, const ::Eldritch2::UTF8Char* const shortName, const ::std::function<int( const Argument )>& handler );
+			OptionRegistrationVisitor&	AddTypedArgument( const Eldritch2::Utf8Char* const name, const std::function<int ( const Argument )>& handler );
 
 			OptionRegistrationVisitor&	AddInputFileHandler( const Handler& handler );
 
 		// ---------------------------------------------------
 
-			int	DispatchProgramArguments( const::Eldritch2::Range<::Eldritch2::UTF8Char**> arguments );
+			int	DispatchProgramArguments( const Eldritch2::Range<Eldritch2::Utf8Char**> arguments );
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			::Eldritch2::ChildAllocator					_allocator;
-			::Eldritch2::ResizableArray<KnownOption>	_knownOptions;
-			Handler										_inputFileHandler;
+			Eldritch2::ChildAllocator				_allocator;
+			Eldritch2::ResizableArray<KnownOption>	_knownOptions;
+			Handler									_inputFileHandler;
 		};
 
 	// ---------------------------------------------------
@@ -86,15 +86,15 @@ namespace Detail {
 	// ---------------------------------------------------
 
 	public:
-		int Run( const ::Eldritch2::Range<::Eldritch2::UTF8Char**> options );
+		int Run( const Eldritch2::Range<Eldritch2::Utf8Char**> options );
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//!	Constructs this @ref ToolCRTPBase instance.
+	//!	Constructs this @ref ToolCRTPBase instance.
 		ToolCRTPBase() = default;
 
-		//!	Destroys this @ref ToolCRTPBase instance.
+	//!	Destroys this @ref ToolCRTPBase instance.
 		~ToolCRTPBase() = default;
 	};
 

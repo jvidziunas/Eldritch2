@@ -19,7 +19,7 @@
 
 namespace Eldritch2 {
 
-	class ETPureAbstractHint ArenaAllocatorBase : public ::Eldritch2::Allocator {
+	class ETPureAbstractHint ArenaAllocatorBase : public Eldritch2::Allocator {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -27,13 +27,22 @@ namespace Eldritch2 {
 
 	// ---
 
+	public:
 		class ScopedCheckpoint {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			ETInlineHint ScopedCheckpoint( ArenaAllocatorBase& allocator );
+		//!	Constructs this @ref ScopedCheckpoint instance.
+			ScopedCheckpoint( ArenaAllocatorBase& allocator );
+		//!	Disable copying.
+			ScopedCheckpoint( const ScopedCheckpoint& ) = delete;
 
-			ETInlineHint ~ScopedCheckpoint();
+			~ScopedCheckpoint();
+
+		// ---------------------------------------------------
+
+		//!	Disable assignment.
+			ScopedCheckpoint&	operator=( const ScopedCheckpoint& ) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -44,17 +53,15 @@ namespace Eldritch2 {
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const AllocationOptions options ) override sealed;
-		ETRestrictHint void*	Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) override sealed;
+	public:
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal ) override sealed;
+		ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) override sealed;
 
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const ReallocationOptions options ) override sealed;
-		ETRestrictHint void*	Reallocate( void* const address, const SizeType newSizeInBytes, const SizeType alignmentInBytes, const ReallocationOptions options ) override sealed;
-
-		void					Deallocate( void* const address ) override sealed;
-		void					Deallocate( void* const address, const AlignedDeallocationSemanticsTag ) override sealed;
+		void					Deallocate( void* const address, SizeType sizeInBytes ) override sealed;
 
 	// ---------------------------------------------------
 
+	public:
 		Checkpoint	CreateCheckpoint() const;
 
 		void		RestoreCheckpoint( const Checkpoint checkpoint );
@@ -62,106 +69,104 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	protected:
-		//! Constructs this @ref ArenaAllocatorBase instance.
-		ArenaAllocatorBase( void* const pool, const void* const poolEnd, const ::Eldritch2::UTF8Char* const name );
-		//! Constructs this @ref ArenaAllocatorBase instance.
-		ArenaAllocatorBase( void* const pool, const SizeType poolCapacityInBytes, const ::Eldritch2::UTF8Char* const name );
-		//! Constructs this @ref ArenaAllocatorBase instance.
+	//! Constructs this @ref ArenaAllocatorBase instance.
+		ArenaAllocatorBase( void* const pool, SizeType poolCapacityInBytes, const Eldritch2::Utf8Char* const name );
+	//! Constructs this @ref ArenaAllocatorBase instance.
+		ArenaAllocatorBase( void* const pool, const void* const poolEnd, const Eldritch2::Utf8Char* const name );
+	//! Disable copying.
 		ArenaAllocatorBase( const ArenaAllocatorBase& ) = delete;
-		//! Constructs this @ref ArenaAllocatorBase instance.
-		ArenaAllocatorBase( ArenaAllocatorBase&& allocator );
+	//! Constructs this @ref ArenaAllocatorBase instance.
+		ArenaAllocatorBase( ArenaAllocatorBase&& );
 
-		//! Destroys this @ref ArenaAllocatorBase instance.
 		~ArenaAllocatorBase() = default;
-
-	// ---------------------------------------------------
-
-		SizeType	EstimateActualAllocationSizeInBytes( const SizeType allocationSizeInBytes, const SizeType alignmentInBytes ) const override sealed;
 
 	// - DATA MEMBERS ------------------------------------
 
-		::std::atomic<char*>	_allocationPointer;
-		const char* const		_arenaEnd;
+	protected:
+		std::atomic<char*>	_allocationPointer;
+		const char* const	_arenaEnd;
 	};
 
 // ---------------------------------------------------
 
-	class ExternalArenaAllocator : public ::Eldritch2::ArenaAllocatorBase {
+	class ExternalArenaAllocator : public Eldritch2::ArenaAllocatorBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref ExternalArenaAllocator instance.
-		ExternalArenaAllocator( void* const pool, const void* const poolEnd, const ::Eldritch2::UTF8Char* const name );
-		//!	Constructs this @ref ExternalArenaAllocator instance.
-		ExternalArenaAllocator( void* const pool, const SizeType poolCapacityInBytes, const ::Eldritch2::UTF8Char* const name );
-		//!	Constructs this @ref ExternalArenaAllocator instance.
-		ExternalArenaAllocator( ExternalArenaAllocator&& allocator );
-		//!	Constructs this @ref ExternalArenaAllocator instance.
+	//!	Constructs this @ref ExternalArenaAllocator instance.
+		ExternalArenaAllocator( void* const pool, SizeType poolCapacityInBytes, const Eldritch2::Utf8Char* const name );
+	//!	Constructs this @ref ExternalArenaAllocator instance.
+		ExternalArenaAllocator( void* const pool, const void* const poolEnd, const Eldritch2::Utf8Char* const name );
+	//!	Disable copying.
 		ExternalArenaAllocator( const ExternalArenaAllocator& ) = delete;
+	//!	Constructs this @ref ExternalArenaAllocator instance.
+		ExternalArenaAllocator( ExternalArenaAllocator&& );
 
-		//!	Destroys this @ref ExternalArenaAllocator instance.
 		~ExternalArenaAllocator() = default;
 
 	// ---------------------------------------------------
 
-		ExternalArenaAllocator&	operator=(const ExternalArenaAllocator&) = delete;
+	//!	Disable assignment.
+		ExternalArenaAllocator&	operator=( const ExternalArenaAllocator& ) = delete;
 	};
 
 // ---------------------------------------------------
 
-	class ArenaChildAllocator : public ::Eldritch2::ArenaAllocatorBase {
+	class ArenaChildAllocator : public Eldritch2::ArenaAllocatorBase {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref ArenaChildAllocator instance.
-		ArenaChildAllocator( ::Eldritch2::Allocator& parent, const Allocator::SizeType allocationLimitInBytes, const Allocator::AllocationOptions allocationOptions, const ::Eldritch2::UTF8Char* const name );
-		//!	Constructs this @ref ArenaChildAllocator instance.
-		ArenaChildAllocator( ArenaChildAllocator&& allocator );
-		//!	Constructs this @ref ArenaChildAllocator instance.
+	//!	Constructs this @ref ArenaChildAllocator instance.
+		ArenaChildAllocator( Eldritch2::Allocator& parent, SizeType allocationLimitInBytes, AllocationDuration duration, const Eldritch2::Utf8Char* const name );
+	//!	Disable copying.
 		ArenaChildAllocator( const ArenaChildAllocator& ) = delete;
+	//!	Constructs this @ref ArenaChildAllocator instance.
+		ArenaChildAllocator( ArenaChildAllocator&& );
 
-		//!	Destroys this @ref ArenaChildAllocator instance.
 		~ArenaChildAllocator();
 
 	// ---------------------------------------------------
 
-		ArenaChildAllocator&	operator=(const ArenaChildAllocator&) = delete;
+	//!	Disable assignment.
+		ArenaChildAllocator&	operator=( const ArenaChildAllocator& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::Allocator&	_parent;
-		void*					_allocation;
+		Eldritch2::Allocator&	_parent;
+		char*					_allocation;
 	};
 
 // ---------------------------------------------------
 
 	template <size_t arenaSizeInBytes>
-	class FixedStackAllocator : public ::Eldritch2::ArenaAllocatorBase {
+	class FixedStackAllocator : public Eldritch2::ArenaAllocatorBase {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum : size_t {
+		enum : SizeType {
 			ReservedSizeInBytes = arenaSizeInBytes
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//! Constructs this @ref FixedStackAllocator instance.
-		FixedStackAllocator( const ::Eldritch2::UTF8Char* const name );
-		//!	Constructs this @ref FixedStackAllocator instance.
+	public:
+	//! Constructs this @ref FixedStackAllocator instance.
+		FixedStackAllocator( const Eldritch2::Utf8Char* const name );
+	//!	Disable copying.
 		FixedStackAllocator( const FixedStackAllocator& ) = delete;
 
-		//! Destroys this @ref FixedStackAllocator instance.
 		~FixedStackAllocator() = default;
 
 	// ---------------------------------------------------
 
-		FixedStackAllocator&	operator=(const FixedStackAllocator&) = delete;
+	//!	Disable assignment.
+		FixedStackAllocator&	operator=( const FixedStackAllocator& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
+	//	Aligned for generic type support.
 		ET16ByteAligned char	_arena[arenaSizeInBytes];
 	};
 

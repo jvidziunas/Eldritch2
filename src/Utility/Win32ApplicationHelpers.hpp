@@ -25,26 +25,26 @@ using HINSTANCE	= HINSTANCE__*;
 namespace Eldritch2 {
 namespace Utility {
 
-	void ETNoThrowHint	StoreMainArguments( ::HINSTANCE hInstance, int nCmdShow );
+	void ETNoThrowHint	StoreMainArguments( HINSTANCE hInstance, int nCmdShow );
 
 // ---------------------------------------------------
 
-	bool ETNoThrowHint	CommandLineContains( char* option );
 	bool ETNoThrowHint	CommandLineContains( wchar_t* option );
+	bool ETNoThrowHint	CommandLineContains( char* option );
 
 // ---------------------------------------------------
 
-	::HINSTANCE ETNoThrowHint	GetInstance();
+	HINSTANCE ETNoThrowHint	GetInstance( void* addressOfItemInModule = nullptr );
 
 // ---------------------------------------------------
 	
-	const char*		GetCommandLine();
-
 	const wchar_t*	GetWideCommandLine();
+
+	const char*		GetCommandLine();
 
 // ---------------------------------------------------
 
-	int ETNoAliasHint ETNoThrowHint GetCmdShow();
+	int ETPureFunctionHint ETNoThrowHint GetCmdShow();
 
 }	// namespace Utility
 }	// namespace Eldritch2

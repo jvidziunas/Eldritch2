@@ -5,54 +5,41 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/ArenaAllocator.hpp>
-#include <Scripting/Message.hpp>
+#include <Scripting/ScriptTypeToken.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-	namespace Scripting {
-		class	Message;
-	}
-}
 
 namespace Eldritch2 {
 namespace Scripting {
 
-	class ETPureAbstractHint MessageBus {
+	class MessageBus {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using MessageTarget = void*;
-
-	// ---------------------------------------------------
-
-		template <typename DispatchedMessage>
-		void			SendMessage( const MessageTarget target, DispatchedMessage&& message );
-
-	protected:
-		virtual void	SendMessage( const MessageTarget target, Scripting::Message& message ) abstract;
+		using ObjectId	= void*;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref MessageBus instance.
-		/*!	@remarks Designed to be called from within subclasses.
-			*/
-		MessageBus();
+	public:
+	//!	Constructs this @ref MessageBus instance.
+		MessageBus() = default;
 
-		//!	Destroys this @ref MessageBus instance.
-		/*!	@remarks Designed to be called from within subclasses.
-			*/
 		~MessageBus() = default;
 
-	private:
-		::Eldritch2::ExternalArenaAllocator	_messageAllocator;
+	// ---------------------------------------------------
+
+	protected:
+		virtual void	Dispatch( RawTypeToken messageType, ObjectId destinationId, ObjectId senderId, Eldritch2::uint64 time, const void* message ) abstract;
+
+	public:
+		template <typename Message>
+		void			Dispatch( ScriptTypeToken<Message> typeToken, ObjectId destinationId, ObjectId senderId, Eldritch2::uint64 time, const Message& message );
 	};
 
 }	// namespace Scripting

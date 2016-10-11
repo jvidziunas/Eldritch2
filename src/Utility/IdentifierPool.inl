@@ -13,109 +13,156 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Assert.hpp>
-#include <type_traits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Utility {
+namespace Detail {
 
-	template <typename Identifier, class Allocator>
-	ETForceInlineHint IdentifierPool<Identifier, Allocator>::AvailableRange::AvailableRange( IdentifierType initialElement, IdentifierType endElement ) : begin( initialElement ), end( endElement ) {}
+	template <typename Identifier>
+	ETForceInlineHint IdentifierPoolBase<Identifier>::IdentifierRange::IdentifierRange( IdentifierType firstIdentifier, IdentifierType lastIdentifier ) : firstIdentifier( firstIdentifier ), lastIdentifier( lastIdentifier ) {}
 
 // ---------------------------------------------------
 
-	template <typename Identifier, class Allocator>
-	ETForceInlineHint bool IdentifierPool<Identifier, Allocator>::AvailableRange::ContainsElements() const {
-		return begin <= end;
+	template <typename Identifier>
+	ETInlineHint bool IdentifierPoolBase<Identifier>::IdentifierRange::CanMergeForwardWith( const IdentifierRange& range ) const {
+		return lastIdentifier == range.firstIdentifier;
 	}
 
 // ---------------------------------------------------
 
-	template <typename Identifier, class Allocator>
-	IdentifierPool<Identifier, Allocator>::IdentifierPool( IdentifierType maximumIdentifier, AllocatorType&& allocator ) : _availableRanges( ::std::move( allocator ) ) {
-		_availableRanges.Reserve( 16u );
-		_availableRanges.PushBack( { static_cast<IdentifierType>(0), maximumIdentifier } );
+	template <typename Identifier>
+	ETInlineHint bool IdentifierPoolBase<Identifier>::IdentifierRange::CanAccomodateRangeOfSize( IdentifierType size ) const {
+		return size <= GetSize();
 	}
 
 // ---------------------------------------------------
 
+	template <typename Identifier>
+	typename IdentifierPoolBase<Identifier>::IdentifierType IdentifierPoolBase<Identifier>::IdentifierRange::GetSize() const {
+		return lastIdentifier - firstIdentifier;
+	}
+
+// ---------------------------------------------------
+
+	template <typename Identifier>
+	ETInlineHint bool IdentifierPoolBase<Identifier>::IdentifierRange::Contains( IdentifierType identifier ) const {
+		return (firstIdentifier <= identifier) & (identifier < lastIdentifier);
+	}
+
+// ---------------------------------------------------
+
+	template <typename Identifier>
+	ETInlineHint bool IdentifierPoolBase<Identifier>::IdentifierRange::IsEmpty() const {
+		return firstIdentifier == lastIdentifier;
+	}
+
+}	// namespace Detail
+
 	template <typename Identifier, class Allocator>
-	typename IdentifierPool<Identifier, Allocator>::AllocationResult IdentifierPool<Identifier, Allocator>::AllocateIdentifier() {
-		AllocationResult	result { 0u, true };
-		AvailableRange&		activeRange( _availableRanges.Front() );
-
-		if( activeRange.ContainsElements() ) {
-			result.identifier = activeRange.begin;
-
-			// If current range is full and there is another one, that will become the new current range
-			if( activeRange.begin == activeRange.end && ( _availableRanges.Size() > 1 ) ) {
-				_availableRanges.Erase( _availableRanges.Begin() );
-			} else {
-				++activeRange.begin;
-			}
-		} else {
-			// No available ID left
-			result.successful = false;
+	ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool( std::initializer_list<IdentifierRange> ranges, const AllocatorType& allocator ) : IdentifierPool( allocator ) {
+		for( const auto& range : ranges ) {
+			ReleaseRange( range );
 		}
+	}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool( IdentifierRange initialRange, const AllocatorType& allocator ) : IdentifierPool( allocator ) {
+		ReleaseRange( initialRange );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool( IdentifierType maximumIdentifier, const AllocatorType& allocator ) : IdentifierPool( { static_cast<IdentifierType>( 0 ), maximumIdentifier }, allocator ) {}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool( const AllocatorType& allocator ) : _availableRanges( allocator ) {}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool( IdentifierPool<Identifier, Allocator>&& pool ) : _availableRanges( eastl::move( pool._availableRanges ) ) {}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	Eldritch2::Pair<Identifier, bool> IdentifierPool<Identifier, Allocator>::AllocateIdentifier() {
+		return AllocateRangeOfSize( static_cast<Identifier>(1) );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	Eldritch2::Pair<Identifier, bool> IdentifierPool<Identifier, Allocator>::AllocateRangeOfSize( IdentifierType rangeSizeInElements ) {
+		const auto	candidate( eastl::find_if( _availableRanges.Begin(), _availableRanges.End(), [=] ( const IdentifierRange& range ) {
+			return range.CanAccomodateRangeOfSize( rangeSizeInElements );
+		} ) );
+
+		if( _availableRanges.End() == candidate ) {
+			return { 0, false };
+		}
+
+		const auto	returnedIdentifier( candidate->firstIdentifier );
+
+		candidate->firstIdentifier += rangeSizeInElements;
+
+		if( candidate->IsEmpty() && ( ( candidate + 1 ) < _availableRanges.End() ) ) {
+		//	If current range is full and there is another one, that will become the new current range.
+			_availableRanges.Erase( candidate );
+		}
+
+		return { returnedIdentifier, true };
+	}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	void IdentifierPool<Identifier, Allocator>::ReleaseIdentifier( IdentifierType identifier ) {
+		return ReleaseRange( { identifier, identifier + static_cast<IdentifierType>(1) } );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	void IdentifierPool<Identifier, Allocator>::ReleaseRange( IdentifierRange releasedRange ) {
+		const auto	candidate( eastl::lower_bound( _availableRanges.Begin(), _availableRanges.End(), releasedRange, [] ( const IdentifierRange& lhs, const IdentifierRange& rhs ) {
+			return lhs.lastIdentifier <= rhs.firstIdentifier;
+		} ) );
+
+		if( candidate == _availableRanges.End() ) {
+			_availableRanges.PushBack( releasedRange );
+			return;
+		}
+
+		if( releasedRange.CanMergeForwardWith( *candidate ) ) {
+			candidate->lastIdentifier = releasedRange.lastIdentifier;
+
+			if( candidate + 1 != _availableRanges.End() && candidate->CanMergeForwardWith( candidate[1] ) ) {
+				candidate->lastIdentifier = candidate[1].lastIdentifier;
+				_availableRanges.Erase( candidate + 1 );
+			}
+
+			return;
+		} 
 		
-		return result;
-	}
+		if( candidate->CanMergeForwardWith( releasedRange ) ) {
+			candidate->firstIdentifier = releasedRange.firstIdentifier;
 
-// ---------------------------------------------------
-
-	template <typename Identifier, class Allocator>
-	typename IdentifierPool<Identifier, Allocator>::AllocationResult IdentifierPool<Identifier, Allocator>::AllocateIdentifierRange( const DifferenceType rangeSizeInElements ) {
-		class FindAppropriateRangePredicate {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			ETForceInlineHint FindAppropriateRangePredicate( const DifferenceType rangeSizeInElements ) : _rangeSizeInElements( rangeSizeInElements ) {}
-
-		// ---------------------------------------------------
-
-			ETForceInlineHint bool	operator()( typename const IdentifierPool<Identifier, Allocator>::AvailableRange& range ) const {
-				return _rangeSizeInElements <= ( 1 + range.end - range.begin );
+			if( candidate != _availableRanges.Begin() && candidate[-1].CanMergeForwardWith( *candidate ) ) {
+				candidate[-1].lastIdentifier = candidate->firstIdentifier;
+				_availableRanges.Erase( candidate - 1 );
 			}
 
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			const DifferenceType	_rangeSizeInElements;
-		};
-
-	// ---
-
-		AllocationResult	result { 0u, true };
-		const auto			range( Find( _availableRanges.Begin(), _availableRanges.End(), FindAppropriateRangePredicate( rangeSizeInElements ) ) );
-
-		if( _availableRanges.End() != range ) {
-			result.identifier = range->begin;
-
-			if( rangeSizeInElements == ( 1 + range->end - range->begin ) && ( ( range + 1 ) < _availableRanges.End() ) ) {
-				// If current range is full and there is another one, that will become the new current range
-				_availableRanges.Erase( range );
-			} else {
-				range->begin += rangeSizeInElements;
-			}
-		} else {
-			// No range of free IDs was large enough to create the requested continuous ID sequence
-			result.successful = false;
+			return;
 		}
 
-		return result;
-	}
+		_availableRanges.Insert( candidate, releasedRange );
 
-// ---------------------------------------------------
-
-	template <typename Identifier, class Allocator>
-	void IdentifierPool<Identifier, Allocator>::ReleaseIdentifier( const IdentifierType identifier ) {
-		return this->ReleaseIdentifierRange( identifier, identifier + 1u );
-	}
-
-// ---------------------------------------------------
-
-	template <typename Identifier, class Allocator>
-	void IdentifierPool<Identifier, Allocator>::ReleaseIdentifierRange( const IdentifierType rangeBegin, const IdentifierType rangeEnd ) {
+#if 0
 		// Binary search of the range list
 		AvailableRangeCollection::SizeType	i0( 0 );
 		AvailableRangeCollection::SizeType	i1( _availableRanges.Size() - 1 );
@@ -123,20 +170,20 @@ namespace Utility {
 		for( ; ; ) {
 			const AvailableRangeCollection::SizeType	i( ( i0 + i1 ) / 2 );
 
-			if( rangeBegin < _availableRanges[i].begin ) {
+			if( releasedRange.firstIdentifier < _availableRanges[i].begin ) {
 				// Before current range, check if neighboring
-				if( rangeEnd >= _availableRanges[i].begin ) {
+				if( releasedRange.lastIdentifier >= _availableRanges[i].begin ) {
 					// Overlaps a range of free IDs, thus (at least partially) invalid IDs
-					ETRuntimeAssert( rangeEnd == _availableRanges[i].begin );
+					ETRuntimeAssert( releasedRange.lastIdentifier == _availableRanges[i].begin );
 
 					// Neighbor id, check if neighboring previous range too
-					if( i > i0 && rangeBegin - 1 == _availableRanges[i - 1].end ) {
+					if( i > i0 && releasedRange.firstIdentifier - 1 == _availableRanges[i - 1].end ) {
 						// Merge with previous range
 						_availableRanges[i - 1].end = _availableRanges[i].end;
 						_availableRanges.Erase( _availableRanges.Begin() + i );
 					} else {
 						// Just grow range
-						_availableRanges[i].begin = rangeBegin;
+						_availableRanges[i].begin = releasedRange.firstIdentifier;
 					}
 
 					break;
@@ -147,21 +194,21 @@ namespace Utility {
 						i1 = i - 1;
 					} else {
 						// Found our position in the list, insert the deleted range here
-						_availableRanges.Insert( _availableRanges.Begin() + i, AvailableRange( rangeBegin, rangeEnd - 1 ) );
+						_availableRanges.Insert( _availableRanges.Begin() + i, AvailableRange( releasedRange.firstIdentifier, releasedRange.lastIdentifier - 1 ) );
 						break;
 					}
 				}
-			} else if( rangeBegin > _availableRanges[i].end ) {
+			} else if( releasedRange.firstIdentifier > _availableRanges[i].end ) {
 				// After current range, check if neighboring
-				if( rangeBegin - 1 == _availableRanges[i].end ) {
+				if( releasedRange.firstIdentifier - 1 == _availableRanges[i].end ) {
 					// Neighbor id, check if neighboring next range too
-					if( i < i1 && rangeEnd == _availableRanges[i + 1].begin ) {
+					if( i < i1 && releasedRange.lastIdentifier == _availableRanges[i + 1].begin ) {
 						// Merge with next range
 						_availableRanges[i].end = _availableRanges[i + 1].end;
 						_availableRanges.Erase( _availableRanges.Begin() + i + 1 );
 					} else {
 						// Just grow range
-						_availableRanges[i].end += (rangeEnd - rangeBegin);
+						_availableRanges[i].end += (releasedRange.lastIdentifier - releasedRange.firstIdentifier);
 					}
 
 					break;
@@ -172,7 +219,7 @@ namespace Utility {
 						i0 = i + 1;
 					} else {
 						// Found our position in the list, insert the deleted range here
-						_availableRanges.Insert( _availableRanges.Begin() + i + 1, AvailableRange( rangeBegin, rangeEnd - 1 ) );
+						_availableRanges.Insert( _availableRanges.Begin() + i + 1, AvailableRange( releasedRange.firstIdentifier, releasedRange.lastIdentifier - 1 ) );
 						break;
 					}
 				}
@@ -181,15 +228,23 @@ namespace Utility {
 				ETRuntimeAssert( false );
 			}
 		}
+#endif
 	}
 
 // ---------------------------------------------------
 
 	template <typename Identifier, class Allocator>
-	typename IdentifierPool<Identifier, Allocator>::DifferenceType IdentifierPool<Identifier, Allocator>::GetLargestAvailableBlockLengthInElements() const {
-		DifferenceType	largestRangeSizeInElements( 0 );
+	ETInlineHint bool IdentifierPool<Identifier, Allocator>::IsEmpty() const {
+		return _availableRanges.IsEmpty();
+	}
 
-		ForEachAvailableIdentifierRange( [&largestRangeSizeInElements] ( const AvailableRange& range ) {
+// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	typename IdentifierPool<Identifier, Allocator>::IdentifierType IdentifierPool<Identifier, Allocator>::GetLargestAvailableBlockLengthInElements() const {
+		IdentifierType	largestRangeSizeInElements( 0 );
+
+		ForEachAvailableIdentifierRange( [&] ( const AvailableRange& range ) {
 			const auto	rangeLength( range.end - range.begin );
 
 			if( largestRangeSizeInElements < rangeLength ) {
@@ -204,11 +259,10 @@ namespace Utility {
 
 	template <typename Identifier, class Allocator>
 	template <typename Predicate>
-	Predicate IdentifierPool<Identifier, Allocator>::ForEachAvailableIdentifierRange( Predicate predicate ) const {
+	void IdentifierPool<Identifier, Allocator>::ForEachAvailableIdentifierRange( Predicate predicate ) const {
 		for( const auto& range : _availableRanges ) {
 			predicate( range );
 		}
 	}
 
-}	// namespace Utility
 }	// namespace Eldritch2

@@ -13,83 +13,124 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/ResizableArray.hpp>
-#include <Utility/MPL/Noncopyable.hpp>
+#include <Utility/Pair.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Utility {
+namespace Detail {
 
-	template <typename Identifier, class Allocator = ::Eldritch2::ChildAllocator>
-	class IdentifierPool : public Utility::Noncopyable {
+	template <typename Identifier>
+	class IdentifierPoolBase {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using AllocatorType		= Allocator;
-		using IdentifierType	= Identifier;
-		using DifferenceType	= IdentifierType;
+		using IdentifierType = Identifier;
 
 	// ---
 
-		struct AvailableRange {
+		struct IdentifierRange {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Constructs this @ref AvailableRange instance.
-			ETForceInlineHint AvailableRange( IdentifierType initialElement, IdentifierType endElement );
-			//!	Constructs this @ref AvailableRange instance.
-			ETForceInlineHint AvailableRange() = default;
+		public:
+		//!	Constructs this @ref IdentifierRange instance.
+			IdentifierRange( IdentifierType firstIdentifier, IdentifierType lastIdentifier );
+		//!	Constructs this @ref IdentifierRange instance.
+			IdentifierRange() = default;
 
-			//!	Destroys this @ref AvailableRange instance.
-			ETForceInlineHint ~AvailableRange() = default;
+			~IdentifierRange() = default;
 
 		// ---------------------------------------------------
 
-			ETForceInlineHint bool	ContainsElements() const;
+		public:
+			bool	CanMergeForwardWith( const IdentifierRange& range ) const;
+
+		// ---------------------------------------------------
+
+		public:
+			IdentifierType	GetSize() const;
+
+		// ---------------------------------------------------
+
+		public:
+			bool	CanAccomodateRangeOfSize( IdentifierType size ) const;
+
+			bool	Contains( IdentifierType identifier ) const;
+
+			bool	IsEmpty() const;
 
 		// - DATA MEMBERS ------------------------------------
 
-			IdentifierType	begin;
-			IdentifierType	end;
+		public:
+			IdentifierType	firstIdentifier;
+			IdentifierType	lastIdentifier;
 		};
+	};
 
-	// ---
+}	// namespace Detail
 
-		struct AllocationResult {
-			IdentifierType	identifier;
-			bool			successful;
-		};
+	template <typename Identifier, class Allocator = Eldritch2::ChildAllocator>
+	class IdentifierPool : Detail::IdentifierPoolBase<Identifier> {
+	// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using IdentifierRange	= typename IdentifierPoolBase<Identifier>::IdentifierRange;
+		using IdentifierType	= typename IdentifierPoolBase<Identifier>::IdentifierType;
+		using AllocatorType		= Allocator;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref IdentifierPool instance.
-		ETInlineHint IdentifierPool( IdentifierType maximumIdentifier, AllocatorType&& allocator = AllocatorType() );
+	public:
+	//!	Constructs this @ref IdentifierPool instance.
+		explicit IdentifierPool( std::initializer_list<IdentifierRange> ranges, const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref IdentifierPool instance.
+		explicit IdentifierPool( IdentifierRange initialRange, const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref IdentifierPool instance.
+		explicit IdentifierPool( IdentifierType maximumIdentifier, const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref IdentifierPool instance.
+		explicit IdentifierPool( const AllocatorType& allocator = AllocatorType() );
+	//!	Constructs this @ref IdentifierPool instance.
+		IdentifierPool( IdentifierPool&& );
+	//!	Disable copying.
+		IdentifierPool( const IdentifierPool& ) = delete;
 
-		//!	Destroys this @ref IdentifierPool instance.
+	//!	Destroys this @ref IdentifierPool instance.
 		~IdentifierPool() = default;
 
 	// ---------------------------------------------------
 
-		AllocationResult	AllocateIdentifier();
+	public:
+		Eldritch2::Pair<Identifier, bool>	AllocateIdentifier();
 
-		AllocationResult	AllocateIdentifierRange( const DifferenceType rangeSizeInElements );
+		Eldritch2::Pair<Identifier, bool>	AllocateRangeOfSize( IdentifierType rangeSizeInElements );
 
-		void				ReleaseIdentifier( const IdentifierType identifier );
+		void								ReleaseRange( IdentifierRange range );
 
-		void				ReleaseIdentifierRange( const IdentifierType rangeBegin, const IdentifierType rangeEnd );
+		void								ReleaseIdentifier( IdentifierType identifier );
 
 	// ---------------------------------------------------
 
-		DifferenceType	GetLargestAvailableBlockLengthInElements() const;
+	public:
+		bool	IsEmpty() const;
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		IdentifierPool&	operator=( const IdentifierPool& ) = delete;
+
+	// ---------------------------------------------------
+
+	public:
+		IdentifierType	GetLargestAvailableBlockLengthInElements() const;
 
 		template <typename Predicate>
-		Predicate		ForEachAvailableIdentifierRange( Predicate predicate ) const;
+		void			ForEachAvailableIdentifierRange( Predicate predicate ) const;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ResizableArray<AvailableRange, AllocatorType>	_availableRanges;
+		Eldritch2::ResizableArray<IdentifierRange, AllocatorType>	_availableRanges;
 	};
 
-}	// namespace Utility
 }	// namespace Eldritch2
 
 //==================================================================//

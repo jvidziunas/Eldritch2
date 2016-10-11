@@ -32,6 +32,6 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <size_t arenaSizeInBytes>
-	FixedStackAllocator<arenaSizeInBytes>::FixedStackAllocator( const ::Eldritch2::UTF8Char* const name ) : ::Eldritch2::ArenaAllocatorBase( _arena, sizeof(_arena), name ) {}
+	FixedStackAllocator<arenaSizeInBytes>::FixedStackAllocator( const Eldritch2::Utf8Char* const name ) : Eldritch2::ArenaAllocatorBase( _arena, sizeof(_arena), name ) {}
 
 }	// namespace Eldritch2

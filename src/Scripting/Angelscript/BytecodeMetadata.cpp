@@ -13,233 +13,133 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Angelscript/BytecodeMetadata.hpp>
-#include <Utility/Memory/NullAllocator.hpp>
+#include <Utility/Containers/Range.hpp>
 #include <Utility/ErrorCode.hpp>
 //------------------------------------------------------------------//
-#include <Scripting/AngelScript/BytecodePackage_generated.h>
+#include <Flatbuffers/AngelScriptBytecodePackage_generated.h>
 //------------------------------------------------------------------//
 #include <angelscript.h>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2::Utility;
-using namespace ::Eldritch2;
-using namespace ::std;
 
 namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
 
-	ErrorCode BytecodeMetadata::FunctionMetadata::Bind( ::asIScriptFunction& scriptFunction, const FlatBuffers::FunctionMetadata& /*metadata*/ ) {
-		SetMetadata( scriptFunction, *this );
-		return Error::None;
-	}
+	BytecodeMetadata::BytecodeMetadata( Allocator& allocator ) : _typeMetadata( { allocator, "Angelscript Bytecode Package Type Metadata Allocator" } ),
+																 _functionMetadata( { allocator, "Angelscript Bytecode Package Function Metadata Allocator" } ),
+																 _typePropertyMetadata( { allocator, "Angelscript Bytecode Package Type Property Metadata Allocator" } ),
+																 _moduleGlobalPropertyMetadata( { allocator, "Angelscript Bytecode Package Global Property Metadata Allocator" } ) {}
 
 // ---------------------------------------------------
 
-	ErrorCode BytecodeMetadata::PropertyMetadata::Bind( const FlatBuffers::PropertyMetadata& /*metadata*/ ) {
-		return Error::None;
-	}
+	BytecodeMetadata::BytecodeMetadata( BytecodeMetadata&& other ) : _typeMetadata( eastl::move( other._typeMetadata ) ),
+																	 _functionMetadata( eastl::move( other._functionMetadata ) ),
+																	 _typePropertyMetadata( eastl::move( other._typePropertyMetadata ) ),
+																	 _moduleGlobalPropertyMetadata( eastl::move( other._moduleGlobalPropertyMetadata ) ) {}
 
 // ---------------------------------------------------
 
-	BytecodeMetadata::TypeMetadata::TypeMetadata( Allocator& allocator ) : _methodMetadata( { allocator, UTF8L("Angelscript Type Metadata Method Metadata Allocator") } ),
-																		   _propertyMetadata( { allocator, UTF8L("Angelscript Type Metadata Property Metadata Allocator") } ) {}
+	const BytecodeMetadata::FunctionMetadata* BytecodeMetadata::GetMetadata( const asIScriptFunction* function ) const {
+		const auto candidate( _functionMetadata.Find( function ) );
 
-// ---------------------------------------------------
-
-	BytecodeMetadata::TypeMetadata::TypeMetadata( TypeMetadata&& metadata ) : _methodMetadata( ::std::move( metadata._methodMetadata ) ), _propertyMetadata( ::std::move( metadata._propertyMetadata ) ) {}
-
-// ---------------------------------------------------
-
-	ErrorCode BytecodeMetadata::TypeMetadata::Bind( ::asITypeInfo& scriptType, const FlatBuffers::TypeMetadata& metadata ) {
-		const auto	methods( metadata.Methods() );
-		const auto	properties( metadata.Properties() );
-
-		if( methods && (0 != methods->size()) ) {
-			_methodMetadata.SetCapacity( methods->size() );
-
-			for( auto methodMetadata( methods->begin() ), end( methods->end() ); methodMetadata != end; ++methodMetadata ) {
-				auto	scriptFunction( scriptType.GetMethodByIndex( methodMetadata->Index() ) );
-
-				if( !scriptFunction ) {
-					return Error::InvalidParameter;
-				}
-
-				_methodMetadata.PushBack();
-				_methodMetadata.Back().Bind( *scriptFunction, **methodMetadata );
-			}
+		if( candidate == _functionMetadata.End() ) {
+			return nullptr;
 		}
 
-		if( properties && 0 != properties->size() ) {
-			_propertyMetadata.SetCapacity( properties->size() );
+		return &candidate->second;
+	}
 
-			for( auto propertyMetadata( properties->begin() ), end( properties->end() ); propertyMetadata != end; ++propertyMetadata ) {
-				_propertyMetadata.Insert( { propertyMetadata->Index(), PropertyMetadata() } ).first->second.Bind( **propertyMetadata );
-			}
+// ---------------------------------------------------
+
+	const BytecodeMetadata::TypeMetadata* BytecodeMetadata::GetMetadata( const asITypeInfo* type ) const {
+		const auto candidate( _typeMetadata.Find( type ) );
+
+		if( candidate == _typeMetadata.End() ) {
+			return nullptr;
 		}
 
-		SetMetadata( scriptType, *this );
-
-		return Error::None;
+		return &candidate->second;
 	}
 
 // ---------------------------------------------------
 
-	const BytecodeMetadata::PropertyMetadata* BytecodeMetadata::TypeMetadata::GetPropertyMetadata( const ::asUINT propertyIndex ) const {
-		const auto	candidate( _propertyMetadata.Find( propertyIndex ) );
+	const BytecodeMetadata::PropertyMetadata* BytecodeMetadata::GetPropertyMetadata( const asITypeInfo* objectType, asUINT propertyIndex ) const {
+		const auto candidate( _typePropertyMetadata.Find( { objectType, propertyIndex } ) );
 
-		return candidate != _propertyMetadata.End() ? &(candidate->second) : nullptr;
-	}
-
-// ---------------------------------------------------
-
-	BytecodeMetadata::BytecodeMetadata( Allocator& allocator ) : _rootAllocator( { allocator, UTF8L("Angelscript Bytecode Package Metadata Root Allocator") } ),
-																 _typeMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Type Metadata Allocator") } ),
-																 _functionMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Function Metadata Allocator") } ),
-																 _propertyMetadata( { _rootAllocator, UTF8L("Angelscript Bytecode Package Global Property Metadata Allocator") } ) {}
-
-// ---------------------------------------------------
-
-	const BytecodeMetadata::FunctionMetadata* BytecodeMetadata::GetMetadata( const ::asIScriptFunction& function ) {
-		return static_cast<FunctionMetadata*>(function.GetUserData());
-	}
-
-// ---------------------------------------------------
-
-	const BytecodeMetadata::ModuleMetadata* BytecodeMetadata::GetMetadata( const ::asIScriptModule& module ) {
-		return static_cast<ModuleMetadata*>(module.GetUserData());
-	}
-
-// ---------------------------------------------------
-
-	const BytecodeMetadata::TypeMetadata* BytecodeMetadata::GetMetadata( const ::asITypeInfo& type ) {
-		return static_cast<TypeMetadata*>(type.GetUserData());
-	}
-
-// ---------------------------------------------------
-
-	const BytecodeMetadata::PropertyMetadata* BytecodeMetadata::GetPropertyMetadata( const ::asITypeInfo& objectType, const ::asUINT propertyIndex ) {
-		const auto typeMetadata( GetMetadata( objectType ) );
-
-		return typeMetadata ? typeMetadata->GetPropertyMetadata( propertyIndex ) : nullptr;
-	}
-
-// ---------------------------------------------------
-
-	const BytecodeMetadata::PropertyMetadata* BytecodeMetadata::GetPropertyMetadata( const ::asIScriptModule& module, const void* propertyAddress ) {
-		if( const auto moduleMetadata = GetMetadata( module ) ) {
-			const auto	candidate( moduleMetadata->_propertyMetadata.Find( propertyAddress ) );
-
-			if( candidate != moduleMetadata->_propertyMetadata.End() ) {
-				return &(candidate->second);
-			}
+		if( candidate == _typePropertyMetadata.End() ) {
+			return nullptr;
 		}
 
-		return nullptr;
+		return &candidate->second;
 	}
 
 // ---------------------------------------------------
 
-	void BytecodeMetadata::SetMetadata( ::asIScriptFunction& function, const FunctionMetadata& metadata ) {
-		function.SetUserData( const_cast<FunctionMetadata*>(&metadata) );
-	}
+	const BytecodeMetadata::PropertyMetadata* BytecodeMetadata::GetPropertyMetadata( const void* propertyAddress ) const {
+		const auto candidate( _moduleGlobalPropertyMetadata.Find( propertyAddress ) );
 
-// ---------------------------------------------------
-
-	void BytecodeMetadata::SetMetadata( ::asIScriptModule& module, const ModuleMetadata& metadata ) {
-		module.SetUserData( const_cast<ModuleMetadata*>(&metadata) );
-	}
-
-// ---------------------------------------------------
-
-	void BytecodeMetadata::SetMetadata( ::asITypeInfo& type, const TypeMetadata& metadata ) {
-		type.SetUserData( const_cast<TypeMetadata*>(&metadata) );
-	}
-
-// ---------------------------------------------------
-
-	ErrorCode BytecodeMetadata::BindToModule( ::asIScriptModule& module, Range<const char*> sourceBytes ) {
-		auto	metadata( FlatBuffers::GetModuleMetadata( sourceBytes.first ) );
-
-		SetMetadata( module, *this );
-
-		return LoadTypeMetadata( module, *metadata ) && LoadFunctionMetadata( module, *metadata ) && LoadPropertyMetadata( module, *metadata ) ? Error::None : Error::InvalidParameter;
-	}
-
-// ---------------------------------------------------
-
-	ErrorCode BytecodeMetadata::LoadTypeMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
-		// Early out if there is no type metadata stored in the module.
-		if( !sourceData.Types() || (0 == sourceData.Types()->size()) ) {
-			return Error::None;
+		if( candidate == _moduleGlobalPropertyMetadata.End() ) {
+			return nullptr;
 		}
 
-		// Minimize repeated allocations.
-		_typeMetadata.SetCapacity( sourceData.Types()->size() );
+		return &candidate->second;
+	}
 
-		for( auto metadata( sourceData.Types()->begin() ), end( sourceData.Types()->end() ); metadata != end; ++metadata ) {
-			auto	scriptType( module.GetObjectTypeByIndex( metadata->Index() ) );
+// ---------------------------------------------------
 
-			// Ensure the index is legal and we have a valid script type.
+	ErrorCode BytecodeMetadata::BindToModule( asIScriptModule& module, Range<const char*> sourceBytes ) {
+		HashMap<const asITypeInfo*, TypeMetadata>					typeMetadata( _typeMetadata.GetAllocator() );
+		HashMap<const asIScriptFunction*, FunctionMetadata>			functionMetadata( _functionMetadata.GetAllocator() );
+		HashMap<Pair<const asITypeInfo*, asUINT>, PropertyMetadata>	typePropertyMetadata( _typePropertyMetadata.GetAllocator() );
+		HashMap<const void*, PropertyMetadata>						moduleGlobalPropertyMetadata( _moduleGlobalPropertyMetadata.GetAllocator() );
+		auto														definitions( FlatBuffers::GetModuleMetadata( sourceBytes.Begin() ) );
+
+		for( const auto& definition : *definitions->Types() ) {
+			const auto	scriptType( module.GetObjectTypeByIndex( definition->Index() ) );
+
+		//	Ensure the index is legal and we have a valid script type.
 			if( !scriptType ) {
 				return Error::InvalidParameter;
 			}
 
-			_typeMetadata.PushBack( { _rootAllocator } );
-			_typeMetadata.Back().Bind( *scriptType, **metadata );
+			for( const auto& propertyDefinition : *definition->Properties() ) {
+				if( propertyDefinition->Index() < scriptType->GetPropertyCount() ) {
+					return Error::InvalidParameter;
+				}
+
+				_typePropertyMetadata.Emplace( Pair<const asITypeInfo*, asUINT>( scriptType, propertyDefinition->Index() ), PropertyMetadata() );
+			}
+
+			_typeMetadata.Emplace( scriptType, TypeMetadata() );
 		}
 
-		return Error::None;
-	}
+		for( const auto& definition : *definitions->Functions() ) {
+			const auto	scriptFunction( module.GetFunctionByIndex( definition->Index() ) );
 
-// ---------------------------------------------------
-
-	ErrorCode BytecodeMetadata::LoadFunctionMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
-		// Early out if there is no free function metadata stored in the module.
-		if( !sourceData.Functions() || (0 == sourceData.Functions()->size()) ) {
-			return Error::None;
-		}
-
-		// Minimize repeated allocations.
-		_functionMetadata.SetCapacity( sourceData.Functions()->size() );
-
-		for( auto metadata( sourceData.Functions()->begin() ), end( sourceData.Functions()->end() ); metadata != end; ++metadata ) {
-			auto	scriptFunction( module.GetFunctionByIndex( metadata->Index() ) );
-
-			// Ensure the index is legal and we have a valid script function.
+		//	Ensure the index is legal and we have a valid script type.
 			if( !scriptFunction ) {
 				return Error::InvalidParameter;
 			}
 
-			_functionMetadata.PushBack();
-			_functionMetadata.Back().Bind( *scriptFunction, **metadata );
+			functionMetadata.Emplace( scriptFunction, FunctionMetadata() );
 		}
 
-		return Error::None;
-	}
+		for( const auto& definition : *definitions->Properties() ) {
+			auto	scriptProperty( module.GetAddressOfGlobalVar( definition->Index() ) );
 
-// ---------------------------------------------------
-
-	ErrorCode BytecodeMetadata::LoadPropertyMetadata( ::asIScriptModule& module, const FlatBuffers::ModuleMetadata& sourceData ) {
-		// Early out if there is no global property metadata stored in the module.
-		if( !sourceData.Properties() || (0 == sourceData.Properties()->size()) ) {
-			return Error::None;
-		}
-
-		// Minimize repeated allocations.
-		_propertyMetadata.Reserve( sourceData.Properties()->size() );
-
-		for( auto metadata( sourceData.Properties()->begin() ), end( sourceData.Properties()->end() ); metadata != end; ++metadata ) {
-			auto	scriptProperty( module.GetAddressOfGlobalVar( metadata->Index() ) );
-
-			// Ensure the index is legal and we have a valid property.
+		//	Ensure the index is legal and we have a valid property.
 			if( !scriptProperty ) {
 				return Error::InvalidParameter;
 			}
 
-			_propertyMetadata.Insert( { scriptProperty, PropertyMetadata() } ).first->second.Bind( **metadata );
+			moduleGlobalPropertyMetadata.Emplace( scriptProperty, PropertyMetadata() );
 		}
+
+	//	Commit the metadata changes to the view.
+		_typeMetadata					= eastl::move( typeMetadata );
+		_functionMetadata				= eastl::move( functionMetadata );
+		_typePropertyMetadata			= eastl::move( typePropertyMetadata );
+		_moduleGlobalPropertyMetadata	= eastl::move( moduleGlobalPropertyMetadata );
 
 		return Error::None;
 	}

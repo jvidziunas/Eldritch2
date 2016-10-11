@@ -12,26 +12,23 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Packages/ResourceViewFactoryPublishingInitializationVisitor.hpp>
-#include <Scripting/AngelScript/BytecodePackageResourceView.hpp>
-#include <Scripting/AngelScript/UserDefinedTypeRegistrar.hpp>
-#include <Scripting/AngelScript/ObjectGraphResourceView.hpp>
+#include <Scripting/AngelScript/AssetViews/BytecodePackageView.hpp>
+#include <Scripting/AngelScript/AssetViews/ObjectGraphView.hpp>
 #include <Scripting/AngelScript/NativeBindings.hpp>
 #include <Configuration/ConfigurationDatabase.hpp>
+#include <Animation/ScriptComponents/Armature.hpp>
 #include <Scripting/AngelScript/EngineService.hpp>
-#include <Scripting/Angelscript/WorldView.hpp>
+#include <Scripting/AngelScript/ApiRegistrar.hpp>
+#include <Scripting/Angelscript/WorldService.hpp>
+#include <Assets/AssetViewFactoryRegistrar.hpp>
 #include <Scripting/AngelScript/ApiExport.hpp>
-#include <Utility/Memory/InstanceDeleters.hpp>
-#include <Scripting/ScriptMarshalTypes.hpp>
-#include <FileSystem/ContentProvider.hpp>
-#include <Foundation/GameEngine.hpp>
-#include <Animation/Armature.hpp>
+#include <Platform/SynchronousFileWriter.hpp>
+#include <Platform/ContentProvider.hpp>
 #include <Utility/ErrorCode.hpp>
+#include <Core/Engine.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
 #include <angelscript.h>
-//------------------------------------------------------------------//
-#include <memory>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -45,13 +42,12 @@
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
-using namespace ::Eldritch2::FileSystem;
-using namespace ::Eldritch2::Foundation;
+using namespace ::Eldritch2::Scheduling;
 using namespace ::Eldritch2::Animation;
-using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2::Scheduler;
-using namespace ::Eldritch2::Utility;
-using namespace ::Eldritch2;
+using namespace ::Eldritch2::Platform;
+using namespace ::Eldritch2::Logging;
+using namespace ::Eldritch2::Assets;
+using namespace ::Eldritch2::Core;
 
 #if( ET_COMPILER_IS_MSVC )
 #	pragma warning( push )
@@ -61,117 +57,170 @@ using namespace ::Eldritch2;
 namespace Eldritch2 {
 namespace Scripting {
 namespace AngelScript {
+namespace {
 
-	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ), _allocator( GetEngineAllocator(), UTF8L("Angelscript Engine Allocator") ), _forceScriptApiExport( false ) {}
+	static ETPureFunctionHint ErrorCode ExportApi( Allocator& allocator, ContentProvider& contentProvider, asIScriptEngine& scriptEngine ) {
+		Result<SynchronousFileWriter>	createWriterResult( contentProvider.CreateOrTruncateSynchronousFileWriter( WellKnownDirectory::WorkingDirectory, "Eldritch2.E2AngelscriptApi" ) );
+		if( !createWriterResult ) {
+			return createWriterResult.GetErrorCode();
+		}
+
+		return ExportScriptApi( allocator, scriptEngine, *createWriterResult );
+	}
+
+}	// anonymous namespace
+
+	EngineService::EngineService( const Engine& engine ) : Core::EngineService( engine.GetServiceBlackboard() ), _allocator( engine.GetAllocator(), "Angelscript Engine Allocator" ), _log( engine.GetLog() ), _forceExport( false ) {}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const EngineService::GetName() const {
-		return UTF8L("Angelscript Virtual Machine");
+	Utf8Literal EngineService::GetName() const {
+		return "Angelscript Virtual Machine";
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( world, GetScriptEngine() ) ? Error::None : Error::OutOfMemory;
+	Result<Eldritch2::UniquePointer<Core::WorldService>> EngineService::CreateWorldService( Allocator& allocator, const World& world ) {
+		auto	result( MakeUnique<AngelScript::WorldService>( allocator, world ) );
+
+		if( !result ) {
+			return Error::OutOfMemory;
+		}
+
+		return eastl::move( result );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		WorldView::ExposeScriptAPI( visitor );
+	void EngineService::AcceptVisitor( Scripting::ApiRegistrar& registrar ) {
+		WorldService::RegisterScriptApi( registrar );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::OnEngineInitializationStarted( WorkerContext& /*executingContext*/ ) {
-		MICROPROFILE_SCOPEI( "Angelscript Virtual Machine", "Create script API", 0xBBBBBBBB );
+	void EngineService::AcceptVisitor( JobFiber& executor, const BeginInitializationVisitor ) {
+		MICROPROFILE_SCOPEI( GetName(), "Register script API", 0xBBBBBBBB );
 
-		GetLogger()( UTF8L("Registering script API.") ET_UTF8_NEWLINE_LITERAL );
+		_log( MessageSeverity::Message, "Registering script API." ET_UTF8_NEWLINE_LITERAL );
 
-		AngelScript::EngineHandle	scriptEngine( ::asCreateScriptEngine() );
-
+		UniquePointer<asIScriptEngine>	scriptEngine( asCreateScriptEngine() );
 		if( !scriptEngine ) {
-			GetLogger( LogMessageType::Error )( UTF8L("Unable to create Angelscript SDK instance!") ET_UTF8_NEWLINE_LITERAL );
-
+			_log( MessageSeverity::Error, "Unable to create Angelscript SDK instance!" ET_UTF8_NEWLINE_LITERAL );
 			return;
 		}
 
-		scriptEngine->SetMessageCallback( ::asMETHOD( EngineService, MessageCallback ), this, ::asECallConvTypes::asCALL_THISCALL );
-		// scriptEngine->SetContextCallbacks( asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, this );
+		scriptEngine->SetMessageCallback( asMETHOD(EngineService, MessageCallback), this, asECallConvTypes::asCALL_THISCALL );
+		scriptEngine->SetContextCallbacks( [] ( asIScriptEngine*, void* engineService ) { return static_cast<EngineService*>(engineService)->GetContext(); },
+										   [] ( asIScriptEngine*, asIScriptContext* context, void* engineService ) { static_cast<EngineService*>(engineService)->ReturnContext( context ); },
+										   this );
+	
+		{	AngelScript::ApiRegistrar	registrar( *scriptEngine, _allocator );
+		//	Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
+			registrar.DefineCoreTypes();
 
-		// Register 'low-level' shared script types here, as we don't know when the main registration method will be invoked relative to other services.
-		{	AngelScript::UserDefinedTypeRegistrar	registrationVisitor( *scriptEngine );
+			ScriptComponents::Armature::RegisterScriptApi( registrar );
+
+		//	scriptEngine->RegisterDefaultArrayType();
+			scriptEngine->RegisterStringFactory( registrar.GetTypeName( typeid(Utf8String<>) ), asMETHOD( EngineService, MarshalStringLiteral ), asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
 			
-			StringMarshal::ExposeScriptAPI( registrationVisitor );
-			Float4Marshal::ExposeScriptAPI( registrationVisitor );
-			OrientationMarshal::ExposeScriptAPI( registrationVisitor );
-			RigidTransformMarshal::ExposeScriptAPI( registrationVisitor );
-			Armature::ExposeScriptAPI( registrationVisitor );
-			
-			BroadcastInitializationVisitor( registrationVisitor );
+			LocateService<Engine>().VisitServices( registrar );
 		}
 
-		RegisterCMathLibrary( scriptEngine.get() );
-		RegisterAlgorithmLibrary( scriptEngine.get() );
+		RegisterCMath( scriptEngine.Get() );
+		RegisterAlgorithms( scriptEngine.Get() );
 
-		scriptEngine->RegisterStringFactory( StringMarshal::scriptTypeName, ::asMETHOD( EngineService, MarshalStringLiteral ), ::asECallConvTypes::asCALL_THISCALL_ASGLOBAL, this );
+		_log( MessageSeverity::Message, "Script API registered successfully." ET_UTF8_NEWLINE_LITERAL );
 
-		// Export the script API for the compiler tool.
-		if( auto apiWriter = GetEngineContentProvider().CreateSynchronousFileWriter( GetEngineAllocator(), ContentProvider::KnownContentLocation::AppDataLocal, UTF8L("Eldritch2.E2AngelscriptApi") ) ) {
-			AngelScript::ExportScriptApi( GetEngineAllocator(), *scriptEngine.get(), *apiWriter.object );
+	//	Transfer ownership.
+		_scriptEngine = eastl::move( scriptEngine );
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::AcceptVisitor( JobFiber& executor, const InitializationCompleteVisitor ) {
+		if( !_scriptEngine ) {
+			return;
 		}
 
-		GetLogger()( UTF8L("Script API registered successfully.") ET_UTF8_NEWLINE_LITERAL );
+	//	Export the script API for the compiler tool.
+		const ErrorCode	exportApiResult( ExportApi( _allocator, LocateService<ContentProvider>(), *_scriptEngine ) );
+		if( !exportApiResult ) {
+			_log( MessageSeverity::Warning, "Unable to export script API: {}." ET_UTF8_NEWLINE_LITERAL, GetErrorString( exportApiResult ) );
+			return;
+		}
 
-		// Transfer ownership.
-		_bytecodePackageFactory.SetScriptEngine( ::std::move( scriptEngine ) );
+		_log( MessageSeverity::Message, "Exported script API successfully." ET_UTF8_NEWLINE_LITERAL );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ResourceViewFactoryPublishingInitializationVisitor& visitor ) {
-		visitor.PublishFactory( BytecodePackageResourceView::GetSerializedDataTag(), _bytecodePackageFactory ).PublishFactory( ObjectGraphResourceView::GetSerializedDataTag(), _objectGraphFactory );
+	void EngineService::AcceptVisitor( ServiceBlackboard& serviceLocator ) {
+		serviceLocator.Publish( *_scriptEngine );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
-		GetScriptEngine().GarbageCollect( ::asGC_DETECT_GARBAGE | ::asGC_DESTROY_GARBAGE | ::asGC_ONE_STEP );
+	void EngineService::AcceptVisitor( AssetViewFactoryRegistrar& registrar ) {
+		registrar.Publish( AssetViews::BytecodePackageView::GetExtension(), [this] ( Allocator& allocator, const AssetLibrary& library, const Utf8Char* const name, Range<const char*> rawBytes ) {
+				return AssetViews::BytecodePackageView::CreateView( allocator, *_scriptEngine, library, name, rawBytes );
+			} )
+			.Publish( AssetViews::ObjectGraphView::GetExtension(), [] ( Allocator& allocator, const AssetLibrary& library, const Utf8Char* const name, Range<const char*> rawBytes ) {
+				return AssetViews::ObjectGraphView::CreateView( allocator, library, name, rawBytes );
+			} );
 	}
 
 // ---------------------------------------------------
 
-	StringMarshal EngineService::MarshalStringLiteral( const unsigned int literalLengthInOctets, const UTF8Char* const stringLiteral ) {
-		return StringMarshal( stringLiteral, literalLengthInOctets );
+	void EngineService::AcceptVisitor( JobFiber& /*fiber*/, const ServiceTickVisitor visitor ) {
+		MICROPROFILE_SCOPEI( GetName(), "Collect script garbage", 0xBBBBBBBB );
+
+		_scriptEngine->GarbageCollect( asEGCFlags::asGC_DETECT_GARBAGE | asEGCFlags::asGC_DESTROY_GARBAGE );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::MessageCallback( const ::asSMessageInfo* messageInfo ) {
-		LogMessageType	messageType;
+	Utf8String<> EngineService::MarshalStringLiteral( const unsigned int literalLengthInOctets, const Utf8Char* const stringLiteral ) {
+		return { stringLiteral, stringLiteral + literalLengthInOctets, { _allocator, "Marshalled String Allocator" } };
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::MessageCallback( const asSMessageInfo* messageInfo ) {
+		MessageSeverity	severity;
 		const char*		description;
 		
 		switch( messageInfo->type ) {
 			case asMSGTYPE_ERROR: {
-				messageType = LogMessageType::Error;
+				severity	= MessageSeverity::Error;
 				description = "error";
 				break;
 			}
 			case asMSGTYPE_WARNING: {
-				messageType = LogMessageType::Warning;
+				severity	= MessageSeverity::Warning;
 				description = "warning";
 				break;
 			}
 			case asMSGTYPE_INFORMATION:
 			default: {
-				messageType = LogMessageType::Message;
+				severity	= MessageSeverity::Message;
 				description = "message";
 				break;
 			}
 		}
 
-		GetLogger( messageType )( UTF8L("Angelscript {} in '{}'[{}, {}]: {}.") ET_UTF8_NEWLINE_LITERAL, description, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
+		_log( severity, "Angelscript {} in '{}'[{}, {}]: {}." ET_UTF8_NEWLINE_LITERAL, description, messageInfo->section, messageInfo->row, messageInfo->col, messageInfo->message );
+	}
+
+// ---------------------------------------------------
+
+	asIScriptContext* EngineService::GetContext() {
+		return _scriptEngine->CreateContext();
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::ReturnContext( asIScriptContext* context ) {
+		context->Release();
 	}
 
 }	// namespace AngelScript

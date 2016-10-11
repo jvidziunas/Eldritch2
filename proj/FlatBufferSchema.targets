@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <ItemGroup>
+  <PropertyPageSchema Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+  <AvailableItemName Include="FlatbufferSchemaItem">
+   <Targets>CompileFlatBuffers</Targets>
+  </AvailableItemName>
+ </ItemGroup>
+
+ <Target
+  Name="CompileFlatBuffers"
+  BeforeTargets="ClCompile"
+  Inputs="%(FlatbufferSchemaItem.Identity)"
+  Outputs="%(FlatbufferSchemaItem.RelativeDir)%(FlatbufferSchemaItem.Filename)_generated.h">
+  <Message Text="Generating FlatBuffer schema: %(FlatBufferSchemaItem.FullPath)" Importance="High" />
+  <Exec Command="&quot;$(SolutionDir)tools\flatc.exe&quot; --cpp --scoped-enums -o %(FlatBufferSchemaItem.RelativeDir) %(FlatBufferSchemaItem.Identity)"/>
+ </Target>
+ </Project>

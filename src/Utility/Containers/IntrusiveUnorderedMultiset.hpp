@@ -29,13 +29,13 @@ namespace Eldritch2 {
 
 namespace Eldritch2 {
 
-	template <typename StoredObject, typename CollectionOptions, typename HashPredicate, typename EqualityPredicate = ::std::equal_to<StoredObject>, typename BucketAllocator = ::Eldritch2::ChildAllocator>
+	template <typename Value, typename CollectionOptions, typename HashPredicate, typename EqualityPredicate = std::equal_to<Value>, typename BucketAllocator = Eldritch2::ChildAllocator>
 	class IntrusiveUnorderedMultiset {
 	// - TYPE PUBLISHING ---------------------------------
 
 	protected:
-		using BucketCollection		= ::Eldritch2::ResizableArray<typename ::boost::intrusive::unordered_bucket<CollectionOptions>::type, BucketAllocator>;
-		using UnderlyingContainer	= ::boost::intrusive::unordered_multiset<StoredObject,
+		using BucketCollection		= Eldritch2::ResizableArray<typename ::boost::intrusive::unordered_bucket<CollectionOptions>::type, BucketAllocator>;
+		using UnderlyingContainer	= ::boost::intrusive::unordered_multiset<Value,
 																			 CollectionOptions,
 																			 ::boost::intrusive::hash<HashPredicate>,
 																			 ::boost::intrusive::equal<EqualityPredicate>,
@@ -66,17 +66,17 @@ namespace Eldritch2 {
 
 	// - ALGORITHMS --------------------------------------
 
-		::Eldritch2::Range<Iterator>		EqualRange( ConstReference value );
-		::Eldritch2::Range<ConstIterator>	EqualRange( ConstReference value ) const;
+		Eldritch2::Range<Iterator>		EqualRange( ConstReference value );
+		Eldritch2::Range<ConstIterator>	EqualRange( ConstReference value ) const;
 
 		template <typename Key, typename KeyHashPredicate, typename KeyEqualityPredicate>
-		::Eldritch2::Range<Iterator>		EqualRange( const Key& key, KeyHashPredicate keyHashPredicate, KeyEqualityPredicate keyEqualityPredicate );
+		Eldritch2::Range<Iterator>		EqualRange( const Key& key, KeyHashPredicate keyHashPredicate, KeyEqualityPredicate keyEqualityPredicate );
 		template <typename Key, typename KeyHashPredicate, typename KeyEqualityPredicate>
-		::Eldritch2::Range<ConstIterator>	EqualRange( const Key& key, KeyHashPredicate keyHashPredicate, KeyEqualityPredicate keyEqualityPredicate ) const;
+		Eldritch2::Range<ConstIterator>	EqualRange( const Key& key, KeyHashPredicate keyHashPredicate, KeyEqualityPredicate keyEqualityPredicate ) const;
 		template <typename Key>
-		::Eldritch2::Range<Iterator>		EqualRange( const Key& key );
+		Eldritch2::Range<Iterator>		EqualRange( const Key& key );
 		template <typename Key>
-		::Eldritch2::Range<ConstIterator>	EqualRange( const Key& key ) const;
+		Eldritch2::Range<ConstIterator>	EqualRange( const Key& key ) const;
 
 		template <typename Key, typename KeyHashPredicate, typename KeyEqualityPredicate>
 		ETForceInlineHint SizeType	RemoveIf( const Key& key, KeyHashPredicate keyHashPredicate, KeyEqualityPredicate keyEqualityPredicate );
@@ -99,7 +99,7 @@ namespace Eldritch2 {
 	// - CONTAINER DUPLICATION ---------------------------
 
 		template <class AlternateAllocator, typename Cloner, typename Disposer>
-		ETForceInlineHint void	CloneFrom( const ::Eldritch2::IntrusiveUnorderedMultiset<StoredObject, CollectionOptions, HashPredicate, EqualityPredicate, AlternateAllocator>& containerTemplate, Cloner cloner, Disposer disposer );
+		ETForceInlineHint void	CloneFrom( const Eldritch2::IntrusiveUnorderedMultiset<Value, CollectionOptions, HashPredicate, EqualityPredicate, AlternateAllocator>& containerTemplate, Cloner cloner, Disposer disposer );
 
 	// - CONTAINER MANIPULATION --------------------------
 

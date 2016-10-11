@@ -18,11 +18,10 @@
 #include <Utility/MPL/IntTypes.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
-
+namespace Eldritch2 {
 namespace {
 
-	static ETForceInlineHint ETNoAliasHint uint64 mix( uint64& value ) {
+	static ETForceInlineHint ETPureFunctionHint uint64 mix( uint64& value ) {
 		value ^= value >> 23;
 		value *= 0x2127599bf4325c37ULL;
 		value ^= value >> 47;
@@ -32,7 +31,7 @@ namespace {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint uint64 FastHash( const void* bufferToHash, const size_t lengthInBytes, const uint64 seed ) {
+	static ETPureFunctionHint uint64 FastHash( const void* bufferToHash, size_t lengthInBytes, uint64 seed ) {
 		enum : uint64 {
 			m = 0x880355f21e6d1965ull
 		};
@@ -70,10 +69,10 @@ namespace {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint uint32 FastHash( const void* bufferToHash, const size_t lengthInBytes, const uint32 seed ) {
-		// the following trick converts the 64-bit hashcode to Fermat
-		// residue, which shall retain information from both the higher
-		// and lower parts of hashcode.
+	static ETPureFunctionHint uint32 FastHash( const void* bufferToHash, size_t lengthInBytes, uint32 seed ) {
+	/*	the following trick converts the 64-bit hashcode to Fermat
+	 *	residue, which shall retain information from both the higher
+	 *	and lower parts of hashcode. */
 		const uint64	h( FastHash( bufferToHash, lengthInBytes, static_cast<uint64>(seed) ) );
 
 		return static_cast<uint32>(h - (h >> 32));
@@ -81,15 +80,13 @@ namespace {
 
 }	// anonymous namespace
 
-namespace Eldritch2 {
-
-	ETNoAliasHint size_t HashMemory( const void* memory, const size_t sizeInBytes, const size_t seed ) {
+	ETPureFunctionHint size_t HashMemory( const void* memory, size_t sizeInBytes, size_t seed ) {
 		return FastHash( memory, sizeInBytes, seed );
 	}
 
 // ---------------------------------------------------
 
-	ETNoAliasHint char* PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, ... ) {
+	ETPureFunctionHint char* PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, ... ) {
 		va_list args;
 		va_start( args, formatString );
 			PrintFormatted( destinationString, maxCharacters, formatString, args );
@@ -100,7 +97,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint wchar_t* PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, ... ) {
+	ETPureFunctionHint wchar_t* PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, ... ) {
 		va_list args;
 		va_start( args, formatString );
 			PrintFormatted( destinationString, maxCharacters, formatString, args );
@@ -111,10 +108,10 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint char* PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, va_list args ) {
+	ETPureFunctionHint char* PrintFormatted( char* destinationString, const size_t maxCharacters, const char* const formatString, va_list args ) {
 		va_list forwardedArgs;
 		va_copy( forwardedArgs, args );
-			::std::vsnprintf( destinationString, maxCharacters, formatString, forwardedArgs );
+			std::vsnprintf( destinationString, maxCharacters, formatString, forwardedArgs );
 		va_end( forwardedArgs );
 
 		return destinationString;
@@ -122,10 +119,10 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	ETNoAliasHint wchar_t* PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, va_list args ) {
+	ETPureFunctionHint wchar_t* PrintFormatted( wchar_t* destinationString, const size_t maxCharacters, const wchar_t* const formatString, va_list args ) {
 		va_list forwardedArgs;
 		va_copy( forwardedArgs, args );
-			::std::vswprintf( destinationString, maxCharacters, formatString, forwardedArgs );
+			std::vswprintf( destinationString, maxCharacters, formatString, forwardedArgs );
 		va_end( forwardedArgs );
 
 		return destinationString;

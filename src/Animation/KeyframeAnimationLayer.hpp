@@ -17,7 +17,9 @@
 
 namespace Eldritch2 {
 	namespace Animation {
-		class	KeyframeAnimationResourceView;
+		namespace AssetViews {
+			class	KeyframeAnimationView;
+		}
 	}
 }
 
@@ -28,25 +30,22 @@ namespace Animation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 	
 	protected:
-		//! Constructs this @ref KeyframeAnimationLayer instance.
-		KeyframeAnimationLayer( Animation::KeyframeAnimationResourceView& asset );
-		//! Constructs this @ref KeyframeAnimationLayer instance.
+	//! Constructs this @ref KeyframeAnimationLayer instance.
+		KeyframeAnimationLayer( AssetViews::KeyframeAnimationView& asset );
+	//! Constructs this @ref KeyframeAnimationLayer instance.
 		KeyframeAnimationLayer( const KeyframeAnimationLayer& ) = default;
 	
 		~KeyframeAnimationLayer() = default;
 	
 	// ---------------------------------------------------
 	
-		void	EvaluateCacheForTime( Animation::KeyCache& cache, Animation::BoneIndex maximumBoneToConsider, ::Eldritch2::uint64 time ) override;
+		void	EvaluateCacheForAlphaFactor( Animation::KeyCache& cache, Animation::BoneIndex maximumBoneToConsider, Eldritch2::uint64 time ) override;
 	
 	// - DATA MEMBERS ------------------------------------
 	
-	public:
-		static const char* const					scriptTypeName;
-	
 	private:
-		Animation::KeyframeAnimationResourceView*	_asset;
-		::Eldritch2::float32						_playbackRate;
+		const AssetViews::KeyframeAnimationView*	_asset;
+		Eldritch2::float32							_playbackRate;
 	};
 
 }	// namespace Animation

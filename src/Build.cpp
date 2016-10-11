@@ -17,5 +17,5 @@
 
 using namespace ::Eldritch2;
 
-const UTF8Char* const	buildDateStamp		= UTF8L( __TIMESTAMP__ );
+const Utf8Char* const	buildDateStamp		= __TIMESTAMP__;
 const wchar_t* const	wideBuildDateStamp	= ET_PREPROCESSOR_JOIN( L, __TIMESTAMP__ );

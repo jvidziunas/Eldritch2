@@ -14,13 +14,12 @@
 //==================================================================//
 #include <Utility/Containers/IntrusiveForwardList.hpp>
 #include <Utility/Containers/ResizableArray.hpp>
-#include <Utility/Containers/UTF8String.hpp>
+#include <Utility/Containers/Utf8String.hpp>
 #include <Utility/Containers/HashSet.hpp>
 #include <Utility/Containers/HashMap.hpp>
 #include <Utility/MPL/FloatTypes.hpp>
 #include <Utility/MPL/IntTypes.hpp>
-//------------------------------------------------------------------//
-#include <typeinfo>
+#include <Utility/TypeHandle.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -35,34 +34,72 @@ namespace Detail {
 
 	// ---
 
-		struct Fact {
+		class Fact {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Constructs this @ref Fact instance.
-			template <typename Value>
-			ETInlineHint Fact( Value&& value );
-			//!	Constructs this @ref Fact instance.
-			ETInlineHint Fact( const Fact& ) = default;
-			//!	Constructs this @ref Fact instance.
-			ETInlineHint Fact( Fact&& );
-			//!	Constructs this @ref Fact instance.
-			ETInlineHint Fact();
+		public:
+		//!	Constructs this @ref Fact instance.
+			template <typename Value, class = eastl::enable_if<eastl::is_trivially_destructible<Value>::value>>
+			Fact( Value&& value );
+		//!	Constructs this @ref Fact instance.
+			Fact( const Fact& ) = default;
+		//!	Constructs this @ref Fact instance.
+			Fact( Fact&& );
+		//!	Constructs this @ref Fact instance.
+			Fact();
 
 			~Fact() = default;
 
 		// ---------------------------------------------------
 
+		public:
 			template <typename FactValue>
-			ETInlineHint const FactValue&	GetValueAs() const;
+			const FactValue&	GetValueAs() const;
 
 			template <typename FactValue>
-			ETInlineHint bool				IsType() const;
+			bool				IsType() const;
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			const ::std::type_info&	_typeInfo;
+			Eldritch2::TypeHandle	_type;
 			char					_allocationSpace[sizeof(void*)];
+		};
+
+	// ---
+
+		class ETPureAbstractHint Query {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		protected:
+		//!	Constructs this @ref Query instance.
+		/*!	@param[in] allocator @ref Allocator instance the new @ref Query should use to allocate @ref Fact data. */
+			Query( const SurjectiveQueryDatabase& database, Eldritch2::Allocator& allocator );
+
+			~Query() = default;
+
+		// ---------------------------------------------------
+
+		public:
+		//!	Publishes a pattern for matching with various @ref Rule instances.
+		/*!	@param[in] name Name of the pattern.
+			@param[in] value Value to add to the @ref Fact collection.
+			@returns A reference to *this for method chaining. */
+			template <typename FactValue>
+			Query&	PublishFact( const Eldritch2::Utf8Char* const name, FactValue&& value );
+
+			Query&	PublishTag( const Eldritch2::Utf8Char* const name );
+
+		// ---------------------------------------------------
+
+		public:
+			const Fact*	TryGetFactByName( InternedFactName name ) const;
+
+		// - DATA MEMBERS ------------------------------------
+
+		protected:
+			const SurjectiveQueryDatabase&				_database;
+			Eldritch2::HashMap<InternedFactName, Fact>	_facts;
 		};
 
 	// ---
@@ -71,123 +108,70 @@ namespace Detail {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
-			class Criterion : public ::Eldritch2::IntrusiveForwardListBaseHook {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-			protected:
-				ETInlineHint Criterion( InternedFactName targetFactName );
-
-			public:
-				virtual ~Criterion() = default;
-
-			// ---------------------------------------------------
-
-				ETInlineHint InternedFactName	GetTargetFactName() const;
-
-			// ---------------------------------------------------
-
-				virtual bool	operator()( const Fact& fact ) const abstract;
-
-			// - DATA MEMBERS ------------------------------------
-
-			protected:
-				InternedFactName	_targetFactName;
-			};
+			using Criterion = Eldritch2::Pair<InternedFactName, std::function<bool ( const Fact& )>>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			//!	Constructs this @ref Rule instance.
-			/*!	@param[in] database @ref SurjectiveQueryDatabase owning the new @ref Rule.
-				*/
+		public:
+		//!	Constructs this @ref Rule instance.
+		/*!	@param[in] database @ref SurjectiveQueryDatabase owning the new @ref Rule. */
 			Rule( SurjectiveQueryDatabase& database );
-			//!	Constructs this @ref Rule instance.
+		//!	Constructs this @ref Rule instance.
+			Rule( const Rule& ) = default;
+		//!	Constructs this @ref Rule instance.
 			Rule( Rule&& );
-			//!	Constructs this @ref Rule instance.
+		//!	Constructs this @ref Rule instance.
 			Rule() = default;
 
-			~Rule();
+			~Rule() = default;
 
-		// ---------------------------------------------------
-
-			ETInlineHint const ::Eldritch2::IntrusiveForwardList<Criterion>&	GetCriteria() const;
-
-		// ---------------------------------------------------
-
-			template <typename Comparator>
-			Rule&	AddCriterion( const ::Eldritch2::UTF8Char* const factName, Comparator&& comparator );
-
-			Rule&	AddTagCriterion( const ::Eldritch2::UTF8Char* const tagFactName );
-
-		// - DATA MEMBERS ------------------------------------
-
-		private:
-			SurjectiveQueryDatabase&						_database;
-			::Eldritch2::IntrusiveForwardList<Criterion>	_criteria;
-		};
-
-	// ---
-
-		class Query {
 		// ---------------------------------------------------
 
 		public:
-			//!	Publishes a pattern for matching with various @ref Rule instances.
-			/*!	@param[in] name Name of the pattern.
-				@param[in] value Value to add to the @ref Fact collection.
-				@returns A reference to *this for method chaining.
-				*/
-			template <typename FactValue>
-			ETInlineHint Query&	PublishFact( const ::Eldritch2::UTF8Char* const name, FactValue&& value );
-
-			ETInlineHint Query&	PublishTag( const ::Eldritch2::UTF8Char* const name );
+			size_t	EvaluateMatchWeight( const Query& query ) const;
 
 		// ---------------------------------------------------
 
-			ETInlineHint const SurjectiveQueryDatabase&	GetDatabase() const;
+		public:
+			template <typename Evaluator>
+			Rule&	AddCriterion( const Eldritch2::Utf8Char* const factName, Evaluator&& comparator );
 
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		protected:
-			//!	Constructs this @ref Query instance.
-			/*!	@param[in] allocator @ref Allocator instance the new @ref Query should use to allocate @ref Fact data.
-				*/
-			Query( const SurjectiveQueryDatabase& database, ::Eldritch2::Allocator& allocator );
-
-			~Query() = default;
-
-		// ---------------------------------------------------
-
-			size_t	EvaluateRuleMatchWeight( const Rule& rule ) const;
+			Rule&	AddTagCriterion( const Eldritch2::Utf8Char* const tagFactName );
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			const SurjectiveQueryDatabase&					_database;
-			::Eldritch2::HashMap<InternedFactName, Fact>	_facts;
+			SurjectiveQueryDatabase&				_database;
+			Eldritch2::ResizableArray<Criterion>	_criteria;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		SurjectiveQueryDatabase( ::Eldritch2::Allocator& allocator );
+	public:
+	//!	Constructs this @ref SurjectiveQueryDatabase instance.
+		SurjectiveQueryDatabase( Eldritch2::Allocator& allocator );
+	//!	Constructs this @ref SurjectiveQueryDatabase instance.
+		SurjectiveQueryDatabase( const SurjectiveQueryDatabase& ) = default;
 
 		~SurjectiveQueryDatabase() = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint ::Eldritch2::Allocator&	GetAllocator();
+	public:
+		Eldritch2::Allocator&	GetAllocator();
 
 	// ---------------------------------------------------
 
-		InternedFactName	TryInternFactName( const ::Eldritch2::UTF8Char* const factName ) const;
+	public:
+		InternedFactName	TryInternFactName( const Eldritch2::Utf8Char* const factName ) const;
 
-	protected:
-		InternedFactName	InternFactName( const ::Eldritch2::UTF8Char* const factName );
+		InternedFactName	InternFactName( const Eldritch2::Utf8Char* const factName );
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ChildAllocator						_allocator;
-		::Eldritch2::HashSet<::Eldritch2::UTF8String<>>	_internedStrings;
+		mutable Eldritch2::ChildAllocator			_allocator;
+		Eldritch2::HashSet<Eldritch2::Utf8String<>>	_internedStrings;
 	};
 
 }	// namespace Detail
@@ -201,19 +185,19 @@ namespace Detail {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref Rule instance.
-			/*!	@param[in] database @ref SurjectiveQueryDatabase that will own the new @ref Rule.
-				@param[in] response @ref Response the new @ref Rule should manage.
-				*/
+		//!	Constructs this @ref Rule instance.
+		/*!	@param[in] database @ref SurjectiveQueryDatabase that will own the new @ref Rule.
+			@param[in] response @ref Response the new @ref Rule should manage. */
 			Rule( SurjectiveQueryDatabase<Response>& database, Response&& response );
-			//!	Constructs this @ref Rule instance.
+		//!	Constructs this @ref Rule instance.
 			Rule( Rule&& );
 
 			~Rule() = default;
 
 		// ---------------------------------------------------
 
-			ETInlineHint const Response&	GetResponse() const;
+		public:
+			const Response&	GetResponse() const;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -227,17 +211,21 @@ namespace Detail {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			Query( const SurjectiveQueryDatabase<Response>& database, ::Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref Query instance.
+			Query( const SurjectiveQueryDatabase<Response>& database, Eldritch2::Allocator& allocator );
+		//!	Constructs this @ref Query instance.
+			Query( const Query& ) = default;
 
 			~Query() = default;
 
 		// ---------------------------------------------------
 
+		public:
 			template <typename Evaluator>
-			void	EvaluateMostSuitableResponse( ::Eldritch2::Allocator& allocator, Evaluator&& evaluator ) const;
+			void	EvaluateMostSuitableResponse( Eldritch2::Allocator& allocator, Evaluator&& evaluator ) const;
 
 			template <typename Evaluator>
-			void	EvaluateAllSuitableResponses( ::Eldritch2::Allocator& allocator, Evaluator&& evaluator ) const;
+			void	EvaluateAllSuitableResponses( Eldritch2::Allocator& allocator, Evaluator&& evaluator ) const;
 
 			template <typename MatchingRuleCollection>
 			void	CollectMatchingRules( MatchingRuleCollection&& collection ) const;
@@ -245,18 +233,23 @@ namespace Detail {
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		SurjectiveQueryDatabase( ::Eldritch2::Allocator& allocator );
+	public:
+	//!	Constructs this @ref SurjectiveQueryDatabase instance.
+		SurjectiveQueryDatabase( Eldritch2::Allocator& allocator );
+	//!	Constructs this @ref SurjectiveQueryDatabase instance.
+		SurjectiveQueryDatabase( const SurjectiveQueryDatabase& ) = default;
 
 		~SurjectiveQueryDatabase() = default;
 
 	// ---------------------------------------------------
 
+	public:
 		Rule&	AddRule( Response&& response );
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		::Eldritch2::ResizableArray<Rule>	_rules;
+		Eldritch2::ResizableArray<Rule>	_rules;
 	};
 
 }	// namespace Utility

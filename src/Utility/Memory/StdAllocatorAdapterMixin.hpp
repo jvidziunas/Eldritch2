@@ -17,7 +17,7 @@
 
 namespace Eldritch2 {
 
-	template <typename T, typename Allocator = ::Eldritch2::ChildAllocator>
+	template <typename T, typename Allocator = Eldritch2::ChildAllocator>
 	class StdAllocatorAdapterMixin : public Allocator {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -33,41 +33,46 @@ namespace Eldritch2 {
 
 		template <typename U, typename AlternateAllocator = UnderlyingAllocatorType>
 		struct rebind {
-			typedef ::Eldritch2::StdAllocatorAdapterMixin<U, AlternateAllocator> other;
+			using	other = Eldritch2::StdAllocatorAdapterMixin<U, AlternateAllocator>;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref StdAllocatorAdapterMixin instance.
+	public:
+	//!	Constructs this @ref StdAllocatorAdapterMixin instance.
 		template <typename... ConstructorArguments>
-		ETInlineHint StdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments );
+		StdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments );
 
-		//!	Destroys this @ref StdAllocatorAdapterMixin instance.
 		virtual	~StdAllocatorAdapterMixin() = default;
 
 	// ---------------------------------------------------
 		
-		ETForceInlineHint pointer		address( reference r ) const;
-		ETForceInlineHint const_pointer	address( const_reference s ) const;
+	public:
+		const_pointer	address( const_reference s ) const;
+		pointer			address( reference r ) const;
 
 	// ---------------------------------------------------
 		
-		ETForceInlineHint size_type	max_size() const;
+	public:
+		size_type	max_size() const;
 
 	// ---------------------------------------------------
 		
-		ETForceInlineHint bool	operator!=( const ::Eldritch2::StdAllocatorAdapterMixin<T, Allocator>& other ) const;
+	public:
+		bool	operator!=( const Eldritch2::StdAllocatorAdapterMixin<T, Allocator>& other ) const;
 
-		ETForceInlineHint bool	operator==( const ::Eldritch2::StdAllocatorAdapterMixin<T, Allocator>& other ) const;
+		bool	operator==( const Eldritch2::StdAllocatorAdapterMixin<T, Allocator>& other ) const;
 
 	// ---------------------------------------------------
 		
-		ETForceInlineHint void	construct( T* const p, const_reference t ) const;
+	public:
+		void	construct( T* const p, const_reference t ) const;
 
-		ETForceInlineHint void	destroy( T* const p ) const;
+		void	destroy( T* const p ) const;
 
 	// ---------------------------------------------------
 
+	public:
 		ETRestrictHint pointer	allocate( const size_type n );
 		ETRestrictHint pointer	allocate( const size_type n, const void* hint );
 		template<typename U>
@@ -78,31 +83,33 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template<typename T, size_t alignment = ::Eldritch2::TypeTraits::AlignmentOf<T>::val, typename AllocatorType = ::Eldritch2::ChildAllocator>
-	class AlignedStdAllocatorAdapterMixin : public ::Eldritch2::StdAllocatorAdapterMixin<T, AllocatorType> {
+	template<typename T, size_t alignment = Eldritch2::TypeTraits::AlignmentOf<T>::val, typename AllocatorType = Eldritch2::ChildAllocator>
+	class AlignedStdAllocatorAdapterMixin : public Eldritch2::StdAllocatorAdapterMixin<T, AllocatorType> {
 	// - TYPE PUBLISHING ---------------------------------
 		
 	public:
 		template <typename U, size_t alternateAlignment = alignment, typename AlternateAllocator = UnderlyingAllocatorType>
 		struct rebind {
-			typedef ::Eldritch2::AlignedStdAllocatorAdapterMixin<U, alternateAlignment, AlternateAllocator> other;
+			using other	= Eldritch2::AlignedStdAllocatorAdapterMixin<U, alternateAlignment, AlternateAllocator>;
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref AlignedStdAllocatorAdapterMixin instance.
+	public:
+	//!	Constructs this @ref AlignedStdAllocatorAdapterMixin instance.
 		template <typename... ConstructorArguments>
 		AlignedStdAllocatorAdapterMixin( ConstructorArguments&&... constructorArguments );
 		
-		//!	Destroys this @ref AlignedStdAllocatorAdapterMixin instance.
 		~AlignedStdAllocatorAdapterMixin() = default;
 
 	// ---------------------------------------------------
 		
-		ETForceInlineHint size_type	max_size() const;
+	public:
+		size_type	max_size() const;
 
 	// ---------------------------------------------------
 
+	public:
 		ETRestrictHint pointer	allocate( const size_type n );
 		ETRestrictHint pointer	allocate( const size_type n, const void* hint );
 		template <typename U>

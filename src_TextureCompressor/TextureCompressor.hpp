@@ -45,7 +45,7 @@ namespace Tools {
 
 	// ---------------------------------------------------
 
-		int	ProcessInputFiles( ::Eldritch2::Range<const UTF8Char**> inputFiles );
+		int	ProcessInputFiles( Eldritch2::Range<const UTF8Char**> inputFiles );
 	};
 
 }	// namespace Tools

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Eldritch2::ResizableArray&lt;*&gt;">
+    <DisplayString>{{size = {_underlyingContainer.mpEnd-_underlyingContainer.mpBegin}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Item>
+      <Item Name="[capacity]">_underlyingContainer.mpCapacity-_underlyingContainer.mpBegin</Item>
+      <ArrayItems>
+        <Size>_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Size>
+        <ValuePointer>_underlyingContainer.mpBegin</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Eldritch2::ArrayMap&lt;*&gt;">
+    <DisplayString>{{size = {_underlyingContainer.mpEnd-_underlyingContainer.mpBegin}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Item>
+      <Item Name="[capacity]">_underlyingContainer.m_capacityEnd-_underlyingContainer.mpBegin</Item>
+      <ArrayItems>
+        <Size>_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Size>
+        <ValuePointer>_underlyingContainer.mpBegin</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Eldritch2::ArraySet&lt;*&gt;">
+    <DisplayString>{{size = {_underlyingContainer.mpEnd-_underlyingContainer.mpBegin}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Item>
+      <Item Name="[capacity]">_underlyingContainer.m_capacityEnd-_underlyingContainer.mpBegin</Item>
+      <ArrayItems>
+        <Size>_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Size>
+        <ValuePointer>_underlyingContainer.mpBegin</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Eldritch2::HashMap&lt;*&gt;">
+    <DisplayString>{{size = {_underlyingContainer.mnElementCount}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">_underlyingContainer.mnElementCount</Item>
+      <Item Name="[buckets]">_underlyingContainer.mnBucketCount</Item>
+      <ArrayItems>
+        <Size>_underlyingContainer.mnBucketCount</Size>
+        <ValuePointer>_underlyingContainer.mpBucketArray</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Eldritch2::HashSet&lt;*&gt;">
+    <DisplayString>{{size = {_underlyingContainer.mnElementCount}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">_underlyingContainer.mnElementCount</Item>
+      <Item Name="[buckets]">_underlyingContainer.mnBucketCount</Item>
+      <ArrayItems>
+        <Size>_underlyingContainer.mnBucketCount</Size>
+        <ValuePointer>_underlyingContainer.mpBucketArray</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Eldritch2::String&lt;Eldritch2::UTF8Char,*&gt;">
+  	<DisplayString>{_underlyingContainer.mpBegin,s8}</DisplayString>
+    <StringView>_underlyingContainer.mpBegin,s8</StringView>
+  </Type>
+  <Type Name="Eldritch2::String&lt;wchar_t,*&gt;">
+  	<DisplayString>{_underlyingContainer.mpBegin,su}</DisplayString>
+    <StringView>_underlyingContainer.mpBegin,su</StringView>
+  </Type>
+  <Type Name="Eldritch2::UniquePointer&lt;*&gt;">
+    <DisplayString Condition="mPair.mFirst == 0">empty</DisplayString>
+    <DisplayString Condition="mPair.mFirst != 0">UniquePointer {*mPair.mFirst}</DisplayString>
+    <Expand>
+      <Item Condition="mPair.mFirst != 0" Name="[ptr]">mPair.mFirst</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

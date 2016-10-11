@@ -28,37 +28,44 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR -------------------------- 
 
 	public:
-		//!	Constructs this @ref RadianMeasure instance.
-		ETForceInlineHint RadianMeasure() = default;
-		//!	Constructs this @ref RadianMeasure instance.
-		ETForceInlineHint explicit RadianMeasure( ::Eldritch2::float32 value );
-		//!	Constructs this @ref RadianMeasure instance.
-		ETForceInlineHint RadianMeasure( const ::Eldritch2::DegreeMeasure& value );
-		//!	Constructs this @ref RadianMeasure instance.
-		ETForceInlineHint RadianMeasure( const ::Eldritch2::RadianMeasure& value );
+	//!	Constructs this @ref RadianMeasure instance.
+		explicit RadianMeasure( Eldritch2::float32 value );
+	//!	Constructs this @ref RadianMeasure instance.
+		RadianMeasure( const Eldritch2::DegreeMeasure& value );
+	//!	Constructs this @ref RadianMeasure instance.
+		RadianMeasure( const RadianMeasure& ) = default;
+	//!	Constructs this @ref RadianMeasure instance.
+		RadianMeasure() = default;
 
-		//!	Destroys this @ref RadianMeasure instance.
-		ETForceInlineHint ~RadianMeasure() = default;
-
-	// ---------------------------------------------------
-
-		ETForceInlineHint	operator ::Eldritch2::float32() const;
+		~RadianMeasure() = default;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint const Eldritch2::RadianMeasure&	operator=( ::Eldritch2::float32 value );
-		ETForceInlineHint const Eldritch2::RadianMeasure&	operator=( const ::Eldritch2::DegreeMeasure& value );
-		ETForceInlineHint const Eldritch2::RadianMeasure&	operator=( const ::Eldritch2::RadianMeasure& value );
+	public:
+		explicit operator	Eldritch2::float32() const;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint bool	operator==( const ::Eldritch2::RadianMeasure& other ) const;
-		ETForceInlineHint bool	operator==( const ::Eldritch2::DegreeMeasure& other ) const;
+	public:
+		friend ETInlineHint ETPureFunctionHint RadianMeasure	operator*( RadianMeasure left, Eldritch2::float32 scalar );
+
+		friend ETInlineHint ETPureFunctionHint RadianMeasure	operator/( RadianMeasure left, Eldritch2::float32 scalar );
+
+		RadianMeasure&									operator*=( Eldritch2::float32 scalar );
+
+		RadianMeasure&									operator/=( Eldritch2::float32 scalar );
+
+	// ---------------------------------------------------
+
+	public:
+		RadianMeasure&	operator=( const Eldritch2::DegreeMeasure& value );
+		RadianMeasure&	operator=( const RadianMeasure& ) = default;
+		RadianMeasure&	operator=( Eldritch2::float32 value );
 
 	// ---------------------------------------------------
 
 	private:
-		::Eldritch2::float32	_measure;
+		Eldritch2::float32	_measure;
 	};
 
 // ---
@@ -67,37 +74,42 @@ namespace Eldritch2 {
 	// - CONSTRUCTOR/DESTRUCTOR -------------------------- 
 
 	public:
-		//!	Constructs this @ref DegreeMeasure instance.
-		ETForceInlineHint DegreeMeasure() = default;
-		//!	Constructs this @ref DegreeMeasure instance.
-		ETForceInlineHint explicit DegreeMeasure( ::Eldritch2::float32 value );
-		//!	Constructs this @ref DegreeMeasure instance.
-		ETForceInlineHint DegreeMeasure( const ::Eldritch2::DegreeMeasure& value );
-		//!	Constructs this @ref DegreeMeasure instance.
-		ETForceInlineHint DegreeMeasure( const ::Eldritch2::RadianMeasure& value );
+	//!	Constructs this @ref DegreeMeasure instance.
+		explicit DegreeMeasure( Eldritch2::float32 value );
+	//!	Constructs this @ref DegreeMeasure instance.
+		DegreeMeasure( const Eldritch2::RadianMeasure& value );
+	//!	Constructs this @ref DegreeMeasure instance.
+		DegreeMeasure( const DegreeMeasure& ) = default;
+	//!	Constructs this @ref DegreeMeasure instance.
+		DegreeMeasure() = default;
 
-		//!	Destroys this @ref DegreeMeasure instance.
-		ETForceInlineHint ~DegreeMeasure() = default;
-
-	// ---------------------------------------------------
-
-		ETForceInlineHint	operator ::Eldritch2::float32() const;
+		~DegreeMeasure() = default;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint const Eldritch2::DegreeMeasure&	operator=( ::Eldritch2::float32 value );
-		ETForceInlineHint const Eldritch2::DegreeMeasure&	operator=( const ::Eldritch2::RadianMeasure& value );
-		ETForceInlineHint const Eldritch2::DegreeMeasure&	operator=( const ::Eldritch2::DegreeMeasure& value );
+	public:
+		explicit operator	Eldritch2::float32() const;
 
 	// ---------------------------------------------------
 
-		ETForceInlineHint bool	operator==( const ::Eldritch2::RadianMeasure& other ) const;
-		ETForceInlineHint bool	operator==( const ::Eldritch2::DegreeMeasure& other ) const;
+		friend ETInlineHint ETPureFunctionHint DegreeMeasure		operator*( DegreeMeasure left, Eldritch2::float32 scalar );
+
+		friend ETInlineHint ETPureFunctionHint DegreeMeasure		operator/( DegreeMeasure left, Eldritch2::float32 scalar );
+
+		DegreeMeasure&										operator*=( Eldritch2::float32 scalar );
+
+		DegreeMeasure&										operator/=( Eldritch2::float32 scalar );
+
+	// ---------------------------------------------------
+
+		DegreeMeasure&	operator=( const Eldritch2::RadianMeasure& value );
+		DegreeMeasure&	operator=( Eldritch2::float32 value );
+		DegreeMeasure&	operator=( const DegreeMeasure& ) = default;
 
 	// ---------------------------------------------------
 
 	private:
-		::Eldritch2::float32	_measure;
+		Eldritch2::float32	_measure;
 	};
 
 }	// namespace Eldritch2

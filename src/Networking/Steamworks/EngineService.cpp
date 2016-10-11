@@ -12,15 +12,12 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Configuration/ConfigurationPublishingInitializationVisitor.hpp>
+#include <Configuration/ConfigurationRegistrar.hpp>
 #include <Networking/Steamworks/EngineService.hpp>
-#include <Networking/Steamworks/WorldView.hpp>
-#include <Utility/Memory/InstanceNew.hpp>
-#include <Scheduler/ThreadScheduler.hpp>
-#include <Utility/Concurrency/Lock.hpp>
-#include <Utility/CountedResult.hpp>
-#include <Foundation/GameEngine.hpp>
+#include <Networking/Steamworks/WorldService.hpp>
+#include <Scripting/ApiRegistrar.hpp>
 #include <Utility/Result.hpp>
+#include <Core/Engine.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
@@ -44,117 +41,144 @@
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Configuration;
-using namespace ::Eldritch2::Networking;
-using namespace ::Eldritch2::Foundation;
-using namespace ::Eldritch2::Scheduler;
+using namespace ::Eldritch2::Scheduling;
 using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2::Utility;
-using namespace ::Eldritch2;
+using namespace ::Eldritch2::Platform;
+using namespace ::Eldritch2::Logging;
+using namespace ::Eldritch2::Core;
 
 namespace Eldritch2 {
 namespace Networking {
 namespace Steamworks {
 
-	EngineService::EngineService( GameEngine& owningEngine ) : GameEngineService( owningEngine ),
-															   _allocator( GetEngineAllocator(), UTF8L("Steamworks Networking Service Root Allocator") ),
-															   _steamPort( 6690u ),
-															   _gamePort( 6691u ),
-															   _queryPort( 6692u ),
-															   _versionString( UTF8_VERSION_STRING, _allocator ),
-															   _lobbyWorldName( UTF8_PROJECT_NAME UTF8L("Lobby"), _allocator ),
-															   _lobbyRulesName( UTF8_PROJECT_NAME UTF8L("LobbyRules@") UTF8_PROJECT_NAME, _allocator ),
-															   _useVACAuthentication( true ),
-															   _useSteamworks( false ),
-															   _replicationUploadBandwidthLimitInKilobytesPerSecond( 1024u ),
-															   _replicationDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
-															   _contentDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
-															   _contentUploadBandwidthLimitInKilobytesPerSecond( 1024u ),
-															   _banList( { _allocator, UTF8L("Steamworks Ban List Allocator") } ) {}
+	EngineService::EngineService( const Engine& engine ) : Core::EngineService( engine.GetServiceBlackboard() ),
+														   _log( engine.GetLog() ),
+														   _allocator( engine.GetAllocator(), "Steamworks Networking Service Root Allocator" ),
+														   _steamPort( 6690u ),
+														   _networkPortPool( { _allocator, "Steamworks Networking Service Port Pool Allocator" } ),
+														   _versionString( VERSION_STRING, { _allocator, "Steamworks Version String Allocator" } ),
+														   _lobbyWorldName( PROJECT_NAME "Lobby", { _allocator, "Steamworks Lobby World Name Allocator" } ),
+														   _useVacAuthentication( true ),
+														   _replicationUploadBandwidthLimitInKilobytesPerSecond( 1024u ),
+														   _replicationDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
+														   _contentDownloadBandwidthLimitInKilobytesPerSecond( 3u * 1024u ),
+														   _contentUploadBandwidthLimitInKilobytesPerSecond( 1024u ),
+														   _banList( { _allocator, "Steamworks Ban List Allocator" } ) {}
 
 // ---------------------------------------------------
 
 	EngineService::~EngineService() {
-		::SteamAPI_Shutdown();
+		SteamAPI_Shutdown();
 	}
 
 // ---------------------------------------------------
 
-	const UTF8Char* const EngineService::GetName() const { 
-		return UTF8L("Steamworks Networking Service");
+	Utf8Literal EngineService::GetName() const { 
+		return "Steamworks Networking Service";
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode EngineService::AllocateWorldView( Allocator& allocator, World& world ) {
-		return new(allocator, Allocator::AllocationDuration::Normal) WorldView( *this, world ) ? Error::None : Error::OutOfMemory;
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnEngineConfigurationBroadcast( WorkerContext& /*executingContext*/ ) {
-		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Initiate Steam connection", 0xBBBBBB );
-
-		GetLogger()( UTF8L("Connecting to Steam instance.") ET_UTF8_NEWLINE_LITERAL );
-
-		const ::EServerMode	serverMode( _useVACAuthentication ? ::eServerModeAuthenticationAndSecure : ::eServerModeAuthentication );
-		const uint32		serverAddress( 0u ); // INADDR_ANY
-
-		// Attempt to establish a connection with the Steam master servers.
-		if( ::SteamAPI_Init() ) {
-			GetLogger()( UTF8L("Initial Steam connection established.") ET_UTF8_NEWLINE_LITERAL );
-		} else {
-			GetLogger( LogMessageType::Error )( UTF8L("Unable to initialize Steam API!") ET_UTF8_NEWLINE_LITERAL );
+	Result<UniquePointer<Core::WorldService>> EngineService::CreateWorldService( Allocator& allocator, const World& world ) {
+		if( !SteamAPI_IsSteamRunning() ) {
+			_log( MessageSeverity::Error, "Unable to create world Steamworks network presence: Steam not running!" ET_UTF8_NEWLINE_LITERAL );
+			return Error::None;
 		}
+
+		if( SteamClient() == nullptr ) {
+			_log( MessageSeverity::Error, "Unable to create world Steamworks network presence: No connection to local Steam client!" ET_UTF8_NEWLINE_LITERAL );
+			return Error::None;
+		}
+
+		HSteamPipe	pipe( SteamClient()->CreateSteamPipe() );
+		HSteamUser	user( SteamClient()->CreateLocalUser( &pipe, EAccountType::k_EAccountTypeAnonGameServer ) );
+
+		auto	result( MakeUnique<WorldService>( allocator, pipe, user, world ) );
+		if( !result ) {
+			return Error::OutOfMemory;
+		}
+
+		return eastl::move( result );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::AcceptInitializationVisitor( ConfigurationPublishingInitializationVisitor& visitor ) {
-		visitor.PushSection( UTF8L("Steamworks") );
+	void EngineService::AcceptVisitor( JobFiber& /*fiber*/, const ConfigurationBroadcastVisitor ) {
+		MICROPROFILE_SCOPEI( GetName(), "Initiate Steam connection", 0xBBBBBB );
 
-		visitor.Register( UTF8L("SteamPort"), _steamPort ).Register( UTF8L("GamePort"), _gamePort ).Register( UTF8L("QueryPort"), _queryPort ).Register( UTF8L("VersionString"), _versionString );
-		visitor.Register( UTF8L("UseValveAntiCheatAuthentication"), _useVACAuthentication ).Register( UTF8L("UseSteamworks"), _useSteamworks );
-		visitor.Register( UTF8L("ReplicationUploadBandwidthLimitInKilobytesPerSecond"), _replicationUploadBandwidthLimitInKilobytesPerSecond );
-		visitor.Register( UTF8L("ReplicationDownloadBandwidthLimitInKilobytesPerSecond"), _replicationDownloadBandwidthLimitInKilobytesPerSecond );
-		visitor.Register( UTF8L("ContentDownloadBandwidthLimitInKilobytesPerSecond"), _contentDownloadBandwidthLimitInKilobytesPerSecond );
-		visitor.Register( UTF8L("ContentUploadBandwidthLimitInKilobytesPerSecond"), _contentUploadBandwidthLimitInKilobytesPerSecond );
+		if( _networkPortPool.IsEmpty() ) {
+			_log( MessageSeverity::VerboseWarning, "No network ports assigned to Steam, using default." ET_UTF8_NEWLINE_LITERAL );
+		//	Add a small set of default ports.
+			_networkPortPool.ReleaseRange( { 6691u, 6671u } );
+		}
 
-		visitor.PushSection( UTF8_PROJECT_NAME );
-		visitor.Register( UTF8L("LobbyWorldName"), _lobbyWorldName ).Register( UTF8L("LobbyRulesName"), _lobbyRulesName );
-	}
+		_log( MessageSeverity::Message, "Connecting to Steam instance." ET_UTF8_NEWLINE_LITERAL );
 
-// ---------------------------------------------------
-
-	void EngineService::AcceptInitializationVisitor( ScriptApiRegistrationInitializationVisitor& visitor ) {
-		WorldView::ExposeScriptApi( visitor );
-	}
-
-// ---------------------------------------------------
-
-	void EngineService::OnEngineInitializationCompleted( WorkerContext& /*executingContext*/ ) {
-		auto	createLobbyWorldResult( CreateWorld( _lobbyWorldName.AsCString(), _lobbyRulesName.AsCString() ) );
-
-		if( !createLobbyWorldResult ) {
-			GetLogger( LogMessageType::Error )( UTF8L("Unable to create lobby world!") ET_UTF8_NEWLINE_LITERAL );
+	//	Attempt to establish a connection with the Steam master servers.
+		if( !SteamAPI_Init() ) {
+			_log( MessageSeverity::Error, "Unable to initialize Steam API!" ET_UTF8_NEWLINE_LITERAL );
 			return;
 		}
 
-		_lobbyWorld = ::std::move( createLobbyWorldResult.object );
+		SteamClient()->SetLocalIPBinding( 0u, _steamPort );
 
-		// AcknowledgePlayerConnection( { ::SteamUser()->GetSteamID(), 0u } );
+		_log( MessageSeverity::Message, "Initial Steam connection established." ET_UTF8_NEWLINE_LITERAL );
 	}
 
 // ---------------------------------------------------
 
-	void EngineService::OnServiceTickStarted( WorkerContext& /*executingContext*/ ) {
-		MICROPROFILE_SCOPEI( "Steamworks Networking Service", "Process and dispatch callbacks", 0xAAAAAA );
+	void EngineService::AcceptVisitor( ConfigurationRegistrar& registrar ) {
+		registrar.BeginSection( "Steamworks" )
+			.Register( "SteamPort", _steamPort )
+			.Register( "VersionString", [&] ( Range<const Utf8Char*> value ) { _versionString.Assign( value.Begin(), value.End() ); } )
+			.Register( "UseValveAntiCheatAuthentication", _useVacAuthentication )
+			.Register( "ReplicationUploadBandwidthLimitInKilobytesPerSecond", _replicationUploadBandwidthLimitInKilobytesPerSecond )
+			.Register( "ReplicationDownloadBandwidthLimitInKilobytesPerSecond", _replicationDownloadBandwidthLimitInKilobytesPerSecond )
+			.Register( "ContentDownloadBandwidthLimitInKilobytesPerSecond", _contentDownloadBandwidthLimitInKilobytesPerSecond )
+			.Register( "ContentUploadBandwidthLimitInKilobytesPerSecond", _contentUploadBandwidthLimitInKilobytesPerSecond );
 
-		::SteamAPI_RunCallbacks();
-		::SteamGameServer_RunCallbacks();
+		registrar.BeginSection( "Steamworks.BannedSteamIdList" )
+			.RegisterDynamicKeySetter( [&] ( Utf8Literal valueName, Range<const Utf8Char*> /*value*/ ) {
+				_banList.Insert( CSteamID() );
+			} );
 
-		if( _lobbyWorld && !( _lobbyWorld->CanExecute() ) ) {
-			_lobbyWorld = nullptr;
+		registrar.BeginSection( "Engine" )
+			.Register( "LobbyWorldName", [&] ( Range<const Utf8Char*> value ) {
+				_lobbyWorldName.Assign( value.Begin(), value.End() );
+			} );
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::AcceptVisitor( ApiRegistrar& visitor ) {
+		WorldService::RegisterScriptApi( visitor );
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::AcceptVisitor( ServiceBlackboard& /*serviceLocator*/ ) {
+	//	Nothing here for now.
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::AcceptVisitor( JobFiber& /*fiber*/, const InitializationCompleteVisitor ) {
+		Engine&			engine( LocateService<Engine>() );
+		const ErrorCode	createWorldResult( engine.CreateWorld( { { World::GetRequiredPackagesKey(), _lobbyWorldName }, { World::GetRulesKey(), "LobbyRules" } } ) );
+
+		if( !createWorldResult ) {
+			_log( MessageSeverity::Error, "Error creating lobby world: {}!" ET_UTF8_NEWLINE_LITERAL, GetErrorString( createWorldResult ) );
+			engine.ShutDown();
+			return;
 		}
+	}
+
+// ---------------------------------------------------
+
+	void EngineService::AcceptVisitor( JobFiber& /*fiber*/, const ServiceTickVisitor ) {
+		MICROPROFILE_SCOPEI( GetName(), "Process and dispatch callbacks", 0xAAAAAA );
+
+		SteamAPI_RunCallbacks();
 	}
 
 }	// namespace Steamworks

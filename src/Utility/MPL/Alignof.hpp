@@ -49,5 +49,5 @@ namespace TypeTraits {
 }	// namespace Eldritch2
 
 #if( !ET_COMPILER_SUPPORTS_CPP11 )
-#	define alignof( x ) static_cast<size_t>( ::Eldritch2::TypeTraits::AlignmentOf<x>::val )
+#	define alignof( x ) static_cast<size_t>( Eldritch2::TypeTraits::AlignmentOf<x>::val )
 #endif

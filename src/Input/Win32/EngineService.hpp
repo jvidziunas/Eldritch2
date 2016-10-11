@@ -14,153 +14,101 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Foundation/GameEngineService.hpp>
-#include <Utility/Containers/FlatMap.hpp>
-#include <Utility/Concurrency/Lock.hpp>
-#include <Scheduler/Thread.hpp>
-#include <Input/Keyboard.hpp>
-#include <Input/Mouse.hpp>
+#include <Input/Win32/RawInputSubscriber.hpp>
+#include <Utility/Memory/ChildAllocator.hpp>
+#include <Core/EngineService.hpp>
+#include <Scheduling/Thread.hpp>
+#include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
-#ifndef WIN32_LEAN_AND_MEAN
-#	define WIN32_LEAN_AND_MEAN
-#endif
-#include <Windows.h>
-//------------------------------------------------------------------//
+
+namespace Eldritch2 {
+	namespace Core {
+		class	Engine;
+	}
+}
+
+struct HWND__;
+struct HHOOK__;
+
+using HWND	= HWND__*;
+using HHOOK	= HHOOK__*;
 
 namespace Eldritch2 {
 namespace Input {
 namespace Win32 {
 
-	class EngineService : public Foundation::GameEngineService {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Constructs this @ref EngineService instance.
-		EngineService( Foundation::GameEngine& owningEngine );
-
-		//!	Destroys this @ref EngineService instance.
-		~EngineService();
-
-	// ---------------------------------------------------
-
-		const ::Eldritch2::UTF8Char* const	GetName() const override sealed;
-
-	// ---------------------------------------------------
-
-	protected:
-		void	OnEngineInitializationStarted( Scheduler::WorkerContext& executingContext ) override sealed;
-
-		void	AcceptInitializationVisitor( Scripting::ScriptApiRegistrationInitializationVisitor& visitor ) override sealed;
-
+	class EngineService : public Core::EngineService {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		class RawInputPollingThread : public Scheduler::Thread {
+		class RawInputPollingThread : public Scheduling::Thread {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref RawInputPollingThread instance.
-			RawInputPollingThread( EngineService& hostingService );
+		//!	Constructs this @ref RawInputPollingThread instance.
+			RawInputPollingThread( Eldritch2::Allocator& allocator );
+		//!	Disable copying.
+			RawInputPollingThread( const RawInputPollingThread& ) = delete;
 
-			//!	Destroys this @ref RawInputPollingThread instance.
 			~RawInputPollingThread() = default;
 
 		// ---------------------------------------------------
-
-			const ::Eldritch2::UTF8Char* const	GetHumanReadableName() const override sealed;
+			
+		public:
+			Eldritch2::Utf8Literal	GetHumanReadableName() const override sealed;
 
 		// ---------------------------------------------------
 
+		public:
+			void	RequestGracefulShutdown() override;
+
 			void	Run() override sealed;
 
-			void	RequestGracefulShutdown() override;
+		// ---------------------------------------------------
+
+		//!	Disable assignment.
+			RawInputPollingThread&	operator=( const RawInputPollingThread& ) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-			EngineService&	_hostingInputService;
-			::DWORD			_threadID;
+			mutable Eldritch2::ChildAllocator	_allocator;
+			std::atomic<HWND>					_window;
 		};
 
-	// ---
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		class ETPureAbstractHint RawInputSubscriber {
-		// ---------------------------------------------------
+	public:
+	//!	Constructs this @ref EngineService instance.
+		EngineService( const Core::Engine& owningEngine );
+	//!	Disable copying.
+		EngineService( const EngineService& ) = delete;
 
-		public:
-			//!	Converts a generic Win32 raw input packet into HID-specific input events.
-			/*!	@param[in] inputPacket Packet to parse.
-				*/
-			virtual void	ReadInputPacket( const ::RAWINPUT& inputPacket ) abstract;
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		protected:
-			//!	Constructs this @ref RawInputSubscriber instance.
-			RawInputSubscriber() = default;
-
-		public:
-			//!	Destroys this @ref RawInputSubscriber instance.
-			virtual ~RawInputSubscriber() = default;
-		};
-
-	// ---
-
-		class Keyboard : public RawInputSubscriber, public Input::Keyboard {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref Keyboard instance.
-			Keyboard( const ::HANDLE deviceHandle, EngineService& owner );
-
-			//!	Destroys this @ref Keyboard instance.
-			~Keyboard() = default;
-
-		// ---------------------------------------------------
-
-			void	Dispose() override sealed;
-
-		// ---------------------------------------------------
-
-			void	ReadInputPacket( const ::RAWINPUT& inputPacket ) override sealed;
-		};
-
-	// ---
-
-		class Mouse : public RawInputSubscriber, public Input::Mouse {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref Mouse instance.
-			Mouse( const ::HANDLE deviceHandle, EngineService& owner );
-
-			//!	Destroys this @ref Mouse instance.
-			~Mouse() = default;
-
-		// ---------------------------------------------------
-
-			void	Dispose() override sealed;
-
-		// ---------------------------------------------------
-
-			void	ReadInputPacket( const ::RAWINPUT& inputPacket ) override;
-		};
+	//!	Destroys this @ref EngineService instance.
+		~EngineService();
 
 	// ---------------------------------------------------
 
-		void	EnumerateAvailableRawInputDevices();
+	public:
+		Eldritch2::Utf8Literal	GetName() const override;
 
 	// ---------------------------------------------------
 
-		void	HandleDeviceAttach( const ::HANDLE deviceHandle );
+	protected:
+		void	AcceptVisitor( Scheduling::JobFiber& executor, const BeginInitializationVisitor ) override;
+		void	AcceptVisitor( Scripting::ApiRegistrar& registrar ) override;
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+		EngineService&	operator=( const EngineService& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
-		::Eldritch2::ChildAllocator									_allocator;
-		const ::HHOOK												_keyboardHook;
-		Utility::ReaderWriterUserMutex*								_deviceDirectoryMutex;
-		::Eldritch2::FlatMap<::HANDLE, RawInputSubscriber*>	_deviceDirectory;
-		RawInputPollingThread										_pollingThread;
+	private:
+		mutable Logging::ChildLog	_log;
+		const HHOOK					_keyboardHook;
+		RawInputPollingThread		_pollingThread;
 	};
 
 }	// namespace Win32

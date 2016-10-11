@@ -23,64 +23,23 @@
 #include <Utility/Memory/Allocator.hpp>
 #include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
-#include <memory>
+#include <EASTL/memory.h>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2;
 
 namespace Eldritch2 {
 
-	const Allocator::AlignedDeallocationSemanticsTag AlignedDeallocationSemantics;
+	Allocator::Allocator( const Utf8Char* const name ) : _name( name ) {}
 
 // ---------------------------------------------------
 
-	Allocator::Allocator( const UTF8Char* const name ) : _name( name ) {}
-
-// ---------------------------------------------------
-
-	Allocator::Allocator( Allocator&& allocator ) : _name( allocator._name ) {}
-
-// ---------------------------------------------------
-
-	ETRestrictHint void* Allocator::Allocate( const SizeType sizeInBytes, const SizeType alignmentInBytes, const AllocationOptions options ) {
-		SizeType	allocationSize( EstimateActualAllocationSizeInBytes( sizeInBytes, alignmentInBytes ) );
-		if( void* const allocation = Allocate( allocationSize, options ) ) {
-			void*	userPointer( static_cast<void**>(allocation) + 1 );
-
-			if( ::std::align( alignmentInBytes, sizeInBytes, userPointer, allocationSize ) ) {
-				// Store the 'real' pointer that will be internally fed back to the allocator just before what the user sees.
-				static_cast<void**>(userPointer)[-1] = allocation;
-				return userPointer;
-			}
-
-			this->Deallocate( allocation );
-		}
-
-		return nullptr;
-	}
-
-// ---------------------------------------------------
-
-	void Allocator::Deallocate( void* address, const AlignedDeallocationSemanticsTag ) {
-		return Deallocate( GetAllocationPointerFromAlignedUserPointer( address ) );
-	}
-
-// ---------------------------------------------------
-
-	ETNoAliasHint void* Allocator::GetAllocationPointerFromAlignedUserPointer( void* userPointer ) {
-		return static_cast<void**>(userPointer)[-1];
-	}
-
-// ---------------------------------------------------
-
-	Allocator::SizeType Allocator::EstimateActualAllocationSizeInBytes( const SizeType allocationSizeInBytes, const SizeType alignmentInBytes ) const {
-		return static_cast<SizeType>(allocationSizeInBytes + sizeof(void*) + (Max( alignmentInBytes, sizeof(void*) ) - 1u));
-	}
-
-// ---------------------------------------------------
-
-	const UTF8Char* Allocator::GetName() const {
+	const Utf8Char* Allocator::GetName() const {
 		return _name;
+	}
+
+// ---------------------------------------------------
+
+	void Allocator::SetName( const Eldritch2::Utf8Char* const name ) {
+		_name = name;
 	}
 
 }	// namespace Eldritch2

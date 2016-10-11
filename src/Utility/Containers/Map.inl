@@ -13,51 +13,48 @@
 // INCLUDES
 //==================================================================//
 #include <Utility/Containers/Range.hpp>
-#include <type_traits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <typename Key, typename StoredObject, class Allocator>
-	template <typename... AllocatorConstructorArguments>
-	ETInlineHint Map<Key, StoredObject, Allocator>::Map( AllocatorType&& allocator ) : _underlyingContainer( ::std::move( allocator ) ) {}
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint Map<Key, Value, Allocator>::Map( const AllocatorType& allocator ) : _underlyingContainer( allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	template <typename InputIterator, typename... AllocatorConstructorArguments>
-	ETInlineHint Map<Key, StoredObject, Allocator>::Map( InputIterator begin, InputIterator end, AllocatorType&& allocator ) : _underlyingContainer( begin, end, ::std::move( allocator ) ) {}
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint Map<Key, Value, Allocator>::Map( InputIterator begin, InputIterator end, const AllocatorType& allocator ) : _underlyingContainer( begin, end, allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	template <class AlternateAllocator, typename... AllocatorConstructorArguments>
-	ETInlineHint Map<Key, StoredObject, Allocator>::Map( const ::Eldritch2::Map<Key, StoredObject, AlternateAllocator>& containerTemplate, AllocatorType&& allocator ) : _underlyingContainer( containerTemplate.Begin(), containerTemplate.End(), ::std::move( allocator ) ) {}
+	template <typename Key, typename Value, class Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint Map<Key, Value, Allocator>::Map( const Map<Key, Value, AlternateAllocator>& containerTemplate, const AllocatorType& allocator ) : _underlyingContainer( containerTemplate._underlyingContainer, allocator ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint Map<Key, StoredObject, Allocator>::Map( ::Eldritch2::Map<Key, StoredObject, Allocator>&& moveSource ) : _underlyingContainer( ::std::move( moveSource ) ) {}
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint Map<Key, Value, Allocator>::Map( Map<Key, Value, Allocator>&& moveSource ) : _underlyingContainer( eastl::move( moveSource._underlyingContainer ) ) {}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::Iterator Map<Key, StoredObject, Allocator>::Find( const KeyType& key ) {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::Iterator Map<Key, Value, Allocator>::Find( const KeyType& key ) {
 		return _underlyingContainer.find( key );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::ConstIterator Map<Key, StoredObject, Allocator>::Find( const KeyType& key ) const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::ConstIterator Map<Key, Value, Allocator>::Find( const KeyType& key ) const {
 		return _underlyingContainer.find( key );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
+	template <typename Key, typename Value, class Allocator>
 	template <typename Predicate>
-	ETInlineHint void Map<Key, StoredObject, Allocator>::RemoveIf( Predicate predicate ) {
+	ETInlineHint void Map<Key, Value, Allocator>::RemoveIf( Predicate predicate ) {
 		for( Iterator element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
 			if( predicate( *element ) ) {
 				_underlyingContainer.erase( element++ );
@@ -69,9 +66,9 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
+	template <typename Key, typename Value, class Allocator>
 	template <typename ExtraArgumentType, typename Predicate>
-	ETInlineHint void Map<Key, StoredObject, Allocator>::RemoveIf( ExtraArgumentType extraArgument, Predicate predicate ) {
+	ETInlineHint void Map<Key, Value, Allocator>::RemoveIf( ExtraArgumentType extraArgument, Predicate predicate ) {
 		for( Iterator element( _underlyingContainer.begin() ), end( _underlyingContainer.end() ); element != end; ) {
 			if( predicate( *element, extraArgument ) ) {
 				_underlyingContainer.erase( element++ );
@@ -83,99 +80,114 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::Iterator Map<Key, StoredObject, Allocator>::Begin() {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::Iterator Map<Key, Value, Allocator>::Begin() {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::ConstIterator Map<Key, StoredObject, Allocator>::Begin() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::ConstIterator Map<Key, Value, Allocator>::Begin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::ConstIterator Map<Key, StoredObject, Allocator>::ConstBegin() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::ConstIterator Map<Key, Value, Allocator>::ConstBegin() const {
 		return _underlyingContainer.begin();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::Iterator Map<Key, StoredObject, Allocator>::End() {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::Iterator Map<Key, Value, Allocator>::End() {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::ConstIterator Map<Key, StoredObject, Allocator>::End() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::ConstIterator Map<Key, Value, Allocator>::End() const {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::ConstIterator Map<Key, StoredObject, Allocator>::ConstEnd() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::ConstIterator Map<Key, Value, Allocator>::ConstEnd() const {
 		return _underlyingContainer.end();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::MappedType& Map<Key, StoredObject, Allocator>::operator[]( const KeyType& key ) {
-		return static_cast<UnderlyingContainer&>( *this )[key];
+	template <typename Key, typename Value, class Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint typename Map<Key, Value, Allocator>::MappedType& Map<Key, Value, Allocator>::operator[]( const KeyType& key ) {
+		return _underlyingContainer[key];
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint void Map<Key, StoredObject, Allocator>::CloneFrom( const ::Eldritch2::Map<Key, StoredObject, Allocator>& containerTemplate ) {
-		static_cast<UnderlyingContainer&>( *this ) = containerTemplate;
+	template <typename Key, typename Value, class Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint Map<Key, Value, Allocator>& Map<Key, Value, Allocator>::operator=( const Map<Key, Value, Allocator>& other ) {
+		_underlyingContainer = other._underlyingContainer;
+
+		return *this;
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint void Map<Key, StoredObject, Allocator>::Swap( ::Eldritch2::Map<Key, StoredObject, Allocator>& other ) {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint Map<Key, Value, Allocator>& Map<Key, Value, Allocator>::operator=( Map<Key, Value, Allocator>&& ) {
+		_underlyingContainer = eastl::move( other._underlyingContainer );
+
+		return *this;
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint void Map<Key, Value, Allocator>::Swap( Eldritch2::Map<Key, Value, Allocator>& other ) {
 		_underlyingContainer.swap( other );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::InsertResult Map<Key, StoredObject, Allocator>::Insert( const ValueType& value ) {
+	template <typename Key, typename Value, class Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint typename Map<Key, Value, Allocator>::InsertResult Map<Key, Value, Allocator>::Insert( const ValueType& value ) {
 		return _underlyingContainer.insert( value );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::InsertResult Map<Key, StoredObject, Allocator>::Insert( const KeyType& key, const MappedType& value ) {
+	template <typename Key, typename Value, class Allocator>
+	template <class /*SFINAE*/>
+	ETInlineHint typename Map<Key, Value, Allocator>::InsertResult Map<Key, Value, Allocator>::Insert( const KeyType& key, const MappedType& value ) {
 		return _underlyingContainer.insert( ValueType( key, value ) );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::SizeType Map<Key, StoredObject, Allocator>::Erase( const KeyType& key ) {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::SizeType Map<Key, Value, Allocator>::Erase( const KeyType& key ) {
 		return _underlyingContainer.erase( key );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint void Map<Key, StoredObject, Allocator>::Erase( Iterator position ) {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint void Map<Key, Value, Allocator>::Erase( Iterator position ) {
 		_underlyingContainer.erase( position );
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint void Map<Key, StoredObject, Allocator>::Erase( Iterator begin, Iterator end ) {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint void Map<Key, Value, Allocator>::Erase( Iterator begin, Iterator end ) {
 		while( begin != end ) {
 			_underlyingContainer.erase( begin++ );
 		}
@@ -183,67 +195,37 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint void Map<Key, StoredObject, Allocator>::Clear() {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint void Map<Key, Value, Allocator>::Clear() {
 		_underlyingContainer.clear();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename Map<Key, StoredObject, Allocator>::SizeType Map<Key, StoredObject, Allocator>::Size() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename Map<Key, Value, Allocator>::SizeType Map<Key, Value, Allocator>::GetSize() const {
 		return _underlyingContainer.size();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint bool Map<Key, StoredObject, Allocator>::Empty() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint bool Map<Key, Value, Allocator>::IsEmpty() const {
 		return _underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint Map<Key, StoredObject, Allocator>::operator bool() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint Map<Key, Value, Allocator>::operator bool() const {
 		return !_underlyingContainer.empty();
 	}
 
 // ---------------------------------------------------
 
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint typename const Map<Key, StoredObject, Allocator>::AllocatorType& Map<Key, StoredObject, Allocator>::GetAllocator() const {
+	template <typename Key, typename Value, class Allocator>
+	ETInlineHint typename const Map<Key, Value, Allocator>::AllocatorType& Map<Key, Value, Allocator>::GetAllocator() const {
 		return _underlyingContainer.get_allocator();
 	}
 
 }	// namespace Eldritch2
-
-namespace std {
-
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto begin( ::Eldritch2::Map<Key, StoredObject, Allocator>& collection ) -> decltype(collection.Begin()) {
-		return collection.Begin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto begin( const ::Eldritch2::Map<Key, StoredObject, Allocator>& collection ) -> decltype(collection.ConstBegin()) {
-		return collection.ConstBegin();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto end( ::Eldritch2::Map<Key, StoredObject, Allocator>& collection ) -> decltype(collection.End()) {
-		return collection.End();
-	}
-
-// ---------------------------------------------------
-
-	template <typename Key, typename StoredObject, class Allocator>
-	ETInlineHint ETNoAliasHint auto end( const ::Eldritch2::Map<Key, StoredObject, Allocator>& collection ) -> decltype(collection.ConstEnd()) {
-		return collection.ConstEnd();
-	}
-
-}	// namespace std

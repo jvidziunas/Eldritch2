@@ -13,12 +13,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <rdestl/algorithm.h>
-#include <algorithm>
+#include <Utility/MPL/Compiler.hpp>
+#if ET_COMPILER_IS_MSVC && !defined( EA_COMPILER_HAS_C99_FORMAT_MACROS )
+//	MSVC complains about *lots* of macro redefinitions in eabase/inttypes.h.
+#	define EA_COMPILER_HAS_C99_FORMAT_MACROS
+#endif
+#include <eastl/algorithm.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Utility {
 namespace Detail {
 
 	template <typename InputIterator, typename OutputIterator, typename Predicate>
@@ -37,15 +40,6 @@ namespace Detail {
 	template <typename InputIterator, typename Predicate>
 	InputIterator Find( InputIterator begin, InputIterator end, Predicate predicate ) {
 		for( ; begin != end && !predicate( *begin ); ++begin ) {};
-
-		return begin;
-	}
-
-// ---------------------------------------------------
-
-	template <typename InputIterator, typename Predicate>
-	InputIterator FindInPlace( InputIterator begin, InputIterator end, Predicate& predicate ) {
-		while( ( begin != end ) && predicate( *begin++ ) ) {};
 
 		return begin;
 	}
@@ -78,29 +72,7 @@ namespace Detail {
 
 	template <typename ObjectType, size_t arraySize, typename Predicate>
 	Predicate ForEach( ObjectType (&range)[arraySize], Predicate predicate ) {
-		return Utility::ForEach( range, range + _countof( range ), predicate );
-	}
-
-// ---------------------------------------------------
-
-	template <typename InputIterator, typename Predicate>
-	Predicate& ForEachInPlace( InputIterator begin, InputIterator end, Predicate& predicate ) {
-		while( begin != end ) {
-			predicate( *begin++ );
-		}
-
-		return predicate;
-	}
-
-// ---------------------------------------------------
-
-	template <typename InputIterator, typename Predicate>
-	const Predicate& ForEachInPlace( InputIterator begin, InputIterator end, const Predicate& predicate ) {
-		while( begin != end ) {
-			predicate( *begin++ );
-		}
-
-		return predicate;
+		return Eldritch2::ForEach( range, range + _countof( range ), predicate );
 	}
 
 // ---------------------------------------------------
@@ -111,14 +83,14 @@ namespace Detail {
 			*outputBegin++ = predicate( *begin++ );
 		}
 
-		return begin;
+		return outputBegin;
 	}
 
 // ---------------------------------------------------
 
 	template <typename ObjectType, size_t arraySize, typename OutputIterator, typename Predicate>
 	OutputIterator Transform( ObjectType (&range)[arraySize], OutputIterator outputBegin, Predicate predicate ) {
-		return Utility::Transform( range, range + _countof( range ), outputBegin, predicate );
+		return Eldritch2::Transform( static_cast<ObjectType*>(range), static_cast<ObjectType*>(range) + _countof(range), outputBegin, predicate );
 	}
 
 // ---------------------------------------------------
@@ -136,7 +108,7 @@ namespace Detail {
 
 	template <typename ObjectType, size_t arraySize, typename SecondaryInputIterator, typename OutputIterator, typename Predicate>
 	OutputIterator Transform( ObjectType (&range)[arraySize], SecondaryInputIterator secondaryBegin, OutputIterator outputBegin, Predicate predicate ) {
-		return Utility::Transform( range, range + _countof( range ), secondaryBegin, outputBegin, predicate );
+		return Eldritch2::Transform( static_cast<ObjectType*>(range), static_cast<ObjectType*>(range) + _countof(range), secondaryBegin, outputBegin, predicate );
 	}
 
 // ---------------------------------------------------
@@ -165,7 +137,7 @@ namespace Detail {
 
 	template <typename ForwardIterator, typename Predicate>
 	ForwardIterator	RemoveIf( ForwardIterator begin, ForwardIterator end, Predicate predicate ) {
-		begin = Utility::Find( begin, end, predicate );
+		begin = Eldritch2::Find( begin, end, predicate );
 
 		if( begin == end ) {
 			return begin;
@@ -179,36 +151,35 @@ namespace Detail {
 
 	template <typename InputIterator, typename ValueType, typename ComparisonPredicate>
 	InputIterator LowerBound( InputIterator rangeBegin, InputIterator rangeEnd, const ValueType& value, ComparisonPredicate predicate ) {
-		return ::std::lower_bound( rangeBegin, rangeEnd, value, predicate );
+		return eastl::lower_bound( rangeBegin, rangeEnd, value, predicate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename InputIterator, typename ValueType, typename ComparisonPredicate>
 	InputIterator UpperBound( InputIterator rangeBegin, InputIterator rangeEnd, const ValueType& value, ComparisonPredicate predicate ) {
-		return ::std::upper_bound( rangeBegin, rangeEnd, value, predicate );
+		return eastl::upper_bound( rangeBegin, rangeEnd, value, predicate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename InputIterator, typename SortPredicate>
 	void Sort( InputIterator rangeBegin, InputIterator rangeEnd, SortPredicate sortPredicate ) {
-		::std::sort( rangeBegin, rangeEnd, sortPredicate );
+		eastl::sort( rangeBegin, rangeEnd, sortPredicate );
 	}
 
 // ---------------------------------------------------
 
 	template <typename InputIterator>
 	void DestroyRange( InputIterator rangeStart, InputIterator rangeEnd ) {
-		Utility::ForEach( rangeStart, rangeEnd, Utility::InvokeDestructor() );
+		Eldritch2::ForEach( rangeStart, rangeEnd, Eldritch2::InvokeDestructor() );
 	}
 
 // ---------------------------------------------------
 
 	template <typename InputIterator>
 	void TrivialConstructRange( InputIterator rangeStart, InputIterator rangeEnd ) {
-		Utility::ForEach( rangeStart, rangeEnd, Utility::InvokeTrivialConstructor() );
+		Eldritch2::ForEach( rangeStart, rangeEnd, Eldritch2::InvokeTrivialConstructor() );
 	}
 
-}	// namespace Utility
 }	// namespace Eldritch2
