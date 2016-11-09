@@ -4,9 +4,6 @@
 [submodule "extern/recastnavigation"]
 	path = extern/recastnavigation
 	url = https://github.com/recastnavigation/recastnavigation.git
-[submodule "extern/microprofile"]
-	path = extern/microprofile
-	url = https://github.com/theunknownxy/microprofile.git
 [submodule "extern/opus"]
 	path = extern/opus
 	url = https://git.xiph.org/opus.git
@@ -22,3 +19,6 @@
 [submodule "extern/eastl"]
 	path = extern/eastl
 	url = https://github.com/jvidziunas/EASTL.git
+[submodule "extern/wren"]
+	path = extern/wren
+	url = https://github.com/munificent/wren.git
