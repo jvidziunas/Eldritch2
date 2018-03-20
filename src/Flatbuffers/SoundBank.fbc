@@ -1,5 +1,5 @@
 file_identifier	"ESBF";
-file_extension	".E2SoundBank";
+file_extension	".e2soundbank";
 
 namespace Eldritch2.Sound.FlatBuffers;
 

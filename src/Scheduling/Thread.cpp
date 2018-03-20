@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Scheduling/Thread.hpp>
-#include <Utility/Assert.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -23,49 +22,49 @@ namespace Scheduling {
 
 // ---------------------------------------------------
 
-	Thread::Thread() : _executionState( ExecutionState::Uninitialized ) {}
+	Thread::Thread() : _state( ExecutionState::Uninitialized ) {}
 
 // ---------------------------------------------------
 
 	Thread::~Thread() {
-		ETRuntimeAssert( ExecutionState::Running != _executionState.load( std::memory_order_consume ) );
+		ET_ASSERT( _state.load( std::memory_order_consume ) != ExecutionState::Running, "Destroying thread before it has completed!" );
 	}
 
 // ---------------------------------------------------
 
-	bool Thread::HasCompleted() const {
-		return ExecutionState::Done == _executionState.load( std::memory_order_consume );
+	bool Thread::IsRunning( std::memory_order order ) const {
+		return _state.load( order ) == ExecutionState::Running;
 	}
 
 // ---------------------------------------------------
 
 	void Thread::AwaitCompletion() {
-		RequestGracefulShutdown();
+		SetShouldShutDown();
 
-		while( ExecutionState::Running == _executionState.load( std::memory_order_consume ) ) {
-		//	Busy loop.
+		while (IsRunning( std::memory_order_consume )) {
+		//	Busy loop waiting for join.
 		}
 	}
 
 // ---------------------------------------------------
 
-	bool Thread::HasStartedExecution() const {
-		return ExecutionState::Uninitialized != _executionState.load( std::memory_order_consume );
+	bool Thread::HasStarted( std::memory_order order ) const {
+		return _state.load( order ) != ExecutionState::Uninitialized;
 	}
 
 // ---------------------------------------------------
 
-	void Thread::SchedulerEntryPoint() {
-#	if ET_DEBUG_MODE_ENABLED
-		const auto	previousState( _executionState.exchange( ExecutionState::Running, std::memory_order_acq_rel ) );
-		ETRuntimeAssert( ExecutionState::Uninitialized == previousState );
+	void Thread::Enter() {
+#	if ET_DEBUG_BUILD
+		const ExecutionState previous( _state.exchange( ExecutionState::Running, std::memory_order_acq_rel ) );
+		ET_ASSERT( previous == ExecutionState::Uninitialized, "Duplicate thread start operation!" );
 #	else
-		_executionState.store( ExecutionState::Running, std::memory_order_release );
+		_state.store( ExecutionState::Running, std::memory_order_release );
 #	endif
 
 		Run();
 
-		_executionState.store( ExecutionState::Done, std::memory_order_release );
+		_state.store( ExecutionState::Done, std::memory_order_release );
 	}
 
 }	// namespace Scheduling

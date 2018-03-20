@@ -1,25 +1,33 @@
 include			"Eldritch2Types.fbc";
 file_identifier	"E2RP";
-file_extension	".E2RenderPipeline";
+file_extension	".e2renderpipeline";
 
-namespace Eldritch2.Renderer.FlatBuffers;
+namespace Eldritch2.Graphics.FlatBuffers;
 
-table ColorAttachmentDescriptor {
-	ResourceName		: string (required);
+table DrawGeometryPass {
+	ShaderUsageName		: string	(required);
+	InstanceSources		: [string]	(required);
+	InputAttachments	: [string]	(required);
+	ColorOutputs		: [string]	(required);
+	DepthAttachment		: string;
 }
 
-table DepthAttachmentDescriptor {
-	ResourceName		: string (required);
+table ImageCopy {
+	Source				: string (required);
+	Target				: string (required);
 }
 
-table PassDescriptor {
-	UsageName			: string (required);
-	ColorAttachments	: [ColorAttachmentDescriptor] (required);
-	DepthAttachment		: DepthAttachmentDescriptor;
+table CopyResourcesPass {
+	ImageCopies			: [ImageCopy];
+}
+
+union RenderPass {
+	DrawGeometryPass,
+	CopyResourcesPass,
 }
 
 table RenderPipeline {
-	Passes				: [PassDescriptor] (required);
+	Passes				: [RenderPass]	(required);
 }
 
 root_type RenderPipeline;

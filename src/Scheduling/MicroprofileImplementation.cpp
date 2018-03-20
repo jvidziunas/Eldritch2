@@ -12,42 +12,31 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Mpl/Compiler.hpp>
-#include <Utility/Mpl/Platform.hpp>
-//------------------------------------------------------------------//
 #include <EABase/eabase.h>
 #ifdef UNICODE
 #	undef UNICODE
 #endif
-#define MICROPROFILE_USE_THREAD_NAME_CALLBACK 1
-// #define MICROPROFILE_GPU_TIMERS_D3D11 1
+//	Don't use the thread name callback, we provide the name ourselves in the scheduler classes and don't need the 'retained mode' callback.
+#define MICROPROFILE_USE_THREAD_NAME_CALLBACK 0
 #define MICROPROFILE_GPU_TIMERS 0
-#define MICROPROFILE_IMPL
-#if( ET_COMPILER_IS_MSVC )
-/*	MSVC complains about macro redefinitions, since a few DirectX components separately define some HRESULT values without an include guard.
-	The definitions themselves are consistent, so just disable the warning. */
-#	pragma warning( push )
-#	pragma warning( disable : 4005 )
-#endif
-#include <microprofile/microprofile.h>
-#if( ET_COMPILER_IS_MSVC )
-#	pragma warning( pop )
-#endif
+ET_PUSH_COMPILER_WARNING_STATE()
+/*	(4005) MSVC complains about macro redefinitions, since a few DirectX components separately define some HRESULT values without an include guard.
+ *	The definitions themselves are consistent, so just disable the warning.
+ *	(4201) Nameless struct/union
+ *	(6255) _alloca use
+ *	(4996) Insecure (not *_s) CRT function usage
+ *	(6387) Lack of NULL checking
+ *	(28251) Not decorating Win32 function prototypes with SAL markup
+ *	(6262) Stack allocation of big (32kb) buffer in printf implementation */
+ET_SET_MSVC_WARNING_STATE( disable : 4005 4189 6330 4201 6255 4996 6387 28251 6262 )
+#include <microprofile/microprofile.cpp>
+ET_POP_COMPILER_WARNING_STATE()
 //------------------------------------------------------------------//
 
 //==================================================================//
 // LIBRARIES
 //==================================================================//
 #if ET_PLATFORM_WINDOWS
-ET_LINK_LIBRARY( "Ws2_32.lib" )
+	ET_LINK_LIBRARY( "Ws2_32.lib" )
 #endif
 //------------------------------------------------------------------//
-
-#if (0 == MICROPROFILE_GPU_TIMERS)
-void MicroProfileGpuInitD3D11( void* /*pDevice*/, void* /*pDeviceContext*/ ) {}
-#endif
-#if (0 != MICROPROFILE_USE_THREAD_NAME_CALLBACK)
-MICROPROFILE_API const char* MicroProfileGetThreadName() {
-	return "<Unknown>";
-}
-#endif

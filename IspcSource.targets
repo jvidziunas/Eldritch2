@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <ItemGroup>
+  <PropertyPageSchema Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+  <AvailableItemName Include="IspcSourceItem">
+   <Targets>CompileIspcSource</Targets>
+  </AvailableItemName>
+ </ItemGroup>
+
+ <Target
+  Name="CompileIspcSource"
+  BeforeTargets="ClCompile"
+  Inputs="%(IspcSourceItem.Identity)"
+  Outputs="$(IntDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj">
+  <Message Text="Compiling ISPC source: %(IspcSourceItem.FullPath)" Importance="High" />
+  <Exec Command="&quot;$(SolutionDir)tools\ispc\ispc.exe&quot; &quot;%(IspcSourceItem.Identity)&quot; -h &quot;%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename)_generated.h&quot; -o &quot;$(IntDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj&quot;"/>
+ </Target>
+ </Project>

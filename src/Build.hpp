@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/CharTypes.hpp>
+#include <Common/Mpl/CharTypes.hpp>
 //------------------------------------------------------------------//
 
 #if !defined( PROJECT_NAME )
@@ -56,15 +56,15 @@
 #endif
 
 #if !defined( ARCHITECTURE_STRING )
-#	if( ET_PLATFORM_X86 )
-#		if( ET_PLATFORM_64BIT )
+#	if (ET_PLATFORM_X86 )
+#		if (ET_PLATFORM_64BIT )
 #			define ARCHITECTURE_STRING "x64"
-#		elif( ET_PLATFORM_32BIT )
+#		elif (ET_PLATFORM_32BIT )
 #			define ARCHITECTURE_STRING "x86"
 #		else
 #			define ARCHITECTURE_STRING ""
 #		endif
-#	elif( ET_PLATFORM_POWERPC )
+#	elif (ET_PLATFORM_POWERPC )
 #		define ARCHITECTURE_STRING "ppc"
 #	endif
 #endif
@@ -85,5 +85,5 @@
 #	define UTF32_ARCHITECTURE_STRING UTF32L( ARCHITECTURE_STRING )
 #endif
 
-extern const Eldritch2::Utf8Char* const	buildDateStamp;
-extern const wchar_t* const				wideBuildDateStamp;
+extern const ::Eldritch2::Utf8Char* const	buildDateStamp;
+extern const wchar_t* const					wideBuildDateStamp;

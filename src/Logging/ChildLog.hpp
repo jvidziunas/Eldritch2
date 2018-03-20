@@ -18,38 +18,40 @@
 namespace Eldritch2 {
 namespace Logging {
 
-	class ChildLog : public Logging::Log {
+	class ChildLog : public Log {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 	//!	Constructs this @ref ChildLog instance.
-		ChildLog( Logging::Log& logger );
-	//!	Constructs this @ref ChildLog instance.
 		ChildLog( const ChildLog& ) = delete;
+	//!	Constructs this @ref ChildLog instance.
+		ChildLog( Log& log );
 
 		~ChildLog() = default;
 
 	// ---------------------------------------------------
 
 	public:
-		Logging::Log&	SetParent( Logging::Log& newParent );
+		Log&	SetParent( Log& parent );
 
-		Logging::Log&	GetParent() const;
-
-	// ---------------------------------------------------
-
-	public:
-		void	Write( const Eldritch2::Utf8Char* const string, size_t lengthInOctets ) override sealed;
+		Log&	GetParent() const;
 
 	// ---------------------------------------------------
 
 	public:
-		ChildLog&	operator=( const ChildLog& ) = delete;
+		using Log::Write;
+
+		void	Write( const Utf8Char* const string, size_t lengthInOctets ) override sealed;
+
+	// ---------------------------------------------------
+
+	public:
+		ChildLog&	operator=( const ChildLog& ) = default;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		Logging::Log*	_parent;
+		Log*	_parent;
 	};
 
 }	// namespace Logging

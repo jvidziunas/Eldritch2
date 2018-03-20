@@ -12,16 +12,13 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/MPL/CharTypes.hpp>
-#include <Utility/MPL/IntTypes.hpp>
-//------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Logging {
 
-	enum class MessageSeverity {
+	enum class MessageType {
 		VerboseWarning = 0,
 		Warning,
 		Error,
@@ -46,17 +43,17 @@ namespace Logging {
 	// ---------------------------------------------------
 
 	public:
-		virtual void	Write( const Eldritch2::Utf8Char* const string, size_t lengthInOctets ) abstract;
+		virtual void	Write( const Utf8Char* const string, size_t lengthInOctets ) abstract;
 
-		template <typename... Arguments>
-		void			operator()( Logging::MessageSeverity severity, ETFormatStringHint( const Eldritch2::Utf8Char* str ), Arguments&&... arguments );
+		template <size_t formatSize, typename... Arguments>
+		void			Write( MessageType type, const Utf8Char (&formatString)[formatSize], Arguments&&... arguments );
 
 	// ---------------------------------------------------
 
 	public:
-		Logging::MessageSeverity	GetMuteThreshold() const;
+		MessageType	GetMuteThreshold() const;
 
-		void						SetMuteThreshold( Logging::MessageSeverity muteThreshold );
+		void		SetMuteThreshold( MessageType threshold );
 
 	// ---------------------------------------------------
 
@@ -66,7 +63,7 @@ namespace Logging {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		std::atomic<Logging::MessageSeverity>	_muteThreshold;
+		std::atomic<Logging::MessageType>	_muteThreshold;
 	};
 
 }	// namespace Logging

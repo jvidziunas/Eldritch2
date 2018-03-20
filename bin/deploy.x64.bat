@@ -1,4 +1,4 @@
-del .\x64\Release\*.vshost.*
-xcopy .\x64\Release\*.exe L:\dev\bin\ /y
-xcopy .\x64\Release\*.dll L:\dev\bin\ /y
-xcopy .\x64\Release\steam_appid.txt L:\dev\bin\ /y
+del .\x64\%1\*.vshost.*
+xcopy .\x64\%1\*.exe L:\dev\ /y
+xcopy .\x64\%1\*.dll L:\dev\ /y
+xcopy .\x64\%1\steam_appid.txt L:\dev\ /y

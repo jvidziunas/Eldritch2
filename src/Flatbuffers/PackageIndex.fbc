@@ -1,0 +1,16 @@
+file_identifier	"ECRF";
+file_extension	".e2index";
+
+namespace Eldritch2.Assets.FlatBuffers;
+
+table AssetDescriptor {
+	Name	: string (required);
+	Offset	: ulong;
+	Length	: ulong;
+}
+
+table PackageIndex {
+	Assets	: [AssetDescriptor] (required);
+}
+
+root_type PackageIndex;

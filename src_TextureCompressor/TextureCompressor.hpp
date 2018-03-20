@@ -12,48 +12,46 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Tools/ToolCRTPBase.hpp>
+#include <Common/Containers/HashSet.hpp>
+#include <Common/Containers/String.hpp>
+#include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-	template <typename Iterator>
-	class	Range;
-}
 
 namespace Eldritch2 {
 namespace Tools {
 
-	template <class GlobalAllocator, class FileAccessorFactory>
-	class TextureCompressor : GlobalAllocator, FileAccessorFactory, public Tools::ToolCRTPBase<TextureCompressor<GlobalAllocator, FileAccessorFactory>> {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using	AllocatorType			= GlobalAllocator;
-		using	FileAccessorFactoryType = FileAccessorFactory;
-		using	BaseToolType			= Tools::ToolCRTPBase<TextureCompressor<Allocator, FileAccessorFactory>>;
-
+	class TextureCompressor : public CrtpTool<TextureCompressor> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		//!	Constructs this @ref TextureCompressor instance.
+	public:
+	//!	Constructs this @ref TextureCompressor instance.
 		TextureCompressor();
 
 		~TextureCompressor() = default;
 
 	// ---------------------------------------------------
 
-		ETInlineHint AllocatorType&	GetAllocator();
+	public:
+		Allocator&	GetAllocator() const;
 
 	// ---------------------------------------------------
 
-		int	ProcessInputFiles( Eldritch2::Range<const UTF8Char**> inputFiles );
+	public:
+		void	RegisterOptions( OptionRegistrar& options );
+
+		int		ProcessFile( const Utf8Char* path );
+
+		int		Process();
+
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		uint32				_quality;
+		bool				_isPerceptualData;
+		bool				_useMipmaps;
+		
+		HashSet<String<>>	_sourcePaths;
 	};
 
 }	// namespace Tools
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <TextureCompressor.inl>
-//------------------------------------------------------------------//
-

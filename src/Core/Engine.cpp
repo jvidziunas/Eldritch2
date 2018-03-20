@@ -5,150 +5,75 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Platform/SynchronousFileAppender.hpp>
-#include <Assets/AssetPackageLoaderThread.hpp>
-#include <Platform/PlatformInterface.hpp>
-#include <Scheduling/ThreadScheduler.hpp>
-#include <Platform/ContentProvider.hpp>
-#include <Scheduling/JobFiber.hpp>
+#include <Scheduling/JobExecutor.hpp>
+#include <Core/PropertyRegistrar.hpp>
+#include <Scheduling/JobSystem.hpp>
+#include <Core/IniParser.hpp>
 #include <Core/Engine.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
-#include <EASTL/iterator.h>
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2::Configuration;
-using namespace ::Eldritch2::Scheduling;
-using namespace ::Eldritch2::Scripting;
-using namespace ::Eldritch2::Platform;
-using namespace ::Eldritch2::Logging;
-using namespace ::Eldritch2::Assets;
 
 namespace Eldritch2 {
 namespace Core {
+
+	using namespace ::Eldritch2::Scheduling;
+	using namespace ::Eldritch2::Scripting;
+	using namespace ::Eldritch2::Logging;
+	using namespace ::Eldritch2::Assets;
+
 namespace {
 
-	static ETInlineHint ETPureFunctionHint SynchronousFileAppender CreateLogFile( ContentProvider& provider, const Utf8Char* const fileName ) {
-		auto	createAppenderResult( provider.CreateSynchronousFileAppender( WellKnownDirectory::Logs, fileName ) );
+	enum : size_t {
+		HighParallelismSplit	= 1u,
+		LowParallelismSplit		= 2u
+	};
 
-		ETRuntimeVerification( createAppenderResult );
+// ---
 
-		return eastl::move( *createAppenderResult );
-	}
+	ETInlineHint ETPureFunctionHint float32 AsMilliseconds( uint64 microseconds ) {
+		static constexpr float32	MicrosecondsPerMillisecond = 1000.0f;
 
-// ---------------------------------------------------
-
-	static ETInlineHint UniquePointer<EngineService*[]> MakeHeapCopy( Allocator& allocator, std::initializer_list<std::reference_wrapper<EngineService>> services ) {
-		const auto	result( static_cast<EngineService**>( allocator.Allocate( sizeof(EngineService*) * services.size() ) ) );
-
-		eastl::transform( services.begin(), services.end(), result, [] ( std::reference_wrapper<EngineService> service ) { return eastl::addressof( service.get() ); } );
-
-		return UniquePointer<EngineService*[]>( result, { services.size(), allocator } );
-	}
-
-// ---------------------------------------------------
-
-	static Result<UniquePointer<UniquePointer<WorldService>[]>> CreateWorldServices( Allocator& allocator, const World& world, UniquePointer<EngineService*[]>& services ) {
-		const auto	tempBegin( static_cast<UniquePointer<WorldService>*>(_alloca( sizeof(UniquePointer<WorldService>) * services.GetSize() )) );
-		auto		tempEnd( tempBegin );
-
-	//	It would be nice to use eastl::transform for this, but at the same time we would like to support early-out. Can we instead use a stateful predicate?
-		for( EngineService* service : services ) {
-			auto	allocateServiceResult( service->CreateWorldService( world.GetAllocator(), world ) );
-
-			if( !allocateServiceResult ) {
-			//	Ensure we destroy any created services so we don't leak memory.
-				eastl::destruct( tempBegin, tempEnd );
-				return allocateServiceResult.GetErrorCode();
-			}
-
-			new( tempEnd++ ) UniquePointer<WorldService>( eastl::move( *allocateServiceResult ) );
-		}
-
-	//	eastl::remove_if doesn't support move semantics yet, so we need to rely on the std implementation.
-		const auto		copyEnd( std::remove_if( tempBegin, tempEnd, [] ( UniquePointer<WorldService>& service ) { return !service; } ) );
-		const auto		count( static_cast<size_t>(eastl::distance( tempBegin, copyEnd )) );
-		const auto		result( static_cast<UniquePointer<WorldService>*>( allocator.Allocate( sizeof(UniquePointer<WorldService>) * count ) ) );
-		if( result ) {
-			eastl::uninitialized_move( tempBegin, copyEnd, result );
-		}
-		
-	//	Ensure we destroy any created services so we don't leak memory.
-		eastl::destruct( tempBegin, tempEnd );
-
-		if( !result ) {
-			return Error::OutOfMemory;
-		}
-
-		return UniquePointer<UniquePointer<WorldService>[]>( result, { count, allocator } );
-	}
-
-// ---------------------------------------------------
-
-	static UniquePointer<AssetPackageLoader> CreatePackageLoader( Allocator& allocator, ContentProvider& contentProvider ) {
-		return MakeUnique<AssetPackageLoaderThread>( allocator, contentProvider, allocator );
+		return microseconds / MicrosecondsPerMillisecond;
 	}
 
 }	// anonymous namespace
 
-	Engine::Engine( PlatformInterface& platformInterface, ThreadScheduler& scheduler, Allocator& allocator ) : _allocator( allocator, "Game Engine Allocator" ),
-																											   _contentProvider( _allocator ),
-																											   _log( CreateLogFile( _contentProvider, "EngineLog.txt" ) ),
-																											   _assetLibrary( _contentProvider, CreatePackageLoader( _allocator, _contentProvider ), _allocator ),
-																											   _worldDefaultProperties( { _allocator, "Game Engine Default World Properties Bucket Allocator" } ),
-																											   _worlds( { _allocator, "Game Engine Ticking World List Allocator" } ),
-																											   _hasShutDown( false ),
-																											   _hasInitialized( false ),
-																											   _blackboard( _allocator ) {
+	Engine::Engine(
+		JobSystem& scheduler
+	) : _allocator( "Game Engine Allocator" ),
+		_services(),
+		_packageProvider(),
+		_log(),
+		_shouldRun( true ),
+		_worlds( MallocAllocator( "Game Engine World List Allocator" ) ),
+		_components( MallocAllocator( "Game Engine Component List Allocator" ) ) {
 	//	Create the bootstrap set of services.
-		_blackboard.Publish<Platform::ContentProvider>( _contentProvider );
-		_blackboard.Publish<Assets::AssetLibrary>( _assetLibrary );
-		_blackboard.Publish<Scheduling::ThreadScheduler>( scheduler );
-		_blackboard.Publish<Platform::PlatformInterface>( platformInterface );
-		_blackboard.Publish<Core::Engine>( *this );
+		_services.Publish<PackageDatabase>( _packageProvider.GetPackageDatabase() );
+		_services.Publish<AssetDatabase>( _packageProvider.GetAssetDatabase() );
+		_services.Publish<FileSystem>( _packageProvider.GetFileSystem() );
+		_services.Publish<JobSystem>( scheduler );
+		_services.Publish<Engine>( *this );
 	}
 
 // ---------------------------------------------------
 
-	ErrorCode Engine::CreateWorld( std::initializer_list<Pair<const Utf8Char*, const Utf8Char*>> customProperties ) {
-		MICROPROFILE_SCOPEI( "Game engine", "Create New World", 0xAAAAAA );
+	ErrorCode Engine::CreateWorld( JobExecutor& executor ) {
+		UniquePointer<World> world( CreateUnique<World>( _allocator, GetBlackboard(), GetLog() ) );
 
-		UniquePointer<World>	world( MakeUnique<World>( _allocator, *this ) );
-		if( !world ) {
-			return Error::OutOfMemory;
-		}
+		ET_FAIL_UNLESS( world ? Error::None : Error::OutOfMemory );
+		ET_FAIL_UNLESS( world->BindResources( executor, _components.Begin(), _components.End() ) );
 
-		auto	createServicesResult( CreateWorldServices( _allocator, *world, _services ) );
-		if( !createServicesResult ) {
-			_log( MessageSeverity::Error, "Unable to create services for world {}: {}!" ET_UTF8_NEWLINE_LITERAL, static_cast<const void*>(world.Get()), GetErrorString( createServicesResult.GetErrorCode() ) );
-			return createServicesResult;
-		}
-
-	//	Transfer ownership of the new services to the world.
-		world->AttachAndInitializeWith( eastl::move( *createServicesResult ) );
-
-	/*	Dispatch the default/shared properties, and then dispatch the custom property set in the arguments. The ordering is
-	 *	important here, as we want the custom set to override any default(s) in the event the same property is specified in
-	 *	both collections. */
-		for( const auto& property : _worldDefaultProperties ) {
-			world->SetProperty( property.first, property.second );
-		}
-		world->SetProperties( customProperties );
-
-		_log( MessageSeverity::Message, "Created world {} successfully!" ET_UTF8_NEWLINE_LITERAL, static_cast<const void*>(world.Get()) );
-
-	//	Finally, add the world to our collection!
-		{	ScopedWriteLock	_( _worldMutex );
-
-			_worlds.PushBack( eastl::move( world ) );
-
+	//	Add the world to the global collection.
+		{	Lock	_( _worldsMutex );
+			_worlds.Append( eastl::move( world ) );
 		}	// End of lock scope.
 
 		return Error::None;
@@ -156,58 +81,177 @@ namespace {
 
 // ---------------------------------------------------
 
-	void Engine::InitializeWithServices( JobFiber& executor, std::initializer_list<std::reference_wrapper<EngineService>> services ) {
-		MICROPROFILE_SCOPEI( "Game engine", "Initialization", 0xAAAAAA );
+	void Engine::TickWorlds( JobExecutor& executor ) {
+		{	MICROPROFILE_SCOPEI( "Engine/WorldManagement", "Garbage collect worlds", 0x3422F3 );
+			Lock	_( _worldsMutex );
 
-	//	We should only ever initialize once.
-		ETRuntimeAssert( false == _hasInitialized.load( std::memory_order_acquire ) );
-		
-	//	Allocate a permanent collection of service references, as the initializer_list will only last until the end of scope.
-		_services = MakeHeapCopy( _allocator, services );
+			executor.ForEach<HighParallelismSplit>( _worlds.Begin(), _worlds.End(), [this] ( JobExecutor& executor, UniquePointer<World>& world ) {
+				if (world->ShouldShutDown()) {			
+				/*	Note that there will (temporarily) be a null pointer in the world collection until these entries are removed at the end
+				 *	of the sweep phase-- see below. */
+					world->FreeResources( executor );
+					world.Reset();
+				}
+			} );
 
-	//	Broadcast the various initialization visitor objects to each of the attached services.
-		VisitServices( executor, EngineService::BeginInitializationVisitor() );
-		VisitServices( executor, EngineService::InitializationCompleteVisitor() );
+		//	Remove all null entries from the worlds collection.
+			_worlds.EraseIf( [] ( UniquePointer<World>& world ) { return world == nullptr; } );
 
-	//	At this point, we are done initializing this Engine and can call the full set of methods.
-		_hasInitialized.store( true, std::memory_order_release );
-	
-		_log( MessageSeverity::Message, "Engine initialization complete!" ET_UTF8_NEWLINE_LITERAL );
+			if (_worlds.IsEmpty()) {
+				_log.Write( MessageType::Message, "No running worlds, shutting down engine." UTF8_NEWLINE );
+				return SetShouldShutDown();
+			}
+
+		}	// End of profile scope.
+		{	MICROPROFILE_SCOPEI( "Engine/WorldManagement", "Tick worlds", 0xF32334 );
+			executor.ForEach<HighParallelismSplit>( _worlds.Begin(), _worlds.End(), [this] ( JobExecutor& executor, UniquePointer<World>& world ) {
+				world->Tick( executor );
+			} );
+		}	// End of profile scope.
 	}
 
 // ---------------------------------------------------
 
-	void Engine::EnterMainLoopOnCaller( JobFiber& executor ) {
-		while( !HasShutDown() ) {
-			MicroProfileFlip( nullptr );
+	ErrorCode Engine::ApplyConfiguration( const Utf8Char* const path ) {
+		MappedFile iniFile;
+		{	const ErrorCode result( iniFile.Open( MappedFile::Read, _packageProvider.GetFileSystem().GetAbsolutePath( KnownDirectory::UserDocuments, path ).AsCString() ) );
+			 if (Failed( result )) {
+				_log.Write( MessageType::Warning, "Error opening {}, skipping configuration." UTF8_NEWLINE, path );
 
-			MICROPROFILE_SCOPEI( "Game engine", "Frame", 0xAAAAAA );
-
-			{	MICROPROFILE_SCOPEI( "Game engine", "Engine Service Tick", 0xEEEEEE );
-				VisitServices( executor, EngineService::ServiceTickVisitor() );
-			}	// End of profile scope.
-
-			{	MICROPROFILE_SCOPEI( "Game engine", "World Tick", 0xFFFFFF );
-				VisitServices( executor, EngineService::WorldTickVisitor() );
-			}	// End of profile scope.
+				return result;
+			}
 		}
 
-		_log( MessageSeverity::Message, "Terminating execution." ET_UTF8_NEWLINE_LITERAL );
+		iniFile.Prefetch( MappedFile::StartOfFile, MappedFile::EndOfFile );
+
+	//	Give the disk time to page in the configuration data by registering client properties.
+		PropertyDatabase properties;
+	
+		{	PropertyRegistrar registrar( properties );
+			for (EngineComponent* component : _components) {
+				component->AcceptVisitor( registrar );
+			}
+		}
+
+		ApplyIni( iniFile.GetRangeAtOffset<const Utf8Char>( MappedFile::StartOfFile, iniFile.GetSizeInBytes() ),
+			[&] ( const Utf8Char* const group, const Utf8Char* const name, const Range<const Utf8Char*>& value ) -> bool {
+				return properties.SetValue( group, name, value );
+			},
+			[&] ( const Utf8Char* const group, const Utf8Char* const name, const Range<const Utf8Char*>& /*value*/ ) {
+				_log.Write( MessageType::Warning, "Unknown configuration key '[{}] {}'." UTF8_NEWLINE, group, name );
+			}
+		);
+
+		return Error::None;
 	}
 
 // ---------------------------------------------------
 
-	size_t Engine::DestroyShutDownWorlds() {
-		MICROPROFILE_SCOPEI( "Game engine", "Garbage collect worlds", 0x3422F3 );
+	void Engine::SweepPackages( size_t collectionLimit ) {
+		_packageProvider.GetPackageDatabase().DestroyGarbage( collectionLimit, _packageProvider.GetAssetDatabase() );
+	}
 
-		ScopedWriteLock	_( _worldMutex );
+// ---------------------------------------------------
 
-		const auto	initialCount( _worlds.GetSize() );
-		const auto	inactiveWorlds( _worlds.RemoveIf( [] ( const UniquePointer<World>& world ) { return world->HasShutDown(); } ) );
+	void Engine::BuildAssetApi() {
+	//	Collect all asset view creation event handlers and publish them to the asset library.
+		AssetApiBuilder	apiBuilder;
 
-		_worlds.Erase( inactiveWorlds, _worlds.End() );
+		for (EngineComponent* component : _components) {
+			component->AcceptVisitor( apiBuilder );
+		}
 
-		return initialCount - _worlds.GetSize();
+		_packageProvider.GetAssetDatabase().BindResources( eastl::move( apiBuilder.GetFactories() ) );
+	}
+
+// ---------------------------------------------------
+
+	void Engine::ScanPackages() {
+		Stopwatch	timer;
+
+		_packageProvider.ScanPackages();
+
+		_log.Write( MessageType::Message, "Rebuilt package listing in {:.2f}ms." UTF8_NEWLINE, AsMilliseconds( timer.GetDuration() ) );
+	}
+
+// ---------------------------------------------------
+
+	int Engine::BootOnCaller( JobExecutor& executor ) {
+		MicroProfileFlip( nullptr );
+		
+		if (Failed( _packageProvider.BindResources() )) {
+			return -1;
+		}
+
+		_log.BindResources( _packageProvider.GetFileSystem().GetAbsolutePath( KnownDirectory::Logs, "EngineLog.txt" ).AsCString() );
+		_log.Write( MessageType::Message,
+			"\t======================================================" UTF8_NEWLINE
+			"\t| INITIALIZING APPLICATION                           |" UTF8_NEWLINE
+			"\t======================================================" UTF8_NEWLINE
+		);
+
+		InitializeComponents( executor );
+		CreateBootWorld( executor );
+
+		while (ShouldRun()) {
+			MicroProfileFlip( nullptr );
+			RunFrame( executor );
+		}
+
+		_log.Write( MessageType::Message,
+			"\t======================================================" UTF8_NEWLINE
+			"\t| TERMINATING APPLICATION                            |" UTF8_NEWLINE
+			"\t======================================================" UTF8_NEWLINE
+		);
+
+		_packageProvider.FreeResources();
+
+		return 0;
+	}
+
+// ---------------------------------------------------
+
+	void Engine::InitializeComponents( JobExecutor& executor ) {
+		MICROPROFILE_SCOPEI( "Engine/Initialization", "Initialization", 0xAAAAAA );
+		Stopwatch	timer;
+
+	//	Complete all initialization steps on each of the attached services.
+		executor.ForEach<HighParallelismSplit>( _components.Begin(), _components.End(), [] ( JobExecutor& executor, EngineComponent* component ) {
+			component->AcceptVisitor( executor, EngineComponent::InitializationVisitor() );
+		} );
+		executor.ForEach<HighParallelismSplit>( _components.Begin(), _components.End(), [] ( JobExecutor& executor, EngineComponent* component ) {
+			component->AcceptVisitor( executor, EngineComponent::LateInitializationVisitor() );
+		} );
+
+		_log.Write( MessageType::Message, UTF8_NEWLINE "Engine initialization complete in {:.2f}ms." UTF8_NEWLINE UTF8_NEWLINE, AsMilliseconds( timer.GetDuration() ) );
+	}
+
+// ---------------------------------------------------
+
+	void Engine::CreateBootWorld( JobExecutor& executor ) {
+		const ErrorCode	result( CreateWorld( executor ) );
+		if (Failed( result )) {
+			_log.Write( MessageType::Error, "Failed to create boot world: {}!" UTF8_NEWLINE, AsCString( result ) );
+		}
+	}
+
+// ---------------------------------------------------
+
+	void Engine::RunFrame( JobExecutor& executor ) {
+		MICROPROFILE_SCOPEI( "Engine/Frame", "Frame", 0xAAAAAA );
+
+	//	Engine component tick is run in sequence before world tick; we want all shared state to be updated *before* world tick happens.
+		{	MICROPROFILE_SCOPEI( "Engine/Frame", "Engine Component Tick", 0xEEEEEE );
+			executor.ForEach<LowParallelismSplit>( _components.Begin(), _components.End(), [] ( JobExecutor& executor, EngineComponent* component ) {
+				component->AcceptVisitor( executor, EngineComponent::ServiceTickVisitor() );
+			} );
+		}	// End of profile scope.
+
+		{	MICROPROFILE_SCOPEI( "Engine/Frame", "World Tick", 0xFFFFFF );
+			executor.ForEach<LowParallelismSplit>( _components.Begin(), _components.End(), [] ( JobExecutor& executor, EngineComponent* component ) {
+				component->AcceptVisitor( executor, EngineComponent::WorldTickVisitor() );
+			} );
+		}	// End of profile scope.
 	}
 
 }	// namespace Core

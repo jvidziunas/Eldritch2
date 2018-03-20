@@ -22,3 +22,15 @@
 [submodule "extern/wren"]
 	path = extern/wren
 	url = https://github.com/munificent/wren.git
+[submodule "extern/microprofile"]
+	path = extern/microprofile
+	url = https://github.com/jonasmr/microprofile.git
+[submodule "extern/crunch"]
+	path = extern/crunch
+	url = https://github.com/BinomialLLC/crunch.git
+[submodule "extern/libmorton"]
+	path = extern/libmorton
+	url = https://github.com/Forceflow/libmorton.git
+[submodule "extern/VulkanMemoryAllocator"]
+	path = extern/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git

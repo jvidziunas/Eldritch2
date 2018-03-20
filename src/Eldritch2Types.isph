@@ -1,0 +1,2 @@
+typedef int16		half;
+typedef float<4>	Quaternion;

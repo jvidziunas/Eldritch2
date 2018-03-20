@@ -10,17 +10,7 @@ table BoxShape {
 	HalfExtent	: Eldritch2.FlatBuffers.Float3;
 }
 
-table CapsuleShapeX {
-	Radius		: float;
-	Height		: float;
-}
-
-table CapsuleShapeY {
-	Radius		: float;
-	Height		: float;
-}
-
-table CapsuleShapeZ {
+table CapsuleShape {
 	Radius		: float;
 	Height		: float;
 }
@@ -28,7 +18,5 @@ table CapsuleShapeZ {
 union CollisionShape {
 	SphereShape,
 	BoxShape,
-	CapsuleShapeX,
-	CapsuleShapeY,
-	CapsuleShapeZ
+	CapsuleShape
 }

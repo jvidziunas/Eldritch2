@@ -1,4 +1,3 @@
-doc
-bin/*
-extern/angelscript/*
-obj
+*.sdf
+*.vcxproj.user
+*.vcxproj.filters

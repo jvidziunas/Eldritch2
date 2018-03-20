@@ -12,9 +12,6 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/StringLiteral.hpp>
-#include <Utility/MPL/IntTypes.hpp>
-//------------------------------------------------------------------//
 #include <atomic>
 //------------------------------------------------------------------//
 
@@ -25,7 +22,7 @@ namespace Scheduling {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum ExecutionState : Eldritch2::uint32 {
+		enum ExecutionState : uint32 {
 			Uninitialized,
 			Running,
 			Done
@@ -35,7 +32,7 @@ namespace Scheduling {
 
 	/*!	Implementation aid for @ref Thread implementations that involve processes that do not have built-in signaling mechanisms.
 	 	Classes are encouraged to use an std::atomic member of this enum for self-documentation. */
-		enum TerminationBehavior : Eldritch2::uint32 {
+		enum RunBehavior : uint32 {
 			Terminate,	//!< The @ref Thread should cease execution at the earliest possible opportunity.
 			Continue	//!< The @ref Thread should continue execution.
 		};
@@ -54,22 +51,22 @@ namespace Scheduling {
 
 	public:
 	//! Retrieves a pointer to a null-terminated character array containing the UTF8-encoded name of this @ref Thread. */
-		virtual Eldritch2::Utf8Literal	GetHumanReadableName() const abstract;
+		virtual Utf8Literal	GetName() const abstract;
 
 	// ---------------------------------------------------
 
 	public:
 	//! Checks to see if this @ref Thread instance has been scheduled on a concrete operating system thread.
-	/*!	@returns A boolean value indicating whether the @ref Thread is executing currently or at some point in the past. */
-		bool	HasStartedExecution() const;
+	/*!	@returns A boolean value indicating whether the @ref Thread is executing currently or has completed at some point in the past. */
+		bool	HasStarted( std::memory_order order = std::memory_order_consume ) const;
 
 	//! Checks to see if this @ref Thread instance is still scheduled on a concrete operating system thread.
-		bool	HasCompleted() const;
+		bool	IsRunning( std::memory_order order = std::memory_order_consume ) const;
 
 	//! Notifies this Thread instance that it should terminate, and blocks the calling thread until it completes doing so.
-	/*!	@remark The turnaround time for a full termination is very much unbounded. Where possible, try to call @ref Thread::RequestGracefulShutdown() ahead of time and then call this function at the last possible moment.
-		@see @ref Thread::RequestGracefulShutdown()
-		@see @ref Thread::HasCompleted() */
+	/*!	@remark The turnaround time for a full termination is very much unbounded. Where possible, try to call @ref Thread::ShutDown() ahead of time and then call this function at the last possible moment.
+		@see @ref Thread::ShutDown()
+		@see @ref Thread::IsRunning() */
 		void	AwaitCompletion();
 
 	// ---------------------------------------------------
@@ -77,9 +74,9 @@ namespace Scheduling {
 	public:
 	//! Notifies this @ref Thread instance that the bound operating system thread should terminate.
 	/*! @remark Implementations should be fully re-entrant, as this may be called from multiple threads, multiple times on the same thread, or both. */
-		virtual void	RequestGracefulShutdown() abstract;
+		virtual void	SetShouldShutDown() abstract;
 
-		void			SchedulerEntryPoint();
+		void			Enter();
 
 	// ---------------------------------------------------
 
@@ -90,7 +87,7 @@ namespace Scheduling {
 
 	private:
 	/*! Marker used by the underlying operating system thread to indicate whether or not it has forked/joined. */
-		std::atomic<ExecutionState>	_executionState;
+		std::atomic<ExecutionState>	_state;
 	};
 
 }	// namespace Scheduling

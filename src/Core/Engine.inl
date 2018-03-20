@@ -8,7 +8,7 @@
   low-level generic simulation engines.
 
   ------------------------------------------------------------------
-  ©2010-2012 Eldritch Entertainment, LLC.
+  ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -20,14 +20,27 @@
 
 namespace Eldritch2 {
 namespace Core {
+namespace Detail {
 
-	ETInlineHint const Core::ServiceBlackboard& Engine::GetServiceBlackboard() const {
-		return _blackboard;
+	template <class Service, class... AdditionalComponents>
+	static ETInlineHint void CopyComponents( EngineComponent** out, Service& service, AdditionalComponents&... additionalComponents ) {
+		*out = eastl::addressof( service );
+		CopyComponents( out + 1, additionalComponents... );
+	}
+
+// ---
+
+	static ETInlineHint void CopyComponents( EngineComponent** /*out*/ ) {}
+
+}	// namespace Detail
+
+	ETInlineHint const Blackboard& Engine::GetBlackboard() const {
+		return _services;
 	}
 
 // ---------------------------------------------------
 	
-	ETInlineHint Eldritch2::Allocator& Engine::GetAllocator() const {
+	ETInlineHint Allocator& Engine::GetAllocator() const {
 		return _allocator;
 	}
 
@@ -39,66 +52,27 @@ namespace Core {
 
 // ---------------------------------------------------
 
-	template <typename... Arguments>
-	ETInlineHint void Engine::VisitServices( Scheduling::JobFiber& executor, Arguments&&... arguments ) {
-		Scheduling::JobBarrier	barrier( 0 );
-
-		for( const auto& service : _services ) {
-			executor.Enqueue( barrier, [&service, &arguments...]( Scheduling::JobFiber& executor ) {
-			//	We are deliberately not forwarding here.
-				service->AcceptVisitor( executor, arguments... );
-			} );
-		}
-
-		executor.AwaitBarrier( barrier );
+	ETInlineHint bool Engine::ShouldRun() const {
+		return _shouldRun.load( std::memory_order_consume );
 	}
 
 // ---------------------------------------------------
 
-	template <typename... Arguments>
-	ETInlineHint void Engine::VisitServices( Arguments&&... arguments ) {
-		for( const auto& service : _services ) {
-		//	We are deliberately not forwarding here.
-			service->AcceptVisitor( arguments... );
-		}
+	ETInlineHint void Engine::SetShouldShutDown() const {
+		_shouldRun.store( false, std::memory_order_release );
 	}
 
 // ---------------------------------------------------
 
-	template <typename... Arguments>
-	ETInlineHint void Engine::VisitWorlds( Scheduling::JobFiber& executor, Arguments&&... arguments ) {
-		Scheduling::JobBarrier	barrier( 0 );
+	template <class... Components>
+	ETInlineHint int Engine::BootOnCaller( Scheduling::JobExecutor& executor, Components&... clientComponents ) {
+		ArrayList<EngineComponent*>	components( sizeof...( clientComponents ), _components.GetAllocator() );
 
-		for( const auto& world : _worlds ) {
-			executor.Enqueue( barrier, [&world, &arguments...]( Scheduling::JobFiber& executor ) {
-			//	We are deliberately *not* forwarding here.
-				world->AcceptVisitor( executor, arguments... );
-			} );
-		}
+		Detail::CopyComponents( components.Begin(), clientComponents... );
 
-		executor.AwaitBarrier( barrier );
-	}
+		Swap( _components, components );
 
-// ---------------------------------------------------
-
-	template <typename... Arguments>
-	ETInlineHint void Engine::VisitWorlds( Arguments&&... arguments ) {
-		for( const auto& world : _worlds ) {
-		//	We are deliberately *not* forwarding here.
-			world->AcceptVisitor( arguments... );
-		}
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint bool Engine::HasShutDown() const {
-		return _hasShutDown.load( std::memory_order_consume );
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint void Engine::ShutDown() const {
-		_hasShutDown.store( true, std::memory_order_release );
+		return BootOnCaller( executor );
 	}
 
 }	// namespace Core

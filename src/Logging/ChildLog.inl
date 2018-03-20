@@ -22,17 +22,17 @@ namespace Logging {
 
 // ---------------------------------------------------
 
-	ETInlineHint Logging::Log& ChildLog::SetParent( Logging::Log& newParent ) {
+	ETInlineHint Log& ChildLog::SetParent( Log& parent ) {
 		auto&	oldLogger( GetParent() );
 
-		_parent = &newParent;
+		_parent = &parent;
 
 		return oldLogger;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint Logging::Log& ChildLog::GetParent() const {
+	ETInlineHint Log& ChildLog::GetParent() const {
 		return *_parent;
 	}
 

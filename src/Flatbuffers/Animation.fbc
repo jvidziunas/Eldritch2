@@ -1,6 +1,6 @@
 include			"Eldritch2Types.fbc";
 file_identifier	"E2AD";
-file_extension	".E2Animation";
+file_extension	".e2animation";
 
 namespace Eldritch2.Animation.FlatBuffers;
 

@@ -12,18 +12,21 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Assert.hpp>
+#include <Common/Assert.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Scheduling {
 
 	template <class HostScheduler>
-	PrivateQueueWorker<HostScheduler>::PrivateQueueWorker( const WorkItem& defaultWorkItem, Eldritch2::Allocator& allocator ) : JobFiber( defaultWorkItem, allocator ),
-																																_randomWorkerSeed( static_cast<size_t>(__rdtsc()) ),
-																																_transferCell( BarrierStatus::Complete ),
-																																_thief( this ),
-																																_terminationBehavior( TerminationBehavior::Continue ) {}
+	PrivateQueueWorker<HostScheduler>::PrivateQueueWorker(
+		const WorkItem& defaultTask,
+		Allocator& allocator
+	) : JobFiber( defaultTask, allocator ),
+		_randomWorkerSeed( static_cast<size_t>(__rdtsc()) ),
+		_transferCell( BarrierStatus::Complete ),
+		_thief( this ),
+		_terminationBehavior( TerminationBehavior::Continue ) {}
 
 // ---------------------------------------------------
 
@@ -33,7 +36,7 @@ namespace Scheduling {
 // ---------------------------------------------------
 
 	template <class HostScheduler>
-	Eldritch2::Utf8Literal PrivateQueueWorker<HostScheduler>::GetHumanReadableName() const {
+	Utf8Literal PrivateQueueWorker<HostScheduler>::GetHumanReadableName() const {
 		return "Worker Thread";
 	}
 

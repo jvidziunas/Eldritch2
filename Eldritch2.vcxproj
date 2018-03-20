@@ -1,0 +1,811 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseWithDebugInfo|x64">
+      <Configuration>ReleaseWithDebugInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FEF2E044-4B9B-4856-9D35-F82F0F0FE27D}</ProjectGuid>
+    <RootNamespace>Eldritch2</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="FlatBufferSchema.targets" />
+  <Import Project="IspcSource.targets" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx86.props" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx64.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx86.props" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx64.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx86.props" />
+    <Import Project="$(SolutionDir)Eldritch2Commonx64.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(BinaryDir)</OutDir>
+    <IntDir>$(IntermediateDir)</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(ExternSrcDir)PhysXSDK\Lib\Win64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(BinaryDir)</OutDir>
+    <IntDir>$(IntermediateDir)</IntDir>
+    <LibraryPath>$(ExternSrcDir)PhysXSDK\Lib\Win64;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
+    <OutDir>$(BinaryDir)</OutDir>
+    <IntDir>$(IntermediateDir)</IntDir>
+    <LibraryPath>$(ExternSrcDir)PhysXSDK\Lib\Win64;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Command>call "$(SolutionDir)Prebuild.bat" "$(SolutionDir)"</Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP /Zo /volatile:iso</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)VulkanMemoryAllocator\src;$(ExternSrcDir)opus\include;$(ExternSrcDir)wren\src\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)libmorton\libmorton\include;$(ExternSrcDir)PhysX-3.4\PxShared\include;$(ExternSrcDir)PhysX-3.4\PhysX_3.4\Include;$(ExternSrcDir)recastnavigation\DetourCrowd\Include\;$(ExternSrcDir)recastnavigation\Detour\Include\;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;VK_USE_PLATFORM_WIN32_KHR;WIN32;_WIN32;_CHAR16T;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnablePREfast>true</EnablePREfast>
+      <StringPooling>true</StringPooling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ShowIncludes>false</ShowIncludes>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Common/Precompiled.hpp</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>Common/Precompiled.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX-3.4\PxShared\lib\vc14win64;$(ExternSrcDir)PhysX-3.4\PhysX_3.4\Lib\vc14win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <PreLinkEvent>
+      <Message>
+      </Message>
+    </PreLinkEvent>
+    <PostBuildEvent>
+      <Command>cd "$(SolutionDir)bin\"
+call "deploy.x64.bat" "$(ConfigurationName)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEvent>
+      <Command>call "$(SolutionDir)Prebuild.bat" "$(SolutionDir)"</Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP /Zo /volatile:iso</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)VulkanMemoryAllocator\src;$(ExternSrcDir)opus\include;$(ExternSrcDir)wren\src\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)libmorton\libmorton\include;$(ExternSrcDir)PhysX-3.4\PxShared\include;$(ExternSrcDir)PhysX-3.4\PhysX_3.4\Include;$(ExternSrcDir)recastnavigation\DetourCrowd\Include\;$(ExternSrcDir)recastnavigation\Detour\Include\;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;VK_USE_PLATFORM_WIN32_KHR;WIN32;_WIN32;_CHAR16T;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnablePREfast>true</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>false</OpenMPSupport>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ShowIncludes>false</ShowIncludes>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Common/Precompiled.hpp</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>Common/Precompiled.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX-3.4\PxShared\lib\vc14win64;$(ExternSrcDir)PhysX-3.4\PhysX_3.4\Lib\vc14win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>true</Profile>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(SolutionDir)bin\"
+call "deploy.x64.bat" "$(ConfigurationName)"</Command>
+    </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <PreLinkEvent>
+      <Message>
+      </Message>
+    </PreLinkEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
+    <PreBuildEvent>
+      <Command>call "$(SolutionDir)Prebuild.bat" "$(SolutionDir)"</Command>
+    </PreBuildEvent>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP /Zo /volatile:iso</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ExternSrcDir)VulkanMemoryAllocator\src;$(ExternSrcDir)opus\include;$(ExternSrcDir)wren\src\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)libmorton\libmorton\include;$(ExternSrcDir)PhysX-3.4\PxShared\include;$(ExternSrcDir)PhysX-3.4\PhysX_3.4\Include;$(ExternSrcDir)recastnavigation\DetourCrowd\Include\;$(ExternSrcDir)recastnavigation\Detour\Include\;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;VK_USE_PLATFORM_WIN32_KHR;WIN32;_WIN32;_CHAR16T;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnablePREfast>true</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>false</OpenMPSupport>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ShowIncludes>false</ShowIncludes>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Common/Precompiled.hpp</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>Common/Precompiled.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX-3.4\PxShared\lib\vc14win64;$(ExternSrcDir)PhysX-3.4\PhysX_3.4\Lib\vc14win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>true</Profile>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(SolutionDir)bin\"
+call "deploy.x64.bat" "$(ConfigurationName)"</Command>
+    </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <PreLinkEvent>
+      <Message>
+      </Message>
+    </PreLinkEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Animation\AnimationTree.cpp" />
+    <ClCompile Include="src\Animation\AnimationTypes.cpp" />
+    <ClCompile Include="src\Animation\Armature.cpp" />
+    <ClCompile Include="src\Animation\Armature.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Animation\AssetViews\AnimationTreeAsset.cpp" />
+    <ClCompile Include="src\Animation\AssetViews\KeyframeClipAsset.cpp" />
+    <ClCompile Include="src\Animation\BipedalWalkClip.cpp" />
+    <ClCompile Include="src\Animation\KeyframeClip.cpp" />
+    <ClCompile Include="src\Animation\Storyboard.cpp" />
+    <ClCompile Include="src\Assets\AssetDatabase.cpp" />
+    <ClCompile Include="src\Assets\Package.cpp" />
+    <ClCompile Include="src\Assets\FlatBufferPackageProvider.cpp" />
+    <ClCompile Include="src\Assets\Asset.Builder.cpp" />
+    <ClCompile Include="src\Assets\PackageDatabase.cpp" />
+    <ClCompile Include="src\Audio\Listener.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\OpusStreamingCallback.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\XAudio2AudioScene.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\XAudio2AudioScene.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\XAudio2EngineComponent.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\XAudio2Listener.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\Xaudio2Listener.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\Xaudio2WorldComponent.cpp" />
+    <ClCompile Include="src\Audio\XAudio2\XAudio2WorldComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Build.cpp" />
+    <ClCompile Include="src\Common\FileAppender.Win32.cpp" />
+    <ClCompile Include="src\Common\FileReader.Win32.cpp" />
+    <ClCompile Include="src\Common\Filesystem.Win32.cpp" />
+    <ClCompile Include="src\Common\FileWriter.Win32.cpp" />
+    <ClCompile Include="src\Common\MappedFile.Win32.cpp" />
+    <ClCompile Include="src\Common\Memory.cpp" />
+    <ClCompile Include="src\Common\Blackboard.cpp" />
+    <ClCompile Include="src\Common\Memory\MallocAllocator.cpp" />
+    <ClCompile Include="src\Common\Mutex.cpp" />
+    <ClCompile Include="src\Common\Mutex.Win32.cpp" />
+    <ClCompile Include="src\Common\Platform.Win32.cpp" />
+    <ClCompile Include="src\Common\Precompiled.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Common/Precompiled.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Common/Precompiled.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">Common/Precompiled.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\Common\Semaphore.Win32.cpp" />
+    <ClCompile Include="src\Common\Sort.cpp" />
+    <ClCompile Include="src\Common\Stopwatch.cpp" />
+    <ClCompile Include="src\Common\SymbolTable.cpp" />
+    <ClCompile Include="src\Common\WaitableEvent.Win32.cpp" />
+    <ClCompile Include="src\Common\Window.Win32.cpp" />
+    <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Core\Engine.ManagementComponent.cpp" />
+    <ClCompile Include="src\Core\EngineComponent.cpp" />
+    <ClCompile Include="src\Core\PropertyDatabase.cpp" />
+    <ClCompile Include="src\Core\PropertyRegistrar.cpp" />
+    <ClCompile Include="src\Core\TimeAccumulator.cpp" />
+    <ClCompile Include="src\Core\World.cpp" />
+    <ClCompile Include="src\Core\World.ManagementComponent.cpp" />
+    <ClCompile Include="src\Core\World.ManagementComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Core\WorldComponent.cpp" />
+    <ClCompile Include="src\Input\Win32\DeviceCoordinator.cpp" />
+    <ClCompile Include="src\Input\Win32\DeviceCoordinator.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Input\Win32\Win32InputEngineComponent.cpp" />
+    <ClCompile Include="src\Input\Win32\Win32InputEngineComponent.SamplingThread.cpp" />
+    <ClCompile Include="src\Input\Win32\Win32InputWorldComponent.cpp" />
+    <ClCompile Include="src\Input\Win32\Win32InputWorldComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Input\Win32\InputDevices.Keyboard.cpp" />
+    <ClCompile Include="src\Input\Win32\InputDevices.Mouse.cpp" />
+    <ClCompile Include="src\Input\XInput\XInputEngineComponent.cpp" />
+    <ClCompile Include="src\Input\XInput\XInputWorldComponent.cpp" />
+    <ClCompile Include="src\Input\XInput\XInputWorldComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\logging\ChildLog.cpp" />
+    <ClCompile Include="src\Navigation\Recast\BipedalAgent.cpp" />
+    <ClCompile Include="src\Navigation\Recast\BipedalAgent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Navigation\Recast\NavigationScene.cpp" />
+    <ClCompile Include="src\Navigation\Recast\NavigationScene.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Navigation\Recast\RecastEngineComponent.cpp" />
+    <ClCompile Include="src\Navigation\Recast\RecastImplementation.cpp" />
+    <ClCompile Include="src\Navigation\Recast\RecastWorldComponent.cpp" />
+    <ClCompile Include="src\Navigation\Recast\RecastWorldComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Networking\Steamworks\SteamworksEngineComponent.cpp" />
+    <ClCompile Include="src\Networking\Steamworks\Player.cpp" />
+    <ClCompile Include="src\Networking\Steamworks\SteamTools.cpp" />
+    <ClCompile Include="src\Networking\Steamworks\SteamworksWorldComponent.cpp" />
+    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureAsset.cpp" />
+    <ClCompile Include="src\Physics\PhysX\AssetViews\PhysicsAsset.cpp" />
+    <ClCompile Include="src\Physics\PhysX\AssetViews\TerrainAsset.cpp" />
+    <ClCompile Include="src\Physics\PhysX\CharacterPhysics.cpp" />
+    <ClCompile Include="src\Physics\PhysX\CharacterPhysics.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Physics\PhysX\CpuDispatcher.cpp" />
+    <ClCompile Include="src\Physics\PhysX\Physics.AnimationClip.cpp" />
+    <ClCompile Include="src\Physics\PhysX\Physics.cpp" />
+    <ClCompile Include="src\Physics\PhysX\Physics.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysicsScene.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysicsScene.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysicsShape.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysxAllocatorMixin.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysxEngineComponent.AssetApi.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysxEngineComponent.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysxErrorMixin.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysxWorldComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Physics\PhysX\PhysxWorldComponent.cpp" />
+    <ClCompile Include="src\Physics\PhysX\TerrainPhysics.cpp" />
+    <ClCompile Include="src\Physics\PhysX\TerrainPhysics.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Physics\PhysX\TriggerArea.cpp" />
+    <ClCompile Include="src\Physics\PhysX\TriggerArea.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Graphics\Camera.cpp" />
+    <ClCompile Include="src\Graphics\CrunchImageSource.cpp" />
+    <ClCompile Include="src\Graphics\Direct3D\FormatHelpers.cpp" />
+    <ClCompile Include="src\Graphics\GraphicsScene.cpp" />
+    <ClCompile Include="src\Graphics\ResolutionScale.cpp" />
+    <ClCompile Include="src\Graphics\RgbColor.cpp" />
+    <ClCompile Include="src\Graphics\RgbColor.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\AssetViews\ImageAsset.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\AssetViews\MeshAsset.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\AssetViews\MeshAsset.Surface.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\AssetViews\RenderPipelineAsset.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\AssetViews\SpirVShaderPackageAsset.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\CommandList.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\DescriptorTable.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\Gpu.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.UniformBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\ResidencyCoordinator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.TransferBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\Light.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\Mesh.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\RenderPipeline.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\IoBuilder.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.Geometry.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.ShaderImage.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuHeap.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\PresentCoordinator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.SparsePageManager.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\ShaderPipeline.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanEngineComponent.AssetApi.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\OutputWindow.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\OutputWindow.Win32.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VmaImplementation.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanGraphicsScene.PlayerView.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanGraphicsScene.PlayerView.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\Vulkan.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanEngineComponent.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanGraphicsScene.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanGraphicsScene.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.SparseShaderImage.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuDetails.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanTools.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanWorldComponent.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\VulkanWorldComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scheduling\JobExecutor.cpp" />
+    <ClCompile Include="src\Scheduling\JobFiber.Win32.cpp" />
+    <ClCompile Include="src\Scheduling\MicroprofileImplementation.cpp" />
+    <ClCompile Include="src\Scheduling\Thread.cpp" />
+    <ClCompile Include="src\Scheduling\JobSystem.cpp" />
+    <ClCompile Include="src\Scheduling\Win32\FiberJobSystem.cpp" />
+    <ClCompile Include="src\Scheduling\Win32\FiberJobSystem.JobThread.cpp" />
+    <ClCompile Include="src\Logging\FileLog.cpp" />
+    <ClCompile Include="src\Scripting\Wren\ActionSet.cpp" />
+    <ClCompile Include="src\Scripting\Wren\ActionSet.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\ApiBuilder.cpp" />
+    <ClCompile Include="src\Scripting\Wren\AssetViews\DialogueSetAsset.cpp" />
+    <ClCompile Include="src\Scripting\Wren\AssetViews\ScriptAsset.cpp" />
+    <ClCompile Include="src\Scripting\Wren\DialogueSet.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\WrenEngineComponent.AssetApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Planner.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Quaternion.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\EventCoordinator.cpp" />
+    <ClCompile Include="src\Scripting\Wren\EventCoordinator.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Vector.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Game.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\GameObject.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Transformation.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Context.cpp" />
+    <ClCompile Include="src\Scripting\Wren\DialogueSet.cpp" />
+    <ClCompile Include="src\Scripting\Wren\WrenEngineComponent.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Game.cpp" />
+    <ClCompile Include="src\Scripting\Wren\GameObject.cpp" />
+    <ClCompile Include="src\Scripting\Wren\Planner.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Scripting\Wren\WrenWorldComponent.cpp" />
+    <ClCompile Include="src\Scripting\Wren\WrenVm.cpp" />
+    <ClCompile Include="src\Scripting\Wren\WrenWorldComponent.WrenScriptApi.cpp" />
+    <ClCompile Include="src\UserInterface\Nuklear\AssetViews\InterfaceAsset.cpp" />
+    <ClCompile Include="src\UserInterface\Nuklear\Interface.cpp" />
+    <ClCompile Include="src\Common\Assert.cpp" />
+    <ClCompile Include="src\Common\containers\IntrusiveConcurrentQueue.cpp" />
+    <ClCompile Include="src\Common\Fmtlib.cpp" />
+    <ClCompile Include="src\Common\Eastl.cpp" />
+    <ClCompile Include="src\Common\ErrorCode.cpp" />
+    <ClCompile Include="src\Common\Memory\EaStlAllocatorMixin.cpp" />
+    <ClCompile Include="src\Common\Memory\NullAllocator.cpp" />
+    <ClCompile Include="src\Common\Mpl\Matrices.cpp" />
+    <ClCompile Include="src\Common\RuleSet.cpp" />
+    <ClCompile Include="src\Common\Type.cpp" />
+    <ClCompile Include="src\Common\Win32Tools.cpp" />
+    <ClCompile Include="src\Common\memory\InstanceNew.cpp" />
+    <ClCompile Include="src\Common\memory\Allocator.cpp" />
+    <ClCompile Include="src\Common\memory\ArenaAllocator.cpp" />
+    <ClCompile Include="src\Common\Memory\ChildAllocator.cpp" />
+    <ClCompile Include="src\Common\memory\Win32HeapAllocator.cpp" />
+    <ClCompile Include="src\Common\Containers\AbstractString.cpp" />
+    <ClCompile Include="src\Main.Win32.cpp" />
+    <ClCompile Include="src\UserInterface\Nuklear\Interface.WrenScriptApi.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Animation\AnimationTree.hpp" />
+    <ClInclude Include="src\Animation\Clip.hpp" />
+    <ClInclude Include="src\Animation\Armature.hpp" />
+    <ClInclude Include="src\Animation\AssetViews\AnimationTreeAsset.hpp" />
+    <ClInclude Include="src\Animation\AssetViews\KeyframeClipAsset.hpp" />
+    <ClInclude Include="src\Animation\BipedalWalkClip.hpp" />
+    <ClInclude Include="src\Animation\Blend.hpp" />
+    <ClInclude Include="src\Animation\KeyframeClip.hpp" />
+    <ClInclude Include="src\Animation\Storyboard.hpp" />
+    <ClInclude Include="src\Assets\AssetDatabase.hpp" />
+    <ClInclude Include="src\Assets\Package.hpp" />
+    <ClInclude Include="src\Assets\FlatBufferPackageProvider.hpp" />
+    <ClInclude Include="src\Assets\Asset.hpp" />
+    <ClInclude Include="src\Assets\PackageDatabase.hpp" />
+    <ClInclude Include="src\Audio\Listener.hpp" />
+    <ClInclude Include="src\Audio\XAudio2\OpusStreamingCallback.hpp" />
+    <ClInclude Include="src\Audio\XAudio2\XAudio2AudioScene.hpp" />
+    <ClInclude Include="src\Audio\XAudio2\Xaudio2EngineComponent.hpp" />
+    <ClInclude Include="src\Audio\XAudio2\ForwardDeclarations.hpp" />
+    <ClInclude Include="src\Audio\XAudio2\Xaudio2Listener.hpp" />
+    <ClInclude Include="src\Audio\XAudio2\Xaudio2WorldComponent.hpp" />
+    <ClInclude Include="src\Audio\XAudio2\XAudioMarshals.hpp" />
+    <ClInclude Include="src\Build.hpp" />
+    <ClInclude Include="src\Common\Containers\Dequeue.hpp" />
+    <ClInclude Include="src\Common\Containers\PriorityQueue.hpp" />
+    <ClInclude Include="src\Common\Containers\Queue.hpp" />
+    <ClInclude Include="src\Common\Containers\PlatformString.hpp" />
+    <ClInclude Include="src\Common\Containers\Stack.hpp" />
+    <ClInclude Include="src\Common\FileAppender.hpp" />
+    <ClInclude Include="src\Common\FileReader.hpp" />
+    <ClInclude Include="src\Common\Filesystem.hpp" />
+    <ClInclude Include="src\Common\FileWriter.hpp" />
+    <ClInclude Include="src\Common\MappedFile.hpp" />
+    <ClInclude Include="src\Common\Math.hpp" />
+    <ClInclude Include="src\Common\Memory.hpp" />
+    <ClInclude Include="src\Common\Blackboard.hpp" />
+    <ClInclude Include="src\Common\Memory\Allocator.hpp" />
+    <ClInclude Include="src\Common\Memory\MallocAllocator.hpp" />
+    <ClInclude Include="src\Common\Mpl\EnableIf.hpp" />
+    <ClInclude Include="src\Common\Mpl\FloatTypes.hpp" />
+    <ClInclude Include="src\Common\Mpl\FunctionTraits.hpp" />
+    <ClInclude Include="src\Common\Mpl\IntTypes.hpp" />
+    <ClInclude Include="src\Common\Mutex.hpp" />
+    <ClInclude Include="src\Common\Platform.hpp" />
+    <ClInclude Include="src\Common\Precompiled.hpp" />
+    <ClInclude Include="src\Common\ScopeGuard.hpp" />
+    <ClInclude Include="src\Common\Semaphore.hpp" />
+    <ClInclude Include="src\Common\Sort.hpp" />
+    <ClInclude Include="src\Common\Stopwatch.hpp" />
+    <ClInclude Include="src\Common\SymbolTable.hpp" />
+    <ClInclude Include="src\Common\Tuple.hpp" />
+    <ClInclude Include="src\Common\WaitableEvent.hpp" />
+    <ClInclude Include="src\Common\Window.hpp" />
+    <ClInclude Include="src\Core\Engine.hpp" />
+    <ClInclude Include="src\Core\EngineComponent.hpp" />
+    <ClInclude Include="src\Core\IniParser.hpp" />
+    <ClInclude Include="src\Core\PropertyDatabase.hpp" />
+    <ClInclude Include="src\Core\PropertyRegistrar.hpp" />
+    <ClInclude Include="src\Core\TimeAccumulator.hpp" />
+    <ClInclude Include="src\Core\World.hpp" />
+    <ClInclude Include="src\Core\WorldComponent.hpp" />
+    <ClInclude Include="src\Input\Binding.hpp" />
+    <ClInclude Include="src\Input\Win32\DeviceCoordinator.hpp" />
+    <ClInclude Include="src\Input\Win32\Win32InputEngineComponent.hpp" />
+    <ClInclude Include="src\Input\Win32\Win32InputWorldComponent.hpp" />
+    <ClInclude Include="src\Input\Win32\InputDevices.hpp" />
+    <ClInclude Include="src\Input\XInput\XInputEngineComponent.hpp" />
+    <ClInclude Include="src\Input\XInput\XInputWorldComponent.hpp" />
+    <ClInclude Include="src\logging\ChildLog.hpp" />
+    <ClInclude Include="src\Navigation\Recast\BipedalAgent.hpp" />
+    <ClInclude Include="src\Navigation\Recast\NavigationScene.hpp" />
+    <ClInclude Include="src\Navigation\Recast\RecastEngineComponent.hpp" />
+    <ClInclude Include="src\Navigation\Recast\RecastWorldComponent.hpp" />
+    <ClInclude Include="src\Networking\Steamworks\SteamworksEngineComponent.hpp" />
+    <ClInclude Include="src\Networking\Steamworks\Player.hpp" />
+    <ClInclude Include="src\Networking\Steamworks\SteamTools.hpp" />
+    <ClInclude Include="src\Networking\Steamworks\SteamworksWorldComponent.hpp" />
+    <ClInclude Include="src\Physics\PhysX\AssetViews\ArmatureAsset.hpp" />
+    <ClInclude Include="src\Physics\PhysX\AssetViews\PhysicsAsset.hpp" />
+    <ClInclude Include="src\Physics\PhysX\AssetViews\TerrainAsset.hpp" />
+    <ClInclude Include="src\Physics\PhysX\CharacterPhysics.hpp" />
+    <ClInclude Include="src\Physics\PhysX\CpuDispatcher.hpp" />
+    <ClInclude Include="src\Physics\PhysX\Physics.hpp" />
+    <ClInclude Include="src\Physics\PhysX\PhysicsScene.hpp" />
+    <ClInclude Include="src\Physics\PhysX\PhysxAllocatorMixin.hpp" />
+    <ClInclude Include="src\Physics\PhysX\PhysxEngineComponent.hpp" />
+    <ClInclude Include="src\Physics\PhysX\PhysxErrorMixin.hpp" />
+    <ClInclude Include="src\Physics\PhysX\TerrainPhysics.hpp" />
+    <ClInclude Include="src\Physics\PhysX\TriggerArea.hpp" />
+    <ClInclude Include="src\Physics\PhysX\PhysxMarshals.hpp" />
+    <ClInclude Include="src\Physics\PhysX\PhysxPointer.hpp" />
+    <ClInclude Include="src\Physics\PhysX\PhysxWorldComponent.hpp" />
+    <ClInclude Include="src\Graphics\Camera.hpp" />
+    <ClInclude Include="src\Graphics\CrunchImageSource.hpp" />
+    <ClInclude Include="src\Graphics\Direct3D\FormatHelpers.hpp" />
+    <ClInclude Include="src\Graphics\GpuFormats.hpp" />
+    <ClInclude Include="src\Graphics\ImageSource.hpp" />
+    <ClInclude Include="src\Graphics\ImageTools.hpp" />
+    <ClInclude Include="src\Graphics\GeometrySource.hpp" />
+    <ClInclude Include="src\Graphics\PortalView.hpp" />
+    <ClInclude Include="src\Graphics\RenderConcept.hpp" />
+    <ClInclude Include="src\Graphics\ResolutionScale.hpp" />
+    <ClInclude Include="src\Graphics\RgbColor.hpp" />
+    <ClInclude Include="src\Graphics\GraphicsScene.hpp" />
+    <ClInclude Include="src\Graphics\ViewConcept.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\AssetViews\ImageAsset.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\AssetViews\MeshAsset.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\AssetViews\RenderPipelineAsset.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\AssetViews\SpirVShaderPackageAsset.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\CommandList.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\DescriptorTable.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\Gpu.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\GpuHeap.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\IoBuilder.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\ResidencyCoordinator.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\GpuResources.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\PresentCoordinator.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\RenderPipeline.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\OutputWindow.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\ShaderPipeline.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\Vulkan.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\VulkanEngineComponent.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\VulkanGraphicsScene.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\HostMixin.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\GpuDetails.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\VulkanTools.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\VulkanWorldComponent.hpp" />
+    <ClInclude Include="src\Scheduling\JobExecutor.hpp" />
+    <ClInclude Include="src\Scheduling\Thread.hpp" />
+    <ClInclude Include="src\Scheduling\JobSystem.hpp" />
+    <ClInclude Include="src\Scheduling\Win32\FiberJobSystem.hpp" />
+    <ClInclude Include="src\Scripting\Wren\ActionSet.hpp" />
+    <ClInclude Include="src\Scripting\Wren\ApiBuilder.hpp" />
+    <ClInclude Include="src\Scripting\Wren\AssetReference.hpp" />
+    <ClInclude Include="src\Scripting\Wren\AssetViews\DialogueSetAsset.hpp" />
+    <ClInclude Include="src\Scripting\Wren\AssetViews\ScriptAsset.hpp" />
+    <ClInclude Include="src\Scripting\Wren\DialogueSet.hpp" />
+    <ClInclude Include="src\Scripting\Wren\EventCoordinator.hpp" />
+    <ClInclude Include="src\Scripting\Wren\Planner.hpp" />
+    <ClInclude Include="src\Scripting\Wren\Context.hpp" />
+    <ClInclude Include="src\Scripting\Wren\GameObject.hpp" />
+    <ClInclude Include="src\Scripting\Wren\WrenEngineComponent.hpp" />
+    <ClInclude Include="src\Scripting\Wren\Game.hpp" />
+    <ClInclude Include="src\Scripting\Wren\Marshal.hpp" />
+    <ClInclude Include="src\Scripting\Wren\WrenWorldComponent.hpp" />
+    <ClInclude Include="src\Scripting\Wren\WrenInternal.hpp" />
+    <ClInclude Include="src\UserInterface\Nuklear\AssetViews\InterfaceAsset.hpp" />
+    <ClInclude Include="src\UserInterface\Nuklear\Interface.hpp" />
+    <ClInclude Include="src\Common\Algorithms.hpp" />
+    <ClInclude Include="src\Common\Assert.hpp" />
+    <ClInclude Include="src\Common\ComPointer.hpp" />
+    <ClInclude Include="src\Common\Containers\ArraySet.hpp" />
+    <ClInclude Include="src\Common\Containers\ArrayBvh.hpp" />
+    <ClInclude Include="src\Common\Containers\HashMultiMap.hpp" />
+    <ClInclude Include="src\Common\Containers\HashSet.hpp" />
+    <ClInclude Include="src\Common\Containers\IntrusiveForwardList.hpp" />
+    <ClInclude Include="src\Common\Containers\IntrusiveListHook.hpp" />
+    <ClInclude Include="src\Common\Containers\IntrusiveConcurrentQueue.hpp" />
+    <ClInclude Include="src\Common\Containers\RangeAdapters.hpp" />
+    <ClInclude Include="src\Common\Containers\AbstractString.hpp" />
+    <ClInclude Include="src\Common\Containers\String.hpp" />
+    <ClInclude Include="src\Common\CountedPointer.hpp" />
+    <ClInclude Include="src\Common\EqualTo.hpp" />
+    <ClInclude Include="src\Common\Function.hpp" />
+    <ClInclude Include="src\Common\GreaterThan.hpp" />
+    <ClInclude Include="src\Common\Hash.hpp" />
+    <ClInclude Include="src\Common\LessThan.hpp" />
+    <ClInclude Include="src\Common\Memory\NullAllocator.hpp" />
+    <ClInclude Include="src\Common\Memory\TrackingMixin.hpp" />
+    <ClInclude Include="src\Common\Mpl\CharTypes.hpp" />
+    <ClInclude Include="src\Common\Pair.hpp" />
+    <ClInclude Include="src\Common\ErrorCode.hpp" />
+    <ClInclude Include="src\Common\IdentifierPool.hpp" />
+    <ClInclude Include="src\Common\Memory\Win32HeapAllocator.hpp" />
+    <ClInclude Include="src\Common\Result.hpp" />
+    <ClInclude Include="src\Common\StringLiteral.hpp" />
+    <ClInclude Include="src\Common\RuleSet.hpp" />
+    <ClInclude Include="src\Common\Type.hpp" />
+    <ClInclude Include="src\Common\UniquePointer.hpp" />
+    <ClInclude Include="src\Common\Win32Tools.hpp" />
+    <ClInclude Include="src\Common\Memory\InstanceDeleter.hpp" />
+    <ClInclude Include="src\Common\Memory\ChildAllocator.hpp" />
+    <ClInclude Include="src\Common\Mpl\Matrices.hpp" />
+    <ClInclude Include="src\Common\Mpl\Vectors.hpp" />
+    <ClInclude Include="src\Common\Mpl\Compiler.hpp" />
+    <ClInclude Include="src\Common\Mpl\Platform.hpp" />
+    <ClInclude Include="src\Common\Containers\Range.hpp" />
+    <ClInclude Include="src\Common\Containers\ArrayList.hpp" />
+    <ClInclude Include="src\Common\Containers\IntrusiveForwardListHook.hpp" />
+    <ClInclude Include="src\Common\Containers\IntrusiveLinkedList.hpp" />
+    <ClInclude Include="src\Common\Containers\LinkedList.hpp" />
+    <ClInclude Include="src\Common\Containers\ArrayMap.hpp" />
+    <ClInclude Include="src\Common\Containers\TreeMap.hpp" />
+    <ClInclude Include="src\Common\Containers\TreeSet.hpp" />
+    <ClInclude Include="src\Common\Containers\HashMap.hpp" />
+    <ClInclude Include="src\Logging\FileLog.hpp" />
+    <ClInclude Include="src\Logging\Log.hpp" />
+    <ClInclude Include="src\Animation\AnimationTypes.hpp" />
+    <ClInclude Include="resources\Eldritch2.Resources.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Eldritch2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Eldritch2.resources.aps" />
+    <None Include="src\Animation\AnimationTree.inl" />
+    <None Include="src\Animation\Armature.inl" />
+    <None Include="src\Animation\KeyframeClip.inl" />
+    <None Include="src\Assets\AssetDatabase.inl" />
+    <None Include="src\Assets\Package.inl" />
+    <None Include="src\Assets\Asset.inl" />
+    <None Include="src\Audio\Listener.inl" />
+    <None Include="src\Audio\XAudio2\XAudioMarshals.inl" />
+    <None Include="src\Common\Assert.inl" />
+    <None Include="src\Common\ComPointer.inl" />
+    <None Include="src\Common\Containers\Dequeue.inl" />
+    <None Include="src\Common\Containers\PriorityQueue.inl" />
+    <None Include="src\Common\Containers\Queue.inl" />
+    <None Include="src\Common\Containers\Stack.inl" />
+    <None Include="src\Common\Filesystem.inl" />
+    <None Include="src\Common\MappedFile.inl" />
+    <None Include="src\Common\Math.inl" />
+    <None Include="src\Common\Blackboard.inl" />
+    <None Include="src\Common\SymbolTable.inl" />
+    <None Include="src\Core\Engine.inl" />
+    <None Include="src\Core\EngineComponent.inl" />
+    <None Include="src\Core\IniParser.inl" />
+    <None Include="src\Core\PropertyRegistrar.inl" />
+    <None Include="src\Core\TimeAccumulator.inl" />
+    <None Include="src\Core\World.inl" />
+    <None Include="src\Core\WorldComponent.inl" />
+    <None Include="src\Logging\ChildLog.inl" />
+    <None Include="src\Logging\Log.inl" />
+    <None Include="src\Physics\PhysX\AssetViews\TerrainAsset.inl" />
+    <None Include="src\Physics\PhysX\PhysicsScene.inl" />
+    <None Include="src\Physics\PhysX\PhysxAllocatorMixin.inl" />
+    <None Include="src\Physics\PhysX\PhysxPointer.inl" />
+    <None Include="src\Physics\PhysX\PhysxMarshals.inl" />
+    <None Include="src\Graphics\ImageTools.inl" />
+    <None Include="src\Graphics\RenderConcept.inl" />
+    <None Include="src\Graphics\RgbColor.inl" />
+    <None Include="src\Graphics\GraphicsScene.inl" />
+    <None Include="src\Graphics\ViewConcept.inl" />
+    <None Include="src\Graphics\Vulkan\AssetViews\ImageAsset.inl" />
+    <None Include="src\Graphics\Vulkan\AssetViews\MeshAsset.inl" />
+    <None Include="src\Graphics\Vulkan\AssetViews\RenderPipelineAsset.inl" />
+    <None Include="src\Graphics\Vulkan\AssetViews\SpirVShaderPackageAsset.inl" />
+    <None Include="src\Graphics\Vulkan\CommandList.inl" />
+    <None Include="src\Graphics\Vulkan\DescriptorTable.inl" />
+    <None Include="src\Graphics\Vulkan\Gpu.inl" />
+    <None Include="src\Graphics\Vulkan\GpuHeap.inl" />
+    <None Include="src\Graphics\Vulkan\GpuResources.inl" />
+    <None Include="src\Graphics\Vulkan\HostMixin.inl" />
+    <None Include="src\Graphics\Vulkan\OutputWindow.inl" />
+    <None Include="src\Graphics\Vulkan\RenderPipeline.inl" />
+    <None Include="src\Graphics\Vulkan\ResidencyCoordinator.inl" />
+    <None Include="src\Graphics\Vulkan\GpuDetails.inl" />
+    <None Include="src\Graphics\Vulkan\VulkanGraphicsScene.inl" />
+    <None Include="src\Graphics\Vulkan\VulkanTools.inl" />
+    <None Include="src\Scheduling\JobExecutor.inl" />
+    <None Include="src\Scheduling\Win32\FiberJobSystem.inl" />
+    <None Include="src\Scripting\Wren\ApiBuilder.inl" />
+    <None Include="src\Scripting\Wren\AssetReference.inl" />
+    <None Include="src\Scripting\Wren\AssetViews\ScriptAsset.inl" />
+    <None Include="src\Scripting\Wren\DialogueSet.inl" />
+    <None Include="src\Scripting\Wren\Marshal.inl" />
+    <None Include="src\Scripting\Wren\Context.inl" />
+    <None Include="src\Scripting\Wren\EventCoordinator.inl" />
+    <None Include="src\UserInterface\Nuklear\Interface.inl" />
+    <None Include="src\Common\Algorithms.inl" />
+    <None Include="src\Common\Containers\ArrayMap.inl" />
+    <None Include="src\Common\Containers\ArraySet.inl" />
+    <None Include="src\Common\Containers\HashMultiMap.inl" />
+    <None Include="src\Common\Containers\HashSet.inl" />
+    <None Include="src\Common\Containers\IntrusiveForwardList.inl" />
+    <None Include="src\Common\Containers\IntrusiveLinkedList.inl" />
+    <None Include="src\Common\Containers\IntrusiveConcurrentQueue.inl" />
+    <None Include="src\Common\Containers\ArrayBvh.inl" />
+    <None Include="src\Common\Containers\LinkedList.inl" />
+    <None Include="src\Common\Containers\TreeMap.inl" />
+    <None Include="src\Common\Containers\TreeSet.inl" />
+    <None Include="src\Common\Containers\Range.inl" />
+    <None Include="src\Common\Containers\ArrayList.inl" />
+    <None Include="src\Common\Containers\AbstractString.inl" />
+    <None Include="src\Common\Containers\HashMap.inl" />
+    <None Include="src\Common\CountedPointer.inl" />
+    <None Include="src\Common\EqualTo.inl" />
+    <None Include="src\Common\ErrorCode.inl" />
+    <None Include="src\Common\GreaterThan.inl" />
+    <None Include="src\Common\Hash.inl" />
+    <None Include="src\Common\IdentifierPool.inl" />
+    <None Include="src\Common\LessThan.inl" />
+    <None Include="src\Common\Memory\ArenaAllocator.inl" />
+    <None Include="src\Common\Memory\ChildAllocator.inl" />
+    <None Include="src\Common\Memory\EaStlAllocatorMixin.hpp" />
+    <None Include="src\Common\Memory\EaStlAllocatorMixin.inl" />
+    <None Include="src\Common\Memory\InstanceDeleter.inl" />
+    <None Include="src\Common\Memory\UsageMixin.inl" />
+    <None Include="src\Common\Mpl\Angle.inl" />
+    <None Include="src\Common\Mpl\CharTypes.inl" />
+    <None Include="src\Common\Mpl\Matrices.inl" />
+    <None Include="src\Common\Mpl\Vectors.inl" />
+    <None Include="src\Common\Result.inl" />
+    <None Include="src\Common\StringLiteral.inl" />
+    <None Include="src\Common\RuleSet.inl" />
+    <None Include="src\Common\Type.inl" />
+    <None Include="src\Common\UniquePointer.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\Eldritch2.Resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Animation.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\AnimationTree.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Armature.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\CollisionShapes.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Eldritch2Types.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\HlslShaderPackage.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Mesh.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\NuklearUi.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\PackageIndex.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\RendererTypes.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\ShaderPackageTypes.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\RenderPipeline.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SerializedWorld.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\PhysicsBody.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SoundBank.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SpirVShaderPackage.fbc" />
+  </ItemGroup>
+  <ItemGroup>
+    <IspcSourceItem Include="src\Animation\AnimateSkeletons.ispc" />
+    <IspcSourceItem Include="src\Common\Containers\SimdSort.ispc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

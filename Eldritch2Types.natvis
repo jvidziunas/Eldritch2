@@ -1,69 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<Type Name="Eldritch2::ResizableArray&lt;*&gt;">
-    <DisplayString>{{size = {_underlyingContainer.mpEnd-_underlyingContainer.mpBegin}}}</DisplayString>
+	<Type Name="Eldritch2::ArrayList&lt;*&gt;">
+    <DisplayString>{{size = {_container.mpEnd-_container.mpBegin}}}</DisplayString>
     <Expand>
-      <Item Name="[size]">_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Item>
-      <Item Name="[capacity]">_underlyingContainer.mpCapacity-_underlyingContainer.mpBegin</Item>
+      <Item Name="[capacity]">_container.mCapacityAllocator.mFirst-_container.mpBegin</Item>
       <ArrayItems>
-        <Size>_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Size>
-        <ValuePointer>_underlyingContainer.mpBegin</ValuePointer>
+        <Size>_container.mpEnd-_container.mpBegin</Size>
+        <ValuePointer>_container.mpBegin</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
   <Type Name="Eldritch2::ArrayMap&lt;*&gt;">
-    <DisplayString>{{size = {_underlyingContainer.mpEnd-_underlyingContainer.mpBegin}}}</DisplayString>
+    <DisplayString>{{size = {_container.mpEnd-_container.mpBegin}}}</DisplayString>
     <Expand>
-      <Item Name="[size]">_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Item>
-      <Item Name="[capacity]">_underlyingContainer.m_capacityEnd-_underlyingContainer.mpBegin</Item>
+      <Item Name="[capacity]">_container.mCapacityAllocator.mFirst-_container.mpBegin</Item>
       <ArrayItems>
-        <Size>_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Size>
-        <ValuePointer>_underlyingContainer.mpBegin</ValuePointer>
+        <Size>_container.mpEnd-_container.mpBegin</Size>
+        <ValuePointer>_container.mpBegin</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
   <Type Name="Eldritch2::ArraySet&lt;*&gt;">
-    <DisplayString>{{size = {_underlyingContainer.mpEnd-_underlyingContainer.mpBegin}}}</DisplayString>
+    <DisplayString>{{size = {_container.mpEnd-_container.mpBegin}}}</DisplayString>
     <Expand>
-      <Item Name="[size]">_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Item>
-      <Item Name="[capacity]">_underlyingContainer.m_capacityEnd-_underlyingContainer.mpBegin</Item>
+      <Item Name="[capacity]">_container.mCapacityAllocator.mFirst-_container.mpBegin</Item>
       <ArrayItems>
-        <Size>_underlyingContainer.mpEnd-_underlyingContainer.mpBegin</Size>
-        <ValuePointer>_underlyingContainer.mpBegin</ValuePointer>
+        <Size>_container.mpEnd-_container.mpBegin</Size>
+        <ValuePointer>_container.mpBegin</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
   <Type Name="Eldritch2::HashMap&lt;*&gt;">
-    <DisplayString>{{size = {_underlyingContainer.mnElementCount}}}</DisplayString>
+    <DisplayString>{{size = {_container.mnElementCount}}}</DisplayString>
     <Expand>
-      <Item Name="[size]">_underlyingContainer.mnElementCount</Item>
-      <Item Name="[buckets]">_underlyingContainer.mnBucketCount</Item>
+      <Item Name="[buckets]">_container.mnBucketCount</Item>
       <ArrayItems>
-        <Size>_underlyingContainer.mnBucketCount</Size>
-        <ValuePointer>_underlyingContainer.mpBucketArray</ValuePointer>
+        <Size>_container.mnBucketCount</Size>
+        <ValuePointer>_container.mpBucketArray</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
   <Type Name="Eldritch2::HashSet&lt;*&gt;">
-    <DisplayString>{{size = {_underlyingContainer.mnElementCount}}}</DisplayString>
+    <DisplayString>{{size = {_container.mnElementCount}}}</DisplayString>
     <Expand>
-      <Item Name="[size]">_underlyingContainer.mnElementCount</Item>
-      <Item Name="[buckets]">_underlyingContainer.mnBucketCount</Item>
+      <Item Name="[buckets]">_container.mnBucketCount</Item>
       <ArrayItems>
-        <Size>_underlyingContainer.mnBucketCount</Size>
-        <ValuePointer>_underlyingContainer.mpBucketArray</ValuePointer>
+        <Size>_container.mnBucketCount</Size>
+        <ValuePointer>_container.mpBucketArray</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
-  <Type Name="Eldritch2::String&lt;Eldritch2::UTF8Char,*&gt;">
-  	<DisplayString>{_underlyingContainer.mpBegin,s8}</DisplayString>
-    <StringView>_underlyingContainer.mpBegin,s8</StringView>
+  <Type Name="Eldritch2::AbstractString&lt;char,*&gt;">
+  	<DisplayString>{_container.mPair.mFirst.mpBegin,s8}</DisplayString>
+    <StringView>_container.mPair.mFirst.mpBegin,s8</StringView>
+    <Expand>
+      <Item Name="length">_container.mPair.mFirst.mpEnd-_container.mPair.mFirst.mpBegin</Item>
+      <Item Name="capacity">_container.mPair.mFirst.mpCapacity-_container.mPair.mFirst.mpBegin</Item>
+      <Item Name="value">_container.mPair.mFirst.mpBegin,sb</Item>
+    </Expand>
   </Type>
-  <Type Name="Eldritch2::String&lt;wchar_t,*&gt;">
-  	<DisplayString>{_underlyingContainer.mpBegin,su}</DisplayString>
-    <StringView>_underlyingContainer.mpBegin,su</StringView>
+  <Type Name="Eldritch2::AbstractString&lt;wchar_t,*&gt;">
+    <DisplayString>{_container.mPair.mFirst.mpBegin,su}</DisplayString>
+    <StringView>_container.mPair.mFirst.mpBegin,su</StringView>
+    <Expand>
+      <Item Name="length">_container.mPair.mFirst.mpEnd-_container.mPair.mFirst.mpBegin</Item>
+      <Item Name="capacity">_container.mPair.mFirst.mpCapacity-_container.mPair.mFirst.mpBegin</Item>
+      <Item Name="value">_container.mPair.mFirst.mpBegin,sub</Item>
+    </Expand>
   </Type>
-  <Type Name="Eldritch2::UniquePointer&lt;*&gt;">
+  <Type Name="Eldritch2::UniquePointer&lt;*,Eldritch2::InstanceArrayDeleter&gt;">
+  	<DisplayString Condition="mPair.mFirst == 0">empty</DisplayString>
+  	<DisplayString Condition="mPair.mFirst != 0">{{size = {mPair.mSecond._countInObjects}}}</DisplayString>
+    <Expand>
+      <ArrayItems>
+        <Size>mPair.mSecond._countInObjects</Size>
+        <ValuePointer>mPair.mFirst</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Eldritch2::UniquePointer&lt;*,Eldritch2::InstanceDeleter&gt;">
     <DisplayString Condition="mPair.mFirst == 0">empty</DisplayString>
     <DisplayString Condition="mPair.mFirst != 0">UniquePointer {*mPair.mFirst}</DisplayString>
     <Expand>

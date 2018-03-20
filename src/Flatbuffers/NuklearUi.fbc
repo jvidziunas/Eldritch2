@@ -1,5 +1,7 @@
 file_identifier	"NKUI";
-file_extension	".NuklearUI";
+file_extension	".nuklearui";
+
+namespace Eldritch2.UserInterface.Nuklear.FlatBuffers;
 
 struct Color {
 	Red				: ubyte;
@@ -103,3 +105,8 @@ enum PopupType : uint {
 	Static,
 	Dynamic
 }
+
+table NuklearUi {
+}
+
+root_type NuklearUi;

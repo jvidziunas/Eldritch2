@@ -11,46 +11,20 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Scheduling/JobExecutor.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Core {
 
-	template <typename... Arguments>
-	ETInlineHint void World::VisitServices( Scheduling::JobFiber& executor, Arguments&&... arguments ) {
-		Scheduling::JobBarrier	barrier( 0 );
-
-		for( const auto& service : _services ) {
-			executor.Enqueue( barrier, [&service, &arguments...]( Scheduling::JobFiber& executor ) {
-			//	We are deliberately not forwarding here.
-				service->AcceptVisitor( executor, arguments... );
-			} );
-		}
-
-		executor.AwaitBarrier( barrier );
+	ETInlineHint const World::ComponentList<WorldComponent>& World::GetComponents() const {
+		return _components;
 	}
 
 // ---------------------------------------------------
 
-	template <typename... Arguments>
-	ETInlineHint void World::VisitServices( Arguments&&... arguments ) {
-		for( const auto& service : _services ) {
-		//	We are deliberately not forwarding here.
-			service->AcceptVisitor( arguments... );
-		}
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint const Core::ServiceBlackboard& World::GetServiceBlackboard() const {
-		return _serviceBlackboard;
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint Eldritch2::Allocator& World::GetAllocator() const {
-		return _allocator;
+	ETInlineHint const Blackboard& World::GetServices() const {
+		return _services;
 	}
 
 // ---------------------------------------------------
@@ -61,34 +35,53 @@ namespace Core {
 
 // ---------------------------------------------------
 
-	ETInlineHint void World::ShutDown() const {
-		_hasShutDown.store( true, std::memory_order_release );
+	ETInlineHint float32 World::GetTimeScalar() const {
+		return _timeAccumulator.GetTimeScalar();
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint void World::SetProperties( std::initializer_list<Pair<const Eldritch2::Utf8Char*, const Eldritch2::Utf8Char*>> keyValuePairs ) {
-		for( const auto& keyValuePair : keyValuePairs ) {
-			SetProperty( keyValuePair.first, keyValuePair.second );
+	ETInlineHint void World::SetTimeScalar( float32 scalar ) {
+		_timeAccumulator.SetTimeScalar( scalar );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Iterator>
+	ETInlineHint ErrorCode World::BindResources( Scheduling::JobExecutor& executor, Iterator firstComponent, Iterator lastComponent ) {
+		ComponentList<WorldComponent>	components( _components.GetAllocator() );
+
+		components.Reserve( eastl::distance( firstComponent, lastComponent ) );
+
+		for (; firstComponent != lastComponent; ++firstComponent) {
+			Result<UniquePointer<WorldComponent>> result( (*firstComponent)->CreateWorldComponent( _allocator, *this ) );
+			if (Failed( result )) {
+				_log.Write( Logging::MessageType::Error, "Failed to create component for world {}: {}!" UTF8_NEWLINE, fmt::ptr( this ), AsCString( result ) );
+				return result;
+			}
+
+			if (result->Get() != nullptr) {
+				components.Append( eastl::move( *result ) );
+			}
 		}
+
+		components.ShrinkToFit();
+
+		Swap( _components, components );
+
+		return BindResources( executor );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint bool World::HasShutDown() const {
-		return _hasShutDown.load( std::memory_order_consume );
+	ETInlineHint bool World::IsRunning( std::memory_order order ) const {
+		return _shouldShutDown.load( order ) == false;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint bool World::IsRunningGame() const {
-		return !IsPaused();
-	}
-
-// ---------------------------------------------------
-
-	ETInlineHint bool World::IsPaused() const {
-		return _isPaused.load( std::memory_order_consume );
+	ETInlineHint bool World::ShouldShutDown( std::memory_order order ) const {
+		return _shouldShutDown.load( order );
 	}
 
 }	// namespace Core

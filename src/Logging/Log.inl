@@ -12,8 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#define FMT_EXCEPTIONS 0
-#include <cppformat/fmt/format.h>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -25,22 +24,18 @@ namespace {
 }	// anonymous namespace
 
 	template <typename Stream>
-	Stream& operator >>( Stream& stream, Logging::MessageSeverity& threshold ) {
-		using MessageSeverityArithmeticType = typename eastl::underlying_type<Logging::MessageSeverity>::type;
-
-	// ---
-
-	//	TODO: This should really use a hash map or something.
-		MessageSeverityArithmeticType 	temp( static_cast<MessageSeverityArithmeticType>(Logging::MessageSeverity::Message) );
-		char							value[16u];
+	ETInlineHint Stream& operator >>( Stream& stream, Logging::MessageType& threshold ) {
+	//	TODO: This should really use a hash map.
+		auto 	temp( static_cast<eastl::underlying_type<Logging::MessageType>::type>(Logging::MessageType::Message) );
+		char	value[16u];
 
 		stream.get( value, _countof( value ) );
 
-		const auto	location( eastl::find( eastl::begin( nameTable ), eastl::end( nameTable ), value, [] ( const char* string0, const char* string1 ) {
-			return Eldritch2::EqualityCompareStringCaseInsensitive( string0, string1 );
+		const auto	location( FindIf( eastl::begin( nameTable ), eastl::end( nameTable ), [&] ( const char* name ) {
+			return StringsEqualCaseInsensitive( value, name );
 		} ) );
 
-		threshold = static_cast<Logging::MessageSeverity>( temp - eastl::distance( eastl::begin( nameTable ), location ) );
+		threshold = static_cast<Logging::MessageType>( temp - eastl::distance( eastl::begin( nameTable ), location ) );
 
 		return stream;
 	}
@@ -48,7 +43,7 @@ namespace {
 // ---------------------------------------------------
 
 	template <typename Stream>
-	Stream& operator <<( Stream& stream, Logging::MessageSeverity threshold ) {
+	ETInlineHint Stream& operator <<( Stream& stream, Logging::MessageType threshold ) {
 		stream << nameTable[static_cast<size_t>( threshold )];
 
 		return stream;
@@ -56,33 +51,31 @@ namespace {
 
 // ---------------------------------------------------
 
-	ETInlineHint Log::Log() : _muteThreshold( Logging::MessageSeverity::VerboseWarning ) {}
+	ETInlineHint Log::Log() : _muteThreshold( Logging::MessageType::VerboseWarning ) {}
 
 // ---------------------------------------------------
 
-	template <typename... Arguments>
-	ETInlineHint void Log::operator()( Logging::MessageSeverity severity, const Eldritch2::Utf8Char* str, Arguments&&... arguments ) {
-		if( severity < GetMuteThreshold() ) {
+	template <size_t formatSize, typename... Arguments>
+	ETInlineHint void Log::Write( Logging::MessageType type, const Utf8Char (&formatString)[formatSize], Arguments&&... arguments ) {
+		if (type < GetMuteThreshold()) {
 			return;
 		}
 
-		Eldritch2::Utf8Char	formattedString[256u];
-		fmt::ArrayWriter	formatter( formattedString );
+		fmt::memory_buffer	string;
+		fmt::vformat_to( string, fmt::basic_string_view<Utf8Char>( formatString, formatSize ), fmt::make_args( eastl::forward<Arguments>( arguments )... ) );
 
-		formatter.write( str, eastl::forward<Arguments>( arguments )... );
-
-		Write( formatter.c_str(), formatter.size());
+		Write( string.data(), string.size() );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint Logging::MessageSeverity Log::GetMuteThreshold() const {
+	ETInlineHint Logging::MessageType Log::GetMuteThreshold() const {
 		return _muteThreshold.load( std::memory_order_acquire );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint void Log::SetMuteThreshold( Logging::MessageSeverity muteThreshold ) {
+	ETInlineHint void Log::SetMuteThreshold( Logging::MessageType muteThreshold ) {
 		_muteThreshold.store( muteThreshold, std::memory_order_release );
 	}
 

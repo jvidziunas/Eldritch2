@@ -5,19 +5,31 @@
   
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <Tools/Win32/FileAccessorFactory.hpp>
+#include <ShaderCompiler.hpp>
 //------------------------------------------------------------------//
 
-#if( ET_PLATFORM_WINDOWS )
-int main( int argc, Eldritch2::Utf8Char** argv ) {
-	return 0;
-}
-#endif
+namespace Eldritch2 {
+namespace Tools {
+
+	ShaderCompiler::ShaderCompiler() {}
+
+// ---------------------------------------------------
+
+	void ShaderCompiler::RegisterOptions( OptionRegistrar& options ) {
+	}
+
+// ---------------------------------------------------
+
+	int ShaderCompiler::Process() {
+		return 0;
+	}
+
+}	// namespace Tools
+}	// namespace Eldritch2

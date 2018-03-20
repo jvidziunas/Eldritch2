@@ -12,17 +12,43 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Utility/Memory/Win32HeapAllocator.hpp>
-#include <Tools/Win32/FileAccessorFactory.hpp>
+#include <Common/Memory/MallocAllocator.hpp>
+#include <Common/UniquePointer.hpp>
 #include <GeometryCompiler.hpp>
 //------------------------------------------------------------------//
+#include <Windows.h>
+//------------------------------------------------------------------//
 
-#if( ET_PLATFORM_WINDOWS )
-int main( int argc, Eldritch2::Utf8Char** argv ) {
-	using namespace ::Eldritch2;
+using namespace ::Eldritch2::Tools;
+using namespace ::Eldritch2;
 
-// ---
+namespace {
 
-	return Tools::GeometryCompiler<Win32GlobalHeapAllocator, Tools::Win32::FileAccessorFactory>().Run( { argv, argv + argc } );
+	template <size_t bufferSize>
+	static bool Utf8FromWideString( Utf8Char( &out )[bufferSize], const PlatformChar* source ) {
+		return 0 != WideCharToMultiByte(
+			CP_UTF8,
+			WC_ERR_INVALID_CHARS,
+			source,
+			-1,
+			out,
+			bufferSize,
+			NULL,
+			NULL
+			);
+	}
+
+}	// anonymous namespace
+
+int wmain( int argc, PlatformChar** argv ) {
+	MallocAllocator	allocator( "Global Allocator" );
+	const auto		convertedArgs( MakeUniqueArray<Utf8Char[MAX_PATH]>( allocator, static_cast<size_t>( argc ) ) );
+
+	for (int i = 0; i < argc; ++i) {
+		if (!Utf8FromWideString( convertedArgs[i], argv[i] )) {
+			return 1;
+		}
+	}
+
+	return GeometryCompiler( allocator ).Run( convertedArgs.Begin(), convertedArgs.End() );
 }
-#endif

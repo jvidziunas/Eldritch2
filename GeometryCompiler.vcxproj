@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5B290AD8-65A3-4043-8AB2-172AB2B732C7}</ProjectGuid>
+    <RootNamespace>GeometryCompiler</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Eldritch2Commonx86.props" />
+    <Import Project="Eldritch2Commonx64.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Eldritch2Commonx86.props" />
+    <Import Project="Eldritch2Commonx64.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(BinaryDir)</OutDir>
+    <IntDir>$(IntermediateDir)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(BinaryDir)</OutDir>
+    <IntDir>$(IntermediateDir)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(FBXSDK_DIR)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(FBXSDK_DIR)lib\vs2015\$(PlatformName)\$(ConfigurationName)\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(FBXSDK_DIR)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(FBXSDK_DIR)lib\vs2015\$(PlatformName)\$(ConfigurationName)\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Common\CppFormatDefinitions.cpp" />
+    <ClCompile Include="src\Common\EastlDefinitions.cpp" />
+    <ClCompile Include="src\Common\Memory.cpp" />
+    <ClCompile Include="src\Common\Memory\MallocAllocator.cpp" />
+    <ClCompile Include="src\Platform\FileWriter.Win32.cpp" />
+    <ClCompile Include="src\Platform\MappedFile.Win32.cpp" />
+    <ClCompile Include="src\Tools\CrtpTool.cpp" />
+    <ClCompile Include="src\Common\Assert.cpp" />
+    <ClCompile Include="src\Common\Containers\ArrayList.cpp" />
+    <ClCompile Include="src\Common\Containers\AbstractString.cpp" />
+    <ClCompile Include="src\Common\Memory\Allocator.cpp" />
+    <ClCompile Include="src\Common\Memory\ChildAllocator.cpp" />
+    <ClCompile Include="src\Common\Memory\InstanceNew.cpp" />
+    <ClCompile Include="src\Common\Memory\NullAllocator.cpp" />
+    <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp" />
+    <ClCompile Include="src_GeometryCompiler\GeometryCompiler.cpp" />
+    <ClCompile Include="src_GeometryCompiler\GeometryCompiler.Win32.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Common\Memory.hpp" />
+    <ClInclude Include="src\Common\Memory\MallocAllocator.hpp" />
+    <ClInclude Include="src\Platform\MappedFile.hpp" />
+    <ClInclude Include="src\Platform\FileWriter.hpp" />
+    <ClInclude Include="src\Tools\CrtpTool.hpp" />
+    <ClInclude Include="src\Common\Assert.hpp" />
+    <ClInclude Include="src\Common\Containers\ArrayList.hpp" />
+    <ClInclude Include="src\Common\Containers\AbstractString.hpp" />
+    <ClInclude Include="src\Common\Containers\String.hpp" />
+    <ClInclude Include="src\Common\Memory\Allocator.hpp" />
+    <ClInclude Include="src\Common\Memory\ChildAllocator.hpp" />
+    <ClInclude Include="src\Common\Memory\InstanceNew.hpp" />
+    <ClInclude Include="src\Common\Memory\NullAllocator.hpp" />
+    <ClInclude Include="src\Common\Memory\Win32HeapAllocator.hpp" />
+    <ClInclude Include="src_GeometryCompiler\GeometryCompiler.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Common\Memory.Win32.inl" />
+    <None Include="src\Common\Memory\MallocAllocator.inl" />
+    <None Include="src\Platform\MappedFile.inl" />
+    <None Include="src\Tools\CrtpTool.inl" />
+    <None Include="src\Common\Containers\ArrayList.inl" />
+    <None Include="src\Common\Containers\AbstractString.inl" />
+    <None Include="src\Common\Containers\UTF8String.inl" />
+    <None Include="src\Common\Memory\Allocator.inl" />
+    <None Include="src\Common\Memory\ChildAllocator.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -7,26 +7,25 @@ If you'd like to get a copy of the executable, (currently tested/running under 6
 
 
 ## What is Eldritch2?
-It's a classic hobby 3D game engine project, written in C++ and Angelscript. Watch out Unreal! Quips aside, there are some interesting things going on here involving pretty cutting-edge work scheduling and cooperative multitasking.
+It's a classic hobby 3D game engine project, written in C++. Watch out Unreal! Quips aside, there are some interesting things going on here involving pretty cutting-edge work scheduling and cooperative multitasking.
 I can production-test interesting research so your project doesn't have to!
 
 Lots of the architectural decisions here are also centered around shooters and action RPGs, at least out of the box.
 
 ## External Dependencies
 * [PhysX](http://www.geforce.com/hardware/technology/physx)
-* [Angelscript](http://www.angelcode.com/angelscript/)
-* [Microprofile](https://github.com/theunknownxy/microprofile)
-* [Recast Navigation/Detour](https://github.com/memononen/recastnavigation)
-* [Boost](http://www.boost.org/), version 1.60
+* [Wren](https://github.com/munificent/wren)
+* [Microprofile](https://github.com/jonasmr/microprofile)
+* [Recast Navigation/Detour](https://github.com/recastnavigation/recastnavigation)
+* [Boost](http://www.boost.org/), version 1.63
 * [Steamworks](https://partner.steamgames.com/)
-* [My RDESTL fork](https://github.com/jvidziunas/rdestl)
+* [EASTL](https://github.com/electronicarts/EASTL)
 * [SimpleOpt](https://github.com/brofield/simpleopt)
 * [Nuklear](https://github.com/vurtun/nuklear)
 
 ## Project Structure
 At a high level, project directories are arranged in a hierarchy. Shared or engine-related files live in the `/src/` subdirectory, and the current set of planned tools each have their own special sibling folder named according to the pattern `/src_<Tool Name>/`.
 Style conventions dictate that while tools may include files from the main project, tools should not include files from other tools; this is enforced to a limited degree by project include path settings and VS property sheet inheritance mechanisms.
-Additionally, I'm in the process of having the C++ namespaces reflect the project directory structure, but that's not 100% complete.
 
 ## Program Structure
 
