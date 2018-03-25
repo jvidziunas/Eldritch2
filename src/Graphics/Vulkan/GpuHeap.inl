@@ -25,18 +25,18 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	ETInlineHint void GpuHeap::AddGarbage( GarbageList<VkBuffer>::ValueType garbage ) {
+	ETInlineHint void GpuHeap::AddGarbage( VkBuffer buffer, VmaAllocation backing ) {
 		Lock	_( _garbageMutex );
 
-		_bufferGarbage.Append( garbage );
+		_bufferGarbage.Append( { buffer, backing } );
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint void GpuHeap::AddGarbage( GarbageList<VkImage>::ValueType garbage ) {
+	ETInlineHint void GpuHeap::AddGarbage( VkImage image, VmaAllocation backing ) {
 		Lock	_( _garbageMutex );
 
-		_imageGarbage.Append( garbage );
+		_imageGarbage.Append( { image, backing } );
 	}
 
 // ---------------------------------------------------

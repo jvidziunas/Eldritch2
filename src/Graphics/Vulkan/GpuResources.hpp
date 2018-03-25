@@ -85,13 +85,6 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		PhysicalTile	ReserveTile();
-
-		void			Free( PhysicalTile tile );
-
-	// ---------------------------------------------------
-
-	public:
 		VkExtent3D	GetImageExtentInTexels() const;
 
 		VkExtent3D	GetTileExtentInTexels() const;
@@ -116,19 +109,20 @@ namespace Vulkan {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		const ImageSource*		_source;
-		ArrayList<PhysicalTile>	_freeTiles;
-		VkExtent3D				_logTileExtent;
-		VkExtent3D				_imageExtent;
+		const ImageSource*	_source;
+		VkExtent3D			_logTileExtent;
+		VkExtent3D			_imageExtent;
 
-		VmaAllocation			_backing;
+		VmaAllocation		_backing;
 	//!	Texture providing the actual texel data that will be sampled during rendering.
-		VkImage					_image;
+		VkImage				_image;
 
 	// ---------------------------------------------------
 
 		friend void	Swap( SparsePageManager&, SparsePageManager& );
 	};
+
+// ---
 
 	class VertexBuffer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -409,9 +403,8 @@ ET_POP_COMPILER_WARNING_STATE()
 	public:
 		using PhysicalTile	= SparsePageManager::PhysicalTile;
 		using CachedTile	= Pair<volatile char*, bool>;
-		using Tile			= SparsePageManager::Tile;
 		template <typename Value>
-		using TileMap		= ArrayMap<Tile, Value>
+		using TileMap		= HashMap<SparsePageManager::Tile, Value>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -429,11 +422,6 @@ ET_POP_COMPILER_WARNING_STATE()
 
 	public:
 		const ImageSource*	GetSource() const;
-
-	// ---------------------------------------------------
-
-	public:
-		PhysicalTile	FindPhysicalTile();
 
 	// ---------------------------------------------------
 

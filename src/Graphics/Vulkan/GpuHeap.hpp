@@ -54,8 +54,8 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		void	AddGarbage( GarbageList<VkBuffer>::ValueType garbage );
-		void	AddGarbage( GarbageList<VkImage>::ValueType garbage );
+		void	AddGarbage( VkBuffer buffer, VmaAllocation backing );
+		void	AddGarbage( VkImage image, VmaAllocation backing );
 
 		void	DestroyGarbage();
 

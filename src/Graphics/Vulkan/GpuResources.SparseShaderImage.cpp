@@ -40,33 +40,28 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	SparseShaderImage::PhysicalTile SparseShaderImage::FindPhysicalTile() {
-		return SparsePageManager::InvalidTile;
-	}
-
-// ---------------------------------------------------
-
 	VkResult SparseShaderImage::Upload( IoBuilder& ioBuilder ) {
 		return VK_SUCCESS;
 	}
 
 // ---------------------------------------------------
 
-	void SparseShaderImage::MakeResident( Tile tile ) {
+	bool SparseShaderImage::MakeResident( Tile tile ) {
 		if (_residentTilesByCoordinate.ContainsKey( tile )) {
-			return;
+			return false;
 		}
 
 		PhysicalTile backing( _pageManager.ReserveTile() );
 
 		if (backing == SparsePageManager::InvalidTile) {
 		//	Find LRU tile and acquire backing.
+		//	backing = 
 			_residentTilesByCoordinate.Erase( candidate );
-
-			return false;
 		}
 
 		_residentTilesByCoordinate.Insert( { tile, backing } );
+
+		return true;
 	}
 
 // ---------------------------------------------------

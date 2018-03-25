@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Common">
+      <UniqueIdentifier>{ead52f3d-85c0-41a8-b5de-5deca70dcdbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{02fce88d-2879-4f36-b599-8290db251ca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common\Memory">
+      <UniqueIdentifier>{5028a3e5-2b9e-4968-ac4b-8b5f9cc26698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Memory">
+      <UniqueIdentifier>{c9db7903-8841-4949-9ff6-47f20ff3241b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{6306b74c-e368-4169-802e-fcb7739d38b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{9b2d5677-8dba-4b61-a110-ae0376573da4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common\Containers">
+      <UniqueIdentifier>{d166b328-4ca9-4af3-bd7a-358b71454d03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Containers">
+      <UniqueIdentifier>{090e468c-89f6-46b6-a93b-83aec25dea81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform">
+      <UniqueIdentifier>{3b69cef5-7210-4007-996e-20988a79a9f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform">
+      <UniqueIdentifier>{0b583969-2983-4c93-97a9-e970412951a4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Common\Memory\Allocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\ChildAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\NullAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Assert.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\InstanceNew.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tools\CrtpTool.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\ArrayList.cpp">
+      <Filter>Source Files\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\AbstractString.cpp">
+      <Filter>Source Files\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\MappedFile.Win32.cpp">
+      <Filter>Source Files\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\FileWriter.Win32.cpp">
+      <Filter>Source Files\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src_GeometryCompiler\GeometryCompiler.Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src_GeometryCompiler\GeometryCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\EastlDefinitions.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\CppFormatDefinitions.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\MallocAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src_GeometryCompiler\GeometryCompiler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\Allocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\ChildAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\NullAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\Win32HeapAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Assert.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\InstanceNew.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tools\CrtpTool.hpp">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\ArrayList.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\AbstractString.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\MappedFile.hpp">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\FileWriter.hpp">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\MallocAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\String.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Common\Memory\Allocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Common\Memory\ChildAllocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Common\Containers\UTF8String.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Tools\CrtpTool.inl">
+      <Filter>Source Files\Tools</Filter>
+    </None>
+    <None Include="src\Common\Containers\ArrayList.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Containers\AbstractString.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Platform\MappedFile.inl">
+      <Filter>Source Files\Platform</Filter>
+    </None>
+    <None Include="src\Common\Memory.Win32.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Common\Memory\MallocAllocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+</Project>

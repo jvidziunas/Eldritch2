@@ -1,0 +1,951 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Code">
+      <UniqueIdentifier>{3f636cd7-7bfa-4387-97f7-34314d2738a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Code">
+      <UniqueIdentifier>{94e8a0e6-1765-428e-ae7e-a04d1ea27f5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests">
+      <UniqueIdentifier>{02520148-fccd-4feb-9abe-5b1f24b73301}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests\StandardLibrary">
+      <UniqueIdentifier>{fbd117e0-8cdd-45c6-af64-8a15cb2d129b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests\Assets">
+      <UniqueIdentifier>{2d5e20c0-e3c4-43a9-a861-0c21076693d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests\StandardLibrary\Common">
+      <UniqueIdentifier>{001f1d7f-5333-4520-84bd-1d4ee81e08a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests\StandardLibrary\Common\Containers">
+      <UniqueIdentifier>{6a55dd49-e134-4550-80cc-15220ce24427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests\Core">
+      <UniqueIdentifier>{680d6f5c-43e9-4df2-a688-1e57593e4b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests\RuleDatabase">
+      <UniqueIdentifier>{55dc15be-1915-4393-834b-5bed6bd2c00e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src_TestCases\TestCases.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src_TestCases\SurjectiveQueries\RuleDatabase_Test.cpp">
+      <Filter>Source Files\Tests\RuleDatabase</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Build.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\AnimationTree.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\AnimationTypes.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\Armature.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\BipedalWalkClip.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\KeyframeClip.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\Storyboard.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\AssetViews\AnimationTreeAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\AssetViews\KeyframeClipAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\ScriptClasses\Armature.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\ScriptClasses\Armature.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\AssetDatabase.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\AssetFactoryRegistrar.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\AssetId.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\FlatBufferPackageProvider.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Package.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\PackageProvider.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\Listener.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\Xaudio2EngineComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\Xaudio2WorldComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\Xaudio2WorldComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\ScriptClasses\AudioScene.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Assert.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Blackboard.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\CppFormatDefinitions.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\EastlDefinitions.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\ErrorCode.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\IntrusivePointerBase.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\RuleDatabase.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Sort.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Stopwatch.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\TypeId.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Win32ApplicationHelpers.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\AbstractString.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\ArrayList.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\IntrusiveConcurrentQueue.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\Allocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\ArenaAllocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\ChildAllocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\EaStlAllocatorAdapterMixin.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\InstanceNew.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\MallocAllocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\NullAllocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Mpl\Matrices.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Engine.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Engine.ManagementComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\EngineComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\PropertyDatabase.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\PropertyRegistrar.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\TimeAccumulator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\World.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\World.ManagementComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\World.ManagementComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\WorldComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Mouse.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\XInput\XInputEngineComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\XInput\XInputEngineComponent.Gamepad.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logging\ChildLog.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logging\FileAppenderLog.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\NavigationScene.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\RecastEngineComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\RecastImplementation.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\RecastWorldComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\RecastWorldComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\ScriptClasses\Agent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\ScriptClasses\Agent.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\ScriptClasses\NavigationScene.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\ScriptClasses\NavigationScene.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Networking\Steamworks\Player.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Networking\Steamworks\SteamTools.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Networking\Steamworks\SteamworksEngineComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Networking\Steamworks\SteamworksWorldComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\CpuDispatcher.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\Physics.AnimationClip.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\Physics.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\PhysXWorldComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\CharacterPhysics.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\CharacterPhysics.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\Physics.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\Physics.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\PhysicsScene.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\PhysicsScene.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\TerrainPhysics.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\TerrainPhysics.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\TriggerVolume.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\ScriptClasses\TriggerVolume.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\AssetViews\PhysicsAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\AssetViews\TerrainAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\ContentProvider.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\ContentProvider.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\FileAppender.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\FileReader.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\FileWriter.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\MappedFile.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Mutex.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Mutex.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Platform.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Semaphore.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\WaitableEvent.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Window.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Camera.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\CrunchImageSource.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\RgbColor.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\RgbColor.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\AssetViews\ImageAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\AssetViews\MeshAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\AssetViews\MeshAsset.Element.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\CommandBuffer.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\Gpu.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\Gpu.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\GpuDetails.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\HardwareSparsePageManager.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\PinnedMemory.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\PresentationManager.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\RenderPipeline.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ResidencyManager.FrameIoBuilder.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ResidencyManager.Geometry.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ResidencyManager.Image.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ResidencyManager.SparseImage.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\SwapChain.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\Vulkan.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\VulkanEngineComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\VulkanPointer.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\VulkanTools.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\VulkanWorldComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\VulkanWorldComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\WindowSwapchain.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scheduling\JobExecutor.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scheduling\JobFiber.Win32.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scheduling\MicroprofileImplementation.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scheduling\Scheduler.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scheduling\Thread.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scheduling\Win32\FiberScheduler.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scheduling\Win32\FiberScheduler.JobThread.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ApiBuilder.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ClassTools.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\DialogueDatabase.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\Game.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\GameObject.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\WrenContext.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\WrenEngineComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\WrenVm.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\WrenWorldComponent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\AssetViews\DialogueAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\AssetViews\ScriptAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ScriptClasses\DialogueDatabase.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ScriptClasses\DialogueDatabase.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ScriptClasses\Game.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ScriptClasses\Game.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ScriptClasses\ImmediateGui.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ScriptClasses\ImmediateGui.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\AssetViews\RenderPipelineAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\AssetViews\SpirVShaderPackageAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\GraphicsScene.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\GraphicsScene.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\Light.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\Light.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\Mesh.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\Mesh.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\SwapChain.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\SwapChain.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\Viewpoint.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\ScriptClasses\Viewpoint.WrenScriptApi.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UserInterface\Nuklear\Interface.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UserInterface\Nuklear\AssetViews\InterfaceAsset.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src_TestCases\Assets\AssetDatabase_Test.cpp">
+      <Filter>Source Files\Tests\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src_TestCases\StandardLibrary\ArrayList_Test.cpp">
+      <Filter>Source Files\Tests\StandardLibrary\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src_TestCases\StandardLibrary\UniquePointer_Test.cpp">
+      <Filter>Source Files\Tests\StandardLibrary\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src_TestCases\Core\World_Test.cpp">
+      <Filter>Source Files\Tests\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\GraphicsScene.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\VulkanGraphicsScene.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\VulkanGraphicsScene.GpuContext.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\ScriptClasses\Xaudio2AudioScene.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Win32Keyboard.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\BipedalAgent.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\GpuAllocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\DescriptorTable.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\GpuResidencyManager.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Vulkan\OutputWindow.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Animation\AnimationTree.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Animation\Armature.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Animation\KeyframeClip.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Assets\Asset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Assets\AssetDatabase.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Assets\AssetId.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Assets\AssetLoader.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Assets\Package.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Assets\PackageProvider.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Algorithms.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Assert.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Blackboard.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Cache.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\ComPointer.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\CountedPointer.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\EqualTo.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\ErrorCode.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\GreaterThan.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Hash.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\IdentifierPool.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\LessThan.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Math.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory.Win32.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Result.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\RuleDatabase.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\StringLiteral.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\SymbolTable.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\TypeId.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\UniquePointer.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\AbstractString.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\ArrayBvh.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\ArrayList.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\ArrayMap.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\ArraySet.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\ConcurrentCounterHash.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\Dequeue.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\Event.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\HashMap.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\HashMultiMap.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\HashSet.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\IntrusiveConcurrentQueue.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\IntrusiveForwardList.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\IntrusiveHashMultiset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\IntrusiveHashSet.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\IntrusiveList.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\LinkedList.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\PriorityQueue.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\Queue.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\Range.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\Stack.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\TreeMap.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Containers\TreeSet.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\ArenaAllocator.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\ChildAllocator.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\EaStlAllocatorAdapterMixin.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\InstanceDeleter.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\MallocAllocator.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\Prefetch.Win.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\StdAllocatorAdapterMixin.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Memory\TrackingAllocatorMixin.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Mpl\Angle.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Mpl\CharTypes.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Mpl\Matrices.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Mpl\Vectors.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\Engine.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\EngineComponent.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\IniParser.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\PropertyRegistrar.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\TimeAccumulator.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\World.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\WorldComponent.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Core\WorldPropertyRegistrar.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Logging\ChildLog.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Logging\Log.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Physics\PhysX\PhysxAllocatorMixin.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Physics\PhysX\PhysXPointer.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Physics\PhysX\TypeMarshals.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Physics\PhysX\ScriptClasses\PhysicsScene.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Physics\PhysX\AssetViews\TerrainAsset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Platform\ContentProvider.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Platform\MappedFile.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\ImageTools.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\RenderConcept.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\RgbColor.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\AssetViews\ImageAsset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\AssetViews\MeshAsset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\CommandBuffer.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\Gpu.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\GpuDetails.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\HostAllocatorMixin.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\PinnedMemory.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\RenderPipeline.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\SwapChain.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\Vulkan.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\VulkanPointer.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\VulkanResult.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\VulkanTools.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\VulkanWorldComponent.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scheduling\JobExecutor.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scheduling\PrivateQueueWorker.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scheduling\Win32\FiberScheduler.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scripting\Wren\ApiBuilder.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scripting\Wren\DialogueDatabase.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scripting\Wren\Game.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scripting\Wren\Marshal.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scripting\Wren\WrenContext.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Scripting\Wren\AssetViews\ScriptAsset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\AssetViews\RenderPipelineAsset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\AssetViews\SpirVGraphicsPipelineView.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\AssetViews\SpirVShaderPackageAsset.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\ScriptClasses\Viewpoint.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\UserInterface\Nuklear\Interface.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\GraphicsScene.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\GpuAllocator.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\DescriptorTable.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Renderer\Vulkan\GpuResidencyManager.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+</Project>

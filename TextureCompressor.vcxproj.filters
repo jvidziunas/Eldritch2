@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{c7534c85-daea-4bde-90ca-c82b6afdaf51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{031eefea-5c5e-4864-9b6c-23dad057b389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common">
+      <UniqueIdentifier>{be3744b2-c568-4fa0-bc26-058302c57f7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{435ed44c-a37b-4179-8279-d073a8ee3176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common\Containers">
+      <UniqueIdentifier>{af609aaa-3b78-41b8-af05-6124089dd857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Containers">
+      <UniqueIdentifier>{33d7ffd0-81c3-4ae7-956b-4c6437c08d02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common\Memory">
+      <UniqueIdentifier>{86e805da-b0d2-41fb-a221-af0c0dbad304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Memory">
+      <UniqueIdentifier>{227ebe19-57c9-45bd-8bfc-8f8da6971d27}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src_texturecompressor\TextureCompressor.Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tools\CrtpTool.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="src_TextureCompressor\TextureCompressor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\Allocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\AbstractString.cpp">
+      <Filter>Source Files\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\ChildAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\CppFormatDefinitions.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\EastlDefinitions.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Assert.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\MallocAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src_texturecompressor\TextureCompressor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tools\CrtpTool.hpp">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Assert.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\HashSet.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\AbstractString.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\Allocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\ChildAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\Win32HeapAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\MallocAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Tools\CrtpTool.inl">
+      <Filter>Source Files\Tools</Filter>
+    </None>
+    <None Include="src\Common\Containers\AbstractString.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Memory\ChildAllocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Common\Containers\HashSet.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Memory\MallocAllocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+</Project>

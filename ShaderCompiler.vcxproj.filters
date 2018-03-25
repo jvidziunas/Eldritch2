@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{6e4dc903-1bee-4980-868f-c9f165c55543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform">
+      <UniqueIdentifier>{5c5c1294-dc0a-472e-9046-fd5170e8930c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{bf1f6fd1-a522-48d4-a32b-e4c05a7ecfd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Memory">
+      <UniqueIdentifier>{d51a974f-9a49-4751-9a6a-e63814eb2017}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common">
+      <UniqueIdentifier>{70da4834-d164-46e7-96f1-401ffb41cd19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common\Memory">
+      <UniqueIdentifier>{6c2a1eea-77b1-43fb-82aa-cd9990d03099}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{b197d747-59ec-4189-a164-325e85054daa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src_ShaderCompiler\ShaderCompiler.Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src_ShaderCompiler\ShaderCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\Allocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\ChildAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\EaStlAllocatorAdapterMixin.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Memory\MallocAllocator.cpp">
+      <Filter>Source Files\Common\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tools\CrtpTool.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src_ShaderCompiler\ShaderCompiler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\Allocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\ChildAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\EastlAllocatorAdapterMixin.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\MallocAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tools\CrtpTool.hpp">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Common\Memory\ChildAllocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Common\Memory\EaStlAllocatorAdapterMixin.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Common\Memory\MallocAllocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Tools\CrtpTool.inl">
+      <Filter>Source Files\Tools</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+</Project>

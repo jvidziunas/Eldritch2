@@ -42,7 +42,7 @@ namespace Vulkan {
 	ETInlineHint void CommandList::BindBuffers( const VkBuffer (&buffers)[bufferCount], VkBuffer indexBuffer, VkIndexType type ) {
 		const VkDeviceSize offsets[bufferCount] = { 0u };
 
-		this->BindBuffers( bufferCount, buffers, indexBuffer, type );
+		this->BindBuffers( bufferCount, buffers, offsets, indexBuffer, type );
 	}
 
 // ---------------------------------------------------

@@ -102,31 +102,6 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	template <typename TileIterator>
-	ETInlineHint void SparseShaderImage::MakeResident( TileIterator begin, TileIterator end ) {
-		for (; begin != end; ++begin) {
-			const auto	 tile( *begin );
-
-			if (_residentTilesByCoordinate.ContainsKey( tile )) {
-				continue;
-			}
-
-			const auto	candidate( _cachedTilesByCoordinate.Find( tile ) );
-			if (candidate != _cachedTilesByCoordinate.End()) {
-				_pageManager->Commit( tile, EvictPhysicalTile() );
-				continue;
-			}
-
-		//	Try to reserve a spot in the backing memory pool. We will finally commit the tile once we have generated/loaded data to fill it.
-			const SparsePageManager::PhysicalTile physicalTile( _pageManager->ReserveTile() );
-			if (physicalTile != SparsePageManager::InvalidTile) {
-				_residentTilesByCoordinate.Emplace( tile, physicalTile );
-			}
-		}
-	}
-
-// ---------------------------------------------------
-
 	ETInlineHint TransferBuffer::operator VkBuffer() {
 		return _buffer;
 	}
