@@ -31,98 +31,6 @@ namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
-	class SparsePageManager {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		enum : uint32 {
-			PageCoordinateBits	= 18u,
-			PageMipBits			= 10u,
-			MaxImageDimension	= 1u << PageCoordinateBits
-		};
-
-	// ---
-
-	public:
-		enum : VkDeviceSize {
-			InvalidTile = static_cast<VkDeviceSize>(0)
-		};
-
-	// ---
-
-	public:
-		using PhysicalTile = VkDeviceSize;
-
-	// ---
-
-	public:
-		struct Tile {
-			uint32_t	x	: PageCoordinateBits;
-			uint32_t	y	: PageCoordinateBits;
-			uint32_t	z	: PageCoordinateBits;
-			uint32_t	mip : PageMipBits;
-		};
-
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-	//!	Disable copy construction.
-		SparsePageManager( const SparsePageManager& ) = delete;
-	//!	Constructs this @ref SparsePageManager instance.
-		SparsePageManager( SparsePageManager&& );
-	//!	Constructs this @ref SparsePageManager instance.
-		SparsePageManager();
-
-		~SparsePageManager();
-
-	// ---------------------------------------------------
-
-	public:
-		VkOffset3D	GetTexel( Tile tile ) const;
-
-		Tile		GetTile( VkOffset3D texel, uint32_t mip = 0 ) const;
-
-	// ---------------------------------------------------
-
-	public:
-		VkExtent3D	GetImageExtentInTexels() const;
-
-		VkExtent3D	GetTileExtentInTexels() const;
-
-	// ---------------------------------------------------
-
-	public:
-		const ImageSource*	GetSource() const;
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	BindResources( GpuHeap& heap, VkExtent3D tileExtent, const ImageSource& source );
-
-		void		FreeResources( GpuHeap& heap );
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-		SparsePageManager&	operator=( const SparsePageManager& ) = delete;
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		const ImageSource*	_source;
-		VkExtent3D			_logTileExtent;
-		VkExtent3D			_imageExtent;
-
-		VmaAllocation		_backing;
-	//!	Texture providing the actual texel data that will be sampled during rendering.
-		VkImage				_image;
-
-	// ---------------------------------------------------
-
-		friend void	Swap( SparsePageManager&, SparsePageManager& );
-	};
-
-// ---
 
 	class VertexBuffer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -260,6 +168,98 @@ namespace Vulkan {
 
 // ---
 
+	class SparsePageManager {
+	// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		enum : uint32 {
+			PageCoordinateBits	= 18u,
+			PageMipBits			= 10u,
+			MaxImageDimension	= 1u << PageCoordinateBits
+		};
+
+	// ---
+
+	public:
+		enum : VkDeviceSize {
+			InvalidTile = static_cast<VkDeviceSize>(0)
+		};
+
+	// ---
+
+	public:
+		using PhysicalTile = VkDeviceSize;
+
+	// ---
+
+	public:
+		struct Tile {
+			uint32_t	x	: PageCoordinateBits;
+			uint32_t	y	: PageCoordinateBits;
+			uint32_t	z	: PageCoordinateBits;
+			uint32_t	mip : PageMipBits;
+		};
+
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+	//!	Disable copy construction.
+		SparsePageManager( const SparsePageManager& ) = delete;
+	//!	Constructs this @ref SparsePageManager instance.
+		SparsePageManager( SparsePageManager&& );
+	//!	Constructs this @ref SparsePageManager instance.
+		SparsePageManager();
+
+		~SparsePageManager();
+
+	// ---------------------------------------------------
+
+	public:
+		VkOffset3D	GetTexel( Tile tile ) const;
+
+		Tile		GetTile( VkOffset3D texel, uint32_t mip = 0 ) const;
+
+	// ---------------------------------------------------
+
+	public:
+		VkExtent3D	GetImageExtentInTexels() const;
+
+		VkExtent3D	GetTileExtentInTexels() const;
+
+	// ---------------------------------------------------
+
+	public:
+		const ImageSource*	GetSource() const;
+
+	// ---------------------------------------------------
+
+	public:
+		VkResult	BindResources( GpuHeap& heap, VkExtent3D tileExtent, const ImageSource& source );
+
+		void		FreeResources( GpuHeap& heap );
+
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+		SparsePageManager&	operator=( const SparsePageManager& ) = delete;
+
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		const ImageSource*	_source;
+		VkExtent3D			_logTileExtent;
+		VkExtent3D			_imageExtent;
+
+		VmaAllocation		_backing;
+	//!	Texture providing the actual texel data that will be sampled during rendering.
+		VkImage				_image;
+
+	// ---------------------------------------------------
+
+		friend void	Swap( SparsePageManager&, SparsePageManager& );
+	};
+
+// ---
 	class ShaderImage {
 	// - TYPE PUBLISHING ---------------------------------
 

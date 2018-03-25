@@ -34,3 +34,6 @@
 [submodule "extern/VulkanMemoryAllocator"]
 	path = extern/VulkanMemoryAllocator
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "extern/PhysX"]
+	path = extern/PhysX
+	url = https://github.com/NVIDIAGameWorks/PhysX-3.4.git
