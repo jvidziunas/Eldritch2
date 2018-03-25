@@ -1,28 +1,25 @@
 /*==================================================================*\
-  ShaderPipeline.hpp
+  OutputCoordinator.hpp
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2017 Eldritch Entertainment, LLC.
+  ©2010-2018 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <vulkan/vulkan_core.h>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Graphics {
 		namespace Vulkan {
-			namespace AssetViews {
-				class	SpirVShaderPackageAsset;
-			}
-
-			class	Gpu;
+			class	PresentCoordinator;
+			class	OutputWindow;
 		}
 	}
 }
@@ -31,41 +28,29 @@ namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
-	class ShaderPipeline {
+	class OutputCoordinator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 	//!	Disable copy construction.
-		ShaderPipeline( const ShaderPipeline& ) = delete;
-	//!	Constructs this @ref ShaderPipeline instance.
-		ShaderPipeline( ShaderPipeline&& ) ETNoexceptHint;
-	//!	Constructs this @ref ShaderPipeline instance.
-		ShaderPipeline();
+		OutputCoordinator( const OutputCoordinator& ) = delete;
+	//!	Constructs this @ref OutputCoordinator instance.
+		OutputCoordinator( PresentCoordinator& presenter );
 
-		~ShaderPipeline();
+		~OutputCoordinator() = default;
 
 	// ---------------------------------------------------
-
+	
 	public:
-		VkResult	BindResources( Gpu& gpu, const AssetViews::SpirVShaderPackageAsset& asset );
-
-		void		FreeResources( Gpu& gpu );
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-		ShaderPipeline&	operator=( const ShaderPipeline& ) = delete;
+		CountedPointer<OutputWindow>	GetWindowByName( const Utf8Char* const name );
 
 	// - DATA MEMBERS ------------------------------------
-
+	
 	private:
-		VkPipeline	_pipeline;
-
-	// ---------------------------------------------------
-
-		friend void	Swap( ShaderPipeline&, ShaderPipeline& );
+		PresentCoordinator& _presenter;
 	};
 
 }	// namespace Vulkan
 }	// namespace Graphics
 }	// namespace Eldritch2
+

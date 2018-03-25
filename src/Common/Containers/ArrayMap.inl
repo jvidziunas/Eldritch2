@@ -119,14 +119,14 @@ namespace Eldritch2 {
 	template <typename Key, typename Value, typename SortPredicate, class Allocator>
 	template <typename AlternateKey, typename AlternateSortPredicate>
 	ETInlineHint bool ArrayMap<Key, Value, SortPredicate, Allocator>::ContainsKey( const AlternateKey& key, const AlternateSortPredicate& sortPredicate ) const {
-		return this->Find( key, sortPredicate ) != _container.end();
+		return _container.find_as( key, sortPredicate ) != _container.end();
 	}
 
 // ---------------------------------------------------
 
 	template <typename Key, typename Value, typename SortPredicate, class Allocator>
 	ETInlineHint bool ArrayMap<Key, Value, SortPredicate, Allocator>::ContainsKey( const KeyType& key ) const {
-		return this->Find( key ) != _container.end();
+		return _container.find( key ) != _container.end();
 	}
 
 // ---------------------------------------------------
@@ -224,7 +224,35 @@ namespace Eldritch2 {
 
 	template <typename Key, typename Value, typename SortPredicate, class Allocator>
 	ETInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator, bool> ArrayMap<Key, Value, SortPredicate, Allocator>::Insert( ValueType&& value ) {
-		return _container.insert( eastl::forward<ValueType>( value ) );
+		return _container.insert( eastl::move( value ) );
+	}
+
+// ---------------------------------------------------
+
+	template <typename Key, typename Value, typename SortPredicate, class Allocator>
+	template <typename... Args>
+	ETInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator, bool> ArrayMap<Key, Value, SortPredicate, Allocator>::TryEmplace( const KeyType& key, Args&&... args ) {
+		Iterator position( _container.find( key ) );
+
+		if (position != _container.end()) {
+			return { position, false };
+		}
+
+		return _container.emplace( key, MappedType( eastl::forward<Args>( args )... ) );
+	}
+
+// ---------------------------------------------------
+	
+	template <typename Key, typename Value, typename SortPredicate, class Allocator>
+	template <typename... Args>
+	ETInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator, bool> ArrayMap<Key, Value, SortPredicate, Allocator>::TryEmplace( KeyType&& key, Args&&... args ) {
+		Iterator position( _container.find( key ) );
+
+		if (position != _container.end()) {
+			return { position, false };
+		}
+
+		return _container.emplace( eastl::move( key ), ValueType( eastl::forward<Args>( args )... ) );
 	}
 
 // ---------------------------------------------------

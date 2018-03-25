@@ -325,6 +325,9 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Core\World.ManagementComponent.cpp" />
     <ClCompile Include="src\Core\World.ManagementComponent.WrenScriptApi.cpp" />
     <ClCompile Include="src\Core\WorldComponent.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\BatchCoordinator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.VertexBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\OutputCoordinator.cpp" />
     <ClCompile Include="src\Input\Win32\DeviceCoordinator.cpp" />
     <ClCompile Include="src\Input\Win32\DeviceCoordinator.WrenScriptApi.cpp" />
     <ClCompile Include="src\Input\Win32\Win32InputEngineComponent.cpp" />
@@ -530,6 +533,8 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Core\TimeAccumulator.hpp" />
     <ClInclude Include="src\Core\World.hpp" />
     <ClInclude Include="src\Core\WorldComponent.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\BatchCoordinator.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\OutputCoordinator.hpp" />
     <ClInclude Include="src\Input\Binding.hpp" />
     <ClInclude Include="src\Input\Win32\DeviceCoordinator.hpp" />
     <ClInclude Include="src\Input\Win32\Win32InputEngineComponent.hpp" />

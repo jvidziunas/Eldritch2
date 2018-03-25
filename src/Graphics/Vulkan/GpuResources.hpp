@@ -130,6 +130,49 @@ namespace Vulkan {
 		friend void	Swap( SparsePageManager&, SparsePageManager& );
 	};
 
+	class VertexBuffer {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+	//!	Disable copy construction.
+		VertexBuffer( const VertexBuffer& ) = delete;
+	//!	Constructs this @ref VertexBuffer instance.
+		VertexBuffer( VertexBuffer&& );
+	//!	Constructs this @ref VertexBuffer instance.
+		VertexBuffer();
+
+		~VertexBuffer();
+
+	// ---------------------------------------------------
+
+	public:
+		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+
+		void		FreeResources( GpuHeap& heap );
+
+	// ---------------------------------------------------
+
+	public:
+		VkBuffer	Get();
+
+		operator VkBuffer();
+
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+		VertexBuffer&	operator=( const VertexBuffer& ) = delete;
+
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		VmaAllocation	_backing;
+		VkBuffer		_buffer;
+
+	// ---------------------------------------------------
+
+		friend void	Swap( VertexBuffer&, VertexBuffer& );
+	};
+
 // ---
 
 	class TransferBuffer {
@@ -155,6 +198,8 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
+		VkBuffer	Get();
+
 		operator VkBuffer();
 
 	// ---------------------------------------------------
@@ -198,6 +243,8 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
+		VkBuffer	Get();
+
 		operator VkBuffer();
 
 	// ---------------------------------------------------
@@ -363,6 +410,8 @@ ET_POP_COMPILER_WARNING_STATE()
 		using PhysicalTile	= SparsePageManager::PhysicalTile;
 		using CachedTile	= Pair<volatile char*, bool>;
 		using Tile			= SparsePageManager::Tile;
+		template <typename Value>
+		using TileMap		= ArrayMap<Tile, Value>
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -393,8 +442,7 @@ ET_POP_COMPILER_WARNING_STATE()
 	/*!	@param[in] ioBuilder @ref GpuIoBuilder to perform the host -> GPU copy. */
 		VkResult	Upload( IoBuilder& ioBuilder );
 
-		template <typename TileIterator>
-		void		MakeResident( TileIterator begin, TileIterator end );
+		bool		MakeResident( Tile tile );
 
 	// ---------------------------------------------------
 
@@ -412,15 +460,15 @@ ET_POP_COMPILER_WARNING_STATE()
 
 	private:
 	//!	Collection of tiles resident on the GPU.
-		ArrayMap<Tile, PhysicalTile>	_residentTilesByCoordinate;
+		TileMap<PhysicalTile>	_residentTilesByCoordinate;
 	//!	Collection of tiles resident on the host.
-		ArrayMap<Tile, CachedTile>		_cachedTilesByCoordinate;
+		TileMap<CachedTile>		_cachedTilesByCoordinate;
 	//!	Page manager instance providing the device resources used by this @ref SparseImage.
-		SparsePageManager				_pageManager;
+		SparsePageManager		_pageManager;
 	/*!	Staging buffer used as a target for tile decompression. The size of this buffer should be much larger
 		than can be transferred in a single frame, as it also serves as a cache for decompressed tiles
 		not necessarily resident on the GPU. Contents are write-only on the host, and read-only on the GPU. */
-		TransferBuffer					_cache;
+		TransferBuffer			_cache;
 
 	// ---------------------------------------------------
 

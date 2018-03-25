@@ -14,7 +14,9 @@
 //==================================================================//
 #include <Graphics/Vulkan/VulkanWorldComponent.hpp>
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
+#include <Graphics/Vulkan/OutputCoordinator.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
+#include <Graphics/Vulkan/Vulkan.hpp>
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
 
@@ -56,6 +58,7 @@ namespace Vulkan {
 		ET_REGISTER_WREN_CLASS( Mesh, api );
 
 		_scene = api.CreateVariable<VulkanGraphicsScene>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "GraphicsScene" );
+		api.CreateVariable<OutputCoordinator>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "OutputCoordinator", FindService<Vulkan>().GetPrimaryDevice() );
 	}
 
 }	// namespace Vulkan

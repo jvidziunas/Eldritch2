@@ -1,37 +1,27 @@
 /*==================================================================*\
-  OutputWindow.Win32.cpp
+  OutputCoordinator.cpp
   ------------------------------------------------------------------
   Purpose:
   
 
   ------------------------------------------------------------------
-  ©2010-2017 Eldritch Entertainment, LLC.
+  ©2010-2018 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
+#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/OutputWindow.hpp>
-#include <Graphics/Vulkan/Vulkan.hpp>
-//------------------------------------------------------------------//
-#include <vulkan/vulkan_win32.h>
+#include <Graphics/Vulkan/PresentCoordinator.hpp>
+#include <Graphics/Vulkan/OutputCoordinator.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
-	VkResult CreateSurface( Vulkan& vulkan, Window& window, VkSurfaceKHR* surface ) {
-		const VkWin32SurfaceCreateInfoKHR	createInfo{
-			VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-			nullptr,	// No (additional) extension data.
-			0u,			// No flags.
-			window.GetHinstance(),
-			window.GetHwnd()
-		};
-
-		return vkCreateWin32SurfaceKHR( vulkan, &createInfo, nullptr, surface );
+	CountedPointer<OutputWindow> OutputCoordinator::GetWindowByName( const Utf8Char* const name ) {
+		return _presenter.GetWindowByName( name );
 	}
 
 }	// namespace Vulkan

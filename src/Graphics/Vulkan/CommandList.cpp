@@ -82,6 +82,7 @@ namespace Vulkan {
 		if (VkCommandBuffer commandBuffer = eastl::exchange( _commandBuffer, nullptr )) {
 			vkFreeCommandBuffers( gpu, _pool, 1u, &commandBuffer );
 		}
+
 		vkDestroyCommandPool( gpu, eastl::exchange( _pool, nullptr ), gpu.GetAllocationCallbacks() );
 	}
 
@@ -130,38 +131,42 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	void CommandList::Dispatch( uint32_t x, uint32_t y, uint32_t z ) {
-		vkCmdDispatch( _commandBuffer, x, y, z );
+	void CommandList::Dispatch( VkEvent halfComplete, VkEvent fullComplete, uint32_t x, uint32_t y, uint32_t z ) {
+		const bool splitDispatch( halfComplete != VK_NULL_HANDLE );
+
+		if (splitDispatch) {
+		//	We can increase GPU utilization % by optionally kicking off two smaller dispatches in place of the single large operation requested by the user.
+			vkCmdDispatch( _commandBuffer, x / 2, y, z );
+			vkCmdSetEvent( _commandBuffer, halfComplete, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT );
+			vkCmdWaitEvents( _commandBuffer, 1u, &halfComplete, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0u, nullptr, 0u, nullptr, 0u, nullptr );
+			vkCmdDispatch( _commandBuffer, x / 2, y, z );
+		} else {
+			vkCmdDispatch( _commandBuffer, x, y, z );
+		}
+
+		if (fullComplete != VK_NULL_HANDLE) {
+			vkCmdSetEvent( _commandBuffer, fullComplete, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT );
+		}
 	}
 
 // ---------------------------------------------------
 
-	void CommandList::DispatchIndirect( VkBuffer buffer, VkDeviceSize offset ) {
-		vkCmdDispatchIndirect( _commandBuffer, buffer, offset );
-	}
-
-// ---------------------------------------------------
-
-	void CommandList::SetDescriptors( VkPipelineBindPoint target, VkPipelineLayout layout, uint32_t setCount, const VkDescriptorSet* sets, uint32_t offsetCount, const uint32_t* offsets ) {
-		vkCmdBindDescriptorSets( _commandBuffer, target, layout, 0u, setCount, sets, offsetCount, offsets );
-	}
-
-// ---------------------------------------------------
-
-	void CommandList::SetPipeline( VkPipelineBindPoint target, VkPipeline pipeline ) {
+	void CommandList::SetPipeline( VkPipelineBindPoint target, VkPipeline pipeline, VkPipelineLayout layout, uint32_t setCount, const VkDescriptorSet* descriptorSets, uint32_t offsetCount, const uint32_t* offsets ) {
 		vkCmdBindPipeline( _commandBuffer, target, pipeline );
+		vkCmdBindDescriptorSets( _commandBuffer, target, layout, 0u, setCount, descriptorSets, offsetCount, offsets );
 	}
 
 // ---------------------------------------------------
 
-	void CommandList::SetIndexBuffer( VkBuffer target, VkDeviceSize offset, VkIndexType type ) {
-		vkCmdBindIndexBuffer( _commandBuffer, target, offset, type );
+	void CommandList::BindBuffers( uint32_t bufferCount, const VkBuffer* buffers, const VkDeviceSize* offsets, VkBuffer indexBuffer, VkIndexType type ) {
+		vkCmdBindVertexBuffers( _commandBuffer, 0u, bufferCount, buffers, offsets );
+		vkCmdBindIndexBuffer( _commandBuffer, indexBuffer, 0u, type );
 	}
 
 // ---------------------------------------------------
 
-	void CommandList::SetBuffers( uint32_t firstBuffer, uint32_t bufferCount, const VkBuffer* buffers, const VkDeviceSize* offsets ) {
-		vkCmdBindVertexBuffers( _commandBuffer, firstBuffer, bufferCount, buffers, offsets );
+	void CommandList::BindBuffers( uint32_t bufferCount, const VkBuffer* buffers, const VkDeviceSize* offsets ) {
+		vkCmdBindVertexBuffers( _commandBuffer, 0u, bufferCount, buffers, offsets );
 	}
 
 // ---------------------------------------------------
@@ -220,31 +225,31 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	void CommandList::CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkImageBlit* regions, VkFilter filter ) {
+	void CommandList::Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkImageBlit* regions, VkFilter filter ) {
 		vkCmdBlitImage( _commandBuffer, source, sourceLayout, target, targetLayout, regionCount, regions, filter );
 	}
 
 // ---------------------------------------------------
 
-	void CommandList::CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkImageCopy* regions ) {
+	void CommandList::Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkImageCopy* regions ) {
 		vkCmdCopyImage( _commandBuffer, source, sourceLayout, target, targetLayout, regionCount, regions );
 	}
 
 // ---------------------------------------------------
 
-	void CommandList::CopyRegions( VkImage target, VkImageLayout targetLayout, VkBuffer source, uint32_t regionCount, const VkBufferImageCopy* regions ) {
+	void CommandList::Copy( VkImage target, VkImageLayout targetLayout, VkBuffer source, uint32_t regionCount, const VkBufferImageCopy* regions ) {
 		vkCmdCopyBufferToImage( _commandBuffer, source, target, targetLayout, regionCount, regions );
 	}
 
 // ---------------------------------------------------
 
-	void CommandList::CopyRegions( VkBuffer target, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkBufferImageCopy* regions ) {
+	void CommandList::Copy( VkBuffer target, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkBufferImageCopy* regions ) {
 		vkCmdCopyImageToBuffer( _commandBuffer, source, sourceLayout, target, regionCount, regions );
 	}
 
 // ---------------------------------------------------
 
-	void CommandList::CopyRegions( VkBuffer target, VkBuffer source, uint32_t regionCount, const VkBufferCopy* regions ) {
+	void CommandList::Copy( VkBuffer target, VkBuffer source, uint32_t regionCount, const VkBufferCopy* regions ) {
 		vkCmdCopyBuffer( _commandBuffer, source, target, regionCount, regions );
 	}
 

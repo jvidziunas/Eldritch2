@@ -32,8 +32,33 @@ namespace Vulkan {
 // ---------------------------------------------------
 
 	template <uint32_t bufferCount>
-	ETInlineHint void CommandList::SetBuffers( uint32_t firstBuffer, const VkBuffer (&buffers)[bufferCount], const VkDeviceSize (&offsets)[bufferCount] ) {
-		this->SetBuffers( firstBuffer, bufferCount, buffers, offsets );
+	ETInlineHint void CommandList::BindBuffers( const VkBuffer (&buffers)[bufferCount], const VkDeviceSize (&offsets)[bufferCount], VkBuffer indexBuffer, VkIndexType type ) {
+		this->BindBuffers( bufferCount, buffers, offsets, indexBuffer, type );
+	}
+
+// ---------------------------------------------------
+
+	template <uint32_t bufferCount>
+	ETInlineHint void CommandList::BindBuffers( const VkBuffer (&buffers)[bufferCount], VkBuffer indexBuffer, VkIndexType type ) {
+		const VkDeviceSize offsets[bufferCount] = { 0u };
+
+		this->BindBuffers( bufferCount, buffers, indexBuffer, type );
+	}
+
+// ---------------------------------------------------
+
+	template <uint32_t bufferCount>
+	ETInlineHint void CommandList::BindBuffers( const VkBuffer (&buffers)[bufferCount], const VkDeviceSize (&offsets)[bufferCount] ) {
+		this->BindBuffers( bufferCount, buffers, offsets );
+	}
+
+// ---------------------------------------------------
+
+	template <uint32_t bufferCount>
+	ETInlineHint void CommandList::BindBuffers( const VkBuffer (&buffers)[bufferCount] ) {
+		const VkDeviceSize offsets[bufferCount] = { 0u };
+
+		this->BindBuffers( bufferCount, buffers, offsets );
 	}
 
 // ---------------------------------------------------
@@ -53,36 +78,36 @@ namespace Vulkan {
 // ---------------------------------------------------
 
 	template <uint32_t blitCount>
-	ETInlineHint void CommandList::CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageBlit (&regions)[blitCount], VkFilter filter ) {
-		this->CopyRegions( target, targetLayout, source, sourceLayout, blitCount, regions, filter );
+	ETInlineHint void CommandList::Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageBlit (&regions)[blitCount], VkFilter filter ) {
+		this->Copy( target, targetLayout, source, sourceLayout, blitCount, regions, filter );
 	}
 
 // ---------------------------------------------------
 
 	template <uint32_t copyCount>
-	ETInlineHint void CommandList::CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageCopy (&regions)[copyCount] ) {
-		this->CopyRegions( target, targetLayout, source, sourceLayout, copyCount, regions );
+	ETInlineHint void CommandList::Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageCopy (&regions)[copyCount] ) {
+		this->Copy( target, targetLayout, source, sourceLayout, copyCount, regions );
 	}
 
 // ---------------------------------------------------
 
 	template <uint32_t copyCount>
-	ETInlineHint void CommandList::CopyRegions( VkImage target, VkImageLayout targetLayout, VkBuffer source, const VkBufferImageCopy (&regions)[copyCount] ) {
-		this->CopyRegions( target, targetLayout, source, copyCount, regions );
+	ETInlineHint void CommandList::Copy( VkImage target, VkImageLayout targetLayout, VkBuffer source, const VkBufferImageCopy (&regions)[copyCount] ) {
+		this->Copy( target, targetLayout, source, copyCount, regions );
 	}
 
 // ---------------------------------------------------
 
 	template <uint32_t copyCount>
-	ETInlineHint void CommandList::CopyRegions( VkBuffer target, VkImage source, VkImageLayout sourceLayout, const VkBufferImageCopy (&regions)[copyCount] ) {
-		this->CopyRegions( target, source, sourceLayout, copyCount, regions );
+	ETInlineHint void CommandList::Copy( VkBuffer target, VkImage source, VkImageLayout sourceLayout, const VkBufferImageCopy (&regions)[copyCount] ) {
+		this->Copy( target, source, sourceLayout, copyCount, regions );
 	}
 
 // ---------------------------------------------------
 
 	template <uint32_t copyCount>
-	ETInlineHint void CommandList::CopyRegions( VkBuffer target, VkBuffer source, const VkBufferCopy (&regions)[copyCount] ) {
-		this->CopyRegions( target, source, copyCount, regions );
+	ETInlineHint void CommandList::Copy( VkBuffer target, VkBuffer source, const VkBufferCopy (&regions)[copyCount] ) {
+		this->Copy( target, source, copyCount, regions );
 	}
 
 // ---------------------------------------------------

@@ -18,7 +18,7 @@
 #include <Graphics/Vulkan/Gpu.hpp>
 #include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {

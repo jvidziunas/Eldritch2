@@ -1,18 +1,18 @@
 /*==================================================================*\
-  PresentCoordinator.hpp
+  BatchCoordinator.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
-  ©2010-2017 Eldritch Entertainment, LLC.
+  ©2010-2018 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/OutputWindow.hpp>
+#include <Graphics/Vulkan/GpuResources.hpp>
 //------------------------------------------------------------------//
 #include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
@@ -20,7 +20,7 @@
 namespace Eldritch2 {
 	namespace Graphics {
 		namespace Vulkan {
-			class	Gpu;
+			class	CommandList;
 		}
 	}
 }
@@ -29,46 +29,55 @@ namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
-	class PresentCoordinator {
+	class BatchCoordinator {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		template <typename Value, class Allocator = MallocAllocator>
-		using NameMap = CachingHashMap<String<>, Value, Hash<String<>>, EqualTo<String<>>, Allocator>;
+		enum : VkDeviceSize {
+			InstanceBufferSize  = 2u * 1024u * 1024u, /*  2MB */
+			ParameterBufferSize =             16384u  /* 16KB */
+		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 	//!	Disable copy construction.
-		PresentCoordinator( const PresentCoordinator& ) = delete;
-	//!	Constructs this @ref PresentCoordinator instance.
-		PresentCoordinator();
+		BatchCoordinator( const BatchCoordinator& ) = delete;
+	//!	Constructs this @ref BatchCoordinator instance.
+		BatchCoordinator();
 
-		~PresentCoordinator() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	Present( Gpu& gpu );
+		~BatchCoordinator() = default;
 
 	// ---------------------------------------------------
 
 	public:
-		CountedPointer<OutputWindow>	GetWindowByName( const Utf8Char* name );
+		VkResult	BindResources( GpuHeap& heap );
+
+		void		FreeResources( GpuHeap& heap );
+
+	// ---------------------------------------------------
+
+	public:
+		void	AddThing( void* thing );
+
+		void	ResetCounts();
+
+	// ---------------------------------------------------
+
+	public:
+		void	RecordDraws( CommandList& commands, VertexBuffer& vertices );
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
-		PresentCoordinator&	operator=( const PresentCoordinator& ) = delete;
+		BatchCoordinator& operator=( const BatchCoordinator& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
-
+	
 	private:
-		mutable Mutex				_outputsMutex;
-		NameMap<OutputWindow>		_outputsByName;
-
-		ArrayList<VkSwapchainKHR>	_presentableSwapchains;
-		ArrayList<uint32_t>			_presentableImageIndices;
+	//!	Container for draw call parameters to be passed to the GPU.
+		UniformBuffer				_drawParameters;
+		ArrayMap<void*, uint32_t>	_countsByThing;
 	};
 
 }	// namespace Vulkan

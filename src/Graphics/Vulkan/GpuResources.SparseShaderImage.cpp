@@ -52,6 +52,25 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
+	void SparseShaderImage::MakeResident( Tile tile ) {
+		if (_residentTilesByCoordinate.ContainsKey( tile )) {
+			return;
+		}
+
+		PhysicalTile backing( _pageManager.ReserveTile() );
+
+		if (backing == SparsePageManager::InvalidTile) {
+		//	Find LRU tile and acquire backing.
+			_residentTilesByCoordinate.Erase( candidate );
+
+			return false;
+		}
+
+		_residentTilesByCoordinate.Insert( { tile, backing } );
+	}
+
+// ---------------------------------------------------
+
 	VkResult SparseShaderImage::BindResources( GpuHeap& heap, VkExtent3D tileExtent, const ImageSource& source ) {
 		using ::Eldritch2::Swap;
 

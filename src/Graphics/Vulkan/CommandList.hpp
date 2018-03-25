@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -74,26 +74,61 @@ namespace Vulkan {
 
 		void	DrawIndexed( uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance );
 
-		void	DrawIndirect( VkBuffer buffer, VkDeviceSize offset, uint32_t drawCount, uint32_t drawStrideInBytes );
+		void	DrawIndirect( VkBuffer buffer, VkDeviceSize offset, uint32_t drawCount, uint32_t drawStrideInBytes = sizeof(VkDrawIndirectCommand) );
 
-		void	DrawIndexedIndirect( VkBuffer buffer, VkDeviceSize offset, uint32_t drawCount, uint32_t drawStrideInBytes );
+		void	DrawIndexedIndirect( VkBuffer buffer, VkDeviceSize offset, uint32_t drawCount, uint32_t drawStrideInBytes = sizeof(VkDrawIndexedIndirectCommand) );
 
-		void	Dispatch( uint32_t x, uint32_t y, uint32_t z );
-
-		void	DispatchIndirect( VkBuffer buffer, VkDeviceSize offset );
+	//!	Dispatch the currently-bound compute shader pipeline.
+	/*!	The dispatch can be optionally split into two subgroups to avoid GPU cache and dispatch bubbles. */
+		void	Dispatch(
+			VkEvent halfComplete,
+			VkEvent fullComplete,
+			uint32_t x,
+			uint32_t y,
+			uint32_t z
+		);
 
 	// ---------------------------------------------------
 
 	public:
-		void	SetDescriptors( VkPipelineBindPoint target, VkPipelineLayout layout, uint32_t setCount, const VkDescriptorSet* descriptorSets, uint32_t offsetCount, const uint32_t* offsets );
-
-		void	SetPipeline( VkPipelineBindPoint target, VkPipeline pipeline );
-
-		void	SetIndexBuffer( VkBuffer buffer, VkDeviceSize offset, VkIndexType type );
-
-		void	SetBuffers( uint32_t firstBuffer, uint32_t bufferCount, const VkBuffer* buffers, const VkDeviceSize* offsets );
+	//!	Bind mesh with indices.
 		template <uint32_t bufferCount>
-		void	SetBuffers( uint32_t firstBuffer, const VkBuffer (&buffers)[bufferCount], const VkDeviceSize (&offsets)[bufferCount] );
+		void	BindBuffers(
+			const VkBuffer (&buffers)[bufferCount],
+			const VkDeviceSize (&offsets)[bufferCount],
+			VkBuffer indexBuffer,
+			VkIndexType type
+		);
+	//!	Bind mesh with indices.
+		template <uint32_t bufferCount>
+		void	BindBuffers( const VkBuffer (&buffers)[bufferCount], VkBuffer indexBuffer, VkIndexType type );
+	//!	Bind mesh with indices.
+		void	BindBuffers( 
+			uint32_t bufferCount,
+			const VkBuffer* buffers,
+			const VkDeviceSize* offsets,
+			VkBuffer indexBuffer,
+			VkIndexType type
+		);
+	//!	Bind mesh.
+		template <uint32_t bufferCount>
+		void	BindBuffers( const VkBuffer (&buffers)[bufferCount], const VkDeviceSize (&offsets)[bufferCount] );
+	//!	Bind mesh.
+		template <uint32_t bufferCount>
+		void	BindBuffers( const VkBuffer (&buffers)[bufferCount] );
+	//!	Bind mesh.
+		void	BindBuffers( uint32_t bufferCount, const VkBuffer* buffers, const VkDeviceSize* offsets );
+
+	// ---------------------------------------------------
+
+	public:
+		void	SetPipeline(
+			VkPipelineBindPoint target,
+			VkPipeline pipeline,
+			VkPipelineLayout layout,
+			uint32_t setCount, const VkDescriptorSet* descriptorSets,
+			uint32_t offsetCount, const uint32_t* offsets
+		);
 
 	// ---------------------------------------------------
 
@@ -126,21 +161,21 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		void	CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkImageBlit* regions, VkFilter filter );
+		void	Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t regionCount, const VkImageBlit* regions, VkFilter filter );
 		template <uint32_t blitCount>
-		void	CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageBlit (&regions)[blitCount], VkFilter filter );
-		void	CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t copyCount, const VkImageCopy* regions );
+		void	Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageBlit (&regions)[blitCount], VkFilter filter );
+		void	Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t copyCount, const VkImageCopy* regions );
 		template <uint32_t copyCount>
-		void	CopyRegions( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageCopy (&regions)[copyCount] );
-		void	CopyRegions( VkImage target, VkImageLayout targetLayout, VkBuffer source, uint32_t copyCount, const VkBufferImageCopy* regions );
+		void	Copy( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, const VkImageCopy (&regions)[copyCount] );
+		void	Copy( VkImage target, VkImageLayout targetLayout, VkBuffer source, uint32_t copyCount, const VkBufferImageCopy* regions );
 		template <uint32_t copyCount>
-		void	CopyRegions( VkImage target, VkImageLayout targetLayout, VkBuffer source, const VkBufferImageCopy (&regions)[copyCount] );
-		void	CopyRegions( VkBuffer target, VkImage source, VkImageLayout sourceLayout, uint32_t copyCount, const VkBufferImageCopy* regions );
+		void	Copy( VkImage target, VkImageLayout targetLayout, VkBuffer source, const VkBufferImageCopy (&regions)[copyCount] );
+		void	Copy( VkBuffer target, VkImage source, VkImageLayout sourceLayout, uint32_t copyCount, const VkBufferImageCopy* regions );
 		template <uint32_t copyCount>
-		void	CopyRegions( VkBuffer target, VkImage source, VkImageLayout sourceLayout, const VkBufferImageCopy (&regions)[copyCount] );
-		void	CopyRegions( VkBuffer target, VkBuffer source, uint32_t copyCount, const VkBufferCopy* regions );
+		void	Copy( VkBuffer target, VkImage source, VkImageLayout sourceLayout, const VkBufferImageCopy (&regions)[copyCount] );
+		void	Copy( VkBuffer target, VkBuffer source, uint32_t copyCount, const VkBufferCopy* regions );
 		template <uint32_t copyCount>
-		void	CopyRegions( VkBuffer target, VkBuffer source, const VkBufferCopy (&regions)[copyCount] );
+		void	Copy( VkBuffer target, VkBuffer source, const VkBufferCopy (&regions)[copyCount] );
 
 		void	Resolve( VkImage target, VkImageLayout targetLayout, VkImage source, VkImageLayout sourceLayout, uint32_t resolveCount, const VkImageResolve* regions );
 		template <uint32_t resolveCount>
@@ -159,7 +194,6 @@ namespace Vulkan {
 		void	Clear( VkImage target, VkImageLayout layout, const VkClearColorValue& value, uint32_t clearCount, const VkImageSubresourceRange* ranges );
 		template <uint32_t clearCount>
 		void	Clear( VkImage target, VkImageLayout layout, const VkClearColorValue& value, const VkImageSubresourceRange (&ranges)[clearCount] );
-
 		void	Clear( uint32_t targetCount, const VkClearAttachment* targets, uint32_t regionCount, const VkClearRect* regions );
 		template <uint32_t clearCount, uint32_t regionCount>
 		void	Clear( const VkClearAttachment (&targets)[clearCount], const VkClearRect (&regions)[regionCount] );

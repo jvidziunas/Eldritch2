@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
+#include <Graphics/Vulkan/OutputCoordinator.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
 #include <Scripting/Wren/Context.hpp>
 //------------------------------------------------------------------//
@@ -30,7 +31,11 @@ namespace Vulkan {
 		api.CreateClass<PlayerView>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "PlayerView",
 			{/* Constructors */
 				DefineConstructor<PlayerView ( OutputCoordinator, Transformation, double )>( "new", [] ( WrenVM* vm ) {
-					SetReturn<PlayerView>( vm, GetSlotAs<Transformation>( vm, 1 ), Angle( wrenGetSlotDouble( vm, 2 ) ) );
+					SetReturn<PlayerView>( vm,
+						GetSlotAs<OutputCoordinator>( vm, 1 ).GetWindowByName( "" ),
+						GetSlotAs<Transformation>( vm, 2 ),
+						Angle( wrenGetSlotDouble( vm, 3 ) )
+					);
 				} )
 			},
 			{/*	Properties */

@@ -120,12 +120,8 @@ namespace {
 	void Vulkan::BeginFrame( JobExecutor& executor ) {
 		executor.ForEach<1u>( _devices, ( _devices + _deviceCount ), [] ( JobExecutor& executor, Device& device ) {
 			executor.AwaitWork(
-				[&] ( JobExecutor&/* executor*/ ) {
-					device.SubmitFrameIo( executor, device );
-				},
-				[&] ( JobExecutor&/* executor*/ ) {
-					device.Present( device );
-				}
+				[&] ( JobExecutor&/* executor*/ ) { device.SubmitFrameIo( executor, device ); },
+				[&] ( JobExecutor&/* executor*/ ) { device.Present( device ); }
 			);
 		} );
 	}

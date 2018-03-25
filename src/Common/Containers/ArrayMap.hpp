@@ -109,6 +109,10 @@ namespace Eldritch2 {
 		Pair<Iterator, bool>	Insert( ValueType&& value );
 
 		template <typename... Args>
+		Pair<Iterator, bool>	TryEmplace( const KeyType& key, Args&&... args );
+		template <typename... Args>
+		Pair<Iterator, bool>	TryEmplace( KeyType&& key, Args&&... args );
+		template <typename... Args>
 		Pair<Iterator, bool>	Emplace( ConstIterator position, Args&&... args );
 		template <typename... Args>
 		Pair<Iterator, bool>	Emplace( Args&&... args );

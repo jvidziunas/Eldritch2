@@ -70,7 +70,7 @@ namespace {
 			return;
 		}
 
-		_commandLists[StandardUpload].CopyRegions( target, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, _frameTransfers, {
+		_commandLists[StandardUpload].Copy( target, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, _frameTransfers, {
 			VkBufferImageCopy{
 				transferOffset,
 				TightPack,
@@ -110,7 +110,7 @@ namespace {
 			return;
 		}
 
-		_commandLists[StandardUpload].CopyRegions( target, _frameTransfers, {
+		_commandLists[StandardUpload].Copy( target, _frameTransfers, {
 			VkBufferCopy {
 				transferOffset,	// Offset in transfer buffer
 				offset,
@@ -141,7 +141,7 @@ namespace {
 			return;
 		}
 
-		_commandLists[StandardDownload].CopyRegions( _frameTransfers, source, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, {
+		_commandLists[StandardDownload].Copy( _frameTransfers, source, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, {
 			VkBufferImageCopy{
 				transferOffset,
 				TightPack,
@@ -181,7 +181,7 @@ namespace {
 			return;
 		}
 
-		_commandLists[StandardDownload].CopyRegions( _frameTransfers, source, {
+		_commandLists[StandardDownload].Copy( _frameTransfers, source, {
 			VkBufferCopy {
 				transferOffset,
 				offset,
