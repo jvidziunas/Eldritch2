@@ -77,7 +77,7 @@ namespace Vulkan {
 			}
 		};
 		const VkDescriptorSetLayoutCreateInfo	layoutInfo{
-			VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+			VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 			nullptr,	// No extension data.
 			0u,			// No create flags.
 			static_cast<uint32_t>(_countof(layoutBindings)),
