@@ -46,7 +46,7 @@ namespace Wren {
 	// ---------------------------------------------------
 
 	public:
-		WrenInterpretResult	Invoke( WrenVM* vm, WrenHandle* receiver, WrenHandle* unaryCallStub ) const;
+		bool	Invoke( WrenVM* vm, WrenHandle* receiver, WrenHandle* unaryCallStub ) const;
 
 	// - DATA MEMBERS ------------------------------------
 

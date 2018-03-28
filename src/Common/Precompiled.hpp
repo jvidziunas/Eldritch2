@@ -62,6 +62,7 @@
 #include <Common/Algorithms.hpp>
 #include <Common/Angle.hpp>
 #include <Common/Assert.hpp>
+#include <Common/Atomic.hpp>
 #include <Common/Blackboard.hpp>
 #include <Common/ComPointer.hpp>
 #include <Common/CountedPointer.hpp>

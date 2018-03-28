@@ -28,16 +28,8 @@ namespace Eldritch2 {
 
 	public:
 	//! Constructs this @ref EaStlAllocatorMixin instance.
-	/*!	@param[in] allocator Movable @ref PublicType reference from which resources will be moved. */
-		EaStlAllocatorMixin( const PublicType& allocator );
-	//! Constructs this @ref EaStlAllocatorMixin instance.
-		EaStlAllocatorMixin( const EaStlAllocatorMixin& ) = default;
-	//! Constructs this @ref EaStlAllocatorMixin instance.
-	/*!	@param[in] allocator Movable @ref PublicType reference from which resources will be moved. */
-		EaStlAllocatorMixin( PublicType&& allocator );
-	//! Constructs this @ref EaStlAllocatorMixin instance.
-	/*!	@param[in] allocator Movable @ref EaStlAllocatorAdapterMixin reference from which resources will be moved. */
-		EaStlAllocatorMixin( EaStlAllocatorMixin&& );
+		template <typename... Arguments>
+		EaStlAllocatorMixin( Arguments&&... arguments ) noexcept;
 
 		~EaStlAllocatorMixin() = default;
 

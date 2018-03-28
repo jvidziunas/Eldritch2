@@ -19,9 +19,6 @@
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
 //------------------------------------------------------------------//
-#include <boost/iostreams/device/array.hpp>
-#include <boost/iostreams/stream.hpp>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Core {
@@ -35,7 +32,8 @@ namespace Core {
 		Engine& owner
 	) : EngineComponent( owner.GetBlackboard() ),
 		_owner( &owner ),
-		_maxPackagesSweptPerFrame( 5u ) {}
+		_maxPackagesSweptPerFrame( 5u ) {
+	}
 
 // ---------------------------------------------------
 
@@ -102,14 +100,17 @@ namespace Core {
 
 		properties.BeginSection( "Engine" )
 			.WhenPropertyChanged( "LogThreshold", [this] ( Range<const Utf8Char*> value ) {
-				using namespace ::boost::iostreams;
+				MessageType	threshold( MessageType::Warning );
 
-				basic_array_source<Utf8Char>	source( value.Begin(), value.End() );
-				stream<decltype(source)>		stream( source );
-
-				MessageType	threshold;
-
-				stream >> threshold;
+				if (StringsEqualCaseInsensitive( value.Begin(), "VerboseWarning", value.GetSize() )) {
+					threshold = MessageType::VerboseWarning;
+				} else if (StringsEqualCaseInsensitive( value.Begin(), "Warning", value.GetSize() )) {
+					threshold = MessageType::Warning;
+				} else if (StringsEqualCaseInsensitive( value.Begin(), "Error", value.GetSize() )) {
+					threshold = MessageType::Error;
+				} else if (StringsEqualCaseInsensitive( value.Begin(), "Message", value.GetSize() )) {
+					threshold = MessageType::Message;
+				}
 
 				_owner->GetLog().SetMuteThreshold( threshold );
 			} )

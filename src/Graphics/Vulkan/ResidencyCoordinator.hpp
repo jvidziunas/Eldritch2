@@ -27,6 +27,9 @@ namespace Eldritch2 {
 		namespace Vulkan {
 			class	Gpu;
 		}
+
+		class	ImageSource;
+		class	MeshSource;
 	}
 }
 
@@ -34,33 +37,24 @@ namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
+	struct Mesh {
+	public:
+		void FreeResources( GpuHeap& heap ) {
+			_vertices.FreeResources( heap );
+			_indices.FreeResources( heap );
+		}
+
+		VertexBuffer	_vertices;
+		IndexBuffer		_indices;
+	};
+
 	class ResidencyCoordinator {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		template <typename Resource>
-		struct ResourceHash {
-			ETPureFunctionHint size_t	operator()( const Resource& resource, size_t seed = 0u ) const;
-			template <typename Source>
-			ETPureFunctionHint size_t	operator()( const Source* source, size_t seed = 0u ) const;
-		};
-
-	// ---
-
-	public:
-		template <typename Resource>
-		struct ResourceEquals {
-			ETPureFunctionHint bool	operator()( const Resource& resource, const Resource& resource1 ) const;
-			template <typename Source>
-			ETPureFunctionHint bool	operator()( const Resource& resource, const Source* source ) const;
-		};
-
-	// ---
-
-	public:
-		template <typename Resource>
-		using ResidentSet	= HashSet<Resource, ResourceHash<Resource>, ResourceEquals<Resource>>;
 		using HostAllocator = HostMixin<MallocAllocator>;
+		template <typename Source, typename Resource>
+		using ResidentSet	= HashMap<const Source*, Resource>;
 
 	// ---
 
@@ -77,7 +71,7 @@ namespace Vulkan {
 	//!	Constructs this @ref ResidencyCoordinator instance.
 		ResidencyCoordinator();
 
-		~ResidencyCoordinator();
+		~ResidencyCoordinator() = default;
 
 	// ---------------------------------------------------
 
@@ -94,11 +88,19 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		VkResult	Insert( const GeometrySource& geometry, bool andUpload = true, bool allowSwap = false );
-		VkResult	Insert( const ImageSource& image, bool andUpload = true, bool allowSwap = false );
+		VkResult	Insert( const ImageSource& image, bool andMakeResident = true );
+		VkResult	Insert( const MeshSource& mesh, bool andMakeResident = true );
 
-		void		Erase( const GeometrySource& geometry );
 		void		Erase( const ImageSource& image );
+		void		Erase( const MeshSource& mesh );
+
+	// ---------------------------------------------------
+
+	private:
+		VkResult	MakeResident( VertexBuffer& target, const MeshSource& source );
+		VkResult	MakeResident( IndexBuffer& target, const MeshSource& source );
+
+		VkResult	MakeResident( ShaderImage& target, const ImageSource& source );
 
 	// ---------------------------------------------------
 
@@ -108,21 +110,14 @@ namespace Vulkan {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable HostAllocator			_allocator;
-		GpuHeap							_heap;
-		IoBuilder						_ioBuilder;
+		mutable HostAllocator					_allocator;
+		GpuHeap									_heap;
+		IoBuilder								_ioBuilder;
 
-		ResidentSet<SparseShaderImage>	_sparseShaderImages;
-		ResidentSet<Geometry>			_geometry;
-		ResidentSet<ShaderImage>		_shaderImages;
+		ResidentSet<MeshSource, Mesh>			_meshesBySource;
+		ResidentSet<ImageSource, ShaderImage>	_imagesBySource;
 	};
 
 }	// namespace Vulkan
 }	// namespace Graphics
 }	// namespace Eldritch2
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Graphics/Vulkan/ResidencyCoordinator.inl>
-//------------------------------------------------------------------//

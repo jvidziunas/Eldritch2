@@ -17,8 +17,6 @@
 #include <Logging/FileLog.hpp>
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Scheduling {
@@ -161,7 +159,7 @@ namespace Core {
 		@see Engine::GetLog() */
 		mutable Logging::FileLog			_log;
 	//!	Mutable so requests to shut down the application can be made with a const reference to the engine.
-		mutable std::atomic<bool>			_shouldRun;
+		mutable Atomic<bool>				_shouldRun;
 	//!	Mutex responsible for protecting the @ref _worlds collection.
 		mutable Mutex						_worldsMutex;
 		ArrayList<UniquePointer<World>>		_worlds;

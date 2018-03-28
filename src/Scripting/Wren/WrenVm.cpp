@@ -15,8 +15,12 @@
 
 //------------------------------------------------------------------//
 
-#define WREN_OPT_META 0
+#define WREN_NAN_TAGGING 1
 #define WREN_OPT_RANDOM 0
+#define WREN_OPT_META 0
+
+// HACK: Symbol conflicts with Windows headers. Works because we're compiling all the Wren code in this TU.
+#define TokenType WrenTokenType
 
 ET_PUSH_COMPILER_WARNING_STATE()
 /*	(4100) lots of unreferenced parameters.

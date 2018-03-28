@@ -35,7 +35,7 @@ namespace AssetViews {
 
 // ---------------------------------------------------
 
-	GeometrySource::Dimensions MeshAsset::GetDimensions() const {
+	MeshSource::Dimensions MeshAsset::GetDimensions() const {
 		return { 0u, 0u };
 	}
 

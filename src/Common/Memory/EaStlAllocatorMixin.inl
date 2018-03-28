@@ -18,17 +18,8 @@
 namespace Eldritch2 {
 
 	template <typename EldritchAllocator>
-	ETInlineHint EaStlAllocatorMixin<EldritchAllocator>::EaStlAllocatorMixin( EaStlAllocatorMixin<EldritchAllocator>&& allocator ) : EldritchAllocator( eastl::forward<EldritchAllocator>( allocator ) ) {}
-
-// ---------------------------------------------------
-
-	template <typename EldritchAllocator>
-	ETInlineHint EaStlAllocatorMixin<EldritchAllocator>::EaStlAllocatorMixin( const PublicType& allocator ) : EldritchAllocator( allocator ) {}
-
-// ---------------------------------------------------
-
-	template <typename EldritchAllocator>
-	ETInlineHint EaStlAllocatorMixin<EldritchAllocator>::EaStlAllocatorMixin( PublicType&& allocator ) : EldritchAllocator( eastl::forward<EldritchAllocator>( allocator ) ) {}
+	template <typename... Arguments>
+	ETInlineHint EaStlAllocatorMixin<EldritchAllocator>::EaStlAllocatorMixin( Arguments&&... arguments ) noexcept : EldritchAllocator( eastl::forward<Arguments>( arguments )... ) {}
 
 // ---------------------------------------------------
 

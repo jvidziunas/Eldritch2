@@ -121,6 +121,12 @@ namespace Vulkan {
 		return result < VK_SUCCESS;
 	}
 
+// ---------------------------------------------------
+
+	ETInlineHint ETPureFunctionHint VkImageType GetImageType( VkExtent3D extent ) {
+		return extent.depth > 1u ? VK_IMAGE_TYPE_3D : extent.height > 1u ? VK_IMAGE_TYPE_2D : VK_IMAGE_TYPE_1D;
+	}
+
 }	// namespace Vulkan
 }	// namespace Graphics
 }	// namespace Eldritch2

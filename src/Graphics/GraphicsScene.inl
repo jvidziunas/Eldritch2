@@ -25,7 +25,7 @@ ET_POP_COMPILER_WARNING_STATE()
 namespace Eldritch2 {
 namespace Graphics {
 
-	ETInlineHint Mesh::Mesh( const Animation::Armature& armature, const GeometrySource& source ) : source( &source ), armature( &armature ) {}
+	ETInlineHint Mesh::Mesh( const Animation::Armature& armature, const MeshSource& source ) : source( &source ), armature( &armature ) {}
 
 // ---------------------------------------------------
 

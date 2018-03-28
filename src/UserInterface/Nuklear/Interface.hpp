@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/GeometrySource.hpp>
+#include <Graphics/MeshSource.hpp>
 //------------------------------------------------------------------//
 #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 #define NK_BUTTON_TRIGGER_ON_RELEASE
@@ -105,7 +105,7 @@ namespace Nuklear {
 
 // ---
 
-	class Interface : public Graphics::GeometrySource {
+	class Interface : public Graphics::MeshSource {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:

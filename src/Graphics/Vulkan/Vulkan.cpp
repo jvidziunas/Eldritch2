@@ -15,6 +15,9 @@
 #include <Graphics/Vulkan/VulkanTools.hpp>
 #include <Graphics/Vulkan/Vulkan.hpp>
 #include <Scheduling/JobExecutor.hpp>
+#if ET_PLATFORM_WINDOWS
+#	include <vulkan/vulkan_win32.h>
+#endif
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -82,8 +85,9 @@ namespace {
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Logging;
 
-	VkResult Vulkan::Device::BindResources( Vulkan& /*vulkan*/, VkPhysicalDevice device, VkDeviceSize transferBufferSize ) {
+	VkResult Vulkan::Device::BindResources( Vulkan& vulkan, VkPhysicalDevice device, VkDeviceSize transferBufferSize ) {
 		ET_FAIL_UNLESS( Gpu::BindResources( device ) );
+		ET_FAIL_UNLESS( PresentCoordinator::BindResources( vulkan ) );
 		ET_FAIL_UNLESS( ResidencyCoordinator::BindResources( *this, transferBufferSize ) );
 
 		return VK_SUCCESS;
@@ -91,8 +95,9 @@ namespace {
 
 // ---------------------------------------------------
 
-	void Vulkan::Device::FreeResources() {
+	void Vulkan::Device::FreeResources( Vulkan& vulkan ) {
 		ResidencyCoordinator::FreeResources( *this );
+		PresentCoordinator::FreeResources( vulkan );
 		Gpu::FreeResources();
 	}
 
@@ -120,8 +125,8 @@ namespace {
 	void Vulkan::BeginFrame( JobExecutor& executor ) {
 		executor.ForEach<1u>( _devices, ( _devices + _deviceCount ), [] ( JobExecutor& executor, Device& device ) {
 			executor.AwaitWork(
-				[&] ( JobExecutor&/* executor*/ ) { device.SubmitFrameIo( executor, device ); },
-				[&] ( JobExecutor&/* executor*/ ) { device.Present( device ); }
+				[&] ( JobExecutor& /*executor*/ ) { device.SubmitFrameIo( executor, device ); },
+				[&] ( JobExecutor& /*executor*/ ) { device.Present( device ); }
 			);
 		} );
 	}
@@ -202,8 +207,8 @@ namespace {
 // ---------------------------------------------------
 
 	void Vulkan::FreeResources( JobExecutor& executor ) {
-		executor.ForEach<1u>( _devices, ( _devices + eastl::exchange( _deviceCount, 0u ) ), [] ( JobExecutor& /*executor*/, Device& gpu ) {
-			gpu.FreeResources();
+		executor.ForEach<1u>( _devices, ( _devices + eastl::exchange( _deviceCount, 0u ) ), [this] ( JobExecutor& /*executor*/, Device& gpu ) {
+			gpu.FreeResources( *this );
 		} );
 
 		DestroyDebugReportCallbackEXT( _vulkan, eastl::exchange( _debugCallback, nullptr ), _allocator );

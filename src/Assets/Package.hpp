@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <atomic>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -74,9 +74,9 @@ namespace Assets {
 	private:
 	/*!	File system path to the package. Used for identity comparison between different @ref Package instances;
 		*DO NOT CHANGE* once the package has been registered with an @ref AssetDatabase. */
-		Utf8Char					_path[MaxPathLength];
-		mutable std::atomic<size_t>	_referenceCount;
-		AssetList					_assets;
+		Utf8Char				_path[MaxPathLength];
+		mutable Atomic<size_t>	_referenceCount;
+		AssetList				_assets;
 	};
 
 }	// namespace Assets

@@ -142,15 +142,13 @@ namespace {
 // ---------------------------------------------------
 
 	void XAudio2EngineComponent::OnProcessingPassStart() {
-	//	MICROPROFILE_SCOPE macros assumes you enter and leave a profile scope in the same C++ block, which is not true here.
-		MICROPROFILE_CONDITIONAL( _audioProcessingPassTick = MicroProfileEnterInternal( g_mp_audioProcessingPass ) );
+		MICROPROFILE_ENTER( audioProcessingPass );
 	}
 
 // ---------------------------------------------------
 
 	void XAudio2EngineComponent::OnProcessingPassEnd() {
-	//	MICROPROFILE_SCOPE macros assumes you enter and leave a profile scope in the same C++ block, which is not true here.
-		MICROPROFILE_CONDITIONAL( MicroProfileLeaveInternal( g_mp_audioProcessingPass, _audioProcessingPassTick ) );
+		MICROPROFILE_LEAVE();
 	}
 
 // ---------------------------------------------------

@@ -17,7 +17,6 @@
 #include <Input/Win32/Win32InputEngineComponent.hpp>
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
-#define WIN32_LEAN_AND_MEAN
 #include <windowsx.h>
 #include <Windows.h>
 //------------------------------------------------------------------//

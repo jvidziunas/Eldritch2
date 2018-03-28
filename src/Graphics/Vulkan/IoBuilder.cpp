@@ -14,16 +14,12 @@
 //==================================================================//
 #include <Graphics/Vulkan/VulkanTools.hpp>
 #include <Graphics/Vulkan/IoBuilder.hpp>
-#include <Scheduling/JobExecutor.hpp>
 #include <Graphics/Vulkan/Gpu.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
-
-	using namespace ::Eldritch2::Scheduling;
-
 namespace {
 
 	enum : uint32_t {
@@ -33,7 +29,7 @@ namespace {
 // ---------------------------------------------------
 
 	template <typename Offset>
-	ETInlineHint bool LockRegion( std::atomic<Offset>& tracker, Offset extent, Offset& offset ) {
+	ETInlineHint bool LockRegion( Atomic<Offset>& tracker, Offset extent, Offset& offset ) {
 		VkDeviceSize transferOffset( tracker.load( std::memory_order_consume ) );
 
 		do {
@@ -51,8 +47,6 @@ namespace {
 	IoBuilder::IoBuilder(
 	) : _imageBinds( MallocAllocator( "GPU I/O Builder Image Bind List Allocator" ) ),
 		_opaqueImageBinds( MallocAllocator( "GPU I/O Builder Opaque Image Bind List Allocator" ) ),
-		_imageBarriers( MallocAllocator( "GPU I/O Builder Image Barrier List Allocator" ) ),
-		_bufferBarriers( MallocAllocator( "GPU I/O Builder Buffer Barrier List Allocator" ) ),
 		_readOffset( 0u ),
 		_writeOffset( 0u ),
 		_phaseCompleted{ nullptr },
@@ -62,154 +56,98 @@ namespace {
 
 // ---------------------------------------------------
 
-	void IoBuilder::TransferToGpu( VkImage target, VkImageSubresourceLayers subresource, VkOffset3D offset, VkExtent3D extent ) {
-		VkDeviceSize	transferOffset;
-		VkDeviceSize	transferExtent( extent.width * extent.height * extent.depth );
+	void IoBuilder::TransferToGpu( VkImage target, VkImageSubresourceLayers subresource, VkOffset3D targetOffset, VkExtent3D targetExtent ) {
+		VkDeviceSize	extent( targetExtent.width * targetExtent.height * targetExtent.depth * subresource.layerCount );
+		VkDeviceSize	stagingOffset;
 
-		if (!LockRegion<VkDeviceSize>( _readOffset, transferExtent, transferOffset )) {
+		if (!LockRegion<VkDeviceSize>( _readOffset, extent, stagingOffset )) {
 			return;
 		}
 
-		_commandLists[StandardUpload].Copy( target, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, _frameTransfers, {
+		_commandLists[StandardUpload].Copy( target, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, _stagingBuffer, {
 			VkBufferImageCopy{
-				transferOffset,
+				stagingOffset,
 				TightPack,
 				TightPack,
 				subresource,
-				offset,
-				extent,
-			}
-		} );
-
-		_imageBarriers.Append( VkImageMemoryBarrier{
-			VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			nullptr,
-			VK_ACCESS_SHADER_READ_BIT,
-			VK_ACCESS_TRANSFER_WRITE_BIT,
-			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			_drawFamily,
-			_transferFamily,
-			target,
-			VkImageSubresourceRange{
-				subresource.aspectMask,
-				subresource.mipLevel,
-				1u,
-				subresource.baseArrayLayer,
-				subresource.layerCount
+				targetOffset,
+				targetExtent,
 			}
 		} );
 	}
 
 // ---------------------------------------------------
 
-	void IoBuilder::TransferToGpu( VkBuffer target, VkDeviceSize offset, VkDeviceSize extent ) {
-		VkDeviceSize	transferOffset;
+	void IoBuilder::TransferToGpu( VkBuffer target, VkDeviceSize targetOffset, VkDeviceSize targetExtent ) {
+		VkDeviceSize	stagingOffset;
 
-		if (!LockRegion<VkDeviceSize>( _readOffset, extent, transferOffset )) {
+		if (!LockRegion<VkDeviceSize>( _readOffset, targetExtent, stagingOffset )) {
 			return;
 		}
 
-		_commandLists[StandardUpload].Copy( target, _frameTransfers, {
+		_commandLists[StandardUpload].Copy( target, _stagingBuffer, {
 			VkBufferCopy {
-				transferOffset,	// Offset in transfer buffer
-				offset,
-				extent
+				stagingOffset,
+				targetOffset,
+				targetExtent
 			}
-		} );
-
-		_bufferBarriers.Append( VkBufferMemoryBarrier{
-			VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-			nullptr,
-			VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,
-			VK_ACCESS_TRANSFER_WRITE_BIT,
-			_drawFamily,
-			_transferFamily,
-			target,
-			offset,
-			extent
 		} );
 	}
 
 // ---------------------------------------------------
 
-	void IoBuilder::TransferToHost( VkImage source, VkImageSubresourceLayers subresource, VkOffset3D offset, VkExtent3D extent ) {
-		VkDeviceSize	transferOffset;
-		VkDeviceSize	transferExtent( extent.width * extent.height * extent.depth );
+	void IoBuilder::TransferToHost( VkImage source, VkImageSubresourceLayers subresource, VkOffset3D sourceOffset, VkExtent3D sourceExtent ) {
+		VkDeviceSize	stagingOffset;
+		VkDeviceSize	extent( sourceExtent.width * sourceExtent.height * sourceExtent.depth * subresource.layerCount );
 
-		if (!LockRegion<VkDeviceSize>( _readOffset, transferExtent, transferOffset )) {
+		if (!LockRegion<VkDeviceSize>( _readOffset, extent, stagingOffset )) {
 			return;
 		}
 
-		_commandLists[StandardDownload].Copy( _frameTransfers, source, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, {
+		_commandLists[StandardDownload].Copy( _stagingBuffer, source, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, {
 			VkBufferImageCopy{
-				transferOffset,
+				stagingOffset,
 				TightPack,
 				TightPack,
 				subresource,
-				offset,
-				extent,
-			}
-		} );
-
-		_imageBarriers.Append( VkImageMemoryBarrier{
-			VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			nullptr,
-			(VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT),
-			VK_ACCESS_TRANSFER_READ_BIT,
-			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			_drawFamily,
-			_transferFamily,
-			source,
-			VkImageSubresourceRange{
-				subresource.aspectMask,
-				subresource.mipLevel,
-				1u,
-				subresource.baseArrayLayer,
-				subresource.layerCount
+				sourceOffset,
+				sourceExtent,
 			}
 		} );
 	}
 
 // ---------------------------------------------------
 
-	void IoBuilder::TransferToHost( VkBuffer source, VkDeviceSize offset, VkDeviceSize extent ) {
-		VkDeviceSize transferOffset;
+	void IoBuilder::TransferToHost( VkBuffer source, VkDeviceSize sourceOffset, VkDeviceSize sourceExtent ) {
+		VkDeviceSize stagingOffset;
 
-		if (!LockRegion<VkDeviceSize>( _readOffset, extent, transferOffset )) {
+		if (!LockRegion<VkDeviceSize>( _readOffset, sourceExtent, stagingOffset )) {
 			return;
 		}
 
-		_commandLists[StandardDownload].Copy( _frameTransfers, source, {
-			VkBufferCopy {
-				transferOffset,
-				offset,
-				extent
-			}
-		} );
-
-		_bufferBarriers.Append( VkBufferMemoryBarrier{
-			VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-			nullptr,
-			VK_ACCESS_SHADER_WRITE_BIT,
-			VK_ACCESS_TRANSFER_READ_BIT,
-			_drawFamily,
-			_transferFamily,
-			source,
-			offset,
-			extent
+		_commandLists[StandardDownload].Copy( _stagingBuffer, source, {
+			VkBufferCopy{ stagingOffset, sourceOffset, sourceExtent }
 		} );
 	}
 
 // ---------------------------------------------------
 
-	VkResult IoBuilder::SubmitCommands( JobExecutor& executor, Gpu& gpu ) {
+	bool IoBuilder::CheckCommandsConsumed( Gpu& gpu ) const {
+		return vkWaitForFences( gpu, 1u, &_commandsConsumed, VK_FALSE, 0u ) != VK_TIMEOUT;
+	}
+
+// ---------------------------------------------------
+
+	VkResult IoBuilder::SubmitCommands( Gpu& gpu ) {
 		constexpr VkPipelineStageFlags	AllCommandsStage	= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
 		constexpr VkPipelineStageFlags	TransferStage		= VK_PIPELINE_STAGE_TRANSFER_BIT;
 
-	//	Wait for previous frame commands to drain to avoid data hazards.
-		executor.AwaitCondition( vkWaitForFences( gpu, 1u, &_commandsConsumed, VK_FALSE, 0u ) != VK_TIMEOUT );
+		VkMemoryBarrier barrier{
+			VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+			nullptr,	// No extension structures.
+		};
+
+		ET_ASSERT( CheckCommandsConsumed( gpu ), "Call CheckCommandsConsumed() to wait for GPU to finish processing commands!" );
 
 	//	Reset the command buffers and record the frame's commands.
 		ET_FAIL_UNLESS( vkResetFences( gpu, 1u, &_commandsConsumed ) );
@@ -218,19 +156,27 @@ namespace {
 		for (CommandList& list : _commandLists) {
 			ET_FAIL_UNLESS( list.ResetPool( gpu ) );
 			ET_FAIL_UNLESS( list.BeginRecording( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT ) );
+		}
 
-				list.FillBuffer( _frameTransfers, 0u, 0xFFFF, sizeof( uint32 ) );
+		barrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		_commandLists[StandardDownload].PipelineBarrier( 0u, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 1u, &barrier, 0u, nullptr, 0u, nullptr );
 
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		_commandLists[StandardUpload].PipelineBarrier( 0u, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 1u, &barrier, 0u, nullptr, 0u, nullptr );
+		_commandLists[SparseUpload].PipelineBarrier( 0u, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 1u, &barrier, 0u, nullptr, 0u, nullptr );
+
+		for (CommandList& list : _commandLists) {
 			ET_FAIL_UNLESS( list.FinishRecording() );
 		}
 
-		ET_FAIL_UNLESS( _barrierCommandList.ResetPool( gpu ) );
-		ET_FAIL_UNLESS( _barrierCommandList.BeginRecording( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT ) );
+		ET_FAIL_UNLESS( _finalizeCommandList.ResetPool( gpu ) );
+		ET_FAIL_UNLESS( _finalizeCommandList.BeginRecording( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT ) );
 
-		//	_barrierCommandList.PipelineBarrier( 0u, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, );
-			_barrierCommandList.SetEvent( _ioCompleted, VK_PIPELINE_STAGE_TRANSFER_BIT );
+			_finalizeCommandList.SetEvent( _ioCompleted, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT );
 
-		ET_FAIL_UNLESS( _barrierCommandList.FinishRecording() );
+		ET_FAIL_UNLESS( _finalizeCommandList.FinishRecording() );
 
 	//	Send the commands to the GPU for execution. Clients may wait on one or more of the upload event objects to ensure that there are no memory hazards.
 	/*	Per section 5.5 of the Vulkan spec, it is necessary to split the pre/post bind submit operations into separate batch submission calls in order to
@@ -267,7 +213,7 @@ namespace {
 			AsSubmitInfo(
 				{ _phaseCompleted[StandardUpload],	_phaseCompleted[SparseUpload]	},	// Waits
 				{ AllCommandsStage,					AllCommandsStage				},	// Wait stages
-				{ _barrierCommandList.Get()											}	// Commands
+				{ _finalizeCommandList.Get()										}	// Commands
 			//	No signals-- clients rely on an event set in the command buffer to prevent data hazards.
 			)
 		} ) );
@@ -280,9 +226,9 @@ namespace {
 	VkResult IoBuilder::BindResources( Gpu& gpu, GpuHeap& heap, VkDeviceSize transferBufferSize ) {
 		using ::Eldritch2::Swap;
 
-		TransferBuffer frameTransfers;
-		ET_FAIL_UNLESS( frameTransfers.BindResources( heap, transferBufferSize ) );
-		ET_AT_SCOPE_EXIT( frameTransfers.FreeResources( heap ) );
+		TransferBuffer stagingBuffer;
+		ET_FAIL_UNLESS( stagingBuffer.BindResources( heap, transferBufferSize ) );
+		ET_AT_SCOPE_EXIT( stagingBuffer.FreeResources( heap ) );
 
 		VkSemaphore phaseCompleted[Phase::COUNT];
 		ET_AT_SCOPE_EXIT( for (VkSemaphore semaphore : phaseCompleted) vkDestroySemaphore( gpu, semaphore, gpu.GetAllocationCallbacks() ); );
@@ -319,17 +265,17 @@ namespace {
 			ET_FAIL_UNLESS( list.BindResources( gpu, QueueConcept::Transfer, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT ) );
 		}
 	
-		CommandList barrierCommandList;
-		ET_FAIL_UNLESS( barrierCommandList.BindResources( gpu, QueueConcept::Drawing, 0u ) );
-		ET_AT_SCOPE_EXIT( barrierCommandList.FreeResources( gpu ) );
+		CommandList finalizeCommandList;
+		ET_FAIL_UNLESS( finalizeCommandList.BindResources( gpu, QueueConcept::Drawing, 0u ) );
+		ET_AT_SCOPE_EXIT( finalizeCommandList.FreeResources( gpu ) );
 
 	//	Swap created resources into the object.
-		Swap( _frameTransfers,     frameTransfers );
-		Swap( _phaseCompleted,     phaseCompleted );
-		Swap( _commandsConsumed,   commandsConsumed );
-		Swap( _ioCompleted,        ioCompleted );
-		Swap( _commandLists,       commandLists );
-		Swap( _barrierCommandList, barrierCommandList );
+		Swap( _stagingBuffer,       stagingBuffer );
+		Swap( _phaseCompleted,      phaseCompleted );
+		Swap( _commandsConsumed,    commandsConsumed );
+		Swap( _ioCompleted,         ioCompleted );
+		Swap( _commandLists,        commandLists );
+		Swap( _finalizeCommandList, finalizeCommandList );
 
 		return VK_SUCCESS;
 	}
@@ -337,7 +283,7 @@ namespace {
 // ---------------------------------------------------
 
 	void IoBuilder::FreeResources( Gpu& gpu, GpuHeap& heap ) {
-		_barrierCommandList.FreeResources( gpu );
+		_finalizeCommandList.FreeResources( gpu );
 
 		for (CommandList& list : _commandLists) {
 			list.FreeResources( gpu );
@@ -350,7 +296,7 @@ namespace {
 		}
 
 		vkDestroyEvent( gpu, eastl::exchange( _ioCompleted, nullptr ), gpu.GetAllocationCallbacks() );
-		_frameTransfers.FreeResources( heap );
+		_stagingBuffer.FreeResources( heap );
 	}
 
 // ---------------------------------------------------
@@ -358,13 +304,9 @@ namespace {
 	void Swap( IoBuilder& builder0, IoBuilder& builder1 ) {
 		using ::Eldritch2::Swap;
 
-		Swap( builder0._drawFamily,			builder1._drawFamily );
-		Swap( builder0._transferFamily,		builder1._transferFamily );
-		Swap( builder0._opaqueImageBinds,	builder1._opaqueImageBinds );
-		Swap( builder0._imageBinds,			builder1._imageBinds );
-		Swap( builder0._imageBarriers,		builder1._imageBarriers );
-		Swap( builder0._bufferBarriers,		builder1._bufferBarriers );
-		Swap( builder0._frameTransfers,		builder1._frameTransfers );
+		Swap( builder0._opaqueImageBinds, builder1._opaqueImageBinds );
+		Swap( builder0._imageBinds,       builder1._imageBinds );
+		Swap( builder0._stagingBuffer,    builder1._stagingBuffer );
 
 	//	Swap read/write offsets.
 		VkDeviceSize readOffset( builder1._readOffset.exchange( builder0._readOffset.load( std::memory_order_relaxed ), std::memory_order_relaxed ) );
@@ -373,11 +315,11 @@ namespace {
 		builder0._readOffset.store( readOffset, std::memory_order_relaxed );
 		builder1._writeOffset.store( writeOffset, std::memory_order_relaxed );
 
-		Swap( builder0._phaseCompleted,		builder1._phaseCompleted );
-		Swap( builder0._commandsConsumed,	builder1._commandsConsumed );
-		Swap( builder0._ioCompleted,		builder1._ioCompleted );
-		Swap( builder0._commandLists,		builder1._commandLists );
-		Swap( builder0._barrierCommandList,	builder1._barrierCommandList );
+		Swap( builder0._phaseCompleted,      builder1._phaseCompleted );
+		Swap( builder0._commandsConsumed,    builder1._commandsConsumed );
+		Swap( builder0._ioCompleted,         builder1._ioCompleted );
+		Swap( builder0._commandLists,        builder1._commandLists );
+		Swap( builder0._finalizeCommandList, builder1._finalizeCommandList );
 	}
 
 }	// namespace Vulkan

@@ -42,7 +42,7 @@ namespace Vulkan {
 	// ---
 
 	public:
-		class Device : public Gpu, public ResidencyCoordinator, public PresentCoordinator {
+		class Device : public Gpu, public PresentCoordinator, public ResidencyCoordinator {
 		// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -65,7 +65,7 @@ namespace Vulkan {
 		public:
 			VkResult	BindResources( Vulkan& vulkan, VkPhysicalDevice device, VkDeviceSize transferBufferSize );
 
-			void		FreeResources();
+			void		FreeResources( Vulkan& vulkan );
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

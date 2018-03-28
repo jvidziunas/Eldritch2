@@ -31,12 +31,11 @@ ET_POP_COMPILER_WARNING_STATE()
 //==================================================================//
 // LIBRARIES
 //==================================================================//
-ET_LINK_DEBUGGABLE_LIBRARY( "PxFoundationDEBUG_x64.lib",				"PxFoundation_x64.lib" );
-ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3ExtensionsDEBUG.lib",				"PhysX3Extensions.lib" );
-ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3CommonDEBUG_x64.lib",				"PhysX3Common_x64.lib" );
-ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3DEBUG_x64.lib",						"PhysX3_x64.lib" );
-ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3GpuDEBUG_x64.lib",					"PhysX3Gpu_x64.lib" );
-ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3CharacterKinematicDEBUG_x64.lib",	"PhysX3CharacterKinematic_x64.lib" );
+ET_LINK_DEBUGGABLE_LIBRARY( "PxFoundationDEBUG_x64.lib",             "PxFoundation_x64.lib" );
+ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3ExtensionsDEBUG.lib",             "PhysX3Extensions.lib" );
+ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3CommonDEBUG_x64.lib",             "PhysX3Common_x64.lib" );
+ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3DEBUG_x64.lib",                   "PhysX3_x64.lib" );
+ET_LINK_DEBUGGABLE_LIBRARY( "PhysX3CharacterKinematicDEBUG_x64.lib", "PhysX3CharacterKinematic_x64.lib" );
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <atomic>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -63,7 +63,7 @@ namespace Logging {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		std::atomic<Logging::MessageType>	_muteThreshold;
+		Atomic<Logging::MessageType>	_muteThreshold;
 	};
 
 }	// namespace Logging

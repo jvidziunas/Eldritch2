@@ -53,12 +53,12 @@ namespace Vulkan {
 		_presentableSwapchains.Reserve( _outputsByName.GetSize() );
 		_presentableImageIndices.Reserve( _outputsByName.GetSize() );
 
-		for (NameMap<OutputWindow>::Iterator& output( _outputsByName.Begin() ); output != _outputsByName.End(); ) {
+		for (NameMap<OutputWindow>::Iterator output( _outputsByName.Begin() ); output != _outputsByName.End(); ) {
 			OutputWindow&	window( output->second );
 
-		//	Destroy unreferenced swapchains.
-			if (!window.IsReferenced( std::memory_order_consume )) {
-				window.FreeResources( gpu );
+		//	Garbage collect swapchains.
+			if (window.IsReferenced( std::memory_order_consume ) == false) {
+				window.FreeResources( *_vulkan, gpu );
 
 				output = _outputsByName.Erase( output );
 				continue;
@@ -87,6 +87,20 @@ namespace Vulkan {
 		}
 
 		return { &candidate->second };
+	}
+
+// ---------------------------------------------------
+
+	VkResult PresentCoordinator::BindResources( Vulkan& vulkan ) {
+		_vulkan = eastl::addressof( vulkan );
+
+		return VK_SUCCESS;
+	}
+
+// ---------------------------------------------------
+
+	void PresentCoordinator::FreeResources( Vulkan& /*vulkan*/ ) {
+		_vulkan = nullptr;
 	}
 
 }	// namespace Vulkan

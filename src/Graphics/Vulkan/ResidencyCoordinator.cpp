@@ -15,7 +15,7 @@
 #include <Graphics/Vulkan/ResidencyCoordinator.hpp>
 #include <Graphics/Vulkan/VulkanTools.hpp>
 #include <Scheduling/JobExecutor.hpp>
-#include <Graphics/Vulkan/Gpu.hpp>
+#include <Graphics/ImageSource.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -26,29 +26,16 @@ namespace Vulkan {
 
 	ResidencyCoordinator::ResidencyCoordinator(
 	) : _allocator( "Residency Manager Root Allocator" ),
-		_sparseShaderImages( MallocAllocator( "Sparse Image By Source Collection Allocator" ) ),
-		_geometry( MallocAllocator( "Geometry By Source Collection Allocator" ) ),
-		_shaderImages( MallocAllocator( "Image By Source Collection Allocator" ) ) {
-	}
-
-// ---------------------------------------------------
-
-	ResidencyCoordinator::~ResidencyCoordinator() {
-		ET_ASSERT( _sparseShaderImages.IsEmpty(), "Leaking Vulkan sparse shader images!" );
-		ET_ASSERT( _geometry.IsEmpty(),           "Leaking Vulkan geometry!" );
-		ET_ASSERT( _shaderImages.IsEmpty(),       "Leaking Vulkan shader images!" );
+		_meshesBySource( MallocAllocator( "Geometry By Source Collection Allocator" ) ),
+		_imagesBySource( MallocAllocator( "Image By Source Collection Allocator" ) ) {
 	}
 
 // ---------------------------------------------------
 
 	VkResult ResidencyCoordinator::SubmitFrameIo( JobExecutor& executor, Gpu& gpu ) {
-		for (const SparseShaderImage& image : _sparseShaderImages) {
-		/*	Use of const_cast is gross, but this is one of the suggested solutions in C++ Defect Report 103.
-		 *	See http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#103 */
-			const_cast<SparseShaderImage&>(image).Upload( _ioBuilder );
-		}
+		executor.AwaitCondition( _ioBuilder.CheckCommandsConsumed( gpu ) );
 
-		return _ioBuilder.SubmitCommands( executor, gpu );
+		return _ioBuilder.SubmitCommands( gpu );
 	}
 
 // ---------------------------------------------------
@@ -73,77 +60,86 @@ namespace Vulkan {
 // ---------------------------------------------------
 
 	void ResidencyCoordinator::FreeResources( Gpu& gpu ) {
-		_sparseShaderImages.Clear();
-		_shaderImages.Clear();
-		_geometry.Clear();
+		_imagesBySource.Clear();
+		_meshesBySource.Clear();
 
 		_heap.FreeResources( gpu );
 	}
 
 // ---------------------------------------------------
 
-	VkResult ResidencyCoordinator::Insert( const GeometrySource& source, bool andUpload, bool allowSwap ) {
-		ResidentSet<Geometry>::ValueType geometry;
-		ET_FAIL_UNLESS( geometry.BindResources( _heap, source ) );
-		ET_AT_SCOPE_EXIT( geometry.FreeResources( _heap ) );
+	VkResult ResidencyCoordinator::Insert( const MeshSource& source, bool andMakeResident ) {
+	//	const MeshSource::Dimensions dimensions( source.GetDimensions() );
 
-		if (andUpload) {
-			ET_FAIL_UNLESS( geometry.Upload( _ioBuilder ) );
+		Mesh mesh;
+		if (andMakeResident) {
+			ET_FAIL_UNLESS( MakeResident( mesh._indices, source ) );
+			ET_FAIL_UNLESS( MakeResident( mesh._vertices, source ) );
 		}
 
-		const auto insertResult( _geometry.Insert( eastl::move( geometry ) ) );
-		if (allowSwap && !insertResult.second) {
-			Swap( geometry, const_cast<Geometry&>(*insertResult.first) );
-		}
+		_meshesBySource.Emplace( &source, eastl::move( mesh ) );
 
 		return VK_SUCCESS;
 	}
 
 // ---------------------------------------------------
 
-	VkResult ResidencyCoordinator::Insert( const ImageSource& source, bool andUpload, bool allowSwap ) {
-		ResidentSet<ShaderImage>::ValueType	image;
-		ET_FAIL_UNLESS( image.BindResources( _heap, source ) );
+	VkResult ResidencyCoordinator::Insert( const ImageSource& source, bool andMakeResident ) {
+		const ImageSource::Dimensions dimensions( source.GetDimensions() );
+
+		ShaderImage	image;
+		ET_FAIL_UNLESS( image.BindResources( _heap, VkExtent3D{ dimensions.widthInTexels, dimensions.heightInTexels, dimensions.depthInTexels }, 0u ) );
 		ET_AT_SCOPE_EXIT( image.FreeResources( _heap ) );
 		
-		if (andUpload) {
-			ET_FAIL_UNLESS( image.Upload( _ioBuilder ) );
+		if (andMakeResident) {
+			ET_FAIL_UNLESS( MakeResident( image, source ) );
 		}
 
-		const auto insertResult( _shaderImages.Insert( eastl::move( image ) ) );
-		if (allowSwap && !insertResult.second) {
-			Swap( image, const_cast<ShaderImage&>(*insertResult.first) );
-		}
+		_imagesBySource.Emplace( &source, eastl::move( image ) );
 
 		return VK_SUCCESS;
 	}
 
 // ---------------------------------------------------
 
-	void ResidencyCoordinator::Erase( const GeometrySource& source ) {
-		const auto candidate( _geometry.Find( &source, _geometry.GetHashPredicate(), _geometry.GetEqualityPredicate() ) );
+	void ResidencyCoordinator::Erase( const MeshSource& source ) {
+		const auto candidate( _meshesBySource.Find( &source ) );
 
-		if (candidate != _geometry.End()) {
-		/*	Use of const_cast is gross, but this is one of the suggested solutions in C++ Defect Report 103.
-		 *	See http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#103 */
-			const_cast<Geometry&>(*candidate).FreeResources( _heap );
+		if (candidate != _meshesBySource.End()) {
+			candidate->second.FreeResources( _heap );
 
-			_geometry.Erase( candidate );
+			_meshesBySource.Erase( candidate );
 		}
 	}
 
 // ---------------------------------------------------
 
 	void ResidencyCoordinator::Erase( const ImageSource& source ) {
-		const auto candidate( _shaderImages.Find( &source, _shaderImages.GetHashPredicate(), _shaderImages.GetEqualityPredicate() ) );
+		const auto candidate( _imagesBySource.Find( &source ) );
 
-		if (candidate != _shaderImages.End()) {
-		/*	Use of const_cast is gross, but this is one of the suggested solutions in C++ Defect Report 103.
-		 *	See http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#103 */
-			const_cast<ShaderImage&>(*candidate).FreeResources( _heap );
+		if (candidate != _imagesBySource.End()) {
+			candidate->second.FreeResources( _heap );
 
-			_shaderImages.Erase( candidate );
+			_imagesBySource.Erase( candidate );
 		}
+	}
+
+// ---------------------------------------------------
+
+	VkResult ResidencyCoordinator::MakeResident( VertexBuffer& /*target*/, const MeshSource& /*source*/ ) {
+		return VK_SUCCESS;
+	}
+
+// ---------------------------------------------------
+
+	VkResult ResidencyCoordinator::MakeResident( IndexBuffer& /*target*/, const MeshSource& /*source*/ ) {
+		return VK_SUCCESS;
+	}
+
+// ---------------------------------------------------
+
+	VkResult ResidencyCoordinator::MakeResident( ShaderImage& /*target*/, const ImageSource& /*source*/ ) {
+		return VK_SUCCESS;
 	}
 
 }	// namespace Vulkan

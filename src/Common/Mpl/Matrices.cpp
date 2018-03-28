@@ -19,21 +19,21 @@
 
 namespace Eldritch2 {
 
-	ETPureFunctionHint Matrix4x4 ETSimdCall Matrix4x4::AsPerspectiveProjection( Angle verticalFov, float32 aspect, float32 near, float32 far ) {
-		return AsPerspectiveProjection( Angle( verticalFov * aspect ), verticalFov, near, far );
+	ETPureFunctionHint Matrix4x4 ETSimdCall Matrix4x4::AsPerspectiveProjection( Angle verticalFov, float32 aspect, float32 nearPlane, float32 farPlane ) {
+		return AsPerspectiveProjection( Angle( verticalFov * aspect ), verticalFov, nearPlane, farPlane );
 	}
 
 // ---------------------------------------------------
 
-	ETPureFunctionHint Matrix4x4 ETSimdCall Matrix4x4::AsPerspectiveProjection( Angle horizontalFov, Angle verticalFov, float32 near, float32 far ) {
+	ETPureFunctionHint Matrix4x4 ETSimdCall Matrix4x4::AsPerspectiveProjection( Angle horizontalFov, Angle verticalFov, float32 nearPlane, float32 farPlane ) {
 	//	Restrict far - near for numerical stability.
-		const float32	depthRange( far / Max( far - near, FLT_EPSILON ) );
+		const float32	depthRange( farPlane / Max( farPlane - nearPlane, FLT_EPSILON ) );
 
 		return Matrix4x4{
-			Reciprocal( Tangent( horizontalFov * 0.5f ) ), 0.0f,                                                 0.0f,              0.0f,
-			0.0f,                                                  Reciprocal( Tangent( verticalFov * 0.5f ) ),  0.0f,              0.0f,
-			0.0f,                                                  0.0f,                                         depthRange,        1.0f,
-			0.0f,                                                  0.0f,                                        -depthRange * near, 0.0f
+			Reciprocal( Tangent( horizontalFov * 0.5f ) ), 0.0f,                                                 0.0f,                   0.0f,
+			0.0f,                                                  Reciprocal( Tangent( verticalFov * 0.5f ) ),  0.0f,                   0.0f,
+			0.0f,                                                  0.0f,                                         depthRange,             1.0f,
+			0.0f,                                                  0.0f,                                        -depthRange * nearPlane, 0.0f
 		};
 	}
 
@@ -87,7 +87,7 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
-#if (ET_COMPILER_IS_MSVC )
+#if ( ET_COMPILER_IS_MSVC )
 #	pragma warning( push )
 //	MSVC complains about writing to uninitialized memory... thus initializing it.
 #	pragma warning( disable : 6001 )
@@ -95,7 +95,7 @@ namespace Eldritch2 {
 	ETPureFunctionHint Matrix4x4 ETSimdCall Matrix4x4::Zero() {
 		return { _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps() };
 	}
-#if (ET_COMPILER_IS_MSVC )
+#if ( ET_COMPILER_IS_MSVC )
 #	pragma warning( pop )	// 6001
 #endif
 

@@ -1,5 +1,5 @@
 /*==================================================================*\
-  GeometrySource.hpp
+  MeshSource.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -18,7 +18,7 @@
 namespace Eldritch2 {
 namespace Graphics {
 
-	class ETPureAbstractHint GeometrySource {
+	class ETPureAbstractHint MeshSource {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -49,12 +49,12 @@ namespace Graphics {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref GeometrySource instance.
-		GeometrySource( const GeometrySource& ) = default;
-	//!	Constructs this @ref GeometrySource instance.
-		GeometrySource() = default;
+	//!	Constructs this @ref MeshSource instance.
+		MeshSource( const MeshSource& ) = default;
+	//!	Constructs this @ref MeshSource instance.
+		MeshSource() = default;
 
-		~GeometrySource() = default;
+		~MeshSource() = default;
 
 	// ---------------------------------------------------
 

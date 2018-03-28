@@ -125,7 +125,7 @@ namespace {
 		_surface( eastl::exchange( window._surface, nullptr ) ),
 		_swapchain( eastl::exchange( window._swapchain, nullptr ) ),
 		_imageCount( eastl::exchange( window._imageCount, 0 ) ),
-		_imageViews(),
+		_images(),
 		_imageAvailable( eastl::move( window._imageAvailable ) ),
 		_canComposite( eastl::move( window._canComposite ) ) {
 	}
@@ -137,7 +137,7 @@ namespace {
 		_window(),
 		_surface( nullptr ),
 		_imageCount( 0u ),
-		_imageViews{ nullptr },
+		_images{ nullptr },
 		_imageAvailable(),
 		_canComposite() {
 	}
@@ -183,6 +183,10 @@ namespace {
 			vkDestroySwapchainKHR( gpu, eastl::exchange( _swapchain, swapchain ), gpu.GetAllocationCallbacks() );
 
 			if (Succeeded( result )) {
+				result = vkGetSwapchainImagesKHR( gpu, _swapchain, &_imageCount, _images );
+			}
+
+			if (Succeeded( result )) {
 				result = vkAcquireNextImageKHR( gpu, _swapchain, InfiniteTimeout, nullptr, nullptr, &_presentableIndex );
 			}
 		}
@@ -226,49 +230,7 @@ namespace {
 		Swap( _surface,			surface );
 		Swap( _imageAvailable,	imageAvailable );
 		Swap( _canComposite,	canComposite );
-
-		return VK_SUCCESS;
-	}
-
-// ---------------------------------------------------
-
-	VkResult OutputWindow::BindImages( Gpu& gpu ) {
-		using ::Eldritch2::Swap;
-
-		VkImage	images[MaxQueueDepth];
-		uint32	imageCount( _countof(images) );
-		ET_FAIL_UNLESS( vkGetSwapchainImagesKHR( gpu, _swapchain, &imageCount, images ) );
-
-		VkImageViewCreateInfo viewInfo{
-			VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			nullptr,	// No extensions.
-			0u,			// No create flags.
-			nullptr,	// Image will be set below.
-			VK_IMAGE_VIEW_TYPE_2D,
-			VK_FORMAT_UNDEFINED,
-			MakeIdentitySwizzle(),
-			VkImageSubresourceRange{
-				VK_IMAGE_ASPECT_COLOR_BIT,
-				0u,		//	'Identity' MIP level. 
-				1u,		//	Single-level MIP chain.
-				0u,		//	'Identity' array region.
-				1u
-			}
-		};
-
-		VkImageView views[_countof(images)];
-		ET_AT_SCOPE_EXIT( for (VkImageView view : views) vkDestroyImageView( gpu, view, gpu.GetAllocationCallbacks() ) );
-		for (uint32 image( 0 ); image < imageCount; ++image) {
-			if (images[image] == nullptr) {
-				break;
-			}
-
-			viewInfo.image = images[image];
-
-			ET_FAIL_UNLESS( vkCreateImageView( gpu, &viewInfo, gpu.GetAllocationCallbacks(), views + image ) );
-		}
-
-		Swap( _imageViews, views );
+		Swap( _window,          window );
 
 		return VK_SUCCESS;
 	}
@@ -279,11 +241,14 @@ namespace {
 		vkDestroyEvent( gpu, eastl::exchange( _canComposite, nullptr ), gpu.GetAllocationCallbacks() );
 		vkDestroyFence( gpu, eastl::exchange( _imageAvailable, nullptr ), gpu.GetAllocationCallbacks() );
 
-		for (VkImageView& view : _imageViews) {
-			vkDestroyImageView( gpu, eastl::exchange( view, nullptr ), gpu.GetAllocationCallbacks() );
+	//	Vulkan implementation defined as being responsible for destroying images as a part of swapchain destruction.
+		for (VkImage& image : _images) {
+			image = nullptr;
 		}
 
+		vkDestroySwapchainKHR( gpu, eastl::exchange( _swapchain, nullptr ), gpu.GetAllocationCallbacks() );
 		vkDestroySurfaceKHR( vulkan, eastl::exchange( _surface, nullptr ), nullptr );
+		_window.FreeResources();
 	}
 
 // ---------------------------------------------------
@@ -295,7 +260,7 @@ namespace {
 		Swap( window0._surface,          window1._surface );
 		Swap( window0._imageCount,       window1._imageCount );
 		Swap( window0._presentableIndex, window1._presentableIndex );
-		Swap( window0._imageViews,       window1._imageViews );
+		Swap( window0._images,           window1._images );
 		Swap( window0._imageAvailable,   window1._imageAvailable );
 		Swap( window0._canComposite,     window1._canComposite );
 	}

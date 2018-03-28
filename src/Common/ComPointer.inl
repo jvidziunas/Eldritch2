@@ -49,7 +49,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Interface>
-	ComPointer<Interface>::~ComPointer() {
+	ETInlineHint ComPointer<Interface>::~ComPointer() {
 		Reset();
 	}
 
@@ -171,11 +171,8 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Interface>
-	ETInlineHint void Swap( ComPointer<Interface> pointer0, ComPointer<Interface>& pointer1 ) {
-		Interface* const	temp( pointer1._pointer );
-
-		pointer0._pointer = _pointer;
-		pointer1._pointer = temp;
+	ETInlineHint void Swap( ComPointer<Interface>& pointer0, ComPointer<Interface>& pointer1 ) {
+		Swap( pointer0._pointer, pointer1._pointer );
 	}
 
 }	// namespace Eldritch2

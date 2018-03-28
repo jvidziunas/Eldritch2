@@ -12,13 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <EABase/eabase.h>
-#ifdef UNICODE
-#	undef UNICODE
-#endif
 //	Don't use the thread name callback, we provide the name ourselves in the scheduler classes and don't need the 'retained mode' callback.
 #define MICROPROFILE_USE_THREAD_NAME_CALLBACK 0
-#define MICROPROFILE_GPU_TIMERS 0
 ET_PUSH_COMPILER_WARNING_STATE()
 /*	(4005) MSVC complains about macro redefinitions, since a few DirectX components separately define some HRESULT values without an include guard.
  *	The definitions themselves are consistent, so just disable the warning.

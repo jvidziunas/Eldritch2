@@ -22,8 +22,6 @@ ET_PUSH_COMPILER_WARNING_STATE()
 #	include <steamclientpublic.h>
 ET_POP_COMPILER_WARNING_STATE()
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Networking {

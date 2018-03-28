@@ -18,8 +18,6 @@
 #	include <XAudio2.h>
 #endif
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Audio {
@@ -55,9 +53,9 @@ namespace XAudio2 {
 	// ---------------------------------------------------
 
 	private:
-		std::atomic<uint32>	_producedBuffers;
-		std::atomic<uint32>	_consumedBuffers;
-		char				_decoderMemory[];
+		Atomic<uint32>	_producedBuffers;
+		Atomic<uint32>	_consumedBuffers;
+		char			_decoderMemory[];
 	};
 
 }	// namespace XAudio2

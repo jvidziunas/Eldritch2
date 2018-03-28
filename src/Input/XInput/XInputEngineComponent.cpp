@@ -21,10 +21,10 @@
 //==================================================================//
 // LIBRARIES
 //==================================================================//
-#if defined( _WIN32_WINNT_WIN8 ) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-	ET_LINK_LIBRARY( "XInput.lib" )
-#else 
+#if defined( XINPUT_USE_9_1_0 )
 	ET_LINK_LIBRARY( "XInput9_1_0.lib" )
+#else 
+	ET_LINK_LIBRARY( "XInput.lib" )
 #endif
 //------------------------------------------------------------------//
 

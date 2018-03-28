@@ -18,12 +18,10 @@ ET_PUSH_COMPILER_WARNING_STATE()
 #	include <task/PxCpuDispatcher.h>
 ET_POP_COMPILER_WARNING_STATE()
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Scheduling {
-		using JobFence = std::atomic<int>;
+		using JobFence = Atomic<int>;
 	}
 }
 

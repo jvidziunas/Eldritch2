@@ -15,14 +15,6 @@
 #include <Graphics/Vulkan/GpuResources.hpp>
 #include <Graphics/Vulkan/CommandList.hpp>
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
-
-namespace Eldritch2 {
-	namespace Scheduling {
-		class	JobExecutor;
-	}
-}
 
 namespace Eldritch2 {
 namespace Graphics {
@@ -54,16 +46,18 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		void	TransferToGpu( VkImage target, VkImageSubresourceLayers subresource, VkOffset3D offset, VkExtent3D extent );
-		void	TransferToGpu( VkBuffer target, VkDeviceSize offset, VkDeviceSize extent );
+		void	TransferToGpu( VkImage target, VkImageSubresourceLayers subresource, VkOffset3D targetOffset, VkExtent3D targetExtent );
+		void	TransferToGpu( VkBuffer target, VkDeviceSize targetOffset, VkDeviceSize targetExtent );
 
-		void	TransferToHost( VkImage source, VkImageSubresourceLayers subresource, VkOffset3D offset, VkExtent3D extent );
-		void	TransferToHost( VkBuffer source, VkDeviceSize offset, VkDeviceSize extent );
+		void	TransferToHost( VkImage source, VkImageSubresourceLayers subresource, VkOffset3D sourceOffset, VkExtent3D sourceExtent );
+		void	TransferToHost( VkBuffer source, VkDeviceSize sourceOffset, VkDeviceSize sourceExtent );
 
 	// ---------------------------------------------------
 
 	public:
-		VkResult	SubmitCommands( Scheduling::JobExecutor& executor, Gpu& gpu );
+		VkResult	SubmitCommands( Gpu& gpu );
+
+		bool		CheckCommandsConsumed( Gpu& gpu ) const;
 
 	// ---------------------------------------------------
 
@@ -80,24 +74,19 @@ namespace Vulkan {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		uint32_t										_drawFamily;
-		uint32_t										_transferFamily;
-
 		ArrayList<VkSparseImageOpaqueMemoryBindInfo>	_opaqueImageBinds;
 		ArrayList<VkSparseImageMemoryBindInfo>			_imageBinds;
-		ArrayList<VkImageMemoryBarrier>					_imageBarriers;
-		ArrayList<VkBufferMemoryBarrier>				_bufferBarriers;
 
-		TransferBuffer									_frameTransfers;
-		std::atomic<VkDeviceSize>						_readOffset;
-		std::atomic<VkDeviceSize>						_writeOffset;
+		TransferBuffer									_stagingBuffer;
+		Atomic<VkDeviceSize>							_readOffset;
+		Atomic<VkDeviceSize>							_writeOffset;
 
 		VkSemaphore										_phaseCompleted[Phase::COUNT];
 		VkFence											_commandsConsumed;
 		VkEvent											_ioCompleted;
 
 		CommandList										_commandLists[Phase::COUNT];
-		CommandList										_barrierCommandList;
+		CommandList										_finalizeCommandList;
 
 	// ---------------------------------------------------
 

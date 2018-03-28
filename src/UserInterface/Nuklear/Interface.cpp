@@ -13,6 +13,9 @@
 // INCLUDES
 //==================================================================//
 #define NK_IMPLEMENTATION
+#if defined( CopyMemory )
+#	undef CopyMemory
+#endif	// defined( CopyMemory )
 #define NK_MEMSET ::Eldritch2::SetMemory
 #define NK_MEMCPY ::Eldritch2::CopyMemory
 #define NK_SQRT ::Eldritch2::Sqrt

@@ -89,7 +89,7 @@
       <AdditionalOptions>/MP /Zo /volatile:iso</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ExternSrcDir)VulkanMemoryAllocator\src;$(ExternSrcDir)opus\include;$(ExternSrcDir)wren\src\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)libmorton\libmorton\include;$(ExternSrcDir)PhysX\PxShared\include;$(ExternSrcDir)PhysX\PhysX_3.4\Include;$(ExternSrcDir)recastnavigation\DetourCrowd\Include\;$(ExternSrcDir)recastnavigation\Detour\Include\;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;VK_USE_PLATFORM_WIN32_KHR;WIN32;_WIN32;_CHAR16T;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;XINPUT_USE_9_1_0;WIN32_LEAN_AND_MEAN;MICROPROFILE_GPU_TIMERS_VULKAN;_CHAR16T;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <MinimalRebuild>false</MinimalRebuild>
@@ -122,7 +122,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX\PxShared\lib\vc14win64;$(ExternSrcDir)PhysX\PhysX_3.4\Lib\vc14win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX\PxShared\lib\vc15win64;$(ExternSrcDir)PhysX\PhysX_3.4\Lib\vc15win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
@@ -152,7 +152,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(ExternSrcDir)VulkanMemoryAllocator\src;$(ExternSrcDir)opus\include;$(ExternSrcDir)wren\src\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)libmorton\libmorton\include;$(ExternSrcDir)PhysX\PxShared\include;$(ExternSrcDir)PhysX\PhysX_3.4\Include;$(ExternSrcDir)recastnavigation\DetourCrowd\Include\;$(ExternSrcDir)recastnavigation\Detour\Include\;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;VK_USE_PLATFORM_WIN32_KHR;WIN32;_WIN32;_CHAR16T;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;XINPUT_USE_9_1_0;WIN32_LEAN_AND_MEAN;MICROPROFILE_GPU_TIMERS_VULKAN;_CHAR16T;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -182,7 +182,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX\PxShared\lib\vc14win64;$(ExternSrcDir)PhysX\PhysX_3.4\Lib\vc14win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX\PxShared\lib\vc15win64;$(ExternSrcDir)PhysX\PhysX_3.4\Lib\vc15win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -215,7 +215,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(ExternSrcDir)VulkanMemoryAllocator\src;$(ExternSrcDir)opus\include;$(ExternSrcDir)wren\src\include;$(ExternSrcDir)Steamworks\sdk\public\steam;$(ExternSrcDir)libmorton\libmorton\include;$(ExternSrcDir)PhysX\PxShared\include;$(ExternSrcDir)PhysX\PhysX_3.4\Include;$(ExternSrcDir)recastnavigation\DetourCrowd\Include\;$(ExternSrcDir)recastnavigation\Detour\Include\;$(VK_SDK_PATH)\Include;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;VK_USE_PLATFORM_WIN32_KHR;WIN32;_WIN32;_CHAR16T;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;XINPUT_USE_9_1_0;WIN32_LEAN_AND_MEAN;MICROPROFILE_GPU_TIMERS_VULKAN;_CHAR16T;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -245,7 +245,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)lib64-msvc-12.0;$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX\PxShared\lib\vc14win64;$(ExternSrcDir)PhysX\PhysX_3.4\Lib\vc14win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX\PxShared\lib\vc15win64;$(ExternSrcDir)PhysX\PhysX_3.4\Lib\vc15win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -326,8 +326,11 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Core\World.ManagementComponent.WrenScriptApi.cpp" />
     <ClCompile Include="src\Core\WorldComponent.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\BatchCoordinator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.AbstractBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.AbstractImage.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.VertexBuffer.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\OutputCoordinator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\OutputCoordinator.WrenScriptApi.cpp" />
     <ClCompile Include="src\Input\Win32\DeviceCoordinator.cpp" />
     <ClCompile Include="src\Input\Win32\DeviceCoordinator.WrenScriptApi.cpp" />
     <ClCompile Include="src\Input\Win32\Win32InputEngineComponent.cpp" />
@@ -396,7 +399,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Graphics\Vulkan\Mesh.WrenScriptApi.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\RenderPipeline.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\IoBuilder.cpp" />
-    <ClCompile Include="src\Graphics\Vulkan\GpuResources.Geometry.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.IndexBuffer.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.ShaderImage.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuHeap.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\PresentCoordinator.cpp" />
@@ -495,6 +498,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Audio\XAudio2\Xaudio2WorldComponent.hpp" />
     <ClInclude Include="src\Audio\XAudio2\XAudioMarshals.hpp" />
     <ClInclude Include="src\Build.hpp" />
+    <ClInclude Include="src\Common\Atomic.hpp" />
     <ClInclude Include="src\Common\Containers\Dequeue.hpp" />
     <ClInclude Include="src\Common\Containers\PriorityQueue.hpp" />
     <ClInclude Include="src\Common\Containers\Queue.hpp" />
@@ -572,7 +576,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Graphics\GpuFormats.hpp" />
     <ClInclude Include="src\Graphics\ImageSource.hpp" />
     <ClInclude Include="src\Graphics\ImageTools.hpp" />
-    <ClInclude Include="src\Graphics\GeometrySource.hpp" />
+    <ClInclude Include="src\Graphics\MeshSource.hpp" />
     <ClInclude Include="src\Graphics\PortalView.hpp" />
     <ClInclude Include="src\Graphics\RenderConcept.hpp" />
     <ClInclude Include="src\Graphics\ResolutionScale.hpp" />
@@ -729,7 +733,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include="src\Graphics\Vulkan\HostMixin.inl" />
     <None Include="src\Graphics\Vulkan\OutputWindow.inl" />
     <None Include="src\Graphics\Vulkan\RenderPipeline.inl" />
-    <None Include="src\Graphics\Vulkan\ResidencyCoordinator.inl" />
     <None Include="src\Graphics\Vulkan\GpuDetails.inl" />
     <None Include="src\Graphics\Vulkan\VulkanGraphicsScene.inl" />
     <None Include="src\Graphics\Vulkan\VulkanTools.inl" />

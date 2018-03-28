@@ -12,7 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <fmt/format.h>
+ET_PUSH_COMPILER_WARNING_STATE()
+	ET_SET_MSVC_WARNING_STATE( disable : 4459 4244 )
+#	include <fmt/format.h>
+ET_POP_COMPILER_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {

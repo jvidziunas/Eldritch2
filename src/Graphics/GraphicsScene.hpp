@@ -28,7 +28,7 @@ namespace Eldritch2 {
 	}
 
 	namespace Graphics {
-		class	GeometrySource;
+		class	MeshSource;
 	}
 }
 
@@ -65,9 +65,9 @@ namespace Graphics {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref Geometry instance.
-		Mesh( const Animation::Armature& armature, const GeometrySource& source );
-	//!	Constructs this @ref Geometry instance.
+	//!	Constructs this @ref Mesh instance.
+		Mesh( const Animation::Armature& armature, const MeshSource& source );
+	//!	Constructs this @ref Mesh instance.
 		Mesh( const Mesh& ) = default;
 
 		~Mesh() = default;
@@ -76,7 +76,7 @@ namespace Graphics {
 
 	public:
 		const Animation::Armature*	armature;
-		const GeometrySource*		source;
+		const MeshSource*		source;
 	};
 
 // ---

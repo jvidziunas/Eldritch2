@@ -139,11 +139,11 @@ namespace Eldritch2 {
 /*	Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
  *	If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
  *	not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case. */
-	ETPureFunctionHint int	OrderStringsCaseInsensitive( const char* str0, const char* str1, size_t stringLengthInCharacters );
+	ETPureFunctionHint int	OrderStringsCaseInsensitive( const char* str0, const char* str1, size_t lengthInCharacters );
 /*	Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
  *	If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
  *	not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case. */
-	ETPureFunctionHint int	OrderStringsCaseInsensitive( const wchar_t* str0, const wchar_t* str1, size_t stringLengthInCharacters );
+	ETPureFunctionHint int	OrderStringsCaseInsensitive( const wchar_t* str0, const wchar_t* str1, size_t lengthInCharacters );
 /*	Performs a case-insensitive comparison of the individual characters in str0 against the individual characters in str1.
  *	If all characters are equal, the result is 0. Otherwise, the result is greater than zero if the first character that does
  *	not match in str0 is greater than the first character that does not match in str1 and vice versa in the less-than case. */

@@ -14,8 +14,6 @@
 //==================================================================//
 #include <Common/Platform.hpp>
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
@@ -52,7 +50,7 @@ namespace Eldritch2 {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		std::atomic<CpuTimestamp>	_start;
+		Atomic<CpuTimestamp>	_start;
 	};
 
 }	// namespace Eldritch2

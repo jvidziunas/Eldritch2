@@ -18,57 +18,136 @@
 namespace Eldritch2 {
 	namespace Graphics {
 		namespace Vulkan {
-			class	IoBuilder;
 			class	GpuHeap;
 		}
-
-		class	GeometrySource;
-		class	ImageSource;
 	}
 }
 
 namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
+namespace Detail {
 
-
-	class VertexBuffer {
+	class ETPureAbstractHint AbstractBuffer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+	protected:
 	//!	Disable copy construction.
-		VertexBuffer( const VertexBuffer& ) = delete;
-	//!	Constructs this @ref VertexBuffer instance.
-		VertexBuffer( VertexBuffer&& );
-	//!	Constructs this @ref VertexBuffer instance.
-		VertexBuffer();
+		AbstractBuffer( const AbstractBuffer& ) = delete;
+	//!	Constructs this @ref AbstractBuffer instance.
+		AbstractBuffer( AbstractBuffer&& );
+	//!	Constructs this @ref AbstractBuffer instance.
+		AbstractBuffer();
 
-		~VertexBuffer();
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
-
-		void		FreeResources( GpuHeap& heap );
+		~AbstractBuffer();
 
 	// ---------------------------------------------------
 
 	public:
-		VkBuffer	Get();
+		VkBuffer	Get() ETNoexceptHint;
 
-		operator VkBuffer();
+		operator	VkBuffer() ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+	public:
+		void	FreeResources( GpuHeap& heap );
+
+	// ---------------------------------------------------
+
+	protected:
+		VkResult	BindResources( GpuHeap& heap, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo );
+
+		void		GetAllocationInfo( GpuHeap& heap, VmaAllocationInfo& info );
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
-		VertexBuffer&	operator=( const VertexBuffer& ) = delete;
+		AbstractBuffer&	operator=( const AbstractBuffer& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
 		VmaAllocation	_backing;
 		VkBuffer		_buffer;
+
+	// ---------------------------------------------------
+
+		friend void	Swap( AbstractBuffer&, AbstractBuffer& );
+	};
+
+// ---
+
+	class ETPureAbstractHint AbstractImage {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	protected:
+	//!	Disable copy construction.
+		AbstractImage( const AbstractImage& ) = delete;
+	//!	Constructs this @ref AbstractImage instance.
+		AbstractImage( AbstractImage&& );
+	//!	Constructs this @ref AbstractImage instance.
+		AbstractImage();
+
+		~AbstractImage();
+
+	// ---------------------------------------------------
+
+	public:
+		VkImage	Get() ETNoexceptHint;
+
+		operator VkImage() ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+	public:
+		void	FreeResources( GpuHeap& heap );
+
+	// ---------------------------------------------------
+
+	protected:
+		VkResult	BindResources( GpuHeap& heap, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo );
+
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+		AbstractImage&	operator=( const AbstractImage& ) = delete;
+
+	// - DATA MEMBERS ------------------------------------
+
+	private:
+		VmaAllocation	_backing;
+		VkImage			_image;
+
+	// ---------------------------------------------------
+
+		friend void	Swap( AbstractImage&, AbstractImage& );
+	};
+
+}	// namespace Detail
+
+	class VertexBuffer : public Detail::AbstractBuffer {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+	//!	Disable copy construction.
+		VertexBuffer( const VertexBuffer& ) = delete;
+	//!	Constructs this @ref VertexBuffer instance.
+		VertexBuffer( VertexBuffer&& ) = default;
+	//!	Constructs this @ref VertexBuffer instance.
+		VertexBuffer() = default;
+
+		~VertexBuffer() = default;
+
+	// ---------------------------------------------------
+
+	public:
+		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+		VertexBuffer&	operator=( const VertexBuffer& ) = delete;
 
 	// ---------------------------------------------------
 
@@ -77,43 +156,60 @@ namespace Vulkan {
 
 // ---
 
-	class TransferBuffer {
+	class IndexBuffer : public Detail::AbstractBuffer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 	//!	Disable copy construction.
-		TransferBuffer( const TransferBuffer& ) = delete;
-	//!	Constructs this @ref TransferBuffer instance.
-		TransferBuffer( TransferBuffer&& );
-	//!	Constructs this @ref TransferBuffer instance.
-		TransferBuffer();
+		IndexBuffer( const IndexBuffer& ) = delete;
+	//!	Constructs this @ref IndexBuffer instance.
+		IndexBuffer( IndexBuffer&& ) = default;
+	//!	Constructs this @ref IndexBuffer instance.
+		IndexBuffer() = default;
 
-		~TransferBuffer();
+		~IndexBuffer() = default;
 
 	// ---------------------------------------------------
 
 	public:
 		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
 
-		void		FreeResources( GpuHeap& heap );
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+		IndexBuffer&	operator=( const IndexBuffer& ) = delete;
+
+	// ---------------------------------------------------
+
+		friend void	Swap( IndexBuffer&, IndexBuffer& );
+	};
+
+// ---
+
+	class TransferBuffer : public Detail::AbstractBuffer {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+	//!	Disable copy construction.
+		TransferBuffer( const TransferBuffer& ) = delete;
+	//!	Constructs this @ref TransferBuffer instance.
+		TransferBuffer( TransferBuffer&& ) = default;
+	//!	Constructs this @ref TransferBuffer instance.
+		TransferBuffer() = default;
+
+		~TransferBuffer() = default;
 
 	// ---------------------------------------------------
 
 	public:
-		VkBuffer	Get();
+		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
 
-		operator VkBuffer();
+		void*		GetHostPointer( GpuHeap& heap );
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
 		TransferBuffer&	operator=( const TransferBuffer& ) = delete;
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		VmaAllocation	_backing;
-		VkBuffer		_buffer;
 
 	// ---------------------------------------------------
 
@@ -122,44 +218,30 @@ namespace Vulkan {
 
 // ---
 
-	class UniformBuffer {
+	class UniformBuffer : public Detail::AbstractBuffer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 	//!	Disable copy construction.
 		UniformBuffer( const UniformBuffer& ) = delete;
 	//!	Constructs this @ref UniformBuffer instance.
-		UniformBuffer( UniformBuffer&& );
+		UniformBuffer( UniformBuffer&& ) = default;
 	//!	Constructs this @ref UniformBuffer instance.
-		UniformBuffer();
+		UniformBuffer() = default;
 
-		~UniformBuffer();
+		~UniformBuffer() = default;
 
 	// ---------------------------------------------------
 
 	public:
 		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
 
-		void		FreeResources( GpuHeap& heap );
-
-	// ---------------------------------------------------
-
-	public:
-		VkBuffer	Get();
-
-		operator VkBuffer();
+		void*		GetHostPointer( GpuHeap& heap );
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
 		UniformBuffer&	operator=( const UniformBuffer& ) = delete;
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		VmaAllocation	_backing;
-		VkBuffer		_buffer;
-		void*			_base;
 
 	// ---------------------------------------------------
 
@@ -172,7 +254,8 @@ namespace Vulkan {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum : uint32 {
+		enum : uint64_t { InvalidTile = static_cast<uint64_t>(0u) };
+		enum : uint32_t {
 			PageCoordinateBits	= 18u,
 			PageMipBits			= 10u,
 			MaxImageDimension	= 1u << PageCoordinateBits
@@ -181,78 +264,68 @@ namespace Vulkan {
 	// ---
 
 	public:
-		enum : VkDeviceSize {
-			InvalidTile = static_cast<VkDeviceSize>(0)
-		};
-
-	// ---
-
-	public:
-		using PhysicalTile = VkDeviceSize;
-
-	// ---
-
-	public:
 		struct Tile {
-			uint32_t	x	: PageCoordinateBits;
-			uint32_t	y	: PageCoordinateBits;
-			uint32_t	z	: PageCoordinateBits;
-			uint32_t	mip : PageMipBits;
+			uint32_t x   : PageCoordinateBits;
+			uint32_t y   : PageCoordinateBits;
+			uint32_t z   : PageCoordinateBits;
+			uint32_t mip : PageMipBits;
 		};
+
+	// ---
+
+	public:
+		template <typename Value>
+		using TileMap		= HashMap<Tile, Value>;
+		using CachedTile	= Pair<volatile char*, bool>;
+		using PhysicalTile	= VkDeviceSize;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
+	//!	Constructs this @ref SparsePageManager instance.
+		SparsePageManager( VkExtent3D tileExtent, VkExtent3D extent );
+	//!	Constructs this @ref SparsePageManager instance.
 		SparsePageManager( const SparsePageManager& ) = delete;
 	//!	Constructs this @ref SparsePageManager instance.
 		SparsePageManager( SparsePageManager&& );
 	//!	Constructs this @ref SparsePageManager instance.
 		SparsePageManager();
 
-		~SparsePageManager();
+		~SparsePageManager() = default;
 
 	// ---------------------------------------------------
 
 	public:
-		VkOffset3D	GetTexel( Tile tile ) const;
+		VkOffset3D	GetTexel( Tile tile ) const ETNoexceptHint;
 
-		Tile		GetTile( VkOffset3D texel, uint32_t mip = 0 ) const;
-
-	// ---------------------------------------------------
-
-	public:
-		VkExtent3D	GetImageExtentInTexels() const;
-
-		VkExtent3D	GetTileExtentInTexels() const;
+		Tile		GetTile( VkOffset3D texel, uint32_t mip = 0 ) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 	public:
-		const ImageSource*	GetSource() const;
+		VkExtent3D	GetImageExtentInTexels() const ETNoexceptHint;
+
+		VkExtent3D	GetTileExtentInTexels() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkExtent3D tileExtent, const ImageSource& source );
-
-		void		FreeResources( GpuHeap& heap );
+		bool	MakeResident( SparsePageManager::Tile tile );
 
 	// ---------------------------------------------------
 
-	//!	Disable copy assignment.
+	public:
 		SparsePageManager&	operator=( const SparsePageManager& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		const ImageSource*	_source;
-		VkExtent3D			_logTileExtent;
-		VkExtent3D			_imageExtent;
-
-		VmaAllocation		_backing;
-	//!	Texture providing the actual texel data that will be sampled during rendering.
-		VkImage				_image;
+		VkExtent3D				_logTileExtent;
+		VkExtent3D				_extent;
+	//!	Collection of tiles resident on the GPU.
+		TileMap<PhysicalTile>	_residentTilesByCoordinate;
+	//!	Collection of tiles resident on the host.
+		TileMap<CachedTile>		_cachedTilesByCoordinate;
 
 	// ---------------------------------------------------
 
@@ -260,34 +333,13 @@ namespace Vulkan {
 	};
 
 // ---
-	class ShaderImage {
+
+	class ShaderImage : public Detail::AbstractImage {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		using ArraySlice	= uint16;
 		using MipIndex		= uint16;
-
-	// ---
-
-ET_PUSH_COMPILER_WARNING_STATE()
-/*	(4309) MSVC doesn't like the 32 bit -> 16 bit truncation here, but since we're just looking to set all the
- *	bits there's nothing to be afraid of. */
-	ET_SET_MSVC_WARNING_STATE( disable : 4309 )
-	public:
-		enum : MipIndex {
-			FirstMipInImage	= 0,
-			LastMipInImage	= static_cast<MipIndex>(~0u),
-		};
-
-	// ---
-
-	public:
-		enum : ArraySlice {
-			FirstSliceInImage	= 0,
-			LastSliceInImage	= static_cast<ArraySlice>(~0u),
-		};
-
-ET_POP_COMPILER_WARNING_STATE()
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -295,46 +347,21 @@ ET_POP_COMPILER_WARNING_STATE()
 	//!	Disable copy construction.
 		ShaderImage( const ShaderImage& ) = delete;
 	//!	Constructs this @ref ShaderImage instance.
-		ShaderImage( ShaderImage&& );
+		ShaderImage( ShaderImage&& ) = default;
 	//!	Constructs this @ref ShaderImage instance.
-		ShaderImage();
+		ShaderImage() = default;
 
-		~ShaderImage();
-
-	// ---------------------------------------------------
-
-	public:
-		const ImageSource*	GetSource() const;
+		~ShaderImage() = default;
 
 	// ---------------------------------------------------
 
 	public:
-		VkResult	Upload(
-			IoBuilder& ioBuilder,
-			MipIndex firstMip = FirstMipInImage,
-			MipIndex lastMip = LastMipInImage,
-			ArraySlice firstSlice = FirstSliceInImage,
-			ArraySlice lastSlice = LastSliceInImage
-		);
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	BindResources( GpuHeap& heap, const ImageSource& source );
-
-		void		FreeResources( GpuHeap& heap );
+		VkResult	BindResources( GpuHeap& heap, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers = 1u );
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
 		ShaderImage&	operator=( const ShaderImage& ) = delete;
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		const ImageSource*	_source;
-		VmaAllocation		_backing;
-		VkImage				_image;
 
 	// ---------------------------------------------------
 
@@ -343,69 +370,7 @@ ET_POP_COMPILER_WARNING_STATE()
 
 // ---
 
-	class Geometry {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-	//!	Disable copy construction.
-		Geometry( const Geometry& ) = delete;
-	//!	Constructs this @ref Geometry instance.
-		Geometry( Geometry&& );
-	//!	Constructs this @ref Geometry instance.
-		Geometry();
-
-		~Geometry();
-
-	// ---------------------------------------------------
-
-	public:
-		const GeometrySource*	GetSource() const;
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	Upload( IoBuilder& ioBuilder );
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	BindResources( GpuHeap& heap, const GeometrySource& source );
-
-		void		FreeResources( GpuHeap& heap );
-
-	// ---------------------------------------------------
-
-	public:
-		operator VkBuffer();
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-		Geometry&	operator=( const Geometry& ) = delete;
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		const GeometrySource*	_source;
-		VmaAllocation			_backing;
-		VkBuffer				_buffer;
-
-	// ---------------------------------------------------
-
-		friend void	Swap( Geometry&, Geometry& );
-	};
-
-// ---
-
-	class SparseShaderImage {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using PhysicalTile	= SparsePageManager::PhysicalTile;
-		using CachedTile	= Pair<volatile char*, bool>;
-		template <typename Value>
-		using TileMap		= HashMap<SparsePageManager::Tile, Value>;
-
+	class SparseShaderImage : public Detail::AbstractImage {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -421,23 +386,14 @@ ET_POP_COMPILER_WARNING_STATE()
 	// ---------------------------------------------------
 
 	public:
-		const ImageSource*	GetSource() const;
-
-	// ---------------------------------------------------
-
-	public:
-	//!	Streams texel data for image tiles from the @ref ImageSource assigned to the resource to the GPU.
-	/*!	@param[in] ioBuilder @ref GpuIoBuilder to perform the host -> GPU copy. */
-		VkResult	Upload( IoBuilder& ioBuilder );
-
-		bool		MakeResident( Tile tile );
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	BindResources( GpuHeap& heap, VkExtent3D tileExtent, const ImageSource& source );
+		VkResult	BindResources( GpuHeap& heap, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips );
 
 		void		FreeResources( GpuHeap& heap );
+
+	// ---------------------------------------------------
+
+	public:
+		bool	MakeResident( SparsePageManager::Tile tile );
 
 	// ---------------------------------------------------
 
@@ -447,22 +403,17 @@ ET_POP_COMPILER_WARNING_STATE()
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-	//!	Collection of tiles resident on the GPU.
-		TileMap<PhysicalTile>	_residentTilesByCoordinate;
-	//!	Collection of tiles resident on the host.
-		TileMap<CachedTile>		_cachedTilesByCoordinate;
-	//!	Page manager instance providing the device resources used by this @ref SparseImage.
-		SparsePageManager		_pageManager;
+	//!	Page manager instance providing the device resources used by this @ref SparseShaderImage.
+		SparsePageManager	_pageManager;
 	/*!	Staging buffer used as a target for tile decompression. The size of this buffer should be much larger
 		than can be transferred in a single frame, as it also serves as a cache for decompressed tiles
 		not necessarily resident on the GPU. Contents are write-only on the host, and read-only on the GPU. */
-		TransferBuffer			_cache;
+		TransferBuffer		_cache;
 
 	// ---------------------------------------------------
 
 		friend void	Swap( SparseShaderImage&, SparseShaderImage& );
 	};
-
 
 }	// namespace Vulkan
 }	// namespace Graphics

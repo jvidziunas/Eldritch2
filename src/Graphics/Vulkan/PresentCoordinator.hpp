@@ -18,14 +18,6 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			class	Gpu;
-		}
-	}
-}
-
-namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
@@ -58,12 +50,21 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
+	public:
+		VkResult	BindResources( Vulkan& vulkan );
+
+		void		FreeResources( Vulkan& vulkan );
+
+	// ---------------------------------------------------
+
 	//!	Disable copy assignment.
 		PresentCoordinator&	operator=( const PresentCoordinator& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
+		Vulkan*						_vulkan;
+
 		mutable Mutex				_outputsMutex;
 		NameMap<OutputWindow>		_outputsByName;
 

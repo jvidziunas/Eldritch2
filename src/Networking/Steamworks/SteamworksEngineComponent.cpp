@@ -20,7 +20,7 @@
 //------------------------------------------------------------------//
 #include <microprofile/microprofile.h>
 ET_PUSH_COMPILER_WARNING_STATE()
-//	(6340) Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
+//	(6340) Valve has a few mismatches in their printf specifiers! We can't fix these, so disable the warning.
 	ET_SET_MSVC_WARNING_STATE( disable : 6340 )
 #	include <steam_api.h>
 ET_POP_COMPILER_WARNING_STATE()
@@ -89,9 +89,12 @@ namespace Steamworks {
 		}
 
 		SteamClient()->SetLocalIPBinding( 0u, _steamPort );
-		SteamClient()->SetWarningMessageHook( [] ( int /*severity*/, const char* message ) {
-			ETUnreferencedParameter( message );
-			ET_TRIGGER_DEBUGBREAK();
+		SteamClient()->SetWarningMessageHook( [] ( int severity, const char* message ) {
+			OutputDebugStringA( message );
+
+			if (severity >= 1) {
+				ET_TRIGGER_DEBUGBREAK();
+			}
 		} );
 
 		_log.Write( MessageType::Message, "Connected to local Steam client." UTF8_NEWLINE );

@@ -19,8 +19,6 @@
 #include <Core/WorldComponent.hpp>
 #include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
-#include <atomic>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Scheduling {
@@ -139,7 +137,7 @@ namespace Core {
 	//!	Mutable so logs can be written even if we only have a const reference to the world.
 		mutable Logging::ChildLog			_log;
 	//!	Mutable so termination can be requested even if we only have a const reference to the world.
-		mutable std::atomic<bool>			_shouldShutDown;
+		mutable Atomic<bool>				_shouldShutDown;
 
 		Blackboard							_services;
 		TimeAccumulator						_timeAccumulator;

@@ -78,6 +78,10 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
+	ETPureFunctionHint VkImageType GetImageType( VkExtent3D extent );
+
+// ---------------------------------------------------
+
 	ETPureFunctionHint bool	Succeeded( VkResult result );
 
 	ETPureFunctionHint bool	Failed( VkResult result );

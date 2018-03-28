@@ -32,10 +32,10 @@ namespace Vulkan {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		OutputCoordinator( const OutputCoordinator& ) = delete;
 	//!	Constructs this @ref OutputCoordinator instance.
 		OutputCoordinator( PresentCoordinator& presenter );
+	//!	Disable copy construction.
+		OutputCoordinator( const OutputCoordinator& ) = delete;
 
 		~OutputCoordinator() = default;
 
@@ -53,4 +53,3 @@ namespace Vulkan {
 }	// namespace Vulkan
 }	// namespace Graphics
 }	// namespace Eldritch2
-

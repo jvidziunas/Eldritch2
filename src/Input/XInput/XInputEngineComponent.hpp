@@ -14,10 +14,6 @@
 //==================================================================//
 #include <Core/EngineComponent.hpp>
 //------------------------------------------------------------------//
-#if ET_PLATFORM_WINDOWS
-#	define WIN32_LEAN_AND_MEAN
-#	include <Windows.h>
-#endif
 #include <XInput.h>
 //------------------------------------------------------------------//
 
@@ -57,7 +53,7 @@ namespace XInput {
 	// - DATA MEMBERS ------------------------------------
 	
 	private:
-		XINPUT_STATE	_gamepads[XUSER_MAX_COUNT];
+		XINPUT_STATE	_gamepads[4u];
 	};
 
 }	// namespace XInput

@@ -185,16 +185,28 @@ namespace Eldritch2 {
 	}
 
 // ---------------------------------------------------
+	
+	ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive( const char* string0, const char* string1, size_t lengthInCharacters ) {
+		return _strnicmp( string0, string1, lengthInCharacters );
+	}
+
+// ---------------------------------------------------
+
+	ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive( const wchar_t* string0, const wchar_t* string1, size_t lengthInCharacters ) {
+		return _wcsnicmp( string0, string1, lengthInCharacters );
+	}
+
+// ---------------------------------------------------
 
 	template <size_t lengthInCharacters>
-	ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive( const char( &string0 )[lengthInCharacters], const char( &string1 )[lengthInCharacters] ) {
+	ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive( const char (&string0)[lengthInCharacters], const char (&string1)[lengthInCharacters] ) {
 		return std::_memicmp( string0, string1, lengthInCharacters );
 	}
 
 // ---------------------------------------------------
 
 	template <size_t lengthInCharacters>
-	ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive( const wchar_t( &string0 )[lengthInCharacters], const wchar_t( &string1 )[lengthInCharacters] ) {
+	ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive( const wchar_t (&string0)[lengthInCharacters], const wchar_t (&string1)[lengthInCharacters] ) {
 		return Eldritch2::OrderStringsCaseInsensitive( static_cast<const wchar_t*>(string0), static_cast<const wchar_t*>(string1) );
 	}
 

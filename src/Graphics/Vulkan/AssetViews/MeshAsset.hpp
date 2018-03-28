@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/GeometrySource.hpp>
+#include <Graphics/MeshSource.hpp>
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 
@@ -29,7 +29,7 @@ namespace Graphics {
 namespace Vulkan {
 namespace AssetViews {
 
-	class MeshAsset : public Assets::Asset, public GeometrySource {
+	class MeshAsset : public Assets::Asset, public MeshSource {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:

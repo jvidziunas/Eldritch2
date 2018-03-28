@@ -1,5 +1,5 @@
 /*==================================================================*\
-  OutputCoordinator.cpp
+  Atomic.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,22 +12,14 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/PresentCoordinator.hpp>
-#include <Graphics/Vulkan/OutputCoordinator.hpp>
+#include <Common/Mpl/Compiler.hpp>
+//------------------------------------------------------------------//
+#include <atomic>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
 
-	OutputCoordinator::OutputCoordinator( PresentCoordinator& presenter ) : _presenter( presenter ) {}
+	template <typename Value>
+	using Atomic = std::atomic<Value>;
 
-// ---------------------------------------------------
-
-	CountedPointer<OutputWindow> OutputCoordinator::GetWindowByName( const Utf8Char* const name ) {
-		return _presenter.GetWindowByName( name );
-	}
-
-}	// namespace Vulkan
-}	// namespace Graphics
 }	// namespace Eldritch2

@@ -591,9 +591,6 @@
     <ClCompile Include="src\Assets\PackageDatabase.cpp">
       <Filter>Source Files\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\GpuResources.Geometry.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.SparsePageManager.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
@@ -810,6 +807,18 @@
     <ClCompile Include="src\Graphics\Vulkan\OutputCoordinator.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.AbstractBuffer.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.AbstractImage.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\GpuResources.IndexBuffer.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\OutputCoordinator.WrenScriptApi.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Common\Algorithms.hpp">
@@ -922,9 +931,6 @@
     </ClInclude>
     <ClInclude Include="src\Common\Containers\ArrayBvh.hpp">
       <Filter>Header Files\Common\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\GeometrySource.hpp">
-      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="resources\Eldritch2.Resources.h">
       <Filter>Resource Files</Filter>
@@ -1415,6 +1421,12 @@
     <ClInclude Include="src\Graphics\Vulkan\OutputCoordinator.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="src\Common\Atomic.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\MeshSource.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Eldritch2.ico">
@@ -1703,9 +1715,6 @@
     </None>
     <None Include="src\Common\Filesystem.inl">
       <Filter>Source Files\Common</Filter>
-    </None>
-    <None Include="src\Graphics\Vulkan\ResidencyCoordinator.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
     </None>
     <None Include="src\Scripting\Wren\EventCoordinator.inl">
       <Filter>Source Files\Scripting\Wren</Filter>

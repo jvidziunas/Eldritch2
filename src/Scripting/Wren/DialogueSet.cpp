@@ -26,13 +26,13 @@ namespace Wren {
 
 // ---------------------------------------------------
 
-	WrenInterpretResult DialogueResponse::Invoke( WrenVM* vm, WrenHandle* receiver, WrenHandle* unaryCallStub ) const {
+	bool DialogueResponse::Invoke( WrenVM* vm, WrenHandle* receiver, WrenHandle* unaryCallStub ) const {
 		wrenEnsureSlots( vm, 2 );
 
 		wrenSetSlotHandle( vm, 0, _function );
 		wrenSetSlotHandle( vm, 1, receiver );
 
-		return wrenCall( vm, unaryCallStub );
+		return wrenCall( vm, unaryCallStub ) == WREN_RESULT_SUCCESS;
 	}
 
 // ---------------------------------------------------

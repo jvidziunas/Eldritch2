@@ -24,7 +24,6 @@
 #include <eastl/utility.h>
 #include <Windows.h>
 #include <process.h>
-#include <atomic>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -120,7 +119,7 @@ namespace {
 		MSG			message;
 
 	//	Publish readiness to the world.
-		static_cast<std::atomic<HWND>*>(windowPointer)->store( window, std::memory_order_release );
+		static_cast<Atomic<HWND>*>(windowPointer)->store( window, std::memory_order_release );
 		if (!window) {
 			return GetLastError();
 		}
@@ -208,7 +207,7 @@ namespace {
 	ErrorCode Window::BindResources() {
 	//	This value intentionally not legal.
 		static const HWND	WaitingForResponse( reinterpret_cast<HWND>(-1L) );
-		std::atomic<HWND>	window( WaitingForResponse );
+		Atomic<HWND>		window( WaitingForResponse );
 
 		const HANDLE thread( reinterpret_cast<HANDLE>(_beginthreadex( nullptr, 4096u, &MessageThreadEntryPoint, &window, 0, nullptr )) );
 		if (thread == nullptr) {

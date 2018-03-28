@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <atomic>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -31,7 +31,7 @@ namespace Detail {
 #	define ET_ENABLE_JOB_DEBUGGING ET_DEBUG_BUILD
 #endif
 
-	using JobFence = std::atomic<int>;
+	using JobFence = Atomic<int>;
 
 // ---------------------------------------------------
 

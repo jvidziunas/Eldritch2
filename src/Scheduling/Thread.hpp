@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <atomic>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -87,7 +87,7 @@ namespace Scheduling {
 
 	private:
 	/*! Marker used by the underlying operating system thread to indicate whether or not it has forked/joined. */
-		std::atomic<ExecutionState>	_state;
+		Atomic<ExecutionState>	_state;
 	};
 
 }	// namespace Scheduling

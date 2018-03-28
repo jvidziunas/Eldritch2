@@ -77,7 +77,8 @@ namespace Eldritch2 {
 	private:
 		Interface*	_pointer;
 
-		friend void	Swap( ComPointer&, ComPointer& );
+		template <typename T>
+		friend void	Swap( ComPointer<T>&, ComPointer<T>& );
 	};
 
 }	// namespace Eldritch2
