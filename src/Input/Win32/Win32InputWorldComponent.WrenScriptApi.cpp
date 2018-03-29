@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Input/Win32/Win32InputWorldComponent.hpp>
+#include <Input/Win32/DeviceCoordinator.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
 //------------------------------------------------------------------//
 
@@ -32,6 +33,9 @@ namespace Win32 {
 
 	void Win32InputWorldComponent::AcceptVisitor( ApiBuilder& api ) {
 		ET_REGISTER_WREN_CLASS( DeviceCoordinator, api );
+
+		api.CreateVariable<DeviceCoordinator>( ET_BUILTIN_WREN_MODULE_NAME( Input ), "MouseCoordinator" );
+		api.CreateVariable<DeviceCoordinator>( ET_BUILTIN_WREN_MODULE_NAME( Input ), "KeyboardCoordinator" );
 	}
 
 }	// namespace Win32

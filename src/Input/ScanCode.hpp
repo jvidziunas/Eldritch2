@@ -1,5 +1,5 @@
 /*==================================================================*\
-  Binding.hpp
+  ScanCode.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -18,12 +18,12 @@
 namespace Eldritch2 {
 namespace Input {
 
-	using ScanCode	= uint8;
+	using ScanCode = uint8;
 
 // ---
 
 	struct Binding {
-		uint16	actionId;
+		uint8	actionId;
 		int16	weight;
 	};
 

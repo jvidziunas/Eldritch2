@@ -17,7 +17,6 @@ Lots of the architectural decisions here are also centered around shooters and a
 * [Wren](https://github.com/munificent/wren)
 * [Microprofile](https://github.com/jonasmr/microprofile)
 * [Recast Navigation/Detour](https://github.com/recastnavigation/recastnavigation)
-* [Boost](http://www.boost.org/), version 1.63
 * [Steamworks](https://partner.steamgames.com/)
 * [EASTL](https://github.com/electronicarts/EASTL)
 * [SimpleOpt](https://github.com/brofield/simpleopt)

@@ -539,7 +539,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Core\WorldComponent.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\BatchCoordinator.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\OutputCoordinator.hpp" />
-    <ClInclude Include="src\Input\Binding.hpp" />
+    <ClInclude Include="src\Input\ScanCode.hpp" />
     <ClInclude Include="src\Input\Win32\DeviceCoordinator.hpp" />
     <ClInclude Include="src\Input\Win32\Win32InputEngineComponent.hpp" />
     <ClInclude Include="src\Input\Win32\Win32InputWorldComponent.hpp" />

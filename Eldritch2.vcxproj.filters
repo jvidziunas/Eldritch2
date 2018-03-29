@@ -1382,9 +1382,6 @@
     <ClInclude Include="src\Input\Win32\DeviceCoordinator.hpp">
       <Filter>Header Files\Input\Win32</Filter>
     </ClInclude>
-    <ClInclude Include="src\Input\Binding.hpp">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scheduling\JobSystem.hpp">
       <Filter>Header Files\Scheduling</Filter>
     </ClInclude>
@@ -1426,6 +1423,9 @@
     </ClInclude>
     <ClInclude Include="src\Graphics\MeshSource.hpp">
       <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\ScanCode.hpp">
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
