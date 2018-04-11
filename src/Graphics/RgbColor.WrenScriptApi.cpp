@@ -30,18 +30,18 @@ namespace Graphics {
 				DefineConstructor<RgbColor ( double, double, double )>( "fromRgb", [] ( WrenVM* vm ) {
 					SetReturn<RgbColor>(
 						vm,
-						float16( wrenGetSlotDouble( vm, 1 ) ),
-						float16( wrenGetSlotDouble( vm, 2 ) ),
-						float16( wrenGetSlotDouble( vm, 3 ) )
+						float32( wrenGetSlotDouble( vm, 1 ) ),
+						float32( wrenGetSlotDouble( vm, 2 ) ),
+						float32( wrenGetSlotDouble( vm, 3 ) )
 					);
 				} ),
 				DefineConstructor<RgbColor ( double, double, double )>( "fromXyz", [] ( WrenVM* vm ) {
 					SetReturn<RgbColor>(
 						vm,
 						GetRgbFromCieXyz(
-							float16( wrenGetSlotDouble( vm, 1 ) ),
-							float16( wrenGetSlotDouble( vm, 2 ) ),
-							float16( wrenGetSlotDouble( vm, 3 ) )
+							float32( wrenGetSlotDouble( vm, 1 ) ),
+							float32( wrenGetSlotDouble( vm, 2 ) ),
+							float32( wrenGetSlotDouble( vm, 3 ) )
 						)
 					);
 				} ),
@@ -49,8 +49,18 @@ namespace Graphics {
 					SetReturn<RgbColor>( vm, GetRgbFromKelvin( wrenGetSlotDouble( vm, 1 ) ) );
 				} )
 			},
-			{/*	Properties */},
+			{/*	Properties */
+				DefineGetter<const Utf8Char*>( "toString", [] ( WrenVM* vm ) {
+					const RgbColor& self( GetSlotAs<RgbColor>( vm, 0 ) );
+
+					fmt::memory_buffer	string;
+					fmt::format_to( string, "<r={}, g={}, b={}>", self.GetRed(), self.GetGreen(), self.GetBlue() );
+
+					wrenSetSlotString( vm, 0, string.data() );
+				} ) 
+			},
 			{/*	Methods */},
+			{/* Static methods */},
 			{/*	Operators */}
 		);
 	}

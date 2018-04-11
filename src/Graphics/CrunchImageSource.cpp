@@ -59,10 +59,10 @@ namespace {
 		}
 
 	//	Crunch wants all slices to have their own pointer.
-		unsigned int	sliceCount( 1 );
+		const uint32	sliceCount( 1 );
 		void** const	outputs( static_cast<void**>(_alloca( sliceCount * sizeof(void*) )) );
 
-		for (unsigned int slice = 0; slice < sliceCount; ++slice) {
+		for (uint32 slice = 0; slice < sliceCount; ++slice) {
 			outputs[slice] = static_cast<char*>(request.target) + ( slice * request.sliceStrideInBytes );
 		}
 
@@ -79,11 +79,11 @@ namespace {
 
 // ---------------------------------------------------
 
-	ErrorCode CrunchImageSource::BindResources( Range<const char*> header ) {
-		const crnd_unpack_context	context( crnd_unpack_begin( header.Begin(), static_cast<uint32>(header.GetSize()) ) );
+	ErrorCode CrunchImageSource::BindResources( const char* begin, const char* end ) {
+		const crnd_unpack_context	context( crnd_unpack_begin( begin, uint32( end - begin ) ) );
 		crn_texture_info			textureInfo;
 
-		if (!context || !crnd_get_texture_info( header.Begin(), static_cast<uint32>(header.GetSize()), &textureInfo )) {
+		if (!context || !crnd_get_texture_info( begin, uint32( end - begin ), &textureInfo )) {
 			return Error::InvalidParameter;
 		}
 

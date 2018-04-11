@@ -82,15 +82,15 @@ namespace Vulkan {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable Atomic<uint32>	_referenceCount;
-		Window					_window;
-		VkSurfaceKHR			_surface;
-		VkSwapchainKHR			_swapchain;
-		uint32_t				_imageCount;
-		uint32_t				_presentableIndex;
-		VkImage					_images[MaxQueueDepth];
-		VkFence					_imageAvailable;
-		VkEvent					_canComposite;
+		mutable Atomic<uint32_t>	_referenceCount;
+		Window						_window;
+		VkSurfaceKHR				_surface;
+		VkSwapchainKHR				_swapchain;
+		uint32_t					_imageCount;
+		uint32_t					_presentableIndex;
+		VkImage						_images[MaxQueueDepth];
+		VkFence						_imageAvailable;
+		VkEvent						_canComposite;
 
 	// ---------------------------------------------------
 

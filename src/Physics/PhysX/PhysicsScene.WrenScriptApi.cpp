@@ -40,7 +40,8 @@ namespace {
 			_vm( vm ),
 			_callback( callback ),
 			_unaryCallHandle( unaryCallHandle ),
-			_errorObject( nullptr ) {}
+			_errorObject( nullptr ) {
+		}
 	//!	Disable copy construction.
 		WrenHitCallback( const WrenHitCallback& ) = delete;
 
@@ -134,6 +135,7 @@ namespace {
 					);
 				} )
 			},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

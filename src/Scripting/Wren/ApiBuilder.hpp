@@ -35,15 +35,13 @@ namespace Wren {
 
 	// ---
 
-		enum : size_t {
-			MaxSignatureLength = 64u
-		};
+		enum : size_t { MaxSignatureLength = 64u };
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 	//!	Constructs this @ref ForeignMethod instance.
-		ForeignMethod( Utf8Literal name, Utf8Literal argumentSpecifier, Body body, bool isStatic = false );
+		ForeignMethod( Utf8Literal name, Utf8Literal argumentSpecifier, Body body );
 	//!	Constructs this @ref ForeignMethod instance.
 		ForeignMethod( const ForeignMethod& ) = default;
 	//!	Constructs this @ref ForeignMethod instance.
@@ -56,7 +54,6 @@ namespace Wren {
 	public:
 		char	signature[MaxSignatureLength];
 		Body	body;
-		bool	isStatic;
 	};
 
 // ---
@@ -82,11 +79,13 @@ namespace Wren {
 			std::initializer_list<ForeignMethod> constructors,
 			std::initializer_list<Pair<ForeignMethod, ForeignMethod>> properties,
 			std::initializer_list<ForeignMethod> methods,
+			std::initializer_list<ForeignMethod> staticMethods,
 			std::initializer_list<ForeignMethod> operators
 		);
 
 		template <class Class, typename... Arguments>
 		Class*	CreateVariable( const char* module, const char* name, Arguments&&... arguments );
+		void	CreateVariable( const char* module, const char* name, double value );
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -102,23 +101,11 @@ namespace Wren {
 	template <typename Signature>
 	ETPureFunctionHint ForeignMethod						DefineMethod( Utf8Literal name, ForeignMethod::Body body );
 
-	template <typename Signature>
-	ETPureFunctionHint ForeignMethod						DefineStaticMethod( Utf8Literal name, ForeignMethod::Body body );
-
-	template <typename Property>
-	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod>	DefineStaticGetter( Utf8Literal name, ForeignMethod::Body body );
-
 	template <typename Property>
 	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod>	DefineGetter( Utf8Literal name, ForeignMethod::Body body );
 
 	template <typename Property>
-	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod>	DefineStaticSetter( Utf8Literal name, ForeignMethod::Body body );
-
-	template <typename Property>
 	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod>	DefineSetter( Utf8Literal name, ForeignMethod::Body body );
-
-	template <typename Property>
-	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod>	DefineStaticProperty( Utf8Literal name, ForeignMethod::Body getterBody, ForeignMethod::Body setterBody );
 
 	template <typename Property>
 	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod>	DefineProperty( Utf8Literal name, ForeignMethod::Body getterBody, ForeignMethod::Body setterBody );

@@ -172,10 +172,20 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
+	ETPureFunctionHint ETNeverThrowsHint uint32	AsIntBits( float32 value );
+	ETPureFunctionHint ETNeverThrowsHint uint64	AsIntBits( float64 value );
+
+// ---------------------------------------------------
+
 	ETPureFunctionHint ETNeverThrowsHint float32	AsFloat( int32 value );
 	ETPureFunctionHint ETNeverThrowsHint float32	AsFloat( uint32 value );
 	ETPureFunctionHint ETNeverThrowsHint float32	AsFloat( int64 value );
 	ETPureFunctionHint ETNeverThrowsHint float32	AsFloat( uint64 value );
+
+// ---------------------------------------------------
+
+	ETPureFunctionHint ETNeverThrowsHint float32	AsFloatBits( uint32 value );
+	ETPureFunctionHint ETNeverThrowsHint float64	AsFloatBits( uint64 value );
 
 // ---------------------------------------------------
 

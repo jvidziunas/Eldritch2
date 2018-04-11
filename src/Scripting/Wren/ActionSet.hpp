@@ -12,8 +12,16 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <wren.h>
+
 //------------------------------------------------------------------//
+
+namespace Eldritch2 {
+	namespace Input {
+		class	InputDevice;
+	}
+}
+
+struct	WrenHandle;
 
 namespace Eldritch2 {
 namespace Scripting {
@@ -24,8 +32,9 @@ namespace Wren {
 
 	public:
 		struct Action {
-			WrenHandle*	handler;
+			WrenHandle*	closure;
 			int32		weight;
+			uint32		flags;
 		};
 
 	// ---------------------------------------------------
@@ -41,17 +50,17 @@ namespace Wren {
 	// ---------------------------------------------------
 
 	public:
-		void	Activate( uint32 index, float32 amount );
+		bool	DispatchEvents( WrenVM* vm, WrenHandle* receiver, WrenHandle* binaryCallHandle );
 
 	// ---------------------------------------------------
 
 	public:
-		WrenInterpretResult	Dispatch( WrenVM* vm, WrenHandle* receiver, WrenHandle* binaryCallHandle );
+		bool	TryAcquire( Input::InputDevice& device );
 
 	// ---------------------------------------------------
 
 	public:
-		void	BindResources( WrenVM* vm, WrenHandle* actionMap );
+		void	BindResources( WrenVM* vm, int bindingsSlot );
 
 		void	FreeResources( WrenVM* vm );
 

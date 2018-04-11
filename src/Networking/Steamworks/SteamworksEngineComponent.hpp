@@ -31,10 +31,10 @@ namespace Steamworks {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using PortIndex = uint16;
+		using Port = uint16;
 
 	public:
-		enum : PortIndex {
+		enum : Port {
 			DefaultWorldPortBegin	= 6670u,
 			DefaultWorldPortEnd		= 6689u,
 			DefaultSteamPort		= 6690u
@@ -59,6 +59,8 @@ namespace Steamworks {
 		void										AcceptVisitor( Scheduling::JobExecutor& executor, const ServiceTickVisitor ) override;
 		void										AcceptVisitor( Core::PropertyRegistrar& properties ) override;
 
+		void										AddLocalUser();
+
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
@@ -70,11 +72,9 @@ namespace Steamworks {
 	//!	Mutable so logs can be written in const methods.
 		mutable Logging::ChildLog	_log;
 	//!	Port used to communicate user state to the Steam master servers.
-		PortIndex					_steamPort;
+		Port						_steamPort;
 	//!	Pool of ports that may be assigned to worlds for communication with Steam servers.
-		IdentifierPool<PortIndex>	_worldPorts;
-
-		String<>					_version;
+		IdentifierPool<Port>		_worldPorts;
 		HashSet<CSteamID>			_bannedIds;
 	};
 

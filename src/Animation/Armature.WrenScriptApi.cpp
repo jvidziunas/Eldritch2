@@ -16,8 +16,8 @@
 #include <Scripting/Wren/Context.hpp>
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
-#include <wren.h>
-//------------------------------------------------------------------//
+
+void	wrenSetSlotHandle( WrenVM* vm, int slot, WrenHandle* handle );
 
 namespace Eldritch2 {
 namespace Animation {
@@ -33,20 +33,28 @@ namespace Animation {
 				} )
 			},
 			{/*	Properties */
-				DefineGetter<Transformation>( "localToWorld", [] ( WrenVM* vm ) {
-					Armature&	self( GetSlotAs<Armature>( vm, 0 ) );
+				DefineProperty<Transformation>( "localToWorld",
+				//	Getter
+					[] ( WrenVM* vm ) {
+						Armature&	self( GetSlotAs<Armature>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Transformation>() );
-					SetReturn<Transformation>( vm, self.GetLocalToWorld() );
-				} ),
+						wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
+						SetReturn<Transformation>( vm, self.GetLocalToWorld() );
+					},
+				//	Setter
+					[] ( WrenVM* vm ) {
+						GetSlotAs<Armature>( vm, 0 ).SetLocalToWorld( GetSlotAs<Transformation>( vm, 1 ) );
+					}
+				),
 				DefineGetter<Transformation>( "worldToLocal", [] ( WrenVM* vm ) {
 					Armature&	self( GetSlotAs<Armature>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Transformation>() );
+					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
 					SetReturn<Transformation>( vm, self.GetWorldToLocal() );
 				} )
 			},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

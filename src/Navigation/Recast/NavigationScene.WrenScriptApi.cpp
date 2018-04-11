@@ -28,6 +28,7 @@ namespace Recast {
 			{/* Constructors */},
 			{/*	Properties */},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

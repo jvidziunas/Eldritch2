@@ -31,7 +31,7 @@ namespace Assets {
 
 		public:
 		//!	Constructs this @ref Builder instance.
-			Builder( Logging::Log& log, Range<const char*> assetData );
+			Builder( Logging::Log& log, const char* begin, const char* end );
 		//!	Constructs this @ref Builder instance.
 			Builder( const Builder& ) = default;
 
@@ -46,13 +46,17 @@ namespace Assets {
 		// ---------------------------------------------------
 
 		public:
-			Range<const char*>	GetRawBytes() const;
+			const char*	Begin() const;
+			const char*	End() const;
+
+			size_t		GetSize() const;
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
 			mutable Logging::ChildLog	_log;
-			Range<const char*>			_bytes;
+			const char*					_begin;
+			const char*					_end;
 		};
 
 	// ---

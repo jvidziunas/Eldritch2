@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/AssetViews/SpirVShaderPackageAsset.hpp>
-#include <Graphics/Vulkan/AssetViews/RenderPipelineAsset.hpp>
+#include <Graphics/Vulkan/AssetViews/GraphicsPipelineAsset.hpp>
 #include <Animation/AssetViews/AnimationTreeAsset.hpp>
 #include <Animation/AssetViews/KeyframeClipAsset.hpp>
 #include <Graphics/Vulkan/VulkanEngineComponent.hpp>
@@ -36,7 +36,7 @@ namespace Vulkan {
 		MICROPROFILE_SCOPEI( "Engine/Initialization", "Asset factory registration", 0xBBBBBB );
 
 		factories.DefineType<SpirVShaderPackageAsset>( ".e2spirvshaderpackage" );
-		factories.DefineType<RenderPipelineAsset>( ".e2renderpipeline" );
+		factories.DefineType<GraphicsPipelineAsset>( ".e2renderpipeline" );
 		factories.DefineType<KeyframeClipAsset>( ".e2anim" );
 		factories.DefineType<ImageAsset>( ".e2image" );
 		factories.DefineType<MeshAsset>( ".e2mesh" );

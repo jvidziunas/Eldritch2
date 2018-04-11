@@ -15,9 +15,11 @@
 #include <Graphics/Vulkan/VulkanTools.hpp>
 #include <Graphics/Vulkan/Vulkan.hpp>
 #include <Scheduling/JobExecutor.hpp>
+//------------------------------------------------------------------//
 #if ET_PLATFORM_WINDOWS
 #	include <vulkan/vulkan_win32.h>
 #endif
+#include <microprofile/microprofile.h>
 //------------------------------------------------------------------//
 
 //==================================================================//

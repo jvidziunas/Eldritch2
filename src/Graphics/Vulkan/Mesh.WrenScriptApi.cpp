@@ -24,61 +24,60 @@
 namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
-namespace {
 
 	using namespace ::Eldritch2::Graphics::Vulkan::AssetViews;
 	using namespace ::Eldritch2::Scripting::Wren;
 	using namespace ::Eldritch2::Animation;
 	using namespace ::Eldritch2::Scripting;
 
-	struct StaticMesh : public Graphics::Mesh {
-	public:
-	//!	Constructs this @ref StaticMesh instance.
-		StaticMesh( const Armature& armature, const MeshAsset& asset ) : Graphics::Mesh( armature, asset ), asset( asset ) {}
-	//!	Disable copy construction.
-		StaticMesh( const StaticMesh& ) = delete;
+	ET_IMPLEMENT_WREN_CLASS( StaticMeshInstance ) {
+		class StaticMeshInstance : public Graphics::MeshInstance {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		~StaticMesh() = default;
+		public:
+		//!	Constructs this @ref StaticMeshInstance instance.
+			ETInlineHint StaticMeshInstance( const Armature& armature, const MeshAsset& asset ) : Graphics::MeshInstance( armature, asset ) {}
+		//!	Disable copy construction.
+			StaticMeshInstance( const StaticMeshInstance& ) = delete;
 
-	public:
-		const MeshAsset&	asset;
-	};
+			~StaticMeshInstance() = default;
+		};
 
-// ---
-
-	struct Mesh : public StaticMesh {
-	//!	Constructs this @ref Mesh instance.
-		Mesh( const Armature& armature, const MeshAsset& asset ) : StaticMesh( armature, asset ) {}
-	//!	Disable copy construction.
-		Mesh( const Mesh& ) = delete;
-
-		~Mesh() = default;
-	};
-
-}	// anonymous namespace
-
-	ET_IMPLEMENT_WREN_CLASS( StaticMesh ) {
-		api.CreateClass<StaticMesh>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "StaticMesh",
+		api.CreateClass<StaticMeshInstance>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "StaticMesh",
 			{/* Constructors */
-				DefineConstructor<Mesh ( VulkanGraphicsScene, Armature, AssetReference<MeshAsset> )>( "new", [] ( WrenVM* vm ) {
-					SetReturn<Mesh>( vm, GetSlotAs<Armature>( vm, 2 ), GetSlotAs<AssetReference<MeshAsset>>( vm, 3 ) );
+				DefineConstructor<MeshInstance ( VulkanGraphicsScene, Armature, AssetReference<MeshAsset> )>( "new", [] ( WrenVM* vm ) {
+					SetReturn<MeshInstance>( vm, GetSlotAs<Armature>( vm, 2 ), GetSlotAs<AssetReference<MeshAsset>>( vm, 3 ) );
 				} )
 			},
 			{/*	Properties */},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}
 
-	ET_IMPLEMENT_WREN_CLASS( Mesh ) {
-		api.CreateClass<Mesh>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "Mesh",
+	ET_IMPLEMENT_WREN_CLASS( MeshInstance ) {
+		class MeshInstance : public Graphics::MeshInstance {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+		//!	Constructs this @ref MeshInstance instance.
+			ETInlineHint MeshInstance( const Armature& armature, const MeshAsset& asset ) : Graphics::MeshInstance( armature, asset ) {}
+		//!	Disable copy construction.
+			MeshInstance( const MeshInstance& ) = delete;
+
+			~MeshInstance() = default;
+		};
+
+		api.CreateClass<MeshInstance>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "Mesh",
 			{/* Constructors */
-				DefineConstructor<Mesh ( VulkanGraphicsScene, Armature, AssetReference<MeshAsset> )>( "new", [] ( WrenVM* vm ) {
-					SetReturn<Mesh>( vm, GetSlotAs<Armature>( vm, 2 ), GetSlotAs<AssetReference<MeshAsset>>( vm, 3 ) );
+				DefineConstructor<MeshInstance ( VulkanGraphicsScene, Armature, AssetReference<MeshAsset> )>( "new", [] ( WrenVM* vm ) {
+					SetReturn<MeshInstance>( vm, GetSlotAs<Armature>( vm, 2 ), GetSlotAs<AssetReference<MeshAsset>>( vm, 3 ) );
 				} )
 			},
 			{/*	Properties */},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

@@ -59,6 +59,7 @@ namespace PhysX {
 					GetSlotAs<TerrainPhysics>( vm, 0 ).Disable();
 				} )
 			},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

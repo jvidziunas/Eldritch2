@@ -12,8 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Graphics/Vulkan/GraphicsPipeline.hpp>
+#include <Graphics/Vulkan/BatchCoordinator.hpp>
 #include <Graphics/Vulkan/DescriptorTable.hpp>
-#include <Graphics/Vulkan/RenderPipeline.hpp>
 #include <Graphics/Vulkan/GpuResources.hpp>
 #include <Graphics/Vulkan/OutputWindow.hpp>
 #include <Graphics/Vulkan/CommandList.hpp>
@@ -101,7 +102,7 @@ namespace Vulkan {
 	public:
 		enum : uint32		{ MaxQueuedFrames = 2u };
 		enum : VkDeviceSize {
-			DescriptorPoolSizeInElements = 256u,
+			DescriptorPoolSizeInElements =                 256u,
 			DefaultTransformArenaSize    =  16u * 1024u * 1024u, /*  16MB */
 			GpuHeapBlockSize             = 256u * 1024u * 1024u, /* 256MB */
 		};
@@ -139,16 +140,18 @@ namespace Vulkan {
 	/*!	Heap for world-local resources. This should be used to create things like shader uniforms and pipeline-specific
 		framebuffer attachments. */
 		GpuHeap				_heap;
+		UniformBuffer		_transforms;
+		BatchCoordinator	_batchCoordinator;
+	//	ShaderImage			_shadowAtlas;
 		uint32				_frameId;
 
 		struct Frame {
 			DescriptorTable	descriptors;
-			UniformBuffer	transforms;
 
 			CommandList		commands;
 			VkFence			commandsConsumed;
 
-			RenderPipeline	pipelines[PipelineType::COUNT];
+			GraphicsPipeline	pipelines[PipelineType::COUNT];
 		}					_queuedFrames[MaxQueuedFrames];
 	};
 

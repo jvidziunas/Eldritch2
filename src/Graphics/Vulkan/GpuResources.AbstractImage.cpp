@@ -62,11 +62,11 @@ namespace Detail {
 
 // ---------------------------------------------------
 
-	void Swap( AbstractImage& buffer0, AbstractImage& buffer1 ) {
+	void Swap( AbstractImage& lhs, AbstractImage& rhs ) {
 		using ::Eldritch2::Swap;
 
-		Swap( buffer0._image,   buffer1._image );
-		Swap( buffer0._backing, buffer1._backing );
+		Swap( lhs._image,   rhs._image );
+		Swap( lhs._backing, rhs._backing );
 	}
 
 }	// namespace Detail

@@ -12,9 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Mpl/Compiler.hpp>
+#include <Common/Mpl/TypeTraits.hpp>
 //------------------------------------------------------------------//
-#include <eastl/type_traits.h>
 #include <eastl/tuple.h>
 //------------------------------------------------------------------//
 
@@ -27,15 +26,12 @@ namespace Eldritch2 {
 
 	template <typename Return, typename... Arguments>
 	struct FunctionTraits<Return ( Arguments... )> {
-		enum : size_t {
-			Arity = typename eastl::integral_constant<size_t, sizeof...( Arguments )>::type::value
-		};
+		static constexpr size_t	Arity = IntegralConstant<size_t, sizeof...( Arguments )>::Value;
+		static constexpr bool	IsConstMethod = false;
 
 		template <size_t index>
 		using ArgumentType	= typename eastl::tuple_element<index, eastl::tuple<Arguments...>>::type;
 		using ReturnType	= Return;
-
-		static const bool	isConstMethod = false;
 	};
 
 // ---
@@ -45,14 +41,6 @@ namespace Eldritch2 {
 		using NativeSignatureType = Return (*)( Arguments... );
 	};
 
-#if ET_COMPILER_IS_MSVC
-//	Specialization for SIMDCall functions.
-	template <typename Return, typename... Arguments>
-	struct FunctionTraits<Return (ETSimdCall*)( Arguments... )> : public FunctionTraits<Return ( Arguments... )> {
-		using NativeSignatureType = Return (ETSimdCall*)( Arguments... );
-	};
-#endif
-
 //	Specialization for member functions.
 	template <typename Return, class Class, typename... Arguments>
 	struct FunctionTraits<Return (Class::*)( Arguments... )> : public FunctionTraits<Return ( Arguments... )> {
@@ -60,32 +48,32 @@ namespace Eldritch2 {
 		using ClassType				= Class;
 	};
 
-#if ET_COMPILER_IS_MSVC
-//	Specialization for SIMDCall member functions.
-	template <typename Return, class Class, typename... Arguments>
-	struct FunctionTraits<Return (ETSimdCall Class::*)( Arguments... )> : public FunctionTraits<Return (Class::*)( Arguments... )> {
-		using NativeSignatureType	= Return (ETSimdCall Class::*)( Arguments... );
-		using ClassType				= Class;
-	};
-#endif
-
 //	Specialization for const member functions.
 	template <typename Return, class Class, typename... Arguments>
 	struct FunctionTraits<Return (Class::*)( Arguments... ) const> : public FunctionTraits<Return (Class::*)( Arguments... )> {
+		static constexpr bool	IsConstMethod = true;
+
 		using NativeSignatureType	= Return (Class::*)( Arguments... ) const;
 		using ClassType				= Class;
-
-		static const bool	isConstMethod = true;
 	};
 
 #if ET_COMPILER_IS_MSVC
-//	Specialization for SIMDCall const member functions.
+//	Specialization for SimdCall functions.
+	template <typename Return, typename... Arguments>
+	struct FunctionTraits<Return (ETSimdCall*)( Arguments... )> : public FunctionTraits<Return ( Arguments... )> {
+		using NativeSignatureType = Return (ETSimdCall*)( Arguments... );
+	};
+
+//	Specialization for SimdCall member functions.
+	template <typename Return, class Class, typename... Arguments>
+	struct FunctionTraits<Return (ETSimdCall Class::*)( Arguments... )> : public FunctionTraits<Return (Class::*)( Arguments... )> {
+		using NativeSignatureType = Return (ETSimdCall Class::*)( Arguments... );
+	};
+
+//	Specialization for SimdCall const member functions.
 	template <typename Return, class Class, typename... Arguments>
 	struct FunctionTraits<Return (ETSimdCall Class::*)( Arguments... ) const> : public FunctionTraits<Return (Class::*)( Arguments... ) const> {
-		using NativeSignatureType	= Return (ETSimdCall Class::*)( Arguments... ) const;
-		using ClassType				= Class;
-
-		static const bool	isConstMethod = true;
+		using NativeSignatureType = Return (ETSimdCall Class::*)( Arguments... ) const;
 	};
 #endif	// if ET_COMPILER_IS_MSVC
 

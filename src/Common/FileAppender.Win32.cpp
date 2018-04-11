@@ -23,7 +23,7 @@ namespace Eldritch2 {
 namespace {
 
 	static ETInlineHint HANDLE MakeAppender( const wchar_t* const path, DWORD creationDisposition ) {
-		return CreateFileW( path, FILE_APPEND_DATA, (FILE_SHARE_READ | FILE_SHARE_WRITE), nullptr, creationDisposition, FILE_FLAG_POSIX_SEMANTICS, nullptr );
+		return CreateFileW( path, FILE_APPEND_DATA, FILE_SHARE_READ, nullptr, creationDisposition, FILE_FLAG_POSIX_SEMANTICS, nullptr );
 	}
 
 }	// anonymous namespace
@@ -42,6 +42,22 @@ namespace {
 		}
 
 		CloseHandle( _file );
+	}
+
+// ---------------------------------------------------
+
+	ErrorCode FileAppender::CreateOrTruncate( const PlatformChar* path ) {
+		using ::Eldritch2::Swap;
+
+		HANDLE file( MakeAppender( path, CREATE_ALWAYS ) );
+		ET_FAIL_UNLESS( file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName );
+
+		Swap( _file, file );
+		if (file != INVALID_HANDLE_VALUE) {
+			CloseHandle( file );
+		}
+
+		return Error::None;
 	}
 
 // ---------------------------------------------------

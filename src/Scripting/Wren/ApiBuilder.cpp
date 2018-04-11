@@ -68,12 +68,12 @@ namespace {
 
 // ---------------------------------------------------
 
-	void Bind( WrenVM* vm, WrenHandle* target, const ForeignMethod& foreignMethod ) {
+	void Bind( WrenVM* vm, WrenHandle* target, const ForeignMethod& method, bool isStatic ) {
 		wrenBindMethod(
 			vm,
-			foreignMethod.isStatic ? AS_CLASS( target->value )->obj.classObj : AS_CLASS( target->value ),
-			wrenSymbolTableEnsure( vm, &vm->methodNames, foreignMethod.signature, StringLength( foreignMethod.signature ) ),
-			AsWrenMethod( foreignMethod )
+			isStatic ? AS_CLASS( target->value )->obj.classObj : AS_CLASS( target->value ),
+			wrenSymbolTableEnsure( vm, &vm->methodNames, method.signature, StringLength( method.signature ) ),
+			AsWrenMethod( method )
 		);
 	}
 
@@ -82,12 +82,9 @@ namespace {
 	ForeignMethod::ForeignMethod(
 		Utf8Literal name,
 		Utf8Literal argumentSpecifier,
-		Body body,
-		bool isStatic
-	) : body( body ),
-		isStatic( isStatic ) {
+		Body body
+	) : body( body ) {
 		ET_ASSERT( body != nullptr, "Wren foreign method must have a body!" );
-
 		AppendString( CopyString( signature, name ), argumentSpecifier );
 	}
 

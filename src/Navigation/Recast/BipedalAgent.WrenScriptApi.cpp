@@ -39,6 +39,7 @@ namespace Recast {
 					GetSlotAs<BipedalAgent>( vm, 0 ).BeginNavigation( GetSlotAs<NavigationScene>( vm, 1 ), GetSlotAs<Vector>( vm, 1 ) );
 				} )
 			},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

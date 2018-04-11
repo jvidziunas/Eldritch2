@@ -48,7 +48,7 @@ namespace Eldritch2 {
 #	define ET_ASSERT(cond, message, ...)	static_cast<void>(sizeof((cond)))
 #endif
 
-#define ET_VERIFY(cond, message, ...)	    if (!(cond) && !Eldritch2::ReportFailure( #cond, __FILE__, static_cast<Eldritch2::uint32>(__LINE__), message ) ) { ET_DEBUG_BUILD ? ET_TRIGGER_DEBUGBREAK() : std::terminate(); }
+#define ET_VERIFY(cond, message, ...)	    if (!(cond) && !Eldritch2::ReportFailure( #cond, __FILE__, static_cast<Eldritch2::uint32>(__LINE__), message ) ) { ETIsDebugBuild() ? ET_TRIGGER_DEBUGBREAK() : std::terminate(); }
 
 }	// namespace Eldritch2
 

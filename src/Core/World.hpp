@@ -71,7 +71,7 @@ namespace Core {
 	//! Disable copy construction.
 		World( const World& ) = delete;
 
-		~World();
+		~World() = default;
 
 	// - STATE INSPECTION --------------------------------
 		

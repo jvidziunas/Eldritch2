@@ -13,12 +13,13 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
-#include <Graphics/Vulkan/OutputCoordinator.hpp>
+#include <Graphics/Vulkan/DisplayBus.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
 #include <Scripting/Wren/Context.hpp>
 //------------------------------------------------------------------//
-#include <wren.h>
-//------------------------------------------------------------------//
+
+double	wrenGetSlotDouble( WrenVM* vm, int slot );
+void	wrenSetSlotDouble( WrenVM* vm, int slot, double value );
 
 namespace Eldritch2 {
 namespace Graphics {
@@ -30,22 +31,17 @@ namespace Vulkan {
 	ET_IMPLEMENT_WREN_CLASS( PlayerView ) {
 		api.CreateClass<PlayerView>( ET_BUILTIN_WREN_MODULE_NAME( Graphics ), "PlayerView",
 			{/* Constructors */
-				DefineConstructor<PlayerView ( OutputCoordinator, Transformation, double )>( "new", [] ( WrenVM* vm ) {
-					SetReturn<PlayerView>( vm,
-						GetSlotAs<OutputCoordinator>( vm, 1 ).GetWindowByName( "" ),
-						GetSlotAs<Transformation>( vm, 2 ),
-						Angle( wrenGetSlotDouble( vm, 3 ) )
-					);
+				DefineConstructor<PlayerView ( DisplayBus, Transformation, double )>( "new", [] ( WrenVM* vm ) {
+					SetReturn<PlayerView>( vm, GetSlotAs<DisplayBus>( vm, 1 ).FindWindowByName( "" ), GetSlotAs<Transformation>( vm, 2 ), Angle( wrenGetSlotDouble( vm, 3 ) ) );
 				} )
 			},
 			{/*	Properties */
-				DefineProperty<Transformation>(
-					"localToWorld",
+				DefineProperty<Transformation>( "localToWorld",
 				//	Getter
 					[] ( WrenVM* vm ) {
 						const PlayerView&	self( GetSlotAs<PlayerView>( vm, 0 ) );
 
-						wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Transformation>() );
+						wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
 						SetReturn<Transformation>( vm, self.GetLocalToWorld() );
 					},
 				//	Setter
@@ -56,11 +52,10 @@ namespace Vulkan {
 				DefineGetter<Transformation>( "worldToLocal", [] ( WrenVM* vm ) {
 					const PlayerView&	self( GetSlotAs<PlayerView>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Transformation>() );
+					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
 					SetReturn<Transformation>( vm, self.GetLocalToWorld().GetInverse() );
 				} ),
-				DefineProperty<float32>(
-					"verticalFovDegrees",
+				DefineProperty<float32>( "verticalFovDegrees",
 				//	Getter
 					[] ( WrenVM* vm ) {
 						wrenSetSlotDouble( vm, 0, DegreesFromAngle( GetSlotAs<PlayerView>( vm, 0 ).GetVerticalFov() ) );
@@ -71,8 +66,9 @@ namespace Vulkan {
 					}
 				),
 			},
-			{/*	Methods */
-				DefineStaticMethod<double ( double )>( "getVerticalFov", [] ( WrenVM* vm ) {
+			{/* Methods */},
+			{/*	Static methods */
+				DefineMethod<double ( double )>( "getVerticalFov", [] ( WrenVM* vm ) {
 					wrenSetSlotDouble( vm, 0, (16.0 / 9.0) * wrenGetSlotDouble( vm, 1 ) );
 				} )
 			},

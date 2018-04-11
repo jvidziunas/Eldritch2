@@ -63,6 +63,7 @@ namespace PhysX {
 					GetSlotAs<TriggerArea>( vm, 0 ).Disable();
 				} )
 			},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

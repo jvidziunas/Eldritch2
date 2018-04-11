@@ -59,12 +59,9 @@ namespace Detail {
 // ---
 
 	ETPureFunctionHint size_t	HashForeignMethod( const char* const module, const char* const className, bool isStatic, const char* const signature, size_t seed = 0u );
-
 	ETPureFunctionHint size_t	HashForeignClass( const char* const module, const char* const className, size_t seed = 0u );
-
 	void						BindFinalizer( WrenVM* vm, WrenHandle* target, void (*finalizer)( void* ) );
-
-	void						Bind( WrenVM* vm, WrenHandle* target, const ForeignMethod& method );
+	void						Bind( WrenVM* vm, WrenHandle* target, const ForeignMethod& method, bool isStatic );
 
 }	// namespace Detail
 
@@ -78,7 +75,7 @@ namespace Detail {
 	ETInlineHint ETPureFunctionHint ForeignMethod DefineConstructor( Utf8Literal name, ForeignMethod::Body body ) {
 		enum : size_t { Arity = FunctionTraits<Signature>::Arity };
 
-		return ForeignMethod( name, Detail::ParameterList<Arity>::Get(), body, true );
+		return ForeignMethod( name, Detail::ParameterList<Arity>::Get(), body );
 	}
 
 // ---------------------------------------------------
@@ -88,27 +85,6 @@ namespace Detail {
 		enum : size_t { Arity = FunctionTraits<Signature>::Arity };
 
 		return ForeignMethod( name, Detail::ParameterList<Arity>::Get(), body );
-	}
-
-// ---------------------------------------------------
-
-	template <typename Signature>
-	ETInlineHint ETPureFunctionHint ForeignMethod DefineStaticMethod( Utf8Literal name, ForeignMethod::Body body ) {
-		enum : size_t { Arity = FunctionTraits<Signature>::Arity };
-
-		return ForeignMethod( name, Detail::ParameterList<Arity>::Get(), body, true );
-	}
-
-// ---------------------------------------------------
-
-	template <typename Property>
-	ETInlineHint ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineStaticGetter( Utf8Literal name, ForeignMethod::Body body ) {
-		using GetterSignature = typename Detail::PropertySignatureHelper<Property>::GetterSignature;
-
-		return {
-			ForeignMethod( name, "", body, true ),
-			ForeignMethod( nullptr )
-		};
 	}
 
 // ---------------------------------------------------
@@ -126,38 +102,10 @@ namespace Detail {
 // ---------------------------------------------------
 
 	template <typename Property>
-	ETInlineHint ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineStaticSetter( Utf8Literal name, ForeignMethod::Body body ) {
-		using SetterSignature = typename Detail::PropertySignatureHelper<Property>::SetterSignature;
-
-		return {
-			ForeignMethod( nullptr ),
-			ForeignMethod( name, "=(_)", body, true )
-		};
-	}
-
-// ---------------------------------------------------
-
-	template <typename Property>
 	ETInlineHint ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineSetter( Utf8Literal name, ForeignMethod::Body body ) {
 		using SetterSignature = typename Detail::PropertySignatureHelper<Property>::SetterSignature;
 
-		return {
-			ForeignMethod( nullptr ),
-			ForeignMethod( name, "=(_)", body )
-		};
-	}
-
-// ---------------------------------------------------
-
-	template <typename Property>
-	ETInlineHint ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineStaticProperty( Utf8Literal name, ForeignMethod::Body getterBody, ForeignMethod::Body setterBody ) {
-		using GetterSignature = typename Detail::PropertySignatureHelper<Property>::GetterSignature;
-		using SetterSignature = typename Detail::PropertySignatureHelper<Property>::SetterSignature;
-
-		return {
-			ForeignMethod( name, "", getterBody, true ),
-			ForeignMethod( name, "=(_)", setterBody, true )
-		};
+		return { ForeignMethod( nullptr ), ForeignMethod( name, "=(_)", body ) };
 	}
 
 // ---------------------------------------------------
@@ -167,10 +115,7 @@ namespace Detail {
 		using GetterSignature = typename Detail::PropertySignatureHelper<Property>::GetterSignature;
 		using SetterSignature = typename Detail::PropertySignatureHelper<Property>::SetterSignature;
 
-		return {
-			ForeignMethod( name, "", getterBody ),
-			ForeignMethod( name, "=(_)", setterBody )
-		};
+		return { ForeignMethod( name, "", getterBody ), ForeignMethod( name, "=(_)", setterBody ) };
 	}
 
 // ---------------------------------------------------
@@ -182,10 +127,11 @@ namespace Detail {
 		std::initializer_list<ForeignMethod> constructors,
 		std::initializer_list<Pair<ForeignMethod, ForeignMethod>> properties,
 		std::initializer_list<ForeignMethod> methods,
+		std::initializer_list<ForeignMethod> staticMethods,
 		std::initializer_list<ForeignMethod> operators
 	) {
 	//	Only define types once.
-		ET_ASSERT( _context->GetForeignClass<Class>() == nullptr, "Multiple definitions for script type found!" );
+		if (_context->FindForeignClass<Class>() != nullptr) { return; }
 
 		WrenHandle* const	newClass( _context->CreateForeignClass( module, name, typeid(Class) ) );
 		WrenVM* const		vm( _context->GetVm() );
@@ -197,24 +143,28 @@ namespace Detail {
 		} );
 
 		for (const ForeignMethod& constructor : constructors) {
-			Detail::Bind( vm, newClass, constructor );
+			Detail::Bind( vm, newClass, constructor, true );
 		}
 
 		for (const ForeignMethod& method : methods) {
-			Detail::Bind( vm, newClass, method );
+			Detail::Bind( vm, newClass, method, false );
+		}
+
+		for (const ForeignMethod& method : staticMethods) {
+			Detail::Bind( vm, newClass, method, true );
 		}
 
 		for (const ForeignMethod& op : operators) {
-			Detail::Bind( vm, newClass, op );
+			Detail::Bind( vm, newClass, op, false );
 		}
 
 		for (const Pair<ForeignMethod, ForeignMethod>& property : properties) {
 			if (property.first.body) {
-				Detail::Bind( vm, newClass, property.first );
+				Detail::Bind( vm, newClass, property.first, false );
 			}
 
 			if (property.second.body) {
-				Detail::Bind( vm, newClass, property.second );
+				Detail::Bind( vm, newClass, property.second, false );
 			}
 		}
 	}
@@ -223,11 +173,17 @@ namespace Detail {
 
 	template <class Class, typename... Arguments>
 	ETInlineHint Class* ApiBuilder::CreateVariable( const char* module, const char* name, Arguments&&... arguments ) {
-		WrenHandle* const	classHandle( _context->GetForeignClass<Class>() );
+		WrenHandle* const	classHandle( _context->FindForeignClass<Class>() );
 
 		ET_ASSERT( classHandle != nullptr, "Class has not been registered with the API builder!" );
 
 		return new( _context->CreateVariable( module, name, classHandle, sizeof(Class)) ) Class( eastl::forward<Arguments>( arguments )... );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint void ApiBuilder::CreateVariable( const char* module, const char* name, double value ) {
+		_context->CreateVariable( module, name, value );
 	}
 
 }	// namespace Wren

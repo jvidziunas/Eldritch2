@@ -49,18 +49,8 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	void* UniformBuffer::GetHostPointer( GpuHeap& heap ) {
-		VmaAllocationInfo allocationInfo;
-
-		GetAllocationInfo( heap, allocationInfo );
-
-		return allocationInfo.pMappedData;
-	}
-
-// ---------------------------------------------------
-
-	void Swap( UniformBuffer& buffer0, UniformBuffer& buffer1 ) {
-		Detail::Swap( buffer0, buffer1 );
+	void Swap( UniformBuffer& lhs, UniformBuffer& rhs ) {
+		Detail::Swap( lhs, rhs );
 	}
 
 }	// namespace Vulkan

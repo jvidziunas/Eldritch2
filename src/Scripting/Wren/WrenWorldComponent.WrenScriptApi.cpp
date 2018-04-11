@@ -54,7 +54,7 @@ namespace Wren {
 		ET_REGISTER_WREN_CLASS( Planner, api );
 		ET_REGISTER_WREN_CLASS( Game, api );
 
-		_game				= api.CreateVariable<Game>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "Game" );
+		_game				= api.CreateVariable<Game>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "Game", FindService<World>() );
 		_eventCoordinator	= api.CreateVariable<EventCoordinator>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "EventCoordinator" );
 	}
 

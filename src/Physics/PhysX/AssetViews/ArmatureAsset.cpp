@@ -35,18 +35,33 @@ namespace Eldritch2 {
 namespace Physics {
 namespace PhysX {
 namespace AssetViews {
+namespace {
+
+	ETInlineHint ETPureFunctionHint PxQuat Decompress( const FlatBuffers::CompressedUnitQuaternion& quaternion ) {
+		return PxQuat( PxIdentity );
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint ETPureFunctionHint PxTransform AsPxTransform( const Bone& pose ) {
+		const auto&	translation( pose.Translation() );
+
+		return { translation.X(), translation.Y(), translation.Z(), Decompress( pose.Orientation() ) };
+	}
+
+}	// anonymous namespace
 
 	ArmatureAsset::ArmatureAsset( const Utf8Char* const filePath ) : Asset( filePath ), _joints( MallocAllocator( "PhysX Armature Asset Joint Definition Allocator" ) ) {}
 
 // ---------------------------------------------------
 
 	PhysxPointer<PxArticulation> ArmatureAsset::CreateArticulation( PxScene& scene ) const {
-		PxArticulation* const	articulation( scene.getPhysics().createArticulation() );
-		auto					links( static_cast<PxArticulationLink**>(_alloca( sizeof(PxArticulationLink*) * (_joints.GetSize() + 1) )) );
-		uint32					linkIndex( 1u );
+		const auto	articulation( scene.getPhysics().createArticulation() );
+		const auto	links( static_cast<PxArticulationLink**>(_alloca( sizeof(PxArticulationLink*) * (_joints.GetSize() + 1) )) );
+		uint32		linkId( 1u );
 
 		for (const Joint& joint : _joints) {
-			links[linkIndex++] = articulation->createLink( links[joint.parentIndex], joint.bindPose );
+			links[linkId++] = articulation->createLink( links[joint.parentIndex], joint.bindPose );
 		}
 
 		scene.addArticulation( *articulation );
@@ -56,19 +71,21 @@ namespace AssetViews {
 
 // ---------------------------------------------------
 
-	ErrorCode ArmatureAsset::BindResources( const Builder& builder ) {
-		const auto&	bytes( builder.GetRawBytes() );
-
+	ErrorCode ArmatureAsset::BindResources( const Builder& asset ) {
 	//	Ensure we're working with data that can plausibly represent an armature.
-		Verifier verifier( reinterpret_cast<const uint8_t*>(bytes.Begin()), bytes.GetSize() );
+		Verifier verifier( reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize() );
 		if (!VerifyArmatureBuffer( verifier )) {
-			builder.WriteLog( MessageType::Error, "{} is malformed." UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "{} is malformed." UTF8_NEWLINE, GetPath() );
 			return Error::InvalidParameter;
 		}
 
-		const Armature&	asset( *GetArmature( bytes.Begin() ) );
-
 		ArrayList<Joint>	joints( _joints.GetAllocator() );
+
+		for (const JointDescriptor* joint : *GetArmature( asset.Begin() )->Joints()) {
+			const Bone*	pose( joint->BindPose() );
+
+			joints.Append( { AsPxTransform( *pose ), joint->ParentIndex() } );
+		}
 
 		Swap( _joints, joints );
 

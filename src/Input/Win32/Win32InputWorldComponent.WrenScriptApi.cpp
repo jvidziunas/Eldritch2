@@ -13,15 +13,13 @@
 // INCLUDES
 //==================================================================//
 #include <Input/Win32/Win32InputWorldComponent.hpp>
-#include <Input/Win32/DeviceCoordinator.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
+#include <Input/InputBus.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 	namespace Input {
-		namespace Win32 {
-			ET_DECLARE_WREN_CLASS( DeviceCoordinator );
-		}
+		ET_DECLARE_WREN_CLASS( InputBus );
 	}
 }
 
@@ -32,10 +30,10 @@ namespace Win32 {
 	using namespace ::Eldritch2::Scripting::Wren;
 
 	void Win32InputWorldComponent::AcceptVisitor( ApiBuilder& api ) {
-		ET_REGISTER_WREN_CLASS( DeviceCoordinator, api );
+		ET_REGISTER_WREN_CLASS( InputBus, api );
 
-		api.CreateVariable<DeviceCoordinator>( ET_BUILTIN_WREN_MODULE_NAME( Input ), "MouseCoordinator" );
-		api.CreateVariable<DeviceCoordinator>( ET_BUILTIN_WREN_MODULE_NAME( Input ), "KeyboardCoordinator" );
+		api.CreateVariable<InputBus>( ET_BUILTIN_WREN_MODULE_NAME( Input ), "KeyboardBus" );
+		api.CreateVariable<InputBus>( ET_BUILTIN_WREN_MODULE_NAME( Input ), "MouseBus" );
 	}
 
 }	// namespace Win32

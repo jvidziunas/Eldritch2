@@ -31,26 +31,16 @@ namespace Core {
 			World* const	world;
 		};
 
-		api.CreateClass<WorldBridge>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "_World",
+		api.CreateClass<WorldBridge>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "World_",
 			{/* Constructors */},
-			{/*	Properties */
-				DefineProperty<double>( "timeScalar",
-				//	Getter
-					[] ( WrenVM* vm ) {
-						wrenSetSlotDouble( vm, 0, GetSlotAs<WorldBridge>( vm, 0 ).world->GetTimeScalar() );
-					},
-				//	Setter
-					[] ( WrenVM* vm ) {
-						GetSlotAs<WorldBridge>( vm, 0 ).world->SetTimeScalar( static_cast<float32>( wrenGetSlotDouble( vm, 1 ) ) );
-					}
-				)
-			},
+			{/*	Properties */},
 			{/*	Methods */
 				DefineMethod<void ( const Utf8Char* )>( "requirePackage", [] ( WrenVM* vm ) {
 					const ErrorCode	importResult( GetSlotAs<WorldBridge>( vm, 0 ).world->Import( wrenGetSlotString( vm, 1 ) ) );
 					ET_ABORT_WREN_IF( Failed( importResult ), AsCString( importResult ) );
 				} )
 			},
+			{/* Static methods */},
 			{/*	Operators */}
 		);
 

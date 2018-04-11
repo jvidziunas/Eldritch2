@@ -7,7 +7,7 @@
   ------------------------------------------------------------------
   ©2010-2018 Eldritch Entertainment, LLC.
 \*==================================================================*/
-#pragma once
+
 
 //==================================================================//
 // INCLUDES
@@ -21,6 +21,10 @@
 namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
+
+	BatchCoordinator::BatchCoordinator() : _drawParameters(), _countsByThing( MallocAllocator( "Batch Coordinator Group Count Allocator" ) ) {}
+
+//---------------------------------------------------
 
 	VkResult BatchCoordinator::BindResources( GpuHeap& heap ) {
 		ET_FAIL_UNLESS( _drawParameters.BindResources( heap, ParameterBufferSize ) );
@@ -50,9 +54,19 @@ namespace Vulkan {
 
 //---------------------------------------------------
 
-	void BatchCoordinator::RecordDraws( CommandList& commands, VertexBuffer& vertices ) {
-		commands.BindBuffers( { vertices.Get() }, static_cast<VkBuffer>(VK_NULL_HANDLE), VK_INDEX_TYPE_UINT16 );
+	void BatchCoordinator::RecordDraws( CommandList& commands, VertexBuffer& vertices, IndexBuffer& indices ) {
+	//	commands.Dispatch( VK_NULL_HANDLE, VK_NULL_HANDLE 1u, 1u, 1u );
+		commands.BindBuffers( { vertices.Get() }, indices.Get(), VK_INDEX_TYPE_UINT16 );
 		commands.DrawIndexedIndirect( _drawParameters, 0u, _countsByThing.GetSize() );
+	}
+
+//---------------------------------------------------
+
+	void Swap( BatchCoordinator& lhs, BatchCoordinator& rhs ) {
+		using ::Eldritch2::Swap;
+
+		Swap( lhs._drawParameters, rhs._drawParameters );
+		Swap( rhs._countsByThing,  rhs._countsByThing );
 	}
 
 }	// namespace Vulkan

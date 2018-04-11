@@ -27,6 +27,7 @@ namespace XAudio2 {
 			{/* Constructors */},
 			{/*	Properties */},
 			{/*	Methods */},
+			{/* Static methods */},
 			{/*	Operators */}
 		);
 	}

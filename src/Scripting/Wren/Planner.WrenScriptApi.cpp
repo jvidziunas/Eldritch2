@@ -39,6 +39,7 @@ namespace Wren {
 			},
 			{/*	Properties */},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

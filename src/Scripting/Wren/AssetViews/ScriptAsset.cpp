@@ -32,14 +32,12 @@ namespace AssetViews {
 
 // ---------------------------------------------------
 
-	ErrorCode ScriptAsset::BindResources( const Builder& builder ) {
-		const Range<const char*>&	bytes( builder.GetRawBytes() );
-
-		if (bytes.IsEmpty()) {
+	ErrorCode ScriptAsset::BindResources( const Builder& asset ) {
+		if (asset.GetSize() == 0u) {
 			return Error::InvalidParameter;
 		}
 
-		String<>	source( bytes.Begin(), bytes.End(), _source.GetAllocator() );
+		String<> source( asset.Begin(), asset.End(), _source.GetAllocator() );
 
 		Swap( _source, source );
 

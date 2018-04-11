@@ -46,7 +46,7 @@ namespace {
 	ETPureFunctionHint const Utf8Char* GetErrorString( EP2PSessionError error ) {
 		switch( error ) {
 		case k_EP2PSessionErrorNotRunningApp:			return "User not running the same application";
-		case k_EP2PSessionErrorNoRightsToApp:			return "User does not have right to use application";
+		case k_EP2PSessionErrorNoRightsToApp:			return "User does not have rights to use application";
 		case k_EP2PSessionErrorDestinationNotLoggedIn:	return "User not connected to Steam";
 		case k_EP2PSessionErrorTimeout:					return "Session timeout/blocked connection";
 		default:										return "Unknown";
@@ -73,7 +73,8 @@ namespace {
 		_log( owner.GetLog() ),
 		_connectedToSteam( false ),
 		_gamePort( 0u ),
-		_queryPort( 0u ) {}
+		_queryPort( 0u ) {
+	}
 
 // ---------------------------------------------------
 
@@ -96,6 +97,8 @@ namespace {
 			Steam_RunCallbacks( _pipe, true );
 			SteamGameServer_ReleaseCurrentThreadMemory();
 		}
+
+
 	}
 
 // ---------------------------------------------------
@@ -106,9 +109,7 @@ namespace {
 		if (IsConnectedToSteam()) {
 			ISteamNetworking* const networking( GetSteamNetworking( _serverUser, _pipe ) );
 
-			uint32 packetSize;
-
-			while (networking->IsP2PPacketAvailable( &packetSize )) {
+			for (uint32 packetSize; networking->IsP2PPacketAvailable( &packetSize ); ) {
 				CSteamID remoteId;
 
 				networking->ReadP2PPacket( nullptr, 0, &packetSize, &remoteId );
@@ -212,6 +213,8 @@ namespace {
 
 	void SteamworksWorldComponent::OnSteamServersDisconnected( SteamServersDisconnected_t* /*message*/ ) {
 		_log.Write( MessageType::Message, "Disconnected from Steam servers." UTF8_NEWLINE );
+
+		DisconnectFromSteam();
 	}
 
 // ---------------------------------------------------

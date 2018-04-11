@@ -47,7 +47,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint CountedPointer<Object, Disposer>::CountedPointer( CountedPointer<Object, Disposer>&& pointer ) : CountedPointer( nullptr ) {
+	ETInlineHint CountedPointer<Object, Disposer>::CountedPointer( CountedPointer<Object, Disposer>&& pointer ) ETNoexceptHint : CountedPointer( nullptr ) {
 		eastl::swap( _pointerAndDeleter, pointer._pointerAndDeleter );
 	}
 
@@ -66,14 +66,14 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint Object* CountedPointer<Object, Disposer>::Release() {
+	ETInlineHint Object* CountedPointer<Object, Disposer>::Release() ETNoexceptHint {
 		return eastl::exchange( _pointerAndDeleter.first(), nullptr );
 	}
 
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint Object* CountedPointer<Object, Disposer>::Get() const {
+	ETInlineHint Object* CountedPointer<Object, Disposer>::Get() const ETNoexceptHint {
 		return _pointerAndDeleter.first();
 	}
 
@@ -95,28 +95,28 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint const typename CountedPointer<Object, Disposer>::DisposerType& CountedPointer<Object, Disposer>::GetDisposer() const {
+	ETInlineHint const typename CountedPointer<Object, Disposer>::DisposerType& CountedPointer<Object, Disposer>::GetDisposer() const ETNoexceptHint {
 		return _pointerAndDeleter.second();
 	}
 
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint Object* CountedPointer<Object, Disposer>::operator->() const {
+	ETInlineHint Object* CountedPointer<Object, Disposer>::operator->() const ETNoexceptHint {
 		return _pointerAndDeleter.first();
 	}
 
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint Object& CountedPointer<Object, Disposer>::operator*() const {
+	ETInlineHint Object& CountedPointer<Object, Disposer>::operator*() const ETNoexceptHint {
 		return *_pointerAndDeleter.first();
 	}
 
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint CountedPointer<Object, Disposer>::operator bool() const {
+	ETInlineHint CountedPointer<Object, Disposer>::operator bool() const ETNoexceptHint {
 		return _pointerAndDeleter.first() != nullptr;
 	}
 
@@ -124,7 +124,7 @@ namespace Eldritch2 {
 
 	template <class Object, typename Disposer>
 	template <typename CompatibleObject, typename CompatibleDeleter>
-	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( const CountedPointer<CompatibleObject, CompatibleDeleter>& pointer ) {
+	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( const CountedPointer<CompatibleObject, CompatibleDeleter>& pointer ) ETNoexceptHint {
 		Reset( pointer._pointerAndDeleter.first() );
 
 		_pointerAndDeleter.second() = pointer._pointerAndDeleter.second();
@@ -135,7 +135,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( const CountedPointer<Object, Disposer>& pointer ) {
+	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( const CountedPointer<Object, Disposer>& pointer ) ETNoexceptHint {
 		Reset( pointer._pointerAndDeleter.first() );
 
 		_pointerAndDeleter.second() = pointer._pointerAndDeleter.second();
@@ -147,7 +147,7 @@ namespace Eldritch2 {
 
 	template <class Object, typename Disposer>
 	template <typename CompatibleObject, typename CompatibleDeleter>
-	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( CountedPointer<CompatibleObject, CompatibleDeleter>&& pointer ) {
+	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( CountedPointer<CompatibleObject, CompatibleDeleter>&& pointer ) ETNoexceptHint {
 		Reset( eastl::exchange( pointer._pointerAndDeleter.first(), nullptr ) );
 
 		_pointerAndDeleter.second()	= eastl::move( handle._pointerAndDeleter.second() );
@@ -158,7 +158,7 @@ namespace Eldritch2 {
 // ---------------------------------------------------
 
 	template <class Object, typename Disposer>
-	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( CountedPointer<Object, Disposer>&& pointer ) {
+	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( CountedPointer<Object, Disposer>&& pointer ) ETNoexceptHint {
 		Reset( eastl::exchange( pointer._pointerAndDeleter.first(), nullptr ) );
 
 		_pointerAndDeleter = eastl::move( pointer._pointerAndDeleter );
@@ -170,7 +170,7 @@ namespace Eldritch2 {
 
 	template <class Object, typename Disposer>
 	template <typename CompatibleObject>
-	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( CompatibleObject* object ) {
+	ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=( CompatibleObject* object ) ETNoexceptHint {
 		Reset( object );
 
 		return *this;

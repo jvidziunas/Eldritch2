@@ -35,7 +35,7 @@ namespace Vulkan {
 	public:
 		enum : VkDeviceSize {
 			InstanceBufferSize  = 2u * 1024u * 1024u, /*  2MB */
-			ParameterBufferSize =             16384u  /* 16KB */
+			ParameterBufferSize =        16u * 1024u  /* 16KB */
 		};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -65,12 +65,14 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		void	RecordDraws( CommandList& commands, VertexBuffer& vertices );
+		void	RecordDraws( CommandList& commands, VertexBuffer& vertices, IndexBuffer& indices );
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
 		BatchCoordinator& operator=( const BatchCoordinator& ) = delete;
+
+		friend void Swap( BatchCoordinator&, BatchCoordinator& );
 
 	// - DATA MEMBERS ------------------------------------
 	

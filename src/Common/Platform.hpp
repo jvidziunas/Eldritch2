@@ -39,7 +39,7 @@ namespace Eldritch2 {
 
 	ETPureFunctionHint CoreInfo	GetCoreInfo();
 
-	ETPureFunctionHint size_t			GetL0CacheLineSizeInBytes();
+	ETPureFunctionHint size_t	GetL0CacheLineSizeInBytes();
 
 // - TIMING DATA -------------------------------------
 

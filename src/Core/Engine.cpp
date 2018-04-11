@@ -182,13 +182,16 @@ namespace {
 		if (Failed( _packageProvider.BindResources() )) {
 			return -1;
 		}
+		ET_AT_SCOPE_EXIT( _packageProvider.FreeResources() );
+
+		_packageProvider.GetFileSystem().Move( KnownDirectory::Logs, "EngineLog.old.txt", "EngineLog.txt" );
 
 		_log.BindResources( _packageProvider.GetFileSystem().GetAbsolutePath( KnownDirectory::Logs, "EngineLog.txt" ).AsCString() );
-		_log.Write( MessageType::Message,
-			"\t======================================================" UTF8_NEWLINE
-			"\t| INITIALIZING APPLICATION                           |" UTF8_NEWLINE
-			"\t======================================================" UTF8_NEWLINE
-		);
+		ET_AT_SCOPE_EXIT( _log.FreeResources() );
+
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t| INITIALIZING APPLICATION                           |" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
 
 		InitializeComponents( executor );
 		CreateBootWorld( executor );
@@ -198,13 +201,9 @@ namespace {
 			RunFrame( executor );
 		}
 
-		_log.Write( MessageType::Message,
-			"\t======================================================" UTF8_NEWLINE
-			"\t| TERMINATING APPLICATION                            |" UTF8_NEWLINE
-			"\t======================================================" UTF8_NEWLINE
-		);
-
-		_packageProvider.FreeResources();
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t| TERMINATING APPLICATION                            |" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
 
 		return 0;
 	}
@@ -223,7 +222,8 @@ namespace {
 			component->AcceptVisitor( executor, EngineComponent::LateInitializationVisitor() );
 		} );
 
-		_log.Write( MessageType::Message, UTF8_NEWLINE "Engine initialization complete in {:.2f}ms." UTF8_NEWLINE UTF8_NEWLINE, AsMilliseconds( timer.GetDuration() ) );
+		_log.Write( MessageType::Message, "Engine initialization complete in {:.2f}ms." UTF8_NEWLINE, AsMilliseconds( timer.GetDuration() ) );
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
 	}
 
 // ---------------------------------------------------

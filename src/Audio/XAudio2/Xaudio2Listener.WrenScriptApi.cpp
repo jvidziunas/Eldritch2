@@ -35,17 +35,18 @@ namespace XAudio2 {
 				DefineGetter<Transformation>( "localToWorld", [] ( WrenVM* vm ) {
 					const XAudio2Listener&	self( GetSlotAs<XAudio2Listener>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Transformation>() );
+					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
 					SetReturn<Transformation>( vm, self.GetLocalToWorld() );
 				} ),
 				DefineGetter<Transformation>( "worldToLocal", [] ( WrenVM* vm ) {
 					const XAudio2Listener&	self( GetSlotAs<XAudio2Listener>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Transformation>() );
+					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
 					SetReturn<Transformation>( vm, self.GetWorldToLocal() );
 				} )
 			},
 			{/*	Methods */},
+			{/* Static methods */},
 			{/*	Operators */}
 		);
 	}

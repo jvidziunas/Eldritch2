@@ -18,14 +18,20 @@
 namespace Eldritch2 {
 namespace Animation {
 
-	ETInlineHint Transformation Armature::GetLocalToWorld() const {
+	ETInlineHint Transformation ETSimdCall Armature::GetLocalToWorld() const {
 		return _localToWorld;
 	}
 
 // ---------------------------------------------------
 
-	ETInlineHint Transformation Armature::GetWorldToLocal() const {
+	ETInlineHint Transformation ETSimdCall Armature::GetWorldToLocal() const {
 		return { -_localToWorld.translation, -_localToWorld.rotation };
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint void ETSimdCall Armature::SetLocalToWorld( Transformation localToWorld ) {
+		_localToWorld = localToWorld;
 	}
 
 }	// namespace Animation

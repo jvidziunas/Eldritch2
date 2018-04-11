@@ -27,6 +27,7 @@ namespace Vulkan {
 			{/* Constructors */},
 			{/*	Properties */},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

@@ -14,8 +14,8 @@
 //==================================================================//
 #include <Graphics/Vulkan/GpuResources.hpp>
 #include <Graphics/Vulkan/HostMixin.hpp>
-#include <Graphics/Vulkan/IoBuilder.hpp>
 #include <Graphics/Vulkan/GpuHeap.hpp>
+#include <Graphics/Vulkan/GpuBus.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -81,18 +81,18 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( Gpu& gpu, VkDeviceSize transferBufferSize );
-
-		void		FreeResources( Gpu& gpu );
-
-	// ---------------------------------------------------
-
-	public:
 		VkResult	Insert( const ImageSource& image, bool andMakeResident = true );
 		VkResult	Insert( const MeshSource& mesh, bool andMakeResident = true );
 
 		void		Erase( const ImageSource& image );
 		void		Erase( const MeshSource& mesh );
+
+	// ---------------------------------------------------
+
+	public:
+		VkResult	BindResources( Gpu& gpu, VkDeviceSize transferBufferSize );
+
+		void		FreeResources( Gpu& gpu );
 
 	// ---------------------------------------------------
 
@@ -112,7 +112,7 @@ namespace Vulkan {
 	private:
 		mutable HostAllocator					_allocator;
 		GpuHeap									_heap;
-		IoBuilder								_ioBuilder;
+		GpuBus									_bus;
 
 		ResidentSet<MeshSource, Mesh>			_meshesBySource;
 		ResidentSet<ImageSource, ShaderImage>	_imagesBySource;

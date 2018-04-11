@@ -27,9 +27,9 @@ namespace AssetViews {
 
 // ---------------------------------------------------
 
-	ErrorCode ImageAsset::BindResources( const Builder& builder ) {
-		if (Failed( CrunchImageSource::BindResources( builder.GetRawBytes() )) ) {
-			builder.WriteLog( MessageType::Error, "{} contains malformed data!", GetPath() );
+	ErrorCode ImageAsset::BindResources( const Builder& asset ) {
+		if (Failed( CrunchImageSource::BindResources( asset.Begin(), asset.End() )) ) {
+			asset.WriteLog( MessageType::Error, "{} contains malformed data!", GetPath() );
 			return Error::Unspecified;
 		}
 

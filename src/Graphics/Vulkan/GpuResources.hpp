@@ -60,6 +60,10 @@ namespace Detail {
 
 		void		GetAllocationInfo( GpuHeap& heap, VmaAllocationInfo& info );
 
+		void*		MapHostPointer( GpuHeap& heap );
+
+		void		UnmapHostPointer( GpuHeap& heap );
+
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
@@ -202,9 +206,13 @@ namespace Detail {
 	// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+		using Detail::AbstractBuffer::MapHostPointer;
+		using Detail::AbstractBuffer::UnmapHostPointer;
 
-		void*		GetHostPointer( GpuHeap& heap );
+	// ---------------------------------------------------
+
+	public:
+		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
 
 	// ---------------------------------------------------
 
@@ -234,9 +242,13 @@ namespace Detail {
 	// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+		using Detail::AbstractBuffer::MapHostPointer;
+		using Detail::AbstractBuffer::UnmapHostPointer;
 
-		void*		GetHostPointer( GpuHeap& heap );
+	// ---------------------------------------------------
+
+	public:
+		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
 
 	// ---------------------------------------------------
 
@@ -250,25 +262,30 @@ namespace Detail {
 
 // ---
 
-	class SparsePageManager {
+	class TileManager {
 	// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum : uint64_t { InvalidTile = static_cast<uint64_t>(0u) };
 		enum : uint32_t {
 			PageCoordinateBits	= 18u,
 			PageMipBits			= 10u,
 			MaxImageDimension	= 1u << PageCoordinateBits
 		};
 
+		enum class CacheResult {
+			Hit,
+			L0Miss,
+			L1Miss
+		};
+
 	// ---
 
 	public:
 		struct Tile {
-			uint32_t x   : PageCoordinateBits;
-			uint32_t y   : PageCoordinateBits;
-			uint32_t z   : PageCoordinateBits;
-			uint32_t mip : PageMipBits;
+			uint64_t x   : PageCoordinateBits;
+			uint64_t y   : PageCoordinateBits;
+			uint64_t z   : PageCoordinateBits;
+			uint64_t mip : PageMipBits;
 		};
 
 	// ---
@@ -276,22 +293,21 @@ namespace Detail {
 	public:
 		template <typename Value>
 		using TileMap		= HashMap<Tile, Value>;
-		using CachedTile	= Pair<volatile char*, bool>;
-		using PhysicalTile	= VkDeviceSize;
+		using CachedPage	= volatile char*;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref SparsePageManager instance.
-		SparsePageManager( VkExtent3D tileExtent, VkExtent3D extent );
-	//!	Constructs this @ref SparsePageManager instance.
-		SparsePageManager( const SparsePageManager& ) = delete;
-	//!	Constructs this @ref SparsePageManager instance.
-		SparsePageManager( SparsePageManager&& );
-	//!	Constructs this @ref SparsePageManager instance.
-		SparsePageManager();
+	//!	Constructs this @ref TileManager instance.
+		TileManager( VkExtent3D tileExtent, VkExtent3D extent );
+	//!	Disable copy construction.
+		TileManager( const TileManager& ) = delete;
+	//!	Constructs this @ref TileManager instance.
+		TileManager( TileManager&& );
+	//!	Constructs this @ref TileManager instance.
+		TileManager();
 
-		~SparsePageManager() = default;
+		~TileManager() = default;
 
 	// ---------------------------------------------------
 
@@ -310,26 +326,36 @@ namespace Detail {
 	// ---------------------------------------------------
 
 	public:
-		bool	MakeResident( SparsePageManager::Tile tile );
+		bool	IsResident( Tile tile ) const ETNoexceptHint;
+
+		bool	IsLoading( Tile tile ) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 	public:
-		SparsePageManager&	operator=( const SparsePageManager& ) = delete;
+		CacheResult	MakeResident( Tile tile );
+
+		void		NotifyCached( Tile tile, CachedPage page );
+
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+		TileManager&	operator=( const TileManager& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-		VkExtent3D				_logTileExtent;
-		VkExtent3D				_extent;
+		VkExtent3D			_logTileExtent;
+		VkExtent3D			_extent;
 	//!	Collection of tiles resident on the GPU.
-		TileMap<PhysicalTile>	_residentTilesByCoordinate;
-	//!	Collection of tiles resident on the host.
-		TileMap<CachedTile>		_cachedTilesByCoordinate;
+		HashSet<Tile>		_residentTiles;
+	//!	Collection of pages resident on the host.
+		TileMap<CachedPage>	_cachedPagesByTile;
+		HashSet<Tile>		_loadingTiles;
 
 	// ---------------------------------------------------
 
-		friend void	Swap( SparsePageManager&, SparsePageManager& );
+		friend void	Swap( TileManager&, TileManager& );
 	};
 
 // ---
@@ -379,7 +405,7 @@ namespace Detail {
 	//!	Constructs this @ref SparseShaderImage instance.
 		SparseShaderImage( SparseShaderImage&& );
 	//!	Constructs this @ref SparseShaderImage instance.
-		SparseShaderImage();
+		SparseShaderImage() = default;
 
 		~SparseShaderImage() = default;
 
@@ -392,23 +418,17 @@ namespace Detail {
 
 	// ---------------------------------------------------
 
-	public:
-		bool	MakeResident( SparsePageManager::Tile tile );
-
-	// ---------------------------------------------------
-
 	//!	Disable copy assignment.
 		SparseShaderImage&	operator=( const SparseShaderImage& ) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-	//!	Page manager instance providing the device resources used by this @ref SparseShaderImage.
-		SparsePageManager	_pageManager;
-	/*!	Staging buffer used as a target for tile decompression. The size of this buffer should be much larger
+		TileManager		_tileManager;
+	/*!	Staging buffer used as a target for page decompression. The size of this buffer should be much larger
 		than can be transferred in a single frame, as it also serves as a cache for decompressed tiles
 		not necessarily resident on the GPU. Contents are write-only on the host, and read-only on the GPU. */
-		TransferBuffer		_cache;
+		TransferBuffer	_pageCache;
 
 	// ---------------------------------------------------
 

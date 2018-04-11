@@ -20,7 +20,7 @@ namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
-	void Swap( ShaderPipeline& pipeline0, ShaderPipeline& pipeline1 ) {
+	void Swap( ShaderPipeline& lhs, ShaderPipeline& rhs ) {
 	}
 
 }	// namespace Vulkan

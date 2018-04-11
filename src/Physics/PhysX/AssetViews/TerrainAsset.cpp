@@ -45,7 +45,7 @@ namespace {
 
 	public:
 	//!	Constructs this @ref InputStream instance.
-		InputStream( Range<const char*> source ) : _source( source ) {}
+		InputStream( const char* begin, const char* end ) : _source( begin, end ) {}
 	//!	Constructs this @ref InputStream instance.
 		InputStream( const InputStream& ) = default;
 
@@ -79,24 +79,24 @@ namespace {
 
 // ---------------------------------------------------
 
-	ErrorCode TerrainAsset::BindResources( const Builder& builder ) {
+	ErrorCode TerrainAsset::BindResources( const Builder& asset ) {
 		PhysxPointer<PxMaterial> material( PxGetPhysics().createMaterial( 1.0f, 1.0f, 0.1f ) );
 		if (!material) {
-			builder.WriteLog( MessageType::Error, "Unable to create PhysX material for asset '{}'!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "Unable to create PhysX material for asset '{}'!" UTF8_NEWLINE, GetPath() );
 			return Error::Unspecified;
 		}
 
-		InputStream	input( builder.GetRawBytes() );
+		InputStream	input( asset.Begin(), asset.End() );
 
 		PhysxPointer<PxHeightField>	heightfield( PxGetPhysics().createHeightField( input ) );
 		if (!heightfield) {
-			builder.WriteLog( MessageType::Error, "Unable to create PhysX heightfield for asset '{}'!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "Unable to create PhysX heightfield for asset '{}'!" UTF8_NEWLINE, GetPath() );
 			return Error::Unspecified;
 		}
 
 		PhysxPointer<PxShape> shape( PxGetPhysics().createShape( PxHeightFieldGeometry( heightfield.Get(), PxMeshGeometryFlags(0), HeightScale, RowScale, ColumnScale ), *material ) );
 		if (!shape) {
-			builder.WriteLog( MessageType::Error, "Unable to create PhysX shape for asset '{}'!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "Unable to create PhysX shape for asset '{}'!" UTF8_NEWLINE, GetPath() );
 			return Error::Unspecified;
 		}
 

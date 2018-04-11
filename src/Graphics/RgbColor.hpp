@@ -23,7 +23,7 @@ namespace Graphics {
 
 	public:
 	//!	Constructs this @ref RgbColor instance.
-		RgbColor( float16 red, float16 green, float16 blue );
+		RgbColor( float32 red, float32 green, float32 blue );
 	//!	Constructs this @ref RgbColor instance.
 		RgbColor( const RgbColor& ) = default;
 
@@ -56,7 +56,9 @@ namespace Graphics {
 
 // ---
 
-	ETPureFunctionHint RgbColor	GetRgbFromCieXyz( float16 x, float16 y, float16 z );
+	ETPureFunctionHint RgbColor	GetRgbFromCieXyz( float32 x, float32 y, float32 z );
+
+	ETPureFunctionHint RgbColor	GetRgbFromEv( uint8 red, uint8 green, uint8 blue, float16 exposureStops = float16(1.0f) );
 
 	ETPureFunctionHint RgbColor	GetRgbFromKelvin( float32 degrees );
 

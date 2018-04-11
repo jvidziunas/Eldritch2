@@ -46,8 +46,8 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	void Swap( VertexBuffer& buffer0, VertexBuffer& buffer1 ) {
-		Detail::Swap( buffer0, buffer1 );
+	void Swap( VertexBuffer& lhs, VertexBuffer& rhs ) {
+		Detail::Swap( lhs, rhs );
 	}
 	
 }	// namespace Vulkan

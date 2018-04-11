@@ -29,7 +29,7 @@ namespace Vulkan {
 	using namespace ::Eldritch2::Assets;
 	using namespace ::Eldritch2::Core;
 
-	VulkanWorldComponent::VulkanWorldComponent( const World& owner ) : WorldComponent( owner.GetServices() ), _scene( nullptr ) {}
+	VulkanWorldComponent::VulkanWorldComponent( const World& owner ) : WorldComponent( owner.GetServices() ), _scene( nullptr ), _displayBus( nullptr ) {}
 
 // ---------------------------------------------------
 
@@ -46,15 +46,16 @@ namespace Vulkan {
 	void VulkanWorldComponent::AcceptVisitor( JobExecutor& executor, const VariableTickVisitor& ) {
 		MICROPROFILE_SCOPEI( "World/VariableTick", "Draw Scene", 0x0C11F0 );
 
-		_scene->SubmitGpuCommands( executor, FindService<Vulkan>() );
+		Vulkan& vulkan( FindService<Vulkan>() );
+
+		_scene->SubmitGpuCommands( executor, vulkan );
+	//	_displayBus->
 	}
 
 // ---------------------------------------------------
 
 	void VulkanWorldComponent::AcceptVisitor( JobExecutor& executor, const TearDownVisitor ) {
-		if (_scene) {
-			_scene->FreeResources( executor, FindService<Vulkan>() );
-		}
+		if (_scene) { _scene->FreeResources( executor, FindService<Vulkan>() ); }
 	}
 
 }	// namespace Vulkan

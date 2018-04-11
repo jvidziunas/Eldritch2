@@ -30,13 +30,11 @@ namespace AssetViews {
 
 // ---------------------------------------------------
 
-	ErrorCode KeyframeClipAsset::BindResources( const Builder& builder ) {
-		const auto&	bytes( builder.GetRawBytes() );
-
+	ErrorCode KeyframeClipAsset::BindResources( const Builder& asset ) {
 	//	Ensure we're working with data that can plausibly represent a keyframe animation clip.
-		Verifier verifier( reinterpret_cast<const uint8_t*>(bytes.Begin()), bytes.GetSize() );
+		Verifier verifier( reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize() );
 		if (!VerifyAnimationBuffer( verifier )) {
-			builder.WriteLog( MessageType::Error, "{} is malformed!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "{} is malformed!" UTF8_NEWLINE, GetPath() );
 			return Error::InvalidParameter;
 		}
 

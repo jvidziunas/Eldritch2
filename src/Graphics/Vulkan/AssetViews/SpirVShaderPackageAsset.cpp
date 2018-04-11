@@ -289,21 +289,19 @@ namespace {
 
 // ---------------------------------------------------
 
-	ErrorCode SpirVShaderPackageAsset::BindResources( const Builder& builder ) {
+	ErrorCode SpirVShaderPackageAsset::BindResources( const Builder& asset ) {
 		enum : VkShaderModuleCreateFlags { ShaderCreateFlags = 0u };
 
-		const Range<const char*>&	bytes( builder.GetRawBytes() );
-
 	//	Ensure we're working with data that can plausibly represent a shader package.
-		Verifier verifier( reinterpret_cast<const uint8_t*>(bytes.Begin()), bytes.GetSize() );
+		Verifier verifier( reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize() );
 		if (!VerifySpirVShaderPackageBuffer( verifier )) {
-			builder.WriteLog( MessageType::Error, "{} is malformed." UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "{} is malformed." UTF8_NEWLINE, GetPath() );
 			return Error::InvalidParameter;
 		}
 			
 		UsageSet<Usage>	usages( _usages.GetAllocator() );
 
-		for (const UsageDescriptor* usage : *GetSpirVShaderPackage( bytes.Begin() )->Usages()) {
+		for (const UsageDescriptor* usage : *GetSpirVShaderPackage( asset.Begin() )->Usages()) {
 			VkPipelineColorBlendAttachmentState	colorBlendStates[Usage::MaxColorAttachments];
 
 			usages.Emplace(

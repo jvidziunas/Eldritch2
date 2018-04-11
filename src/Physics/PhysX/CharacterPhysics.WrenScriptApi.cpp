@@ -50,6 +50,7 @@ namespace PhysX {
 					GetSlotAs<CharacterPhysics>( vm, 0 ).Move( GetSlotAs<Vector>( vm, 1 ) );
 				} )
 			},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

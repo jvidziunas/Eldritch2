@@ -64,8 +64,7 @@ namespace {
 	Context::Context(
 		const AssetDatabase& assets,
 		Log& log
-	) : _allocator( "Wren Context Root Allocator" ),
-		_log( log ),
+	) : _log( log ),
 		_assets( &assets ),
 		_classesByType( MallocAllocator( "Wren Class By Type Allocator" ) ),
 		_vm( nullptr ),
@@ -85,10 +84,10 @@ namespace {
 		wrenPushRoot( _vm, reinterpret_cast<Obj*>(wrenName) );
 
 		const Value wrenClass( OBJ_VAL( wrenNewClass( _vm, _vm->objectClass, -1, wrenName ) ) );
-		const int	addResult( wrenDefineVariable( _vm, GetModule( _vm, module ), name, StringLength( name ), wrenClass ) );
+		const int	result( wrenDefineVariable( _vm, GetModule( _vm, module ), name, StringLength( name ), wrenClass ) );
 
-		ET_ASSERT( addResult != -1, "Duplicate Wren class registration!" );
-		ET_ASSERT( addResult != -2, "Error registering Wren class object with module!" );
+		ET_ASSERT( result != -1, "Duplicate Wren class registration!" );
+		ET_ASSERT( result != -2, "Error registering Wren class object with module!" );
 
 		WrenHandle* klass( wrenMakeHandle( _vm, OBJ_VAL( wrenClass ) ) );
 	//	Pop Wren class name.
@@ -107,6 +106,12 @@ namespace {
 		wrenDefineVariable( _vm, GetModule( _vm, module ), name, StringLength( name ), OBJ_VAL( variable ) );
 
 		return variable->data;
+	}
+
+// ---------------------------------------------------
+
+	void Context::CreateVariable( const char* module, const char* name, double value ) {
+		wrenDefineVariable( _vm, GetModule( _vm, module ), name, StringLength( name ), NUM_VAL( value ) );
 	}
 
 // ---------------------------------------------------
@@ -135,9 +140,11 @@ namespace {
 				return nullptr;
 			}
 
-			char* const source( static_cast<char*>(wrenReallocate( vm, nullptr, 0u, script->GetLength() )) );
+		//	The initial script source is null-terminated, though we need to make sure to allocate room for the terminator here.
+			char* const source( static_cast<char*>(wrenReallocate( vm, nullptr, 0u, script->GetLength() + 1u )) );
 			if (source) {
 				Copy( script->Begin(), script->End(), source );
+				source[script->GetLength()] = '\0';
 			}
 
 			return source;

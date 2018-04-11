@@ -19,7 +19,7 @@ namespace Eldritch2 {
 	namespace Graphics {
 		namespace Vulkan {
 			class	VulkanGraphicsScene;
-			class	OutputCoordinator;
+			class	DisplayBus;
 		}
 	}
 }
@@ -56,7 +56,7 @@ namespace Vulkan {
 
 	private:
 		VulkanGraphicsScene*	_scene;
-		OutputCoordinator*		_outputCoordinator;
+		DisplayBus*				_displayBus;
 	};
 
 }	// namespace Vulkan

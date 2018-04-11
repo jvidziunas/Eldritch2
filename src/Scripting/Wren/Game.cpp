@@ -26,7 +26,9 @@ namespace Wren {
 	using namespace ::Eldritch2::Core;
 
 	Game::Game(
-	) : _playerJoinHandler( nullptr ),
+		World& world
+	) : _world( eastl::addressof( world ) ),
+		_playerJoinHandler( nullptr ),
 		_playerLeaveHandler( nullptr ),
 		_entityTags( MallocAllocator( "Wren Game Entity Tag Allocator" ) ),
 		_gameObjects( MallocAllocator( "Wren Game Object Collection Allocator" ) ) {
@@ -49,11 +51,25 @@ namespace Wren {
 
 // ---------------------------------------------------
 
-	void Game::HandlePlayerLeave( WrenVM* vm, WrenHandle* unaryCallHandle ) {
+	void Game::HandlePlayerLeave( WrenVM* vm, WrenHandle* unaryCallHandle, const Utf8Char* const name ) {
 		wrenEnsureSlots( vm, 2 );
 		wrenSetSlotHandle( vm, 0, _playerLeaveHandler );
-		wrenSetSlotString( vm, 1, "asdf" );
+		wrenSetSlotString( vm, 1, name );
 		wrenCall( vm, unaryCallHandle );
+	}
+
+// ---------------------------------------------------
+
+	void Game::FreeResources( WrenVM* vm ) {
+		SetPlayerJoinHandler( vm, nullptr );
+		SetPlayerLeaveHandler( vm, nullptr );
+
+		while (_gameObjects) {
+			wrenReleaseHandle( vm, _gameObjects.Back() );
+			_gameObjects.Pop();
+		}
+
+		_entityTags.Clear();
 	}
 
 // ---------------------------------------------------
@@ -74,14 +90,20 @@ namespace Wren {
 
 // ---------------------------------------------------
 
-	void Game::FreeResources( WrenVM* vm ) {
-		SetPlayerJoinHandler( vm, nullptr );
-		SetPlayerLeaveHandler( vm, nullptr );
+	double Game::GetTimeScalar() const {
+		return _world->GetTimeScalar();
+	}
 
-		while (_gameObjects) {
-			wrenReleaseHandle( vm, _gameObjects.Back() );
-			_gameObjects.Pop();
-		}
+// ---------------------------------------------------
+
+	void Game::SetTimeScalar( double value ) {
+		_world->SetTimeScalar( static_cast<float32>(value) );
+	}
+
+// ---------------------------------------------------
+
+	void Game::ShutDown( bool andEngine ) const {
+		_world->SetShouldShutDown( andEngine );
 	}
 
 }	// namespace Wren

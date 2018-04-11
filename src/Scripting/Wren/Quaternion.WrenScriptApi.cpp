@@ -36,41 +36,45 @@ namespace Wren {
 				} ),
 				DefineConstructor<Quaternion ( Vector, Vector )>( "forBasis", [] ( WrenVM* vm ) {
 					SetReturn<Quaternion>( vm, AsBasis( GetSlotAs<Vector>( vm, 1 ), GetSlotAs<Vector>( vm, 2 ) ) );
+				} ),
+				DefineConstructor<Quaternion ()>( "identity", [] ( WrenVM * vm ) {
+					SetReturn<Quaternion>( vm, 1.0f, 0.0f, 0.0f, 0.0f );
 				} )
 			},
 			{/*	Properties */
 				DefineGetter<Vector>( "forward", [] ( WrenVM* vm ) {
 					const Quaternion&	self( GetSlotAs<Quaternion>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Vector>() );
+					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Vector>() );
 					SetReturn<Vector>( vm, self.GetForward() );
 				} ),
 				DefineGetter<Vector>( "right", [] ( WrenVM* vm ) {
 					const Quaternion&	self( GetSlotAs<Quaternion>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Vector>() );
+					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Vector>() );
 					SetReturn<Vector>( vm, self.GetRight() );
 				} ),
 				DefineGetter<Vector>( "up", [] ( WrenVM* vm ) {
 					const Quaternion&	self( GetSlotAs<Quaternion>( vm, 0 ) );
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Vector>() );
+					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Vector>() );
 					SetReturn<Vector>( vm, self.GetUp() );
-				} )
-			},
-			{/*	Methods */
-				DefineStaticMethod<double ( Quaternion, Quaternion )>( "dot", [] ( WrenVM* vm ) {
-					wrenSetSlotDouble( vm, 0, DotProduct( GetSlotAs<Quaternion>( vm, 1 ), GetSlotAs<Quaternion>( vm, 2 ) ) );
 				} ),
-				DefineMethod<const Utf8Char* ()>( "toString", [] ( WrenVM* vm ) {
+				DefineGetter<const Utf8Char*>( "toString", [] ( WrenVM* vm ) {
 					fmt::memory_buffer	string;
 					float32				coefficients[4];
 
 					GetSlotAs<Quaternion>( vm, 0 ).ExtractCoefficients( coefficients );
 
-					fmt::format_to( string, "[i={}, j={}, k={}, w={}]", coefficients[0], coefficients[1], coefficients[2], coefficients[3] );
-					
-					wrenSetSlotString( vm, 0, string.data() );
+					fmt::format_to( string, "<i={}, j={}, k={}, w={}>", coefficients[3], coefficients[2], coefficients[1], coefficients[0] );
+
+					wrenSetSlotBytes( vm, 0, string.data(), string.size() );
+				} )
+			},
+			{/*	Methods */},
+			{/*	Static methods */
+				DefineMethod<double ( Quaternion, Quaternion )>( "dot", [] ( WrenVM* vm ) {
+					wrenSetSlotDouble( vm, 0, DotProduct( GetSlotAs<Quaternion>( vm, 1 ), GetSlotAs<Quaternion>( vm, 2 ) ) );
 				} )
 			},
 			{/*	Operators */}

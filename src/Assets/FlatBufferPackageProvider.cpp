@@ -91,13 +91,12 @@ namespace {
 	ErrorCode FlatBufferPackageProvider::BindResources() {
 		const PlatformString<>	logPath( _fileSystem.GetAbsolutePath( KnownDirectory::Logs, "ContentLog.txt" ) );
 
+		_fileSystem.Move( KnownDirectory::Logs, "ContentLog.old.txt", "ContentLog.txt" );
 		ET_FAIL_UNLESS( _log.BindResources( logPath.AsCString() ) );
 
-		_log.Write( MessageType::Message,
-			"\t======================================================" UTF8_NEWLINE
-			"\t| INITIALIZING LOG                                   |" UTF8_NEWLINE
-			"\t======================================================" UTF8_NEWLINE
-		);
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t| INITIALIZING LOG                                   |" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
 
 		return Error::None;
 	}
@@ -105,11 +104,9 @@ namespace {
 // ---------------------------------------------------
 
 	void FlatBufferPackageProvider::FreeResources() {
-		_log.Write( MessageType::Message,
-			"\t======================================================" UTF8_NEWLINE
-			"\t| TERMINATING LOG                                    |" UTF8_NEWLINE
-			"\t======================================================" UTF8_NEWLINE
-		);
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t| TERMINATING LOG                                    |" UTF8_NEWLINE );
+		_log.Write( MessageType::Message, "\t======================================================" UTF8_NEWLINE );
 
 		_log.FreeResources();
 	}
@@ -118,7 +115,7 @@ namespace {
 
 	void FlatBufferPackageProvider::Load( Package& package ) {
 		String<>	path( MallocAllocator( "Path Allocator" ) );
-		Stopwatch		loadTimer;
+		Stopwatch	loadTimer;
 
 		_log.Write( MessageType::Message, "Loading package {}." UTF8_NEWLINE, package.GetPath() );
 
@@ -161,9 +158,12 @@ namespace {
 				continue;
 			}
 
-			if (UniquePointer<Asset> asset = _assetDatabase.CreateAsset( source->Name()->c_str() ) ) {				
-				asset->BindResources( Asset::Builder( _log, blobFile.GetRangeAtOffset<const char>( source->Offset(), source->Length() ) ) );
-				assets.Append( eastl::move( asset ) );
+			if (UniquePointer<Asset> asset = _assetDatabase.CreateAsset( source->Name()->c_str() ) ) {
+				const auto begin( blobFile.GetAtOffset<const char>( source->Offset() ) );
+				
+				if (Succeeded( asset->BindResources( Asset::Builder( _log, begin, begin + source->Length() ) ) )) {
+					assets.Append( eastl::move( asset ) );
+				}
 			}
 		}
 

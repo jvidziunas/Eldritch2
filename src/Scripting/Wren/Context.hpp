@@ -42,6 +42,8 @@ namespace Wren {
 	// ---------------------------------------------------
 
 	public:
+	/*!	Returns a callable handle (i.e. may be used as an argument to `wrenCall()`) to a stub function that sends `call(_)`
+		to the object bound as the receiver. */
 		WrenHandle*	GetUnaryCallStub() const;
 
 		WrenVM*		GetVm();
@@ -55,11 +57,12 @@ namespace Wren {
 
 	public:
 		template <typename Type>
-		WrenHandle*	GetForeignClass() const;
+		WrenHandle*	FindForeignClass() const;
 
 		WrenHandle*	CreateForeignClass( const char* module, const char* name, Type type );
 
 		void*		CreateVariable( const char* module, const char* name, WrenHandle* klass, size_t size );
+		void		CreateVariable( const char* module, const char* name, double value );
 
 	// ---------------------------------------------------
 
@@ -77,9 +80,6 @@ namespace Wren {
 	// - DATA MEMBERS ------------------------------------
 
 	private:
-	/*!	Root allocator for memory required by the Wren runtime. Mutable as allocated objects
-		are not logically part of the @ref Context internal state. */
-		mutable UsageMixin<MallocAllocator>	_allocator;
 	//!	Log used to track errors and print debug messages.
 		mutable Logging::ChildLog			_log;
 	//!	@ref AssetDatabase used to service asset/script import requests. Never null.

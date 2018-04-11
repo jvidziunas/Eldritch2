@@ -1,0 +1,39 @@
+file_identifier	"E2GP";
+file_extension	".e2graphicspipeline";
+
+namespace Eldritch2.Graphics.FlatBuffers;
+
+table DrawStage {
+	ShaderUsageName		: string	(required);
+	InstanceSources		: [string]	(required);
+	InputAttachments	: [string]	(required);
+	ColorOutputs		: [string]	(required);
+	DepthAttachment		: string;
+}
+
+table ComputeStage {
+	ShaderName			: string   (required);
+	InputAttachments	: string   (required);
+	OutputAttachments	: [string] (required);
+}
+
+table ImageCopy {
+	Source				: string (required);
+	Target				: string (required);
+}
+
+table CopyStage {
+	ImageCopies			: [ImageCopy];
+}
+
+union GraphicsStage {
+	DrawStage,
+	CopyStage,
+	ComputeStage
+}
+
+table GraphicsPipeline {
+	Stages				: [GraphicsStage] (required);
+}
+
+root_type GraphicsPipeline;

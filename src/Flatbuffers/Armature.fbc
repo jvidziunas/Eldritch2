@@ -25,14 +25,14 @@ union PhysicsConstraint {
 }
 
 table JointDescriptor {
+	ParentIndex					: ubyte;
 	BindPose					: Bone (required);
-	ParentIndex					: ushort;
 	Constraint					: PhysicsConstraint (required);
 }
 
 table SocketDescriptor {
+	BoneIndex					: ubyte;
 	Name						: string (required);
-	BoneIndex					: ushort;
 }
 
 table Armature {

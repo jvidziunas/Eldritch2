@@ -18,8 +18,24 @@
 namespace Eldritch2 {
 namespace Assets {
 
-	ETInlineHint Range<const char*> Asset::Builder::GetRawBytes() const {
-		return _bytes;
+	ETInlineHint Asset::Builder::Builder( Logging::Log& log, const char* begin, const char* end ) : _log( log ), _begin( begin ), _end( end ) {}
+
+// ---------------------------------------------------
+
+	ETInlineHint const char* Asset::Builder::Begin() const {
+		return _begin;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint const char* Asset::Builder::End() const {
+		return _end;
+	}
+
+// ---------------------------------------------------
+
+	ETInlineHint size_t Asset::Builder::GetSize() const {
+		return _end - _begin;
 	}
 
 // ---------------------------------------------------

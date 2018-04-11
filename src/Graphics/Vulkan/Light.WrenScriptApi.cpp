@@ -15,8 +15,9 @@
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
 //------------------------------------------------------------------//
-#include <wren.h>
-//------------------------------------------------------------------//
+
+double	wrenGetSlotDouble( WrenVM* vm, int slot );
+void	wrenSetSlotHandle( WrenVM* vm, int slot, WrenHandle* handle );
 
 namespace Eldritch2 {
 namespace Graphics {
@@ -46,7 +47,7 @@ namespace {
 					[] ( WrenVM* vm ) {
 						Light&	self( GetSlotAs<Light>( vm, 0 ) );
 
-						wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<RgbColor>() );
+						wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<RgbColor>() );
 						SetReturn<RgbColor>( vm, self.color );
 					},
 				//	Setter
@@ -60,7 +61,7 @@ namespace {
 					[] ( WrenVM* vm ) {
 						Light&	self( GetSlotAs<Light>( vm, 0 ) );
 
-						wrenSetSlotHandle( vm, 0, AsContext( vm ).GetForeignClass<Transformation>() );
+						wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
 						SetReturn<Transformation>( vm, self.localToWorld );
 					},
 				//	Setter
@@ -70,6 +71,7 @@ namespace {
 				)
 			},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

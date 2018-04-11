@@ -14,18 +14,15 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Input/Win32/InputDevices.hpp>
 #include <Core/EngineComponent.hpp>
 #include <Scheduling/Thread.hpp>
+#include <Input/InputDevice.hpp>
 #include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 
-struct HHOOK__;
-struct HWND__;
-
 using HANDLE	= void*;
-using HHOOK		= HHOOK__*;
-using HWND		= HWND__*;
+using HHOOK		= struct HHOOK__*;
+using HWND		= struct HWND__*;
 
 namespace Eldritch2 {
 namespace Input {
@@ -35,32 +32,21 @@ namespace Win32 {
 	// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		class SamplingThread : public Scheduling::Thread {
-		// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			template <typename Value>
-			using DeviceMap = ArrayMap<HANDLE, Value>;
-
+		class ReaderThread : public Scheduling::Thread {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
+		//!	Constructs this @ref ReaderThread instance.
+			ReaderThread( Win32InputEngineComponent& owner );
 		//!	Disable copy construction.
-			SamplingThread( const SamplingThread& ) = delete;
-		//!	Constructs this @ref SamplingThread instance.
-			SamplingThread( Logging::Log& log );
+			ReaderThread( const ReaderThread& ) = delete;
 
-			~SamplingThread() = default;
+			~ReaderThread() = default;
 
 		// ---------------------------------------------------
 			
 		public:
 			Utf8Literal	GetName() const override sealed;
-
-		// ---------------------------------------------------
-
-		public:
-			void	ScanDevices();
 
 		// ---------------------------------------------------
 
@@ -72,21 +58,19 @@ namespace Win32 {
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
-			SamplingThread&	operator=( const SamplingThread& ) = delete;
+			ReaderThread&	operator=( const ReaderThread& ) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 		private:
-		//!	Mutable so logs may be written in const methods.
-			mutable Logging::ChildLog	_log;
+			Win32InputEngineComponent&	_owner;
 		/*!	Win32 raw input requires a window for input registration. The handle is exposed primarily for the
 		 *	engine component to issue a shutdown request to the sampling thread when the application terminates,
 		 *	as there is little need to push state to the window. */
-			std::atomic<HWND>			_window;
-
-			DeviceMap<Keyboard>			_keyboardsByHandle;
-			DeviceMap<Mouse>			_miceByHandle;
+			Atomic<HWND>				_window;
 		};
+
+	// ---
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -107,6 +91,15 @@ namespace Win32 {
 
 	// ---------------------------------------------------
 
+	protected:
+	//!	Polls the system for all attached raw input devices and creates dispatch structures for routing input events to game systems.
+		void	ScanDevices();
+
+	//!	Broadcasts a single Win32 raw input event to the appropriate subscriber.
+		void	Dispatch( const RAWINPUT& event ) const;
+
+	// ---------------------------------------------------
+
 	//!	Disable copy assignment.
 		Win32InputEngineComponent&	operator=( const Win32InputEngineComponent& ) = delete;
 
@@ -114,9 +107,13 @@ namespace Win32 {
 
 	private:
 	//!	Mutable so logs may be written in const methods.
-		mutable Logging::ChildLog	_log;
-		const HHOOK					_keyboardHook;
-		SamplingThread				_inputSampler;
+		mutable Logging::ChildLog		_log;
+		const HHOOK						_keyboardHook;
+
+		ReaderThread					_inputReader;
+		ArrayMap<HANDLE, InputDevice>	_devicesByHandle;
+		ArrayList<InputDevice*>			_mice;
+		ArrayList<InputDevice*>			_keyboards;
 	};
 
 }	// namespace Win32

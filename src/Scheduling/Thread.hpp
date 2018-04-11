@@ -65,7 +65,6 @@ namespace Scheduling {
 
 	//! Notifies this Thread instance that it should terminate, and blocks the calling thread until it completes doing so.
 	/*!	@remark The turnaround time for a full termination is very much unbounded. Where possible, try to call @ref Thread::ShutDown() ahead of time and then call this function at the last possible moment.
-		@see @ref Thread::ShutDown()
 		@see @ref Thread::IsRunning() */
 		void	AwaitCompletion();
 

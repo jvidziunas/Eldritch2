@@ -42,6 +42,8 @@ namespace Eldritch2 {
 	// ---------------------------------------------------
 
 	public:
+		ErrorCode	CreateOrTruncate( const PlatformChar* path );
+
 		ErrorCode	OpenOrCreate( const PlatformChar* path );
 
 		ErrorCode	Open( const PlatformChar* path );

@@ -45,6 +45,7 @@ namespace Wren {
 					wrenReleaseHandle( vm, target );
 				} )
 			},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

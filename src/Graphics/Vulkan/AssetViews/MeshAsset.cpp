@@ -45,13 +45,11 @@ namespace AssetViews {
 
 // ---------------------------------------------------
 
-	ErrorCode MeshAsset::BindResources( const Builder& builder ) {
-		const Range<const char*>&	assetData( builder.GetRawBytes() );
-
+	ErrorCode MeshAsset::BindResources( const Builder& asset ) {
 	//	Verify the data we're working with can plausibly represent a mesh.
-		Verifier verifier( reinterpret_cast<const uint8_t*>(assetData.Begin()), assetData.GetSize() );
+		Verifier verifier( reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize() );
 		if (!VerifyMeshBuffer( verifier )) {
-			builder.WriteLog( MessageType::Error, "Mesh {} is malformed!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "Mesh {} is malformed!" UTF8_NEWLINE, GetPath() );
 			return Error::Unspecified;
 		}
 

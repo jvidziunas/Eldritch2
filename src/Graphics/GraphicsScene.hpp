@@ -61,22 +61,22 @@ namespace Graphics {
 
 // ---
 
-	class Mesh {
+	class MeshInstance {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref Mesh instance.
-		Mesh( const Animation::Armature& armature, const MeshSource& source );
-	//!	Constructs this @ref Mesh instance.
-		Mesh( const Mesh& ) = default;
+	//!	Constructs this @ref MeshInstance instance.
+		MeshInstance( const Animation::Armature& armature, const MeshSource& source );
+	//!	Constructs this @ref MeshInstance instance.
+		MeshInstance( const MeshInstance& ) = default;
 
-		~Mesh() = default;
+		~MeshInstance() = default;
 		
 	// - DATA MEMBERS ------------------------------------
 
 	public:
 		const Animation::Armature*	armature;
-		const MeshSource*		source;
+		const MeshSource*			source;
 	};
 
 // ---
@@ -120,7 +120,7 @@ namespace Graphics {
 		// ---------------------------------------------------
 
 		public:
-			uintptr	operator()( const Mesh& geometry ) const;
+			uintptr	operator()( const MeshInstance& geometry ) const;
 			uintptr	operator()( const Light& light ) const;
 
 		// - DATA MEMBERS ------------------------------------
@@ -133,7 +133,7 @@ namespace Graphics {
 
 	public:
 		using PortalViewConcept	= ViewConcept<PortalView, MallocAllocator>;
-		using GeometryConcept	= RenderConcept<Mesh, LeafExtractor, MallocAllocator>;
+		using GeometryConcept	= RenderConcept<MeshInstance, LeafExtractor, MallocAllocator>;
 		using LightConcept		= RenderConcept<Light, LeafExtractor, MallocAllocator>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------

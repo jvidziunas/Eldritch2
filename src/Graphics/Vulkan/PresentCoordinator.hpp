@@ -46,7 +46,7 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	public:
-		CountedPointer<OutputWindow>	GetWindowByName( const Utf8Char* name );
+		CountedPointer<OutputWindow>	FindWindowByName( const Utf8Char* name );
 
 	// ---------------------------------------------------
 

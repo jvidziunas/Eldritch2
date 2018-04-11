@@ -77,7 +77,7 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	CountedPointer<OutputWindow> PresentCoordinator::GetWindowByName( const Utf8Char* name ) {
+	CountedPointer<OutputWindow> PresentCoordinator::FindWindowByName( const Utf8Char* name ) {
 		Lock	_( _outputsMutex );
 
 		NameMap<OutputWindow>::Iterator	candidate( _outputsByName.Find( name, Hash<decltype(name)>(), EqualTo<decltype(name)>() ) );

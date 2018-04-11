@@ -68,11 +68,27 @@ namespace Detail {
 
 // ---------------------------------------------------
 
-	void Swap( AbstractBuffer& buffer0, AbstractBuffer& buffer1 ) {
+	void* AbstractBuffer::MapHostPointer( GpuHeap& heap ) {
+		void*	result( nullptr );
+
+		vmaMapMemory( heap, _backing, &result );
+
+		return result;
+	}
+
+// ---------------------------------------------------
+
+	void AbstractBuffer::UnmapHostPointer( GpuHeap& heap ) {
+		vmaUnmapMemory( heap, _backing );
+	}
+
+// ---------------------------------------------------
+
+	void Swap( AbstractBuffer& lhs, AbstractBuffer& rhs ) {
 		using ::Eldritch2::Swap;
 
-		Swap( buffer0._buffer,  buffer1._buffer );
-		Swap( buffer0._backing, buffer1._backing );
+		Swap( lhs._buffer,  rhs._buffer );
+		Swap( lhs._backing, rhs._backing );
 	}
 
 }	// namespace Detail

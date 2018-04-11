@@ -15,15 +15,18 @@
 #include <Scripting/Wren/ApiBuilder.hpp>
 #include <Scripting/Wren/Game.hpp>
 //------------------------------------------------------------------//
-#include <wren.h>
-//------------------------------------------------------------------//
+
+WrenHandle* wrenGetSlotHandle( WrenVM* vm, int slot );
+double		wrenGetSlotDouble( WrenVM* vm, int slot );
+void		wrenSetSlotDouble( WrenVM* vm, int slot, double value );
+bool		wrenGetSlotBool( WrenVM* vm, int slot );
 
 namespace Eldritch2 {
 namespace Scripting {
 namespace Wren {
 
 	ET_IMPLEMENT_WREN_CLASS( Game ) {
-		api.CreateClass<Game>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "_Game",
+		api.CreateClass<Game>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "Game_",
 			{/* Constructors */ },
 			{/*	Properties */
 				DefineSetter<WrenHandle>( "whenPlayerJoins", [] ( WrenVM* vm ) {
@@ -31,9 +34,24 @@ namespace Wren {
 				} ),
 				DefineSetter<WrenHandle>( "whenPlayerLeaves", [] ( WrenVM* vm ) {
 					GetSlotAs<Game>( vm, 0 ).SetPlayerLeaveHandler( vm, wrenGetSlotHandle( vm, 1 ) );
+				} ),
+				DefineProperty<double>( "timeScalar",
+				//	Getter
+					[] ( WrenVM* vm ) {
+						wrenSetSlotDouble( vm, 0, GetSlotAs<Game>( vm, 0 ).GetTimeScalar() );
+					},
+				//	Setter
+					[] ( WrenVM* vm ) {
+						GetSlotAs<Game>( vm, 0 ).SetTimeScalar( wrenGetSlotDouble( vm, 1 ) );
+					}
+				)
+			},
+			{/*	Methods */
+				DefineMethod<void ( bool )>( "shutDown", [] ( WrenVM* vm ) {
+					GetSlotAs<Game>( vm, 0 ).ShutDown( wrenGetSlotBool( vm, 1 ) );
 				} )
 			},
-			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

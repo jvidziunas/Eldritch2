@@ -1,0 +1,14 @@
+include			"ShaderPackageTypes.fbc";
+file_identifier	"EXSP";
+file_extension	".e2dxbcshaderpackage";
+
+namespace Eldritch2.Graphics.Direct3D.FlatBuffers;
+
+table UsageDescriptor {
+}
+
+table DxbcShaderPackage {
+	Usages	: [UsageDescriptor];
+}
+
+root_type DxbcShaderPackage;

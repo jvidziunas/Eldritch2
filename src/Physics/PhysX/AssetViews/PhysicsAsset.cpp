@@ -117,7 +117,8 @@ namespace {
 		const Utf8Char* const filePath
 	) : Asset( filePath ),
 		_rigidShapes( MallocAllocator( "PhysX Physics Asset Rigid Shape Collection Allocator" ) ),
-		_clothShapes( MallocAllocator( "PhysX Physics Asset Cloth Shape Collection Allocator" ) ) {}
+		_clothShapes( MallocAllocator( "PhysX Physics Asset Cloth Shape Collection Allocator" ) ) {
+	}
 
 // ---------------------------------------------------
 
@@ -133,27 +134,25 @@ namespace {
 
 // ---------------------------------------------------
 
-	ErrorCode PhysicsAsset::BindResources( const Builder& builder ) {
-		const auto&	bytes( builder.GetRawBytes() );
-
+	ErrorCode PhysicsAsset::BindResources( const Builder& asset ) {
 	//	Verify the data we are considering can plausibly represent a collision asset.
-		Verifier verifier( reinterpret_cast<const uint8_t*>(bytes.Begin()), bytes.GetSize() );
+		Verifier verifier( reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize() );
 		if (!VerifyPhysicsBodyBuffer( verifier )) {
-			builder.WriteLog( MessageType::Error, "{} is malformed!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "{} is malformed!" UTF8_NEWLINE, GetPath() );
 			return Error::InvalidParameter;
 		}
 
-		const PhysicsBody&	asset( *GetPhysicsBody( bytes.Begin() ) );
+		const PhysicsBody*	physicsAsset( GetPhysicsBody( asset.Begin() ) );
 
-		Result<ArrayList<RigidShape>> createRigidShapesResult( CreateRigidShapes( _rigidShapes.GetAllocator(), PxGetPhysics(), *asset.RigidShapes() ) );
+		Result<ArrayList<RigidShape>> createRigidShapesResult( CreateRigidShapes( _rigidShapes.GetAllocator(), PxGetPhysics(), *physicsAsset->RigidShapes() ) );
 		if (Failed( createRigidShapesResult )) {
-			builder.WriteLog( MessageType::Error, "Rigid shape data for {} is malformed!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "Rigid shape data for {} is malformed!" UTF8_NEWLINE, GetPath() );
 			return createRigidShapesResult;
 		}
 
-		Result<ArrayList<ClothShape>> createClothShapesResult( CreateClothShapes( _clothShapes.GetAllocator(), PxGetPhysics(), *asset.ClothShapes() ) );
+		Result<ArrayList<ClothShape>> createClothShapesResult( CreateClothShapes( _clothShapes.GetAllocator(), PxGetPhysics(), *physicsAsset->ClothShapes() ) );
 		if (Failed( createClothShapesResult )) {
-			builder.WriteLog( MessageType::Error, "Cloth shape data for {} is malformed!" UTF8_NEWLINE, GetPath() );
+			asset.WriteLog( MessageType::Error, "Cloth shape data for {} is malformed!" UTF8_NEWLINE, GetPath() );
 			return createClothShapesResult;
 		}
 

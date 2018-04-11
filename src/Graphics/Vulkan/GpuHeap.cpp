@@ -30,15 +30,16 @@ namespace Vulkan {
 // ---------------------------------------------------
 
 	GpuHeap::GpuHeap(
-		GpuHeap&& allocator
-	) : _allocator( eastl::exchange( allocator._allocator, nullptr ) ),
-		_imageGarbage( eastl::move( allocator._imageGarbage ) ),
-		_bufferGarbage( eastl::move( allocator._bufferGarbage ) ) {}
+		GpuHeap&& heap
+	) ETNoexceptHint : _allocator( eastl::exchange( heap._allocator, nullptr ) ),
+		_imageGarbage( eastl::move( heap._imageGarbage ) ),
+		_bufferGarbage( eastl::move( heap._bufferGarbage ) ) {
+	}
 
 // ---------------------------------------------------
 
 	GpuHeap::~GpuHeap() {
-		ET_ASSERT( _allocator == nullptr, "Leaking Vulkan allocator instance!" );
+		ET_ASSERT( _allocator == nullptr, "Leaking Vulkan allocator!" );
 	}
 
 // ---------------------------------------------------
@@ -48,8 +49,8 @@ namespace Vulkan {
 		GarbageList<VkBuffer>	bufferGarbage( _bufferGarbage.GetAllocator() );
 
 		{	Lock	_( _garbageMutex );
-			Swap( _imageGarbage,	imageGarbage );
-			Swap( _bufferGarbage,	bufferGarbage );
+			Swap( _imageGarbage,  imageGarbage );
+			Swap( _bufferGarbage, bufferGarbage );
 		}	// End of lock scope.
 
 		for (const Pair<VkImage, VmaAllocation>& garbage : imageGarbage) {
@@ -69,8 +70,8 @@ namespace Vulkan {
 		VmaAllocator allocator;
 		const VmaAllocatorCreateInfo allocatorInfo{
 			VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT,
-			static_cast<VkPhysicalDevice>(gpu),
-			static_cast<VkDevice>(gpu),
+			VkPhysicalDevice( gpu ),
+			VkDevice( gpu ),
 			heapBlockSize,
 			gpu.GetAllocationCallbacks(),
 			nullptr

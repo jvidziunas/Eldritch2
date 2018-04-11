@@ -54,7 +54,14 @@ namespace {
 	using namespace ::Eldritch2::Graphics::Vulkan::AssetViews;
 	using namespace ::Eldritch2::Scheduling;
 
-	VulkanGraphicsScene::VulkanGraphicsScene() : GraphicsScene( GeometryCellDimensions, LightCellDimensions ), _frameId( 0u ) {}
+	VulkanGraphicsScene::VulkanGraphicsScene(
+	) : GraphicsScene( GeometryCellDimensions, LightCellDimensions ),
+		_heap(),
+		_transforms(),
+		_batchCoordinator(),
+		_frameId( 0u ),
+		_queuedFrames{} {
+	}
 
 // ---------------------------------------------------
 
@@ -85,6 +92,9 @@ namespace {
 					Failed( frame.commands.BeginRecording( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT ) ) ) {
 					return;
 				}
+
+				_transforms.MapHostPointer( _heap );
+				ET_AT_SCOPE_EXIT( _transforms.UnmapHostPointer( _heap ) );
 
 				for (const View& view : views) {
 					frame.commands.SetStencilReference( VK_STENCIL_FRONT_AND_BACK, view.id );
@@ -128,14 +138,18 @@ namespace {
 		ET_FAIL_UNLESS( heap.BindResources( gpu, GpuHeapBlockSize ) );
 		ET_AT_SCOPE_EXIT( heap.FreeResources( gpu ) );
 
+		UniformBuffer transforms;
+		ET_FAIL_UNLESS( transforms.BindResources( heap, transformArenaSize * MaxQueuedFrames ) );
+		ET_AT_SCOPE_EXIT( transforms.FreeResources( heap ) );
+
+		BatchCoordinator batchCoordinator;
+		ET_FAIL_UNLESS( batchCoordinator.BindResources( heap ) );
+		ET_AT_SCOPE_EXIT( batchCoordinator.FreeResources( heap ) );
+
 		for (Frame& frame : _queuedFrames) {
 			DescriptorTable	descriptors;
 			ET_FAIL_UNLESS( descriptors.BindResources( gpu, DescriptorPoolSizeInElements ) );
 			ET_AT_SCOPE_EXIT( descriptors.FreeResources( gpu ) );
-
-			UniformBuffer transforms;
-			ET_FAIL_UNLESS( transforms.BindResources( heap, transformArenaSize ) );
-			ET_AT_SCOPE_EXIT( transforms.FreeResources( heap ) );
 
 			CommandList commands;
 			ET_FAIL_UNLESS( commands.BindResources( gpu, QueueConcept::Drawing, 0u ) );
@@ -150,14 +164,14 @@ namespace {
 			ET_FAIL_UNLESS( vkCreateFence( gpu, &commandsConsumedInfo, gpu.GetAllocationCallbacks(), &commandsConsumed ) );
 			ET_AT_SCOPE_EXIT( vkDestroyFence( gpu, commandsConsumed, gpu.GetAllocationCallbacks() ) );
 
-			Swap( frame.descriptors,        descriptors );
-			Swap( frame.transforms,			transforms );
-			Swap( frame.commands,			commands );
-			Swap( frame.commandsConsumed,	commandsConsumed );
+			Swap( frame.descriptors,      descriptors );
+			Swap( frame.commands,         commands );
+			Swap( frame.commandsConsumed, commandsConsumed );
 		}
 
-		Swap( _heap, heap );
-
+		Swap( _heap,             heap );
+		Swap( _transforms,       transforms );
+		Swap( _batchCoordinator, batchCoordinator );
 		_frameId = 0u;
 
 		return VK_SUCCESS;
@@ -169,15 +183,15 @@ namespace {
 		Gpu&	gpu( vulkan.GetPrimaryDevice() );
 
 		for (Frame& frame : _queuedFrames) {
-			for (RenderPipeline& pipeline : frame.pipelines) pipeline.FreeResources( gpu );
+			for (GraphicsPipeline& pipeline : frame.pipelines) pipeline.FreeResources( gpu );
 
 			vkDestroyFence( gpu, eastl::exchange( frame.commandsConsumed, nullptr ), gpu.GetAllocationCallbacks() );
 
 			frame.commands.FreeResources( gpu );
-			frame.transforms.FreeResources( _heap );
 			frame.descriptors.FreeResources( gpu );
 		}
 
+		_transforms.FreeResources( _heap );
 		_heap.FreeResources( gpu );
 	}
 

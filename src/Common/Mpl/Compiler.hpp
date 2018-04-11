@@ -19,21 +19,13 @@
 
 //------------------------------------------------------------------//
 
-#if defined( __cplusplus ) && ( __cplusplus != 199711L )
-#	define ET_COMPILER_SUPPORTS_CPP11 1
-#else
-#	define ET_COMPILER_SUPPORTS_CPP11 0
-#endif
-
 #define _NULL_MACRO                         ((void)0)
 #define _ET_NULL_DEFINE
 #define ET_PREPROCESSOR_JOIN(a, b)          ET_PREPROCESSOR_JOIN1(a, b)
 #define ET_PREPROCESSOR_JOIN1(a, b)         ET_PREPROCESSOR_JOIN2(a, b)
 #define ET_PREPROCESSOR_JOIN2(a, b)         a##b
 
-// Since the Intel compiler tries to be a drop-in replacement
-// for MSVC, we'll check against its properties first
-// in order to rule it out
+// Since the Intel compiler tries to be a drop-in replacement for MSVC, we'll check against its properties first in order to rule it out
 #if defined( __INTEL_COMPILER ) || defined( __ICC ) || defined( __ECC )
 #	define ET_COMPILER_IS_MSVC              0
 #	define ET_COMPILER_IS_GCC               0
@@ -103,6 +95,11 @@
 #if !defined( _MT )
 #	error The engine requires that it be built with the Multithreaded CRT (debug or release) library for convenience.
 #endif
+#	if (_MSC_VER >= 1700)
+#		define ET_COMPILER_SUPPORTS_CPP11   1
+#	else
+#		define ET_COMPILER_SUPPORTS_CPP11   0
+#	endif
 #	define ET_COMPILER_IS_MSVC              1
 #	define ET_COMPILER_IS_GCC               0
 #	define ET_COMPILER_IS_ICC               0
@@ -248,7 +245,15 @@
 #	endif
 #endif
 
-#define ETUnreferencedParameter(ParameterName)         static_cast<void>(ParameterName)
+#if !defined( ET_COMPILER_SUPPORTS_CPP11 )
+#	if defined( __cplusplus ) && ( __cplusplus != 199711L )
+#		define ET_COMPILER_SUPPORTS_CPP11 1
+#	else
+#		define ET_COMPILER_SUPPORTS_CPP11 0
+#	endif
+#endif
+
+#define ETUnreferencedParameter(ParameterName) static_cast<void>(ParameterName)
 
 // Syntatic sugar. The function-style #define can be
 // used to make platform-dependent code and if/else
@@ -295,33 +300,23 @@ namespace Detail {
 
 	template <typename Type>
 	struct AlignmentOf {
-#if !ET_COMPILER_SUPPORTS_CPP11
-#	if ET_COMPILER_IS_MSVC
-		enum : size_t {
-			value = __alignof( Type )
-		};
-#	elif ET_COMPILER_IS_GCC
-		enum : size_t { 
-			value =  __alignof__( Type )
-		};
-#	else
-		enum : size_t { 
-			value = static_cast<size_t>( offsetof( struct{ char c; Type m; }, m ) )
-		};
-#	endif
+#if ET_COMPILER_SUPPORTS_CPP11
+		enum : size_t { Value = alignof( Type ) };
 #else
-		enum : size_t { 
-			value = alignof( Type )
-		};
-#endif	// !ET_COMPILER_SUPPORTS_CPP11
+#	if ET_COMPILER_IS_MSVC
+		enum : size_t { Value = __alignof( Type ) };
+#	elif ET_COMPILER_IS_GCC
+		enum : size_t { Value =  __alignof__( Type ) };
+#	else
+		enum : size_t { Value = static_cast<size_t>(offsetof( struct{ char c; Type m; }, m )) };
+#	endif
+#endif	// ET_COMPILER_SUPPORTS_CPP11
 	};
 
 }	// namespace Detail
 }	// namespace Eldritch2
 
-#if !ET_COMPILER_SUPPORTS_CPP11
-#	define ET_ALIGN_OF( x ) static_cast<size_t>( ::Eldritch2::Detail::AlignmentOf<x>::value )
-#endif	// !ET_COMPILER_SUPPORTS_CPP11
+#define ET_ALIGN_OF( type ) static_cast<size_t>(::Eldritch2::Detail::AlignmentOf<type>::Value)
 
 /*	Since the override specifiers and enum class language extensions are safely wrapped away in here, turn off the warnings.
  *	(4505) Some template classes will have unreferenced inline members. The optimizer/linker will strip these out, so we don't need to worry.

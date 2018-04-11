@@ -25,7 +25,7 @@ ET_POP_COMPILER_WARNING_STATE()
 namespace Eldritch2 {
 namespace Graphics {
 
-	ETInlineHint Mesh::Mesh( const Animation::Armature& armature, const MeshSource& source ) : source( &source ), armature( &armature ) {}
+	ETInlineHint MeshInstance::MeshInstance( const Animation::Armature& armature, const MeshSource& source ) : source( &source ), armature( &armature ) {}
 
 // ---------------------------------------------------
 
@@ -37,7 +37,7 @@ namespace Graphics {
 
 // ---------------------------------------------------
 
-	ETInlineHint uintptr GraphicsScene::LeafExtractor::operator()( const Mesh& geometry ) const {
+	ETInlineHint uintptr GraphicsScene::LeafExtractor::operator()( const MeshInstance& geometry ) const {
 		float32	scaledPosition[4];
 
 		(_inverseCellLength * geometry.armature->GetLocalToWorld().translation).ExtractCoefficients( scaledPosition );

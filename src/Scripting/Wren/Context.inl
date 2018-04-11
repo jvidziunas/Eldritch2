@@ -29,7 +29,7 @@ namespace Wren {
 // ---------------------------------------------------
 
 	template <typename Type>
-	ETInlineHint WrenHandle* Context::GetForeignClass() const {
+	ETInlineHint WrenHandle* Context::FindForeignClass() const {
 		const auto	candidate( _classesByType.Find( typeid(Type) ) );
 
 		return candidate != _classesByType.End() ? candidate->second : nullptr;

@@ -40,6 +40,7 @@ namespace Wren {
 					self.CallAtGameTime( time, wrenGetSlotHandle( vm, 2 ) );
 				} )
 			},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}

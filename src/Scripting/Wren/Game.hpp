@@ -15,6 +15,12 @@
 
 //------------------------------------------------------------------//
 
+namespace Eldritch2 {
+	namespace Core {
+		class	World;
+	}
+}
+
 struct	WrenHandle;
 struct	WrenVM;
 
@@ -26,10 +32,10 @@ namespace Wren {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
+	//!	Constructs this @ref Game instance.
+		Game( Core::World& world );
 	//!	Disable copy construction.
 		Game( const Game& ) = delete;
-	//!	Constructs this @ref Game instance.
-		Game();
 
 		~Game();
 
@@ -38,7 +44,19 @@ namespace Wren {
 	public:
 		void	HandlePlayerJoin( WrenVM* vm, WrenHandle* unaryCallHandle, const Utf8Char* const name );
 
-		void	HandlePlayerLeave( WrenVM* vm, WrenHandle* unaryCallHandle );
+		void	HandlePlayerLeave( WrenVM* vm, WrenHandle* unaryCallHandle, const Utf8Char* const name );
+
+	// ---------------------------------------------------
+
+	public:
+		void	FreeResources( WrenVM* vm );
+
+	// ---------------------------------------------------
+
+	public:
+		double	GetTimeScalar() const;
+
+		void	SetTimeScalar( double value );
 
 	// ---------------------------------------------------
 
@@ -50,11 +68,13 @@ namespace Wren {
 	// ---------------------------------------------------
 
 	public:
-		void	FreeResources( WrenVM* vm );
+		void	ShutDown( bool andEngine ) const;
 
 	// - DATA MEMBERS ------------------------------------
 
 	private:
+		Core::World*			_world;
+
 		WrenHandle*				_playerJoinHandler;
 		WrenHandle*				_playerLeaveHandler;
 

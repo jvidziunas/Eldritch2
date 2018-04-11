@@ -71,6 +71,9 @@ namespace Eldritch2 {
 		void	Copy( KnownDirectory destinationDirectory, const Utf8Char* const destinationPath, KnownDirectory sourceDirectory, const Utf8Char* const sourcePath, OverwriteBehavior overwriteBehavior );
 		void	Copy( KnownDirectory directory, const Utf8Char* const destinationPath, const Utf8Char* const sourcePath, OverwriteBehavior overwriteBehavior );
 
+		void	Move( KnownDirectory destinationDirectory, const Utf8Char* const destinationPath, KnownDirectory sourceDirectory, const Utf8Char* const sourcePath );
+		void	Move( KnownDirectory directory, const Utf8Char* const destinationPath, const Utf8Char* const sourcePath );
+
 		void	Delete( KnownDirectory directory, const Utf8Char* const path );
 
 	// ---------------------------------------------------

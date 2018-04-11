@@ -32,9 +32,11 @@ namespace Animation {
 	// ---------------------------------------------------
 
 	public:
-		Transformation	GetLocalToWorld() const;
+		Transformation ETSimdCall	GetLocalToWorld() const;
 
-		Transformation	GetWorldToLocal() const;
+		Transformation ETSimdCall	GetWorldToLocal() const;
+
+		void ETSimdCall				SetLocalToWorld( Transformation localToWorld );
 
 	// - DATA MEMBERS ------------------------------------
 

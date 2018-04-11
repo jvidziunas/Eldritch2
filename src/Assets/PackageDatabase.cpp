@@ -19,30 +19,6 @@
 namespace Eldritch2 {
 namespace Assets {
 
-	ETPureFunctionHint bool PackageDatabase::PackageEqual::operator()( const Package& package, const Utf8Char* name ) const {
-		return StringsEqual( package.GetPath(), name );
-	}
-
-// ---------------------------------------------------
-
-	ETPureFunctionHint bool PackageDatabase::PackageEqual::operator()( const Package& package0, const Package& package1 ) const {
-		return (*this)( package0, package1.GetPath() );
-	}
-
-// ---------------------------------------------------
-
-	ETPureFunctionHint size_t PackageDatabase::PackageHash::operator()( const Package& package, size_t seed ) const {
-		return (*this)( package.GetPath(), seed );
-	}
-
-// ---------------------------------------------------
-
-	ETPureFunctionHint size_t PackageDatabase::PackageHash::operator()( const Utf8Char* name, size_t seed ) const {
-		return HashMemory( name, StringLength( name ), seed );
-	}
-
-// ---------------------------------------------------
-
 	PackageDatabase::PackageDatabase(
 	) : _packages( MallocAllocator( "Asset Database Package Bucket Allocator" ) ),
 		_gcCursor( _packages.Begin() ) {}
@@ -75,9 +51,9 @@ namespace Assets {
 		{	Lock	_( _packagesMutex );
 			GcCursor gcCursor( packages.Begin() );
 
-			Swap( _loadFunction,	loadFunction );
-			Swap( _gcCursor,		gcCursor );
-			Swap( _packages,		packages );
+			Swap( _loadFunction, loadFunction );
+			Swap( _gcCursor,     gcCursor );
+			Swap( _packages,     packages );
 		}	// End of lock scope.
 
 		//	The previous resident set will be destroyed at the end of scope, outside the lock.

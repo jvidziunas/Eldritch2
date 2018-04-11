@@ -30,7 +30,7 @@ namespace Logging {
 
 	ErrorCode FileLog::BindResources( const PlatformChar* path ) {
 		FileAppender appender;
-		ET_FAIL_UNLESS( appender.OpenOrCreate( path ) );
+		ET_FAIL_UNLESS( appender.CreateOrTruncate( path ) );
 
 		Swap( _appender, appender );
 

@@ -21,6 +21,7 @@
 #include <Common/Mpl/IntTypes.hpp>
 #include <Common/Mpl/Matrices.hpp>
 #include <Common/Mpl/Platform.hpp>
+#include <Common/Mpl/TypeTraits.hpp>
 #include <Common/Mpl/Vectors.hpp>
 
 //	Containers library
@@ -84,6 +85,7 @@
 #include <Common/Mutex.hpp>
 #include <Common/Pair.hpp>
 #include <Common/Platform.hpp>
+#include <Common/Ratio.hpp>
 #include <Common/Result.hpp>
 #include <Common/RuleSet.hpp>
 #include <Common/ScopeGuard.hpp>

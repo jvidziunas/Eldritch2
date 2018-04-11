@@ -43,7 +43,7 @@ namespace Graphics {
 	// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources( Range<const char*> header );
+		ErrorCode	BindResources( const char* begin, const char* end );
 
 		void		FreeResources();
 

@@ -33,9 +33,9 @@ namespace Vulkan {
 // ---------------------------------------------------
 
 	VkResult ResidencyCoordinator::SubmitFrameIo( JobExecutor& executor, Gpu& gpu ) {
-		executor.AwaitCondition( _ioBuilder.CheckCommandsConsumed( gpu ) );
+		executor.AwaitCondition( _bus.CheckCommandsConsumed( gpu ) );
 
-		return _ioBuilder.SubmitCommands( gpu );
+		return _bus.SubmitCommands( gpu );
 	}
 
 // ---------------------------------------------------
@@ -47,12 +47,12 @@ namespace Vulkan {
 		ET_FAIL_UNLESS( heap.BindResources( gpu, GpuHeapBlockSize ) );
 		ET_AT_SCOPE_EXIT( heap.FreeResources( gpu ) );
 
-		IoBuilder ioBuilder;
-		ET_FAIL_UNLESS( ioBuilder.BindResources( gpu, heap, transferBufferSize ) );
-		ET_AT_SCOPE_EXIT( ioBuilder.FreeResources( gpu, heap ) );
+		GpuBus bus;
+		ET_FAIL_UNLESS( bus.BindResources( gpu, heap, transferBufferSize ) );
+		ET_AT_SCOPE_EXIT( bus.FreeResources( gpu, heap ) );
 
-		Swap( _heap,      heap );
-		Swap( _ioBuilder, ioBuilder );
+		Swap( _heap, heap );
+		Swap( _bus,  bus );
 
 		return VK_SUCCESS;
 	}

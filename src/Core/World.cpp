@@ -62,12 +62,6 @@ namespace {
 
 // ---------------------------------------------------
 
-	World::~World() {
-		ETUnreferencedParameter( this );
-	}
-
-// ---------------------------------------------------
-
 	void World::Tick( JobExecutor& executor ) {
 		enum : uint32 {
 		//	Avoid spiral of death by capping the number of fixed-rate ticks that can be run per main loop invocation.

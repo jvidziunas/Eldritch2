@@ -196,7 +196,8 @@ namespace {
 		_sharedAppDataDirectory( GetSharedAppDataDirectory() ),
 		_packageDirectory( GetPackageDirectory( _workingDirectory ) ),
 		_downloadedPackageDirectory( GetDownloadedPackagesDirectoryPath( _userDocumentsDirectory ) ),
-		_logDirectory( GetLogDirectory( _userDocumentsDirectory ) ) {}
+		_logDirectory( GetLogDirectory( _userDocumentsDirectory ) ) {
+	}
 
 // ---------------------------------------------------
 
@@ -211,6 +212,20 @@ namespace {
 		const auto	destinationAbsolutePath( GetAbsolutePath( destination, destinationPath ) );
 
 		CopyFileW( sourceAbsolutePath, destinationAbsolutePath, OverwriteBehavior::SkipIfExists == overwriteBehavior ? TRUE : FALSE );
+	}
+
+// ---------------------------------------------------
+
+	void FileSystem::Move(
+		KnownDirectory destination,
+		const Utf8Char* const destinationPath,
+		KnownDirectory source,
+		const Utf8Char* const sourcePath
+	) {
+		const auto	sourceAbsolutePath( GetAbsolutePath( source, sourcePath ) );
+		const auto	destinationAbsolutePath( GetAbsolutePath( destination, destinationPath ) );
+
+		MoveFileExW( sourceAbsolutePath, destinationAbsolutePath, MOVEFILE_REPLACE_EXISTING );
 	}
 
 // ---------------------------------------------------

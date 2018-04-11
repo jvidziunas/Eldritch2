@@ -24,7 +24,8 @@ namespace Vulkan {
 	DescriptorTable::DescriptorTable(
 	) : _pool( nullptr ),
 		_descriptors( nullptr ),
-		_setLayout( nullptr ) {}
+		_setLayout( nullptr ) {
+	}
 
 // ---------------------------------------------------
 
@@ -116,12 +117,12 @@ namespace Vulkan {
 
 // ---------------------------------------------------
 
-	void Swap( DescriptorTable& set0, DescriptorTable& set1 ) {
+	void Swap( DescriptorTable& lhs, DescriptorTable& rhs ) {
 		using ::Eldritch2::Swap;
 
-		Swap( set0._pool,			set1._pool );
-		Swap( set0._descriptors,	set1._descriptors );
-		Swap( set0._setLayout,		set1._setLayout );
+		Swap( lhs._pool,        rhs._pool );
+		Swap( lhs._descriptors, rhs._descriptors );
+		Swap( lhs._setLayout,   rhs._setLayout );
 	}
 
 }	// namespace Vulkan

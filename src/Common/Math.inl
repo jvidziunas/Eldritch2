@@ -717,9 +717,21 @@ namespace Eldritch2 {
 
 // ---------------------------------------------------
 
+	ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint32 AsIntBits( float32 value ) {
+		return reinterpret_cast<const uint32&>(value);
+	}
+
+// ---------------------------------------------------
+
+	ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint64 AsIntBits( float64 value ) {
+		return reinterpret_cast<const uint64&>(value);
+	}
+
+// ---------------------------------------------------
+
+ET_PUSH_COMPILER_WARNING_STATE()
 /*	MSVC doesn't like that we use 'temp' in the below functions without initializing it,
  *	but for these specific use cases it doesn't actually matter, since we're writing the value. */
-ET_PUSH_COMPILER_WARNING_STATE()
 	ET_SET_MSVC_WARNING_STATE( disable : 4700 )
 
 	ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloat( int32 value ) {
@@ -758,6 +770,18 @@ ET_PUSH_COMPILER_WARNING_STATE()
 #	else
 		return static_cast<float32>(value);
 #	endif
+	}
+
+// ---------------------------------------------------
+
+	ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloatBits( uint32 value ) {
+		return reinterpret_cast<const float32&>( value );
+	}
+
+// ---------------------------------------------------
+
+	ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloatBits( uint64 value ) {
+		return reinterpret_cast<const float64&>( value );
 	}
 
 // ---------------------------------------------------

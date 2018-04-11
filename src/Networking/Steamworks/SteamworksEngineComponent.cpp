@@ -49,7 +49,6 @@ namespace Steamworks {
 		_log( log ),
 		_steamPort( DefaultSteamPort ),
 		_worldPorts( MallocAllocator( "Steamworks Port Pool Allocator" ) ),
-		_version( VERSION_STRING, MallocAllocator( "Steamworks Version String Allocator" ) ),
 		_bannedIds( MallocAllocator( "Steamworks Banned ID List Allocator" ) ) {
 	}
 
@@ -106,10 +105,7 @@ namespace Steamworks {
 		MICROPROFILE_SCOPEI( "Engine/Initialization", "Steamworks property registration", 0xBBBBBB );
 
 		properties.BeginSection( "Steamworks" )
-			.WhenPropertyChanged( "SteamPort", _steamPort )
-			.WhenPropertyChanged( "VersionString", [this] ( Range<const Utf8Char*> value ) {
-				_version.Assign( value.Begin(), value.End() );
-			} );
+			.WhenPropertyChanged( "SteamPort", _steamPort );
 
 		properties.BeginSection( "Steamworks.BannedSteamIds" )
 			.WhenDynamicPropertyChanged( [this] ( const Utf8Char* /*name*/, Range<const Utf8Char*> /*value*/ ) {
@@ -127,6 +123,10 @@ namespace Steamworks {
 		Steam_RunCallbacks( SteamAPI_GetHSteamPipe(), false );
 		SteamAPI_ReleaseCurrentThreadMemory();
 	}
+
+// ---------------------------------------------------
+
+	void SteamworksEngineComponent::AddLocalUser() {}
 
 }	// namespace Steamworks
 }	// namespace Networking

@@ -42,6 +42,7 @@ namespace PhysX {
 			},
 			{/*	Properties */},
 			{/*	Methods */},
+			{/*	Static methods */},
 			{/*	Operators */}
 		);
 	}
