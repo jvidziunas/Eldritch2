@@ -2,7 +2,7 @@
   Game.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -12,76 +12,51 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <wren.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Core {
-		class	World;
-	}
-}
-
-struct	WrenHandle;
-struct	WrenVM;
-
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	class Game {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref Game instance.
-		Game( Core::World& world );
-	//!	Disable copy construction.
-		Game( const Game& ) = delete;
+		//!	Disable copy construction.
+		Game(const Game&) = delete;
+		//!	Constructs this @ref Game instance.
+		Game();
 
 		~Game();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	HandlePlayerJoin( WrenVM* vm, WrenHandle* unaryCallHandle, const Utf8Char* const name );
+		WrenInterpretResult HandlePlayerJoin(WrenVM* vm, const Utf8Char* const name);
 
-		void	HandlePlayerLeave( WrenVM* vm, WrenHandle* unaryCallHandle, const Utf8Char* const name );
+		WrenInterpretResult HandlePlayerLeave(WrenVM* vm, const Utf8Char* const name);
 
-	// ---------------------------------------------------
-
-	public:
-		void	FreeResources( WrenVM* vm );
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		double	GetTimeScalar() const;
+		ErrorCode BindResources(WrenVM* vm);
 
-		void	SetTimeScalar( double value );
+		void FreeResources(WrenVM* vm);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	public:
-		void	SetPlayerJoinHandler( WrenVM* vm, WrenHandle* handler );
+		//!	Disable copy assignment.
+		Game& operator=(const Game&) = delete;
 
-		void	SetPlayerLeaveHandler( WrenVM* vm, WrenHandle* handler );
-
-	// ---------------------------------------------------
-
-	public:
-		void	ShutDown( bool andEngine ) const;
-
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Core::World*			_world;
+		WrenHandle* _game;
 
-		WrenHandle*				_playerJoinHandler;
-		WrenHandle*				_playerLeaveHandler;
+		WrenHandle* _whenPlayerJoinsStub;
+		WrenHandle* _whenPlayerLeavesStub;
 
-		SymbolTable<Utf8Char>	_entityTags;
-		ArrayList<WrenHandle*>	_gameObjects;
+		SymbolTable<Utf8Char>  _tags;
+		ArrayList<WrenHandle*> _gameObjects;
 	};
 
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren

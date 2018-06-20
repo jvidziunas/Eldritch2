@@ -2,8 +2,8 @@
   ImageAsset.hpp
   ------------------------------------------------------------------
   Purpose:
-  
-  
+
+
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
@@ -27,23 +27,23 @@ namespace AssetViews {
 	public:
 	//!	Constructs this @ref ImageAsset instance.
 	/*!	@param[in] path Null-terminated, UTF-8-encoded file system path to the asset this @ref ImageAsset describes. */
-		ImageAsset( const Utf8Char* const path );
+		ImageAsset(const Utf8Char* const path);
 	//!	Disable copy construction.
-		ImageAsset( const ImageAsset& ) = delete;
+		ImageAsset(const ImageAsset&) = delete;
 
 		~ImageAsset() override = default;
 
 	// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources( const Builder& builder ) override;
+		ErrorCode	BindResources(const Builder& builder) override;
 
 		void		FreeResources() override;
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
-		ImageAsset&	operator=( const ImageAsset& ) = delete;
+		ImageAsset&	operator=(const ImageAsset&) = delete;
 	};
 
 }	// namespace AssetViews

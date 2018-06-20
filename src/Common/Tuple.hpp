@@ -2,7 +2,7 @@
   Tuple.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -17,7 +17,7 @@
 
 namespace Eldritch2 {
 
-	template <typename... Elements>
-	using Tuple = eastl::tuple<Elements...>;
+template <typename... Elements>
+using Tuple = eastl::tuple<Elements...>;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

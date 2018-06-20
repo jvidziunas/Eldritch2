@@ -15,41 +15,39 @@
 #include <Animation/Clip.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Animation {
+namespace Eldritch2 { namespace Animation {
 
 	class BipedalWalkClip : public Animation::Clip {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		enum : size_t {
-			FootCount	= 2u
+			FootCount = 2u
 		};
 
-	// ---
+		// ---
 
 	public:
 		struct FootstepState {
-			uint64	endTime;
-			Vector	centerOfMassPosition;
-			float16	centerOfMassVelocity[3];
+			uint64  endTime;
+			Vector  centerOfMassPosition;
+			float16 centerOfMassVelocity[3];
 		};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref BipedalWalkClip instance.
-		BipedalWalkClip( const BipedalWalkClip& ) = delete;
-	//!	Constructs this @ref BipedalWalkClip instance.
+		//!	Constructs this @ref BipedalWalkClip instance.
+		BipedalWalkClip(const BipedalWalkClip&) = delete;
+		//!	Constructs this @ref BipedalWalkClip instance.
 		BipedalWalkClip();
 
 		~BipedalWalkClip() = default;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		FootstepState	_footStates[FootCount];
+		FootstepState _footStates[FootCount];
 	};
 
-}	// namespace Animation
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Animation

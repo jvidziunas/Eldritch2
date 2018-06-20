@@ -2,7 +2,7 @@
   WrenEngineComponent.AssetApi.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -21,19 +21,19 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+	namespace Scripting {
+		namespace Wren {
 
-	using namespace ::Eldritch2::Scripting::Wren::AssetViews;
-	using namespace ::Eldritch2::Assets;
+			using namespace ::Eldritch2::Scripting::Wren::AssetViews;
+			using namespace ::Eldritch2::Assets;
 
-	void WrenEngineComponent::AcceptVisitor( AssetApiBuilder& factories ) {
-		MICROPROFILE_SCOPEI( "Engine/Initialization", "Asset factory registration", 0xBBBBBB );
+			void WrenEngineComponent::AcceptVisitor(AssetApiBuilder& factories) {
+				MICROPROFILE_SCOPEI("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
 
-		factories.DefineType<DialogueSetAsset>( DialogueSetAsset::GetExtension() );
-		factories.DefineType<ScriptAsset>( ScriptAsset::GetExtension() );
-	}
+				factories.DefineType(DialogueSetAsset::GetExtension(), AssetApiBuilder::DefaultFactory<DialogueSetAsset>());
+				factories.DefineType(ScriptAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ScriptAsset>());
+			}
 
-}	// namespace Wren
-}	// namespace Scripting
+		}	// namespace Wren
+	}	// namespace Scripting
 }	// namespace Eldritch2

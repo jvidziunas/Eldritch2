@@ -2,7 +2,7 @@
   Interface.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -21,100 +21,94 @@
 #include <nuklear/nuklear.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		class	ImageSource;
-	}
-}
+namespace Eldritch2 { namespace Graphics {
+	class ImageSource;
+}} // namespace Eldritch2::Graphics
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	class Interface : public Graphics::MeshSource {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		Interface( const Interface& ) = delete;
-	//!	Constructs this @ref Interface instance.
+		//!	Disable copy construction.
+		Interface(const Interface&) = delete;
+		//!	Constructs this @ref Interface instance.
 		Interface();
 
 		~Interface();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
 		template <typename UnaryConsumer>
-		void	DoStaticLayoutRegion( float rowHeight, int columnWidth, int columns, UnaryConsumer commandGenerator );
+		void DoStaticLayoutRegion(float rowHeight, int columnWidth, int columns, UnaryConsumer commandGenerator);
 
 		template <typename UnaryConsumer>
-		void	DoDynamicLayoutRegion( float rowHeight, int columns, UnaryConsumer commandGenerator );
+		void DoDynamicLayoutRegion(float rowHeight, int columns, UnaryConsumer commandGenerator);
 
-	// ---------------------------------------------------
-
-	public:
-		nk_flags	DoTextEditBox( nk_flags flags, Utf8Char* const text, int* len, int max, nk_plugin_filter filter );
-
-		bool		DoButton( const Graphics::ImageSource& image, const Utf8Char* const text, nk_text_align alignment );
-
-		bool		DoCheckbox( const Utf8Char* const text, unsigned int* flags, unsigned int value );
-		bool		DoCheckbox( const Utf8Char* const text, bool* active );
-
-		bool		DoRadioButton( const Utf8Char* const text, int* isActive );
-
-		bool		DoRadioLabel( const Utf8Char* const text, nk_text_align alignment, int* value );
-
-		bool		DoSlider( double min, double* val, double max, double step );
-
-		bool		DoProgressBar( nk_size* cur, nk_size max, bool isMutable );
-
-		bool		DoColorPicker( nk_colorf* color, nk_color_format format );
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	DoText( const Utf8Char* const text, nk_flags alignment, nk_color textColor );
+		nk_flags DoTextEditBox(nk_flags flags, Utf8Char* const text, int* len, int max, nk_plugin_filter filter);
 
-		void	DoImage( const Graphics::ImageSource& image );
+		bool DoButton(const Graphics::ImageSource& image, const Utf8Char* const text, nk_text_align alignment);
 
-		void	DoProperty( const Utf8Char* const text, double min, double* val, double max, double step, double incrementPerPixel );
+		bool DoCheckbox(const Utf8Char* const text, unsigned int* flags, unsigned int value);
+		bool DoCheckbox(const Utf8Char* const text, bool* active);
 
-	// ---------------------------------------------------
+		bool DoRadioButton(const Utf8Char* const text, int* isActive);
+
+		bool DoRadioLabel(const Utf8Char* const text, nk_text_align alignment, int* value);
+
+		bool DoSlider(double min, double* val, double max, double step);
+
+		bool DoProgressBar(nk_size* cur, nk_size max, bool isMutable);
+
+		bool DoColorPicker(nk_colorf* color, nk_color_format format);
+
+		// ---------------------------------------------------
+
+	public:
+		void DoText(const Utf8Char* const text, nk_flags alignment, nk_color textColor);
+
+		void DoImage(const Graphics::ImageSource& image);
+
+		void DoProperty(const Utf8Char* const text, double min, double* val, double max, double step, double incrementPerPixel);
+
+		// ---------------------------------------------------
 
 	public:
 		template <typename UnaryConsumer>
-		void	DoStaticPopup( const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation );
+		void DoStaticPopup(const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
 
 		template <typename UnaryConsumer>
-		void	DoDynamicPopup( const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation );
+		void DoDynamicPopup(const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
 
 		template <typename UnaryConsumer>
-		void	DoWindow( const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation );
+		void DoWindow(const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
 
 		template <typename UnaryConsumer>
-		void	DoTooltip( float width, UnaryConsumer implementation );
+		void DoTooltip(float width, UnaryConsumer implementation);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	Stream( const VertexStreamRequest& vertices, const IndexStreamRequest& indices ) const override;
-		
-	// ---------------------------------------------------
+		void Stream(const VertexStreamRequest& vertices, const IndexStreamRequest& indices) const override;
+
+		// ---------------------------------------------------
 
 	public:
-		void	Clear();
+		void Clear();
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable nk_buffer	_commandPool;
-		mutable nk_context	_context;
+		mutable nk_buffer  _commandPool;
+		mutable nk_context _context;
 	};
 
-}	// namespace Nuklear
-}	// namespace UserInterface
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

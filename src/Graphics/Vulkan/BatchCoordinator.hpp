@@ -17,71 +17,76 @@
 #include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			class	CommandList;
-		}
-	}
-}
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class CommandList;
+}}} // namespace Eldritch2::Graphics::Vulkan
 
 namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
+	struct View {
+		//!  Set of planes to clip objects against.
+		Vector   frustumPlanes[6];
+		VkRect2D scissorRect;
+		uint8    id;
+	};
+
+	// ---
+
 	class BatchCoordinator {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		enum : VkDeviceSize {
 			InstanceBufferSize  = 2u * 1024u * 1024u, /*  2MB */
-			ParameterBufferSize =        16u * 1024u  /* 16KB */
+			ParameterBufferSize = 16u * 1024u         /* 16KB */
 		};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		BatchCoordinator( const BatchCoordinator& ) = delete;
-	//!	Constructs this @ref BatchCoordinator instance.
+		//!	Disable copy construction.
+		BatchCoordinator(const BatchCoordinator&) = delete;
+		//!	Constructs this @ref BatchCoordinator instance.
+		BatchCoordinator(BatchCoordinator&&);
+		//!	Constructs this @ref BatchCoordinator instance.
 		BatchCoordinator();
 
 		~BatchCoordinator() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap );
+		VkResult BindResources(Gpu& gpu);
 
-		void		FreeResources( GpuHeap& heap );
+		void FreeResources(Gpu& gpu);
 
-	// ---------------------------------------------------
-
-	public:
-		void	AddThing( void* thing );
-
-		void	ResetCounts();
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	RecordDraws( CommandList& commands, VertexBuffer& vertices, IndexBuffer& indices );
+		void AddThing(void* thing);
 
-	// ---------------------------------------------------
+		void ResetCounts();
 
-	//!	Disable copy assignment.
-		BatchCoordinator& operator=( const BatchCoordinator& ) = delete;
+		// ---------------------------------------------------
 
-		friend void Swap( BatchCoordinator&, BatchCoordinator& );
+	public:
+		void RecordDraws(CommandList& commands, const View& view, VertexBuffer& vertices, IndexBuffer& indices) const;
 
-	// - DATA MEMBERS ------------------------------------
-	
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		BatchCoordinator& operator=(const BatchCoordinator&) = delete;
+
+		friend void Swap(BatchCoordinator&, BatchCoordinator&);
+
+		// - DATA MEMBERS ------------------------------------
+
 	private:
-	//!	Container for draw call parameters to be passed to the GPU.
-		UniformBuffer				_drawParameters;
-		ArrayMap<void*, uint32_t>	_countsByThing;
+		//!	Container for draw call parameters to be passed to the GPU.
+		UniformBuffer             _drawParameters;
+		ArrayMap<void*, uint32_t> _countsByThing;
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan

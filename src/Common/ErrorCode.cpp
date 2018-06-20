@@ -11,7 +11,6 @@
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -23,23 +22,23 @@
 
 namespace Eldritch2 {
 
-	ETPureFunctionHint const Utf8Char* AsCString( ErrorCode code ) {
-		static const Utf8Char*	strings[] = {
-			"Operation successful",
-			"Unspecified error",
-			"Insufficient free memory",
-			"Invalid parameter sent as argument to function",
-			"Null pointer argument sent to function expecting a valid target",
-			"Invalid or nonexistent file path",
-			"Invalid object internal state",
-			"Access denied",
-			"Operation not supported for this object",
-			"<Undefined>"
-		};
+ETPureFunctionHint const Utf8Char* AsCString(ErrorCode code) {
+	static const Utf8Char* strings[] = {
+		"Operation successful",
+		"Unspecified error",
+		"Insufficient free memory",
+		"Invalid parameter sent as argument to function",
+		"Null pointer argument sent to function expecting a valid target",
+		"Invalid or nonexistent file path",
+		"Invalid object internal state",
+		"Access denied",
+		"Operation not supported for this object",
+		"<Undefined>"
+	};
 
 	// ---
 
-		return strings[Clamp( -code._value, 0, static_cast<int32>(_countof(strings)) )];
-	}
+	return strings[Clamp(-code._value, 0, static_cast<int32>(_countof(strings)))];
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

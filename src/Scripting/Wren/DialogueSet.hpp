@@ -2,7 +2,7 @@
   DialogueSet.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,80 +15,70 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Scripting {
-		namespace Wren {
-			namespace AssetViews {
-				class	DialogueSetAsset;
-			}
-		}
-	}
-}
+namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetViews {
+	class DialogueSetAsset;
+}}}} // namespace Eldritch2::Scripting::Wren::AssetViews
 
 struct WrenHandle;
 struct WrenVM;
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	class DialogueResponse {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref DialogueResponse instance.
-		DialogueResponse( const DialogueResponse& ) = default;
-	//!	Constructs this @ref DialogueResponse instance.
-		DialogueResponse( WrenHandle* function );
+		//!	Constructs this @ref DialogueResponse instance.
+		DialogueResponse(const DialogueResponse&) = default;
+		//!	Constructs this @ref DialogueResponse instance.
+		DialogueResponse(WrenHandle* function);
 
 		~DialogueResponse() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		bool	Invoke( WrenVM* vm, WrenHandle* receiver, WrenHandle* unaryCallStub ) const;
+		bool Invoke(WrenVM* vm, WrenHandle* receiver, WrenHandle* unaryCallStub) const;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		WrenHandle*	_function;
+		WrenHandle* _function;
 	};
 
-// ---
+	// ---
 
 	class DialogueSet : public RuleSet<DialogueResponse> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref DialogueSet instance.
-		DialogueSet( const AssetViews::DialogueSetAsset& asset );
-	//!	Disable copy construction.
-		DialogueSet( const DialogueSet& ) = delete;
+		//!	Disable copy construction.
+		DialogueSet(const DialogueSet&) = delete;
+		//!	Constructs this @ref DialogueSet instance.
+		DialogueSet();
 
 		~DialogueSet() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
 		template <class Allocator>
-		MatchList<Allocator>	MatchAll( const Allocator& allocator, WrenHandle* facts ) const;
+		MatchList<Allocator> MatchAll(const Allocator& allocator, WrenHandle* facts) const;
 
-		RuleIterator			Match( WrenHandle* facts ) const;
+		RuleIterator Match(WrenHandle* facts) const;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		DialogueSet&	operator=( const DialogueSet& ) = delete;
+		//!	Disable copy assignment.
+		DialogueSet& operator=(const DialogueSet&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const AssetViews::DialogueSetAsset&	_asset;
+		const AssetViews::DialogueSetAsset* _asset;
 	};
 
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

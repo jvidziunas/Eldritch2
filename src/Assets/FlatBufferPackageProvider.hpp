@@ -2,7 +2,7 @@
   FlatBufferPackageProvider.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,54 +17,52 @@
 #include <Logging/FileLog.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Assets {
+namespace Eldritch2 { namespace Assets {
 
 	class FlatBufferPackageProvider {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		FlatBufferPackageProvider( const FlatBufferPackageProvider& ) = delete;
-	//!	Constructs this @ref FlatBufferPackageProvider instance.
+		//!	Disable copy construction.
+		FlatBufferPackageProvider(const FlatBufferPackageProvider&) = delete;
+		//!	Constructs this @ref FlatBufferPackageProvider instance.
 		FlatBufferPackageProvider();
 
 		~FlatBufferPackageProvider() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		Assets::PackageDatabase&	GetPackageDatabase();
+		Assets::PackageDatabase& GetPackageDatabase();
 
-		Assets::AssetDatabase&		GetAssetDatabase();
+		Assets::AssetDatabase& GetAssetDatabase();
 
-		FileSystem&					GetFileSystem();
+		FileSystem& GetFileSystem();
 
-	// ---------------------------------------------------
-
-	public:
-		void	ScanPackages();
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources();
+		void ScanPackages();
 
-		void		FreeResources();
+		// ---------------------------------------------------
 
-	// ---------------------------------------------------
+	public:
+		ErrorCode BindResources();
+
+		void FreeResources();
+
+		// ---------------------------------------------------
 
 	private:
-		void	Load( Package& package );
+		void Load(Package& package);
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable Logging::FileLog	_log;
-		FileSystem					_fileSystem;
-		Assets::AssetDatabase		_assetDatabase;
-		Assets::PackageDatabase		_packageDatabase;
+		mutable Logging::FileLog _log;
+		FileSystem               _fileSystem;
+		Assets::AssetDatabase    _assetDatabase;
+		Assets::PackageDatabase  _packageDatabase;
 	};
 
-}	// namespace Assets
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Assets

@@ -2,7 +2,7 @@
   SteamTools.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,6 +17,6 @@
 #include <steamclientpublic.h>
 //------------------------------------------------------------------//
 
-size_t GetHashCode( const CSteamID& id, size_t seed ) {
+size_t GetHashCode(const CSteamID& id, size_t seed) {
 	return id.ConvertToUint64() + seed;
 }

@@ -2,7 +2,7 @@
   WaitableEvent.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -22,38 +22,38 @@ using HANDLE = void*;
 
 namespace Eldritch2 {
 
-	class WaitableEvent {
+class WaitableEvent {
 	// - TYPE PUBLISHING ---------------------------------
 
-	public:
-		enum State {
-			Unsignaled,	//!< An outside source must manually invoke @ref Signal() on this @ref WaitableEvent instance before threads waiting on it will wake up.
-			Signaled	//!< The first thread to block on this @ref WaitableEvent will immediately wake.
-		};
+public:
+	enum State {
+		Unsignaled, //!< An outside source must manually invoke @ref Signal() on this @ref WaitableEvent instance before threads waiting on it will wake up.
+		Signaled    //!< The first thread to block on this @ref WaitableEvent will immediately wake.
+	};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref WaitableEvent instance.
-		WaitableEvent( State initialState );
+	WaitableEvent(State initialState);
 
-		~WaitableEvent();
+	~WaitableEvent();
 
 	// ---------------------------------------------------
 
-	public:
-		void	AwaitSignal() const;
+public:
+	void AwaitSignal() const;
 
-		bool	IsSignaled() const;
+	bool IsSignaled() const;
 
-		void	Signal();
+	void Signal();
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-#	if ET_PLATFORM_WINDOWS
-		HANDLE	_event;
-#	endif
-	};
+private:
+#if ET_PLATFORM_WINDOWS
+	HANDLE _event;
+#endif
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

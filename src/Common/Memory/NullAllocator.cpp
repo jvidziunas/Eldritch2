@@ -8,7 +8,6 @@
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -17,30 +16,31 @@
 
 namespace Eldritch2 {
 
-	NullAllocator::NullAllocator() : Allocator( "<Null Allocator>" ) {}
+NullAllocator::NullAllocator() :
+	Allocator("<Null Allocator>") {}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* NullAllocator::Allocate( SizeType /*sizeInBytes*/, SizeType /*alignmentInBytes*/, SizeType /*offsetInBytes*/, AllocationDuration /*duration*/ ) {
-		return nullptr;
-	}
+ETRestrictHint void* NullAllocator::Allocate(SizeType /*sizeInBytes*/, SizeType /*alignmentInBytes*/, SizeType /*offsetInBytes*/, AllocationDuration /*duration*/) {
+	return nullptr;
+}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* NullAllocator::Allocate( SizeType /*sizeInBytes*/, AllocationDuration /*duration*/ ) {
-		return nullptr;
-	}
+ETRestrictHint void* NullAllocator::Allocate(SizeType /*sizeInBytes*/, AllocationDuration /*duration*/) {
+	return nullptr;
+}
 
 // ---------------------------------------------------
 
-	void NullAllocator::Deallocate( void* /*address*/, SizeType	/*sizeInBytes*/ ) {}
+void NullAllocator::Deallocate(void* /*address*/, SizeType /*sizeInBytes*/) {}
 
 // ---------------------------------------------------
 
-	NullAllocator& NullAllocator::GetInstance() {
-		static	NullAllocator	nullAllocator;
+NullAllocator& NullAllocator::GetInstance() {
+	static NullAllocator nullAllocator;
 
-		return nullAllocator;
-	}
+	return nullAllocator;
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

@@ -2,7 +2,7 @@
   TreeSet.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -22,97 +22,97 @@
 
 namespace Eldritch2 {
 
-	template <typename Value, typename SortPredicate = LessThan<Value>, class Allocator = MallocAllocator>
-	class TreeSet {
+template <typename Value, typename SortPredicate = LessThan<Value>, class Allocator = MallocAllocator>
+class TreeSet {
 	// - TYPE PUBLISHING ---------------------------------
 
-	protected:
-		using UnderlyingContainer	= eastl::set<Value, LessThan<Value>, EaStlAllocatorMixin<Allocator>>;
+protected:
+	using UnderlyingContainer = eastl::set<Value, LessThan<Value>, EaStlAllocatorMixin<Allocator>>;
 
-	public:
-		using ValueType				= typename UnderlyingContainer::value_type;
-		using AllocatorType			= typename UnderlyingContainer::allocator_type::PublicType;
-		using Iterator				= typename UnderlyingContainer::iterator;
-		using ConstIterator			= typename UnderlyingContainer::const_iterator;
-		using SizeType				= typename AllocatorType::SizeType;
+public:
+	using ValueType     = typename UnderlyingContainer::value_type;
+	using AllocatorType = typename UnderlyingContainer::allocator_type::PublicType;
+	using Iterator      = typename UnderlyingContainer::iterator;
+	using ConstIterator = typename UnderlyingContainer::const_iterator;
+	using SizeType      = typename AllocatorType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref TreeSet instance.
-		explicit TreeSet( const AllocatorType& allocator );
+	explicit TreeSet(const AllocatorType& allocator);
 	//!	Constructs this @ref TreeSet instance.
-		TreeSet( const TreeSet& );
+	TreeSet(const TreeSet&) = default;
 	//!	Constructs this @ref TreeSet instance.
-		TreeSet( TreeSet&& );
+	TreeSet(TreeSet&&) = default;
 
-		~TreeSet() = default;
+	~TreeSet() = default;
 
 	// - ALGORITHMS --------------------------------------
 
-	public:
-		ConstIterator	Find( const ValueType& value ) const;
-		Iterator		Find( const ValueType& value );
+public:
+	ConstIterator Find(const ValueType& value) const;
+	Iterator      Find(const ValueType& value);
 
-		template <typename Predicate>
-		void			RemoveIf( Predicate predicate );
+	template <typename Predicate>
+	void RemoveIf(Predicate predicate);
 
 	// - ELEMENT ITERATION -------------------------------
 
-	public:
-		ConstIterator	ConstBegin() const;
+public:
+	ConstIterator ConstBegin() const;
 
-		ConstIterator	ConstEnd() const;
+	ConstIterator ConstEnd() const;
 
-		ConstIterator	Begin() const;
-		Iterator		Begin();
-		
-		ConstIterator	End() const;
-		Iterator		End();
+	ConstIterator Begin() const;
+	Iterator      Begin();
+
+	ConstIterator End() const;
+	Iterator      End();
 
 	// - CONTAINER DUPLICATION ---------------------------
 
-	public:
-		TreeSet&	operator=( const TreeSet& );
-		TreeSet&	operator=( TreeSet&& );
+public:
+	TreeSet& operator=(const TreeSet&) = default;
+	TreeSet& operator=(TreeSet&&) = default;
 
 	// - CONTAINER MANIPULATION --------------------------
 
-	public:
-		Pair<Iterator, bool>	Insert( const ValueType& value );
-		Pair<Iterator, bool>	Insert( ValueType&& value );
+public:
+	Pair<Iterator, bool> Insert(const ValueType& value);
+	Pair<Iterator, bool> Insert(ValueType&& value);
 
-		Iterator				Erase( Iterator begin, Iterator end );
-		Iterator				Erase( Iterator position );
+	Iterator Erase(Iterator begin, Iterator end);
+	Iterator Erase(Iterator position);
 
-		void					Clear();
+	void Clear();
 
 	// - CONTENT QUERY -----------------------------------
 
-	public:
-		SizeType			GetSize() const;
+public:
+	SizeType GetSize() const;
 
-		bool				IsEmpty() const;
+	bool IsEmpty() const;
 
-		explicit operator	bool() const;
+	explicit operator bool() const;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
-	public:
-		const AllocatorType&	GetAllocator() const;
+public:
+	const AllocatorType& GetAllocator() const;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		UnderlyingContainer	_container;
+private:
+	UnderlyingContainer _container;
 
 	// ---------------------------------------------------
 
-		template <typename Value, typename SortPredicate, class Allocator>
-		friend void	Swap( TreeSet<Value, SortPredicate, Allocator>&, TreeSet<Value, SortPredicate, Allocator>& );
-	};
+	template <typename Value, typename SortPredicate, class Allocator>
+	friend void Swap(TreeSet<Value, SortPredicate, Allocator>&, TreeSet<Value, SortPredicate, Allocator>&);
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

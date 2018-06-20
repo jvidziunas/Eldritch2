@@ -2,7 +2,7 @@
   RecastImplementation.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 ET_PUSH_COMPILER_WARNING_STATE()
-	ET_SET_MSVC_WARNING_STATE( disable : 6334 6385 6011 )
+ET_SET_MSVC_WARNING_STATE(disable : 6334 6385 6011)
 #	include <recastnavigation/DetourCrowd/Source/DetourObstacleAvoidance.cpp>
 #	include <recastnavigation/DetourCrowd/Source/DetourLocalBoundary.cpp>
 #	include <recastnavigation/DetourCrowd/Source/DetourProximityGrid.cpp>

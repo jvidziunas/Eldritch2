@@ -15,41 +15,33 @@
 #include <Core/WorldComponent.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Navigation {
-		namespace Recast {
-			class	NavigationScene;
-		}
-	}
-}
+namespace Eldritch2 { namespace Navigation { namespace Recast {
+	class NavigationScene;
+}}} // namespace Eldritch2::Navigation::Recast
 
-namespace Eldritch2 {
-namespace Navigation {
-namespace Recast {
+namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	class RecastWorldComponent : public Core::WorldComponent {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		RecastWorldComponent( const RecastWorldComponent& ) = delete;
-	//!	Constructs this @ref RecastWorldComponent instance.
-		RecastWorldComponent( const Core::World& owner );
+		//!	Disable copy construction.
+		RecastWorldComponent(const RecastWorldComponent&) = delete;
+		//!	Constructs this @ref RecastWorldComponent instance.
+		RecastWorldComponent(const Core::World& owner);
 
 		~RecastWorldComponent() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	AcceptVisitor( Scheduling::JobExecutor& executor, const LateTickVisitor& ) override;
-		void	AcceptVisitor( Scripting::Wren::ApiBuilder& api ) override;
+		void AcceptVisitor(Scheduling::JobExecutor& executor, const LateTickVisitor&) override;
+		void AcceptVisitor(Scripting::Wren::ApiBuilder& api) override;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		NavigationScene*	_scene;
+		NavigationScene* _scene;
 	};
 
-}	// namespace Recast
-}	// namespace Navigation
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Navigation::Recast

@@ -15,14 +15,12 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Core {
+namespace Eldritch2 { namespace Core {
 
 	template <typename TrinaryConsumer, typename AltTrinaryConsumer>
-	void	ApplyIni( Range<const Utf8Char*> source, TrinaryConsumer keyHandler, AltTrinaryConsumer unknownKeyHandler );
+	void ApplyIni(Range<const Utf8Char*> source, TrinaryConsumer keyHandler, AltTrinaryConsumer unknownKeyHandler);
 
-}	// namespace Core
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Core
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

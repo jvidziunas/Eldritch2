@@ -2,7 +2,7 @@
   AnimationTypes.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -16,27 +16,23 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	class	Quaternion;
-}
+	namespace Animation {
 
-namespace Eldritch2 {
-namespace Animation {
+		using BoneIndex = int16;
+		using KeyTime = float16;
 
-	using BoneIndex = int16;
-	using KeyTime	= float16;
+	// ---
 
-// ---
+		struct CompressedUnitQuaternion {
+			operator Quaternion() const;
 
-	struct CompressedUnitQuaternion {
-		operator Quaternion() const;
+		// - DATA MEMBERS ------------------------------------
 
-	// - DATA MEMBERS ------------------------------------
+			uint32	reconstructedComponentIndex : 2;
+			uint32	component0 : 10;
+			uint32	component1 : 10;
+			uint32	component2 : 10;
+		};
 
-		uint32	reconstructedComponentIndex : 2;
-		uint32	component0					: 10;
-		uint32	component1					: 10;
-		uint32	component2					: 10;
-	};
-
-}	// namespace Animation
+	}	// namespace Animation
 }	// namespace Eldritch2

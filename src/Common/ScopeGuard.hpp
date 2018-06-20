@@ -2,7 +2,7 @@
   ScopeGuard.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -27,12 +27,12 @@ namespace Eldritch2 {
 
 	public:
 	//!	Disable copy construction.
-		ScopeGuard( const ScopeGuard& ) = delete;
+		ScopeGuard(const ScopeGuard&) = delete;
 	//!	Constructs this @ref ScopeGuard instance.
-		ScopeGuard( ScopeGuard&& );
+		ScopeGuard(ScopeGuard&&);
 	//!	Constructs this @ref ScopeGuard instance.
 	/*!	@param[in] onScopeExit Code to be executed when this object leaves scope. */
-		ScopeGuard( Lambda&& onScopeExit );
+		ScopeGuard(Lambda&& onScopeExit);
 
 		~ScopeGuard();
 
@@ -45,7 +45,7 @@ namespace Eldritch2 {
 // ---
 
 	template <typename Lambda>
-	ScopeGuard<Lambda> AtScopeExit( Lambda&& lambda );
+	ScopeGuard<Lambda> AtScopeExit(Lambda&& lambda);
 
 }	// namespace Eldritch2
 

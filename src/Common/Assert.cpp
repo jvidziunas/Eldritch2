@@ -10,12 +10,11 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Memory.hpp>
 #include <Common/Assert.hpp>
+#include <Common/Memory.hpp>
 //------------------------------------------------------------------//
 #if ET_PLATFORM_WINDOWS
 #	ifndef NOMINMAX
@@ -28,28 +27,28 @@
 namespace Eldritch2 {
 namespace {
 
-	static AssertionHandler	handler = [] ( const char* condition, const char* file, uint32 line, const char* message ) -> AssertionFailure {
-#	if ET_PLATFORM_WINDOWS
-		fmt::memory_buffer  string;
+	static AssertionHandler handler = [](const char* condition, const char* file, uint32 line, const char* message) -> AssertionFailure {
+#if ET_PLATFORM_WINDOWS
+		fmt::memory_buffer string;
 
-		fmt::format_to( string, fmt::string_view( "{}({}): [{}] {}" ), file, line, condition, EmptyForNull( message ) );
+		fmt::format_to(string, fmt::string_view("{}({}): [{}] {}"), file, line, condition, EmptyForNull(message));
 
-		OutputDebugStringA( string.data() );
-#	endif
+		OutputDebugStringA(string.data());
+#endif
 
 		return AssertionFailure::Fatal;
 	};
 
-}	// anonymous namespace
+} // anonymous namespace
 
-    void InstallHandler( AssertionHandler newHandler ) {
-		handler = newHandler;
-	}
+void InstallHandler(AssertionHandler newHandler) {
+	handler = newHandler;
+}
 
 // ---------------------------------------------------
-	
-	AssertionFailure ReportFailure( const char* condition, const char* file, uint32 line, const char* message ) {
-		return handler( condition, file, line, message );
-	}
 
-}	// namespace Eldritch2
+AssertionFailure ReportFailure(const char* condition, const char* file, uint32 line, const char* message) {
+	return handler(condition, file, line, message);
+}
+
+} // namespace Eldritch2

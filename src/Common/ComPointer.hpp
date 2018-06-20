@@ -2,7 +2,7 @@
   ComPointer.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,71 +17,71 @@
 
 namespace Eldritch2 {
 
-	template <class Interface>
-	class ComPointer {
+template <class Interface>
+class ComPointer {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref ComPointer instance.
-		template <class CompatibleInterface>
-		ComPointer( const ComPointer<CompatibleInterface>& handle );
+	template <class CompatibleInterface>
+	ComPointer(const ComPointer<CompatibleInterface>& handle);
 	//!	Constructs this @ref ComPointer instance.
-		template <class CompatibleInterface>
-		ComPointer( ComPointer<CompatibleInterface>&& handle );
+	template <class CompatibleInterface>
+	ComPointer(ComPointer<CompatibleInterface>&& handle);
 	//!	Constructs this @ref ComPointer instance.
-		template <class CompatibleInterface>
-		ComPointer( CompatibleInterface* pointer );
+	template <class CompatibleInterface>
+	ComPointer(CompatibleInterface* pointer);
 	//!	Constructs this @ref ComPointer instance.
-		ComPointer( const ComPointer& );
+	ComPointer(const ComPointer&);
 	//!	Constructs this @ref ComPointer instance.
-		ComPointer( decltype(nullptr) );
+	ComPointer(decltype(nullptr));
 	//!	Constructs this @ref ComPointer instance.
-		ComPointer();
+	ComPointer();
 
 	//!	Destroys this @ref ComPointer instance.
-		~ComPointer();
+	~ComPointer();
 
 	// ---------------------------------------------------
 
-	public:
-		ETNeverThrowsHint Interface*	Release() const throw();
+public:
+	ETNeverThrowsHint Interface* Release() throw();
 
-		ETNeverThrowsHint Interface*	Get() const throw();
+	ETNeverThrowsHint Interface* Get() const throw();
 
-		ETNeverThrowsHint void			Reset() throw();
+	ETNeverThrowsHint void Reset() throw();
 
-		ETNeverThrowsHint void			Acquire( Interface* pointer ) throw();
-
-	// ---------------------------------------------------
-
-	public:
-		template <class CompatibleInterface>
-		ETNeverThrowsHint ComPointer&	operator=( const ComPointer<CompatibleInterface>& );
-		template <class CompatibleInterface>
-		ETNeverThrowsHint ComPointer&	operator=( ComPointer<CompatibleInterface>&& );
-		template <class CompatibleInterface>
-		ETNeverThrowsHint ComPointer&	operator=( CompatibleInterface* );
-		ETNeverThrowsHint ComPointer&	operator=( const ComPointer& );
+	ETNeverThrowsHint void Acquire(Interface* pointer) throw();
 
 	// ---------------------------------------------------
 
-	public:
-		Interface**			GetInterfacePointer();
+public:
+	template <class CompatibleInterface>
+	ETNeverThrowsHint ComPointer& operator=(const ComPointer<CompatibleInterface>&);
+	template <class CompatibleInterface>
+	ETNeverThrowsHint ComPointer& operator=(ComPointer<CompatibleInterface>&&);
+	template <class CompatibleInterface>
+	ETNeverThrowsHint ComPointer& operator=(CompatibleInterface*);
+	ETNeverThrowsHint ComPointer& operator=(const ComPointer&);
 
-		Interface*			operator->() const;
+	// ---------------------------------------------------
 
-		explicit operator	bool() const;
+public:
+	Interface** GetInterfacePointer();
+
+	Interface* operator->() const;
+
+	explicit operator bool() const;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		Interface*	_pointer;
+private:
+	Interface* _pointer;
 
-		template <typename T>
-		friend void	Swap( ComPointer<T>&, ComPointer<T>& );
-	};
+	template <typename T>
+	friend void Swap(ComPointer<T>&, ComPointer<T>&);
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

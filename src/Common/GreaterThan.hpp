@@ -2,7 +2,7 @@
   GreaterThan.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,23 +17,23 @@
 
 namespace Eldritch2 {
 
-	template <typename T>
-	class GreaterThan {
+template <typename T>
+class GreaterThan {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref GreaterThan instance.
-		GreaterThan() = default;
+	GreaterThan() = default;
 
-		~GreaterThan() = default;
+	~GreaterThan() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		bool	operator()( const T& object0, const T& object1 ) const;
-	};
+public:
+	bool operator()(const T& object0, const T& object1) const;
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

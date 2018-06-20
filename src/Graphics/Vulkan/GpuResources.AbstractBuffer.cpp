@@ -2,96 +2,83 @@
   GpuResources.AbstractBuffer.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2018 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResources.hpp>
 #include <Graphics/Vulkan/VulkanTools.hpp>
-#include <Graphics/Vulkan/GpuHeap.hpp>
+#include <Graphics/Vulkan/Gpu.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
-namespace Detail {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
 
-	AbstractBuffer::AbstractBuffer( AbstractBuffer&& buffer ) : _backing( eastl::exchange( buffer._backing, nullptr ) ), _buffer( eastl::exchange( buffer._buffer, nullptr ) ) {}
+	AbstractBuffer::AbstractBuffer() :
+		_backing(nullptr),
+		_buffer(nullptr) {}
 
-// ---------------------------------------------------
-
-	AbstractBuffer::AbstractBuffer() : _backing( nullptr ), _buffer( nullptr ) {}
-
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	AbstractBuffer::~AbstractBuffer() {
-		ET_ASSERT( _buffer == nullptr,  "Leaking Vulkan buffer!" );
-		ET_ASSERT( _backing == nullptr, "Leaking Vulkan allocation!" );
+		ET_ASSERT(_buffer == nullptr, "Leaking Vulkan buffer!");
+		ET_ASSERT(_backing == nullptr, "Leaking Vulkan allocation!");
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void AbstractBuffer::FreeResources( GpuHeap& heap ) {
-		if (VkBuffer buffer = eastl::exchange( _buffer, nullptr )) {
-			heap.AddGarbage( buffer, eastl::exchange( _backing, nullptr ) );
+	void AbstractBuffer::FreeResources(Gpu& gpu) {
+		if (VkBuffer buffer = eastl::exchange(_buffer, nullptr)) {
+			gpu.AddGarbage(buffer, eastl::exchange(_backing, nullptr));
 		}
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	VkResult AbstractBuffer::BindResources( GpuHeap& heap, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo ) {
+	VkResult AbstractBuffer::BindResources(Gpu& gpu, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo) {
 		using ::Eldritch2::Swap;
 
 		VmaAllocation backing;
-		VkBuffer buffer;
+		VkBuffer      buffer;
 
-		ET_FAIL_UNLESS( vmaCreateBuffer( heap, &bufferInfo, &allocationInfo, &buffer, &backing, nullptr ) );
-		ET_AT_SCOPE_EXIT( vmaDestroyBuffer( heap, buffer, backing ) );
+		ET_FAIL_UNLESS(vmaCreateBuffer(gpu, &bufferInfo, &allocationInfo, &buffer, &backing, nullptr));
+		ET_AT_SCOPE_EXIT(vmaDestroyBuffer(gpu, buffer, backing));
 
-		Swap( _buffer,	buffer );
-		Swap( _backing, backing );
+		Swap(_buffer, buffer);
+		Swap(_backing, backing);
 
 		return VK_SUCCESS;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void AbstractBuffer::GetAllocationInfo( GpuHeap& heap, VmaAllocationInfo& info ) {
-		vmaGetAllocationInfo( heap, _backing, &info );
+	void AbstractBuffer::GetAllocationInfo(Gpu& gpu, VmaAllocationInfo& info) {
+		vmaGetAllocationInfo(gpu, _backing, &info);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void* AbstractBuffer::MapHostPointer( GpuHeap& heap ) {
-		void*	result( nullptr );
-
-		vmaMapMemory( heap, _backing, &result );
-
-		return result;
+	VkResult AbstractBuffer::MapHostPointer(Gpu& gpu, void*& outBase) const {
+		return vmaMapMemory(gpu, _backing, &outBase);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void AbstractBuffer::UnmapHostPointer( GpuHeap& heap ) {
-		vmaUnmapMemory( heap, _backing );
+	void AbstractBuffer::UnmapHostPointer(Gpu& gpu) const {
+		vmaUnmapMemory(gpu, _backing);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void Swap( AbstractBuffer& lhs, AbstractBuffer& rhs ) {
+	void Swap(AbstractBuffer& lhs, AbstractBuffer& rhs) {
 		using ::Eldritch2::Swap;
 
-		Swap( lhs._buffer,  rhs._buffer );
-		Swap( lhs._backing, rhs._backing );
+		Swap(lhs._buffer, rhs._buffer);
+		Swap(lhs._backing, rhs._backing);
 	}
 
-}	// namespace Detail
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}}} // namespace Eldritch2::Graphics::Vulkan::Detail

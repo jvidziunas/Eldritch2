@@ -2,7 +2,7 @@
   Atomic.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2018 Eldritch Entertainment, LLC.
@@ -19,7 +19,8 @@
 
 namespace Eldritch2 {
 
-	template <typename Value>
-	using Atomic = std::atomic<Value>;
+template <typename Value>
+using Atomic      = std::atomic<Value>;
+using MemoryOrder = std::memory_order;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

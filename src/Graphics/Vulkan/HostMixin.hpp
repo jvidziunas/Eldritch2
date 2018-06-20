@@ -2,7 +2,7 @@
   HostMixin.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -26,11 +26,11 @@ namespace Vulkan {
 	public:
 	//!	Constructs this @ref HostMixin instance.
 		template <typename... Arguments, class = eastl::enable_if<eastl::is_constructible<EldritchAllocator, Arguments...>::value>::type>
-		HostMixin( Arguments&&... arguments );
+		HostMixin(Arguments&&... arguments);
 	//!	Disable copy construction.
-		HostMixin( const HostMixin& ) = delete;
+		HostMixin(const HostMixin&) = delete;
 	//!	Constructs this @ref HostMixin instance.
-		HostMixin( HostMixin&& );
+		HostMixin(HostMixin&&);
 
 		~HostMixin() = default;
 

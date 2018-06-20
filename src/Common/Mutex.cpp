@@ -2,12 +2,11 @@
   Mutex.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -17,38 +16,42 @@
 
 namespace Eldritch2 {
 
-	Lock::Lock( Mutex& lock ) : _mutex( lock ) {
-		_mutex.Enter();
-	}
+Lock::Lock(Mutex& lock) :
+	_mutex(lock) {
+	while (!lock.TryEnter())
+		;
+}
 
 // ---------------------------------------------------
 
-	Lock::~Lock() {
-		_mutex.Leave();
-	}
+Lock::~Lock() {
+	_mutex.Leave();
+}
 
 // ---------------------------------------------------
 
-	bool Lock::IsAttachedTo( const Mutex& mutex ) const {
-		return &mutex == &_mutex;
-	}
+bool Lock::IsAttachedTo(const Mutex& mutex) const {
+	return &mutex == &_mutex;
+}
 
 // ---------------------------------------------------
 
-	ReadLock::ReadLock( Mutex& lock ) : _mutex( lock ) {
-		_mutex.EnterAsReader();
-	}
+ReadLock::ReadLock(const Mutex& lock) :
+	_mutex(lock) {
+	while (!lock.TryEnterAsReader())
+		;
+}
 
 // ---------------------------------------------------
 
-	ReadLock::~ReadLock() {
-		_mutex.LeaveAsReader();
-	}
+ReadLock::~ReadLock() {
+	_mutex.LeaveAsReader();
+}
 
 // ---------------------------------------------------
 
-	bool ReadLock::IsAttachedTo( const Mutex& mutex ) const {
-		return &mutex == &_mutex;
-	}
+bool ReadLock::IsAttachedTo(const Mutex& mutex) const {
+	return &mutex == &_mutex;
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

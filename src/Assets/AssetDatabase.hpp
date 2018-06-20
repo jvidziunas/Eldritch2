@@ -2,7 +2,7 @@
   AssetDatabase.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -15,147 +15,139 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Assets {
-		class	AssetDatabase;
-		class	Asset;
-	}
-}
+namespace Eldritch2 { namespace Assets {
+	class AssetDatabase;
+	class Asset;
+}} // namespace Eldritch2::Assets
 
-namespace Eldritch2 {
-namespace Assets {
+namespace Eldritch2 { namespace Assets {
 
 	class AssetApiBuilder {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using AssetFactory	= Function<UniquePointer<Asset>( Allocator&, const Utf8Char* )>;
-		template <typename Value>
-		using ExtensionMap	= CachingHashMap<Utf8Literal, Value>;
+		template <typename Value, typename Allocator = MallocAllocator>
+		using ExtensionMap = CachingHashMap<Utf8Literal, Value, Hash<Utf8Literal>, EqualTo<Utf8Literal>, Allocator>;
+		using AssetFactory = Function<UniquePointer<Asset>(Allocator&, const Utf8Char*)>;
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref AssetApiBuilder instance.
-		AssetApiBuilder( const AssetApiBuilder& ) = default;
-	//!	Constructs this @ref AssetApiBuilder instance.
+		//!	Constructs this @ref AssetApiBuilder instance.
+		AssetApiBuilder(const AssetApiBuilder&) = default;
+		//!	Constructs this @ref AssetApiBuilder instance.
 		AssetApiBuilder();
 
 		~AssetApiBuilder() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
+	public:
+		//!	Registers an object creation handler for a specified class of asset object.
+		/*!	@param[in] extension @ref Utf8Literal containing the extension of the asset to listen for. This string should include a
+				leading dot character.
+			@returns A reference to *this for method chaining. */
+		AssetApiBuilder& DefineType(Utf8Literal extension, AssetFactory factory);
+
+		// ---------------------------------------------------
 
 	public:
-	//!	Registers an object creation handler for a specified class of asset object.
-	/*!	@param[in] extension @ref Utf8Literal containing the extension of the asset to listen for. This string should include a
-			leading dot character.
-		@returns A reference to *this for method chaining. */
-		AssetApiBuilder&	DefineType( Utf8Literal extension, AssetFactory factory );
-	//!	Registers an object creation handler for a specified class of asset object.
-	/*!	@param[in] extension @ref Utf8Literal containing the extension of the asset to listen for. This string should include a
-			leading dot character.
-		@returns A reference to *this for method chaining. */
-		template <typename PublicAsset>
-		AssetApiBuilder&	DefineType( Utf8Literal extension );
-		
-	// ---------------------------------------------------
+		ExtensionMap<AssetFactory>& GetFactories();
+
+		// ---------------------------------------------------
 
 	public:
-		ExtensionMap<AssetFactory>&	GetFactories();
+		AssetApiBuilder& operator=(const AssetApiBuilder&) = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		AssetApiBuilder&	operator=( const AssetApiBuilder& ) = default;
+		template <typename Type>
+		static ETPureFunctionHint AssetFactory DefaultFactory();
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ExtensionMap<AssetFactory>	_factoriesByExtension;
+		ExtensionMap<AssetFactory> _factoriesByExtension;
 	};
 
-// ---
+	// ---
 
 	class AssetDatabase {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		struct AssetEqual {
-			ETPureFunctionHint bool	operator()( const Asset*, Pair<Type, const Utf8Char*> ) const;
-			ETPureFunctionHint bool	operator()( const Asset*, const Asset* ) const;
+			ETPureFunctionHint bool operator()(const Asset*, const Utf8Char*) const;
+			ETPureFunctionHint bool operator()(const Asset*, const Asset*) const;
 		};
 
-	// ---
+		// ---
 
 	public:
 		struct AssetHash {
-			ETPureFunctionHint size_t	operator()( Pair<Type, const Utf8Char*>, size_t seed = 0u ) const;
-			ETPureFunctionHint size_t	operator()( const Asset*, size_t seed = 0u ) const;
+			ETPureFunctionHint size_t operator()(const Utf8Char*, size_t seed = 0u) const;
+			ETPureFunctionHint size_t operator()(const Asset*, size_t seed = 0u) const;
 		};
 
-	// ---
+		// ---
 
 	public:
-		using AssetFactory	= AssetApiBuilder::AssetFactory;
+		using AssetFactory = AssetApiBuilder::AssetFactory;
 		template <typename Value>
-		using ExtensionMap	= AssetApiBuilder::ExtensionMap<Value>;
+		using ExtensionMap = AssetApiBuilder::ExtensionMap<Value>;
 		template <typename Value>
-		using ResidentSet	= CachingHashSet<Value*, AssetHash, AssetEqual>;
+		using ResidentSet = CachingHashSet<Value*, AssetHash, AssetEqual>;
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//! Disable copy construction.
-		AssetDatabase( const AssetDatabase& ) = delete;
-	//! Constructs this @ref AssetDatabase instance.
+		//! Disable copy construction.
+		AssetDatabase(const AssetDatabase&) = delete;
+		//! Constructs this @ref AssetDatabase instance.
 		AssetDatabase();
 
 		~AssetDatabase();
 
-	// - ASSET MANAGEMENT --------------------------------
+		// - ASSET MANAGEMENT --------------------------------
 
 	public:
-	//!	Locates an existing asset in the database.
-	/*!	@param[in] path A null-terminated UTF-8-encoded character sequence containing the name of the resource to search for.
-		@returns A pointer to the asset, if successful, or null in the event no matching asset was found.
-		@remarks Thread-safe. */
-		template <typename PublicAsset>
-		const PublicAsset*	Require( const Utf8Char* const path ) const;
+		//!	Locates an existing asset in the database.
+		/*!	@param[in] path A null-terminated UTF-8-encoded character sequence containing the name of the resource to search for.
+			@returns A pointer to the asset, if successful, or null in the event no matching asset was found.
+			@remarks Thread-safe. */
+		const Asset* Find(const Utf8Char* const path) const;
 
-	// ---------------------------------------------------
-
-	public:
-		UniquePointer<Asset>	CreateAsset( const Utf8Char* path );
-
-		bool					RegisterAsset( Asset& asset );
-
-		void					UnregisterAsset( Asset& asset );
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources( ExtensionMap<AssetFactory> factories );
+		UniquePointer<Asset> CreateAsset(const Utf8Char* path);
 
-		void		FreeResources();
+		bool Insert(Asset& asset);
 
-	// ---------------------------------------------------
+		void Erase(Asset& asset);
 
-	//!	Disable copy assignment.
-		AssetDatabase&	operator=( const AssetDatabase& ) = delete;
+		// ---------------------------------------------------
 
-	// - DATA MEMBERS ------------------------------------
+	public:
+		ErrorCode BindResources(ExtensionMap<AssetFactory> factoryByExtension);
+
+		void FreeResources();
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		AssetDatabase& operator=(const AssetDatabase&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable UsageMixin<MallocAllocator>	_allocator;
-		mutable Mutex						_assetsMutex;
-		ResidentSet<Asset>					_assets;
-	/*!	Collection of handlers that will allocate concrete @ref Asset instances given metadata and
-		initialization byte streams. */
-		ExtensionMap<AssetFactory>			_factoriesByExtension;
+		mutable UsageMixin<MallocAllocator> _allocator;
+		mutable Mutex                       _assetsMutex;
+		ResidentSet<Asset>                  _assets;
+		ExtensionMap<AssetFactory>          _factoryByExtension;
 	};
 
-}	// namespace Assets
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Assets
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

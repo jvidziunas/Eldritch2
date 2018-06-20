@@ -2,7 +2,7 @@
   MappedFile.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -18,94 +18,94 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	class	ErrorCode;
+class ErrorCode;
 }
 
 namespace Eldritch2 {
 
-	class MappedFile {
+class MappedFile {
 	// - TYPE PUBLISHING ---------------------------------
 
-	public:
-		enum AccessMode {
-			Read	= 0,
-			Write	= 1,
-			All		= (Read | Write)
-		};
+public:
+	enum AccessMode {
+		Read  = 0,
+		Write = 1,
+		All   = (Read | Write)
+	};
 
 	// ---
 
-	public:
-		enum : size_t {
-			StartOfFile	= 0u,
-			EndOfFile	= ~static_cast<size_t>(0)
-		};
+public:
+	enum : size_t {
+		StartOfFile = 0u,
+		EndOfFile   = ~static_cast<size_t>(0)
+	};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Disable copy construction.
-		MappedFile( const MappedFile& ) = delete;
+	MappedFile(const MappedFile&) = delete;
 	//!	Constructs this @ref MappedFile instance.
-		MappedFile( MappedFile&& );
+	MappedFile(MappedFile&&);
 	//!	Constructs this @ref MappedFile instance.
-		MappedFile();
+	MappedFile();
 
-		~MappedFile();
-
-	// ---------------------------------------------------
-
-	public:
-		ErrorCode	ClearOrCreate( AccessMode accessMode, const PlatformChar* path, size_t fileSizeInBytes );
-
-		ErrorCode	Open( AccessMode accessMode, const PlatformChar* path, uint64 offsetInBytes = StartOfFile, size_t mappedLengthInBytes = EndOfFile );
+	~MappedFile();
 
 	// ---------------------------------------------------
 
-	public:
-		template <typename Struct>
-		Range<Struct*>	GetRangeAtOffset( size_t offsetInBytes, size_t lengthInElements ) const;
+public:
+	ErrorCode ClearOrCreate(AccessMode accessMode, const PlatformChar* path, size_t fileSizeInBytes);
 
-		template <typename Struct>
-		Struct*			GetAtOffset( size_t offsetInBytes ) const;
-
-		void*			GetAddressForByteOffset( size_t rawFileOffsetInBytes ) const;
-		
-	// ---------------------------------------------------
-
-	public:
-		size_t	GetSizeInBytes() const;
-
-		bool	HasAccessLevel( AccessMode access ) const;
+	ErrorCode Open(AccessMode accessMode, const PlatformChar* path, uint64 offsetInBytes = StartOfFile, size_t mappedLengthInBytes = EndOfFile);
 
 	// ---------------------------------------------------
 
-	public:
-		void	Prefetch( size_t offsetInBytes, size_t lengthInBytes ) const;
-		void	Prefetch( Range<const char*> range ) const;
+public:
+	template <typename Struct>
+	Range<Struct*> GetRangeAtOffset(size_t offsetInBytes, size_t lengthInElements) const;
 
-		void	Evict( size_t offsetInBytes, size_t lengthInBytes ) const;
-		void	Evict( Range<const char*> range ) const;
+	template <typename Struct>
+	Struct* GetAtOffset(size_t offsetInBytes) const;
+
+	void* GetAddressForByteOffset(size_t rawFileOffsetInBytes) const;
 
 	// ---------------------------------------------------
 
-	public:
+public:
+	size_t GetSizeInBytes() const;
+
+	bool HasAccessLevel(AccessMode access) const;
+
+	// ---------------------------------------------------
+
+public:
+	void Prefetch(size_t offsetInBytes, size_t lengthInBytes) const;
+	void Prefetch(Range<const char*> range) const;
+
+	void Evict(size_t offsetInBytes, size_t lengthInBytes) const;
+	void Evict(Range<const char*> range) const;
+
+	// ---------------------------------------------------
+
+public:
 	//!	Disable copy assignment.
-		MappedFile&	operator=( const MappedFile& ) = delete;
-		MappedFile&	operator=( MappedFile&& );
+	MappedFile& operator=(const MappedFile&) = delete;
+	MappedFile& operator                     =(MappedFile&&);
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-#	if ET_PLATFORM_WINDOWS
-		AccessMode		_access;
-		Range<char*>	_region;
-#	else
-		static_assert( false, "MappedFile needs implementation for target platform!" );
-#	endif	// if ET_PLATFORM_WINDOWS
-	};
+private:
+#if ET_PLATFORM_WINDOWS
+	AccessMode   _access;
+	Range<char*> _region;
+#else
+	static_assert(false, "MappedFile needs implementation for target platform!");
+#endif // if ET_PLATFORM_WINDOWS
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

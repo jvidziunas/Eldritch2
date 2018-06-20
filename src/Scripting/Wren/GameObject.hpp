@@ -2,7 +2,7 @@
   GameObject.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,50 +15,46 @@
 
 //------------------------------------------------------------------//
 
-struct	WrenHandle;
-struct	WrenVM;
+struct WrenHandle;
+struct WrenVM;
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	class GameObject {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using ComponentList	= ArrayList<WrenHandle*>;
-		using Iterator		= typename ComponentList::Iterator;
+		using ComponentList = ArrayList<WrenHandle*>;
+		using Iterator      = typename ComponentList::Iterator;
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		GameObject( const GameObject& ) = delete;
-	//!	Constructs this @ref GameObject instance.
+		//!	Disable copy construction.
+		GameObject(const GameObject&) = delete;
+		//!	Constructs this @ref GameObject instance.
 		GameObject();
 
 		~GameObject();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		Iterator	FindComponentByType( WrenVM* vm, WrenHandle* type );
+		Iterator FindComponentByType(WrenVM* vm, WrenHandle* type);
 
-		bool		HasComponentOfType( WrenVM* vm, WrenHandle* type );
+		bool HasComponentOfType(WrenVM* vm, WrenHandle* type);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	InsertComponent( WrenVM* vm, WrenHandle* component );
+		void InsertComponent(WrenVM* vm, WrenHandle* component);
 
-		void	FreeComponents( WrenVM* vm );
+		void FreeComponents(WrenVM* vm);
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ComponentList	_components;
+		ComponentList _components;
 	};
 
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren

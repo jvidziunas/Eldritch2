@@ -15,15 +15,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Common\Containers\AbstractString.cpp" />
+    <ClCompile Include="src\Common\Eastl.cpp" />
+    <ClCompile Include="src\Common\FileWriter.Win32.cpp" />
     <ClCompile Include="src\Common\Memory\Allocator.cpp" />
     <ClCompile Include="src\Common\Memory\ChildAllocator.cpp" />
-    <ClCompile Include="src\Common\Memory\EaStlAllocatorAdapterMixin.cpp" />
     <ClCompile Include="src\Common\Memory\MallocAllocator.cpp" />
     <ClCompile Include="src\Tools\CrtpTool.cpp" />
     <ClCompile Include="src_ShaderCompiler\ShaderCompiler.cpp" />
     <ClCompile Include="src_ShaderCompiler\ShaderCompiler.Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Common\ComPointer.hpp" />
+    <ClInclude Include="src\Common\Containers\AbstractString.hpp" />
+    <ClInclude Include="src\Common\Containers\ArrayList.hpp" />
+    <ClInclude Include="src\Common\FileWriter.hpp" />
     <ClInclude Include="src\Common\Memory\Allocator.hpp" />
     <ClInclude Include="src\Common\Memory\ChildAllocator.hpp" />
     <ClInclude Include="src\Common\Memory\EastlAllocatorAdapterMixin.hpp" />
@@ -32,9 +38,18 @@
     <ClInclude Include="src_ShaderCompiler\ShaderCompiler.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Common\ComPointer.inl" />
+    <None Include="src\Common\Containers\AbstractString.inl" />
+    <None Include="src\Common\Containers\ArrayList.inl" />
     <None Include="src\Common\Memory\ChildAllocator.inl" />
     <None Include="src\Common\Memory\EaStlAllocatorAdapterMixin.inl" />
     <None Include="src\Common\Memory\MallocAllocator.inl" />
+    <None Include="src\Flatbuffers\DxbcShaderSet.fbc" />
+    <None Include="src\Flatbuffers\Eldritch2Types.fbc" />
+    <None Include="src\Flatbuffers\GraphicsPipeline.fbc" />
+    <None Include="src\Flatbuffers\GraphicsTypes.fbc" />
+    <None Include="src\Flatbuffers\ShaderSetTypes.fbc" />
+    <None Include="src\Flatbuffers\SpirVShaderSet.fbc" />
     <None Include="src\Tools\CrtpTool.inl" />
   </ItemGroup>
   <ItemGroup>
@@ -102,16 +117,17 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)extern\DirectXShaderCompiler\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
+      <PreprocessorDefinitions>FMT_EXCEPTIONS=0;FMT_HEADER_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)DirectXShaderCompiler\lib;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
@@ -125,15 +141,16 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)extern\DirectXShaderCompiler\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
+      <PreprocessorDefinitions>FMT_EXCEPTIONS=0;FMT_HEADER_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)DirectXShaderCompiler\lib;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -149,15 +166,16 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)extern\DirectXShaderCompiler\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
+      <PreprocessorDefinitions>FMT_EXCEPTIONS=0;FMT_HEADER_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ExternSrcDir)DirectXShaderCompiler\lib;$(ExternLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

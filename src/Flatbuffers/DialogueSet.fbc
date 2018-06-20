@@ -1,0 +1,50 @@
+include			"Eldritch2Types.fbc";
+
+file_identifier	"E2DS";
+file_extension	".e2dialogueset";
+
+namespace Eldritch2.Scripting.Wren.FlatBuffers;
+
+struct BoolValue {
+	Value : bool;
+}
+
+struct DoubleValue {
+	Value : double;
+}
+
+struct LongValue {
+	Value : long;
+}
+
+struct UlongValue {
+	Value : ulong;
+}
+
+table StringValue {
+	Value : string;
+}
+
+union FactValue {
+	BoolValue,
+	DoubleValue,
+	LongValue,
+	UlongValue,
+	StringValue
+}
+
+table Criterion {
+	FactName : string    (required);
+	Value    : FactValue (required);
+}
+
+table Rule {
+	Name     : string      (required);
+	Criteria : [Criterion] (required);
+}
+
+table DialogueSet {
+	Rules : [Rule] (required);
+}
+
+root_type DialogueSet;

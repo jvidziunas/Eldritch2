@@ -2,7 +2,7 @@
   IntrusiveForwardListHook.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,6 +17,6 @@
 
 namespace Eldritch2 {
 
-	using IntrusiveForwardListBaseHook = eastl::intrusive_slist_node;
+using IntrusiveForwardListBaseHook = eastl::intrusive_slist_node;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

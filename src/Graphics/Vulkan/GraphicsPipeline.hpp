@@ -2,7 +2,7 @@
   GraphicsPipeline.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -14,87 +14,175 @@
 //==================================================================//
 #include <Graphics/GraphicsScene.hpp>
 //------------------------------------------------------------------//
-#include <vulkan/vulkan_core.h>
+#include <vk_mem_alloc.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			namespace AssetViews {
-				class	GraphicsPipelineAsset;
-			}
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class GraphicsPipelineBuilder;
+	class Gpu;
+}}} // namespace Eldritch2::Graphics::Vulkan
 
-			class	Gpu;
-		}
-	}
-}
-
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class GraphicsPipeline {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class Stage {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		class Pass {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-		//!	Constructs this @ref Stage instance.
-			Stage( const GraphicsScene::GeometryConcept* source = nullptr );
-		//!	Constructs this @ref Stage instance.
-			Stage( const Stage& ) = default;
+			//!	Constructs this @ref Pass instance.
+			Pass(GeometryType source);
+			//!	Constructs this @ref Pass instance.
+			Pass(const Pass&) = default;
 
-			~Stage() = default;
+			~Pass();
 
-		// - DATA MEMBERS ------------------------------------
+			// ---------------------------------------------------
 
 		public:
-			const GraphicsScene::GeometryConcept*	source;
+			VkResult BindResources(Gpu& gpu, const GraphicsPipelineBuilder& builder);
+
+			void FreeResources(Gpu& gpu);
+
+			// - DATA MEMBERS ------------------------------------
+
+		public:
+			VkRenderPass renderPass;
+			GeometryType source;
 		};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		GraphicsPipeline( const GraphicsPipeline& ) = delete;
-	//!	Constructs this @ref RenderPipeline instance.
+		//!	Disable copy construction.
+		GraphicsPipeline(const GraphicsPipeline&) = delete;
+		//!	Constructs this @ref GraphicsPipeline instance.
+		GraphicsPipeline(GraphicsPipeline&&);
+		//!	Constructs this @ref GraphicsPipeline instance.
 		GraphicsPipeline();
 
 		~GraphicsPipeline();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkRenderPass	GetRenderPass();
+		const Pass& operator[](uint32 subpass) const;
 
-	// ---------------------------------------------------
+		uint32 GetPassCount() const;
+
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( Gpu& gpu, const GraphicsScene& scene, const AssetViews::GraphicsPipelineAsset& asset );
+		VkDescriptorSetLayout GetDescriptorLayout() const;
 
-		void		FreeResources( Gpu& gpu );
+		VkQueryPool GetTimingPool() const;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		GraphicsPipeline&	operator=( const GraphicsPipeline& ) = delete;
+	public:
+		VkResult BindResources(Gpu& gpu, const GraphicsPipelineBuilder& builder);
 
-	// - DATA MEMBERS ------------------------------------
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		GraphicsPipeline& operator=(const GraphicsPipeline&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<Stage>	_stages;
-		VkRenderPass		_renderPass;
+		VkDescriptorSetLayout _descriptorLayout;
+		VkQueryPool           _timingPool;
+		ArrayList<Pass>       _passes;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		friend void	Swap( GraphicsPipeline&, GraphicsPipeline& );
+		friend void Swap(GraphicsPipeline&, GraphicsPipeline&);
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+	// ---
+
+	class Framebuffer {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		class Attachment {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Disable copy construction.
+			Attachment(const Attachment&) = delete;
+			//! Constructs this @ref Attachment instance.
+			Attachment(Attachment&&);
+			//! Constructs this @ref Attachment instance.
+			Attachment();
+
+			~Attachment();
+
+			// ---------------------------------------------------
+
+		public:
+			VkResult BindResources(Gpu& gpu, VkFormat format, VkImageCreateFlags flags, VkImageUsageFlags usage, VkSampleCountFlags msaa, VkExtent3D extent, uint32_t arrayLayers);
+			VkResult BindResources(Gpu& gpu, VkFormat format, VkImageViewCreateFlags flags, VkImage image, VkImageViewType type);
+
+			void FreeResources(Gpu& gpu);
+
+			// - DATA MEMBERS ------------------------------------
+
+		public:
+			VkImage     image;
+			VkImageView view;
+
+			// ---------------------------------------------------
+
+			friend void Swap(Attachment&, Attachment&);
+		};
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		Framebuffer(const Framebuffer&) = delete;
+		//!	Constructs this @ref Framebuffer instance.
+		Framebuffer(Framebuffer&&);
+		//!	Constructs this @ref Framebuffer instance.
+		Framebuffer();
+
+		~Framebuffer();
+
+		// ---------------------------------------------------
+
+	public:
+		VkFramebuffer operator[](uint32_t pass) const;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, const GraphicsPipelineBuilder& pipelineSource, VkExtent2D baseDimensions, uint32 arrayLayers = 1u);
+
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		Framebuffer& operator=(const Framebuffer&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		ArrayList<Attachment>    _combinedAttachments;
+		ArrayList<VmaAllocation> _allocations;
+		ArrayList<VkFramebuffer> _framebufferByPass;
+
+		// ---------------------------------------------------
+
+		friend void Swap(Framebuffer&, Framebuffer&);
+	};
+
+}}} // namespace Eldritch2::Graphics::Vulkan
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

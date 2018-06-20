@@ -18,62 +18,60 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Core {
-namespace Detail {
+namespace Eldritch2 { namespace Core {
+	namespace Detail {
 
-	template <class Service, class... AdditionalComponents>
-	static ETInlineHint void CopyComponents( EngineComponent** out, Service& service, AdditionalComponents&... additionalComponents ) {
-		*out = eastl::addressof( service );
-		CopyComponents( out + 1, additionalComponents... );
-	}
+		template <class Service, class... AdditionalComponents>
+		static ETInlineHint void CopyComponents(EngineComponent** out, Service& service, AdditionalComponents&... additionalComponents) {
+			*out = eastl::addressof(service);
+			CopyComponents(out + 1, additionalComponents...);
+		}
 
-// ---
+		// ---
 
-	static ETInlineHint void CopyComponents( EngineComponent** /*out*/ ) {}
+		static ETInlineHint void CopyComponents(EngineComponent** /*out*/) {}
 
-}	// namespace Detail
+	} // namespace Detail
 
 	ETInlineHint const Blackboard& Engine::GetBlackboard() const {
 		return _services;
 	}
 
-// ---------------------------------------------------
-	
+	// ---------------------------------------------------
+
 	ETInlineHint Allocator& Engine::GetAllocator() const {
 		return _allocator;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	ETInlineHint Logging::Log& Engine::GetLog() const {
 		return _log;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	ETInlineHint bool Engine::ShouldRun() const {
-		return _shouldRun.load( std::memory_order_consume );
+		return _shouldRun.load(std::memory_order_consume);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	ETInlineHint void Engine::SetShouldShutDown() const {
-		_shouldRun.store( false, std::memory_order_release );
+		_shouldRun.store(false, std::memory_order_release);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	template <class... Components>
-	ETInlineHint int Engine::BootOnCaller( Scheduling::JobExecutor& executor, Components&... clientComponents ) {
-		ArrayList<EngineComponent*>	components( sizeof...( clientComponents ), _components.GetAllocator() );
+	ETInlineHint int Engine::BootOnCaller(Scheduling::JobExecutor& executor, Components&... clientComponents) {
+		ArrayList<EngineComponent*> components(sizeof...(clientComponents), _components.GetAllocator());
 
-		Detail::CopyComponents( components.Begin(), clientComponents... );
+		Detail::CopyComponents(components.Begin(), clientComponents...);
 
-		Swap( _components, components );
+		Swap(_components, components);
 
-		return BootOnCaller( executor );
+		return BootOnCaller(executor);
 	}
 
-}	// namespace Core
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Core

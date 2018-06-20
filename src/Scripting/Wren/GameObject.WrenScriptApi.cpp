@@ -2,7 +2,7 @@
   GameObject.WrenScriptApi.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -17,19 +17,18 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+	namespace Scripting {
+		namespace Wren {
 
-	ET_IMPLEMENT_WREN_CLASS( GameObject ) {
-		api.CreateClass<GameObject>( ET_BUILTIN_WREN_MODULE_NAME( Core ), "GameObject",
-			{/* Constructors */},
-			{/*	Properties */},
-			{/*	Methods */},
-			{/*	Static methods */},
-			{/*	Operators */}
-		);
-	}
+			ET_IMPLEMENT_WREN_CLASS(GameObject) {
+				api.CreateClass<GameObject>(ET_BUILTIN_WREN_MODULE_NAME(Core), "GameObject",
+											{/* Constructors */ },
+											{/*	Static methods */ },
+											{/*	Properties */ },
+											{/*	Methods */ }
+				);
+			}
 
-}	// namespace Wren
-}	// namespace Scripting
+		}	// namespace Wren
+	}	// namespace Scripting
 }	// namespace Eldritch2

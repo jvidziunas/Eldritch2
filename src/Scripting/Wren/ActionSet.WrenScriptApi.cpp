@@ -2,12 +2,11 @@
   ActionSet.WrenScriptApi.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -17,9 +16,7 @@
 #include <Input/InputBus.hpp>
 //------------------------------------------------------------------//
 
-double	wrenGetSlotDouble( WrenVM* vm, int slot );
-void	wrenSetSlotString( WrenVM* vm, int slot, const char* text );
-void	wrenAbortFiber( WrenVM* vm, int slot );
+double wrenGetSlotDouble(WrenVM* vm, int slot);
 
 namespace Eldritch2 {
 namespace Scripting {
@@ -27,26 +24,28 @@ namespace Wren {
 
 	using namespace ::Eldritch2::Input;
 
-	ET_IMPLEMENT_WREN_CLASS( ActionSet ) {
-		api.CreateClass<ActionSet>( ET_BUILTIN_WREN_MODULE_NAME( Input ), "ActionSet",
-			{/* Constructors */
-				DefineConstructor<ActionSet ( WrenHandle )>( "new", [] ( WrenVM* vm ) {
-					SetReturn<ActionSet>( vm ).BindResources( vm, 1 );
-				} )
-			},
-			{/*	Properties */},
-			{/*	Methods */
-				DefineMethod<void ( InputBus, double )>( "acquireDevice", [] ( WrenVM* vm ) {
-					InputDevice* const target( GetSlotAs<InputBus>( vm, 1 ).Find( AsIntBits( wrenGetSlotDouble( vm, 2 ) ) ) );
-					ET_ABORT_WREN_UNLESS( target != nullptr, "ID does not match any devices" );
-					ET_ABORT_WREN_UNLESS( GetSlotAs<ActionSet>( vm, 0 ).TryAcquire( *target ), "Device already acquired by another client" );
-				} )
-			},
-			{/*	Static methods */},
-			{/*	Operators */}
-		);
+	ET_IMPLEMENT_WREN_CLASS(ActionSet) {
+		// clang-format off
+		api.CreateClass<ActionSet>(ET_BUILTIN_WREN_MODULE_NAME(Input), "ActionSet",
+			{ /*	Constructors */
+				ConstructorMethod("new(_)", [](WrenVM* vm) {
+					SetReturn<ActionSet>(vm).BindResources(vm, 1);
+				})},
+			{ /*	Static methods */ },
+			{ /*	Properties */ },
+			{ /*	Methods */
+				ForeignMethod("acquireLocalDevice(_,_)", [](WrenVM* vm) {
+					InputBus& bus(GetSlotAs<InputBus>(vm, 1));
+					DeviceId  id(AsInt(wrenGetSlotDouble(vm, 2)));
+
+					ET_ABORT_WREN_UNLESS(GetSlotAs<ActionSet>(vm, 0).TryAcquireDevice(bus, id), "Unable to acquire device.");
+				}),
+				ForeignMethod("releaseDevices()", [](WrenVM* vm) {
+					GetSlotAs<ActionSet>(vm, 0).ReleaseDevices();
+				}) });
+		// clang-format on
 	}
 
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}
+}
+} // namespace Eldritch2::Scripting::Wren

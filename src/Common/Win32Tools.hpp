@@ -2,7 +2,7 @@
   Win32Tools.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -15,8 +15,7 @@
 #include <Common/Mpl/Compiler.hpp>
 //------------------------------------------------------------------//
 
-struct HINSTANCE__;
-using HINSTANCE	= HINSTANCE__*;
+using HINSTANCE = struct HINSTANCE__*;
 
 #if defined GetCommandLine
 #	undef GetCommandLine
@@ -24,23 +23,23 @@ using HINSTANCE	= HINSTANCE__*;
 
 namespace Eldritch2 {
 
-	void ETNeverThrowsHint	StoreMainArguments( HINSTANCE hInstance, int nCmdShow );
+void ETNeverThrowsHint StoreMainArguments(HINSTANCE hInstance, int nCmdShow);
 
 // ---------------------------------------------------
 
-	const wchar_t*			GetWideCommandLine();
+const wchar_t* GetWideCommandLine();
 
-	const char*				GetCommandLine();
+const char* GetCommandLine();
 
-	bool ETNeverThrowsHint	CommandLineContains( wchar_t* option );
-	bool ETNeverThrowsHint	CommandLineContains( char* option );
-
-// ---------------------------------------------------
-
-	HINSTANCE ETNeverThrowsHint	GetModuleByAddress( void* addressOfItemInModule = nullptr );
+bool ETNeverThrowsHint CommandLineContains(wchar_t* option);
+bool ETNeverThrowsHint CommandLineContains(char* option);
 
 // ---------------------------------------------------
 
-	int ETPureFunctionHint ETNeverThrowsHint GetCmdShow();
+HINSTANCE ETNeverThrowsHint GetModuleByAddress(void* addressOfItemInModule = nullptr);
 
-}	// namespace Eldritch2
+// ---------------------------------------------------
+
+int ETPureFunctionHint ETNeverThrowsHint GetCmdShow();
+
+} // namespace Eldritch2

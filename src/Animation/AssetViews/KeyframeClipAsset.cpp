@@ -2,7 +2,7 @@
   KeyframeClipAsset.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -23,28 +23,28 @@ using namespace ::Eldritch2::Assets;
 using namespace ::flatbuffers;
 
 namespace Eldritch2 {
-namespace Animation {
-namespace AssetViews {
+	namespace Animation {
+		namespace AssetViews {
 
-	KeyframeClipAsset::KeyframeClipAsset( const Utf8Char* const filePath ) : Asset( filePath ) {}
+			KeyframeClipAsset::KeyframeClipAsset(const Utf8Char* const filePath) : Asset(filePath) {}
 
-// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	ErrorCode KeyframeClipAsset::BindResources( const Builder& asset ) {
-	//	Ensure we're working with data that can plausibly represent a keyframe animation clip.
-		Verifier verifier( reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize() );
-		if (!VerifyAnimationBuffer( verifier )) {
-			asset.WriteLog( MessageType::Error, "{} is malformed!" UTF8_NEWLINE, GetPath() );
-			return Error::InvalidParameter;
-		}
+			ErrorCode KeyframeClipAsset::BindResources(const Builder& asset) {
+			//	Ensure we're working with data that can plausibly represent a keyframe animation clip.
+				Verifier verifier(reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize());
+				if (!VerifyAnimationBuffer(verifier)) {
+					asset.WriteLog(MessageType::Error, "Data integrity check failed for {}, aborting load." UTF8_NEWLINE, GetPath());
+					return Error::InvalidParameter;
+				}
 
-		return Error::None;
-	}
+				return Error::None;
+			}
 
-// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	void KeyframeClipAsset::FreeResources() {}
+			void KeyframeClipAsset::FreeResources() {}
 
-}	// namespace AssetViews
-}	// namespace Animation
+		}	// namespace AssetViews
+	}	// namespace Animation
 }	// namespace Eldritch2

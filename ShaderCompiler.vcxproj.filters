@@ -34,6 +34,15 @@
     <Filter Include="Source Files\Tools">
       <UniqueIdentifier>{b197d747-59ec-4189-a164-325e85054daa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FlatBuffer Schema Definitions">
+      <UniqueIdentifier>{f6115564-4039-47d3-bea1-3a5a9b3f3099}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common\Containers">
+      <UniqueIdentifier>{4af1b949-6854-476c-89ee-b57a6f1dcd4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Containers">
+      <UniqueIdentifier>{01f2ec79-dbb8-4cf3-8b60-4c5dbf2edd8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src_ShaderCompiler\ShaderCompiler.Win32.cpp">
@@ -48,14 +57,20 @@
     <ClCompile Include="src\Common\Memory\ChildAllocator.cpp">
       <Filter>Source Files\Common\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\Memory\EaStlAllocatorAdapterMixin.cpp">
-      <Filter>Source Files\Common\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="src\Common\Memory\MallocAllocator.cpp">
       <Filter>Source Files\Common\Memory</Filter>
     </ClCompile>
     <ClCompile Include="src\Tools\CrtpTool.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\AbstractString.cpp">
+      <Filter>Source Files\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Eastl.cpp">
+      <Filter>Header Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\FileWriter.Win32.cpp">
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +92,18 @@
     <ClInclude Include="src\Tools\CrtpTool.hpp">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="src\Common\Containers\ArrayList.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\AbstractString.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\ComPointer.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\FileWriter.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Common\Memory\ChildAllocator.inl">
@@ -90,6 +117,33 @@
     </None>
     <None Include="src\Tools\CrtpTool.inl">
       <Filter>Source Files\Tools</Filter>
+    </None>
+    <None Include="src\Flatbuffers\GraphicsPipeline.fbc">
+      <Filter>FlatBuffer Schema Definitions</Filter>
+    </None>
+    <None Include="src\Flatbuffers\GraphicsTypes.fbc">
+      <Filter>FlatBuffer Schema Definitions</Filter>
+    </None>
+    <None Include="src\Flatbuffers\ShaderSetTypes.fbc">
+      <Filter>FlatBuffer Schema Definitions</Filter>
+    </None>
+    <None Include="src\Flatbuffers\DxbcShaderSet.fbc">
+      <Filter>FlatBuffer Schema Definitions</Filter>
+    </None>
+    <None Include="src\Flatbuffers\SpirVShaderSet.fbc">
+      <Filter>FlatBuffer Schema Definitions</Filter>
+    </None>
+    <None Include="src\Flatbuffers\Eldritch2Types.fbc">
+      <Filter>FlatBuffer Schema Definitions</Filter>
+    </None>
+    <None Include="src\Common\Containers\ArrayList.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Containers\AbstractString.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\ComPointer.inl">
+      <Filter>Source Files\Common</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

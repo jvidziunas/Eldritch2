@@ -2,7 +2,7 @@
   ChildAllocator.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -17,8 +17,8 @@
 
 namespace Eldritch2 {
 
-	ETInlineHint Allocator& ChildAllocator::GetParent() const {
-		return *_parent;
-	}
+ETInlineHint Allocator& ChildAllocator::GetParent() const {
+	return *_parent;
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

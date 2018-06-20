@@ -2,7 +2,7 @@
   DisplayBus.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2018 Eldritch Entertainment, LLC.
@@ -12,44 +12,39 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Graphics/Vulkan/Display.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			class	PresentCoordinator;
-			class	OutputWindow;
-		}
-	}
-}
-
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class DisplayBus {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref DisplayBus instance.
-		DisplayBus( PresentCoordinator& presenter );
-	//!	Disable copy construction.
-		DisplayBus( const DisplayBus& ) = delete;
+		//!	Constructs this @ref DisplayBus instance.
+		DisplayBus(DisplayMap<>& displayByName, Mutex& mutex);
+		//!	Disable copy construction.
+		DisplayBus(const DisplayBus&) = delete;
 
 		~DisplayBus() = default;
 
-	// ---------------------------------------------------
-	
-	public:
-		CountedPointer<OutputWindow>	FindWindowByName( const Utf8Char* const name );
+		// ---------------------------------------------------
 
-	// - DATA MEMBERS ------------------------------------
-	
+	public:
+		bool TryAcquireDisplay(const Utf8Char* const name, DisplaySource& source);
+
+		void ReleaseDisplay(const Utf8Char* const name, DisplaySource& source);
+
+		// ---------------------------------------------------
+
 	private:
-		PresentCoordinator& _presenter;
+		DisplayMap<>::Iterator CreateDisplay(const Utf8Char* name);
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		DisplayMap<>* _displayByName;
+		Mutex*        _displayMutex;
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan

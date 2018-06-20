@@ -2,7 +2,7 @@
   CharTypes.inl
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -22,50 +22,49 @@ namespace {
 	template <typename PlatformCharType = PlatformChar>
 	struct TranslateDispatcher {
 		template <typename InputIterator, typename OutputIterator>
-		static ETPureFunctionHint void AsPlatformSequence( InputIterator begin, InputIterator end, OutputIterator output ) {
-			eastl::copy( begin, end, output );
+		static ETPureFunctionHint void AsPlatformSequence(InputIterator begin, InputIterator end, OutputIterator output) {
+			eastl::copy(begin, end, output);
 		}
 
 		template <typename InputIterator, typename OutputIterator>
-		static ETPureFunctionHint void AsUtf8Sequence( InputIterator begin, InputIterator end, OutputIterator output ) {
-			eastl::copy( begin, end, output );
+		static ETPureFunctionHint void AsUtf8Sequence(InputIterator begin, InputIterator end, OutputIterator output) {
+			eastl::copy(begin, end, output);
 		}
 	};
 
 	template <>
-	struct TranslateDispatcher</*PlatformCharType =*/ wchar_t> {
+	struct TranslateDispatcher</*PlatformCharType =*/wchar_t> {
 		template <typename InputIterator, typename OutputIterator>
-		static ETPureFunctionHint void AsPlatformSequence( InputIterator begin, InputIterator end, OutputIterator output ) {
-			utf8::unchecked::utf8to16( begin, end, output );
+		static ETPureFunctionHint void AsPlatformSequence(InputIterator begin, InputIterator end, OutputIterator output) {
+			utf8::unchecked::utf8to16(begin, end, output);
 		}
 
 		template <typename InputIterator, typename OutputIterator>
-		static ETPureFunctionHint void AsUtf8Sequence( InputIterator begin, InputIterator end, OutputIterator output ) {
-			utf8::unchecked::utf16to8( begin, end, output );
+		static ETPureFunctionHint void AsUtf8Sequence(InputIterator begin, InputIterator end, OutputIterator output) {
+			utf8::unchecked::utf16to8(begin, end, output);
 		}
 	};
 
-}	// anonymous namespace
+} // anonymous namespace
 
-	template <typename InputIterator, typename OutputIterator>
-	OutputIterator AsPlatformString( InputIterator begin, InputIterator end, OutputIterator output ) {
-		static_assert( eastl::is_same<eastl::iterator_traits<InputIterator>::value_type, Utf8Char>::value, "" );
-		static_assert( eastl::is_same<eastl::iterator_traits<OutputIterator>::value_type, PlatformChar>::value, "" );
+template <typename InputIterator, typename OutputIterator>
+OutputIterator AsPlatformString(InputIterator begin, InputIterator end, OutputIterator output) {
+	static_assert(eastl::is_same<eastl::iterator_traits<InputIterator>::value_type, Utf8Char>::value, "");
+	static_assert(eastl::is_same<eastl::iterator_traits<OutputIterator>::value_type, PlatformChar>::value, "");
 
-		TranslateDispatcher<>::AsPlatformSequence( begin, end, output );
+	TranslateDispatcher<>::AsPlatformSequence(begin, end, output);
 
-		return output;
-	}
+	return output;
+}
 
-	template <typename InputIterator, typename OutputIterator>
-	OutputIterator AsUtf8String( InputIterator begin, InputIterator end, OutputIterator output ) {
-		static_assert( eastl::is_same<eastl::iterator_traits<InputIterator>::value_type, PlatformChar>::value, "" );
-		static_assert( eastl::is_same<eastl::iterator_traits<OutputIterator>::value_type, Utf8Char>::value, "" );
+template <typename InputIterator, typename OutputIterator>
+OutputIterator AsUtf8String(InputIterator begin, InputIterator end, OutputIterator output) {
+	static_assert(eastl::is_same<eastl::iterator_traits<InputIterator>::value_type, PlatformChar>::value, "");
+	static_assert(eastl::is_same<eastl::iterator_traits<OutputIterator>::value_type, Utf8Char>::value, "");
 
-		TranslateDispatcher<>::AsUtf8Sequence( begin, end, output );
+	TranslateDispatcher<>::AsUtf8Sequence(begin, end, output);
 
-		return output;
-	}
+	return output;
+}
 
-}	// namespace Eldritch2
-
+} // namespace Eldritch2

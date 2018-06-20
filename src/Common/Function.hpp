@@ -2,7 +2,7 @@
   Function.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,7 +17,7 @@
 
 namespace Eldritch2 {
 
-	template <typename Signature>
-	using Function = eastl::function<Signature>;
+template <typename Signature>
+using Function = eastl::function<Signature>;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

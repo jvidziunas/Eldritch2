@@ -1,0 +1,14 @@
+file_identifier	"E2PD";
+
+namespace Eldritch2.Core.FlatBuffers;
+
+table Property {
+	Name	: string (required);
+	Value	: string (required);
+}
+
+table PlayerData {
+	Properties : [Property];
+}
+
+root_type PlayerData;

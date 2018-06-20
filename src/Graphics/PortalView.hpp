@@ -2,7 +2,7 @@
   PortalView.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,12 +15,10 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
+namespace Eldritch2 { namespace Graphics {
 
 	class PortalView {
-		Vector	viewPlane;
+		Vector viewPlane;
 	};
 
-}	// namespace Graphics
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Graphics

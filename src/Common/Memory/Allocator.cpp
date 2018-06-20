@@ -14,7 +14,6 @@
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -23,22 +22,22 @@
 
 namespace Eldritch2 {
 
-	Allocator::Allocator( const Utf8Char* const name ) {
-#	if ET_DEBUG_BUILD
-		_name = name;
-#	else
-		ETUnreferencedParameter( name );
-#	endif
-	}
+Allocator::Allocator(const Utf8Char* const name) {
+#if ET_DEBUG_BUILD
+	_name = name;
+#else
+	ETUnreferencedParameter(name);
+#endif
+}
 
 // ---------------------------------------------------
 
-	const Utf8Char* Allocator::GetName() const {
-#	if ET_DEBUG_BUILD
-		return _name;
-#	else
-		return "<Name unavailable in release build>";
-#	endif
-	}
+const Utf8Char* Allocator::GetName() const {
+#if ET_DEBUG_BUILD
+	return _name;
+#else
+	return "<Name unavailable in release build>";
+#endif
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

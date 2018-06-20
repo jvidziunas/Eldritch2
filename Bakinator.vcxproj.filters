@@ -48,9 +48,6 @@
     <ClCompile Include="src\Common\Memory\Allocator.cpp">
       <Filter>Source Files\Common\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp">
-      <Filter>Source Files\Common\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="src\Common\Memory\InstanceNew.cpp">
       <Filter>Source Files\Common\Memory</Filter>
     </ClCompile>
@@ -60,20 +57,11 @@
     <ClCompile Include="src\Common\Memory\ChildAllocator.cpp">
       <Filter>Source Files\Common\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\Memory\NullAllocator.cpp">
-      <Filter>Source Files\Common\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="src\Common\Assert.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Tools\CrtpTool.cpp">
       <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Common\CppFormatDefinitions.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Common\EastlDefinitions.cpp">
-      <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="src_Bakinator\Bakinator.cpp">
       <Filter>Source Files</Filter>
@@ -102,6 +90,9 @@
     <ClCompile Include="src\Common\MappedFile.Win32.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="src\Common\Eastl.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Common\Mpl\Alignof.hpp">
@@ -125,9 +116,6 @@
     <ClInclude Include="src\Common\Memory\Allocator.hpp">
       <Filter>Header Files\Common\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\Memory\Win32HeapAllocator.hpp">
-      <Filter>Header Files\Common\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Memory\InstanceNew.hpp">
       <Filter>Header Files\Common\Memory</Filter>
     </ClInclude>
@@ -135,9 +123,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Memory\ChildAllocator.hpp">
-      <Filter>Header Files\Common\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Common\Memory\NullAllocator.hpp">
       <Filter>Header Files\Common\Memory</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Memory\InstanceDeleter.hpp">

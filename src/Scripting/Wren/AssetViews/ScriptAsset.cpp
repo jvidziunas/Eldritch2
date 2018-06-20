@@ -2,7 +2,7 @@
   ScriptAsset.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -16,41 +16,41 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
-namespace AssetViews {
+	namespace Scripting {
+		namespace Wren {
+			namespace AssetViews {
 
-	using namespace ::Eldritch2::Assets;
+				using namespace ::Eldritch2::Assets;
 
-	ScriptAsset::ScriptAsset( const Utf8Char* const path ) : Asset( path ), _source( MallocAllocator( "Wren Script Asset Source Allocator" ) ) {}
+				ScriptAsset::ScriptAsset(const Utf8Char* const path) : Asset(path), _source(MallocAllocator("Wren Script Asset Source Allocator")) {}
 
-// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	ETPureFunctionHint Utf8Literal ScriptAsset::GetExtension() {
-		return ".wren";
-	}
+				ETPureFunctionHint Utf8Literal ScriptAsset::GetExtension() {
+					return ".wren";
+				}
 
-// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	ErrorCode ScriptAsset::BindResources( const Builder& asset ) {
-		if (asset.GetSize() == 0u) {
-			return Error::InvalidParameter;
-		}
+				ErrorCode ScriptAsset::BindResources(const Builder& asset) {
+					if (asset.GetSize() == 0u) {
+						return Error::InvalidParameter;
+					}
 
-		String<> source( asset.Begin(), asset.End(), _source.GetAllocator() );
+					String<> source(asset.Begin(), asset.End(), _source.GetAllocator());
 
-		Swap( _source, source );
+					Swap(_source, source);
 
-		return Error::None;
-	}
+					return Error::None;
+				}
 
-// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	void ScriptAsset::FreeResources() {
-		_source.Clear();
-	}
+				void ScriptAsset::FreeResources() {
+					_source.Clear();
+				}
 
-}	// namespace AssetViews
-}	// namespace Wren
-}	// namespace Scripting
+			}	// namespace AssetViews
+		}	// namespace Wren
+	}	// namespace Scripting
 }	// namespace Eldritch2

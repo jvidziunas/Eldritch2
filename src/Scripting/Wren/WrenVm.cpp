@@ -2,7 +2,7 @@
   WrenVm.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -33,7 +33,7 @@ ET_PUSH_COMPILER_WARNING_STATE()
  *	(6340) Signed/unsigned char conversion in printf.
  *	(6011) Static analyzer freakout re: null pointers in WrenVM struct.
  *	(4701, 4703)  MSVC doesn't pick up on certain Wren functions initializing 'out' parameters through pointers. */
-	ET_SET_MSVC_WARNING_STATE( disable : 4100 4127 4702 4200 4709 4996 4244 6340 6011 4701 4703 )
+	ET_SET_MSVC_WARNING_STATE(disable : 4100 4127 4702 4200 4709 4996 4244 6340 6011 4701 4703)
 #	include <wren/src/vm/wren_primitive.c>
 #	include <wren/src/vm/wren_compiler.c>
 #	include <wren/src/vm/wren_debug.c>
@@ -41,4 +41,4 @@ ET_PUSH_COMPILER_WARNING_STATE()
 #	include <wren/src/vm/wren_value.c>
 #	include <wren/src/vm/wren_core.c>
 #	include <wren/src/vm/wren_vm.c>
-ET_POP_COMPILER_WARNING_STATE()
+	ET_POP_COMPILER_WARNING_STATE()

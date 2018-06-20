@@ -2,7 +2,7 @@
   Marshal.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,21 +15,17 @@
 
 //------------------------------------------------------------------//
 
-struct	WrenVM;
+struct WrenVM;
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	template <typename T, typename... Arguments>
-	T&	SetReturn( WrenVM* vm, Arguments&&... arguments );
+	T& SetReturn(WrenVM* vm, Arguments&&... arguments);
 
 	template <typename T>
-	ETPureFunctionHint T&	GetSlotAs( WrenVM* vm, int slot );
+	ETPureFunctionHint T& GetSlotAs(WrenVM* vm, int slot);
 
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

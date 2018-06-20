@@ -12,38 +12,37 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/HashSet.hpp>
-#include <Common/Containers/String.hpp>
+#include <Common/Containers/PlatformString.hpp>
+#include <Common/Containers/ArrayList.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Tools {
+namespace Eldritch2 { namespace Tools {
 
 	class Bakinator : public CrtpTool<Bakinator> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		Bakinator( const Bakinator& ) = delete;
-	//!	Constructs this @ref Bakinator instance.
+		//!	Disable copy construction.
+		Bakinator(const Bakinator&) = delete;
+		//!	Constructs this @ref Bakinator instance.
 		Bakinator();
 
 		~Bakinator() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	RegisterOptions( OptionRegistrar& options );
+		void RegisterOptions(OptionRegistrar& options);
 
-		int		Process();
+		int Process();
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		HashSet<String<>>	_exports;
-		String<>			_outPath;
+		ArrayList<PlatformString<>> _exports;
+		PlatformString<>            _indexPath;
+		PlatformString<>            _blobPath;
 	};
 
-}	// namespace Tools
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Tools

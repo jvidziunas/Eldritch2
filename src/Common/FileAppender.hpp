@@ -2,7 +2,7 @@
   FileAppender.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,7 +17,7 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	class	ErrorCode;
+class ErrorCode;
 }
 
 #if ET_PLATFORM_WINDOWS
@@ -26,51 +26,51 @@ using HANDLE = void*;
 
 namespace Eldritch2 {
 
-	class FileAppender {
+class FileAppender {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Disable copy construction.
-		FileAppender( const FileAppender& ) = delete;
+	FileAppender(const FileAppender&) = delete;
 	//!	Constructs this @ref FileAppender instance.
-		FileAppender( FileAppender&& );
+	FileAppender(FileAppender&&);
 	//!	Constructs this @ref FileAppender instance.
-		FileAppender();
+	FileAppender();
 
-		~FileAppender();
-
-	// ---------------------------------------------------
-
-	public:
-		ErrorCode	CreateOrTruncate( const PlatformChar* path );
-
-		ErrorCode	OpenOrCreate( const PlatformChar* path );
-
-		ErrorCode	Open( const PlatformChar* path );
+	~FileAppender();
 
 	// ---------------------------------------------------
 
-	public:
-		ErrorCode	Append( const void* const sourceData, size_t writeLengthInBytes );
+public:
+	ErrorCode CreateOrTruncate(const PlatformChar* path);
+
+	ErrorCode OpenOrCreate(const PlatformChar* path);
+
+	ErrorCode Open(const PlatformChar* path);
 
 	// ---------------------------------------------------
 
-	public:
+public:
+	ErrorCode Append(const void* const sourceData, size_t writeLengthInBytes);
+
+	// ---------------------------------------------------
+
+public:
 	//!	Disable copy assignment.
-		FileAppender&	operator=( const FileAppender& ) = delete;
+	FileAppender& operator=(const FileAppender&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-#	if ET_PLATFORM_WINDOWS
-		HANDLE	_file;
-#	else
-		static_assert( false, "FileAppender needs implementation for target platform!" );
-#	endif
+private:
+#if ET_PLATFORM_WINDOWS
+	HANDLE _file;
+#else
+	static_assert(false, "FileAppender needs implementation for target platform!");
+#endif
 
 	// ---------------------------------------------------
 
-		friend void	Swap( FileAppender&, FileAppender& );
-	};
+	friend void Swap(FileAppender&, FileAppender&);
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

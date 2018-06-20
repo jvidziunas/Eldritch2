@@ -2,12 +2,11 @@
   InputDevice.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2018 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -15,37 +14,52 @@
 #include <Input/InputDevice.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Input {
+namespace Eldritch2 { namespace Input {
 
-	InputDevice::InputDevice() : _bindingByCode( MallocAllocator( "Input Device Binding Map Allocator" ) ), _actionHandler() {}
+	InputDevice::InputDevice() :
+		_bindingByScanCode(MallocAllocator("Input Device Binding Map Allocator")),
+		_handler(nullptr) {}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	bool InputDevice::TryAcquire( BindingMap<> bindingByCode, Handler actionHandler ) {
-		_bindingByCode = eastl::move( bindingByCode );
-		_actionHandler = eastl::move( actionHandler );
+	InputDevice::~InputDevice() {
+		Release();
+	}
+
+	// ---------------------------------------------------
+
+	bool InputDevice::TryAcquire(BindingMap<> bindingByScanCode, InputHandler& handler) {
+		if (_handler != nullptr) {
+			return false;
+		}
+
+		_bindingByScanCode = eastl::move(bindingByScanCode);
+		_handler           = eastl::addressof(handler);
+
+		handler.OnConnect();
 
 		return true;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void InputDevice::Clear() {
-		_bindingByCode.Clear();
-	//	Don't need to clear handler, we have no entries and will never dispatch (see @ref InputDevice::PressButton)
+	void InputDevice::Release() {
+		_bindingByScanCode.Clear();
+
+		if (InputHandler* const handler = eastl::exchange(_handler, nullptr)) {
+			handler->OnDisconnect();
+		}
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void InputDevice::MapCodeAndDispatch( ScanCode code, int32 weight ) const {
-		const BindingMap<>::ConstIterator	binding( _bindingByCode.Find( code ) );
-		if (ET_UNLIKELY( binding == _bindingByCode.End() )) {
+	void InputDevice::Dispatch(ScanCode code, int32 weight) const {
+		const BindingMap<>::ConstIterator binding(_bindingByScanCode.Find(code));
+		if (ET_UNLIKELY(binding == _bindingByScanCode.End())) {
 			return;
 		}
 
-		_actionHandler( binding->second.actionId, weight * binding->second.weight );
+		_handler->Activate(binding->second.actionId, weight * binding->second.weight);
 	}
 
-}	// namespace Input
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Input

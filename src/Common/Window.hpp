@@ -2,7 +2,7 @@
   Window.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,94 +17,93 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	class	ErrorCode;
+class ErrorCode;
 }
 
 #if ET_PLATFORM_WINDOWS
-struct	HINSTANCE__;
-struct	HWND__;
-
-using HINSTANCE = HINSTANCE__*;
-using HWND		= HWND__*;
-using HANDLE	= void*;
+using HINSTANCE = struct HINSTANCE__*;
+using HWND      = struct HWND__*;
+using HANDLE    = void*;
 #endif
 
 namespace Eldritch2 {
 
-	enum class FullscreenMode {
-		Windowed,
-		WindowedFullscreen,
-		Fullscreen
-	};
+enum class FullscreenMode {
+	Windowed,
+	WindowedFullscreen,
+	Fullscreen
+};
 
 // ---
 
-	struct DisplayMode {
-		FullscreenMode	mode;
-		uint16			widthInPixels;
-		uint16			heightInPixels;
-	};
+struct DisplayMode {
+	FullscreenMode mode;
+	uint16         widthInPixels;
+	uint16         heightInPixels;
+};
 
 // ---
 
-	class Window {
+class Window {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Disable copy construction.
-		Window( const Window& ) = delete;
+	Window(const Window&) = delete;
 	//!	Constructs this @ref Window instance.
-		Window( Window&& );
+	Window(Window&&);
 	//!	Constructs this @ref Window instance.
-		Window();
+	Window();
 
-		~Window();
-
-	// ---------------------------------------------------
-
-	public:
-		DisplayMode	GetDisplayMode() const;
-
-		void		SetDisplayMode( DisplayMode mode );
+	~Window();
 
 	// ---------------------------------------------------
 
-	public:
-#	if ET_PLATFORM_WINDOWS
-		HINSTANCE	GetHinstance() const;
+public:
+	DisplayMode GetDisplayMode() const;
 
-		HWND		GetHwnd() const;
-#	endif
+	void SetDisplayMode(DisplayMode mode);
 
 	// ---------------------------------------------------
 
-	public:
-		void	EnsureVisible();
+public:
+#if ET_PLATFORM_WINDOWS
+	HINSTANCE GetHinstance() const;
+
+	HWND GetHwnd() const;
+#endif
 
 	// ---------------------------------------------------
 
-	public:
-		ErrorCode	BindResources();
+public:
+	void EnsureVisible();
 
-		void		FreeResources();
+	bool Exists() const;
+
+	// ---------------------------------------------------
+
+public:
+	ErrorCode BindResources();
+
+	void FreeResources();
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
-		Window&	operator=( const Window& ) = delete;
+	Window& operator=(const Window&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-	#if ET_PLATFORM_WINDOWS
-		FullscreenMode	_mode;
-		HWND			_window;
-		HANDLE			_messageThread;
-	#endif
+private:
+#if ET_PLATFORM_WINDOWS
+	FullscreenMode _mode;
+	HWND           _window;
+	HANDLE         _messageThread;
+#endif
 
 	// ---------------------------------------------------
 
-		friend void	Swap( Window&, Window& );
-	};
+	friend void Swap(Window&, Window&);
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

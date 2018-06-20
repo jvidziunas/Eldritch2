@@ -2,7 +2,7 @@
   IdentifierPool.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -21,114 +21,114 @@ namespace Detail {
 
 	template <typename Identifier>
 	class IdentifierPool {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		using IdentifierType = Identifier;
 
-	// ---
+		// ---
 
 		struct ValueRange {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-		//!	Constructs this @ref ValueRange instance.
-			ValueRange( IdentifierType first, IdentifierType last );
-		//!	Constructs this @ref ValueRange instance.
+			//!	Constructs this @ref ValueRange instance.
+			ValueRange(IdentifierType first, IdentifierType last);
+			//!	Constructs this @ref ValueRange instance.
 			ValueRange() = default;
 
 			~ValueRange() = default;
 
-		// ---------------------------------------------------
+			// ---------------------------------------------------
 
 		public:
-			bool	CanMergeForwardWith( const ValueRange& range ) const;
+			bool CanMergeForwardWith(const ValueRange& range) const;
 
-		// ---------------------------------------------------
-
-		public:
-			IdentifierType	GetSize() const;
-
-		// ---------------------------------------------------
+			// ---------------------------------------------------
 
 		public:
-			bool	Contains( IdentifierType identifier ) const;
+			IdentifierType GetSize() const;
 
-			bool	IsEmpty() const;
-
-		// - DATA MEMBERS ------------------------------------
+			// ---------------------------------------------------
 
 		public:
-			IdentifierType	first;
-			IdentifierType	last;
+			bool Contains(IdentifierType identifier) const;
+
+			bool IsEmpty() const;
+
+			// - DATA MEMBERS ------------------------------------
+
+		public:
+			IdentifierType first;
+			IdentifierType last;
 		};
 	};
 
-}	// namespace Detail
+} // namespace Detail
 
-	template <typename Identifier, class Allocator = MallocAllocator>
-	class IdentifierPool : Detail::IdentifierPool<Identifier> {
+template <typename Identifier, class Allocator = MallocAllocator>
+class IdentifierPool : Detail::IdentifierPool<Identifier> {
 	// - TYPE PUBLISHING ---------------------------------
 
-	public:
-		using ValueRange		= typename Detail::IdentifierPool<Identifier>::ValueRange;
-		using IdentifierType	= typename Detail::IdentifierPool<Identifier>::IdentifierType;
-		using AllocatorType		= Allocator;
+public:
+	using ValueRange     = typename Detail::IdentifierPool<Identifier>::ValueRange;
+	using IdentifierType = typename Detail::IdentifierPool<Identifier>::IdentifierType;
+	using AllocatorType  = Allocator;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref IdentifierPool instance.
-		explicit IdentifierPool( std::initializer_list<ValueRange> ranges, const AllocatorType& allocator );
+	explicit IdentifierPool(std::initializer_list<ValueRange> ranges, const AllocatorType& allocator);
 	//!	Constructs this @ref IdentifierPool instance.
-		explicit IdentifierPool( ValueRange initialRange, const AllocatorType& allocator );
+	explicit IdentifierPool(ValueRange initialRange, const AllocatorType& allocator);
 	//!	Constructs this @ref IdentifierPool instance.
-		explicit IdentifierPool( const AllocatorType& allocator );
+	explicit IdentifierPool(const AllocatorType& allocator);
 	//!	Constructs this @ref IdentifierPool instance.
-		IdentifierPool( IdentifierPool&& );
+	IdentifierPool(IdentifierPool&&);
 	//!	Disable copy construction.
-		IdentifierPool( const IdentifierPool& ) = delete;
+	IdentifierPool(const IdentifierPool&) = delete;
 
-		~IdentifierPool() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		Pair<Identifier, bool>	Allocate();
-
-		Pair<Identifier, bool>	AllocateRange( IdentifierType sizeInElements );
-
-		void					ReleaseRange( ValueRange range );
-
-		void					Release( IdentifierType identifier );
+	~IdentifierPool() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		void	Clear();
+public:
+	Pair<Identifier, bool> Allocate();
+
+	Pair<Identifier, bool> AllocateRange(IdentifierType sizeInElements);
+
+	void ReleaseRange(ValueRange range);
+
+	void Release(IdentifierType identifier);
 
 	// ---------------------------------------------------
 
-	public:
-		bool	IsEmpty() const;
+public:
+	void Clear();
+
+	// ---------------------------------------------------
+
+public:
+	bool IsEmpty() const;
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
-		IdentifierPool&	operator=( const IdentifierPool& ) = delete;
+	IdentifierPool& operator=(const IdentifierPool&) = delete;
 
 	// ---------------------------------------------------
 
-	public:
-		IdentifierType	GetLargestSpanLength() const;
+public:
+	IdentifierType GetLargestSpanLength() const;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		ArrayList<ValueRange, AllocatorType>	_freeRanges;
-	};
+private:
+	ArrayList<ValueRange, AllocatorType> _freeRanges;
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

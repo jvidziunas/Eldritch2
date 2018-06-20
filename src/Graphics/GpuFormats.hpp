@@ -2,7 +2,7 @@
   GpuFormats.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,8 +15,7 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
+namespace Eldritch2 { namespace Graphics {
 
 	enum class GpuBitLayout : uint8 {
 		_32_32_32_32,
@@ -43,11 +42,11 @@ namespace Graphics {
 		_5_6_5,
 
 		Dxt1,
-		Bc1				= Dxt1,
+		Bc1 = Dxt1,
 		Dxt3,
-		Bc2				= Dxt3,
+		Bc2 = Dxt3,
 		Dxt5,
-		Bc3				= Dxt5,
+		Bc3 = Dxt5,
 		Bc4,
 		Bc5,
 		Bc6,
@@ -57,7 +56,7 @@ namespace Graphics {
 		Count
 	};
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	enum class GpuStorageFormat : uint8 {
 		Normalized,
@@ -73,12 +72,11 @@ namespace Graphics {
 		Count
 	};
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	enum GpuFilteringFlags : uint8 {
-		InterpolateAt16BitIfAvailable	= 1u,
-		SampleAsSrgb					= 2u
+		InterpolateAt16BitIfAvailable = 1u,
+		SampleAsSrgb                  = 2u
 	};
 
-}	// namespace Graphics
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Graphics

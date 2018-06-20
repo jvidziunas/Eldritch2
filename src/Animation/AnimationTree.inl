@@ -2,7 +2,7 @@
   AnimationTree.inl
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -16,40 +16,36 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Animation {
+	namespace Animation {
 
-	template <typename Clip, typename... ConstructorArguments>
-	ETInlineHint Result<Clip*> AnimationTree::AddClip( ConstructorArguments&&... arguments ) {
-		auto clip( CreateUnique<Clip>( _allocator, eastl::forward<ConstructorArguments>( arguments )... ) );
-		if (!clip) {
-			return Error::OutOfMemory;
+		template <typename PublicBlend, typename... ConstructorArguments>
+		ETInlineHint void AnimationTree::AddBlend(ConstructorArguments&&... arguments) {
+			void* const memory(_allocator.Allocate(sizeof(PublicBlend), alignof(PublicBlend), 0u));
+			if (memory == nullptr) {
+				return;
+			}
+
+			_blends.EmplaceBack(new(memory) PublicBlend(eastl::forward<ConstructorArguments>(arguments)...));
 		}
 
-		_clips.EmplaceBack( eastl::move( clip ) );
+	// ---------------------------------------------------
 
-		return _clips.Back().Get();
-	}
+		template <typename PublicClip, typename... ConstructorArguments>
+		ETInlineHint void AnimationTree::AddClip(ConstructorArguments&&... arguments) {
+			void* const memory(_allocator.Allocate(sizeof(PublicClip), alignof(PublicClip), 0u));
+			if (memory == nullptr) {
+				return;
+			}
 
-// ---------------------------------------------------
-
-	template <typename Blend, typename... ConstructorArguments>
-	ETInlineHint Result<Blend*> AnimationTree::AddBlend( ConstructorArguments&&... arguments ) {
-		auto blend( CreateUnique<Blend>( _allocator, eastl::forward<ConstructorArguments>( arguments )... ) );
-		if (!blend) {
-			return Error::OutOfMemory;
+			_clips.EmplaceBack(new(memory) PublicClip(eastl::forward<ConstructorArguments>(arguments)...));
 		}
 
-		_blends.EmplaceBack( eastl::move( blend ) );
+	// ---------------------------------------------------
 
-		return _blends.Back().Get();
-	}
+		ETInlineHint void AnimationTree::SetRoot(const Blend& root) {
+			_root = &root;
+		}
 
-// ---------------------------------------------------
-
-	ETInlineHint void AnimationTree::SetRoot( const Blend& root ) {
-		_root = &root;
-	}
-
-}	// namespace Animation
+	}	// namespace Animation
 }	// namespace Eldritch2
 

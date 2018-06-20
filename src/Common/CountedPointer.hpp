@@ -20,86 +20,86 @@
 
 namespace Eldritch2 {
 
-	struct NoopDeleter {
-		template <typename Object>
-		ETInlineHint ETPureFunctionHint void	operator()( Object& /*object*/ ) const {}
-	};
+struct NoopDeleter {
+	template <typename Object>
+	ETInlineHint ETPureFunctionHint void operator()(Object& /*object*/) const {}
+};
 
-	template <class Object, typename Disposer = NoopDeleter>
-	class CountedPointer {
+template <class Object, typename Disposer = NoopDeleter>
+class CountedPointer {
 	// - TYPE PUBLISHING ---------------------------------
 
-	private:
-		using DisposerType	= Disposer;
+private:
+	using DisposerType = Disposer;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref CountedPointer instance.
-		template <typename CompatibleObject>
-		CountedPointer( CompatibleObject pointer, const DisposerType& deleter = DisposerType() );
+	template <typename CompatibleObject>
+	CountedPointer(CompatibleObject pointer, const DisposerType& deleter = DisposerType());
 	//!	Constructs this @ref CountedPointer instance.
-		template <typename CompatibleObject, typename CompatibleDeleter>
-		CountedPointer( const CountedPointer<CompatibleObject, CompatibleDeleter>& handle );
+	template <typename CompatibleObject, typename CompatibleDeleter>
+	CountedPointer(const CountedPointer<CompatibleObject, CompatibleDeleter>& handle);
 	//!	Constructs this @ref CountedPointer instance.
-		CountedPointer( const CountedPointer& handle );
+	CountedPointer(const CountedPointer& handle);
 	//!	Constructs this @ref CountedPointer instance.
-		template <typename CompatibleObject, typename CompatibleDeleter>
-		CountedPointer( CountedPointer<CompatibleObject, CompatibleDeleter>&& handle );
+	template <typename CompatibleObject, typename CompatibleDeleter>
+	CountedPointer(CountedPointer<CompatibleObject, CompatibleDeleter>&& handle);
 	//!	Constructs this @ref CountedPointer instance.
-		CountedPointer( CountedPointer&& ) ETNoexceptHint;
+	CountedPointer(CountedPointer&&) ETNoexceptHint;
 	//!	Constructs this @ref CountedPointer instance.
-		CountedPointer( decltype( nullptr ) = nullptr );
+	CountedPointer(decltype(nullptr) = nullptr);
 
-		~CountedPointer();
+	~CountedPointer();
 
 	// ---------------------------------------------------
 
-	public:
-		Object*	Release() ETNoexceptHint;
+public:
+	Object* Release() ETNoexceptHint;
 
-		Object*	Get() const ETNoexceptHint;
+	Object* Get() const ETNoexceptHint;
 
-		void	Reset( Object* pointer = nullptr );
-
-	// ---------------------------------------------------
-
-	public:
-		const DisposerType&	GetDisposer() const ETNoexceptHint;
+	void Reset(Object* pointer = nullptr);
 
 	// ---------------------------------------------------
 
-	public:
-		template <typename CompatibleObject, typename CompatibleDeleter>
-		CountedPointer&	operator=( const CountedPointer<CompatibleObject, CompatibleDeleter>& handle ) ETNoexceptHint;
-		CountedPointer&	operator=( const CountedPointer& handle ) ETNoexceptHint;
-		template <typename CompatibleObject, typename CompatibleDeleter>
-		CountedPointer&	operator=( CountedPointer<CompatibleObject, CompatibleDeleter>&& handle ) ETNoexceptHint;
-		CountedPointer&	operator=( CountedPointer&& ) ETNoexceptHint;
-		template <typename CompatibleObject>
-		CountedPointer&	operator=( CompatibleObject* object ) ETNoexceptHint;
+public:
+	const DisposerType& GetDisposer() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	public:
-		explicit operator	bool() const ETNoexceptHint;
+public:
+	template <typename CompatibleObject, typename CompatibleDeleter>
+	CountedPointer& operator=(const CountedPointer<CompatibleObject, CompatibleDeleter>& handle) ETNoexceptHint;
+	CountedPointer& operator=(const CountedPointer& handle) ETNoexceptHint;
+	template <typename CompatibleObject, typename CompatibleDeleter>
+	CountedPointer& operator=(CountedPointer<CompatibleObject, CompatibleDeleter>&& handle) ETNoexceptHint;
+	CountedPointer& operator=(CountedPointer&&) ETNoexceptHint;
+	template <typename CompatibleObject>
+	CountedPointer& operator=(CompatibleObject* object) ETNoexceptHint;
 
-		Object*				operator->() const ETNoexceptHint;
+	// ---------------------------------------------------
 
-		Object&				operator*() const ETNoexceptHint;
+public:
+	explicit operator bool() const ETNoexceptHint;
+
+	Object* operator->() const ETNoexceptHint;
+
+	Object& operator*() const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		eastl::compressed_pair<Object*, DisposerType>	_pointerAndDeleter;
+private:
+	eastl::compressed_pair<Object*, DisposerType> _pointerAndDeleter;
 
 	// ---------------------------------------------------
 
-		template <class Object2, typename Disposer2>
-		friend class ::Eldritch2::CountedPointer;
-	};
+	template <class Object2, typename Disposer2>
+	friend class ::Eldritch2::CountedPointer;
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

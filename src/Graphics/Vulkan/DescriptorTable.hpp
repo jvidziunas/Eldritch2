@@ -2,7 +2,7 @@
   DescriptorTable.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -15,66 +15,57 @@
 #include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			class	Gpu;
-		}
-	}
-}
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class Gpu;
+}}} // namespace Eldritch2::Graphics::Vulkan
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class DescriptorTable {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		DescriptorTable( const DescriptorTable& ) = delete;
-	//!	Constructs this @ref DescriptorTable instance.
-		DescriptorTable( DescriptorTable&& );
-	//!	Constructs this @ref DescriptorTable instance.
+		//!	Disable copy construction.
+		DescriptorTable(const DescriptorTable&) = delete;
+		//!	Constructs this @ref DescriptorTable instance.
+		DescriptorTable(DescriptorTable&&);
+		//!	Constructs this @ref DescriptorTable instance.
 		DescriptorTable();
 
 		~DescriptorTable();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	PushDescriptors( Gpu& gpu, uint32_t slot, uint32_t imageCount, const VkDescriptorImageInfo* images );
-		template <uint32_t imageCount>
-		void	PushDescriptors( Gpu& gpu, uint32_t slot, const VkDescriptorImageInfo (&images)[imageCount] );
+		void PushDescriptors(Gpu& gpu, uint32_t slot, uint32_t count, const VkDescriptorImageInfo* images);
+		template <uint32_t count>
+		void PushDescriptors(Gpu& gpu, uint32_t slot, const VkDescriptorImageInfo (&images)[count]);
 
-	// ---------------------------------------------------
-
-	public:
-		VkResult	BindResources( Gpu& gpu, uint32_t poolSize );
-
-		void		FreeResources( Gpu& gpu );
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-	//!	Disable copy assignment.
-		DescriptorTable&	operator=( const DescriptorTable& ) = delete;
+		VkResult BindResources(Gpu& gpu, VkDescriptorSetLayout layout, uint32_t poolCount, const VkDescriptorPoolSize* pools);
 
-	// - DATA MEMBERS ------------------------------------
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+	public:
+		//!	Disable copy assignment.
+		DescriptorTable& operator=(const DescriptorTable&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VkDescriptorPool		_pool;
-		VkDescriptorSet			_descriptors;
-		VkDescriptorSetLayout	_setLayout;
+		VkDescriptorPool _pool;
+		VkDescriptorSet  _descriptors;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		friend void	Swap( DescriptorTable&, DescriptorTable& );
+		friend void Swap(DescriptorTable&, DescriptorTable&);
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

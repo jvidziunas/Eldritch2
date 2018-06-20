@@ -2,7 +2,7 @@
   XAudio2Listener.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -33,71 +33,71 @@ struct	IXAudio2SourceVoice;
 struct	IXAudio2Voice;
 
 namespace Eldritch2 {
-namespace Audio {
-namespace XAudio2 {
+	namespace Audio {
+		namespace XAudio2 {
 
-	class XAudio2Voice : public Voice {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+			class XAudio2Voice : public Voice {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
-	//!	Constructs this @ref XAudio2Voice instance.
-		XAudio2Voice( float32 loudnessDb, IXAudio2SourceVoice* sourceVoice, IXAudio2Voice* effectVoice );
-	//!	Disable copy construction.
-		XAudio2Voice( const XAudio2Voice& ) = delete;
-	//!	Constructs this @ref XAudio2Voice instance.
-		XAudio2Voice( XAudio2Voice&& );
+			public:
+			//!	Constructs this @ref XAudio2Voice instance.
+				XAudio2Voice(float32 loudnessDb, IXAudio2SourceVoice* sourceVoice, IXAudio2Voice* effectVoice);
+			//!	Disable copy construction.
+				XAudio2Voice(const XAudio2Voice&) = delete;
+			//!	Constructs this @ref XAudio2Voice instance.
+				XAudio2Voice(XAudio2Voice&&);
 
-		~XAudio2Voice();
+				~XAudio2Voice();
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	public:
-		void	UpdateDspSettings( const X3DAUDIO_HANDLE settings, const X3DAUDIO_LISTENER& listener, float32 timeScalar ) const;
+			public:
+				void	UpdateDspSettings(const X3DAUDIO_HANDLE settings, const X3DAUDIO_LISTENER& listener, float32 timeScalar) const;
 
-	// - DATA MEMBERS ------------------------------------
+			// - DATA MEMBERS ------------------------------------
 
-	private:
-		X3DAUDIO_EMITTER		_emitter;
+			private:
+				X3DAUDIO_EMITTER		_emitter;
 
-		IXAudio2SourceVoice*	_sourceVoice;
-		IXAudio2Voice*			_effectVoice;
-	};
+				IXAudio2SourceVoice*	_sourceVoice;
+				IXAudio2Voice*			_effectVoice;
+			};
 
-// ---
+		// ---
 
-	class XAudio2Listener : public Listener<XAudio2Voice> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+			class XAudio2Listener : public Listener<XAudio2Voice> {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
-	//!	Constructs this @ref XAudio2Listener instance.
-		XAudio2Listener( Transformation localToWorld );
-	//!	Disable copy construction.
-		XAudio2Listener( const XAudio2Listener& ) = delete;
+			public:
+			//!	Constructs this @ref XAudio2Listener instance.
+				XAudio2Listener(Transformation localToWorld);
+			//!	Disable copy construction.
+				XAudio2Listener(const XAudio2Listener&) = delete;
 
-		~XAudio2Listener() = default;
+				~XAudio2Listener() = default;
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	public:
-		Transformation ETSimdCall	GetLocalToWorld() const;
-		Transformation ETSimdCall	GetWorldToLocal() const;
+			public:
+				Transformation ETSimdCall	GetLocalToWorld() const;
+				Transformation ETSimdCall	GetWorldToLocal() const;
 
-		void ETSimdCall				SetLocalToWorld( Transformation value );
+				void ETSimdCall				SetLocalToWorld(Transformation value);
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	public:
-		void	UpdateVoices( const X3DAUDIO_HANDLE settings, float32 timeScalar );
+			public:
+				void	UpdateVoices(const X3DAUDIO_HANDLE settings, float32 timeScalar);
 
-	// - DATA MEMBERS ------------------------------------
+			// - DATA MEMBERS ------------------------------------
 
-	private:
-		X3DAUDIO_LISTENER		_listener;
+			private:
+				X3DAUDIO_LISTENER		_listener;
 
-		IXAudio2MasteringVoice*	_inWorldMaster;
-		IXAudio2MasteringVoice*	_musicMaster;
-	};
+				IXAudio2MasteringVoice*	_inWorldMaster;
+				IXAudio2MasteringVoice*	_musicMaster;
+			};
 
-}	// namespace XAudio2
-}	// namespace Audio
+		}	// namespace XAudio2
+	}	// namespace Audio
 }	// namespace Eldritch2

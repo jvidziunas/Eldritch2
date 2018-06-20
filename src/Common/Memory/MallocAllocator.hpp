@@ -19,36 +19,36 @@
 
 namespace Eldritch2 {
 
-	class MallocAllocator : public Allocator {
+class MallocAllocator : public Allocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref MallocAllocator instance.
-		MallocAllocator( const Utf8Char* name = "<unnamed allocator>" );
+	MallocAllocator(const Utf8Char* name = "<unnamed allocator>");
 	//!	Constructs this @ref MallocAllocator instance.
-		MallocAllocator( const MallocAllocator& );
+	MallocAllocator(const MallocAllocator&);
 
-		~MallocAllocator() = default;
+	~MallocAllocator() = default;
 
 	// ---------------------------------------------------
 
-	public:
+public:
 	//! Allocates a contiguous chunk of memory with the specified length and alignment using the passed-in allocation behavior duration.
-		ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal ) override;
+	ETRestrictHint void* Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal) override;
 	//! Allocates a contiguous chunk of memory with the specified length using the passed-in allocation behavior duration.
-		ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) override;
+	ETRestrictHint void* Allocate(SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal) override;
 
 	//! Releases a chunk of memory previously allocated by @ref Allocate().
-		void					Deallocate( void* const address, SizeType sizeInBytes ) override;
+	void Deallocate(void* const address, SizeType sizeInBytes) override;
 
 	// ---------------------------------------------------
 
-	public:
-		MallocAllocator&	operator=( const MallocAllocator& );
+public:
+	MallocAllocator& operator=(const MallocAllocator&);
 
 	// ---------------------------------------------------
 
-		friend void	Swap( MallocAllocator&, MallocAllocator& );
-	};
+	friend void Swap(MallocAllocator&, MallocAllocator&);
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

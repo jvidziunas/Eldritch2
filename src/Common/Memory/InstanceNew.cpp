@@ -12,15 +12,14 @@
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Common/Memory/InstanceNew.hpp>
 //------------------------------------------------------------------//
 
-ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration duration, const char* /*file*/, int /*line*/ ) throw( ){
-	const auto	result( static_cast<size_t*>( allocator.Allocate( sizeInBytes + sizeof( size_t ), duration ) ) );
+ETRestrictHint ETNeverThrowsHint void* operator new(size_t sizeInBytes, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration duration, const char* /*file*/, int /*line*/) throw() {
+	const auto result(static_cast<size_t*>(allocator.Allocate(sizeInBytes + sizeof(size_t), duration)));
 
 	if (!result) {
 		return nullptr;
@@ -32,8 +31,8 @@ ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldri
 
 // ---------------------------------------------------
 
-ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration duration ) throw( ){
-	const auto	result( static_cast<size_t*>( allocator.Allocate( sizeInBytes + sizeof(size_t), duration ) ) );
+ETRestrictHint ETNeverThrowsHint void* operator new(size_t sizeInBytes, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration duration) throw() {
+	const auto result(static_cast<size_t*>(allocator.Allocate(sizeInBytes + sizeof(size_t), duration)));
 
 	if (!result) {
 		return nullptr;
@@ -45,8 +44,8 @@ ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldri
 
 // ---------------------------------------------------
 
-ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, size_t alignmentInBytes, ::Eldritch2::AllocationDuration duration, const char* /*file*/, int /*line*/ ) throw( ){
-	const auto	result( static_cast<size_t*>( allocator.Allocate( sizeInBytes + sizeof(size_t), alignmentInBytes, sizeof(size_t), duration ) ) );
+ETRestrictHint ETNeverThrowsHint void* operator new(size_t sizeInBytes, ::Eldritch2::Allocator& allocator, size_t alignmentInBytes, ::Eldritch2::AllocationDuration duration, const char* /*file*/, int /*line*/) throw() {
+	const auto result(static_cast<size_t*>(allocator.Allocate(sizeInBytes + sizeof(size_t), alignmentInBytes, sizeof(size_t), duration)));
 
 	if (!result) {
 		return nullptr;
@@ -58,8 +57,8 @@ ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldri
 
 // ---------------------------------------------------
 
-ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldritch2::Allocator& allocator, size_t alignmentInBytes, ::Eldritch2::AllocationDuration duration ) throw( ){
-	const auto	result( static_cast<size_t*>( allocator.Allocate( sizeInBytes + sizeof(size_t), alignmentInBytes, sizeof(size_t), duration ) ) );
+ETRestrictHint ETNeverThrowsHint void* operator new(size_t sizeInBytes, ::Eldritch2::Allocator& allocator, size_t alignmentInBytes, ::Eldritch2::AllocationDuration duration) throw() {
+	const auto result(static_cast<size_t*>(allocator.Allocate(sizeInBytes + sizeof(size_t), alignmentInBytes, sizeof(size_t), duration)));
 
 	if (!result) {
 		return nullptr;
@@ -71,25 +70,24 @@ ETRestrictHint ETNeverThrowsHint void* operator new( size_t sizeInBytes, ::Eldri
 
 // ---------------------------------------------------
 
-ETNeverThrowsHint void operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration /*duration*/, const char* /*file*/, int /*line*/ ) throw( ) {
-	allocator.Deallocate( allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1] );
+ETNeverThrowsHint void operator delete(void* allocatedMemory, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration /*duration*/, const char* /*file*/, int /*line*/) throw() {
+	allocator.Deallocate(allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1]);
 }
 
 // ---------------------------------------------------
 
-ETNeverThrowsHint void operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration /*duration*/ ) throw( ) {
-	allocator.Deallocate( allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1] );
+ETNeverThrowsHint void operator delete(void* allocatedMemory, ::Eldritch2::Allocator& allocator, ::Eldritch2::AllocationDuration /*duration*/) throw() {
+	allocator.Deallocate(allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1]);
 }
 
 // ---------------------------------------------------
 
-ETNeverThrowsHint void operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, size_t /*alignmentInBytes*/, ::Eldritch2::AllocationDuration /*duration*/, const char* /*file*/, int /*line*/ ) throw( ) {
-	allocator.Deallocate( allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1] );
+ETNeverThrowsHint void operator delete(void* allocatedMemory, ::Eldritch2::Allocator& allocator, size_t /*alignmentInBytes*/, ::Eldritch2::AllocationDuration /*duration*/, const char* /*file*/, int /*line*/) throw() {
+	allocator.Deallocate(allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1]);
 }
 
 // ---------------------------------------------------
 
-ETNeverThrowsHint void operator delete( void* allocatedMemory, ::Eldritch2::Allocator& allocator, size_t /*alignmentInBytes*/, ::Eldritch2::AllocationDuration /*duration*/ ) throw( ) {
-	allocator.Deallocate( allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1] );
+ETNeverThrowsHint void operator delete(void* allocatedMemory, ::Eldritch2::Allocator& allocator, size_t /*alignmentInBytes*/, ::Eldritch2::AllocationDuration /*duration*/) throw() {
+	allocator.Deallocate(allocatedMemory, static_cast<size_t*>(allocatedMemory)[-1]);
 }
-

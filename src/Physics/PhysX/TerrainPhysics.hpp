@@ -2,7 +2,7 @@
   TerrainPhysics.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -15,55 +15,33 @@
 #include <Physics/PhysX/PhysxPointer.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Physics {
-		namespace PhysX {
-			namespace AssetViews {
-				class	TerrainAsset;
-			}
-		}
-	}
-}
-
 namespace physx {
-	class	PxRigidStatic;
-	class	PxScene;
-}
+class PxRigidStatic;
+class PxScene;
+} // namespace physx
 
-namespace Eldritch2 {
-namespace Physics {
-namespace PhysX {
+namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	class TerrainPhysics {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//! Constructs this @ref TerrainPhysics instance.
-		TerrainPhysics( PhysxPointer<physx::PxRigidStatic> actor, const AssetViews::TerrainAsset& asset );
-	//!	Disable copy construction.
-		TerrainPhysics( const TerrainPhysics& ) = delete;
+		//! Constructs this @ref TerrainPhysics instance.
+		TerrainPhysics(PhysxPointer<physx::PxRigidStatic> actor);
+		//!	Disable copy construction.
+		TerrainPhysics(const TerrainPhysics&) = delete;
 
 		~TerrainPhysics() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	public:
-		void	Enable();
+		//!	Disable copy assignment.
+		TerrainPhysics& operator=(const TerrainPhysics&) = delete;
 
-		void	Disable();
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-		TerrainPhysics&	operator=( const TerrainPhysics& ) = delete;
-
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const PhysxPointer<physx::PxRigidStatic>	_actor;
-		const AssetViews::TerrainAsset*				_asset;
+		const PhysxPointer<physx::PxRigidStatic> _actor;
 	};
 
-}	// namespace PhysX
-}	// namespace Physics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Physics::PhysX

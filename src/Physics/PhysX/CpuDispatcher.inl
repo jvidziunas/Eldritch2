@@ -15,14 +15,10 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Physics {
-namespace PhysX {
+namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	ETNeverThrowsHint ETInlineHint const Scheduling::JobFence& CpuDispatcher::GetTasksCompletedFence() const {
 		return _tasksCompleted;
 	}
 
-}	// namespace PhysX
-}	// namespace Physics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Physics::PhysX

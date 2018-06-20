@@ -2,12 +2,11 @@
   ChildAllocator.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -18,38 +17,40 @@
 
 namespace Eldritch2 {
 
-	ChildAllocator::ChildAllocator( Allocator& allocator, const Utf8Char* const name ) : Allocator( name ), _parent( &allocator ) {}
-
-// ---------------------------------------------------
-		
-	ETRestrictHint void* ChildAllocator::Allocate( SizeType sizeInBytes, AllocationDuration duration ) {
-		return ChildAllocator::Allocate( sizeInBytes, 1u, 0u, duration );
-	}
+ChildAllocator::ChildAllocator(Allocator& allocator, const Utf8Char* const name) :
+	Allocator(name),
+	_parent(&allocator) {}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* ChildAllocator::Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration ) {
-		return _parent->Allocate( sizeInBytes, alignmentInBytes, offsetInBytes, duration );
-	}
+ETRestrictHint void* ChildAllocator::Allocate(SizeType sizeInBytes, AllocationDuration duration) {
+	return ChildAllocator::Allocate(sizeInBytes, 1u, 0u, duration);
+}
 
 // ---------------------------------------------------
 
-	void ChildAllocator::Deallocate( void* const address, SizeType sizeInBytes ) {
-		_parent->Deallocate( address, sizeInBytes );
-	}
+ETRestrictHint void* ChildAllocator::Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration) {
+	return _parent->Allocate(sizeInBytes, alignmentInBytes, offsetInBytes, duration);
+}
 
 // ---------------------------------------------------
 
-	ChildAllocator&	ChildAllocator::operator=( const ChildAllocator& allocator ) {
-		_parent = allocator._parent;
-
-		return *this;
-	}
+void ChildAllocator::Deallocate(void* const address, SizeType sizeInBytes) {
+	_parent->Deallocate(address, sizeInBytes);
+}
 
 // ---------------------------------------------------
 
-	void Swap( ChildAllocator& allocator0, ChildAllocator& allocator1 ) {
-		Swap( allocator0._parent, allocator1._parent );
-	}
+ChildAllocator& ChildAllocator::operator=(const ChildAllocator& allocator) {
+	_parent = allocator._parent;
 
-}	// namespace Eldritch2
+	return *this;
+}
+
+// ---------------------------------------------------
+
+void Swap(ChildAllocator& allocator0, ChildAllocator& allocator1) {
+	Swap(allocator0._parent, allocator1._parent);
+}
+
+} // namespace Eldritch2

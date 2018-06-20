@@ -2,7 +2,7 @@
   PlatformString.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -17,7 +17,7 @@
 
 namespace Eldritch2 {
 
-	template <class Allocator = MallocAllocator>
-	using PlatformString = AbstractString<PlatformChar, Allocator>;
+template <class Allocator = MallocAllocator>
+using PlatformString = AbstractString<PlatformChar, Allocator>;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

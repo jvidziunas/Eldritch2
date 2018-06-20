@@ -21,31 +21,34 @@
 
 namespace Eldritch2 {
 
-	ETInlineHint AbstractArenaAllocator::ScopedCheckpoint::ScopedCheckpoint( AbstractArenaAllocator& arena ) : _arena( &arena ), _checkpoint( arena.CreateCheckpoint() ) {}
+ETInlineHint AbstractArenaAllocator::ScopedCheckpoint::ScopedCheckpoint(AbstractArenaAllocator& arena) :
+	_arena(eastl::addressof(arena)),
+	_checkpoint(arena.CreateCheckpoint()) {}
 
 // ---------------------------------------------------
 
-	ETInlineHint AbstractArenaAllocator::ScopedCheckpoint::~ScopedCheckpoint() {
-		_arena->RestoreCheckpoint( _checkpoint );
-	}
+ETInlineHint AbstractArenaAllocator::ScopedCheckpoint::~ScopedCheckpoint() {
+	_arena->RestoreCheckpoint(_checkpoint);
+}
 
 // ---------------------------------------------------
 
-	ETInlineHint const char* AbstractArenaAllocator::GetCurrent( std::memory_order order ) const {
-		return _arena.load( order );
-	}
+ETInlineHint const char* AbstractArenaAllocator::GetCurrent(MemoryOrder order) const {
+	return _arena.load(order);
+}
 
 // ---------------------------------------------------
 
-	ETInlineHint const char* AbstractArenaAllocator::GetEnd() const {
-		return _arenaEnd;
-	}
+ETInlineHint const char* AbstractArenaAllocator::GetEnd() const {
+	return _arenaEnd;
+}
 
 // ---------------------------------------------------
 
-	template <size_t sizeInBytes>
-	ETInlineHint StackAllocator<sizeInBytes>::StackAllocator( const Utf8Char* const name ) : AbstractArenaAllocator( name ) {
-		Reset( eastl::begin( _stack ), eastl::end( _stack ) );
-	}
+template <size_t sizeInBytes>
+ETInlineHint StackAllocator<sizeInBytes>::StackAllocator(const Utf8Char* const name) :
+	AbstractArenaAllocator(name) {
+	Reset(eastl::begin(_stack), eastl::end(_stack));
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

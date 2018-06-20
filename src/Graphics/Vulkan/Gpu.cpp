@@ -2,12 +2,11 @@
   Gpu.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -21,161 +20,189 @@
 //==================================================================//
 // LIBRARIES
 //==================================================================//
-ET_LINK_LIBRARY( "vulkan-1.lib" )
+ET_LINK_LIBRARY("vulkan-1.lib")
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
-namespace {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	namespace {
 
-	enum : VkBool32 {
-		WaitAll = VK_TRUE
-	};
+		ETInlineHint void FindQueueFamilies(VkPhysicalDevice device, uint32_t (&families)[QueueConcept::COUNT]) {
+			uint32_t familyCount(0u);
 
-// ---------------------------------------------------
+			//	Determine the number of queue families exposed by the device.
+			vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, nullptr);
+			const auto properties(static_cast<VkQueueFamilyProperties*>(_alloca(familyCount * sizeof(VkQueueFamilyProperties))));
+			const auto end(properties + familyCount);
+			vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, properties);
 
-	static const char* extensions[] = {
-#	if VK_KHR_swapchain
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-#	endif
-		nullptr
-	};
+			families[QueueConcept::Drawing]         = FindQueueFamilyByFlags(properties, end, { VkQueueFlags(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT) });
+			families[QueueConcept::Presentation]    = FindQueueFamilyByFlags(properties, end, { VkQueueFlags(VK_QUEUE_COMPUTE_BIT) });
+			families[QueueConcept::SparseBinding]   = FindQueueFamilyByFlags(properties, end, { VkQueueFlags(VK_QUEUE_SPARSE_BINDING_BIT | VK_QUEUE_TRANSFER_BIT), VkQueueFlags(VK_QUEUE_SPARSE_BINDING_BIT) });
+			families[QueueConcept::Transfer]        = FindQueueFamilyByFlags(properties, end, { VkQueueFlags(VK_QUEUE_SPARSE_BINDING_BIT | VK_QUEUE_TRANSFER_BIT), VkQueueFlags(VK_QUEUE_TRANSFER_BIT) });
+			families[QueueConcept::BulkComputation] = FindQueueFamilyByFlags(properties, end, { VkQueueFlags(VK_QUEUE_COMPUTE_BIT) });
+		}
 
-// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	void FindQueueFamilies( VkPhysicalDevice device, uint32_t (&queues)[QueueConcept::COUNT] ) {
-		uint32_t	familyCount( 0u );
+		ETInlineHint uint32_t BuildQueueCreateInfos(VkPhysicalDevice device, VkDeviceQueueCreateInfo (&out)[QueueConcept::COUNT]) {
+			static const float priorities[] = { 1.0f };
+			uint32_t           indices[QueueConcept::COUNT];
 
-	//	Determine the number of queue families exposed by the device.
-		vkGetPhysicalDeviceQueueFamilyProperties( device, &familyCount, nullptr );
+			FindQueueFamilies(device, indices);
 
-		const auto	families( static_cast<VkQueueFamilyProperties*>(_alloca( familyCount * sizeof(VkQueueFamilyProperties) )) );
-		const auto	familiesEnd( families + familyCount );
+			Sort(eastl::begin(indices), eastl::end(indices), LessThan<uint32_t>());
+			const auto lastUnique(eastl::unique(eastl::begin(indices), eastl::end(indices)));
 
-		vkGetPhysicalDeviceQueueFamilyProperties( device, &familyCount, families );
+			return static_cast<uint32_t>(eastl::distance(eastl::begin(out), Transform(eastl::begin(indices), lastUnique, out, [](uint32_t familyIndex) {
+															 return VkDeviceQueueCreateInfo{
+																 VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+																 nullptr, // No extension data.
+																 0u,      // No create flags.
+																 familyIndex,
+																 _countof(priorities),
+																 priorities
+															 };
+														 })));
+		}
 
-		queues[QueueConcept::Drawing]			= FindQueueFamilyByFlags( families, familiesEnd, { static_cast<VkQueueFlagBits>(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT) } );
-		queues[QueueConcept::Presentation]		= FindQueueFamilyByFlags( families, familiesEnd, { VK_QUEUE_COMPUTE_BIT } );
-		queues[QueueConcept::SparseBinding]		= FindQueueFamilyByFlags( families, familiesEnd, { VK_QUEUE_SPARSE_BINDING_BIT } );
-		queues[QueueConcept::Transfer]			= FindQueueFamilyByFlags( families, familiesEnd, { static_cast<VkQueueFlagBits>(VK_QUEUE_SPARSE_BINDING_BIT | VK_QUEUE_TRANSFER_BIT), VK_QUEUE_TRANSFER_BIT } );
-		queues[QueueConcept::BulkComputation]	= FindQueueFamilyByFlags( families, familiesEnd, { VK_QUEUE_COMPUTE_BIT } );
+	} // anonymous namespace
+
+	void Gpu::CommandQueue::BindResources(VkDevice device, uint32_t family) {
+		vkGetDeviceQueue(device, family, 0u, &queue);
+		this->family = family;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	uint32_t BuildQueueCreateInfo( VkPhysicalDevice physicalDevice, VkDeviceQueueCreateInfo (&out)[QueueConcept::COUNT] ) {
-		static const float	QueuePriorities[] = { 1.0f };
-		uint32_t			indices[QueueConcept::COUNT];
-
-		FindQueueFamilies( physicalDevice, indices );
-
-		eastl::sort( eastl::begin( indices ), eastl::end( indices ) );
-		const auto	lastUnique( eastl::unique( eastl::begin( indices ), eastl::end( indices ) ) );
-
-		return static_cast<uint32_t>(eastl::distance( eastl::begin( out ), Transform( eastl::begin( indices ), lastUnique, out, [] ( uint32_t familyIndex ) {
-			return VkDeviceQueueCreateInfo{
-				VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-				nullptr,	// No extension data.
-				0u,			// No create flags.
-				familyIndex,
-				_countof(QueuePriorities), QueuePriorities
-			};
-		} ) ));
+	Gpu::Gpu() :
+		_allocator("Gpu Root Allocator"),
+		_physicalDevice(nullptr),
+		_device(nullptr),
+		_pipelineCache(nullptr),
+		_gpuAllocator(nullptr),
+		_imageGarbage(MallocAllocator("Vulkan GPU Image Garbage List Allocator")),
+		_bufferGarbage(MallocAllocator("Vulkan GPU Buffer Garbage List Allocator")),
+		_allocationGarbage(MallocAllocator("Vulkan GPU Allocation Garbage List Allocator")) {
 	}
 
-}	// anonymous namespace
-
-	void Gpu::CommandQueue::BindResources( VkDevice device, uint32_t family ) {
-		vkGetDeviceQueue( device, family, 0u, &queue );
-		familyIndex = family;
-	}
-
-// ---------------------------------------------------
-
-	Gpu::Gpu(
-	) : _allocator( "Gpu Root Allocator" ),
-		_physicalDevice( nullptr ),
-		_device( nullptr ),
-		_pipelineCache( nullptr ) {
-	}
-
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	Gpu::~Gpu() {
-		ET_ASSERT( _device == nullptr,			"Leaking Vulkan device!" );
-		ET_ASSERT( _pipelineCache == nullptr,	"Leaking Vulkan pipeline cache!" );
+		ET_ASSERT(_device == nullptr, "Leaking Vulkan device!");
+		ET_ASSERT(_pipelineCache == nullptr, "Leaking Vulkan pipeline cache!");
+		ET_ASSERT(_gpuAllocator == nullptr, "Leaking Vulkan GPU allocator!");
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	VkResult Gpu::BindResources( VkPhysicalDevice physicalDevice ) {
+	void Gpu::DestroyGarbage() {
+		ArrayList<VkImage>       imageGarbage(_imageGarbage.GetAllocator());
+		ArrayList<VkBuffer>      bufferGarbage(_bufferGarbage.GetAllocator());
+		ArrayList<VmaAllocation> allocationGarbage(_allocationGarbage.GetAllocator());
+
+		{
+			Lock _(_garbageMutex);
+			Swap(_imageGarbage, imageGarbage);
+			Swap(_bufferGarbage, bufferGarbage);
+			Swap(_allocationGarbage, allocationGarbage);
+		} // End of lock scope.
+
+		for (VkImage garbage : imageGarbage) {
+			vkDestroyImage(_device, garbage, GetAllocationCallbacks());
+		}
+
+		for (VkBuffer garbage : bufferGarbage) {
+			vkDestroyBuffer(_device, garbage, GetAllocationCallbacks());
+		}
+
+		{
+			Lock _(_gpuAllocatorMutex);
+			for (VmaAllocation garbage : allocationGarbage) {
+				vmaFreeMemory(_gpuAllocator, garbage);
+			}
+		} // End of lock scope.
+	}
+
+	// ---------------------------------------------------
+
+	VkResult Gpu::BindResources(VkPhysicalDevice physicalDevice, VkDeviceSize heapBlockSize, uint32 frameUseCount) {
 		using ::Eldritch2::Swap;
 
-	//	Create the core Vulkan logical device.
-		VkDevice	device;
-		{	VkDeviceQueueCreateInfo	queueInfo[QueueConcept::COUNT];
-			VkDeviceCreateInfo		createInfo;
-			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		//	No extension data.
-			createInfo.pNext = nullptr;
-		//	No create flags.
-			createInfo.flags = 0u;				
-			createInfo.queueCreateInfoCount		= BuildQueueCreateInfo( physicalDevice, queueInfo );
-			createInfo.pQueueCreateInfos		= queueInfo;
-			createInfo.enabledLayerCount		= 0u;
-			createInfo.ppEnabledLayerNames		= nullptr;
-			createInfo.enabledExtensionCount	= static_cast<uint32_t>(_countof(extensions) - 1u);
-			createInfo.ppEnabledExtensionNames	= extensions;
-			createInfo.pEnabledFeatures			= nullptr;
-		
-			ET_FAIL_UNLESS( vkCreateDevice( physicalDevice, &createInfo, _allocator, &device ) );
+		static const char* const enabledExtensions[] = {
+#if VK_KHR_swapchain
+			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+#endif
+			nullptr
+		};
+
+		VkDeviceQueueCreateInfo  queueInfos[QueueConcept::COUNT];
+		VkDevice                 device;
+		const VkDeviceCreateInfo deviceInfo{
+			VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+			/*pNext =*/nullptr,
+			/*flags =*/0u,
+			/*queueCreateInfoCount =*/BuildQueueCreateInfos(physicalDevice, queueInfos), queueInfos,
+			/*enabledLayerCount =*/0u,
+			/*ppEnabledLayerNames =*/nullptr,
+			/*enabledExtensionCount =*/uint32_t(_countof(enabledExtensions) - 1u), enabledExtensions,
+			/*pEnabledFeatures =*/nullptr
+		};
+		ET_FAIL_UNLESS(vkCreateDevice(physicalDevice, &deviceInfo, _allocator, &device));
+		ET_AT_SCOPE_EXIT(vkDestroyDevice(device, _allocator));
+
+		VkPipelineCache                 pipelineCache;
+		const VkPipelineCacheCreateInfo pipelineCacheInfo{
+			VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
+			/*pNext =*/nullptr,
+			/*flags =*/0u,
+			/*initialDataSize =*/0u,
+			/*pInitialData =*/nullptr,
+		};
+		ET_FAIL_UNLESS(vkCreatePipelineCache(device, &pipelineCacheInfo, _allocator, &pipelineCache));
+		ET_AT_SCOPE_EXIT(if (device) vkDestroyPipelineCache(device, pipelineCache, _allocator););
+
+		uint32_t families[QueueConcept::COUNT];
+		FindQueueFamilies(physicalDevice, families);
+
+		for (uint32_t concept(0u); concept < _countof(_queues); ++concept) {
+			_queues[concept].BindResources(device, families[concept]);
 		}
+		VmaAllocator                 gpuAllocator;
+		const VmaAllocatorCreateInfo gpuAllocatorInfo{
+			VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT,
+			physicalDevice,
+			device,
+			heapBlockSize,
+			GetAllocationCallbacks(),
+			/*pDeviceMemoryCallbacks =*/nullptr,
+			frameUseCount,
+			/*pHeapSizeLimit =*/nullptr,
+			/*pVulkanFunctions =*/nullptr
+		};
+		ET_FAIL_UNLESS(vmaCreateAllocator(&gpuAllocatorInfo, &gpuAllocator));
+		ET_AT_SCOPE_EXIT(vmaDestroyAllocator(gpuAllocator));
 
-		ET_AT_SCOPE_EXIT( vkDestroyDevice( device, _allocator ) );
-
-	//	Create the Vulkan pipeline cache.
-		VkPipelineCache pipelineCache;
-		{	const VkPipelineCacheCreateInfo	createInfo{
-				VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
-				nullptr,	// extension data
-				0u,
-				0u,			// initial data size
-				nullptr,	// initial data
-			};
-
-			ET_FAIL_UNLESS( vkCreatePipelineCache( device, &createInfo, _allocator, &pipelineCache ) );
-		}
-
-		ET_AT_SCOPE_EXIT( if (device) vkDestroyPipelineCache( device, pipelineCache, _allocator ); );
-
-		uint32_t queueFamilies[QueueConcept::COUNT];
-		FindQueueFamilies( physicalDevice, queueFamilies );
-
-		for (uint32_t concept( 0u ); concept < _countof( _queues ); ++concept) {
-			_queues[concept].BindResources( device, queueFamilies[concept] );
-		}
-
-	//	Commit resources to the object.
-		Swap( _physicalDevice,	physicalDevice );
-		Swap( _device,			device );
-		Swap( _pipelineCache,	pipelineCache );
+		//	Commit resources to the object.
+		Swap(_physicalDevice, physicalDevice);
+		Swap(_device, device);
+		Swap(_pipelineCache, pipelineCache);
+		Swap(_gpuAllocator, gpuAllocator);
 
 		return VK_SUCCESS;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	void Gpu::FreeResources() {
-	//	Ensure all rendering operations are complete before destroying the device.
-		vkDeviceWaitIdle( _device );
+		//	Ensure all rendering operations are complete before destroying the device.
+		vkDeviceWaitIdle(_device);
 
-		vkDestroyPipelineCache( _device, eastl::exchange( _pipelineCache, nullptr ), _allocator );
-		vkDestroyDevice( eastl::exchange( _device, nullptr ), _allocator );
+		DestroyGarbage();
 
-		_physicalDevice	= nullptr;
+		vmaDestroyAllocator(eastl::exchange(_gpuAllocator, nullptr));
+		vkDestroyPipelineCache(_device, eastl::exchange(_pipelineCache, nullptr), _allocator);
+		vkDestroyDevice(eastl::exchange(_device, nullptr), _allocator);
+		_physicalDevice = nullptr;
 	}
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan

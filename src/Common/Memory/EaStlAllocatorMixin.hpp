@@ -2,7 +2,7 @@
   EaStlAllocatorMixin.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,49 +17,49 @@
 
 namespace Eldritch2 {
 
-	template <typename EldritchAllocator>
-	class EaStlAllocatorMixin : public EldritchAllocator {
+template <typename EldritchAllocator>
+class EaStlAllocatorMixin : public EldritchAllocator {
 	// - TYPE PUBLISHING ---------------------------------
 
-	public:
-		using PublicType	= typename EldritchAllocator;
+public:
+	using PublicType = typename EldritchAllocator;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//! Constructs this @ref EaStlAllocatorMixin instance.
-		template <typename... Arguments>
-		EaStlAllocatorMixin( Arguments&&... arguments ) noexcept;
+	template <typename... Arguments>
+	EaStlAllocatorMixin(Arguments&&... arguments) noexcept;
 
-		~EaStlAllocatorMixin() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		ETRestrictHint void*	allocate( size_t allocationSizeInBytes, size_t alignmentInBytes, size_t offsetInBytes, int flags = 0 );
-		ETRestrictHint void*	allocate( size_t allocationSizeInBytes, int flags = 0 );
-
-		void					deallocate( void* pointer, size_t allocationSizeInBytes );
+	~EaStlAllocatorMixin() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		ETInlineHint EaStlAllocatorMixin&	operator=( const EaStlAllocatorMixin& ) = default;
+public:
+	ETRestrictHint void* allocate(size_t allocationSizeInBytes, size_t alignmentInBytes, size_t offsetInBytes, int flags = 0);
+	ETRestrictHint void* allocate(size_t allocationSizeInBytes, int flags = 0);
+
+	void deallocate(void* pointer, size_t allocationSizeInBytes);
 
 	// ---------------------------------------------------
 
-	public:
-		const char* get_name() const;
-
-		void        set_name( const char* name );
+public:
+	ETInlineHint EaStlAllocatorMixin& operator=(const EaStlAllocatorMixin&) = default;
 
 	// ---------------------------------------------------
 
-		template <typename EldritchAllocator>
-		friend void	Swap( EaStlAllocatorMixin<EldritchAllocator>&, EaStlAllocatorMixin<EldritchAllocator>& );
-	};
+public:
+	const char* get_name() const;
 
-}	// namespace Eldritch2
+	void set_name(const char* name);
+
+	// ---------------------------------------------------
+
+	template <typename EldritchAllocator>
+	friend void Swap(EaStlAllocatorMixin<EldritchAllocator>&, EaStlAllocatorMixin<EldritchAllocator>&);
+};
+
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

@@ -2,7 +2,7 @@
   GpuResources.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,429 +15,521 @@
 #include <vk_mem_alloc.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			class	GpuHeap;
-		}
-	}
-}
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class GraphicsPipeline;
+	class Gpu;
+}}} // namespace Eldritch2::Graphics::Vulkan
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
-namespace Detail {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	namespace Detail {
 
-	class ETPureAbstractHint AbstractBuffer {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		class ETPureAbstractHint AbstractBuffer {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	protected:
-	//!	Disable copy construction.
-		AbstractBuffer( const AbstractBuffer& ) = delete;
-	//!	Constructs this @ref AbstractBuffer instance.
-		AbstractBuffer( AbstractBuffer&& );
-	//!	Constructs this @ref AbstractBuffer instance.
-		AbstractBuffer();
+		protected:
+			//!	Disable copy construction.
+			AbstractBuffer(const AbstractBuffer&) = delete;
+			//!	Disable move construction; clients should implement themselves via Swap().
+			AbstractBuffer(AbstractBuffer&&) = delete;
+			//!	Constructs this @ref AbstractBuffer instance.
+			AbstractBuffer();
 
-		~AbstractBuffer();
+			~AbstractBuffer();
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	public:
-		VkBuffer	Get() ETNoexceptHint;
+		public:
+			VkBuffer Get() ETNoexceptHint;
 
-		operator	VkBuffer() ETNoexceptHint;
+			operator VkBuffer() ETNoexceptHint;
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	public:
-		void	FreeResources( GpuHeap& heap );
+		public:
+			void FreeResources(Gpu& gpu);
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	protected:
-		VkResult	BindResources( GpuHeap& heap, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo );
+		protected:
+			VkResult BindResources(Gpu& gpu, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo);
 
-		void		GetAllocationInfo( GpuHeap& heap, VmaAllocationInfo& info );
+			void GetAllocationInfo(Gpu& gpu, VmaAllocationInfo& info);
 
-		void*		MapHostPointer( GpuHeap& heap );
+			VkResult MapHostPointer(Gpu& gpu, void*& outBase) const;
 
-		void		UnmapHostPointer( GpuHeap& heap );
+			void UnmapHostPointer(Gpu& gpu) const;
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		AbstractBuffer&	operator=( const AbstractBuffer& ) = delete;
+			//!	Disable copy assignment.
+			AbstractBuffer& operator=(const AbstractBuffer&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+			// - DATA MEMBERS ------------------------------------
 
-	private:
-		VmaAllocation	_backing;
-		VkBuffer		_buffer;
+		private:
+			VmaAllocation _backing;
+			VkBuffer      _buffer;
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-		friend void	Swap( AbstractBuffer&, AbstractBuffer& );
-	};
+			friend void Swap(AbstractBuffer&, AbstractBuffer&);
+		};
 
-// ---
+		// ---
 
-	class ETPureAbstractHint AbstractImage {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		class ETPureAbstractHint AbstractImage {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	protected:
-	//!	Disable copy construction.
-		AbstractImage( const AbstractImage& ) = delete;
-	//!	Constructs this @ref AbstractImage instance.
-		AbstractImage( AbstractImage&& );
-	//!	Constructs this @ref AbstractImage instance.
-		AbstractImage();
+		protected:
+			//!	Disable copy construction.
+			AbstractImage(const AbstractImage&) = delete;
+			//!	Disable move construction; clients should implement themselves via Swap().
+			AbstractImage(AbstractImage&&) = delete;
+			//!	Constructs this @ref AbstractImage instance.
+			AbstractImage();
 
-		~AbstractImage();
+			~AbstractImage();
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	public:
-		VkImage	Get() ETNoexceptHint;
+		public:
+			VkImage Get() ETNoexceptHint;
 
-		operator VkImage() ETNoexceptHint;
+			operator VkImage() ETNoexceptHint;
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	public:
-		void	FreeResources( GpuHeap& heap );
+		public:
+			void FreeResources(Gpu& gpu);
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	protected:
-		VkResult	BindResources( GpuHeap& heap, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo );
+		protected:
+			VkResult BindResources(Gpu& gpu, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo);
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		AbstractImage&	operator=( const AbstractImage& ) = delete;
+			//!	Disable copy assignment.
+			AbstractImage& operator=(const AbstractImage&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+			// - DATA MEMBERS ------------------------------------
 
-	private:
-		VmaAllocation	_backing;
-		VkImage			_image;
+		private:
+			VmaAllocation _backing;
+			VkImage       _image;
 
-	// ---------------------------------------------------
+			// ---------------------------------------------------
 
-		friend void	Swap( AbstractImage&, AbstractImage& );
-	};
+			friend void Swap(AbstractImage&, AbstractImage&);
+		};
 
-}	// namespace Detail
+	} // namespace Detail
 
 	class VertexBuffer : public Detail::AbstractBuffer {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		VertexBuffer( const VertexBuffer& ) = delete;
-	//!	Constructs this @ref VertexBuffer instance.
-		VertexBuffer( VertexBuffer&& ) = default;
-	//!	Constructs this @ref VertexBuffer instance.
+		//!	Disable copy construction.
+		VertexBuffer(const VertexBuffer&) = delete;
+		//!	Constructs this @ref VertexBuffer instance.
+		VertexBuffer(VertexBuffer&&);
+		//!	Constructs this @ref VertexBuffer instance.
 		VertexBuffer() = default;
 
 		~VertexBuffer() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		VertexBuffer&	operator=( const VertexBuffer& ) = delete;
+		//!	Disable copy assignment.
+		VertexBuffer& operator=(const VertexBuffer&) = delete;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		friend void	Swap( VertexBuffer&, VertexBuffer& );
+		friend void Swap(VertexBuffer&, VertexBuffer&);
 	};
 
-// ---
+	// ---
 
 	class IndexBuffer : public Detail::AbstractBuffer {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		IndexBuffer( const IndexBuffer& ) = delete;
-	//!	Constructs this @ref IndexBuffer instance.
-		IndexBuffer( IndexBuffer&& ) = default;
-	//!	Constructs this @ref IndexBuffer instance.
+		//!	Disable copy construction.
+		IndexBuffer(const IndexBuffer&) = delete;
+		//!	Constructs this @ref IndexBuffer instance.
+		IndexBuffer(IndexBuffer&&);
+		//!	Constructs this @ref IndexBuffer instance.
 		IndexBuffer() = default;
 
 		~IndexBuffer() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		IndexBuffer&	operator=( const IndexBuffer& ) = delete;
+		//!	Disable copy assignment.
+		IndexBuffer& operator=(const IndexBuffer&) = delete;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		friend void	Swap( IndexBuffer&, IndexBuffer& );
+		friend void Swap(IndexBuffer&, IndexBuffer&);
 	};
 
-// ---
+	// ---
 
 	class TransferBuffer : public Detail::AbstractBuffer {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		TransferBuffer( const TransferBuffer& ) = delete;
-	//!	Constructs this @ref TransferBuffer instance.
-		TransferBuffer( TransferBuffer&& ) = default;
-	//!	Constructs this @ref TransferBuffer instance.
+		//!	Disable copy construction.
+		TransferBuffer(const TransferBuffer&) = delete;
+		//!	Constructs this @ref TransferBuffer instance.
+		TransferBuffer(TransferBuffer&&);
+		//!	Constructs this @ref TransferBuffer instance.
 		TransferBuffer() = default;
 
 		~TransferBuffer() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
 		using Detail::AbstractBuffer::MapHostPointer;
 		using Detail::AbstractBuffer::UnmapHostPointer;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		TransferBuffer&	operator=( const TransferBuffer& ) = delete;
+		//!	Disable copy assignment.
+		TransferBuffer& operator=(const TransferBuffer&) = delete;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		friend void	Swap( TransferBuffer&, TransferBuffer& );
+		friend void Swap(TransferBuffer&, TransferBuffer&);
 	};
 
-// ---
+	// ---
 
 	class UniformBuffer : public Detail::AbstractBuffer {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		UniformBuffer( const UniformBuffer& ) = delete;
-	//!	Constructs this @ref UniformBuffer instance.
-		UniformBuffer( UniformBuffer&& ) = default;
-	//!	Constructs this @ref UniformBuffer instance.
+		//!	Disable copy construction.
+		UniformBuffer(const UniformBuffer&) = delete;
+		//!	Constructs this @ref UniformBuffer instance.
+		UniformBuffer(UniformBuffer&&);
+		//!	Constructs this @ref UniformBuffer instance.
 		UniformBuffer() = default;
 
 		~UniformBuffer() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
 		using Detail::AbstractBuffer::MapHostPointer;
 		using Detail::AbstractBuffer::UnmapHostPointer;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkDeviceSize sizeInBytes );
+		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		UniformBuffer&	operator=( const UniformBuffer& ) = delete;
+		//!	Disable copy assignment.
+		UniformBuffer& operator=(const UniformBuffer&) = delete;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		friend void	Swap( UniformBuffer&, UniformBuffer& );
+		friend void Swap(UniformBuffer&, UniformBuffer&);
 	};
 
-// ---
+	// ---
 
-	class TileManager {
-	// - TYPE PUBLISHING ---------------------------------
+	class Mesh {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		Mesh(const Mesh&) = delete;
+		//!	Constructs this @ref Mesh instance.
+		Mesh(Mesh&&);
+		//!	Constructs this @ref Mesh instance.
+		Mesh() = default;
+
+		~Mesh() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		const VertexBuffer& GetVertices() const;
+		VertexBuffer&       GetVertices();
+
+		const IndexBuffer& GetIndices() const;
+		IndexBuffer&       GetIndices();
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, uint32_t vertexCount, uint32_t indexCount);
+
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		Mesh& operator=(const Mesh&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		VertexBuffer _vertices;
+		IndexBuffer  _indices;
+
+		// ---------------------------------------------------
+
+		friend void Swap(Mesh&, Mesh&);
+	};
+
+	// ---
+
+	class SparseTileCache : public Detail::AbstractBuffer {
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		enum : uint32_t {
-			PageCoordinateBits	= 18u,
-			PageMipBits			= 10u,
-			MaxImageDimension	= 1u << PageCoordinateBits
+			PageCoordinateBits = 18u,
+			MaxImageDimension  = 1u << PageCoordinateBits,
+			PageMipBits        = 10u
 		};
 
+		// ---
+
+	public:
+		struct Tile {
+			uint64_t x : PageCoordinateBits;
+			uint64_t y : PageCoordinateBits;
+			uint64_t z : PageCoordinateBits;
+			uint64_t mip : PageMipBits;
+		};
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		SparseTileCache(const SparseTileCache&) = delete;
+		//!	Constructs this @ref SparseTileCache instance.
+		SparseTileCache(SparseTileCache&&);
+		//!	Constructs this @ref SparseTileCache instance.
+		SparseTileCache();
+
+		~SparseTileCache() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		using Detail::AbstractBuffer::MapHostPointer;
+		using Detail::AbstractBuffer::UnmapHostPointer;
+
+		// ---------------------------------------------------
+
+	public:
+		bool ShouldCacheTile(Tile tile, VkDeviceSize& reservedOffset);
+
+		void NotifyCached(Tile tile, VkDeviceSize offset);
+
+		// ---------------------------------------------------
+
+	public:
+		bool IsCached(Tile tile, VkDeviceSize& offset) const ETNoexceptHint;
+
+		bool IsLoading(Tile tile) const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, VkDeviceSize tileSizeInBytes, uint32_t cachedTileLimit);
+
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+		//!	 Disable copy assignment.
+		SparseTileCache& operator=(const SparseTileCache&) = delete;
+
+		// ---------------------------------------------------
+
+	private:
+		HashMap<Tile, VkDeviceSize> _cachedPagesByTile;
+		HashSet<Tile>               _loadingTiles;
+
+		// ---------------------------------------------------
+
+		friend void Swap(SparseTileCache&, SparseTileCache&);
+	};
+
+	// ---
+
+	class ShaderImage : public Detail::AbstractImage {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		ShaderImage(const ShaderImage&) = delete;
+		//!	Constructs this @ref ShaderImage instance.
+		ShaderImage(ShaderImage&&);
+		//!	Constructs this @ref ShaderImage instance.
+		ShaderImage() = default;
+
+		~ShaderImage() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers = 1u);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		ShaderImage& operator=(const ShaderImage&) = delete;
+
+		// ---------------------------------------------------
+
+		friend void Swap(ShaderImage&, ShaderImage&);
+	};
+
+	// ---
+
+	class TileManager {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using Tile = SparseTileCache::Tile;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref TileManager instance.
+		TileManager(VkFormat format, VkExtent3D tileExtent, VkExtent3D imageExtent);
+		//!	Disable copy construction.
+		TileManager(const TileManager&) = delete;
+		//!	Constructs this @ref TileManager instance.
+		TileManager(TileManager&&);
+		//!	Constructs this @ref TileManager instance.
+		TileManager();
+
+		~TileManager() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		VkDeviceSize GetTileSize() const ETNoexceptHint;
+
+		VkOffset3D GetTexel(Tile tile) const ETNoexceptHint;
+
+		Tile GetTile(VkOffset3D texel, uint32_t mip = 0) const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		VkExtent3D GetImageExtentInTexels() const ETNoexceptHint;
+
+		VkExtent3D GetTileExtentInTexels() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		bool TouchTile(Tile tile) ETNoexceptHint;
+
+		Tile EvictTile(Tile tile) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		TileManager& operator=(const TileManager&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		HashSet<Tile> _residentTiles;
+		VkDeviceSize  _tileSize;
+		VkExtent3D    _logTileExtent;
+		VkExtent3D    _imageExtent;
+
+		// ---------------------------------------------------
+
+		friend void Swap(TileManager&, TileManager&);
+	};
+
+	// ---
+
+	class SparseShaderImage : public Detail::AbstractImage {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
 		enum class CacheResult {
 			Hit,
 			L0Miss,
 			L1Miss
 		};
 
-	// ---
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		struct Tile {
-			uint64_t x   : PageCoordinateBits;
-			uint64_t y   : PageCoordinateBits;
-			uint64_t z   : PageCoordinateBits;
-			uint64_t mip : PageMipBits;
-		};
-
-	// ---
-
-	public:
-		template <typename Value>
-		using TileMap		= HashMap<Tile, Value>;
-		using CachedPage	= volatile char*;
-
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-	//!	Constructs this @ref TileManager instance.
-		TileManager( VkExtent3D tileExtent, VkExtent3D extent );
-	//!	Disable copy construction.
-		TileManager( const TileManager& ) = delete;
-	//!	Constructs this @ref TileManager instance.
-		TileManager( TileManager&& );
-	//!	Constructs this @ref TileManager instance.
-		TileManager();
-
-		~TileManager() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		VkOffset3D	GetTexel( Tile tile ) const ETNoexceptHint;
-
-		Tile		GetTile( VkOffset3D texel, uint32_t mip = 0 ) const ETNoexceptHint;
-
-	// ---------------------------------------------------
-
-	public:
-		VkExtent3D	GetImageExtentInTexels() const ETNoexceptHint;
-
-		VkExtent3D	GetTileExtentInTexels() const ETNoexceptHint;
-
-	// ---------------------------------------------------
-
-	public:
-		bool	IsResident( Tile tile ) const ETNoexceptHint;
-
-		bool	IsLoading( Tile tile ) const ETNoexceptHint;
-
-	// ---------------------------------------------------
-
-	public:
-		CacheResult	MakeResident( Tile tile );
-
-		void		NotifyCached( Tile tile, CachedPage page );
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-		TileManager&	operator=( const TileManager& ) = delete;
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		VkExtent3D			_logTileExtent;
-		VkExtent3D			_extent;
-	//!	Collection of tiles resident on the GPU.
-		HashSet<Tile>		_residentTiles;
-	//!	Collection of pages resident on the host.
-		TileMap<CachedPage>	_cachedPagesByTile;
-		HashSet<Tile>		_loadingTiles;
-
-	// ---------------------------------------------------
-
-		friend void	Swap( TileManager&, TileManager& );
-	};
-
-// ---
-
-	class ShaderImage : public Detail::AbstractImage {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using ArraySlice	= uint16;
-		using MipIndex		= uint16;
-
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-	//!	Disable copy construction.
-		ShaderImage( const ShaderImage& ) = delete;
-	//!	Constructs this @ref ShaderImage instance.
-		ShaderImage( ShaderImage&& ) = default;
-	//!	Constructs this @ref ShaderImage instance.
-		ShaderImage() = default;
-
-		~ShaderImage() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		VkResult	BindResources( GpuHeap& heap, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers = 1u );
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-		ShaderImage&	operator=( const ShaderImage& ) = delete;
-
-	// ---------------------------------------------------
-
-		friend void	Swap( ShaderImage&, ShaderImage& );
-	};
-
-// ---
-
-	class SparseShaderImage : public Detail::AbstractImage {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-	//!	Disable copy construction.
-		SparseShaderImage( const SparseShaderImage& ) = delete;
-	//!	Constructs this @ref SparseShaderImage instance.
-		SparseShaderImage( SparseShaderImage&& );
-	//!	Constructs this @ref SparseShaderImage instance.
+		//!	Disable copy construction.
+		SparseShaderImage(const SparseShaderImage&) = delete;
+		//!	Constructs this @ref SparseShaderImage instance.
+		SparseShaderImage(SparseShaderImage&&);
+		//!	Constructs this @ref SparseShaderImage instance.
 		SparseShaderImage() = default;
 
 		~SparseShaderImage() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( GpuHeap& heap, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips );
+		const TileManager& GetTileManager() const;
 
-		void		FreeResources( GpuHeap& heap );
+		// ---------------------------------------------------
 
-	// ---------------------------------------------------
+	public:
+		CacheResult MakeResident(const SparseTileCache& cache, VkOffset3D texel, uint32_t mip);
+		CacheResult MakeResident(const SparseTileCache& cache, TileManager::Tile tile);
 
-	//!	Disable copy assignment.
-		SparseShaderImage&	operator=( const SparseShaderImage& ) = delete;
+		// ---------------------------------------------------
 
-	// - DATA MEMBERS ------------------------------------
+	public:
+		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips);
+
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		SparseShaderImage& operator=(const SparseShaderImage&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		TileManager		_tileManager;
-	/*!	Staging buffer used as a target for page decompression. The size of this buffer should be much larger
-		than can be transferred in a single frame, as it also serves as a cache for decompressed tiles
-		not necessarily resident on the GPU. Contents are write-only on the host, and read-only on the GPU. */
-		TransferBuffer	_pageCache;
+		TileManager _tileManager;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		friend void	Swap( SparseShaderImage&, SparseShaderImage& );
+		friend void Swap(SparseShaderImage&, SparseShaderImage&);
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

@@ -2,7 +2,7 @@
   Hash.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,25 +17,25 @@
 
 namespace Eldritch2 {
 
-	template <typename T>
-	class Hash {
+template <typename T>
+class Hash {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref Hash instance.
-		Hash( const Hash& ) = default;
+	Hash(const Hash&) = default;
 	//!	Constructs this @ref Hash instance.
-		Hash() = default;
+	Hash() = default;
 
-		~Hash() = default;
+	~Hash() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		ETPureFunctionHint size_t	operator()( const T& object, size_t seed = 0u ) const;
-	};
+public:
+	ETPureFunctionHint size_t operator()(const T& object, size_t seed = 0u) const;
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

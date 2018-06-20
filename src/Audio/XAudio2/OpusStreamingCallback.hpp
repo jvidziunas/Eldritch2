@@ -2,7 +2,7 @@
   OpusStreamingXAudio2VoiceCallback.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -20,44 +20,44 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Audio {
-namespace XAudio2 {
+	namespace Audio {
+		namespace XAudio2 {
 
-	class OpusStreamingCallback : public IXAudio2VoiceCallback {
-	// - TYPE PUBLISHING ---------------------------------
+			class OpusStreamingCallback : public IXAudio2VoiceCallback {
+			// - TYPE PUBLISHING ---------------------------------
 
-	public:
-		enum : uint32 {
-			OutputSampleRateInHz	= 48000
-		};
+			public:
+				enum : uint32 {
+					OutputSampleRateInHz = 48000
+				};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
-	//!	Disable copy construction.
-		OpusStreamingCallback( const OpusStreamingCallback& ) = delete;
-	//!	Constructs this @ref OpusStreamingCallback instance.
-		OpusStreamingCallback( int channelCount );
-		
-		~OpusStreamingCallback();
+			public:
+			//!	Disable copy construction.
+				OpusStreamingCallback(const OpusStreamingCallback&) = delete;
+			//!	Constructs this @ref OpusStreamingCallback instance.
+				OpusStreamingCallback(int channelCount);
 
-	// ---------------------------------------------------
+				~OpusStreamingCallback();
 
-	public:
-		void	OnBufferStart( void* completedBuffer ) override;
-   
-		void	OnBufferEnd( void* completedBuffer ) override;
+			// ---------------------------------------------------
 
-		void	OnLoopEnd( void* completedBuffer ) override;
+			public:
+				void	OnBufferStart(void* completedBuffer) override;
 
-	// ---------------------------------------------------
+				void	OnBufferEnd(void* completedBuffer) override;
 
-	private:
-		Atomic<uint32>	_producedBuffers;
-		Atomic<uint32>	_consumedBuffers;
-		char			_decoderMemory[];
-	};
+				void	OnLoopEnd(void* completedBuffer) override;
 
-}	// namespace XAudio2
-}	// namespace Audio
+			// ---------------------------------------------------
+
+			private:
+				Atomic<uint32>	_producedBuffers;
+				Atomic<uint32>	_consumedBuffers;
+				char			_decoderMemory[];
+			};
+
+		}	// namespace XAudio2
+	}	// namespace Audio
 }	// namespace Eldritch2

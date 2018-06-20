@@ -2,7 +2,7 @@
   Storyboard.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,29 +15,27 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Scripting {
+namespace Eldritch2 { namespace Scripting {
 
 	struct StoryboardEvent {
-		uint32	time;
+		uint32 time;
 	};
 
-// ---
+	// ---
 
 	class Storyboard {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref Storyboard instance.
+		//!	Constructs this @ref Storyboard instance.
 		Storyboard();
 
 		~Storyboard() = default;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<StoryboardEvent>	_events;
+		ArrayList<StoryboardEvent> _events;
 	};
 
-}	// namespace Scripting
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Scripting

@@ -2,7 +2,7 @@
   KeyframeClipAsset.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -19,30 +19,30 @@ namespace Eldritch2 {
 namespace Animation {
 namespace AssetViews {
 
-	class KeyframeClipAsset : public Assets::Asset {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+class KeyframeClipAsset : public Assets::Asset {
+    // - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
-	//!	Constructs this @ref KeyframeClipAsset instance.
-		KeyframeClipAsset( const Utf8Char* const filePath );
-	//!	Disable copy construction.
-		KeyframeClipAsset( const KeyframeClipAsset& ) = delete;
+public:
+    //!	Constructs this @ref KeyframeClipAsset instance.
+    KeyframeClipAsset(const Utf8Char* const filePath);
+    //!	Disable copy construction.
+    KeyframeClipAsset(const KeyframeClipAsset&) = delete;
 
-		~KeyframeClipAsset() override = default;
+    ~KeyframeClipAsset() override = default;
 
-	// ---------------------------------------------------
+    // ---------------------------------------------------
 
-	public:
-		ErrorCode	BindResources( const Builder& builder ) override;
+public:
+    ErrorCode BindResources(const Builder& builder) override;
 
-		void		FreeResources() override;
+    void FreeResources() override;
 
-	// ---------------------------------------------------
+    // ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		KeyframeClipAsset&	operator=( const KeyframeClipAsset& ) = delete;
-	};
+    //!	Disable copy assignment.
+    KeyframeClipAsset& operator=(const KeyframeClipAsset&) = delete;
+};
 
-}	// namespace AssetViews
-}	// namespace Animation
-}	// namespace Eldritch2
+} // namespace AssetViews
+} // namespace Animation
+} // namespace Eldritch2

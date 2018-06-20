@@ -1,8 +1,8 @@
 /*==================================================================*\
-  Scene.inl
+  RenderConcept.inl
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -12,56 +12,70 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Scheduling/JobExecutor.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
+namespace Eldritch2 { namespace Graphics {
 
-	template <typename Instance, typename Extractor, class Allocator>
-	ETInlineHint RenderConcept<Instance, Extractor, Allocator>::RenderConcept(
-		const AllocatorType& allocator,
-		const Extractor& extractor
-	) : _shouldRebuildHierarchy( false ),
-		_hierarchy( extractor, allocator ) {
+	template <typename Instance, class Allocator>
+	ETInlineHint RenderConcept<Instance, Allocator>::RenderConcept(const AllocatorType& allocator) :
+		HierarchyType(allocator),
+		_shouldRebuildHierarchy(false) {}
+
+	// ---------------------------------------------------
+
+	template <typename Instance, class Allocator>
+	ETInlineHint void RenderConcept<Instance, Allocator>::Insert(const ValueType& value) {
+		Lock _(_hierarchyMutex);
+
+		_hierarchy.Insert(value);
+
+		_shouldRebuildHierarchy.store(true, std::memory_order_release);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	template <typename Instance, typename Extractor, class Allocator>
-	ETInlineHint void RenderConcept<Instance, Extractor, Allocator>::Insert( const ValueType& value ) {
-		Lock	_( _hierarchyMutex );
+	template <typename Instance, class Allocator>
+	ETInlineHint void RenderConcept<Instance, Allocator>::Erase(const ValueType& value) {
+		Lock _(_hierarchyMutex);
 
-		_hierarchy.Insert( value );
+		_hierarchy.Erase(_hierarchy.Find(value));
 
-		_shouldRebuildHierarchy.store( true, std::memory_order_release );
+		_shouldRebuildHierarchy.store(true, std::memory_order_release);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	template <typename Instance, typename Extractor, class Allocator>
-	ETInlineHint void RenderConcept<Instance, Extractor, Allocator>::Erase( const ValueType& value ) {
-		Lock	_( _hierarchyMutex );
-
-		_hierarchy.Erase( _hierarchy.Find( value ) );
-
-		_shouldRebuildHierarchy.store( true, std::memory_order_release );
+	template <typename Instance, class Allocator>
+	ETInlineHint bool RenderConcept<Instance, Allocator>::ShouldRebuildHierarchy(MemoryOrder order) {
+		return _shouldRebuildHierarchy.load(order);
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	template <typename Instance, typename Extractor, class Allocator>
-	ETInlineHint bool RenderConcept<Instance, Extractor, Allocator>::ShouldRebuildHierarchy() {
-		return _shouldRebuildHierarchy.load( std::memory_order_consume );
+	template <typename Value, class Allocator>
+	ETInlineHint ViewConcept<Value, Allocator>::ViewConcept(const AllocatorType& allocator) :
+		_views(allocator) {}
+
+	// ---------------------------------------------------
+
+	template <typename Value, class Allocator>
+	ETInlineHint typename ViewConcept<Value, Allocator>::ConstIterator ViewConcept<Value, Allocator>::Begin() const {
+		return _views.Begin();
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	template <typename Instance, typename Extractor, class Allocator>
-	ETInlineHint void RenderConcept<Instance, Extractor, Allocator>::BuildHierarchy( Scheduling::JobExecutor& executor ) {
-	//	_hierarchy.Build( executor );
-		_shouldRebuildHierarchy.store( false, std::memory_order_release );
+	template <typename Value, class Allocator>
+	ETInlineHint typename ViewConcept<Value, Allocator>::ConstIterator ViewConcept<Value, Allocator>::End() const {
+		return _views.End();
 	}
 
-}	// namespace Graphics
-}	// namespace Eldritch2
+	// ---------------------------------------------------
+
+	template <typename Instance, class Allocator, typename Extractor>
+	ETInlineHint void Rebuild(Scheduling::JobExecutor& executor, RenderConcept<Instance, Allocator>& concept, Extractor extractor) {
+		//	executor.Transform( concept.Begin(), concept.End(), nullptr, extractor );
+	}
+
+}} // namespace Eldritch2::Graphics

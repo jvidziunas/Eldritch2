@@ -2,7 +2,7 @@
   AnimationTree.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -19,43 +19,58 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Animation {
+	namespace Animation {
 
-	using namespace ::Eldritch2::Scheduling;
-	using namespace ::ispc;
+		using namespace ::Eldritch2::Scheduling;
+		using namespace ::ispc;
 
-	AnimationTree::AnimationTree(
-	) : _allocator( "Animation Graph Node Allocator" ),
-		_clips( MallocAllocator( "Animation Graph Clip Collection Allocator" ) ),
-		_blends( MallocAllocator( "Animation Graph Blend Collection Allocator" ) ) {}
-
-// ---------------------------------------------------
-
-	void AnimationTree::PrefetchClipTransforms( JobExecutor& /*executor*/, uint64 timeBegin, uint64 timeEnd ) {
-		for (const UniquePointer<Clip>& clip : _clips) {
-			clip->PrefetchTransforms( timeBegin, timeEnd );
+		AnimationTree::AnimationTree(
+		) : _allocator("Animation Graph Node Allocator"),
+			_clips(MallocAllocator("Animation Graph Clip Collection Allocator")),
+			_blends(MallocAllocator("Animation Graph Blend Collection Allocator")) {
 		}
-	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void AnimationTree::EvaluatePose( Transformation localToWorld, BoneIndex maximumBoneToAnimate, GpuTransformWithVelocity transforms[] ) const {
-		_root->EvaluateGlobalPose( localToWorld, maximumBoneToAnimate, transforms );
-	}
+		AnimationTree::~AnimationTree() {
+			Reset();
+		}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void AnimationTree::EvaluatePose( Transformation localToWorld, BoneIndex maximumBoneToAnimate, GpuTransform transforms[] ) const {
-		_root->EvaluateGlobalPose( localToWorld, maximumBoneToAnimate, transforms );
-	}
+		void AnimationTree::WarmClips(JobExecutor& /*executor*/, uint64 timeBegin, uint64 timeEnd) {
+			for (Clip* clip : _clips) {
+				clip->PrefetchTransforms(timeBegin, timeEnd);
+			}
+		}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void AnimationTree::Reset() {
-		_blends.Clear( ReleaseMemorySemantics() );
-		_clips.Clear( ReleaseMemorySemantics() );
-		_allocator.FreeResources();
-	}
+		void AnimationTree::EvaluatePose(Transformation localToWorld, BoneIndex maximumBoneToAnimate, GpuTransformWithVelocity transforms[]) const {
+			_root->EvaluateGlobalPose(localToWorld, maximumBoneToAnimate, transforms);
+		}
 
-}	// namespace Animation
+	// ---------------------------------------------------
+
+		void AnimationTree::EvaluatePose(Transformation localToWorld, BoneIndex maximumBoneToAnimate, GpuTransform transforms[]) const {
+			_root->EvaluateGlobalPose(localToWorld, maximumBoneToAnimate, transforms);
+		}
+
+	// ---------------------------------------------------
+
+		void AnimationTree::Reset() {
+			for (Clip* clip : _clips) {
+				clip->~Clip();
+			}
+
+			for (Blend* blend : _blends) {
+				blend->~Blend();
+			}
+
+			_blends.Clear(ReleaseMemorySemantics());
+			_clips.Clear(ReleaseMemorySemantics());
+			_allocator.FreeResources();
+		}
+
+	}	// namespace Animation
 }	// namespace Eldritch2

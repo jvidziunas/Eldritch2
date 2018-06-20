@@ -1,5 +1,5 @@
 include			"Eldritch2Types.fbc";
-include			"RendererTypes.fbc";
+include			"GraphicsTypes.fbc";
 file_identifier	"E2MD";
 file_extension	".e2mesh";
 

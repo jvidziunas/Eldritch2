@@ -2,12 +2,11 @@
   Mutex.Win32.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -17,59 +16,48 @@
 
 namespace Eldritch2 {
 
-	Mutex::Mutex( const Mutex& ) : Mutex() {}
+Mutex::Mutex(const Mutex&) :
+	Mutex() {}
 
 // ---------------------------------------------------
 
-	Mutex::Mutex() {
-		InitializeSRWLock( &_lock );
-	}
+Mutex::Mutex() {
+	InitializeSRWLock(&_lock);
+}
 
 // ---------------------------------------------------
 
-	Mutex::~Mutex() {}
+Mutex::~Mutex() {}
 
 // ---------------------------------------------------
 
-	void Mutex::EnterAsReader() {
-		AcquireSRWLockShared( &_lock );
-	}
+bool Mutex::TryEnterAsReader() const {
+	return TryAcquireSRWLockShared(&_lock) != 0;
+}
 
 // ---------------------------------------------------
 
-	bool Mutex::TryEnterAsReader() {
-		return TryAcquireSRWLockShared( &_lock ) != 0;
-	}
+void Mutex::LeaveAsReader() const {
+	ReleaseSRWLockShared(&_lock);
+}
 
 // ---------------------------------------------------
 
-	void Mutex::LeaveAsReader() {
-		ReleaseSRWLockShared( &_lock );
-	}
+bool Mutex::TryEnter() {
+	return TryAcquireSRWLockExclusive(&_lock) != 0;
+}
 
 // ---------------------------------------------------
 
-	void Mutex::Enter() {
-		AcquireSRWLockExclusive( &_lock );
-	}
+void Mutex::Leave() {
+	ReleaseSRWLockExclusive(&_lock);
+}
 
 // ---------------------------------------------------
 
-	bool Mutex::TryEnter() {
-		return TryAcquireSRWLockExclusive( &_lock ) != 0;
-	}
-
-// ---------------------------------------------------
-
-	void Mutex::Leave() {
-		ReleaseSRWLockExclusive( &_lock );
-	}
-
-// ---------------------------------------------------
-
-	Mutex& Mutex::operator =( const Mutex& ) {
+Mutex& Mutex::operator=(const Mutex&) {
 	//	No-op.
-		return *this;
-	}
+	return *this;
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

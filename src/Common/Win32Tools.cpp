@@ -2,12 +2,11 @@
   Win32Tools.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -26,7 +25,7 @@
 //==================================================================//
 // LIBRARIES
 //==================================================================//
-ET_LINK_LIBRARY( "Shlwapi.lib" )
+ET_LINK_LIBRARY("Shlwapi.lib")
 //------------------------------------------------------------------//
 
 #if defined GetCommandLine
@@ -36,56 +35,56 @@ ET_LINK_LIBRARY( "Shlwapi.lib" )
 namespace Eldritch2 {
 namespace {
 
-	static int	cmdShow = 0;
+	static int cmdShow = 0;
 
-}	// anonymous namespace
+} // anonymous namespace
 
-	void StoreMainArguments( HINSTANCE /*hInstance*/, int nCmdShow ) {
-		cmdShow = nCmdShow;
-	}
-
-// ---------------------------------------------------
-
-	const char* GetCommandLine() {
-		return GetCommandLineA();
-	}
+void StoreMainArguments(HINSTANCE /*hInstance*/, int nCmdShow) {
+	cmdShow = nCmdShow;
+}
 
 // ---------------------------------------------------
 
-	const wchar_t* GetWideCommandLine() {
-		return GetCommandLineW();
-	}
+const char* GetCommandLine() {
+	return GetCommandLineA();
+}
 
 // ---------------------------------------------------
 
-	bool ETNeverThrowsHint CommandLineContains( char* const option ) {
-		return FindFirstInstance( GetCommandLine(), option ) != nullptr;
-	}
+const wchar_t* GetWideCommandLine() {
+	return GetCommandLineW();
+}
 
 // ---------------------------------------------------
 
-	bool ETNeverThrowsHint CommandLineContains( wchar_t* const option ) {
-		return FindFirstInstance( GetWideCommandLine(), option ) != nullptr;
-	}
+bool ETNeverThrowsHint CommandLineContains(char* const option) {
+	return FindFirstInstance(GetCommandLine(), option) != nullptr;
+}
 
 // ---------------------------------------------------
 
-	HINSTANCE GetModuleByAddress( void* addressOfItemInModule ) {
-		HINSTANCE	instance( nullptr );
-
-		if (!addressOfItemInModule) {
-			addressOfItemInModule = reinterpret_cast<void*>( &GetModuleByAddress );
-		}
-
-		GetModuleHandleExW( GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, static_cast<LPWSTR>(addressOfItemInModule), &instance );
-
-		return instance;
-	}
+bool ETNeverThrowsHint CommandLineContains(wchar_t* const option) {
+	return FindFirstInstance(GetWideCommandLine(), option) != nullptr;
+}
 
 // ---------------------------------------------------
 
-	int ETPureFunctionHint ETNeverThrowsHint GetCmdShow() {
-		return cmdShow;
+HINSTANCE GetModuleByAddress(void* addressOfItemInModule) {
+	HINSTANCE instance(nullptr);
+
+	if (!addressOfItemInModule) {
+		addressOfItemInModule = reinterpret_cast<void*>(&GetModuleByAddress);
 	}
 
-}	// namespace Eldritch2
+	GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, static_cast<LPWSTR>(addressOfItemInModule), &instance);
+
+	return instance;
+}
+
+// ---------------------------------------------------
+
+int ETPureFunctionHint ETNeverThrowsHint GetCmdShow() {
+	return cmdShow;
+}
+
+} // namespace Eldritch2

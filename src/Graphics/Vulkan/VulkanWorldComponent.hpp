@@ -2,7 +2,7 @@
   VulkanWorldComponent.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -15,50 +15,42 @@
 #include <Core/WorldComponent.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			class	VulkanGraphicsScene;
-			class	DisplayBus;
-		}
-	}
-}
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class VulkanGraphicsScene;
+	class DisplayBus;
+}}} // namespace Eldritch2::Graphics::Vulkan
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class VulkanWorldComponent : public Core::WorldComponent {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		VulkanWorldComponent( const VulkanWorldComponent& ) = delete;
-	//!	Constructs this @ref VulkanWorldComponent instance.
-		VulkanWorldComponent( const Core::World& owner );
+		//!	Disable copy construction.
+		VulkanWorldComponent(const VulkanWorldComponent&) = delete;
+		//!	Constructs this @ref VulkanWorldComponent instance.
+		VulkanWorldComponent(const Core::World& owner);
 
 		~VulkanWorldComponent() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	AcceptVisitor( Scheduling::JobExecutor& executor, const LateInitializationVisitor ) override;
-		void	AcceptVisitor( Scheduling::JobExecutor& executor, const VariableTickVisitor& ) override;
-		void	AcceptVisitor( Scheduling::JobExecutor& executor, const TearDownVisitor ) override;
-		void	AcceptVisitor( Scripting::Wren::ApiBuilder& api ) override;
+		void AcceptVisitor(Scheduling::JobExecutor& executor, const LateInitializationVisitor) override;
+		void AcceptVisitor(Scheduling::JobExecutor& executor, const VariableTickVisitor&) override;
+		void AcceptVisitor(Scheduling::JobExecutor& executor, const TearDownVisitor) override;
+		void AcceptVisitor(Scripting::Wren::ApiBuilder& api) override;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		VulkanWorldComponent&	operator=( const VulkanWorldComponent& ) = delete;
+		//!	Disable copy assignment.
+		VulkanWorldComponent& operator=(const VulkanWorldComponent&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VulkanGraphicsScene*	_scene;
-		DisplayBus*				_displayBus;
+		VulkanGraphicsScene* _scene;
+		DisplayBus*          _displayBus;
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan

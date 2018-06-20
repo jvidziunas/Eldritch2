@@ -2,7 +2,7 @@
   ActionSet.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -12,69 +12,97 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Input/InputDevice.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Input {
-		class	InputDevice;
-	}
-}
+namespace Eldritch2 { namespace Input {
+	class InputBus;
+}} // namespace Eldritch2::Input
 
-struct	WrenHandle;
+struct WrenHandle;
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
-	class ActionSet {
-	// - TYPE PUBLISHING ---------------------------------
+	class ActionSet : public Input::InputHandler {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		enum : int32 { InitialWeight = 0 };
+
+		enum ActionFlags : uint32 {
+			None     = 0u,
+			Pressed  = 1u,
+			Released = 1u << 1u
+		};
+
+		// ---
 
 	public:
 		struct Action {
-			WrenHandle*	closure;
-			int32		weight;
-			uint32		flags;
+			WrenHandle* closure;
+			int32       weight;
+			uint32      flags;
 		};
 
-	// ---------------------------------------------------
+		// ---
+
+		struct DeviceBinding {
+			Input::InputBus* bus;
+			Input::DeviceId  id;
+		};
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		ActionSet( const ActionSet& ) = delete;
-	//!	Constructs this @ref ActionSet instance.
+		//!	Disable copy construction.
+		ActionSet(const ActionSet&) = delete;
+		//!	Constructs this @ref ActionSet instance.
 		ActionSet();
 
 		~ActionSet();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		bool	DispatchEvents( WrenVM* vm, WrenHandle* receiver, WrenHandle* binaryCallHandle );
+		void Activate(Input::ActionId id, int32 amount) override;
 
-	// ---------------------------------------------------
+		void OnConnect() override;
 
-	public:
-		bool	TryAcquire( Input::InputDevice& device );
+		void OnDisconnect() override;
 
-	// ---------------------------------------------------
-
-	public:
-		void	BindResources( WrenVM* vm, int bindingsSlot );
-
-		void	FreeResources( WrenVM* vm );
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-		ActionSet&	operator=( const ActionSet& ) = delete;
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ArrayList<Action>	_actions;
+		//!	Invokes input event handlers for all actions attached to this @ref ActionSet.
+		/*!	@param[in] vm Wren virtual machine object that will execute script code.
+				@param[in] arity3Call Wren call handle with signature `call(_,_,_)`
+				@returns true if all listeners executed successfully, or false if a runtime exception occurred. */
+		bool DispatchEvents(WrenVM* vm, WrenHandle* arity3Call);
+
+		// ---------------------------------------------------
+
+	public:
+		bool TryAcquireDevice(Input::InputBus& bus, Input::DeviceId id);
+
+		void ReleaseDevices();
+
+		// ---------------------------------------------------
+
+	public:
+		void BindResources(WrenVM* vm, int bindingsSlot);
+
+		void FreeResources(WrenVM* vm);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		ActionSet& operator=(const ActionSet&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	public:
+		ArrayList<Action>        _actions;
+		ArrayList<DeviceBinding> _bindings;
 	};
 
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren

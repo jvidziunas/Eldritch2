@@ -2,7 +2,7 @@
   Storyboard.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -16,9 +16,9 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
+	namespace Scripting {
 
-	Storyboard::Storyboard() : _events( MallocAllocator( "Storyboard Event Allocator" ) ) {}
+		Storyboard::Storyboard() : _events(MallocAllocator("Storyboard Event Allocator")) {}
 
-}	// namespace Scripting
+	}	// namespace Scripting
 }	// namespace Eldritch2

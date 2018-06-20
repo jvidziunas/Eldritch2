@@ -2,7 +2,7 @@
   ChildLog.inl
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -15,27 +15,21 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Logging {
+namespace Eldritch2 { namespace Logging {
 
-	ETInlineHint ChildLog::ChildLog( Log& logger ) : _parent( &logger ) {}
+	ETInlineHint ChildLog::ChildLog(Log& parent) :
+		_parent(eastl::addressof(parent)) {}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	ETInlineHint Log& ChildLog::SetParent( Log& parent ) {
-		auto&	oldLogger( GetParent() );
-
-		_parent = &parent;
-
-		return oldLogger;
+	ETInlineHint Log& ChildLog::SetParent(Log& parent) {
+		return *eastl::exchange(_parent, eastl::addressof(parent));
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	ETInlineHint Log& ChildLog::GetParent() const {
 		return *_parent;
 	}
 
-}	// namespace Logging
-}	// namespace Eldritch2
-
+}} // namespace Eldritch2::Logging

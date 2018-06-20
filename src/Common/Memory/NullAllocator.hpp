@@ -2,8 +2,8 @@
   NullAllocator.hpp
   ------------------------------------------------------------------
   Purpose:
-  
-  
+
+
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
@@ -17,29 +17,29 @@
 
 namespace Eldritch2 {
 
-	class NullAllocator : public Allocator {
+class NullAllocator : public Allocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	protected:
+protected:
 	//!	Constructs this @ref NullAllocator instance.
-		NullAllocator( const NullAllocator& ) = delete;
+	NullAllocator(const NullAllocator&) = delete;
 	//!	Constructs this @ref NullAllocator instance.
-		NullAllocator();
+	NullAllocator();
 
-		~NullAllocator() = default;
+	~NullAllocator() = default;
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
-	public:
-		ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal ) override sealed;
-		ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) override sealed;
+public:
+	ETRestrictHint void* Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal) override sealed;
+	ETRestrictHint void* Allocate(SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal) override sealed;
 
-		void					Deallocate( void* const address, SizeType sizeInBytes ) override sealed;
+	void Deallocate(void* const address, SizeType sizeInBytes) override sealed;
 
 	// ---------------------------------------------------
 
-	public:
-		static NullAllocator&	GetInstance();
-	};
+public:
+	static NullAllocator& GetInstance();
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

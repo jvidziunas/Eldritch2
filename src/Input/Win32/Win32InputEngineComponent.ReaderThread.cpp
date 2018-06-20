@@ -10,7 +10,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -21,140 +20,121 @@
 #include <Windows.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Input {
-namespace Win32 {
-namespace {
+namespace Eldritch2 { namespace Input { namespace Win32 {
+	namespace {
 
-	class WindowClass {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		ETInlineHint LPCWSTR RegisterWindowClass(LPCWSTR className, WNDPROC windowProc, HINSTANCE instance) {
+			WNDCLASSEXW windowClass;
 
-	public:
-	//!	Constructs this @ref WindowClass instance.
-		ETInlineHint WindowClass( WNDPROC windowProc ) {
-			WNDCLASSEXW	windowClass;
+			windowClass.cbSize        = sizeof(windowClass);
+			windowClass.style         = 0;
+			windowClass.lpfnWndProc   = windowProc;
+			windowClass.cbClsExtra    = 0;
+			windowClass.cbWndExtra    = 0;
+			windowClass.hInstance     = instance;
+			windowClass.hIcon         = nullptr;
+			windowClass.hCursor       = nullptr;
+			windowClass.hbrBackground = nullptr;
+			windowClass.lpszMenuName  = nullptr;
+			windowClass.lpszClassName = className;
+			windowClass.hIconSm       = nullptr;
 
-			windowClass.cbSize			= sizeof(windowClass);
-			windowClass.style			= 0;
-			windowClass.lpfnWndProc		= windowProc;
-			windowClass.cbClsExtra		= 0;
-			windowClass.cbWndExtra		= 0;
-			windowClass.hInstance		= _instance = GetModuleByAddress( windowProc );
-			windowClass.hIcon			= nullptr;
-			windowClass.hCursor			= nullptr;
-			windowClass.hbrBackground	= nullptr;
-			windowClass.lpszMenuName	= nullptr;
-			windowClass.lpszClassName	= L"MessageWindow";
-			windowClass.hIconSm			= nullptr;
-
-			_atom = reinterpret_cast<LPCWSTR>( RegisterClassExW( &windowClass ) );
+			return reinterpret_cast<LPCWSTR>(RegisterClassExW(&windowClass));
 		}
 
-	//!	Constructs this @ref WindowClass instance.
-		ETInlineHint WindowClass() : WindowClass( &DefWindowProcW ) {}
+		// ---------------------------------------------------
 
-		ETInlineHint ~WindowClass() {
-			UnregisterClassW( _atom, _instance );
+		static ETInlineHint bool RegisterListeners(HWND window) {
+			enum : DWORD { AttachFlags = RIDEV_INPUTSINK | RIDEV_NOLEGACY };
+			enum : USHORT {
+				KeyboardPage  = 0x01,
+				KeyboardUsage = 0x06,
+				MousePage     = 0x01,
+				MouseUsage    = 0x02
+			};
+
+			const RAWINPUTDEVICE listeners[] = {
+				{ KeyboardPage, KeyboardUsage, AttachFlags, window },
+				{ MousePage, MouseUsage, AttachFlags, window }
+			};
+
+			// ---
+
+			if (window == nullptr) {
+				return false;
+			}
+
+			return RegisterRawInputDevices(listeners, _countof(listeners), sizeof(*listeners)) == TRUE;
 		}
 
-	// ---------------------------------------------------
-
-	public:
-		ETInlineHint operator LPCWSTR() const {
-			return _atom;
-		}
-
-	// - DATA MEMBERS ------------------------------------
-
-	private:
-		HINSTANCE	_instance;
-		LPCWSTR		_atom;
-	};
-
-// ---------------------------------------------------
-
-	static ETInlineHint bool RegisterForRawInput( HWND windowHandle ) {
-		enum : DWORD {
-			KeyboardAttachFlags	= ( RIDEV_INPUTSINK | RIDEV_DEVNOTIFY | RIDEV_NOLEGACY ),
-			MouseAttachFlags	= ( RIDEV_INPUTSINK | RIDEV_DEVNOTIFY | RIDEV_NOLEGACY )
-		};
-
-		enum : USHORT {
-			KeyboardUsagePage	= 0x01,
-			KeyboardUsage		= 0x06,
-			MouseUsagePage		= 0x01,
-			MouseUsage			= 0x02
-		};
-
-		const RAWINPUTDEVICE inputDeviceRegistrationList[] = {
-			{ KeyboardUsagePage, KeyboardUsage, KeyboardAttachFlags, windowHandle },
-			{ MouseUsagePage,    MouseUsage,    MouseAttachFlags,    windowHandle }
-		};
-
-	// ---
-
-		return RegisterRawInputDevices( inputDeviceRegistrationList, _countof(inputDeviceRegistrationList), sizeof(*inputDeviceRegistrationList) ) == TRUE;
-	}
-
-}	// anonymous namespace
+	} // anonymous namespace
 
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Logging;
 
-	Win32InputEngineComponent::ReaderThread::ReaderThread( Win32InputEngineComponent& owner ) : _owner( owner ), _window( nullptr ) {}
+	Win32InputEngineComponent::ReaderThread::ReaderThread(DeviceCoordinator& devices) :
+		_window(nullptr),
+		_devices(eastl::addressof(devices)) {}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	Utf8Literal Win32InputEngineComponent::ReaderThread::GetName() const {
 		return "Win32 Input Sampler";
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	void Win32InputEngineComponent::ReaderThread::Run() {
-	/*	Since we operate in short bursts of work before sleeping, boost thread priority slightly to reduce the amount of downtime before the
-	 *	scheduler will queue us for execution. Windows internally does some priority boosting for us behind the scenes when we receive input,
-	 *	this is designed to supplement that behavior. */
-		SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_HIGHEST );
+		/*	Since we operate in short bursts of work before sleeping, boost thread priority slightly to reduce the amount of downtime before the
+			 *	scheduler will queue us for execution. Windows internally does some priority boosting for us behind the scenes when we receive input,
+			 *	this is designed to supplement that behavior. */
+		//	SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_HIGHEST );
+		const LPCWSTR windowClass(RegisterWindowClass(L"MessageWindow", &DefWindowProcW, GetModuleByAddress(&DefWindowProcW)));
+		ET_AT_SCOPE_EXIT(UnregisterClassW(windowClass, GetModuleByAddress(&DefWindowProcW)));
 
-		const WindowClass	windowClass;
-		const HWND			window( CreateWindowExW( 0, windowClass, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, nullptr, nullptr ) );
+		const HWND window(CreateWindowExW(0, windowClass, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, nullptr, nullptr));
+		ET_AT_SCOPE_EXIT(DestroyWindow(window));
 
-		ET_VERIFY( RegisterForRawInput( window ), "Error creating input listener" );
+		if (!RegisterListeners(window) || !_devices->Enumerate()) {
+			_window.store(nullptr, std::memory_order_release);
+			return;
+		}
 
-		_owner.ScanDevices();
-		_window.store( window, std::memory_order_release );
+		//	Signal to the outside world that we have initialized.
+		_window.store(window, std::memory_order_release);
 
-	//	GetMessage() returns 0 if it recieved a WM_QUIT message. This call intentionally blocks.
-		BOOL hadError;
+		RAWINPUT input;
+		BOOL     hadError;
 
-		for (MSG message; ET_LIKELY( hadError = GetMessageW( &message, window, 0u, 0u ) ) != 0; ) {
-			if (ET_UNLIKELY( hadError == -1 )) {
+		//	GetMessage() returns 0 if it recieved a WM_QUIT message. This call intentionally blocks.
+		for (MSG event; ET_LIKELY(hadError = GetMessageW(&event, window, 0u, 0u)) != 0;) {
+			if (ET_UNLIKELY(hadError == -1)) {
 				break;
 			}
 
-			if (ET_LIKELY( message.message == WM_INPUT )) {
-				RAWINPUT	event;
-				UINT		size( sizeof(event) );
+			if (ET_LIKELY(event.message == WM_INPUT)) {
+				PRAWINPUT ptr(&input);
+				UINT      size(sizeof(input));
 
-				if (ET_LIKELY( GetRawInputData( HRAWINPUT( message.lParam ), RID_INPUT, &event, &size, sizeof(RAWINPUTHEADER) ) > 0 )) {
-					_owner.Dispatch( event );
+				if (ET_LIKELY(GetRawInputData(HRAWINPUT(event.lParam), RID_INPUT, ptr, &size, sizeof(RAWINPUTHEADER)) > 0)) {
+					_devices->Route(input);
 				}
-			}
-			
-			TranslateMessage( &message );
-			DispatchMessageW( &message );
-		}
 
-		DestroyWindow( window );
+				//	This seems to be a no-op in all versions of Windows, but we do it just to be safe.
+				DefRawInputProc(&ptr, 1, sizeof(RAWINPUTHEADER));
+			}
+
+			TranslateMessage(&event);
+			DispatchMessageW(&event);
+		}
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	void Win32InputEngineComponent::ReaderThread::SetShouldShutDown() {
-		PostMessageW( _window.load( std::memory_order_acquire ), WM_CLOSE, 0, 0 );
+		if (HWND window = _window.exchange(nullptr, std::memory_order_acquire)) {
+			PostMessageW(window, WM_CLOSE, 0, 0);
+		}
 	}
 
-}	// namespace Win32
-}	// namespace Input
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Input::Win32

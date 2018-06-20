@@ -2,7 +2,7 @@
   IntrusiveListHook.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,7 +17,6 @@
 
 namespace Eldritch2 {
 
-	using IntrusiveListBaseHook = eastl::intrusive_list_node;
+using IntrusiveListBaseHook = eastl::intrusive_list_node;
 
-}	// namespace Eldritch2
-
+} // namespace Eldritch2

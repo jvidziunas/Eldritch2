@@ -2,7 +2,7 @@
   ChildLog.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -15,47 +15,45 @@
 #include <Logging/Log.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Logging {
+namespace Eldritch2 { namespace Logging {
 
 	class ChildLog : public Log {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref ChildLog instance.
-		ChildLog( const ChildLog& ) = delete;
-	//!	Constructs this @ref ChildLog instance.
-		ChildLog( Log& log );
+		//!	Constructs this @ref ChildLog instance.
+		ChildLog(const ChildLog&) = delete;
+		//!	Constructs this @ref ChildLog instance.
+		ChildLog(Log& parent);
 
 		~ChildLog() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		Log&	SetParent( Log& parent );
+		Log& SetParent(Log& parent);
 
-		Log&	GetParent() const;
+		Log& GetParent() const;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
 		using Log::Write;
 
-		void	Write( const Utf8Char* const string, size_t lengthInOctets ) override sealed;
+		void Write(const Utf8Char* const string, size_t lengthInOctets) override sealed;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ChildLog&	operator=( const ChildLog& ) = default;
+		ChildLog& operator=(const ChildLog&) = default;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Log*	_parent;
+		Log* _parent;
 	};
 
-}	// namespace Logging
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Logging
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

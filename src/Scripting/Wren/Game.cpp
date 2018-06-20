@@ -2,7 +2,7 @@
   Game.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -13,99 +13,90 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/Game.hpp>
-#include <Core/World.hpp>
-//------------------------------------------------------------------//
-#include <wren.h>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+	namespace Scripting {
+		namespace Wren {
 
-	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Core;
+			Game::Game(
+			) : _game(nullptr),
+				_whenPlayerJoinsStub(nullptr),
+				_whenPlayerLeavesStub(nullptr),
+				_tags(MallocAllocator("Wren Game Entity Tag Allocator")),
+				_gameObjects(MallocAllocator("Wren Game Object Collection Allocator")) {
+			}
 
-	Game::Game(
-		World& world
-	) : _world( eastl::addressof( world ) ),
-		_playerJoinHandler( nullptr ),
-		_playerLeaveHandler( nullptr ),
-		_entityTags( MallocAllocator( "Wren Game Entity Tag Allocator" ) ),
-		_gameObjects( MallocAllocator( "Wren Game Object Collection Allocator" ) ) {
-	}
+		// ---------------------------------------------------
 
-// ---------------------------------------------------
+			Game::~Game() {
+				ET_ASSERT(_game == nullptr, "Leaking Wren game handle!");
+				ET_ASSERT(_whenPlayerJoinsStub == nullptr, "Leaking Wren player join handler!");
+				ET_ASSERT(_whenPlayerLeavesStub == nullptr, "Leaking Wren player leave handler!");
+				ET_ASSERT(_gameObjects.IsEmpty(), "Leaking Wren game objects!");
+			}
 
-	Game::~Game() {
-		ET_ASSERT( _gameObjects.IsEmpty(), "Leaking Wren game objects!" );
-	}
+		// ---------------------------------------------------
 
-// ---------------------------------------------------
+			WrenInterpretResult Game::HandlePlayerJoin(WrenVM* vm, const Utf8Char* const name) {
+				wrenEnsureSlots(vm, 2);
+				wrenSetSlotHandle(vm, 0, _game);
+				wrenSetSlotString(vm, 1, name);
+				return wrenCall(vm, _whenPlayerJoinsStub);
+			}
 
-	void Game::HandlePlayerJoin( WrenVM* vm, WrenHandle* unaryCallHandle, const Utf8Char* const name ) {
-		wrenEnsureSlots( vm, 2 );
-		wrenSetSlotHandle( vm, 0, _playerJoinHandler );
-		wrenSetSlotString( vm, 1, name );
-		wrenCall( vm, unaryCallHandle );
-	}
+		// ---------------------------------------------------
 
-// ---------------------------------------------------
+			WrenInterpretResult Game::HandlePlayerLeave(WrenVM* vm, const Utf8Char* const name) {
+				wrenEnsureSlots(vm, 2);
+				wrenSetSlotHandle(vm, 0, _game);
+				wrenSetSlotString(vm, 1, name);
+				return wrenCall(vm, _whenPlayerLeavesStub);
+			}
 
-	void Game::HandlePlayerLeave( WrenVM* vm, WrenHandle* unaryCallHandle, const Utf8Char* const name ) {
-		wrenEnsureSlots( vm, 2 );
-		wrenSetSlotHandle( vm, 0, _playerLeaveHandler );
-		wrenSetSlotString( vm, 1, name );
-		wrenCall( vm, unaryCallHandle );
-	}
+		// ---------------------------------------------------
 
-// ---------------------------------------------------
+			ErrorCode Game::BindResources(WrenVM* vm) {
+			/*	Import the boot script into the world scope. This will do things like configure callbacks and create the basic entity set
+			 *	for gameplay. */
+				if (wrenInterpret(vm, R"(import "scripts/Boot" for Game)") != WREN_RESULT_SUCCESS) {
+					return Error::Unspecified;
+				}
 
-	void Game::FreeResources( WrenVM* vm ) {
-		SetPlayerJoinHandler( vm, nullptr );
-		SetPlayerLeaveHandler( vm, nullptr );
+				wrenEnsureSlots(vm, 16);
+				wrenGetVariable(vm, "main", "Game", 0);
 
-		while (_gameObjects) {
-			wrenReleaseHandle( vm, _gameObjects.Back() );
-			_gameObjects.Pop();
-		}
+				_game = wrenGetSlotHandle(vm, 0);
+				_whenPlayerJoinsStub = wrenMakeCallHandle(vm, "whenPlayerJoins(_)");
+				_whenPlayerLeavesStub = wrenMakeCallHandle(vm, "whenPlayerLeaves(_)");
 
-		_entityTags.Clear();
-	}
+				return Error::None;
+			}
 
-// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	void Game::SetPlayerJoinHandler( WrenVM* vm, WrenHandle* handler ) {
-		if (WrenHandle* const old = eastl::exchange( _playerJoinHandler, handler )) {
-			wrenReleaseHandle( vm, old );
-		}
-	}
+			void Game::FreeResources(WrenVM* vm) {
+				if (WrenHandle* const stub = eastl::exchange(_whenPlayerJoinsStub, nullptr)) {
+					wrenReleaseHandle(vm, stub);
+				}
 
-// ---------------------------------------------------
+				if (WrenHandle* const stub = eastl::exchange(_whenPlayerLeavesStub, nullptr)) {
+					wrenReleaseHandle(vm, stub);
+				}
 
-	void Game::SetPlayerLeaveHandler( WrenVM* vm, WrenHandle* handler ) {
-		if (WrenHandle* const old = eastl::exchange( _playerLeaveHandler, handler )) {
-			wrenReleaseHandle( vm, old );
-		}
-	}
+				if (WrenHandle* const game = eastl::exchange(_game, nullptr)) {
+					wrenReleaseHandle(vm, game);
+				}
 
-// ---------------------------------------------------
+				while (_gameObjects) {
+					wrenReleaseHandle(vm, _gameObjects.Back());
+					_gameObjects.Pop();
+				}
 
-	double Game::GetTimeScalar() const {
-		return _world->GetTimeScalar();
-	}
+				_tags.Clear();
+			}
 
-// ---------------------------------------------------
-
-	void Game::SetTimeScalar( double value ) {
-		_world->SetTimeScalar( static_cast<float32>(value) );
-	}
-
-// ---------------------------------------------------
-
-	void Game::ShutDown( bool andEngine ) const {
-		_world->SetShouldShutDown( andEngine );
-	}
-
-}	// namespace Wren
-}	// namespace Scripting
+		}	// namespace Wren
+	}	// namespace Scripting
 }	// namespace Eldritch2

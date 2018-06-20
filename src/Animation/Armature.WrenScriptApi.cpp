@@ -2,7 +2,7 @@
   Armature.WrenScriptApi.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,47 +17,46 @@
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
 
-void	wrenSetSlotHandle( WrenVM* vm, int slot, WrenHandle* handle );
+void	wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
 
 namespace Eldritch2 {
-namespace Animation {
+	namespace Animation {
 
-	using namespace ::Eldritch2::Scripting::Wren;
-	using namespace ::Eldritch2::Scripting;
+		using namespace ::Eldritch2::Scripting::Wren;
+		using namespace ::Eldritch2::Scripting;
 
-	ET_IMPLEMENT_WREN_CLASS( Armature ) {
-		api.CreateClass<Armature>( ET_BUILTIN_WREN_MODULE_NAME( Animation ), "Armature",
-			{/* Constructors */
-				DefineConstructor<void ( Transformation )>( "new", [] ( WrenVM* vm ) {
-					SetReturn<Armature>( vm, GetSlotAs<Transformation>( vm, 1 ) );
-				} )
-			},
+		ET_IMPLEMENT_WREN_CLASS(Armature) {
+			api.CreateClass<Armature>(ET_BUILTIN_WREN_MODULE_NAME(Animation), "Armature",
+									  {/* Constructors */
+										  ConstructorMethod("new(_)", [](WrenVM* vm) {
+											  SetReturn<Armature>(vm, GetSlotAs<Transformation>(vm, 1));
+										  })
+									  },
+										  {/*	Static methods */ },
 			{/*	Properties */
-				DefineProperty<Transformation>( "localToWorld",
+				DefineProperty("localToWorld",
 				//	Getter
-					[] ( WrenVM* vm ) {
-						Armature&	self( GetSlotAs<Armature>( vm, 0 ) );
+					[](WrenVM* vm) {
+						Armature&	self(GetSlotAs<Armature>(vm, 0));
 
-						wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
-						SetReturn<Transformation>( vm, self.GetLocalToWorld() );
+						wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
+						SetReturn<Transformation>(vm, self.GetLocalToWorld());
 					},
 				//	Setter
-					[] ( WrenVM* vm ) {
-						GetSlotAs<Armature>( vm, 0 ).SetLocalToWorld( GetSlotAs<Transformation>( vm, 1 ) );
+					[](WrenVM* vm) {
+						GetSlotAs<Armature>(vm, 0).SetLocalToWorld(GetSlotAs<Transformation>(vm, 1));
 					}
 				),
-				DefineGetter<Transformation>( "worldToLocal", [] ( WrenVM* vm ) {
-					Armature&	self( GetSlotAs<Armature>( vm, 0 ) );
+				DefineGetter("worldToLocal", [](WrenVM* vm) {
+					Armature&	self(GetSlotAs<Armature>(vm, 0));
 
-					wrenSetSlotHandle( vm, 0, AsContext( vm ).FindForeignClass<Transformation>() );
-					SetReturn<Transformation>( vm, self.GetWorldToLocal() );
-				} )
+					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
+					SetReturn<Transformation>(vm, self.GetWorldToLocal());
+				})
 			},
-			{/*	Methods */},
-			{/*	Static methods */},
-			{/*	Operators */}
-		);
-	}
+				{/*	Methods */ }
+				);
+		}
 
-}	// namespace Animation
+	}	// namespace Animation
 }	// namespace Eldritch2

@@ -2,7 +2,7 @@
   ResidencyCoordinator.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -12,112 +12,103 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Graphics/Vulkan/GpuResourceBus.hpp>
 #include <Graphics/Vulkan/GpuResources.hpp>
-#include <Graphics/Vulkan/HostMixin.hpp>
-#include <Graphics/Vulkan/GpuHeap.hpp>
-#include <Graphics/Vulkan/GpuBus.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Scheduling {
-		class	JobExecutor;
-	}
-
-	namespace Graphics {
-		namespace Vulkan {
-			class	Gpu;
-		}
-
-		class	ImageSource;
-		class	MeshSource;
-	}
+namespace Scheduling {
+	class JobExecutor;
 }
 
-namespace Eldritch2 {
 namespace Graphics {
-namespace Vulkan {
+	namespace Vulkan {
+		class Gpu;
+	}
 
-	struct Mesh {
-	public:
-		void FreeResources( GpuHeap& heap ) {
-			_vertices.FreeResources( heap );
-			_indices.FreeResources( heap );
-		}
+	class ImageSource;
+	class MeshSource;
+} // namespace Graphics
+} // namespace Eldritch2
 
-		VertexBuffer	_vertices;
-		IndexBuffer		_indices;
-	};
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class ResidencyCoordinator {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using HostAllocator = HostMixin<MallocAllocator>;
 		template <typename Source, typename Resource>
-		using ResidentSet	= HashMap<const Source*, Resource>;
+		using ResidentSet = HashMap<const Source*, Resource>;
 
-	// ---
+		// ---
 
 	public:
 		enum : VkDeviceSize {
-			GpuHeapBlockSize	= 256u * 1024u * 1024u,	/* 256MB */
+			HeapBlockSize = 256u * 1024u * 1024u, /* 256MB */
 		};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		ResidencyCoordinator( const ResidencyCoordinator& ) = delete;
-	//!	Constructs this @ref ResidencyCoordinator instance.
+		//!	Disable copy construction.
+		ResidencyCoordinator(const ResidencyCoordinator&) = delete;
+		//!	Constructs this @ref ResidencyCoordinator instance.
 		ResidencyCoordinator();
 
 		~ResidencyCoordinator() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	SubmitFrameIo( Scheduling::JobExecutor& executor, Gpu& gpu );
+		const GpuResourceBus& GetBus() const;
+		GpuResourceBus&       GetBus();
 
-	// ---------------------------------------------------
-
-	public:
-		VkResult	Insert( const ImageSource& image, bool andMakeResident = true );
-		VkResult	Insert( const MeshSource& mesh, bool andMakeResident = true );
-
-		void		Erase( const ImageSource& image );
-		void		Erase( const MeshSource& mesh );
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		VkResult	BindResources( Gpu& gpu, VkDeviceSize transferBufferSize );
+		VkResult SubmitFrameIo(Scheduling::JobExecutor& executor, Gpu& gpu);
 
-		void		FreeResources( Gpu& gpu );
+		// ---------------------------------------------------
 
-	// ---------------------------------------------------
+	public:
+		VkResult Insert(Gpu& gpu, const ImageSource& image, bool andMakeResident = true);
+		VkResult Insert(Gpu& gpu, const MeshSource& mesh, bool andMakeResident = true);
+
+		void Erase(Gpu& gpu, const ImageSource& image);
+		void Erase(Gpu& gpu, const MeshSource& mesh);
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, VkDeviceSize transferBufferSize);
+
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
 
 	private:
-		VkResult	MakeResident( VertexBuffer& target, const MeshSource& source );
-		VkResult	MakeResident( IndexBuffer& target, const MeshSource& source );
+		VkResult MakeResident(VertexBuffer& target, const MeshSource& source);
+		VkResult MakeResident(IndexBuffer& target, const MeshSource& source);
 
-		VkResult	MakeResident( ShaderImage& target, const ImageSource& source );
+		VkResult MakeResident(ShaderImage& target, const ImageSource& source);
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		ResidencyCoordinator&	operator=( const ResidencyCoordinator& ) = delete;
+		//!	Disable copy assignment.
+		ResidencyCoordinator& operator=(const ResidencyCoordinator&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable HostAllocator					_allocator;
-		GpuHeap									_heap;
-		GpuBus									_bus;
-
-		ResidentSet<MeshSource, Mesh>			_meshesBySource;
-		ResidentSet<ImageSource, ShaderImage>	_imagesBySource;
+		GpuResourceBus                        _bus;
+		ResidentSet<MeshSource, Mesh>         _meshesBySource;
+		ResidentSet<ImageSource, ShaderImage> _imagesBySource;
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Graphics/Vulkan/ResidencyCoordinator.inl>
+//------------------------------------------------------------------//

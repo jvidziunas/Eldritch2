@@ -2,7 +2,7 @@
   Asset.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -15,98 +15,92 @@
 #include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	class	ErrorCode;
-}
-
-namespace Eldritch2 {
-namespace Assets {
+namespace Eldritch2 { namespace Assets {
 
 	class ETPureAbstractHint Asset {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		class Builder {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-		//!	Constructs this @ref Builder instance.
-			Builder( Logging::Log& log, const char* begin, const char* end );
-		//!	Constructs this @ref Builder instance.
-			Builder( const Builder& ) = default;
+			//!	Constructs this @ref Builder instance.
+			Builder(Logging::Log& log, const char* begin, const char* end);
+			//!	Constructs this @ref Builder instance.
+			Builder(const Builder&) = default;
 
 			~Builder() = default;
 
-		// ---------------------------------------------------
+			// ---------------------------------------------------
 
 		public:
 			template <size_t formatSize, typename... Arguments>
-			void	WriteLog( Logging::MessageType severity, const Utf8Char (&formatString)[formatSize], Arguments&&... arguments ) const;
-		
-		// ---------------------------------------------------
+			void WriteLog(Logging::MessageType severity, const Utf8Char (&formatString)[formatSize], Arguments&&... arguments) const;
+
+			// ---------------------------------------------------
 
 		public:
-			const char*	Begin() const;
-			const char*	End() const;
+			const char* Begin() const;
+			const char* End() const;
 
-			size_t		GetSize() const;
+			size_t GetSize() const;
 
-		// - DATA MEMBERS ------------------------------------
+			// - DATA MEMBERS ------------------------------------
 
 		private:
-			mutable Logging::ChildLog	_log;
-			const char*					_begin;
-			const char*					_end;
+			mutable Logging::ChildLog _log;
+			const char*               _begin;
+			const char*               _end;
 		};
 
-	// ---
+		// ---
 
 	public:
 		enum : size_t {
 			MaxPathLength = 128u
 		};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//! Constructs this @ref Asset instance.
-	/*!	@param[in] path Null-terminated, UTF-8-encoded character sequence containing the file system path to the resource the
-			@ref Asset describes. */
-		Asset( const Utf8Char* const path );
-	//!	Disable copy construction.
-		Asset( const Asset& ) = delete;
-	
+		//! Constructs this @ref Asset instance.
+		/*!	@param[in] path Null-terminated, UTF-8-encoded character sequence containing the file system path to the resource the
+				@ref Asset describes. */
+		Asset(const Utf8Char* const path);
+		//!	Disable copy construction.
+		Asset(const Asset&) = delete;
+
 		virtual ~Asset() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-	//! Gets the file system filePath to the asset.
-	/*! @returns Null-terminated, UTF-8-encoded character sequence containing the file system
-			path to the resource this @ref Asset describes.
-		@remarks Thread-safe. */
-		const Utf8Char* const	GetPath() const;
+		//! Gets the file system filePath to the asset.
+		/*! @returns Null-terminated, UTF-8-encoded character sequence containing the file system
+				path to the resource this @ref Asset describes.
+			@remarks Thread-safe. */
+		const Utf8Char* const GetPath() const;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		virtual ErrorCode	BindResources( const Builder& builder ) abstract;
+		virtual ErrorCode BindResources(const Builder& builder) abstract;
 
-		virtual void		FreeResources() abstract;
+		virtual void FreeResources() abstract;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		Asset&	operator=( const Asset& ) = delete;
+		//!	Disable copy assignment.
+		Asset& operator=(const Asset&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Utf8Char	_path[MaxPathLength];
+		Utf8Char _path[MaxPathLength];
 	};
 
-}	// namespace Assets
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Assets
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

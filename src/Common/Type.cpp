@@ -2,12 +2,11 @@
   TypeId.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -17,7 +16,7 @@
 
 namespace Eldritch2 {
 
-	Type::Type() : Type( ([] () -> const std::type_info& { struct Dummy {}; return typeid( Dummy ); })() ) {}
+Type::Type() :
+	Type(([]() -> const std::type_info& { struct Dummy {}; return typeid(Dummy); })()) {}
 
-}	// namespace Eldritch2
-
+} // namespace Eldritch2

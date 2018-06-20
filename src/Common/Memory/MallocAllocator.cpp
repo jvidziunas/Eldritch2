@@ -10,7 +10,6 @@
   ©2010-2013 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -26,42 +25,44 @@
 
 namespace Eldritch2 {
 
-	MallocAllocator::MallocAllocator( const Utf8Char* name ) : Allocator( name ) {}
+MallocAllocator::MallocAllocator(const Utf8Char* name) :
+	Allocator(name) {}
 
 // ---------------------------------------------------
 
-	MallocAllocator::MallocAllocator( const MallocAllocator& allocator ) : Allocator( allocator ) {}
+MallocAllocator::MallocAllocator(const MallocAllocator& allocator) :
+	Allocator(allocator) {}
 
 // ---------------------------------------------------
 
-	ETRestrictHint void* MallocAllocator::Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration ) {
-		if( ((offsetInBytes % alignmentInBytes) == 0) && (alignmentInBytes <= 16u) ) {
-			return Allocate( sizeInBytes, duration );
-		}
-
-		return nullptr;
+ETRestrictHint void* MallocAllocator::Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration) {
+	if (((offsetInBytes % alignmentInBytes) == 0) && (alignmentInBytes <= 16u)) {
+		return Allocate(sizeInBytes, duration);
 	}
 
-// ---------------------------------------------------
-
-	ETRestrictHint void* MallocAllocator::Allocate( SizeType sizeInBytes, AllocationDuration /*duration*/ ) {
-		return malloc( sizeInBytes );
-	}
+	return nullptr;
+}
 
 // ---------------------------------------------------
 
-	void MallocAllocator::Deallocate( void* const address, SizeType /*sizeInBytes*/ ) {
-		free( address );
-	}
+ETRestrictHint void* MallocAllocator::Allocate(SizeType sizeInBytes, AllocationDuration /*duration*/) {
+	return malloc(sizeInBytes);
+}
 
 // ---------------------------------------------------
 
-	MallocAllocator& MallocAllocator::operator=( const MallocAllocator& /*allocator*/ ) {
-		return *this;
-	}
+void MallocAllocator::Deallocate(void* const address, SizeType /*sizeInBytes*/) {
+	free(address);
+}
 
 // ---------------------------------------------------
 
-	void Swap( MallocAllocator& /*allocator0*/, MallocAllocator& /*allocator1*/ ) {}
+MallocAllocator& MallocAllocator::operator=(const MallocAllocator& /*allocator*/) {
+	return *this;
+}
 
-}	// namespace Eldritch2
+// ---------------------------------------------------
+
+void Swap(MallocAllocator& /*allocator0*/, MallocAllocator& /*allocator1*/) {}
+
+} // namespace Eldritch2

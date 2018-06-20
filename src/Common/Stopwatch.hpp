@@ -2,7 +2,7 @@
   Stopwatch.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -23,9 +23,9 @@ namespace Eldritch2 {
 
 	public:
 	//!	Constructs this @ref Stopwatch instance.
-		Stopwatch( CpuTimestamp start );
+		Stopwatch(CpuTimestamp start);
 	//!	Constructs this @ref Stopwatch instance.
-		Stopwatch( const Stopwatch& );
+		Stopwatch(const Stopwatch&);
 	//!	Constructs this @ref Stopwatch instance.
 		Stopwatch();
 
@@ -35,7 +35,7 @@ namespace Eldritch2 {
 
 	public:
 		CpuTimestamp	GetDurationAndZero();
-		
+
 		CpuTimestamp	GetDuration() const;
 
 	// ---------------------------------------------------
@@ -46,7 +46,7 @@ namespace Eldritch2 {
 	// ---------------------------------------------------
 
 	public:
-		Stopwatch&	operator=( const Stopwatch& );
+		Stopwatch & operator=(const Stopwatch&);
 
 	// - DATA MEMBERS ------------------------------------
 

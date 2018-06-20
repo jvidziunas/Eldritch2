@@ -2,7 +2,7 @@
   AnimationTreeAsset.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -21,37 +21,37 @@ namespace Eldritch2 {
 namespace Animation {
 namespace AssetViews {
 
-	class AnimationTreeAsset : public Assets::Asset {
-	// - TYPE PUBLISHING ---------------------------------
+class AnimationTreeAsset : public Assets::Asset {
+    // - TYPE PUBLISHING ---------------------------------
 
-	public:
-		struct Clip		{};
-		struct Blend	{};
+public:
+    struct Clip {};
+    struct Blend {};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+    // - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
-	//!	Constructs this @ref AnimationTreeAsset instance.
-		AnimationTreeAsset( const Utf8Char* const path );
-	//!	Disable copy construction.
-		AnimationTreeAsset( const AnimationTreeAsset& ) = delete;
+public:
+    //!	Constructs this @ref AnimationTreeAsset instance.
+    AnimationTreeAsset(const Utf8Char* const path);
+    //!	Disable copy construction.
+    AnimationTreeAsset(const AnimationTreeAsset&) = delete;
 
-		~AnimationTreeAsset() override = default;
+    ~AnimationTreeAsset() override = default;
 
-	// ---------------------------------------------------
+    // ---------------------------------------------------
 
-	public:
-		ErrorCode	BindResources( const Builder& builder ) override;
+public:
+    ErrorCode BindResources(const Builder& builder) override;
 
-		void		FreeResources() override;
+    void FreeResources() override;
 
-	// - DATA MEMBERS ------------------------------------
+    // - DATA MEMBERS ------------------------------------
 
-	public:
-		ArrayList<Clip>		_clips;
-		ArrayList<Blend>	_blends;
-	};
+public:
+    ArrayList<Clip>  _clips;
+    ArrayList<Blend> _blends;
+};
 
-}	// namespace AssetViews
-}	// namespace Animation
-}	// namespace Eldritch2
+} // namespace AssetViews
+} // namespace Animation
+} // namespace Eldritch2

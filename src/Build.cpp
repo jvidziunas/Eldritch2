@@ -2,7 +2,7 @@
   Build.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,5 +17,5 @@
 
 using namespace ::Eldritch2;
 
-const Utf8Char* const	buildDateStamp		= __TIMESTAMP__;
-const wchar_t* const	wideBuildDateStamp	= ET_PREPROCESSOR_JOIN( L, __TIMESTAMP__ );
+const Utf8Char* const	buildDateStamp = __TIMESTAMP__;
+const wchar_t* const	wideBuildDateStamp = ET_PREPROCESSOR_JOIN(L, __TIMESTAMP__);

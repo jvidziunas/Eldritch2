@@ -15,58 +15,52 @@
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
-namespace AssetViews {
+namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetViews {
 
 	class ScriptAsset : public Assets::Asset {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//! Constructs this @ref ScriptAsset instance.
-		ScriptAsset( const Utf8Char* const path );
-	//!	Disable copy construction.
-		ScriptAsset( const ScriptAsset& ) = delete;
+		//! Constructs this @ref ScriptAsset instance.
+		ScriptAsset(const Utf8Char* const path);
+		//!	Disable copy construction.
+		ScriptAsset(const ScriptAsset&) = delete;
 
 		~ScriptAsset() override = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		const Utf8Char*	Begin() const;
+		const Utf8Char* Begin() const;
 
-		const Utf8Char*	End() const;
+		const Utf8Char* End() const;
 
-		size_t			GetLength() const;
+		size_t GetLength() const;
 
-	// ---------------------------------------------------
-
-	public:
-		static ETPureFunctionHint Utf8Literal	GetExtension();
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources( const Builder& builder ) override;
+		static ETPureFunctionHint Utf8Literal GetExtension();
 
-		void		FreeResources() override;
+		// ---------------------------------------------------
 
-	// ---------------------------------------------------
+	public:
+		ErrorCode BindResources(const Builder& builder) override;
 
-	//!	Disable copy assignment.
-		ScriptAsset&	operator=( const ScriptAsset& ) = delete;
+		void FreeResources() override;
 
-	// - DATA MEMBERS ------------------------------------
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		ScriptAsset& operator=(const ScriptAsset&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		String<>	_source;
+		String<> _source;
 	};
 
-}	// namespace AssetViews
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}}}} // namespace Eldritch2::Scripting::Wren::AssetViews
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

@@ -1,15 +1,15 @@
 file_identifier	"EWDF";
 file_extension	".e2world";
 
-namespace Eldritch2.Foundation.FlatBuffers;
+namespace Eldritch2.Core.FlatBuffers;
 
 table Property {
 	Name	: string (required);
 	Value	: string (required);
 }
 
-table WorldDefinition {
+table World {
 	Properties : [Property];
 }
 
-root_type WorldDefinition;
+root_type World;

@@ -2,7 +2,7 @@
   XaudioMarshals.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -23,14 +23,14 @@ namespace Eldritch2 {
 }
 
 namespace Eldritch2 {
-namespace Audio {
-namespace XAudio2 {
+	namespace Audio {
+		namespace XAudio2 {
 
-	ETPureFunctionHint X3DAUDIO_VECTOR ETSimdCall	AsX3dAudioVector( Vector value );
-	ETPureFunctionHint Vector ETSimdCall			AsVector( X3DAUDIO_VECTOR value );
+			ETPureFunctionHint X3DAUDIO_VECTOR ETSimdCall	AsX3dAudioVector(Vector value);
+			ETPureFunctionHint Vector ETSimdCall			AsVector(X3DAUDIO_VECTOR value);
 
-}	// namespace XAudio2
-}	// namespace Audio
+		}	// namespace XAudio2
+	}	// namespace Audio
 }	// namespace Eldritch2
 
 //==================================================================//

@@ -1,8 +1,8 @@
 /*==================================================================*\
-  Utf8String.hpp
+  String.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,7 +17,7 @@
 
 namespace Eldritch2 {
 
-	template <class Allocator = MallocAllocator>
-	using String = AbstractString<Utf8Char, Allocator>;
+template <class Allocator = MallocAllocator>
+using String = AbstractString<Utf8Char, Allocator>;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

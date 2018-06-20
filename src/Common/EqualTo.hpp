@@ -2,7 +2,7 @@
   EqualTo.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -17,23 +17,23 @@
 
 namespace Eldritch2 {
 
-	template <typename T>
-	class EqualTo {
+template <typename T>
+class EqualTo {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref EqualTo instance.
-		EqualTo() = default;
+	EqualTo() = default;
 
-		~EqualTo() = default;
+	~EqualTo() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		bool	operator()( const T& object0, const T& object1 ) const;
-	};
+public:
+	bool operator()(const T& object0, const T& object1) const;
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

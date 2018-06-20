@@ -20,30 +20,31 @@
 
 namespace Eldritch2 {
 
-	ETInlineHint ErrorCode::ErrorCode( Error bitfield ) : _value( static_cast<int32>(bitfield) ) {}
+ETInlineHint ErrorCode::ErrorCode(Error bitfield) :
+	_value(static_cast<int32>(bitfield)) {}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETPureFunctionHint int AsPosixInt( ErrorCode code ) {
-		return code._value;
-	}
+ETForceInlineHint ETPureFunctionHint int AsPosixInt(ErrorCode code) {
+	return code._value;
+}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETPureFunctionHint bool Succeeded( ErrorCode code ) {
-		return code._value == static_cast<int32>(Error::None);
-	}
+ETForceInlineHint ETPureFunctionHint bool Succeeded(ErrorCode code) {
+	return code._value == static_cast<int32>(Error::None);
+}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETPureFunctionHint bool Failed( ErrorCode code ) {
-		return code._value != static_cast<int32>(Error::None);
-	}
+ETForceInlineHint ETPureFunctionHint bool Failed(ErrorCode code) {
+	return code._value != static_cast<int32>(Error::None);
+}
 
 // ---------------------------------------------------
 
-	ETForceInlineHint ETPureFunctionHint bool operator==( ErrorCode code, ErrorCode code1 ) {
-		return code._value == code1._value;
-	}
+ETForceInlineHint ETPureFunctionHint bool operator==(ErrorCode code, ErrorCode code1) {
+	return code._value == code1._value;
+}
 
-}	// namespace Eldritch2
+} // namespace Eldritch2

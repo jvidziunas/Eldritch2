@@ -2,7 +2,7 @@
   ImageTools.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -15,19 +15,17 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
+namespace Eldritch2 { namespace Graphics {
 
-	ETPureFunctionHint float32	GetModelScreenCoverageConstant( float32 distance, Angle fov, float32 inverseResolution );
+	ETPureFunctionHint float32 GetModelScreenCoverageConstant(float32 distance, Angle fov, float32 inverseResolution);
 
-	ETPureFunctionHint float32	EstimateTriangleScreenArea( float32 worldArea, float32 screenCoverageConstant );
+	ETPureFunctionHint float32 EstimateTriangleScreenArea(float32 worldArea, float32 screenCoverageConstant);
 
-	ETPureFunctionHint float32	CalculateMinTextureLod( float32 triangleScreenArea, float32 triangleUvArea );
+	ETPureFunctionHint float32 CalculateMinTextureLod(float32 triangleScreenArea, float32 triangleUvArea);
 
-	ETPureFunctionHint uint32	CalcTotalMipPyramidLevels( uint32 width, uint32 height, uint32 depth = 0u );
+	ETPureFunctionHint uint32 CalcTotalMipPyramidLevels(uint32 width, uint32 height, uint32 depth = 0u);
 
-}	// namespace Graphics
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Graphics
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

@@ -2,12 +2,11 @@
   Vulkan.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -25,117 +24,115 @@
 //==================================================================//
 // LIBRARIES
 //==================================================================//
-ET_LINK_LIBRARY( "vulkan-1.lib" )
+ET_LINK_LIBRARY("vulkan-1.lib")
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
-namespace {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	namespace {
 
-	using namespace ::Eldritch2::Logging;
+		using namespace ::Eldritch2::Logging;
 
-	static ETInlineHint ETPureFunctionHint MessageType GetMessageType( VkDebugReportFlagsEXT flags ) {
-		return flags & VK_DEBUG_REPORT_ERROR_BIT_EXT ? MessageType::Error : MessageType::Warning;
-	}
-
-// ---------------------------------------------------
-
-	static ETInlineHint VkResult CreateDebugReportCallbackEXT( VkInstance instance, const VkDebugReportCallbackCreateInfoEXT& createInfo, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback ) {
-		const auto	implementation( reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr( instance, "vkCreateDebugReportCallbackEXT" )) );
-		if (!implementation) {
-			return VK_ERROR_EXTENSION_NOT_PRESENT;
+		static ETInlineHint ETPureFunctionHint MessageType AsMessageType(VkDebugReportFlagsEXT flags) {
+			return flags & VK_DEBUG_REPORT_ERROR_BIT_EXT ? MessageType::Error : MessageType::Warning;
 		}
 
-		return implementation( instance, &createInfo, allocator, callback );
-	}
+		// ---------------------------------------------------
 
-// ---------------------------------------------------
+		static ETInlineHint VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT& createInfo, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback) {
+			const auto implementation(reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT")));
+			if (!implementation) {
+				return VK_ERROR_EXTENSION_NOT_PRESENT;
+			}
 
-	static ETInlineHint void DestroyDebugReportCallbackEXT( VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* allocator ) {
-		const auto destroyCallback( reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr( instance, "vkDestroyDebugReportCallbackEXT" )) );
-
-		if (!destroyCallback) {
-			return;
+			return implementation(instance, &createInfo, allocator, callback);
 		}
 
-		destroyCallback( instance, callback, allocator );
-	}
+		// ---------------------------------------------------
 
-// ---------------------------------------------------
+		static ETInlineHint void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* allocator) {
+			const auto implementation(reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT")));
 
-	static ETInlineHint VkResult CreateLogCallback( VkInstance instance, Vulkan& vulkan, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback ) {
-		const VkDebugReportCallbackCreateInfoEXT	createInfo{
-			VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
-			nullptr,
-			VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
-			[] ( VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*objectType*/, uint64_t /*object*/, size_t /*location*/, int32_t /*messageCode*/, const char* layer, const char* message, void* vulkan ) -> VkBool32 {	
-				static_cast<Vulkan*>(vulkan)->WriteLog( GetMessageType( flags ), "{} [{}]" UTF8_NEWLINE, message, layer );
+			if (!implementation) {
+				return;
+			}
 
-				ET_TRIGGER_DEBUGBREAK();
+			implementation(instance, callback, allocator);
+		}
 
-				return VK_FALSE;
-			},
-			&vulkan
-		};
+		// ---------------------------------------------------
 
-		return CreateDebugReportCallbackEXT( instance, createInfo, allocator, callback );
-	}
+		static ETInlineHint VkResult CreateLogCallback(VkInstance instance, Vulkan& vulkan, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback) {
+			const VkDebugReportCallbackCreateInfoEXT createInfo{
+				VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
+				/*pNext =*/nullptr,
+				VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
+				[](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*source*/, uint64_t /*object*/, size_t /*location*/, int32_t /*code*/, const char* /*layer*/, const char* message, void* vulkan) -> VkBool32 {
+					static_cast<Vulkan*>(vulkan)->WriteLog(AsMessageType(flags), "{}" UTF8_NEWLINE, message);
+					if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+						ET_TRIGGER_DEBUGBREAK();
+					}
 
-}	// anonymous namespace
+					return VK_FALSE;
+				},
+				/*pUserData =*/eastl::addressof(vulkan)
+			};
+
+			return CreateDebugReportCallbackEXT(instance, createInfo, allocator, callback);
+		}
+
+	} // anonymous namespace
 
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Logging;
 
-	VkResult Vulkan::Device::BindResources( Vulkan& vulkan, VkPhysicalDevice device, VkDeviceSize transferBufferSize ) {
-		ET_FAIL_UNLESS( Gpu::BindResources( device ) );
-		ET_FAIL_UNLESS( PresentCoordinator::BindResources( vulkan ) );
-		ET_FAIL_UNLESS( ResidencyCoordinator::BindResources( *this, transferBufferSize ) );
+	VkResult Vulkan::Device::BindResources(VkPhysicalDevice device, VkDeviceSize heapBlockSize, VkDeviceSize transferBufferSize) {
+		ET_FAIL_UNLESS(Gpu::BindResources(device, heapBlockSize, 2u));
+		ET_FAIL_UNLESS(DisplayCoordinator::BindResources(*this));
+		ET_FAIL_UNLESS(ResidencyCoordinator::BindResources(*this, transferBufferSize));
 
 		return VK_SUCCESS;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void Vulkan::Device::FreeResources( Vulkan& vulkan ) {
-		ResidencyCoordinator::FreeResources( *this );
-		PresentCoordinator::FreeResources( vulkan );
+	void Vulkan::Device::FreeResources() {
+		ResidencyCoordinator::FreeResources(*this);
+		DisplayCoordinator::FreeResources(*this);
 		Gpu::FreeResources();
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	Vulkan::Vulkan(
-		Log& log
-	) : _allocator( "Vulkan Root Allocator" ),
-		_log( log ),
-		_vulkan( nullptr ),
-		_debugCallback( nullptr ),
-		_deviceCount( 0u ) {
+		Log& log) :
+		_allocator("Vulkan Root Allocator"),
+		_log(log),
+		_vulkan(nullptr),
+		_debugCallback(nullptr),
+		_deviceCount(0u) {
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	Vulkan::~Vulkan() {
-		ET_ASSERT( _vulkan == nullptr,        "Leaking Vulkan instance!" );
-		ET_ASSERT( _debugCallback == nullptr, "Leaking Vulkan log callback!" );
-		ET_ASSERT( _deviceCount == 0,         "Leaking Vulkan GPUs!" );
+		ET_ASSERT(_vulkan == nullptr, "Leaking Vulkan instance!");
+		ET_ASSERT(_debugCallback == nullptr, "Leaking Vulkan log callback!");
+		ET_ASSERT(_deviceCount == 0, "Leaking Vulkan GPUs!");
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void Vulkan::BeginFrame( JobExecutor& executor ) {
-		executor.ForEach<1u>( _devices, ( _devices + _deviceCount ), [] ( JobExecutor& executor, Device& device ) {
+	void Vulkan::BeginFrame(JobExecutor& executor) {
+		executor.ForEach<1u>(_devices, (_devices + _deviceCount), [this](JobExecutor& executor, Device& device) {
 			executor.AwaitWork(
-				[&] ( JobExecutor& /*executor*/ ) { device.SubmitFrameIo( executor, device ); },
-				[&] ( JobExecutor& /*executor*/ ) { device.Present( device ); }
-			);
-		} );
+				[&](JobExecutor& executor) { device.SubmitFrameIo(executor, device); },
+				[&](JobExecutor& /*executor*/) { device.AcquireImages(*this, device); });
+		});
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	VkResult Vulkan::BindResources( JobExecutor& executor, const VkApplicationInfo& applicationInfo ) {
+	VkResult Vulkan::BindResources(JobExecutor& executor, const VkApplicationInfo& applicationInfo) {
 		using ::Eldritch2::Swap;
 
 		const std::initializer_list<const char*> layers = {
@@ -145,78 +142,79 @@ namespace {
 		const std::initializer_list<const char*> extensions = {
 			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 			VK_KHR_SURFACE_EXTENSION_NAME,
-	#	if ET_PLATFORM_WINDOWS
+#if ET_PLATFORM_WINDOWS
 			VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-	#	endif
+#endif
 		};
 
-		VkInstance	vulkan;
-		{	const VkInstanceCreateInfo	instanceInfo{
+		VkInstance vulkan;
+		{
+			const VkInstanceCreateInfo vulkanInfo{
 				VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 				nullptr,
 				0,
 				&applicationInfo,
-				static_cast<uint32_t>(layers.size()), layers.begin(),
-				static_cast<uint32_t>(extensions.size()), extensions.begin()
+				static_cast<uint32_t>(layers.size()),
+				layers.begin(),
+				static_cast<uint32_t>(extensions.size()),
+				extensions.begin()
 			};
-		
-			const VkResult	result( vkCreateInstance( &instanceInfo, _allocator, &vulkan ) );
-			if (Failed( result )) {
-				WriteLog( MessageType::Error, "Unable to create Vulkan instance! ({})" UTF8_NEWLINE, result );
+
+			const VkResult result(vkCreateInstance(&vulkanInfo, _allocator, &vulkan));
+			if (Failed(result)) {
+				WriteLog(MessageType::Error, "Unable to create Vulkan instance! ({})" UTF8_NEWLINE, result);
 				return VK_ERROR_INITIALIZATION_FAILED;
 			}
 		}
-		ET_AT_SCOPE_EXIT( vkDestroyInstance( vulkan, _allocator ) );
+		ET_AT_SCOPE_EXIT(vkDestroyInstance(vulkan, _allocator));
 
 		VkDebugReportCallbackEXT debugCallback;
-		if (Failed( CreateLogCallback( vulkan, *this, _allocator, &debugCallback ) )) {
-			WriteLog( MessageType::Warning, "Unable to create Vulkan log callback, debug output will be unavailable." UTF8_NEWLINE );
+		if (Failed(CreateLogCallback(vulkan, *this, _allocator, &debugCallback))) {
+			WriteLog(MessageType::Warning, "Unable to create Vulkan log callback, debug output will be unavailable." UTF8_NEWLINE);
 		}
-		ET_AT_SCOPE_EXIT( DestroyDebugReportCallbackEXT( vulkan, debugCallback, _allocator ) );
+		ET_AT_SCOPE_EXIT(DestroyDebugReportCallbackEXT(vulkan, debugCallback, _allocator));
 
-	//	First, get the number of installed physical devices in the system.
-		uint32	gpuCount( 0u );
-		if (Failed( vkEnumeratePhysicalDevices( vulkan, &gpuCount, nullptr ) ) || gpuCount == 0u) {
-			WriteLog( MessageType::Error, "Unable to enumerate Vulkan physical devices!" UTF8_NEWLINE );
+		//	First, get the number of installed physical devices in the system.
+		uint32 gpuCount(0u);
+		if (Failed(vkEnumeratePhysicalDevices(vulkan, &gpuCount, nullptr)) || gpuCount == 0u) {
+			WriteLog(MessageType::Error, "Unable to enumerate Vulkan physical devices!" UTF8_NEWLINE);
 			return VK_ERROR_INITIALIZATION_FAILED;
 		}
 
-	//	Allocate an array large enough to hold all the physical device handles.
-		VkPhysicalDevice* const	devices( static_cast<VkPhysicalDevice*>(_alloca( gpuCount * sizeof(VkPhysicalDevice) )) );
-	//	Fill the array with physical device handles.
-		if (Failed( vkEnumeratePhysicalDevices( vulkan, &gpuCount, devices ) )) {
-			WriteLog( MessageType::Error, "Unable to query Vulkan physical devices!" UTF8_NEWLINE );
+		//	Allocate an array large enough to hold all the physical device handles.
+		VkPhysicalDevice* const devices(static_cast<VkPhysicalDevice*>(_alloca(gpuCount * sizeof(VkPhysicalDevice))));
+		//	Fill the array with physical device handles.
+		if (Failed(vkEnumeratePhysicalDevices(vulkan, &gpuCount, devices))) {
+			WriteLog(MessageType::Error, "Unable to query Vulkan physical devices!" UTF8_NEWLINE);
 			return VK_ERROR_INITIALIZATION_FAILED;
 		}
 
-		gpuCount = Min<uint32>( gpuCount, _countof(_devices) );
+		gpuCount = Min<uint32>(gpuCount, _countof(_devices));
 
-		executor.ForEach<1u>( _devices, ( _devices + gpuCount ), devices, [this] ( JobExecutor& /*executor*/, Device& gpu, VkPhysicalDevice physicalDevice ) {
-			if (Failed( gpu.BindResources( *this, physicalDevice, Device::TransferBufferSize ) )) {
-				WriteLog( MessageType::Error, "Error binding GPU!" UTF8_NEWLINE );
+		executor.ForEach<1u>(_devices, (_devices + gpuCount), devices, [this](JobExecutor& /*executor*/, Device& gpu, VkPhysicalDevice physicalDevice) {
+			if (Failed(gpu.BindResources(physicalDevice, Device::HeapBlockSize, Device::TransferBufferSize))) {
+				WriteLog(MessageType::Error, "Error binding GPU!" UTF8_NEWLINE);
 			}
-		} );
+		});
 
-	//	Commit the changes to the object.
-		Swap( _vulkan,			vulkan );
-		Swap( _debugCallback,	debugCallback );
+		//	Commit the changes to the object.
+		Swap(_vulkan, vulkan);
+		Swap(_debugCallback, debugCallback);
 
 		_deviceCount = gpuCount;
 
 		return VK_SUCCESS;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void Vulkan::FreeResources( JobExecutor& executor ) {
-		executor.ForEach<1u>( _devices, ( _devices + eastl::exchange( _deviceCount, 0u ) ), [this] ( JobExecutor& /*executor*/, Device& gpu ) {
-			gpu.FreeResources( *this );
-		} );
+	void Vulkan::FreeResources(JobExecutor& executor) {
+		executor.ForEach<1u>(_devices, (_devices + eastl::exchange(_deviceCount, 0u)), [this](JobExecutor& /*executor*/, Device& gpu) {
+			gpu.FreeResources();
+		});
 
-		DestroyDebugReportCallbackEXT( _vulkan, eastl::exchange( _debugCallback, nullptr ), _allocator );
-		vkDestroyInstance( eastl::exchange( _vulkan, nullptr ), _allocator );
+		DestroyDebugReportCallbackEXT(_vulkan, eastl::exchange(_debugCallback, nullptr), _allocator);
+		vkDestroyInstance(eastl::exchange(_vulkan, nullptr), _allocator);
 	}
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan

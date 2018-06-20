@@ -2,7 +2,7 @@
   Semaphore.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -31,16 +31,16 @@ namespace Eldritch2 {
 
 	public:
 	//!	Constructs this @ref Semaphore instance.
-		Semaphore( uint32 maximumCount, uint32 initialCount = 0u );
+		Semaphore(uint32 maximumCount, uint32 initialCount = 0u);
 	//!	Constructs this @ref Semaphore instance.
-		Semaphore( const Semaphore& ) = delete;
+		Semaphore(const Semaphore&) = delete;
 
 		~Semaphore();
 
 	// ---------------------------------------------------
 
 	public:
-		uint32	IncreaseCount( uint32 count = 1u );
+		uint32	IncreaseCount(uint32 count = 1u);
 
 		void	Acquire();
 
@@ -49,7 +49,7 @@ namespace Eldritch2 {
 	// ---------------------------------------------------
 
 	//!	Disable copy construction.
-		Semaphore&	operator=( const Semaphore& ) = delete;
+		Semaphore&	operator=(const Semaphore&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 	private:

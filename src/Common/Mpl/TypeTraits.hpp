@@ -2,7 +2,7 @@
   TypeTraits.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2018 Eldritch Entertainment, LLC.
@@ -17,17 +17,22 @@
 
 namespace Eldritch2 {
 
-	template <typename T, T v>
-	struct IntegralConstant {
-		static constexpr T Value	= v;
-		using ValueType				= T;
-		using Type					= IntegralConstant<T, v>;
+template <typename T, T v>
+struct IntegralConstant {
+	static constexpr T Value = v;
 
-		constexpr operator ValueType() const ETNoexceptHint   { return value; }
-		constexpr ValueType operator()() const ETNoexceptHint { return value; }
-	};
+	using ValueType = T;
+	using Type      = IntegralConstant<T, v>;
 
-	using TrueType  = IntegralConstant<bool, true>;
-	using FalseType = IntegralConstant<bool, false>;
+	constexpr operator ValueType() const ETNoexceptHint {
+		return value;
+	}
+	constexpr ValueType operator()() const ETNoexceptHint {
+		return value;
+	}
+};
 
-}	// namespace Eldritch2
+using TrueType  = IntegralConstant<bool, true>;
+using FalseType = IntegralConstant<bool, false>;
+
+} // namespace Eldritch2

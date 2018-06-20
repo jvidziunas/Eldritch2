@@ -2,12 +2,11 @@
   XInputWorldComponent.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -16,14 +15,11 @@
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Input {
-namespace XInput {
+namespace Eldritch2 { namespace Input { namespace XInput {
 
 	using namespace ::Eldritch2::Core;
 
-	XInputWorldComponent::XInputWorldComponent( const World& world ) : WorldComponent( world.GetServices() ) {}
+	XInputWorldComponent::XInputWorldComponent(const World& world) :
+		WorldComponent(world.GetServices()) {}
 
-}	// namespace XInput
-}	// namespace Input
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Input::XInput

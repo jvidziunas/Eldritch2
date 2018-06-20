@@ -2,7 +2,7 @@
   StringLiteral.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -17,38 +17,38 @@
 
 namespace Eldritch2 {
 
-	template <typename Character>
-	class StringLiteral {
+template <typename Character>
+class StringLiteral {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref StringLiteral instance.
-		template <size_t stringLength>
-		StringLiteral( const Character (&literal)[stringLength] );
+	template <size_t length>
+	StringLiteral(const Character (&string)[length]);
 	//!	Constructs this @ref StringLiteral instance.
-		explicit StringLiteral( const Character* const literal );
+	explicit StringLiteral(const Character* const string);
 	//!	Constructs this @ref StringLiteral instance.
-		StringLiteral();
+	StringLiteral();
 
-		~StringLiteral() = default;
+	~StringLiteral() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		operator	const Character*() const;
+public:
+	operator const Character*() const;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		const Character*	_string;
-	};
+private:
+	const Character* _string;
+};
 
 // ---
 
-	using Utf8Literal	= StringLiteral<Utf8Char>;
-	using WcharLiteral	= StringLiteral<wchar_t>;
+using Utf8Literal  = StringLiteral<Utf8Char>;
+using WcharLiteral = StringLiteral<wchar_t>;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

@@ -1,13 +1,12 @@
 /*==================================================================*\
-  ResidencyCoordinator.SparseImage.cpp
+  GpuResources.SparseImage.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
-
 
 //==================================================================//
 // INCLUDES
@@ -16,76 +15,65 @@
 #include <Graphics/Vulkan/VulkanTools.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	SparseShaderImage::SparseShaderImage( SparseShaderImage&& image ) : Detail::AbstractImage( eastl::move( image ) ), _tileManager( eastl::move( image._tileManager ) ), _pageCache( eastl::move( image._pageCache ) ) {}
+	SparseShaderImage::SparseShaderImage(SparseShaderImage&& image) :
+		SparseShaderImage() {
+		Swap(*this, image);
+	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	VkResult SparseShaderImage::BindResources( GpuHeap& heap, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips ) {
-		enum : VkMemoryPropertyFlags { InferMemoryPropertiesFromUsage = 0u };
+	VkResult SparseShaderImage::BindResources(Gpu& gpu, VkFormat format, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips) {
+		enum : VkMemoryPropertyFlags { InferFromUsage = 0u };
 
-		const VkDeviceSize	tileSizeInBytes( tileExtent.width * tileExtent.height * tileExtent.depth );
-
-		TileManager tileManager( tileExtent, extent );
-		TransferBuffer tileCache;
-		ET_FAIL_UNLESS( tileCache.BindResources( heap, tileSizeInBytes * 128u ) );
-		ET_AT_SCOPE_EXIT( tileCache.FreeResources( heap ) );
-
-		ET_FAIL_UNLESS( AbstractImage::BindResources(
-			heap,
+		TileManager tileManager(format, tileExtent, extent);
+		ET_FAIL_UNLESS(AbstractImage::BindResources(
+			gpu,
 			VkImageCreateInfo{
 				VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-				nullptr,
+				/*pNext =*/nullptr,
 				VK_IMAGE_CREATE_SPARSE_BINDING_BIT | VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT,
-				GetImageType( extent ),
-				VK_FORMAT_UNDEFINED,
+				GetImageType(extent),
+				format,
 				extent,
 				mips,
-				1u,						// Array layers
-				VK_SAMPLE_COUNT_1_BIT,	// Shader resources are always 1 sample/texel.
+				/*arrayLayers =*/1u,
+				VK_SAMPLE_COUNT_1_BIT,
 				VK_IMAGE_TILING_OPTIMAL,
 				VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
 				VK_SHARING_MODE_EXCLUSIVE,
-				0u, nullptr,			// Exclusive sharing.
-				VK_IMAGE_LAYOUT_UNDEFINED
-			},
+				/*queueFamilyIndexCount =*/0u,    // Exclusive sharing.
+				/*pQueueFamilyIndices =*/nullptr, // Exclusive sharing.
+				VK_IMAGE_LAYOUT_UNDEFINED },
 			VmaAllocationCreateInfo{
-				0u,
+				/*flags =*/0u,
 				VMA_MEMORY_USAGE_GPU_ONLY,
-				InferMemoryPropertiesFromUsage,
-				InferMemoryPropertiesFromUsage,
-				0u,				//	No type bits.
-				VK_NULL_HANDLE,	//	Use default pooling scheme.
-				nullptr			//	No user data.
-			}
-		) );
+				/*requiredFlags =*/InferFromUsage,
+				/*preferredFlags =*/InferFromUsage,
+				/*memoryTypeBits =*/0u,
+				/*pool =*/VK_NULL_HANDLE,
+				/*pUserData =*/this }));
 
-		Swap( _tileManager, tileManager );
-		Swap( _pageCache,   tileCache );
+		Swap(_tileManager, tileManager);
 
 		return VK_SUCCESS;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void SparseShaderImage::FreeResources( GpuHeap& heap ) {
-		AbstractImage::FreeResources( heap );
+	void SparseShaderImage::FreeResources(Gpu& gpu) {
+		AbstractImage::FreeResources(gpu);
+		// _tileManager.Clear();
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void Swap( SparseShaderImage& lhs, SparseShaderImage& rhs ) {
+	void Swap(SparseShaderImage& lhs, SparseShaderImage& rhs) {
 		using ::Eldritch2::Swap;
 
-		Detail::Swap( lhs, rhs );
-
-		Swap( lhs._tileManager, rhs._tileManager );
-		Swap( lhs._pageCache,   rhs._pageCache );
+		Detail::Swap(lhs, rhs);
+		Swap(lhs._tileManager, rhs._tileManager);
 	}
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan

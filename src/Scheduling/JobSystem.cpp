@@ -15,13 +15,13 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scheduling {
+	namespace Scheduling {
 
-	void JobSystem::BackOff( BackoffContext& /*context*/ ) {}
+		void JobSystem::BackOff(BackoffContext& /*context*/) {}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void JobSystem::SetCallerExecutionPriority( ThreadExecutionPriority /*priority*/ ) {}
+		void JobSystem::SetCallerExecutionPriority(ThreadExecutionPriority /*priority*/) {}
 
-}	// namespace Scheduling
+	}	// namespace Scheduling
 }	// namespace Eldritch2

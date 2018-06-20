@@ -2,7 +2,7 @@
   MeshSource.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -15,54 +15,52 @@
 #include <Graphics/GpuFormats.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
+namespace Eldritch2 { namespace Graphics {
 
 	class ETPureAbstractHint MeshSource {
-	// - TYPE PUBLISHING ---------------------------------
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		struct Dimensions {
-			uint32	vertexCount;
-			uint32	indexCount;
+			uint32 vertexCount;
+			uint32 indexCount;
 		};
 
-	// ---
+		// ---
 
 		struct VertexStreamRequest {
-			size_t	elementStrideInBytes;
-			uint32	first;
-			uint32	last;
+			size_t elementStrideInBytes;
+			uint32 first;
+			uint32 last;
 
-			void*	target;
+			void* target;
 		};
 
-	// ---
+		// ---
 
 		struct IndexStreamRequest {
-			uint32	first;
-			uint32	last;
+			uint32 first;
+			uint32 last;
 
-			void*	target;
+			void* target;
 		};
 
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref MeshSource instance.
-		MeshSource( const MeshSource& ) = default;
-	//!	Constructs this @ref MeshSource instance.
+		//!	Constructs this @ref MeshSource instance.
+		MeshSource(const MeshSource&) = default;
+		//!	Constructs this @ref MeshSource instance.
 		MeshSource() = default;
 
 		~MeshSource() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		virtual Dimensions	GetDimensions() const abstract;
+		virtual Dimensions GetDimensions() const abstract;
 
-		virtual void		Stream( const VertexStreamRequest& vertices, const IndexStreamRequest& indices ) const abstract;
+		virtual void Stream(const VertexStreamRequest& vertices, const IndexStreamRequest& indices) const abstract;
 	};
 
-}	// namespace Graphics
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Graphics

@@ -15,6 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Common\Eastl.cpp" />
     <ClCompile Include="src\Common\FileReader.Win32.cpp" />
     <ClCompile Include="src\Common\Filesystem.Win32.cpp" />
     <ClCompile Include="src\Common\FileWriter.Win32.cpp" />
@@ -23,15 +24,11 @@
     <ClCompile Include="src\Tools\CrtpTool.cpp" />
     <ClCompile Include="src\Common\Assert.cpp" />
     <ClCompile Include="src\Common\Containers\AbstractString.cpp" />
-    <ClCompile Include="src\Common\CppFormatDefinitions.cpp" />
-    <ClCompile Include="src\Common\EastlDefinitions.cpp" />
     <ClCompile Include="src\Common\ErrorCode.cpp" />
     <ClCompile Include="src\Common\Memory\Allocator.cpp" />
     <ClCompile Include="src\Common\Memory\ChildAllocator.cpp" />
     <ClCompile Include="src\Common\Memory\InstanceNew.cpp" />
     <ClCompile Include="src\Common\Memory\MallocAllocator.cpp" />
-    <ClCompile Include="src\Common\Memory\NullAllocator.cpp" />
-    <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp" />
     <ClCompile Include="src_Bakinator\Bakinator.cpp" />
     <ClCompile Include="src_Bakinator\Bakinator.Win32.cpp" />
   </ItemGroup>
@@ -48,8 +45,6 @@
     <ClInclude Include="src\Common\Memory\InstanceDeleter.hpp" />
     <ClInclude Include="src\Common\Memory\InstanceNew.hpp" />
     <ClInclude Include="src\Common\Memory\MallocAllocator.hpp" />
-    <ClInclude Include="src\Common\Memory\NullAllocator.hpp" />
-    <ClInclude Include="src\Common\Memory\Win32HeapAllocator.hpp" />
     <ClInclude Include="src\Common\Mpl\Alignof.hpp" />
     <ClInclude Include="src\Common\Mpl\CharTypes.hpp" />
     <ClInclude Include="src\Common\Mpl\Compiler.hpp" />
@@ -145,7 +140,7 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
-      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;_WIN32_WINNT=0x0601;FMT_EXCEPTIONS=0;FMT_HEADER_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -179,7 +174,7 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
-      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;_WIN32_WINNT=0x0601;FMT_EXCEPTIONS=0;FMT_HEADER_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ProjectReference>
@@ -214,7 +209,7 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
-      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_CHAR16T;_UNICODE;UNICODE;_WIN32_WINNT=0x0601;FMT_EXCEPTIONS=0;FMT_HEADER_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ProjectReference>

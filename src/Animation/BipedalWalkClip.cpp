@@ -16,9 +16,9 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Animation {
+	namespace Animation {
 
-	BipedalWalkClip::BipedalWalkClip() {}
+		BipedalWalkClip::BipedalWalkClip() {}
 
-}	// namespace Animation
+	}	// namespace Animation
 }	// namespace Eldritch2

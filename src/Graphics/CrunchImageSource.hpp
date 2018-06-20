@@ -2,7 +2,7 @@
   CrunchImageSource.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -16,48 +16,46 @@
 //------------------------------------------------------------------//
 
 namespace crnd {
-	using crnd_unpack_context = void*;
+using crnd_unpack_context = void*;
 }
 
-namespace Eldritch2 {
-namespace Graphics {
+namespace Eldritch2 { namespace Graphics {
 
 	class CrunchImageSource : public ImageSource {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		CrunchImageSource( const CrunchImageSource& ) = delete;
-	//!	Constructs this @ref CrunchImageSource instance.
+		//!	Disable copy construction.
+		CrunchImageSource(const CrunchImageSource&) = delete;
+		//!	Constructs this @ref CrunchImageSource instance.
 		CrunchImageSource();
 
 		~CrunchImageSource();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		Dimensions	GetDimensions() const override;
+		Dimensions GetDimensions() const override;
 
-		void		StreamTexels( const StreamRequest& request ) const override;
+		void StreamTexels(const StreamRequest& request) const override;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources( const char* begin, const char* end );
+		ErrorCode BindResources(const char* begin, const char* end);
 
-		void		FreeResources();
+		void FreeResources();
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		CrunchImageSource&	operator=( const CrunchImageSource& ) = delete;
+		//!	Disable copy assignment.
+		CrunchImageSource& operator=(const CrunchImageSource&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		crnd::crnd_unpack_context	_context;
-		Dimensions					_dimensions;
+		crnd::crnd_unpack_context _context;
+		Dimensions                _dimensions;
 	};
 
-}	// namespace Graphics
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Graphics

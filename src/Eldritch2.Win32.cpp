@@ -2,7 +2,7 @@
   Eldritch2.Win32.cpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -34,8 +34,8 @@
 //==================================================================//
 // LIBRARIES
 //==================================================================//
-ET_LINK_LIBRARY( "Shlwapi.lib" )
-ET_LINK_LIBRARY( "dbghelp.lib" )
+ET_LINK_LIBRARY("Shlwapi.lib")
+ET_LINK_LIBRARY("dbghelp.lib")
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Networking::Steamworks;
@@ -60,16 +60,16 @@ namespace {
 	//!	Constructs this @ref Application instance.
 		Application(
 		) : _jobSystem(),
-			_engine( _jobSystem ),
-			_managementComponent( _engine ),
-			_xinputComponent( _engine.GetBlackboard() ),
-			_navigationComponent( _engine.GetBlackboard() ),
-			_win32InputComponent( _engine.GetBlackboard(), _engine.GetLog() ),
-			_steamworksComponent( _engine.GetBlackboard(), _engine.GetLog() ),
-			_wrenComponent( _engine.GetBlackboard() ),
-			_physxComponent( _engine.GetBlackboard(), _engine.GetLog() ),
-			_vulkanComponent( _engine.GetBlackboard(), _engine.GetLog() ),
-			_xaudio2Component( _engine.GetBlackboard(), _engine.GetLog() ) {
+			_engine(_jobSystem),
+			_managementComponent(_engine),
+			_xinputComponent(_engine.GetBlackboard()),
+			_navigationComponent(_engine.GetBlackboard()),
+			_win32InputComponent(_engine.GetBlackboard(), _engine.GetLog()),
+			_steamworksComponent(_engine.GetBlackboard(), _engine.GetLog()),
+			_wrenComponent(_engine.GetBlackboard()),
+			_physxComponent(_engine.GetBlackboard(), _engine.GetLog()),
+			_vulkanComponent(_engine.GetBlackboard(), _engine.GetLog()),
+			_xaudio2Component(_engine.GetBlackboard(), _engine.GetLog()) {
 		}
 
 		~Application() = default;
@@ -78,26 +78,26 @@ namespace {
 
 	public:
 		int Run() {
-			return _jobSystem.Boot( Max( GetCoreInfo().physicalCores, 2u ) - 1u, [this] ( JobExecutor& executor ) {
+			return _jobSystem.Boot(Max(GetCoreInfo().physicalCores, 2u) - 1u, [this](JobExecutor& executor) {
 				MicroProfileInit();
 
 				_jobSystem.SetShouldShutDown(
 					_engine.BootOnCaller(
-						executor,
-						_managementComponent,
-						_xinputComponent,
-						_navigationComponent,
-						_win32InputComponent,
-						_steamworksComponent,
-						_wrenComponent,
-						_physxComponent,
-						_vulkanComponent,
-						_xaudio2Component
-					)
+					executor,
+					_managementComponent,
+					_xinputComponent,
+					_navigationComponent,
+					_win32InputComponent,
+					_steamworksComponent,
+					_wrenComponent,
+					_physxComponent,
+					_vulkanComponent,
+					_xaudio2Component
+				)
 				);
 
 				MicroProfileShutdown();
-			} );
+			});
 		}
 
 	// - DATA MEMBERS ------------------------------------
@@ -119,7 +119,7 @@ namespace {
 
 }	// anonymous namespace
 
- int WINAPI wWinMain( __in HINSTANCE/* hInstance*/, __in_opt HINSTANCE/* hPrevInstance*/, __in LPWSTR/* lpCmdLine*/, __in int/* nCmdShow*/ ) {
+int WINAPI wWinMain(__in HINSTANCE/* hInstance*/, __in_opt HINSTANCE/* hPrevInstance*/, __in LPWSTR/* lpCmdLine*/, __in int/* nCmdShow*/) {
 /*	While the Application structure is pretty big overall, the fiber scheduler means this thread gets a "fresh" stack during bootstrap.
  *	Thus, it makes more sense to put this on the stack rather than in the image data segment. */
 	return Application().Run();

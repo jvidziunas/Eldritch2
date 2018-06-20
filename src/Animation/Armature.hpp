@@ -2,7 +2,7 @@
   Armature.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,38 +15,36 @@
 #include <Animation/AnimationTree.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Animation {
+namespace Eldritch2 { namespace Animation {
 
 	class Armature : public AnimationTree {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//! Constructs this @ref Armature instance.
-		Armature( Transformation localToWorld );
-	//! Disable copy construction.
-		Armature( const Armature& ) = delete;
+		//! Constructs this @ref Armature instance.
+		Armature(Transformation localToWorld);
+		//! Disable copy construction.
+		Armature(const Armature&) = delete;
 
 		~Armature() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		Transformation ETSimdCall	GetLocalToWorld() const;
+		Transformation ETSimdCall GetLocalToWorld() const;
 
-		Transformation ETSimdCall	GetWorldToLocal() const;
+		Transformation ETSimdCall GetWorldToLocal() const;
 
-		void ETSimdCall				SetLocalToWorld( Transformation localToWorld );
+		void ETSimdCall SetLocalToWorld(Transformation localToWorld);
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Transformation					_localToWorld;
-		ArrayMap<Armature*, BoneIndex>	_attachPointsByTarget;
+		Transformation                 _localToWorld;
+		ArrayMap<Armature*, BoneIndex> _attachPointsByTarget;
 	};
 
-}	// namespace Animation
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Animation
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

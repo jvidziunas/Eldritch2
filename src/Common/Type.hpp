@@ -2,7 +2,7 @@
   Type.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -19,48 +19,48 @@
 
 namespace Eldritch2 {
 
-	class Type {
+class Type {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref Type instance.
-		Type( const std::type_info& type );
+	Type(const std::type_info& type);
 	//!	Constructs this @ref Type instance.
-		Type( const Type& ) = default;
+	Type(const Type&) = default;
 	//!	Constructs this @ref Type instance.
-		Type();
+	Type();
 
-		~Type() = default;
+	~Type() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		const char*	GetName() const;
+public:
+	const char* GetName() const;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		const std::type_info*	_type;
+private:
+	const std::type_info* _type;
 
 	// ---------------------------------------------------
 
-	public:
-		friend ETPureFunctionHint size_t	GetHashCode( const Type& type, size_t seed );
+public:
+	friend ETPureFunctionHint size_t GetHashCode(const Type& type, size_t seed);
 
-		friend ETPureFunctionHint bool		operator==( const Type& left, const Type& right );
+	friend ETPureFunctionHint bool operator==(const Type& left, const Type& right);
 
-		friend ETPureFunctionHint bool		operator!=( const Type& left, const Type& right );
+	friend ETPureFunctionHint bool operator!=(const Type& left, const Type& right);
 
-		friend ETPureFunctionHint bool		operator<( const Type& left, const Type& right );
+	friend ETPureFunctionHint bool operator<(const Type& left, const Type& right);
 
-		friend ETPureFunctionHint bool		operator>=( const Type& left, const Type& right );
+	friend ETPureFunctionHint bool operator>=(const Type& left, const Type& right);
 
-		friend ETPureFunctionHint bool		operator>( const Type& left, const Type& right );
+	friend ETPureFunctionHint bool operator>(const Type& left, const Type& right);
 
-		friend ETPureFunctionHint bool		operator<=( const Type& left, const Type& right );
-	};
+	friend ETPureFunctionHint bool operator<=(const Type& left, const Type& right);
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

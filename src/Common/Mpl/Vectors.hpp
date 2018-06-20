@@ -2,7 +2,7 @@
   Vectors.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2015 Eldritch Entertainment, LLC.
@@ -19,228 +19,243 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	class	Matrix4x4;
-}
 
-namespace Eldritch2 {
-
-	class Vector {
+class Vector {
 	// - TYPE PUBLISHING ---------------------------------
 
-	public:
-		enum Component {
-			X = 3,
-			Y = 2,
-			Z = 1,
-			W = 0
-		};
+public:
+	enum Component {
+		X = 3,
+		Y = 2,
+		Z = 1,
+		W = 0
+	};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref Vector instance.
-		Vector( float32 x, float32 y, float32 z, float32 w );
+	constexpr Vector(float32 x, float32 y, float32 z, float32 w);
 	//!	Constructs this @ref Vector instance.
-		Vector( const float32* values );
+	constexpr Vector(const float32* values);
 	//!	Constructs this @ref Vector instance.
-		Vector( const Vector& ) = default;
+	constexpr Vector(const Vector&) = default;
 	//!	Constructs this @ref Vector instance.
-		Vector( const __m128& );
+	constexpr Vector(const __m128&);
 	//!	Constructs this @ref Vector instance.
-		Vector() = default;
+	Vector() = default;
 
-		~Vector() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		template <Component component0, Component component1, Component component2, Component component3>
-		Vector&	Swizzle();
+	~Vector() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		Vector&	ETSimdCall operator+=( Vector operand );
-		Vector&	ETSimdCall operator-=( Vector operand );
-		Vector&	ETSimdCall operator*=( Vector operand );
-		Vector&	ETSimdCall operator*=( float32 scalar );
-		Vector&	ETSimdCall operator/=( Vector operand );
-		Vector&	ETSimdCall operator/=( float32 scalar );
+public:
+	template <Component component0, Component component1, Component component2, Component component3>
+	Vector& Swizzle();
 
 	// ---------------------------------------------------
 
-	public:
-		friend ETPureFunctionHint Vector ETSimdCall	AbsoluteValue( Vector vector );
-
-		friend ETPureFunctionHint Vector ETSimdCall	Floor( Vector vector );
-
-		friend ETPureFunctionHint Vector ETSimdCall	Ceil( Vector vector );
-
-	// ---------------------------------------------------
-
-	public:
-		friend ETPureFunctionHint Vector ETSimdCall		LinearInterpolate( Vector vector0, Vector vector1, float32 alpha );
-
-		friend ETPureFunctionHint Vector ETSimdCall		CrossProduct( Vector vector0, Vector vector1 );
-
-		friend ETPureFunctionHint float32 ETSimdCall	DotProduct( Vector vector0, Vector vector1 );
-
-		friend ETPureFunctionHint float32 ETSimdCall	SquaredLength( Vector vector );
-
-		friend ETPureFunctionHint float32 ETSimdCall	Length( Vector vector );
+public:
+	Vector& ETSimdCall operator+=(Vector operand);
+	Vector& ETSimdCall operator-=(Vector operand);
+	Vector& ETSimdCall operator*=(Vector operand);
+	Vector& ETSimdCall operator*=(float32 scalar);
+	Vector& ETSimdCall operator/=(Vector operand);
+	Vector& ETSimdCall operator/=(float32 scalar);
 
 	// ---------------------------------------------------
 
-	public:
-		Vector&	Normalize();
+public:
+	friend ETPureFunctionHint Vector ETSimdCall AbsoluteValue(Vector vector);
+
+	friend ETPureFunctionHint Vector ETSimdCall Floor(Vector vector);
+
+	friend ETPureFunctionHint Vector ETSimdCall Ceil(Vector vector);
 
 	// ---------------------------------------------------
 
-	public:
-		void	ExtractCoefficients( float32 (&output)[4] ) const;
+public:
+	friend ETPureFunctionHint Vector ETSimdCall LinearInterpolate(Vector vector0, Vector vector1, float32 alpha);
+
+	friend ETPureFunctionHint Vector ETSimdCall CrossProduct(Vector vector0, Vector vector1);
+
+	friend ETPureFunctionHint float32 ETSimdCall DotProduct(Vector vector0, Vector vector1);
+
+	friend ETPureFunctionHint float32 ETSimdCall SquaredLength(Vector vector);
+
+	friend ETPureFunctionHint float32 ETSimdCall Length(Vector vector);
 
 	// ---------------------------------------------------
 
-	public:
-		operator const __m128&() const;
-		operator __m128&();
+public:
+	Vector& Normalize();
+
+	// ---------------------------------------------------
+
+public:
+	void ExtractCoefficients(float32 (&output)[4]) const;
+
+	// ---------------------------------------------------
+
+public:
+	operator const __m128&() const;
+	operator __m128&();
+
+	// ---------------------------------------------------
+
+public:
+	static constexpr Vector ETSimdCall MakeIdentity();
 
 	// - DATA MEMBERS ------------------------------------
 
-	public:
-		__m128	coefficients;
-	};
+public:
+	__m128 coefficients;
+};
 
 // ---------------------------------------------------
 
-	class Quaternion {
+class Quaternion {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-		
-	public:
+
+public:
 	//!	Constructs this @ref Quaternion instance.
-		Quaternion( float32 i, float32 j, float32 k, float32 w );
+	constexpr Quaternion(float32 i, float32 j, float32 k, float32 w);
 	//!	Constructs this @ref Quaternion instance.
-		Quaternion( const float32* values );
+	constexpr Quaternion(const float32* values);
 	//!	Constructs this @ref Quaternion instance.
-		Quaternion( const Quaternion& ) = default;
+	constexpr Quaternion(const Quaternion&) = default;
 	//!	Constructs this @ref Quaternion instance.
-		Quaternion( const __m128& );
+	constexpr Quaternion(const __m128&);
 	//!	Constructs this @ref Quaternion instance.
-		Quaternion() = default;
+	Quaternion() = default;
 
-		~Quaternion() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		Quaternion&	Normalize();
+	~Quaternion() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		Quaternion&	ETSimdCall operator*=( Quaternion );
+public:
+	Quaternion& Normalize();
 
 	// ---------------------------------------------------
 
-	public:
-		ETPureFunctionHint Quaternion ETSimdCall	GetReverse() const;
+public:
+	Quaternion& ETSimdCall operator*=(Quaternion);
+
+	Quaternion ETSimdCall operator~() const;
 
 	// ---------------------------------------------------
 
-	public:
-		ETPureFunctionHint Vector ETSimdCall	Rotate( Vector point ) const;
-
-		Vector ETSimdCall						GetForward() const;
-
-		Vector ETSimdCall						GetRight() const;
-
-		Vector ETSimdCall						GetUp() const;
+public:
+	ETPureFunctionHint Quaternion ETSimdCall GetReverse() const;
 
 	// ---------------------------------------------------
 
-	public:
-		void	ExtractCoefficients( float32 (&coefficients)[4] ) const;
+public:
+	ETPureFunctionHint Vector ETSimdCall Rotate(Vector point) const;
+
+	Vector ETSimdCall GetForward() const;
+
+	Vector ETSimdCall GetRight() const;
+
+	Vector ETSimdCall GetUp() const;
 
 	// ---------------------------------------------------
 
-	public:
-		friend ETPureFunctionHint Quaternion ETSimdCall	AsBasis( Vector forward, Vector up );
-
-		friend ETPureFunctionHint Quaternion ETSimdCall	LinearInterpolateNonConstantVelocity( Quaternion quaternion0, Quaternion quaternion1, float32 alpha );
-
-		friend ETPureFunctionHint Quaternion ETSimdCall	LinearInterpolate( Quaternion quaternion0, Quaternion quaternion1, float32 alpha );
-
-		friend ETPureFunctionHint float32 ETSimdCall	DotProduct( Quaternion quaternion0, Quaternion quaternion1 );
+public:
+	void ExtractCoefficients(float32 (&coefficients)[4]) const;
 
 	// ---------------------------------------------------
 
-	public:
-		operator const __m128&() const;
-		operator __m128&();
+public:
+	friend ETPureFunctionHint Quaternion ETSimdCall AsBasis(Vector forward, Vector up);
+
+	friend ETPureFunctionHint Quaternion ETSimdCall LinearInterpolateNonConstantVelocity(Quaternion quaternion0, Quaternion quaternion1, float32 alpha);
+
+	friend ETPureFunctionHint Quaternion ETSimdCall LinearInterpolate(Quaternion quaternion0, Quaternion quaternion1, float32 alpha);
+
+	friend ETPureFunctionHint float32 ETSimdCall DotProduct(Quaternion quaternion0, Quaternion quaternion1);
+
+	// ---------------------------------------------------
+
+public:
+	operator const __m128&() const;
+	operator __m128&();
+
+	// ---------------------------------------------------
+
+public:
+	static constexpr Quaternion ETSimdCall MakeIdentity();
 
 	// - DATA MEMBERS ------------------------------------
 
-	public:
-		__m128	coefficients;
-	};
+public:
+	__m128 coefficients;
+};
 
 // ---------------------------------------------------
 
-	class Bounds {
+class Bounds {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref Bounds instance.
-		Bounds( Vector minima, Vector maxima );
+	Bounds(Vector minima, Vector maxima);
 	//!	Constructs this @ref Bounds instance.
-		Bounds( const Bounds& ) = default;
+	Bounds(const Bounds&) = default;
 
-		~Bounds() = default;
+	~Bounds() = default;
 
 	// - DATA MEMBERS ------------------------------------
 
-	public:
-		Vector	minima;
-		Vector	maxima;
-	};
+public:
+	Vector minima;
+	Vector maxima;
+};
 
 // ---------------------------------------------------
 
-	class Transformation {
+class Transformation {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref Transformation instance.
-		Transformation( Vector translation, Quaternion rotation );
+	constexpr Transformation(Vector translation, Quaternion rotation);
 	//!	Constructs this @ref Transformation instance.
-		Transformation( const Transformation& ) = default;
+	constexpr Transformation(const Transformation&) = default;
 	//!	Constructs this @ref Transformation instance.
-		Transformation( Quaternion rotation );
+	constexpr Transformation(Quaternion rotation);
 	//!	Constructs this @ref Transformation instance.
-		Transformation( Vector translation );
+	constexpr Transformation(Vector translation);
 	//!	Constructs this @ref Transformation instance.
-		Transformation() = default;
+	Transformation() = default;
 
-		~Transformation() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		Transformation ETSimdCall	GetInverse() const;
+	~Transformation() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		Transformation&	ETSimdCall operator*=( Transformation operand );
+public:
+	Transformation ETSimdCall GetInverse() const;
+
+	// ---------------------------------------------------
+
+public:
+	Transformation& ETSimdCall operator*=(Transformation operand);
+
+	Transformation ETSimdCall operator~() const;
+
+	// ---------------------------------------------------
+
+public:
+	static constexpr Transformation ETSimdCall MakeIdentity();
 
 	// - DATA MEMBERS ------------------------------------
 
-	public:
-		Vector		translation;
-		Quaternion	rotation;
-	};
+public:
+	Vector     translation;
+	Quaternion rotation;
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

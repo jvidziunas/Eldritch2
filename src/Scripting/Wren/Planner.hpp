@@ -1,8 +1,8 @@
 /*==================================================================*\
-  WrenPlanner.hpp
+  Planner.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2017 Eldritch Entertainment, LLC.
@@ -15,45 +15,49 @@
 
 //------------------------------------------------------------------//
 
-struct	WrenHandle;
+struct WrenHandle;
+struct WrenVM;
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	class Action {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref Action instance.
-		Action( WrenHandle* action );
-	//!	Disable copy construction.
-		Action( const Action& ) = delete;
-	//!	Constructs this @ref Action instance.
-		Action( Action&& );
+		//!	Constructs this @ref Action instance.
+		Action(WrenHandle* action);
+		//!	Disable copy construction.
+		Action(const Action&) = delete;
+		//!	Constructs this @ref Action instance.
+		Action(Action&&);
 
 		~Action();
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	protected:
-		WrenHandle*	_action;
+		WrenHandle* _action;
 	};
 
-// ---
+	// ---
 
 	class Planner : public GoapPlanner<Action, float32> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		Planner( const Planner& ) = delete;
-	//!	Constructs this @ref Planner instance.
+		//!	Disable copy construction.
+		Planner(const Planner&) = delete;
+		//!	Constructs this @ref Planner instance.
 		Planner();
 
 		~Planner() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		void BindResources(WrenVM* vm);
+
+		void FreeResources(WrenVM* vm);
 	};
 
-}	// namespace Wren
-}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren

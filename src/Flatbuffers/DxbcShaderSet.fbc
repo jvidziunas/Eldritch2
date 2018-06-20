@@ -1,0 +1,12 @@
+include			"ShaderSetTypes.fbc";
+file_identifier	"EXSS";
+file_extension	".dxbc.e2shaderset";
+
+namespace Eldritch2.Graphics.Direct3D.FlatBuffers;
+
+table DxbcShaderSet {
+	Usages		: [Eldritch2.Graphics.FlatBuffers.UsageDescriptor] (required);
+	Bytecode	: [ubyte] (required);
+}
+
+root_type DxbcShaderSet;

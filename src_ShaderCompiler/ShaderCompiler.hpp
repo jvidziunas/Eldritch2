@@ -12,35 +12,63 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/String.hpp>
+#include <Common/Containers/PlatformString.hpp>
+#include <Common/ComPointer.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Tools {
+namespace Eldritch2 { namespace Tools {
+
+	enum ShaderModel : uint32 {
+		ShaderModel5_0,
+		ShaderModel6_0,
+		ShaderModel6_1,
+	};
+
+	// ---
+
+	enum ShaderStage : uint32 {
+		Vertex,
+		Hull,
+		TessellationControl = Hull,
+		Domain,
+		TessellationEval = Domain,
+		Geometry,
+		Pixel,
+		Fragment = Pixel,
+		Compute,
+	};
+
+	// ---
 
 	class ShaderCompiler : public CrtpTool<ShaderCompiler> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Disable copy construction.
-		ShaderCompiler( const ShaderCompiler& ) = delete;
-	//!	Constructs this @ref ShaderCompiler instance.
+		//!	Disable copy construction.
+		ShaderCompiler(const ShaderCompiler&) = delete;
+		//!	Constructs this @ref ShaderCompiler instance.
 		ShaderCompiler();
 
 		~ShaderCompiler() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	RegisterOptions( OptionRegistrar& options );
+		void RegisterOptions(OptionRegistrar& options);
 
-		int		Process();
+		int Process();
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
+		PlatformString<> _pipelinePath;
+		PlatformString<> _hlslPath;
+		PlatformString<> _spirvOutPath;
+		PlatformString<> _dxbcOutPath;
+		ShaderModel      _shaderModel;
+		bool             _emitSpirV;
+		bool             _emitDxbc;
 	};
 
-}	// namespace Tools
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Tools

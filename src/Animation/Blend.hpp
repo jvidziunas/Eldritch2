@@ -2,7 +2,7 @@
   Blend.hpp
   ------------------------------------------------------------------
   Purpose:
-  
+
 
   ------------------------------------------------------------------
   ©2010-2016 Eldritch Entertainment, LLC.
@@ -15,38 +15,32 @@
 #include <Animation/AnimationTypes.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	class	Transformation;
-}
-
 namespace ispc {
-	struct	GpuTransformWithVelocity;
-	struct	GpuTransform;
-}
+struct GpuTransformWithVelocity;
+struct GpuTransform;
+} // namespace ispc
 
-namespace Eldritch2 {
-namespace Animation {
+namespace Eldritch2 { namespace Animation {
 
 	class ETPureAbstractHint Blend {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref Blend instance.
-		Blend( const Blend& ) = default;
-	//!	Constructs this @ref Blend instance.
+		//!	Constructs this @ref Blend instance.
+		Blend(const Blend&) = default;
+		//!	Constructs this @ref Blend instance.
 		Blend() = default;
 
-		~Blend() = default;
+		virtual ~Blend() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		virtual void	EvaluateGlobalPose( Transformation localToWorld, BoneIndex maximumBoneToAnimate, ispc::GpuTransformWithVelocity transforms[] ) const abstract;
-		virtual void	EvaluateGlobalPose( Transformation localToWorld, BoneIndex maximumBoneToAnimate, ispc::GpuTransform transforms[] ) const abstract;
+		virtual void EvaluateGlobalPose(Transformation localToWorld, BoneIndex maximumBoneToAnimate, ispc::GpuTransformWithVelocity transforms[]) const abstract;
+		virtual void EvaluateGlobalPose(Transformation localToWorld, BoneIndex maximumBoneToAnimate, ispc::GpuTransform transforms[]) const abstract;
 
-		virtual void	EvaluateLocalPose( BoneIndex maximumBoneToAnimate, ispc::GpuTransformWithVelocity transforms[] ) const abstract;
-		virtual void	EvaluateLocalPose( BoneIndex maximumBoneToAnimate, ispc::GpuTransform transforms[] ) const abstract;
+		virtual void EvaluateLocalPose(BoneIndex maximumBoneToAnimate, ispc::GpuTransformWithVelocity transforms[]) const abstract;
+		virtual void EvaluateLocalPose(BoneIndex maximumBoneToAnimate, ispc::GpuTransform transforms[]) const abstract;
 	};
 
-}	// namespace Animation
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Animation

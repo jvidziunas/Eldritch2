@@ -1,39 +1,73 @@
+include			"Eldritch2Types.fbc";
+include			"GraphicsTypes.fbc";
+
 file_identifier	"E2GP";
 file_extension	".e2graphicspipeline";
 
 namespace Eldritch2.Graphics.FlatBuffers;
 
+enum AttachmentFlags : uint (bit_flags) {
+	ClearOnBegin,
+	StoreOnFinish
+}
+
+enum SourceConcept : ubyte {
+	StaticMeshes,
+	Meshes
+}
+
 table DrawStage {
-	ShaderUsageName		: string	(required);
-	InstanceSources		: [string]	(required);
-	InputAttachments	: [string]	(required);
-	ColorOutputs		: [string]	(required);
-	DepthAttachment		: string;
-}
-
-table ComputeStage {
-	ShaderName			: string   (required);
-	InputAttachments	: string   (required);
-	OutputAttachments	: [string] (required);
-}
-
-table ImageCopy {
-	Source				: string (required);
-	Target				: string (required);
+	ShaderUsageName  : string          (required);
+	SourceConcepts   : [SourceConcept] (required);
+	InputAttachments : [uint]          (required);
+	ColorAttachments : [uint]          (required);
+	DepthAttachment  : uint = 0x;
 }
 
 table CopyStage {
-	ImageCopies			: [ImageCopy];
+	Source : uint;
+	Target : uint;
 }
 
-union GraphicsStage {
+table ComputeStage {
+	ShaderName  : string (required);
+	Attachments : [uint] (required);
+}
+
+union PipelineStage {
 	DrawStage,
 	CopyStage,
 	ComputeStage
 }
 
+struct Dynamic {
+	Width  : float = 1.0;
+	Height : float = 1.0;
+	Depth  : float = 1.0;
+}
+
+struct Static {
+	Width  : uint;
+	Height : uint;
+	Depth  : uint = 1;
+}
+
+union AttachmentSize {
+	Dynamic,
+	Static
+}
+
+table Attachment {
+	Name   : string (required, key);
+	Format : GpuFormat;
+	Flags  : AttachmentFlags;
+	Size   : AttachmentSize;
+}
+
 table GraphicsPipeline {
-	Stages				: [GraphicsStage] (required);
+	Attachments  : [Attachment]    (required);
+	SharedImages : [uint]          (required);
+	Stages       : [PipelineStage] (required);
 }
 
 root_type GraphicsPipeline;
