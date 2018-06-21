@@ -90,7 +90,8 @@ namespace Vulkan {
 
 	GraphicsPipelineBuilder::GraphicsPipelineBuilder() :
 		_attachments(MallocAllocator("Vulkan Graphics Pipeline Attachment List Allocator")),
-		_passes(MallocAllocator("Vulkan Graphics Pipeline Stage List Allocator")) {}
+		_buffers(MallocAllocator("Vulkan Graphics Pipeline Buffer List Allocator")),
+		_passes(MallocAllocator("Vulkan Graphics Pipeline Pass List Allocator")) {}
 
 	// ---------------------------------------------------
 
@@ -124,8 +125,9 @@ namespace Vulkan {
 			return false;
 		}
 
-		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT);
 		pass.inputAttachments[pass.inputAttachmentCount++] = AttachmentReference{ index, layout };
+		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT);
+
 		return true;
 	}
 
@@ -139,8 +141,8 @@ namespace Vulkan {
 			return false;
 		}
 
-		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 		pass.attachments[pass.attachmentCount++] = AttachmentReference{ index, layout };
+		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
 		return true;
 	}
@@ -153,8 +155,8 @@ namespace Vulkan {
 			return false;
 		}
 
-		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
 		pass.depthStencilAttachment = AttachmentReference{ index, layout };
+		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
 		return true;
 	}
@@ -173,19 +175,18 @@ namespace Vulkan {
 
 	void GraphicsPipelineBuilder::StripUnusedResources() {
 		ArrayMap<uint32, uint32> remapTable(MallocAllocator("Graphics Pipeline Remap Table Allocator"));
+		remapTable.Reserve(_attachments.GetSize());
 
-		uint32 validIndex(0u);
-		for (uint32 index(0u); index < _attachments.GetSize(); ++index) {
+		// We need to figure out the new index of each attachment after all dead elements have been removed.
+		for (uint32 index(0u), validIndex(0u); index < _attachments.GetSize(); ++index) {
+			remapTable.Insert(index, validIndex);
+
 			if (attachments[index].IsReferenced()) {
 				++validIndex;
 			}
-
-			remapTable.Insert(index, validIndex);
 		}
 
-		_passes.Erase(RemoveIf(_passes.Begin(), _passes.End(), [](const Attachment& attachment) {
-			return !attachment.IsReferenced()
-		});
+		_passes.Erase(RemoveIf(_passes.Begin(), _passes.End(), [](const Attachment& attachment) { return attachment.IsReferenced() == false; }), _passes.End());
 
 		for (Pass& pass : _passes) {
 			PatchAttachmentReferences(pass.attachments, remapTable);
@@ -202,6 +203,7 @@ namespace Vulkan {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs._attachments, rhs._attachments);
+		Swap(lhs._buffers, rhs._buffers);
 		Swap(lhs._passes, rhs._passes);
 	}
 

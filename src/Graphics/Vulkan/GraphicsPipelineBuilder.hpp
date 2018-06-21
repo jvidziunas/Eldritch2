@@ -31,6 +31,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	public:
 		class Attachment {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		public:
 			//! Constructs this @ref Attachment instance.
 			Attachment(VkFormat format, VkSampleCountFlags quality, float32 widthScale = 1.0f, float32 heightScale = 1.0f, float32 depthScale = 1.0f);
@@ -64,6 +65,27 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				float32    scale[3];
 				VkExtent3D dimensions;
 			};
+		};
+
+		class Buffer {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//! Constructs this @ref Buffer instance.
+			Buffer(VkDeviceSize sizeInBytes);
+			//! Constructs this @ref Buffer instance.
+			Buffer(const Buffer&) = default;
+
+			~Buffer() = default;
+
+			// - DATA MEMBERS ------------------------------------
+
+		public:
+			VkDeviceSize        sizeInBytes;
+			VkBufferCreateFlags flags;
+			VkBufferUsageFlags  usages;
+			uint32              firstPass : 10;
+			uint32              lastPass : 10;
 		};
 
 		// ---
@@ -133,17 +155,23 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		bool AttachDepthStencilBuffer(uint32 index, VkImageLayout layout);
 
-		void Finish();
+		void Finish(bool andOptimize = true);
 
 		// ---------------------------------------------------
 
 		//!	Disable copy construction.
 		GraphicsPipelineBuilder& operator=(const GraphicsPipelineBuilder&) = delete;
 
+		// ---------------------------------------------------
+
+	private:
+		void StripUnusedResources();
+
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		ArrayList<Attachment> _attachments;
+		ArrayList<Buffer>     _buffer;
 		ArrayList<Pass>       _passes;
 
 		// ---------------------------------------------------
