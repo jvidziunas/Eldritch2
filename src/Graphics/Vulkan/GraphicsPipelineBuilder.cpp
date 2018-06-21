@@ -22,6 +22,15 @@ namespace Vulkan {
 
 		constexpr GraphicsPipelineBuilder::AttachmentReference InvalidAttachment{ VK_ATTACHMENT_UNUSED, VK_IMAGE_LAYOUT_UNDEFINED };
 
+		template <uint32 size>
+		ETInlineHint void PatchAttachmentReferences(GraphicsPipelineBuilder::AttachmentReference (&references)[size], const ArrayMap<uint32, uint32>& remapTable) {
+			for (GraphicsPipelineBuilder::AttachmentReference& reference : references) {
+				if (reference.index != VK_ATTACHMENT_UNUSED) {
+					reference.index = remapTable[reference.index];
+				}
+			}
+		}
+
 	} // anonymous namespace
 
 	GraphicsPipelineBuilder::Attachment::Attachment(VkFormat format, VkSampleCountFlags quality, float32 widthScale, float32 heightScale, float32 depthScale) :
@@ -58,6 +67,13 @@ namespace Vulkan {
 		firstPass = Min(pass, firstPass);
 		lastPass  = Max(pass, lastPass);
 	}
+
+	// ---------------------------------------------------
+
+	GraphicsPipelineBuilder::Buffer::Buffer(VkDeviceSize sizeInBytes) :
+		sizeInBytes(sizeInBytes),
+		flags(0u),
+		usages(0u) {}
 
 	// ---------------------------------------------------
 
@@ -145,7 +161,40 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void GraphicsPipelineBuilder::Finish() {}
+	void GraphicsPipelineBuilder::Finish(bool andOptimize) {
+		if (!andOptimize) {
+			return;
+		}
+
+		StripUnusedResources();
+	}
+
+	// ---------------------------------------------------
+
+	void GraphicsPipelineBuilder::StripUnusedResources() {
+		ArrayMap<uint32, uint32> remapTable(MallocAllocator("Graphics Pipeline Remap Table Allocator"));
+
+		uint32 validIndex(0u);
+		for (uint32 index(0u); index < _attachments.GetSize(); ++index) {
+			if (attachments[index].IsReferenced()) {
+				++validIndex;
+			}
+
+			remapTable.Insert(index, validIndex);
+		}
+
+		_passes.Erase(RemoveIf(_passes.Begin(), _passes.End(), [](const Attachment& attachment) {
+			return !attachment.IsReferenced()
+		});
+
+		for (Pass& pass : _passes) {
+			PatchAttachmentReferences(pass.attachments, remapTable);
+			PatchAttachmentReferences(pass.inputAttachments, remapTable);
+			if (pass.depthStencilAttachment.index != VK_ATTACHMENT_UNUSED) {
+				pass.depthStencilAttachment.index.index = remapTable[pass.depthStencilAttachment.index.index];
+			}
+		}
+	}
 
 	// ---------------------------------------------------
 

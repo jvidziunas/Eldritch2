@@ -119,19 +119,41 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult ResidencyCoordinator::MakeResident(VertexBuffer& /*target*/, const MeshSource& /*source*/) {
+	VkResult ResidencyCoordinator::MakeResident(VertexBuffer& target, const MeshSource& source) {
+		const MeshSource::Dimensions dimensions(source.GetDimensions());
+
+		for (VkDeviceSize offset(0u); )
+
 		return VK_SUCCESS;
 	}
 
 	// ---------------------------------------------------
 
-	VkResult ResidencyCoordinator::MakeResident(IndexBuffer& /*target*/, const MeshSource& /*source*/) {
+	VkResult ResidencyCoordinator::MakeResident(IndexBuffer& target, const MeshSource& source) {
+		const MeshSource::Dimensions dimensions(source.GetDimensions());
+
 		return VK_SUCCESS;
 	}
 
 	// ---------------------------------------------------
 
-	VkResult ResidencyCoordinator::MakeResident(ShaderImage& /*target*/, const ImageSource& /*source*/) {
+	VkResult ResidencyCoordinator::MakeResident(ShaderImage& target, const ImageSource& source) {
+		const ImageSource::Dimensions dimensions(source.GetDimensions());
+
+		for (uint16 mip(0u); mip < dimensions.mips; ++mip) {
+			for (uint16 layer(0u); layer < dimensions.sliceCount; ++layer) {
+				VkExtent3D mipDimensions{dimensions.widthInTexels >> mip, dimensions.depthInTexels >> mip, dimensions.depthInTexels >> mip};
+				VkExtent3D offset{0u, 0u, 0u};
+
+				ET_FAIL_UNLESS(_bus.TransferToGpu(target, offset, chunkSize, VkImageSubresourceLayers{
+					VK_IMAGE_ASPECT_COLOR_BIT,
+					mip,
+					layer,
+					/*layerCount =*/1u // Always load one layer at a time
+				}));
+			}
+		}
+
 		return VK_SUCCESS;
 	}
 
