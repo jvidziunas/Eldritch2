@@ -17,6 +17,12 @@
 
 namespace Eldritch2 { namespace Core {
 
+	ETInlineHint float32 TimeAccumulator::GetResidualBlendFactor() const {
+		return Min(1.0f, AsFloat(_residual) / AsFloat(GetTickDurationInWallMicroseconds()));
+	}
+
+	// ---------------------------------------------------
+
 	ETInlineHint uint64 TimeAccumulator::GetResidualTime() const {
 		return _residual;
 	}

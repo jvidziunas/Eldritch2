@@ -20,8 +20,6 @@
 #include <Graphics/Vulkan/AssetViews/MeshAsset.hpp>
 #include <Assets/AssetDatabase.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
@@ -29,20 +27,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	using namespace ::Eldritch2::Animation::AssetViews;
 	using namespace ::Eldritch2::Assets;
 
-	void VulkanEngineComponent::AcceptVisitor(AssetApiBuilder& factories) {
-		MICROPROFILE_SCOPEI("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
-
-		factories.DefineType(".e2graphicspipeline", AssetApiBuilder::DefaultFactory<GraphicsPipelineAsset>());
-		factories.DefineType(".spirv.e2shaderset", AssetApiBuilder::DefaultFactory<SpirVShaderSetAsset>());
-		factories.DefineType(".e2anim", AssetApiBuilder::DefaultFactory<KeyframeClipAsset>());
-		factories.DefineType(".e2image", AssetApiBuilder::DefaultFactory<ImageAsset>());
-		factories.DefineType(".e2mesh", AssetApiBuilder::DefaultFactory<MeshAsset>());
-	}
-
-	// ---------------------------------------------------
-
-	void VulkanEngineComponent::AcceptVisitor(Blackboard& services) {
-		services.Publish<Vulkan>(_vulkan);
+	void VulkanEngineComponent::PublishAssetTypes(AssetApiBuilder& types) {
+		ET_PROFILE_SCOPE("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
+		types.DefineType(".e2graphicspipeline", AssetApiBuilder::DefaultFactory<GraphicsPipelineAsset>());
+		types.DefineType(".spirv.e2shaderset", AssetApiBuilder::DefaultFactory<SpirVShaderSetAsset>());
+		types.DefineType(".e2anim", AssetApiBuilder::DefaultFactory<KeyframeClipAsset>());
+		types.DefineType(".e2image", AssetApiBuilder::DefaultFactory<ImageAsset>());
+		types.DefineType(".e2mesh", AssetApiBuilder::DefaultFactory<MeshAsset>());
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

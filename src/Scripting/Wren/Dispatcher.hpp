@@ -28,8 +28,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using Timestamp = uint32;
-		enum : Timestamp { EndOfTime = static_cast<Timestamp>(-1) };
+		using ScriptTime = uint32;
 
 		// ---
 
@@ -38,7 +37,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 		public:
 			//!	Constructs this @ref Event instance.
-			Event(Timestamp dispatchTime, WrenHandle* receiver);
+			Event(ScriptTime dispatchTime, WrenHandle* receiver);
 			//!	Disable copy construction.
 			Event(const Event&) = default;
 			//!	Constructs this @ref Event instance.
@@ -49,7 +48,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 			// ---------------------------------------------------
 
 		public:
-			bool ShouldDispatch(Timestamp now) const;
+			bool ShouldDispatch(ScriptTime now) const;
 
 			// ---------------------------------------------------
 
@@ -66,7 +65,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			Timestamp   dispatchTime;
+			ScriptTime  when;
 			WrenHandle* receiver;
 		};
 
@@ -89,9 +88,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	public:
-		Timestamp GetNow() const;
+		ScriptTime GetNow() const;
 
-		uint64 SetGameTime(uint64 microseconds);
+		MicrosecondTime SetGameTime(MicrosecondTime microseconds);
 
 		double GetWorldTimeScalar() const;
 
@@ -100,9 +99,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	public:
-		void CallAtGameTime(Timestamp time, WrenHandle* receiver);
+		void CallAtGameTime(ScriptTime time, WrenHandle* receiver);
 
-		void ProcessTick(WrenVM* wren, uint64 deltaMicroseconds);
+		void ExecuteScriptEvents(WrenVM* wren, MicrosecondTime deltaMicroseconds);
 
 		// ---------------------------------------------------
 
@@ -121,16 +120,16 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	private:
 		Core::World* _world;
 		/*!	Current 'age of the universe', in microseconds. Note that as a virtual value this can advance at a
-				different rate relative to (or not at all, depending on pause state) a player's wall clock. */
+			different rate relative to (or not at all, depending on pause state) a player's wall clock. */
 		uint64       _gameTime;
 		EventQueue<> _events;
 	};
 
 	// ---
 
-	ETPureFunctionHint Dispatcher::Timestamp AsTimestamp(uint64 microseconds);
+	ETPureFunctionHint Dispatcher::ScriptTime AsScriptTime(MicrosecondTime when);
 
-	ETPureFunctionHint uint64 AsMicroseconds(Dispatcher::Timestamp timestamp);
+	ETPureFunctionHint MicrosecondTime AsMicroseconds(Dispatcher::ScriptTime when);
 
 }}} // namespace Eldritch2::Scripting::Wren
 

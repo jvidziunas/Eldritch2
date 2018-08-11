@@ -13,66 +13,96 @@
 // INCLUDES
 //==================================================================//
 #include <TextureCompressor.hpp>
+#include <Common/ScopeGuard.hpp>
+#include <Common/Math.hpp>
 //------------------------------------------------------------------//
+#include <crn_decomp.h>
 #include <crnlib.h>
 //------------------------------------------------------------------//
+
+//==================================================================//
+// LIBRARIES
+//==================================================================//
+ET_LINK_LIBRARY("crnlib.lib")
+//------------------------------------------------------------------//
+
+#define ET_FAIL_UNLESS2(cond) \
+	{                         \
+		const auto _(cond);   \
+		if (_ != 0) {         \
+			return _;         \
+		}                     \
+	}
 
 namespace Eldritch2 {
 namespace Tools {
 
-	TextureCompressor::TextureCompressor(
-	) : _isPerceptualData( true ),
-		_useMipmaps( true ),
-		_quality( 75 ),
-		_sourcePaths( MallocAllocator( "Source Texture Collection Allocator" ) ) {
+	TextureCompressor::TextureCompressor() :
+		_sourcePaths(MallocAllocator("Source Texture Collection Allocator")),
+		_threadCount(1u),
+		_imageQuality(75u),
+		_mipLevels(~0u),
+		_alphaToCoverageSamplesPerPixel(0u),
+		_correctAlphaTestDistribution(false),
+		_isColorData(true) {
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	void TextureCompressor::RegisterOptions( OptionRegistrar& options ) {
-		options.Register<uint32>( "--quality",   "-q", _quality );
-		options.Register<bool>(   "--colorData", "-c", _isPerceptualData );
-		options.Register<bool>(   "--mipmaps",   "-m", _useMipmaps );
+	void TextureCompressor::RegisterOptions(OptionRegistrar& options) {
+		options.Register<uint32>("--threadCount", "-t", _threadCount);
+		options.Register<uint32>("--quality", "-q", _imageQuality);
+		options.Register<uint32>("--mipLevels", "-m", _mipLevels);
+		options.Register<uint32>("--a2cSpp", "-s", _alphaToCoverageSamplesPerPixel);
+		options.Register<bool>("--correctAlphaTestDistribution", "-a", _correctAlphaTestDistribution);
+		options.Register<bool>("--colorData", "-c", _isColorData);
 
-		options.RegisterInputFileHandler( [this] ( Range<const Utf8Char*> path ) -> int {
+		options.RegisterInputFileHandler([this](Range<const Utf8Char*> path) -> int {
 			if (path.IsEmpty()) {
 				return -1;
 			}
 
-			_sourcePaths.Insert( { path.Begin(), path.End(), MallocAllocator( "Source Texture Path Allocator" ) } );
+			_sourcePaths.Insert({ path.Begin(), path.End(), MallocAllocator("Source Texture Path Allocator") });
 
 			return 0;
-		} );
+		});
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	int TextureCompressor::ProcessFile( const Utf8Char* path ) {
-		crn_comp_params		compressorParameters;
-		crn_mipmap_params	mipGenerationParameters;
+	int TextureCompressor::ProcessImage(const Utf8Char* path) {
+		crn_comp_params   compressorParameters;
+		crn_mipmap_params mipmapParameters;
 
-		compressorParameters.set_flag( cCRNCompFlagPerceptual, _isPerceptualData );
+		compressorParameters.set_flag(cCRNCompFlagPerceptual, _isColorData);
+		compressorParameters.m_num_helper_threads = Max(_threadCount, 1u) - 1u;
 
-		mipGenerationParameters.m_gamma_filtering = _isPerceptualData;
-		mipGenerationParameters.m_mode = _useMipmaps ? cCRNMipModeGenerateMips : cCRNMipModeNoMips;
+		// Compression phase is always considered pass-through, we generate/load mips ourselves as requested by user.
+		mipmapParameters.m_mode = cCRNMipModeUseSourceMips;
 
-		crn_uint32	compressedSize( 0u );
-		const auto	data( crn_compress( compressorParameters, mipGenerationParameters, compressedSize ) );
+		for (uint32 level(0u); level <= _mipLevels; ++level) {
+			compressorParameters.m_pImages[0][level] = nullptr;
+		}
+
+		crn_uint32 combinedSize(0u);
+		const auto data(crn_compress(compressorParameters, mipmapParameters, combinedSize));
+		ET_AT_SCOPE_EXIT(crn_free_block(data));
+		ET_FAIL_UNLESS2(data ? 0 : -1);
+
+		const crn_uint32 segmentedSize(crnd::crnd_get_segmented_file_size(data, combinedSize));
+		ET_FAIL_UNLESS2(crnd::crnd_create_segmented_file(data, combinedSize, nullptr, 0u) ? 0 : -1);
+
+		return 0;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
 	int TextureCompressor::Process() {
 		for (const String<>& path : _sourcePaths) {
-			const int	result( ProcessFile( path ) );
-
-			if (result != 0) {
-				return result;
-			}
+			ET_FAIL_UNLESS2(ProcessImage(path));
 		}
 
 		return 0;
 	}
 
-}	// namespace Tools
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Tools

@@ -42,7 +42,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	public:
 		//! Constructs this @ref SteamworksEngineComponent instance.
-		SteamworksEngineComponent(const Blackboard& services, Logging::Log& log);
+		SteamworksEngineComponent(const ObjectLocator& services, Logging::Log& log);
 		//!	Disable copy construction.
 		SteamworksEngineComponent(const SteamworksEngineComponent&) = delete;
 
@@ -51,12 +51,20 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
-		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const Core::World& world) override;
+		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const ConfigurationBroadcastVisitor) override;
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const ServiceTickVisitor) override;
-		void AcceptVisitor(Core::PropertyRegistrar& properties) override;
+		void BindConfigurableResources(Scheduling::JobExecutor& executor) override;
 
+		void PublishConfiguration(Core::PropertyRegistrar& properties) override;
+
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
+
+	public:
+		void TickEarly(Scheduling::JobExecutor& executor) override;
+
+		// ---------------------------------------------------
+
+	public:
 		void AddLocalUser();
 
 		// ---------------------------------------------------
@@ -69,11 +77,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 	private:
 		//!	Mutable so logs can be written in const methods.
 		mutable Logging::ChildLog _log;
-		//!	Port used to communicate user state to the Steam master servers.
-		Port _steamPort;
-		//!	Pool of ports that may be assigned to worlds for communication with Steam servers.
-		IdentifierPool<Port> _worldPorts;
-		HashSet<CSteamID>    _bannedIds;
+		Port                      _steamPort;
+		IdentifierPool<Port>      _worldPorts;
+		HashSet<CSteamID>         _bannedIds;
 	};
 
 }}} // namespace Eldritch2::Networking::Steamworks

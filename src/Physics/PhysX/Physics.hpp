@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysXPointer.hpp>
-#include <Animation/Clip.hpp>
+#include <Animation/AnimationTypes.hpp>
 //------------------------------------------------------------------//
 #include <PxArticulation.h>
 //------------------------------------------------------------------//
@@ -24,7 +24,6 @@ namespace Animation {
 }
 
 namespace Physics { namespace PhysX { namespace AssetViews {
-	class ArmatureAsset;
 	class PhysicsAsset;
 }}} // namespace Physics::PhysX::AssetViews
 } // namespace Eldritch2
@@ -40,7 +39,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 		public:
 			//!	Constructs this @ref AnimationClip instance.
-			AnimationClip(const physx::PxArticulation& articulation);
+			AnimationClip(PhysxPointer<physx::PxArticulation> articulation, const Animation::Armature& target);
 			//!	Constructs this @ref AnimationClip instance.
 			AnimationClip(const AnimationClip&) = default;
 
@@ -49,33 +48,24 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 			// ---------------------------------------------------
 
 		public:
-			void PrefetchTransforms(uint64 timeBegin, uint64 timeEnd) override;
-
-			void EvaluateWorldPose(Transformation localToWorld, ispc::GpuTransformWithVelocity transforms[]) const override;
-			void EvaluateWorldPose(Transformation localToWorld, ispc::GpuTransform transforms[]) const override;
+			void FetchKnots(Animation::KnotCache& knots, uint64 time, Animation::BoneIndex maximumBone) override;
 
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			const physx::PxArticulation* _articulation;
+			PhysxPointer<physx::PxArticulation> _articulation;
+			const Animation::Armature*          _target;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref Physics instance.
-		Physics(PhysxPointer<physx::PxArticulation> articulation, Animation::Armature& target);
+		Physics(AnimationClip& clip);
 		//! Disable copy construction.
 		Physics(const Physics&) = delete;
 
 		~Physics() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		void Attach(const AssetViews::PhysicsAsset& asset);
-
-		void Detach(const AssetViews::PhysicsAsset& asset);
 
 		// ---------------------------------------------------
 
@@ -85,8 +75,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const PhysxPointer<physx::PxArticulation> _articulation;
-		Animation::Armature*                      _target;
+		AnimationClip* _clip;
 	};
 
 }}} // namespace Eldritch2::Physics::PhysX

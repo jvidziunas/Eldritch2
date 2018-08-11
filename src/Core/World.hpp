@@ -37,7 +37,7 @@ namespace Eldritch2 { namespace Core {
 
 	public:
 		//! Constructs this @ref World instance.
-		World(const Blackboard& services, Logging::Log& log);
+		World(const ObjectLocator& services);
 		//! Disable copy construction.
 		World(const World&) = delete;
 
@@ -48,9 +48,33 @@ namespace Eldritch2 { namespace Core {
 	public:
 		const ComponentList<>& GetComponents() const;
 
-		const Blackboard& GetServices() const;
-
 		Logging::Log& GetLog() const;
+
+		float32 GetTimeScalar() const;
+
+		void SetTimeScalar(float32 scalar);
+
+		// ---------------------------------------------------
+
+	public:
+		void Tick(Scheduling::JobExecutor& executor);
+
+		// ---------------------------------------------------
+
+	public:
+		bool ShouldShutDown(MemoryOrder order = std::memory_order_consume) const;
+
+		//!	Notifies the world that it should cease updating as soon as possible.
+		/*!	@param[in] andEngine boolean option indicating whether or not a shutdown request should be
+				placed for the owning @ref Engine as well.
+			@remarks Idempotent, thread-safe. */
+		void SetShouldShutDown(bool andEngine = false) const;
+
+		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const;
+
+		bool IsRunning(MemoryOrder order = std::memory_order_consume) const;
+
+		void SetShouldPause(MemoryOrder order = std::memory_order_relaxed);
 
 		// ---------------------------------------------------
 
@@ -63,38 +87,6 @@ namespace Eldritch2 { namespace Core {
 
 		// ---------------------------------------------------
 
-	public:
-		void Tick(Scheduling::JobExecutor& executor);
-
-		// ---------------------------------------------------
-
-	public:
-		float32 GetTimeScalar() const;
-
-		void SetTimeScalar(float32 scalar);
-
-		// ---------------------------------------------------
-
-	public:
-		bool ShouldShutDown(MemoryOrder order = std::memory_order_consume) const;
-
-		bool ShouldPause(MemoryOrder order = std::memory_order_consume) const;
-
-		bool IsRunning(MemoryOrder order = std::memory_order_consume) const;
-
-		// ---------------------------------------------------
-
-	public:
-		//!	Notifies the world that it should cease updating as soon as possible.
-		/*!	@param[in] andEngine boolean option indicating whether or not a shutdown request should be
-				placed for the owning @ref Engine as well.
-			@remarks Idempotent, thread-safe. */
-		void SetShouldShutDown(bool andEngine = false) const;
-
-		void SetShouldPause();
-
-		// ---------------------------------------------------
-
 		//!	Disable copy assignment.
 		World& operator=(const World&) = delete;
 
@@ -102,16 +94,15 @@ namespace Eldritch2 { namespace Core {
 
 	private:
 		mutable MallocAllocator   _allocator;
+		ObjectLocator             _services;
 		mutable Logging::ChildLog _log;
 		mutable Atomic<bool>      _shouldShutDown;
 		Atomic<uint32>            _pauseCounter;
-		Blackboard                _services;
 		TimeAccumulator           _timeAccumulator;
 		ComponentList<>           _components;
 	};
 
-}
-} // namespace Eldritch2::Core
+}} // namespace Eldritch2::Core
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

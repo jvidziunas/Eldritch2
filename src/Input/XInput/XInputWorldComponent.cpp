@@ -12,14 +12,11 @@
 // INCLUDES
 //==================================================================//
 #include <Input/XInput/XInputWorldComponent.hpp>
-#include <Core/World.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Input { namespace XInput {
 
-	using namespace ::Eldritch2::Core;
-
-	XInputWorldComponent::XInputWorldComponent(const World& world) :
-		WorldComponent(world.GetServices()) {}
+	XInputWorldComponent::XInputWorldComponent(const ObjectLocator& services) :
+		WorldComponent(services) {}
 
 }}} // namespace Eldritch2::Input::XInput

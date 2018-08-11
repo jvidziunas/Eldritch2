@@ -43,13 +43,12 @@ namespace Eldritch2 { namespace Core {
 	} // anonymous namespace
 
 	template <typename TrinaryConsumer, typename AltTrinaryConsumer>
-	void ApplyIni(Range<const Utf8Char*> source, TrinaryConsumer keyHandler, AltTrinaryConsumer unknownKeyHandler) {
+	void ApplyIni(StringView<Utf8Char> source, TrinaryConsumer keyHandler, AltTrinaryConsumer unknownKeyHandler) {
 		//	The following is adapted from Ben Hoyt's inih library. Original source available at https://github.com/benhoyt/inih
 		//	Consume the BOM, if one exists.
 		const Utf8Char* line(StripBom(source.Begin(), source.End()));
 		const Utf8Char* lineEnd;
-		String<>        group(MallocAllocator("ApplyIni() Group Name Allocator"));
-		String<>        name(MallocAllocator("ApplyIni() Property Name Allocator"));
+		String<>        group, name;
 
 		//	Scan through each line in the range.
 		for (const Utf8Char* readEnd(Find(line, source.End(), '\n')); source.Covers(line); (line = readEnd), readEnd = Find(line, source.End(), '\n')) {
@@ -100,11 +99,11 @@ namespace Eldritch2 { namespace Core {
 			}
 
 			//	Assignment found, try to add to the database or invoke unknown key handler if no matching property is found.
-			if (keyHandler(group.AsCString(), name.AsCString(), { value, valueEnd })) {
+			if (keyHandler(group, name, { value, valueEnd })) {
 				continue;
 			}
 
-			unknownKeyHandler(group.AsCString(), name.AsCString(), { value, valueEnd });
+			unknownKeyHandler(group, name, { value, valueEnd });
 		}
 	}
 

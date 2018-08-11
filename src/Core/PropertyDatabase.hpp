@@ -15,11 +15,9 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Core {
+namespace Eldritch2 { namespace Core {
 	class PropertyRegistrar;
-}
-} // namespace Eldritch2::Core
+}} // namespace Eldritch2::Core
 
 namespace Eldritch2 { namespace Core {
 
@@ -27,9 +25,9 @@ namespace Eldritch2 { namespace Core {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using DynamicSetter = Function<void(const Utf8Char* /*name*/, Range<const Utf8Char*> /*value*/)>;
-		using SetterKey     = Pair<Utf8Literal, Utf8Literal>;
-		using Setter        = Function<void(Range<const Utf8Char*> /*value*/)>;
+		using DynamicSetter = Function<void(StringView<Utf8Char> /*name*/, StringView<Utf8Char> /*value*/)>;
+		using SetterKey     = Pair<StringView<Utf8Char>, StringView<Utf8Char>>;
+		using Setter        = Function<void(StringView<Utf8Char> /*value*/)>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -44,7 +42,7 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
-		bool SetValue(const Utf8Char* group, const Utf8Char* name, Range<const Utf8Char*> value);
+		bool SetValue(StringView<Utf8Char> group, StringView<Utf8Char> name, StringView<Utf8Char> value);
 
 		// ---------------------------------------------------
 
@@ -54,8 +52,8 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		CachingHashMap<SetterKey, Setter>          _settersByKey;
-		CachingHashMap<Utf8Literal, DynamicSetter> _dynamicSettersByGroup;
+		CachingHashMap<SetterKey, Setter>                   _settersByKey;
+		CachingHashMap<StringView<Utf8Char>, DynamicSetter> _dynamicSettersByGroup;
 
 		// - FRIEND CLASS DECLARATION ------------------------
 

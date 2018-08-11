@@ -40,7 +40,7 @@ namespace {
 	public:
 		//!	Constructs this @ref ProcessMemoryCountersEx instance.
 		ETInlineHint ProcessMemoryCountersEx() {
-			GetProcessMemoryInfo(GetCurrentProcess(), reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(this), static_cast<DWORD>(sizeof(*this)));
+			GetProcessMemoryInfo(GetCurrentProcess(), PPROCESS_MEMORY_COUNTERS(this), DWORD(sizeof(*this)));
 		}
 
 		~ProcessMemoryCountersEx() = default;
@@ -64,7 +64,7 @@ namespace {
 	public:
 		//!	Constructs this @ref MemoryStatusEx instance.
 		ETInlineHint MemoryStatusEx() {
-			dwLength = static_cast<DWORD>(sizeof(*this));
+			dwLength = DWORD(sizeof(*this));
 
 			GlobalMemoryStatusEx(this);
 		}
@@ -79,9 +79,8 @@ namespace {
 
 		QueryPerformanceFrequency(&counter);
 
-		//	QueryPerformanceFrequency() returns the number of ticks in a second;
-		//	we want a value in microseconds.
-		return (static_cast<uint64>(counter.QuadPart) / TicksPerMicrosecond);
+		//	QueryPerformanceFrequency() returns the number of ticks in a second; we want a value in microseconds.
+		return uint64(counter.QuadPart) / TicksPerMicrosecond;
 	}
 
 	// ---------------------------------------------------
@@ -90,14 +89,14 @@ namespace {
 		OSVERSIONINFOEX versionInfo;
 		ULONGLONG       conditionMask;
 
-		versionInfo.dwOSVersionInfoSize = static_cast<DWORD>(sizeof(versionInfo));
+		versionInfo.dwOSVersionInfoSize = DWORD(sizeof(versionInfo));
 		versionInfo.dwMajorVersion      = majorVersion;
 		versionInfo.dwMinorVersion      = minorVersion;
 
 		conditionMask = VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL);
 		conditionMask = VerSetConditionMask(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
 
-		return VerifyVersionInfoW(&versionInfo, (VER_MAJORVERSION | VER_MINORVERSION), conditionMask) != FALSE;
+		return VerifyVersionInfoW(&versionInfo, VER_MAJORVERSION | VER_MINORVERSION, conditionMask) != FALSE;
 	}
 
 	// ---------------------------------------------------
@@ -105,7 +104,7 @@ namespace {
 	ETPureFunctionHint ETInlineHint DWORD CountSetBits(ULONG_PTR mask) {
 		enum : DWORD { LSHIFT = CHAR_BIT * sizeof(ULONG_PTR) - 1u };
 
-		ULONG_PTR currentBit((ULONG_PTR)1u << LSHIFT);
+		ULONG_PTR currentBit(ULONG_PTR(1u) << LSHIFT);
 		DWORD     count(0u);
 
 		for (DWORD i(0); i <= LSHIFT; ++i) {
@@ -135,30 +134,29 @@ size_t GetPeakWorkingSetInBytes() {
 // ---------------------------------------------------
 
 size_t GetMaximumWorkingSetInBytes() {
-	return static_cast<size_t>(MemoryStatusEx().ullTotalVirtual);
+	return size_t(MemoryStatusEx().ullTotalVirtual);
 }
 
 // ---------------------------------------------------
 
 size_t GetVirtualMemoryAllocationGranularityInBytes() {
-	return static_cast<size_t>(SystemInfo().dwAllocationGranularity);
+	return size_t(SystemInfo().dwAllocationGranularity);
 }
 
 // ---------------------------------------------------
 
 ETPureFunctionHint CoreInfo GetCoreInfo() {
-	CoreInfo info{};
+	CoreInfo info {};
 	DWORD    length(0);
 
 	if (GetLogicalProcessorInformationEx(RelationAll, nullptr, &length) == FALSE && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-		char* buffer(static_cast<char*>(_alloca(length)));
+		char* buffer(ETStackAlloc(char, length));
 
-		if (GetLogicalProcessorInformationEx(RelationAll, reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(buffer), &length)) {
+		if (GetLogicalProcessorInformationEx(RelationAll, PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX(buffer), &length)) {
 			const char* const end(buffer + length);
 
 			while (buffer < end) {
-				const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX& processor(*reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(buffer));
-
+				const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX& processor(*PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX(buffer));
 				if (processor.Relationship == RelationProcessorCore) {
 					info.physicalCores++;
 
@@ -188,7 +186,7 @@ CpuTimestamp ReadCpuTimestamp() {
 
 	QueryPerformanceCounter(&counter);
 
-	return static_cast<CpuTimestamp>(counter.QuadPart) / CpuTicksPerMicrosecond;
+	return CpuTimestamp(counter.QuadPart) / CpuTicksPerMicrosecond;
 }
 
 // ---------------------------------------------------

@@ -50,12 +50,14 @@ public:
 
 public:
 	//! Constructs this @ref HashSet instance.
-	HashSet(const HashPredicate& hashPredicate, const EqualityPredicate& equalityPredicate, const AllocatorType& allocator);
+	HashSet(const HashPredicate& hashPredicate, const EqualityPredicate& equalityPredicate, const AllocatorType& allocator = AllocatorType());
 	//! Constructs this @ref HashSet instance.
 	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
 	HashSet(const HashSet&, const AllocatorType& allocator);
 	//! Constructs this @ref HashSet instance.
-	explicit HashSet(const AllocatorType& allocator);
+	explicit HashSet(const AllocatorType& allocator = AllocatorType());
+	//! Constructs this @ref HashSet instance.
+	HashSet(const HashSet&);
 	//! Constructs this @ref HashSet instance.
 	HashSet(HashSet&&);
 

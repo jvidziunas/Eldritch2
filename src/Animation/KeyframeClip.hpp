@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/Clip.hpp>
+#include <Animation/AnimationTypes.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Animation { namespace AssetViews {
@@ -20,41 +20,16 @@ namespace Eldritch2 { namespace Animation { namespace AssetViews {
 }}} // namespace Eldritch2::Animation::AssetViews
 
 namespace Eldritch2 { namespace Animation {
-	namespace Detail {
 
-		class ETPureAbstractHint AbstractKeyframeClip : public Animation::Clip {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//! Constructs this @ref AbstractKeyframeClip instance.
-			AbstractKeyframeClip(const AssetViews::KeyframeClipAsset& asset);
-			//! Constructs this @ref AbstractKeyframeClip instance.
-			AbstractKeyframeClip(const AbstractKeyframeClip&) = default;
-
-			~AbstractKeyframeClip() = default;
-
-			// ---------------------------------------------------
-
-		public:
-			void SetStartTimestamp(uint64 worldTime);
-
-			// - DATA MEMBERS ------------------------------------
-
-		private:
-			const AssetViews::KeyframeClipAsset* _asset;
-			uint64                               _startTimestamp;
-			float32                              _playbackRate;
-			float32                              _inverseLength;
-		};
-
-	} // namespace Detail
-
-	template <class Keyframe>
-	class KeyframeClip : public Detail::AbstractKeyframeClip {
+	class KeyframeClip : public Animation::Clip {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using KeyframeType = Keyframe;
+		enum class LoopMode : uint8 {
+			Hold,
+			Repeat,
+			Mirror,
+		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -69,16 +44,28 @@ namespace Eldritch2 { namespace Animation {
 		// ---------------------------------------------------
 
 	public:
-		void PrefetchTransforms(uint64 timeBegin, uint64 timeEnd) override;
+		void SetStartTimestamp(uint64 worldTime);
 
-		void EvaluateWorldPose(Transformation localToWorld, ispc::GpuTransformWithVelocity transforms[]) const override;
-		void EvaluateWorldPose(Transformation localToWorld, ispc::GpuTransform transforms[]) const override;
+		void SetPlaybackRate(float32 rate);
+
+		// ---------------------------------------------------
+
+	public:
+		float32 AsLocalTime(uint64 globalTime) const;
+
+		// ---------------------------------------------------
+
+	public:
+		void FetchKnots(KnotCache& knots, uint64 time, BoneIndex maximumBone) override;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		uint16 _beginTime;
-		uint16 _endTime;
+		const AssetViews::KeyframeClipAsset* _asset;
+		uint64                               _startTimestamp;
+		uint32                               _duration;
+		LoopMode                             _loop[2];
+		float32                              _inverseLength;
 	};
 
 }} // namespace Eldritch2::Animation

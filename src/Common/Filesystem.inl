@@ -17,14 +17,14 @@
 
 namespace Eldritch2 {
 
-ETInlineHint void FileSystem::Copy(KnownDirectory directory, const Utf8Char* const destinationFileName, const Utf8Char* const sourceFileName, OverwriteBehavior overwriteBehavior) {
-	FileSystem::Copy(directory, destinationFileName, directory, sourceFileName, overwriteBehavior);
+ETInlineHint void Copy(KnownDirectory directory, StringView<PlatformChar> destinationFileName, StringView<PlatformChar> sourceFileName, CopyMode mode) {
+	Copy(directory, destinationFileName, directory, sourceFileName, mode);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint void FileSystem::Move(KnownDirectory directory, const Utf8Char* const destinationFileName, const Utf8Char* const sourceFileName) {
-	FileSystem::Move(directory, destinationFileName, directory, sourceFileName);
+ETInlineHint void Move(KnownDirectory directory, StringView<PlatformChar> destinationFileName, StringView<PlatformChar> sourceFileName) {
+	Move(directory, destinationFileName, directory, sourceFileName);
 }
 
 // ---------------------------------------------------

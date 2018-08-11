@@ -22,9 +22,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 void wrenSetSlotBytes(WrenVM* vm, int slot, const char* text, size_t length);
 void wrenAbortFiber(WrenVM* vm, int slot);
 
-namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	class ForeignMethod {
 		// - TYPE PUBLISHING ---------------------------------
@@ -131,9 +129,7 @@ namespace Wren {
 
 	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineSetter(Utf8Literal name, ForeignMethod::Body body);
 
-}
-}
-} // namespace Eldritch2::Scripting::Wren
+}}} // namespace Eldritch2::Scripting::Wren
 
 #define ET_BUILTIN_WREN_MODULE_NAME(name) "builtin/" #name
 

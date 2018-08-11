@@ -16,53 +16,53 @@
 #include <Core/EngineComponent.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Logging {
-		class	Log;
-	}
-}
+namespace Eldritch2 { namespace Logging {
+	class Log;
+}} // namespace Eldritch2::Logging
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-			class VulkanEngineComponent : public Core::EngineComponent {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	class VulkanEngineComponent : public Core::EngineComponent {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			public:
-			//!	Constructs this @ref VulkanEngineComponent instance.
-				VulkanEngineComponent(const Blackboard& services, Logging::Log& log);
-			//!	Disable copy construction.
-				VulkanEngineComponent(const VulkanEngineComponent&) = delete;
+	public:
+		//!	Constructs this @ref VulkanEngineComponent instance.
+		VulkanEngineComponent(const ObjectLocator& services, Logging::Log& log);
+		//!	Disable copy construction.
+		VulkanEngineComponent(const VulkanEngineComponent&) = delete;
 
-				~VulkanEngineComponent() = default;
+		~VulkanEngineComponent() = default;
 
-			// - ENGINE SERVICE SANDBOX METHODS ------------------
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
-			public:
-				Result<UniquePointer<Core::WorldComponent>>	CreateWorldComponent(Allocator& allocator, const Core::World& world) override;
+	public:
+		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
-				void										AcceptVisitor(Scheduling::JobExecutor& executor, const ConfigurationBroadcastVisitor) override;
-				void										AcceptVisitor(Scheduling::JobExecutor& executor, const ServiceTickVisitor) override;
-				void										AcceptVisitor(Core::PropertyRegistrar& properties) override;
-				void										AcceptVisitor(Assets::AssetApiBuilder& factories) override;
-				void										AcceptVisitor(Blackboard& services) override;
+		void BindConfigurableResources(Scheduling::JobExecutor& executor) override;
 
-			// ---------------------------------------------------
+		void PublishConfiguration(Core::PropertyRegistrar& properties) override;
 
-			//!	Disable copy assignment.
-				VulkanEngineComponent&	operator=(const VulkanEngineComponent&) = delete;
+		void PublishAssetTypes(Assets::AssetApiBuilder& factories) override;
 
-			// - DATA MEMBERS ------------------------------------
+		void PublishServices(ObjectLocator& services) override;
 
-			private:
-				Vulkan				_vulkan;
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
-				HashSet<String<>>	_instanceLayers;
-				HashSet<String<>>	_deviceLayers;
-				String<>			_preferredGpuName;
-			};
+	public:
+		void TickEarly(Scheduling::JobExecutor& executor) override;
 
-		}	// namespace Vulkan
-	}	// namespace Graphics
-}	// namespace Eldritch2
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		VulkanEngineComponent& operator=(const VulkanEngineComponent&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		Vulkan            _vulkan;
+		HashSet<String<>> _instanceLayers;
+		HashSet<String<>> _deviceLayers;
+		String<>          _preferredGpu;
+	};
+
+}}} // namespace Eldritch2::Graphics::Vulkan

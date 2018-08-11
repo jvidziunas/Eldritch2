@@ -15,87 +15,102 @@
 #include <Assets/Package.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Assets {
-		class	AssetDatabase;
-	}
-}
+namespace Eldritch2 { namespace Assets {
+	class AssetDatabase;
+}} // namespace Eldritch2::Assets
 
-namespace Eldritch2 {
-	namespace Assets {
+namespace Eldritch2 { namespace Assets {
 
-		class PackageDatabase {
+	class PackageDatabase {
 		// - TYPE PUBLISHING ---------------------------------
 
-		public:
-			struct PackageEqual {
-				ETPureFunctionHint bool	operator()(const Package&, const Utf8Char*) const;
-				ETPureFunctionHint bool	operator()(const Package&, const Package&) const;
-			};
+	public:
+		struct PackageEqual {
+			ETPureFunctionHint bool operator()(const Package&, StringView<Utf8Char>) const;
+			ETPureFunctionHint bool operator()(const Package&, const Package&) const;
+		};
 
 		// ---
 
-		public:
-			struct PackageHash {
-				ETPureFunctionHint size_t	operator()(const Utf8Char*, size_t seed = 0u) const;
-				ETPureFunctionHint size_t	operator()(const Package&, size_t seed = 0u) const;
-			};
+	public:
+		struct PackageHash {
+			ETPureFunctionHint size_t operator()(StringView<Utf8Char>, size_t seed = 0u) const;
+			ETPureFunctionHint size_t operator()(const Package&, size_t seed = 0u) const;
+		};
 
-		public:
-			using LoadFunction = Function<void(Package&)>;
-			using LoadableSet = CachingHashSet<Package, PackageHash, PackageEqual>;
-			using GcCursor = typename LoadableSet::Iterator;
+		// ---
+
+	public:
+		struct LoadRequest {
+			Function<void(CountedPointer<const Package>, ErrorCode)> callback;
+			CountedPointer<Package>                                  package;
+		};
+
+		// ---
+
+	public:
+		using LoadableSet = CachingHashSet<Package, PackageHash, PackageEqual>;
+		using GcCursor    = typename LoadableSet::Iterator;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		public:
+	public:
 		//!	Disable copy construction.
-			PackageDatabase(const PackageDatabase&) = delete;
+		PackageDatabase(const PackageDatabase&) = delete;
 		//!	Constructs this @ref PackageDatabase instance.
-			PackageDatabase();
+		PackageDatabase();
 
-			~PackageDatabase() = default;
-
-		// - PACKAGE MANAGEMENT ------------------------------
-
-		public:
-		//! Signals to the @ref AssetDatabase that resources in the specified package will be needed in the near future.
-		/*! @param[in] path A null-terminated UTF-8-encoded character sequence containing the path to the package file, without any suffix or extension.
-			@remarks Thread-safe.
-			@see @ref Package */
-			CountedPointer<const Package>	Load(const Utf8Char* const path) const;
+		~PackageDatabase() = default;
 
 		// ---------------------------------------------------
 
-		public:
-			void	SetPackages(LoadableSet packages, LoadFunction loadFunction);
-
+	public:
 		//!	Performs an incremental garbage collection pass on the set of unreferenced asset packages.
-		/*!	@param[in] maxPackagesToDestroy @parblock Maximum number of packages to be considered for garbage collection, in the range [0, UINT_MAX]. This value
-				will be clamped to the number of actual packages known to the @ref PackageDatabase; the caller is not responsible for bounds checking. @endparblock
-			@remarks @parblock Note that this function is *not* safe to be called simulaneously on multiple threads, however other methods that operate on the package set
+		/*!	@remarks @parblock Note that this function is *not* safe to be called simulaneously on multiple threads, however other methods that operate on the package set
 				may be safely called while this function is being executed. @endparblock */
-			void	DestroyGarbage(size_t maxPackagesToDestroy, AssetDatabase& assetDatabase);
+		void DestroyGarbage(AssetDatabase& assetDatabase, size_t destructionLimit);
+
+		// - PACKAGE MANAGEMENT ------------------------------
+
+	public:
+		//! Signals to the @ref AssetDatabase that resources in the specified package will be needed in the near future.
+		/*! @param[in] path UTF-8-encoded string view containing the path to the package file, without any suffix or extension.
+			@remarks Thread-safe.
+			@see @ref Package */
+		ErrorCode Load(StringView<Utf8Char> path, Function<void(CountedPointer<const Package>, ErrorCode)> callback);
+
+		bool PopRequest(LoadRequest& outRequest);
+
+		// ---------------------------------------------------
+
+	public:
+		ErrorCode BindResources(LoadableSet packages);
+
+		void FreeResources();
+
+		// ---------------------------------------------------
+
+	private:
+		void PushRequest(LoadRequest request);
+
+		void ClearRequests();
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
-			PackageDatabase&	operator=(const PackageDatabase&) = delete;
+		PackageDatabase& operator=(const PackageDatabase&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
-		private:
-			mutable Mutex	_packagesMutex;
-			LoadFunction	_loadFunction;
-			LoadableSet		_packages;
-		/*!	Current package under consideration for incremental garbage collection. The cursor works in circular fashion,
-			traversing the known packages collection in small chunks during calls to @ref DestroyGarbage and looping back to
-			the start of the collection once all packages have been considered. */
-			GcCursor		_gcCursor;
-		};
+	private:
+		mutable Mutex      _requestsMutex;
+		Stack<LoadRequest> _requests;
+		mutable Mutex      _packagesMutex;
+		LoadableSet        _packages;
+		GcCursor           _gcCursor;
+	};
 
-	}	// namespace Assets
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Assets
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

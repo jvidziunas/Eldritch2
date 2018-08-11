@@ -168,7 +168,7 @@ size_t MappedFile::GetSizeInBytes() const {
 // ---------------------------------------------------
 
 void MappedFile::Prefetch(size_t offsetInBytes, size_t rangeSizeInBytes) const {
-	Prefetch(GetRangeAtOffset<const char>(offsetInBytes, rangeSizeInBytes));
+	Prefetch(GetRange<const char>(offsetInBytes, rangeSizeInBytes));
 }
 
 // ---------------------------------------------------
@@ -192,7 +192,7 @@ void MappedFile::Prefetch(Range<const char*> range) const {
 // ---------------------------------------------------
 
 void MappedFile::Evict(size_t offsetInBytes, size_t rangeSizeInBytes) const {
-	Evict(GetRangeAtOffset<const char>(offsetInBytes, rangeSizeInBytes));
+	Evict(GetRange<const char>(offsetInBytes, rangeSizeInBytes));
 }
 
 // ---------------------------------------------------
@@ -203,7 +203,7 @@ void MappedFile::Evict(Range<const char*> /*range*/) const {
 
 // ---------------------------------------------------
 
-void* MappedFile::GetAddressForByteOffset(size_t rawFileOffsetInBytes) const {
+void* MappedFile::Get(size_t rawFileOffsetInBytes) const {
 	char* const result(_region.Begin() + rawFileOffsetInBytes);
 
 	return result <= _region.End() ? result : nullptr;

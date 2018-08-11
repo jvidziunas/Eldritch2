@@ -15,44 +15,41 @@
 #include <Logging/Log.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Logging {
+namespace Eldritch2 { namespace Logging {
 
-		class FileLog : public Logging::Log {
+	class FileLog : public Logging::Log {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		public:
+	public:
 		//!	Disable copy construction.
-			FileLog(const FileLog&) = delete;
+		FileLog(const FileLog&) = delete;
 		//!	Constructs this @ref FileLog instance.
-			FileLog();
+		FileLog();
 
-			~FileLog() = default;
-
-		// ---------------------------------------------------
-
-		public:
-			using Log::Write;
-
-			void	Write(const Utf8Char* const string, size_t lengthInOctets) override sealed;
+		~FileLog() = default;
 
 		// ---------------------------------------------------
 
-		public:
-			ErrorCode	BindResources(const PlatformChar* path);
+	public:
+		void Write(const Utf8Char* const string, size_t lengthInOctets) override sealed;
+		using Log::Write;
 
-			void		FreeResources();
+		// ---------------------------------------------------
+
+	public:
+		ErrorCode BindResources(StringView<PlatformChar> path);
+
+		void FreeResources();
 
 		// ---------------------------------------------------
 
 		//!	Disable assignment.
-			FileLog&	operator=(const FileLog&) = delete;
+		FileLog& operator=(const FileLog&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
-		private:
-			FileAppender	_appender;
-		};
+	private:
+		FileAppender _appender;
+	};
 
-	}	// namespace Logging
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Logging

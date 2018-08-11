@@ -22,8 +22,8 @@ namespace Eldritch2 { namespace Logging {
 
 	// ---------------------------------------------------
 
-	template <size_t formatSize, typename... Arguments>
-	ETInlineHint void Log::Write(Logging::MessageType type, const Utf8Char (&string)[formatSize], Arguments&&... arguments) {
+	template <typename... Arguments>
+	ETInlineHint void Log::Write(Logging::MessageType type, StringView<Utf8Char> format, Arguments&&... arguments) {
 		static const Utf8Char prefixes[][8] = {
 			"[WARN] ",
 			"[WARN] ",
@@ -39,9 +39,7 @@ namespace Eldritch2 { namespace Logging {
 		const auto&        prefix(prefixes[static_cast<size_t>(type)]);
 
 		output.append(eastl::begin(prefix), eastl::end(prefix) - 1);
-
-		fmt::format_to(output, string, eastl::forward<Arguments>(arguments)...);
-
+		fmt::format_to(output, format, eastl::forward<Arguments>(arguments)...);
 		Write(output.data(), output.size());
 	}
 
@@ -53,7 +51,7 @@ namespace Eldritch2 { namespace Logging {
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Log::SetMuteThreshold(MessageType threshold) {
+	ETInlineHint void Log::SetWriteThreshold(MessageType threshold) {
 		_muteThreshold.store(threshold, std::memory_order_release);
 	}
 

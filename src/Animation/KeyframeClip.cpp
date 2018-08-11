@@ -1,5 +1,5 @@
 /*==================================================================*\
-  KeyframeAnimationNode.cpp
+  KeyframeClip.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -8,21 +8,23 @@
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Animation/AssetViews/KeyframeClipAsset.hpp>
 #include <Animation/KeyframeClip.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Animation {
-		namespace Detail {
+namespace Eldritch2 { namespace Animation {
 
-			using namespace ::Eldritch2::Animation::AssetViews;
+	using namespace ::Eldritch2::Animation::AssetViews;
 
-			AbstractKeyframeClip::AbstractKeyframeClip(const KeyframeClipAsset& asset) : _asset(&asset) {}
+	void KeyframeClip::FetchKnots(KnotCache& knots, uint64 time, BoneIndex maximumBone) {
+		const float32 localTime(AsLocalTime(time));
 
-		}	// namespace Detail
-	}	// namespace Animation
-}	// namespace Eldritch2
+		for (BoneIndex bone(0u); bone < maximumBone; ++bone) {
+			//	knots.PushChannel();
+		}
+	}
+
+}} // namespace Eldritch2::Animation

@@ -14,7 +14,7 @@
 #include <Graphics/Vulkan/AssetViews/MeshAsset.hpp>
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
-#include <Assets/AssetManager.hpp>
+#include <Assets/AssetLocator.hpp>
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
 #include <wren.h>
@@ -78,12 +78,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		api.CreateClass<MeshInstance>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "Mesh",
 			{ /*	Constructors */
 				ConstructorMethod("new(_,_,_)", [](WrenVM* vm) {
-				VulkanGraphicsScene&   scene(GetSlotAs<VulkanGraphicsScene>(vm, 1));
-				const MeshAsset* const asset(Cast<MeshAsset>(GetSlotAs<AssetReference>(vm, 3)));
+					VulkanGraphicsScene&   scene(GetSlotAs<VulkanGraphicsScene>(vm, 1));
+					const MeshAsset* const asset(Cast<MeshAsset>(GetSlotAs<AssetReference>(vm, 3)));
 
-				ET_ABORT_WREN_UNLESS(asset, "Asset must be a MeshAsset.");
+					ET_ABORT_WREN_UNLESS(asset, "Asset must be a MeshAsset.");
 
-				SetReturn<MeshInstance>(vm, GetSlotAs<Armature>(vm, 2), *asset);
+					SetReturn<MeshInstance>(vm, GetSlotAs<Armature>(vm, 2), *asset);
 				})
 			},
 			{ /*	Static methods */ },

@@ -225,7 +225,7 @@
     <ClCompile Include="src\Audio\XAudio2\Xaudio2WorldComponent.WrenScriptApi.cpp" />
     <ClCompile Include="src\Build.cpp" />
     <ClCompile Include="src\Common\Assert.cpp" />
-    <ClCompile Include="src\Common\Blackboard.cpp" />
+    <ClCompile Include="src\Common\ObjectLocator.cpp" />
     <ClCompile Include="src\Common\Containers\AbstractString.cpp" />
     <ClCompile Include="src\Common\Containers\ArrayList.cpp" />
     <ClCompile Include="src\Common\Containers\IntrusiveConcurrentQueue.cpp" />
@@ -398,7 +398,7 @@
     <None Include="src\Assets\PackageProvider.inl" />
     <None Include="src\Common\Algorithms.inl" />
     <None Include="src\Common\Assert.inl" />
-    <None Include="src\Common\Blackboard.inl" />
+    <None Include="src\Common\ObjectLocator.inl" />
     <None Include="src\Common\Cache.inl" />
     <None Include="src\Common\ComPointer.inl" />
     <None Include="src\Common\Containers\AbstractString.inl" />

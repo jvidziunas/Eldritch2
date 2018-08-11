@@ -15,37 +15,83 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Animation {
+namespace Eldritch2 { namespace Animation {
 
-		template <typename PublicBlend, typename... ConstructorArguments>
-		ETInlineHint void AnimationTree::AddBlend(ConstructorArguments&&... arguments) {
-			void* const memory(_allocator.Allocate(sizeof(PublicBlend), alignof(PublicBlend), 0u));
-			if (memory == nullptr) {
-				return;
-			}
-
-			_blends.EmplaceBack(new(memory) PublicBlend(eastl::forward<ConstructorArguments>(arguments)...));
-		}
+	template <typename Allocator>
+	AnimationTree<Allocator>::AnimationTree(const AllocatorType& allocator) :
+		_allocator(allocator),
+		_clips(ChildAllocator(_allocator, "Animation Tree Clip List Allocator")),
+		_blends(ChildAllocator(_allocator, "Animation Tree Blend List Allocator")) {
+	}
 
 	// ---------------------------------------------------
 
-		template <typename PublicClip, typename... ConstructorArguments>
-		ETInlineHint void AnimationTree::AddClip(ConstructorArguments&&... arguments) {
-			void* const memory(_allocator.Allocate(sizeof(PublicClip), alignof(PublicClip), 0u));
-			if (memory == nullptr) {
-				return;
-			}
-
-			_clips.EmplaceBack(new(memory) PublicClip(eastl::forward<ConstructorArguments>(arguments)...));
-		}
+	template <typename Allocator>
+	ETInlineHint const KnotCache& AnimationTree<Allocator>::GetKnots() const {
+		return _knots;
+	}
 
 	// ---------------------------------------------------
 
-		ETInlineHint void AnimationTree::SetRoot(const Blend& root) {
-			_root = &root;
+	template <typename Allocator>
+	ETInlineHint const Blend* AnimationTree<Allocator>::GetRoot() const {
+		return _blends[_root].Get();
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Allocator>
+	template <typename PublicBlend, typename... ConstructorArguments>
+	ETInlineHint PublicBlend& AnimationTree<Allocator>::InsertBlend(ConstructorArguments&&... arguments) {
+		_blends.Append(MakeUnique<PublicBlend>(_allocator, eastl::forward<ConstructorArguments>(arguments)...));
+		return *static_cast<PublicBlend*>(_blends.Back().Get());
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Allocator>
+	template <typename PublicClip, typename... ConstructorArguments>
+	ETInlineHint PublicClip& AnimationTree<Allocator>::InsertClip(ConstructorArguments&&... arguments) {
+		_clips.Append(MakeUnique<PublicClip>(_allocator, eastl::forward<ConstructorArguments>(arguments)...));
+		return *static_cast<PublicClip*>(_clips.Back().Get());
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Allocator>
+	ETInlineHint void AnimationTree<Allocator>::SetRoot(uint32 index) {
+		_root = index;
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Allocator>
+	ETInlineHint void AnimationTree<Allocator>::FetchKnots(uint64 time, BoneIndex maximumBone) {
+		for (const UniquePointer<Clip>& clip : _clips) {
+			clip->FetchKnots(_knots, time, maximumBone);
 		}
+	}
 
-	}	// namespace Animation
-}	// namespace Eldritch2
+	// ---------------------------------------------------
 
+	template <typename Allocator>
+	ETInlineHint void AnimationTree<Allocator>::Clear() {
+		_blends.Clear(ReleaseMemorySemantics());
+		_clips.Clear(ReleaseMemorySemantics());
+		_root = 0u;
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Allocator>
+	ETInlineHint void Swap(AnimationTree<Allocator>& lhs, AnimationTree<Allocator>& rhs) {
+		using ::Eldritch2::Swap;
+
+		Swap(lhs._allocator, rhs._allocator);
+		Swap(lhs._knots, rhs._knots);
+		Swap(lhs._clips, rhs._clips);
+		Swap(lhs._blends, rhs._blends);
+		Swap(lhs._root, rhs._root);
+	}
+
+}} // namespace Eldritch2::Animation

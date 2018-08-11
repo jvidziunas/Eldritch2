@@ -8,7 +8,6 @@
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -17,22 +16,21 @@
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
 
-void	wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
+void wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
 
-namespace Eldritch2 {
-	namespace Animation {
+namespace Eldritch2 { namespace Animation {
 
-		using namespace ::Eldritch2::Scripting::Wren;
-		using namespace ::Eldritch2::Scripting;
+	using namespace ::Eldritch2::Scripting::Wren;
+	using namespace ::Eldritch2::Scripting;
 
-		ET_IMPLEMENT_WREN_CLASS(Armature) {
-			api.CreateClass<Armature>(ET_BUILTIN_WREN_MODULE_NAME(Animation), "Armature",
-									  {/* Constructors */
-										  ConstructorMethod("new(_)", [](WrenVM* vm) {
-											  SetReturn<Armature>(vm, GetSlotAs<Transformation>(vm, 1));
-										  })
-									  },
-										  {/*	Static methods */ },
+	ET_IMPLEMENT_WREN_CLASS(Armature) {
+		api.CreateClass<Armature>(ET_BUILTIN_WREN_MODULE_NAME(Animation), "Armature", // clang-format off
+			{/* Constructors */
+				ConstructorMethod("new(_)", [](WrenVM* vm) {
+					SetReturn<Armature>(vm, GetSlotAs<Transformation>(vm, 1));
+				})
+			},
+			{/*	Static methods */ },
 			{/*	Properties */
 				DefineProperty("localToWorld",
 				//	Getter
@@ -54,9 +52,7 @@ namespace Eldritch2 {
 					SetReturn<Transformation>(vm, self.GetWorldToLocal());
 				})
 			},
-				{/*	Methods */ }
-				);
-		}
+			{/*	Methods */ }); // clang-format on
+	}
 
-	}	// namespace Animation
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Animation

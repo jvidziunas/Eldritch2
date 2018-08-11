@@ -8,7 +8,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -18,24 +17,17 @@
 #include <Physics/PhysX/PhysxEngineComponent.hpp>
 #include <Assets/AssetDatabase.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
-//------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Physics {
-		namespace PhysX {
+namespace Eldritch2 { namespace Physics { namespace PhysX {
 
-			using namespace ::Eldritch2::Physics::PhysX::AssetViews;
-			using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Physics::PhysX::AssetViews;
+	using namespace ::Eldritch2::Assets;
 
-			void PhysxEngineComponent::AcceptVisitor(AssetApiBuilder& api) {
-				MICROPROFILE_SCOPEI("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
+	void PhysxEngineComponent::PublishAssetTypes(AssetApiBuilder& api) {
+		ET_PROFILE_SCOPE("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
+		api.DefineType(ArmatureAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ArmatureAsset>());
+		api.DefineType(TerrainAsset::GetExtension(), AssetApiBuilder::DefaultFactory<TerrainAsset>());
+		api.DefineType(PhysicsAsset::GetExtension(), AssetApiBuilder::DefaultFactory<PhysicsAsset>());
+	}
 
-				api.DefineType(ArmatureAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ArmatureAsset>());
-				api.DefineType(TerrainAsset::GetExtension(), AssetApiBuilder::DefaultFactory<TerrainAsset>());
-				api.DefineType(PhysicsAsset::GetExtension(), AssetApiBuilder::DefaultFactory<PhysicsAsset>());
-			}
-
-		}	// namespace PhysX
-	}	// namespace Eldritch2
-}	// namespace Physics
+}}} // namespace Eldritch2::Physics::PhysX

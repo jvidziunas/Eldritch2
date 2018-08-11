@@ -75,6 +75,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	ETPureFunctionHint VkSampleCountFlags GetSampleCountFlags(uint32_t sampleCount);
 
+	ETPureFunctionHint VkImageAspectFlags GetAspectsByUsage(VkImageUsageFlags usages);
+
 	ETPureFunctionHint VkImageType GetImageType(VkExtent3D extent);
 
 	ETPureFunctionHint bool IsDepthStencilFormat(VkFormat format);

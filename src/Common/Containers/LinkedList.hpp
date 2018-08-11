@@ -45,7 +45,7 @@ public:
 	LinkedList(InputIterator first, InputIterator last, const AllocatorType& allocator = AllocatorType());
 	//! Constructs this @ref LinkedList instance.
 	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	LinkedList(const LinkedList&, const AllocatorType& allocator = AllocatorType());
+	LinkedList(const LinkedList&, const AllocatorType& allocator);
 	//! Constructs this @ref LinkedList instance.
 	explicit LinkedList(const AllocatorType& allocator = AllocatorType());
 	//! Constructs this @ref LinkedList instance.

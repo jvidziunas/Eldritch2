@@ -31,8 +31,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 			//	Determine the number of queue families exposed by the device.
 			vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, nullptr);
-			const auto properties(static_cast<VkQueueFamilyProperties*>(_alloca(familyCount * sizeof(VkQueueFamilyProperties))));
-			const auto end(properties + familyCount);
+			VkQueueFamilyProperties* const properties(ETStackAlloc(VkQueueFamilyProperties, familyCount));
+			VkQueueFamilyProperties* const end(properties + familyCount);
 			vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, properties);
 
 			families[QueueConcept::Drawing]         = FindQueueFamilyByFlags(properties, end, { VkQueueFlags(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT) });
@@ -54,7 +54,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			const auto lastUnique(eastl::unique(eastl::begin(indices), eastl::end(indices)));
 
 			return static_cast<uint32_t>(eastl::distance(eastl::begin(out), Transform(eastl::begin(indices), lastUnique, out, [](uint32_t familyIndex) {
-															 return VkDeviceQueueCreateInfo{
+															 return VkDeviceQueueCreateInfo {
 																 VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 																 nullptr, // No extension data.
 																 0u,      // No create flags.
@@ -128,30 +128,28 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	VkResult Gpu::BindResources(VkPhysicalDevice physicalDevice, VkDeviceSize heapBlockSize, uint32 frameUseCount) {
 		using ::Eldritch2::Swap;
 
-		static const char* const enabledExtensions[] = {
+		ArrayList<const char*> enabledExtensions;
 #if VK_KHR_swapchain
-			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		enabledExtensions.Append(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 #endif
-			nullptr
-		};
 
 		VkDeviceQueueCreateInfo  queueInfos[QueueConcept::COUNT];
 		VkDevice                 device;
-		const VkDeviceCreateInfo deviceInfo{
+		const VkDeviceCreateInfo deviceInfo {
 			VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 			/*pNext =*/nullptr,
 			/*flags =*/0u,
 			/*queueCreateInfoCount =*/BuildQueueCreateInfos(physicalDevice, queueInfos), queueInfos,
 			/*enabledLayerCount =*/0u,
 			/*ppEnabledLayerNames =*/nullptr,
-			/*enabledExtensionCount =*/uint32_t(_countof(enabledExtensions) - 1u), enabledExtensions,
+			/*enabledExtensionCount =*/uint32_t(enabledExtensions.GetSize()), enabledExtensions.GetData(),
 			/*pEnabledFeatures =*/nullptr
 		};
 		ET_FAIL_UNLESS(vkCreateDevice(physicalDevice, &deviceInfo, _allocator, &device));
 		ET_AT_SCOPE_EXIT(vkDestroyDevice(device, _allocator));
 
 		VkPipelineCache                 pipelineCache;
-		const VkPipelineCacheCreateInfo pipelineCacheInfo{
+		const VkPipelineCacheCreateInfo pipelineCacheInfo {
 			VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
 			/*pNext =*/nullptr,
 			/*flags =*/0u,
@@ -168,7 +166,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			_queues[concept].BindResources(device, families[concept]);
 		}
 		VmaAllocator                 gpuAllocator;
-		const VmaAllocatorCreateInfo gpuAllocatorInfo{
+		const VmaAllocatorCreateInfo gpuAllocatorInfo {
 			VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT,
 			physicalDevice,
 			device,
@@ -196,7 +194,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	void Gpu::FreeResources() {
 		//	Ensure all rendering operations are complete before destroying the device.
 		vkDeviceWaitIdle(_device);
-
 		DestroyGarbage();
 
 		vmaDestroyAllocator(eastl::exchange(_gpuAllocator, nullptr));

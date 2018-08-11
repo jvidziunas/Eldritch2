@@ -16,25 +16,26 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Animation {
-	namespace Detail {
 
-		ETInlineHint void AbstractKeyframeClip::SetStartTimestamp(uint64 worldTime) {
-			_startTimestamp = worldTime;
-		}
-
-	} // namespace Detail
-
-	template <class Keyframe>
-	ETInlineHint KeyframeClip<Keyframe>::KeyframeClip(Allocator& /*allocator*/, const AssetViews::KeyframeClipAsset& asset) :
-		Detail::AbstractKeyframeClip(asset) {}
+	ETInlineHint KeyframeClip::KeyframeClip(Allocator& /*allocator*/, const AssetViews::KeyframeClipAsset& asset) :
+		_asset(eastl::addressof(asset)) {}
 
 	// ---------------------------------------------------
 
-	template <class Keyframe>
-	ETInlineHint void KeyframeClip<Keyframe>::PrefetchTransforms(uint64 timeBegin, uint64 timeEnd) {
-		//	Transform global time into local time.
-		const auto localBegin(AsInt((timeBegin - _startTimestamp) * _inverseLength));
-		const auto localEnd(AsInt((timeEnd - _startTimestamp) * _inverseLength));
+	ETInlineHint float32 KeyframeClip::AsLocalTime(uint64 globalTime) const {
+		return AsFloat(Min(globalTime, _startTimestamp) - _startTimestamp) * _inverseLength;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint void KeyframeClip::SetStartTimestamp(uint64 worldTime) {
+		_startTimestamp = worldTime;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint void KeyframeClip::SetPlaybackRate(float32 rate) {
+		_inverseLength = rate != 0.0f ? Reciprocal(AsFloat(_duration) * rate) : 0.0f;
 	}
 
 }} // namespace Eldritch2::Animation

@@ -17,33 +17,8 @@
 
 namespace Eldritch2 { namespace Core {
 
-	ETInlineHint WorldComponent::TickVisitor::TickVisitor(uint64 durationInMicroseconds) :
-		durationInMicroseconds(durationInMicroseconds) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint WorldComponent::EarlyTickVisitor::EarlyTickVisitor(uint64 durationInMicroseconds) :
-		TickVisitor(durationInMicroseconds) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint WorldComponent::StandardTickVisitor::StandardTickVisitor(uint64 durationInMicroseconds) :
-		TickVisitor(durationInMicroseconds) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint WorldComponent::LateTickVisitor::LateTickVisitor(uint64 durationInMicroseconds) :
-		TickVisitor(durationInMicroseconds) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint WorldComponent::VariableTickVisitor::VariableTickVisitor(uint64 durationInMicroseconds) :
-		TickVisitor(durationInMicroseconds) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint WorldComponent::WorldComponent(const Blackboard& services) :
-		_services(&services) {}
+	ETInlineHint WorldComponent::WorldComponent(const ObjectLocator& services) :
+		_services(eastl::addressof(services)) {}
 
 	// ---------------------------------------------------
 

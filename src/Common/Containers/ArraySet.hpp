@@ -50,9 +50,9 @@ public:
 	ArraySet(SizeType reservedSizeInElements, const SorterType& orderingPredicate = SorterType(), const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref ArraySet instance.
 	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	ArraySet(const ArraySet& containerTemplate, const AllocatorType& allocator = AllocatorType());
+	ArraySet(const ArraySet& set, const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref ArraySet instance.
-	explicit ArraySet(const AllocatorType& allocator);
+	ArraySet(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref ArraySet instance.
 	ArraySet(ArraySet&&);
 

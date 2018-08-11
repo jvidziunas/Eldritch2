@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/RenderConcept.hpp>
-#include <Graphics/PortalView.hpp>
 #include <Graphics/RgbColor.hpp>
 //------------------------------------------------------------------//
 
@@ -96,6 +95,12 @@ namespace Eldritch2 { namespace Graphics {
 		Transformation localToWorld;
 		RgbColor       color;
 		float16        radius;
+	};
+
+	// ---
+
+	class PortalView {
+		Vector viewPlane;
 	};
 
 	// ---

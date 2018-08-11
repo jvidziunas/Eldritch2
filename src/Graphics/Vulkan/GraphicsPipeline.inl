@@ -17,8 +17,8 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint const GraphicsPipeline::Pass& GraphicsPipeline::operator[](uint32 pass) const {
-		return _passes[pass];
+	ETInlineHint const GraphicsPipeline::PassDescription* GraphicsPipeline::GetPasses() const {
+		return _passes.GetData();
 	}
 
 	// ---------------------------------------------------
@@ -29,20 +29,38 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
+	ETInlineHint const GraphicsPipeline::AttachmentDescription* GraphicsPipeline::GetFramebufferAttachments() const {
+		return _framebufferAttachments.GetData();
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint uint32 GraphicsPipeline::GetFramebufferAttachmentCount() const {
+		return uint32(_framebufferAttachments.GetSize());
+	}
+
+	// ---------------------------------------------------
+
 	ETInlineHint VkDescriptorSetLayout GraphicsPipeline::GetDescriptorLayout() const {
 		return _descriptorLayout;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint VkQueryPool GraphicsPipeline::GetTimingPool() const {
-		return _timingPool;
+	ETInlineHint const Framebuffer::Pass* Framebuffer::GetPasses() const {
+		return _passes.GetData();
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint VkFramebuffer Framebuffer::operator[](uint32_t pass) const {
-		return _framebufferByPass[pass];
+	ETInlineHint uint32 Framebuffer::GetPassCount() const {
+		return uint32(_passes.GetSize());
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint VkQueryPool Framebuffer::GetTimingPool() const {
+		return _timingPool;
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

@@ -12,7 +12,7 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
-#include <Graphics/Vulkan/DisplayBus.hpp>
+#include <Graphics/Vulkan/DisplayLocator.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
 #include <Scripting/Wren/Context.hpp>
 //------------------------------------------------------------------//
@@ -25,13 +25,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	using namespace ::Eldritch2::Scripting::Wren;
 	using namespace ::Eldritch2::Scripting;
 
-	// clang-format off
-	ET_IMPLEMENT_WREN_CLASS(PlayerView) {
+	ET_IMPLEMENT_WREN_CLASS(PlayerView) { // clang-format off
 		api.CreateClass<PlayerView>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "PlayerView",
 			{/* Constructors */
 				ConstructorMethod("new(_,_)", [](WrenVM* vm) {
 					PlayerView& view(SetReturn<PlayerView>(vm, Angle(wrenGetSlotDouble(vm, 3))));
-
 				//	ET_ABORT_WREN_UNLESS(GetSlotAs<DisplayBus>(vm, 2).TryAcquireDisplay("", view), "Error acquiring display.");
 				})
 			},
@@ -41,24 +39,24 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				})
 			},
 			{/*	Properties */
-				DefineProperty("localToWorld",
+				DefineProperty("viewToWorld",
 				//	Getter
 					[](WrenVM* vm) {
 						const PlayerView&	self(GetSlotAs<PlayerView>(vm, 0));
 
 						wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
-						SetReturn<Transformation>(vm, self.GetLocalToWorld());
+						SetReturn<Transformation>(vm, self.GetWorldToView());
 					},
 				//	Setter
 					[](WrenVM* vm) {
-						GetSlotAs<PlayerView>(vm, 0).SetLocalToWorld(GetSlotAs<Transformation>(vm, 1));
+						GetSlotAs<PlayerView>(vm, 0).SetWorldToView(GetSlotAs<Transformation>(vm, 1));
 					}
 				),
-				DefineGetter("worldToLocal", [](WrenVM* vm) {
+				DefineGetter("worldToView", [](WrenVM* vm) {
 					const PlayerView&	self(GetSlotAs<PlayerView>(vm, 0));
 
 					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
-					SetReturn<Transformation>(vm, self.GetLocalToWorld().GetInverse());
+					SetReturn<Transformation>(vm, self.GetWorldToView().GetInverse());
 				}),
 				DefineProperty("verticalFovDegrees",
 				//	Getter
@@ -73,7 +71,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			},
 			{/* Methods */ }
 		);
-	}
-	// clang-format on
+	} // clang-format on
 
 }}} // namespace Eldritch2::Graphics::Vulkan

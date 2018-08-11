@@ -456,4 +456,10 @@ ETInlineHint constexpr Transformation ETSimdCall Transformation::MakeIdentity() 
 	return { Vector::MakeIdentity(), Quaternion::MakeIdentity() };
 }
 
+// ---------------------------------------------------
+
+ETInlineHint ETPureFunctionHint Transformation ETSimdCall operator*(Transformation lhs, Transformation rhs) {
+	return Transformation{ rhs.translation + rhs.rotation.Rotate(lhs.translation), rhs.rotation * lhs.rotation };
+}
+
 } // namespace Eldritch2

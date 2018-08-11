@@ -5,7 +5,7 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2015 Eldritch Entertainment, LLC.
+  ©2010-2018 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
@@ -18,98 +18,21 @@
 namespace Eldritch2 {
 namespace Scheduling {
 	class JobExecutor;
-}
+} // namespace Scheduling
 
 namespace Scripting { namespace Wren {
 	class ApiBuilder;
 }} // namespace Scripting::Wren
-
-namespace Core {
-	class World;
-}
 } // namespace Eldritch2
 
 namespace Eldritch2 { namespace Core {
 
 	class ETPureAbstractHint WorldComponent {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		struct EarlyInitializationVisitor {};
-		struct LateInitializationVisitor {};
-		struct TearDownVisitor {};
-
-	public:
-		struct TickVisitor {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref TickVisitor instance,
-			TickVisitor(uint64 durationInMicroseconds);
-
-			~TickVisitor() = default;
-
-		public:
-			const uint64 durationInMicroseconds;
-		};
-
-		// ---
-
-	public:
-		struct EarlyTickVisitor : public TickVisitor {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref EarlyTickVisitor instance,
-			EarlyTickVisitor(uint64 durationInMicroseconds);
-
-			~EarlyTickVisitor() = default;
-		};
-
-		// ---
-
-	public:
-		struct StandardTickVisitor : public TickVisitor {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref StandardTickVisitor instance,
-			StandardTickVisitor(uint64 durationInMicroseconds);
-
-			~StandardTickVisitor() = default;
-		};
-
-		// ---
-
-	public:
-		struct LateTickVisitor : public TickVisitor {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref LateTickVisitor instance,
-			LateTickVisitor(uint64 durationInMicroseconds);
-
-			~LateTickVisitor() = default;
-		};
-
-		// ---
-
-	public:
-		struct VariableTickVisitor : public TickVisitor {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref VariableTickVisitor instance,
-			VariableTickVisitor(uint64 durationInMicroseconds);
-
-			~VariableTickVisitor() = default;
-		};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref WorldComponent instance.
-		WorldComponent(const Blackboard& services);
+		WorldComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		WorldComponent(const WorldComponent&) = delete;
 
@@ -118,21 +41,35 @@ namespace Eldritch2 { namespace Core {
 		// - WORLD COMPONENT SANDBOX METHODS -----------------
 
 	public:
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const EarlyInitializationVisitor);
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const LateInitializationVisitor);
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const VariableTickVisitor&);
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const EarlyTickVisitor&);
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const StandardTickVisitor&);
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const LateTickVisitor&);
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const TearDownVisitor);
+		virtual void BindResourcesEarly(Scheduling::JobExecutor& executor);
+
+		virtual void BindResources(Scheduling::JobExecutor& executor);
+
+		virtual void FreeResources(Scheduling::JobExecutor& executor);
+
+		// - WORLD COMPONENT SANDBOX METHODS -----------------
+
+	public:
+		virtual void OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction);
+
+		virtual void OnFixedRateTickEarly(Scheduling::JobExecutor& executor, MicrosecondTime delta);
+
+		virtual void OnFixedRateTick(Scheduling::JobExecutor& executor, MicrosecondTime delta);
+
+		virtual void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime delta);
+
+		// - WORLD COMPONENT SANDBOX METHODS -----------------
+
+	public:
 		//! Interested service classes should override this method in order to participate in script API setup.
 		/*!	@param[in] registrar @parblock @ref Scripting::Wren::ApiBuilder that will handle publishing the service's types,
 				methods and variables to scripts. @endparblock
 			@remark The default implementation does nothing. */
-		virtual void AcceptVisitor(Scripting::Wren::ApiBuilder& api);
-		virtual void AcceptVisitor(Blackboard& services);
+		virtual void DefineScriptApi(Scripting::Wren::ApiBuilder& api);
 
-		// ---------------------------------------------------
+		virtual void PublishServices(ObjectLocator& services);
+
+		// - WORLD SERVICE DISCOVERY -------------------------
 
 	protected:
 		template <typename ServiceType>
@@ -146,7 +83,7 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const Blackboard* _services;
+		const ObjectLocator* _services;
 	};
 
 }} // namespace Eldritch2::Core

@@ -21,23 +21,24 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
+		//!	Constructs this @ref RecastEngineComponent instance.
+		RecastEngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		RecastEngineComponent(const RecastEngineComponent&) = delete;
-		//!	Constructs this @ref RecastEngineComponent instance.
-		RecastEngineComponent(const Blackboard& services);
 
 		~RecastEngineComponent() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const Core::World& world) override;
+		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
 		// ---------------------------------------------------
 
 	public:
-		void AcceptVisitor(Core::PropertyRegistrar& properties) override;
-		void AcceptVisitor(Assets::AssetApiBuilder& factories) override;
+		void PublishConfiguration(Core::PropertyRegistrar& properties) override;
+
+		void PublishAssetTypes(Assets::AssetApiBuilder& factories) override;
 	};
 
 }}} // namespace Eldritch2::Navigation::Recast

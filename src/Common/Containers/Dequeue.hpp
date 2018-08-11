@@ -48,7 +48,7 @@ public:
 	//!	Constructs this @ref Dequeue instance.
 	Dequeue(const Dequeue&, const AllocatorType& allocator);
 	//!	Constructs this @ref Dequeue instance.
-	Dequeue(const AllocatorType& allocator);
+	Dequeue(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref Dequeue instance.
 	Dequeue(Dequeue&&);
 

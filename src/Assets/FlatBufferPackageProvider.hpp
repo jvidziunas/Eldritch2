@@ -37,8 +37,6 @@ namespace Eldritch2 { namespace Assets {
 
 		Assets::AssetDatabase& GetAssetDatabase();
 
-		FileSystem& GetFileSystem();
-
 		// ---------------------------------------------------
 
 	public:
@@ -54,15 +52,22 @@ namespace Eldritch2 { namespace Assets {
 		// ---------------------------------------------------
 
 	private:
-		void Load(Package& package);
+		ErrorCode DeserializeAssets(Package& package);
+
+		void SatisfyLoad();
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		mutable Logging::FileLog _log;
-		FileSystem               _fileSystem;
 		Assets::AssetDatabase    _assetDatabase;
 		Assets::PackageDatabase  _packageDatabase;
 	};
 
 }} // namespace Eldritch2::Assets
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Assets/FlatBufferPackageProvider.inl>
+//------------------------------------------------------------------//

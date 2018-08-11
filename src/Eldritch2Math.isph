@@ -1,119 +1,213 @@
+#ifndef ELDRITCH2_MATH_H
+#define ELDRITCH2_MATH_H
+
 #include "Eldritch2Types.isph"
 
-inline float Dot( float<2> a, float<2> b ) {
+inline float Dot(float2 a, float2 b) {
 	return (a.x * b.x) + (a.y * b.y);
 }
 
-inline float Dot( float<3> a, float<3> b ) {
+inline float Dot(float3 a, float3 b) {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
-inline float Dot( float<4> a, float<4> b ) {
+inline float Dot(float4 a, float4 b) {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
 }
 
-inline float<2> LinearInterpolate( float<2> a, float<2> b, float alpha ) {
-    return (1.f - alpha) * a + alpha * b;
+inline float LinearInterpolate(float a, float b, float alpha) {
+	return (1.f - alpha) * a + alpha * b;
 }
 
-inline float<3> LinearInterpolate( float<3> a, float<3> b, float alpha ) {
-    return (1.f - alpha) * a + alpha * b;
+inline float2 LinearInterpolate(float2 a, float2 b, float alpha) {
+	return (1.f - alpha) * a + alpha * b;
 }
 
-inline float<4> LinearInterpolate( float<4> a, float<4> b, float alpha ) {
-    return (1.f - alpha) * a + alpha * b;
+inline float3 LinearInterpolate(float3 a, float3 b, float alpha) {
+	return (1.f - alpha) * a + alpha * b;
 }
 
-inline float<2> Normalize( float<2> vector ) {
-	return vector * rsqrt( Dot( vector, vector ) );
+inline float4 LinearInterpolate(float4 a, float4 b, float alpha) {
+	return (1.f - alpha) * a + alpha * b;
 }
 
-inline float<3> Normalize( float<3> vector ) {
-	return vector * rsqrt( Dot( vector, vector ) );
+inline float2 Normalize(float2 vector) {
+	return vector * rsqrt(Dot(vector, vector));
 }
 
-inline float<4> Normalize( float<4> vector ) {
-	return vector * rsqrt( Dot( vector, vector ) );
+inline float3 Normalize(float3 vector) {
+	return vector * rsqrt(Dot(vector, vector));
+}
+
+inline float4 Normalize(float4 vector) {
+	return vector * rsqrt(Dot(vector, vector));
 }
 
 // Adapted from the original by Jonathan Blow, see http://number-none.com/product/Hacking%20Quaternions/index.html
 // In particular, the alpha parameter has been changed to take the cosine thereof to exploit the quaternion Dot product.
-float QuaternionAlphaCorrection( float alpha, float alphaK, float alphaAttenuation, float cosAlpha ) {
-	const double	factor = 1.0 - ( alphaAttenuation * cosAlpha );
-	const float	k = alphaK * factor * factor;
-	const float	b =  2.0f * k;
-	const float	c = -3.0f * k;
-	const float	d =  1.0f + k;
+inline float QuaternionAlphaCorrection(float alpha, float alphaK, float alphaAttenuation, float cosAlpha) {
+	const double factor = 1.0 - (alphaAttenuation * cosAlpha);
+	const float  k      = alphaK * factor * factor;
+	const float  b      = 2.0f * k;
+	const float  c      = -3.0f * k;
+	const float  d      = 1.0f + k;
 
-	return alpha * ( b * alpha + c ) + d;
+	return alpha * (b * alpha + c) + d;
 }
 
-inline Quaternion QuaternionLerp( Quaternion a, Quaternion b, float alpha ) {
-	return Normalize( LinearInterpolate( a, b, alpha ) );
+inline Quaternion QuaternionLerp(Quaternion a, Quaternion b, float alpha) {
+	return Normalize(LinearInterpolate(a, b, alpha));
 }
 
-Quaternion ConstantVelocityQuaternionLerp( Quaternion a, Quaternion b, float alpha ) {
-//	RMS minimized coefficients for the quaternion alpha spline adjustment.
-//	Taken from http://number-none.com/product/Hacking%20Quaternions/index.html
-	return QuaternionLerp( a, b, QuaternionAlphaCorrection( alpha, 0.5069269, 0.7878088, Dot( a, b ) ) );
+inline Quaternion ConstantVelocityQuaternionLerp(Quaternion a, Quaternion b, float alpha) {
+	//	RMS minimized coefficients for the quaternion alpha spline adjustment.
+	//	Taken from http://number-none.com/product/Hacking%20Quaternions/index.html
+	return QuaternionLerp(a, b, QuaternionAlphaCorrection(alpha, 0.5069269, 0.7878088, Dot(a, b)));
 }
 
-inline Quaternion FlipW( Quaternion q ) {
+inline Quaternion FlipW(Quaternion q) {
 	q.w = floatbits(intbits(q.w) ^ intbits(-0x0p0));
 	return q;
 }
 
-Quaternion QuaternionMultiply( Quaternion q0, Quaternion q1 ) {
-	return (q0 * q1.wwww) - (q0.zxyx * q1.yzxx) + FlipW( q0.yzxz * q1.zxyz ) + FlipW( q0.wwwy * q1.xyzy );
+inline Quaternion QuaternionMultiply(Quaternion q0, Quaternion q1) {
+	return (q0 * q1.wwww) - (q0.zxyx * q1.yzxx) + FlipW(q0.yzxz * q1.zxyz) + FlipW(q0.wwwy * q1.xyzy);
 }
 
-float<2> HermiteSpline( float<2> point0, float<2> tangent0, float<2> point1, float<2> tangent1, float alpha ) {
-//	Evaluate the spline using the DeCasteljau method
-	float<2> temp = LinearInterpolate( tangent0, point1, alpha );
+inline float HermiteSpline(float point0, float tangent0, float point1, float tangent1, float alpha) {
+	//	Evaluate the spline using the DeCasteljau method
+	float temp = LinearInterpolate(tangent0, point1, alpha);
 	return LinearInterpolate(
 		LinearInterpolate(
-			LinearInterpolate( point0, tangent0, alpha ),
+			LinearInterpolate(point0, tangent0, alpha),
 			temp,
-			alpha
-		),
+			alpha),
 		LinearInterpolate(
 			temp,
-			LinearInterpolate( point1, tangent1, alpha ),
-			alpha ),
-		alpha
-	);
+			LinearInterpolate(point1, tangent1, alpha),
+			alpha),
+		alpha);
 }
 
-float<3> HermiteSpline( float<3> point0, float<3> tangent0, float<3> point1, float<3> tangent1, float alpha ) {
-//	Evaluate the spline using the DeCasteljau method
-	float<3> temp = LinearInterpolate( tangent0, point1, alpha );
+inline float2 HermiteSpline(float2 point0, float2 tangent0, float2 point1, float2 tangent1, float alpha) {
+	//	Evaluate the spline using the DeCasteljau method
+	float2 temp = LinearInterpolate(tangent0, point1, alpha);
 	return LinearInterpolate(
 		LinearInterpolate(
-			LinearInterpolate( point0, tangent0, alpha ),
+			LinearInterpolate(point0, tangent0, alpha),
 			temp,
-			alpha
-		),
+			alpha),
 		LinearInterpolate(
 			temp,
-			LinearInterpolate( point1, tangent1, alpha ),
-			alpha ),
-		alpha
-	);
+			LinearInterpolate(point1, tangent1, alpha),
+			alpha),
+		alpha);
 }
 
-float<4> HermiteSpline( float<4> point0, float<4> tangent0, float<4> point1, float<4> tangent1, float alpha ) {
-//	Evaluate the spline using the DeCasteljau method
-	float<4> temp = LinearInterpolate( tangent0, point1, alpha );
+inline float3 HermiteSpline(float3 point0, float3 tangent0, float3 point1, float3 tangent1, float alpha) {
+	//	Evaluate the spline using the DeCasteljau method
+	float3 temp = LinearInterpolate(tangent0, point1, alpha);
 	return LinearInterpolate(
 		LinearInterpolate(
-			LinearInterpolate( point0, tangent0, alpha ),
+			LinearInterpolate(point0, tangent0, alpha),
 			temp,
-			alpha
-		),
+			alpha),
 		LinearInterpolate(
 			temp,
-			LinearInterpolate( point1, tangent1, alpha ),
-			alpha ),
-		alpha
-	);
+			LinearInterpolate(point1, tangent1, alpha),
+			alpha),
+		alpha);
 }
+
+inline float4 HermiteSpline(float4 point0, float4 tangent0, float4 point1, float4 tangent1, float alpha) {
+	//	Evaluate the spline using the DeCasteljau method
+	float4 temp = LinearInterpolate(tangent0, point1, alpha);
+	return LinearInterpolate(
+		LinearInterpolate(
+			LinearInterpolate(point0, tangent0, alpha),
+			temp,
+			alpha),
+		LinearInterpolate(
+			temp,
+			LinearInterpolate(point1, tangent1, alpha),
+			alpha),
+		alpha);
+}
+
+inline float AsFloat(half value) {
+	return half_to_float(value);
+}
+
+inline uniform float AsFloat(uniform half value) {
+	return half_to_float(value);
+}
+
+inline float2 AsFloat(half2 value) {
+	float2 temp = { half_to_float(value.x), half_to_float(value.y) };
+	return temp;
+}
+
+inline uniform float2 AsFloat(uniform half2 value) {
+	uniform float2 temp =  { half_to_float(value.x), half_to_float(value.y) };
+	return temp;
+}
+
+inline float3 AsFloat(half3 value) {
+	float3 temp =  { half_to_float(value.x), half_to_float(value.y), half_to_float(value.z) };
+	return temp;
+}
+
+inline uniform float3 AsFloat(uniform half3 value) {
+	uniform float3 temp =  { half_to_float(value.x), half_to_float(value.y), half_to_float(value.z) };
+	return temp;
+}
+
+inline float4 AsFloat(half4 value) {
+	float4 temp =  { half_to_float(value.x), half_to_float(value.y), half_to_float(value.z), half_to_float(value.w) };
+	return temp;
+}
+
+inline uniform float4 AsFloat(uniform half4 value) {
+	uniform float4 temp =  { half_to_float(value.x), half_to_float(value.y), half_to_float(value.z), half_to_float(value.w) };
+	return temp;
+}
+
+inline half AsHalf(float value) {
+	return float_to_half(value);
+}
+
+inline uniform half AsHalf(uniform float value) {
+	return float_to_half(value);
+}
+
+inline half2 AsHalf(float2 value) {
+	half2 temp = { float_to_half(value.x), float_to_half(value.y) };
+	return temp;
+}
+
+inline uniform half2 AsHalf(uniform float2 value) {
+	uniform half2 temp = { float_to_half(value.x), float_to_half(value.y) };
+	return temp;
+}
+
+inline half3 AsHalf(float3 value) {
+	half3 temp = { float_to_half(value.x), float_to_half(value.y), float_to_half(value.z) };
+	return temp;
+}
+
+inline uniform half3 AsHalf(uniform float3 value) {
+	uniform half3 temp = { float_to_half(value.x), float_to_half(value.y), float_to_half(value.z) };
+	return temp;
+}
+
+inline half4 AsHalf(float4 value) {
+	half4 temp = { float_to_half(value.x), float_to_half(value.y), float_to_half(value.z), float_to_half(value.w) };
+	return temp;
+}
+
+inline uniform half4 AsHalf(uniform float4 value) {
+	uniform half4 temp = { float_to_half(value.x), float_to_half(value.y), float_to_half(value.z), float_to_half(value.w) };
+	return temp;
+}
+
+#endif // ifndef ELDRITCH2_MATH_H

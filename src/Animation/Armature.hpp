@@ -17,7 +17,7 @@
 
 namespace Eldritch2 { namespace Animation {
 
-	class Armature : public AnimationTree {
+	class Armature : public AnimationTree<> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:

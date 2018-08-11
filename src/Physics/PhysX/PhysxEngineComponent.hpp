@@ -25,7 +25,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	public:
 		//!	Constructs this @ref PhysxEngineComponent instance.
-		PhysxEngineComponent(const Blackboard& services, Logging::Log& log);
+		PhysxEngineComponent(const ObjectLocator& services, Logging::Log& log);
 		//!	Disable copy construction.
 		PhysxEngineComponent(const PhysxEngineComponent&) = delete;
 
@@ -34,10 +34,14 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
-		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const Core::World& world) override;
+		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const InitializationVisitor) override;
-		void AcceptVisitor(Assets::AssetApiBuilder& factories) override;
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
+
+	public:
+		void BindResourcesEarly(Scheduling::JobExecutor& executor) override;
+
+		void PublishAssetTypes(Assets::AssetApiBuilder& factories) override;
 
 		// ---------------------------------------------------
 
@@ -47,9 +51,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		//	Mutable so logs can be written even in const methods.
-		mutable PhysxErrorMixin<Logging::ChildLog> _log;
-		//!	Mutable as objects allocated from the allocator are not directly part of the object's state.
+		mutable PhysxErrorMixin<Logging::ChildLog>   _log;
 		mutable PhysxAllocatorMixin<MallocAllocator> _allocator;
 	};
 

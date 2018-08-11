@@ -125,6 +125,7 @@
       <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib;$(ExternLibDir);$(ExternSrcDir)PhysX\PxShared\lib\vc15win64;$(ExternSrcDir)PhysX\PhysX_3.4\Lib\vc15win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreLinkEvent>
       <Command>
@@ -188,6 +189,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
       <Profile>true</Profile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(SolutionDir)bin\"
@@ -251,6 +253,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
       <Profile>true</Profile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(SolutionDir)bin\"
@@ -266,7 +269,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Animation\AnimationTree.cpp" />
     <ClCompile Include="src\Animation\AnimationTypes.cpp" />
     <ClCompile Include="src\Animation\Armature.cpp" />
     <ClCompile Include="src\Animation\Armature.WrenScriptApi.cpp" />
@@ -275,12 +277,12 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Animation\BipedalWalkClip.cpp" />
     <ClCompile Include="src\Animation\KeyframeClip.cpp" />
     <ClCompile Include="src\Assets\AssetDatabase.cpp" />
-    <ClCompile Include="src\Assets\AssetManager.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Assets\AssetLocator.WrenScriptApi.cpp" />
     <ClCompile Include="src\Assets\Package.cpp" />
     <ClCompile Include="src\Assets\FlatBufferPackageProvider.cpp" />
     <ClCompile Include="src\Assets\PackageDatabase.cpp" />
-    <ClCompile Include="src\Assets\PackageManager.cpp" />
-    <ClCompile Include="src\Assets\PackageManager.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Assets\PackageLocator.cpp" />
+    <ClCompile Include="src\Assets\PackageLocator.WrenScriptApi.cpp" />
     <ClCompile Include="src\Audio\Listener.cpp" />
     <ClCompile Include="src\Audio\XAudio2\OpusStreamingCallback.cpp" />
     <ClCompile Include="src\Audio\XAudio2\XAudio2AudioScene.cpp" />
@@ -291,13 +293,14 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Audio\XAudio2\Xaudio2WorldComponent.cpp" />
     <ClCompile Include="src\Audio\XAudio2\XAudio2WorldComponent.WrenScriptApi.cpp" />
     <ClCompile Include="src\Build.cpp" />
+    <ClCompile Include="src\Common\Containers\String.Win32.cpp" />
     <ClCompile Include="src\Common\FileAppender.Win32.cpp" />
     <ClCompile Include="src\Common\FileReader.Win32.cpp" />
     <ClCompile Include="src\Common\Filesystem.Win32.cpp" />
     <ClCompile Include="src\Common\FileWriter.Win32.cpp" />
     <ClCompile Include="src\Common\MappedFile.Win32.cpp" />
     <ClCompile Include="src\Common\Memory.cpp" />
-    <ClCompile Include="src\Common\Blackboard.cpp" />
+    <ClCompile Include="src\Common\ObjectLocator.cpp" />
     <ClCompile Include="src\Common\Memory\MallocAllocator.cpp" />
     <ClCompile Include="src\Common\Mutex.cpp" />
     <ClCompile Include="src\Common\Mutex.Win32.cpp" />
@@ -319,7 +322,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\Engine.ManagementComponent.cpp" />
     <ClCompile Include="src\Core\EngineComponent.cpp" />
-    <ClCompile Include="src\Core\Microprofile.cpp" />
     <ClCompile Include="src\Core\PropertyDatabase.cpp" />
     <ClCompile Include="src\Core\PropertyRegistrar.cpp" />
     <ClCompile Include="src\Core\TimeAccumulator.cpp" />
@@ -332,10 +334,10 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.Mesh.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.SparseTileCache.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.VertexBuffer.cpp" />
-    <ClCompile Include="src\Graphics\Vulkan\DisplayBus.cpp" />
-    <ClCompile Include="src\Graphics\Vulkan\DisplayBus.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\DisplayLocator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\DisplayLocator.WrenScriptApi.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.cpp" />
-    <ClCompile Include="src\Input\InputBus.WrenScriptApi.cpp" />
+    <ClCompile Include="src\Input\DeviceLocator.WrenScriptApi.cpp" />
     <ClCompile Include="src\Input\InputDevice.cpp" />
     <ClCompile Include="src\Input\InputDevice.InputHandler.cpp" />
     <ClCompile Include="src\Input\Win32\DeviceCoordinator.cpp" />
@@ -397,17 +399,17 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Graphics\Vulkan\DescriptorTable.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\Gpu.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.UniformBuffer.cpp" />
-    <ClCompile Include="src\Graphics\Vulkan\ResidencyCoordinator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\ResourceBus.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.TransferBuffer.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\Light.WrenScriptApi.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\Mesh.WrenScriptApi.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GraphicsPipeline.cpp" />
-    <ClCompile Include="src\Graphics\Vulkan\GpuResourceBus.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\FrameTransferBus.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.IndexBuffer.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.ShaderImage.cpp" />
-    <ClCompile Include="src\Graphics\Vulkan\DisplayCoordinator.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\DisplayBus.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.TileManager.cpp" />
-    <ClCompile Include="src\Graphics\Vulkan\ShaderPipeline.cpp" />
+    <ClCompile Include="src\Graphics\Vulkan\GraphicsPipeline.ShaderPipeline.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\VulkanEngineComponent.AssetApi.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\Display.cpp" />
     <ClCompile Include="src\Graphics\Vulkan\Display.Win32.cpp" />
@@ -457,7 +459,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Scripting\Wren\WrenWorldComponent.WrenScriptApi.cpp" />
     <ClCompile Include="src\Common\Assert.cpp" />
     <ClCompile Include="src\Common\containers\IntrusiveConcurrentQueue.cpp" />
-    <ClCompile Include="src\Common\Eastl.cpp" />
     <ClCompile Include="src\Common\ErrorCode.cpp" />
     <ClCompile Include="src\Common\Memory\EaStlAllocatorMixin.cpp" />
     <ClCompile Include="src\Common\Memory\NullAllocator.cpp" />
@@ -475,20 +476,18 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Animation\AnimationTree.hpp" />
-    <ClInclude Include="src\Animation\Clip.hpp" />
     <ClInclude Include="src\Animation\Armature.hpp" />
     <ClInclude Include="src\Animation\AssetViews\AnimationTreeAsset.hpp" />
     <ClInclude Include="src\Animation\AssetViews\KeyframeClipAsset.hpp" />
     <ClInclude Include="src\Animation\BipedalWalkClip.hpp" />
-    <ClInclude Include="src\Animation\Blend.hpp" />
     <ClInclude Include="src\Animation\KeyframeClip.hpp" />
     <ClInclude Include="src\Assets\AssetDatabase.hpp" />
-    <ClInclude Include="src\Assets\AssetManager.hpp" />
+    <ClInclude Include="src\Assets\AssetLocator.hpp" />
     <ClInclude Include="src\Assets\Package.hpp" />
     <ClInclude Include="src\Assets\FlatBufferPackageProvider.hpp" />
     <ClInclude Include="src\Assets\Asset.hpp" />
     <ClInclude Include="src\Assets\PackageDatabase.hpp" />
-    <ClInclude Include="src\Assets\PackageManager.hpp" />
+    <ClInclude Include="src\Assets\PackageLocator.hpp" />
     <ClInclude Include="src\Audio\Listener.hpp" />
     <ClInclude Include="src\Audio\XAudio2\OpusStreamingCallback.hpp" />
     <ClInclude Include="src\Audio\XAudio2\XAudio2AudioScene.hpp" />
@@ -503,8 +502,8 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Common\Containers\Dequeue.hpp" />
     <ClInclude Include="src\Common\Containers\PriorityQueue.hpp" />
     <ClInclude Include="src\Common\Containers\Queue.hpp" />
-    <ClInclude Include="src\Common\Containers\PlatformString.hpp" />
     <ClInclude Include="src\Common\Containers\Stack.hpp" />
+    <ClInclude Include="src\Common\Containers\StringView.hpp" />
     <ClInclude Include="src\Common\FileAppender.hpp" />
     <ClInclude Include="src\Common\FileReader.hpp" />
     <ClInclude Include="src\Common\Filesystem.hpp" />
@@ -512,7 +511,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Common\MappedFile.hpp" />
     <ClInclude Include="src\Common\Math.hpp" />
     <ClInclude Include="src\Common\Memory.hpp" />
-    <ClInclude Include="src\Common\Blackboard.hpp" />
+    <ClInclude Include="src\Common\ObjectLocator.hpp" />
     <ClInclude Include="src\Common\Memory\Allocator.hpp" />
     <ClInclude Include="src\Common\Memory\MallocAllocator.hpp" />
     <ClInclude Include="src\Common\Mpl\EnableIf.hpp" />
@@ -523,6 +522,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Common\Mutex.hpp" />
     <ClInclude Include="src\Common\Platform.hpp" />
     <ClInclude Include="src\Common\Precompiled.hpp" />
+    <ClInclude Include="src\Common\Profiler.hpp" />
     <ClInclude Include="src\Common\Ratio.hpp" />
     <ClInclude Include="src\Common\ScopeGuard.hpp" />
     <ClInclude Include="src\Common\Semaphore.hpp" />
@@ -541,10 +541,10 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Core\World.hpp" />
     <ClInclude Include="src\Core\WorldComponent.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\BatchCoordinator.hpp" />
-    <ClInclude Include="src\Graphics\Vulkan\DisplayBus.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\DisplayLocator.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\Display.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.hpp" />
-    <ClInclude Include="src\Input\InputBus.hpp" />
+    <ClInclude Include="src\Input\DeviceLocator.hpp" />
     <ClInclude Include="src\Input\InputDevice.hpp" />
     <ClInclude Include="src\Input\Win32\DeviceCoordinator.hpp" />
     <ClInclude Include="src\Input\Win32\Win32InputEngineComponent.hpp" />
@@ -582,7 +582,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Graphics\ImageSource.hpp" />
     <ClInclude Include="src\Graphics\ImageTools.hpp" />
     <ClInclude Include="src\Graphics\MeshSource.hpp" />
-    <ClInclude Include="src\Graphics\PortalView.hpp" />
     <ClInclude Include="src\Graphics\RenderConcept.hpp" />
     <ClInclude Include="src\Graphics\ResolutionScale.hpp" />
     <ClInclude Include="src\Graphics\RgbColor.hpp" />
@@ -594,12 +593,11 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Graphics\Vulkan\CommandList.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\DescriptorTable.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\Gpu.hpp" />
-    <ClInclude Include="src\Graphics\Vulkan\GpuResourceBus.hpp" />
-    <ClInclude Include="src\Graphics\Vulkan\ResidencyCoordinator.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\FrameTransferBus.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\ResourceBus.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\GpuResources.hpp" />
-    <ClInclude Include="src\Graphics\Vulkan\DisplayCoordinator.hpp" />
+    <ClInclude Include="src\Graphics\Vulkan\DisplayBus.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\GraphicsPipeline.hpp" />
-    <ClInclude Include="src\Graphics\Vulkan\ShaderPipeline.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\Vulkan.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\VulkanEngineComponent.hpp" />
     <ClInclude Include="src\Graphics\Vulkan\VulkanGraphicsScene.hpp" />
@@ -684,10 +682,12 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include=".clang-format" />
     <None Include="resources\Eldritch2.resources.aps" />
     <None Include="src\Animation\AnimationTree.inl" />
+    <None Include="src\Animation\AnimationTypes.inl" />
     <None Include="src\Animation\Armature.inl" />
     <None Include="src\Animation\KeyframeClip.inl" />
     <None Include="src\Assets\AssetDatabase.inl" />
-    <None Include="src\Assets\AssetManager.inl" />
+    <None Include="src\Assets\AssetLocator.inl" />
+    <None Include="src\Assets\FlatBufferPackageProvider.inl" />
     <None Include="src\Assets\Package.inl" />
     <None Include="src\Assets\Asset.inl" />
     <None Include="src\Assets\PackageDatabase.inl" />
@@ -699,10 +699,12 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include="src\Common\Containers\PriorityQueue.inl" />
     <None Include="src\Common\Containers\Queue.inl" />
     <None Include="src\Common\Containers\Stack.inl" />
+    <None Include="src\Common\Containers\String.inl" />
+    <None Include="src\Common\Containers\StringView.inl" />
     <None Include="src\Common\Filesystem.inl" />
     <None Include="src\Common\MappedFile.inl" />
     <None Include="src\Common\Math.inl" />
-    <None Include="src\Common\Blackboard.inl" />
+    <None Include="src\Common\ObjectLocator.inl" />
     <None Include="src\Common\SymbolTable.inl" />
     <None Include="src\Core\Engine.inl" />
     <None Include="src\Core\EngineComponent.inl" />
@@ -711,11 +713,14 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include="src\Core\TimeAccumulator.inl" />
     <None Include="src\Core\World.inl" />
     <None Include="src\Core\WorldComponent.inl" />
-    <None Include="src\Graphics\Vulkan\DisplayCoordinator.inl" />
-    <None Include="src\Graphics\Vulkan\GpuResourceBus.inl" />
+    <None Include="src\Eldritch2Math.isph" />
+    <None Include="src\Eldritch2Types.isph" />
+    <None Include="src\Graphics\ImageSource.inl" />
+    <None Include="src\Graphics\Vulkan\DisplayBus.inl" />
+    <None Include="src\Graphics\Vulkan\FrameTransferBus.inl" />
     <None Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.inl" />
-    <None Include="src\Graphics\Vulkan\ResidencyCoordinator.inl" />
-    <None Include="src\Input\InputBus.inl" />
+    <None Include="src\Graphics\Vulkan\ResourceBus.inl" />
+    <None Include="src\Input\DeviceLocator.inl" />
     <None Include="src\Input\Win32\DeviceCoordinator.inl" />
     <None Include="src\Logging\ChildLog.inl" />
     <None Include="src\Logging\Log.inl" />
@@ -793,31 +798,37 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ResourceCompile Include="resources\Eldritch2.Resources.rc" />
   </ItemGroup>
   <ItemGroup>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Animation.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\AnimationTree.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Armature.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\CollisionShapes.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\DialogueSet.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Eldritch2Types.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\DxbcShaderSet.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Mesh.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\NuklearUi.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PackageIndex.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsTypes.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PlayerData.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\ShaderSetTypes.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsPipeline.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\SerializedWorld.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PhysicsBody.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\SoundBank.fbc" />
-    <FlatbufferSchemaItem Include="src\Flatbuffers\SpirVShaderSet.fbc" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Animation.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\AnimationTree.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Armature.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\CollisionShapes.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\DialogueSet.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Eldritch2Types.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\DxbcShaderSet.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Mesh.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\NetPacket.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\NuklearUi.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\PackageIndex.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsTypes.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\ShaderSetTypes.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsPipeline.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SerializedWorld.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\PhysicsBody.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SoundBank.fbs" />
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SpirVShaderSet.fbs" />
   </ItemGroup>
   <ItemGroup>
-    <IspcSourceItem Include="src\Animation\AnimateSkeletons.ispc" />
+    <IspcSourceItem Include="src\Animation\AnimateSkeleton.ispc" />
     <IspcSourceItem Include="src\Common\Containers\SimdSort.ispc" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="FlatBufferSchema.xml" />
+    <Xml Include="IspcSource.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

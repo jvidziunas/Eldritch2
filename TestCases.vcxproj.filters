@@ -117,9 +117,6 @@
     <ClCompile Include="src\Common\Assert.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\Blackboard.cpp">
-      <Filter>Source Files\Code</Filter>
-    </ClCompile>
     <ClCompile Include="src\Common\CppFormatDefinitions.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
@@ -594,6 +591,9 @@
     <ClCompile Include="src\Renderer\Vulkan\OutputWindow.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
+    <ClCompile Include="src\Common\ObjectLocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Animation\AnimationTree.inl">
@@ -627,9 +627,6 @@
       <Filter>Source Files\Code</Filter>
     </None>
     <None Include="src\Common\Assert.inl">
-      <Filter>Source Files\Code</Filter>
-    </None>
-    <None Include="src\Common\Blackboard.inl">
       <Filter>Source Files\Code</Filter>
     </None>
     <None Include="src\Common\Cache.inl">
@@ -942,6 +939,9 @@
       <Filter>Source Files\Code</Filter>
     </None>
     <None Include="src\Renderer\Vulkan\GpuResidencyManager.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\ObjectLocator.inl">
       <Filter>Source Files\Code</Filter>
     </None>
   </ItemGroup>

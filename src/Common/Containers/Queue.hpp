@@ -31,9 +31,9 @@ public:
 
 public:
 	//!	Constructs this @ref Queue instance.
-	Queue(const Queue&, const AllocatorType& allocator);
+	Queue(const Queue&, const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref Queue instance.
-	Queue(const AllocatorType& allocator);
+	Queue(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref Queue instance.
 	Queue(Queue&&);
 

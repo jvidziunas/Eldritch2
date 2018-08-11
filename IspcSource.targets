@@ -7,12 +7,16 @@
   </AvailableItemName>
  </ItemGroup>
 
- <Target
+  <Target
   Name="CompileIspcSource"
   BeforeTargets="ClCompile"
   Inputs="%(IspcSourceItem.Identity)"
-  Outputs="$(IntDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj">
-  <Message Text="Compiling ISPC source: %(IspcSourceItem.FullPath)" Importance="High" />
-  <Exec Command="&quot;$(SolutionDir)tools\ispc\ispc.exe&quot; &quot;%(IspcSourceItem.Identity)&quot; -h &quot;%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename)_generated.h&quot; -o &quot;$(IntDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj&quot;"/>
- </Target>
+  Outputs="$(IntermediateDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj">
+  	<Message Text="Compiling ISPC source: %(IspcSourceItem.FullPath)" Importance="High" />
+    <Exec Command="&quot;$(SolutionDir)tools\ispc.exe&quot; --addressing=32 --arch=x86-64 &quot;%(IspcSourceItem.Identity)&quot; -h &quot;%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename)_generated.h&quot; -o &quot;$(IntermediateDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj&quot;"
+          Outputs="$(IntermediateDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj">
+      <Output TaskParameter="Outputs" ItemName="Link"/>
+    </Exec>
+    <Message Text="%(IspcSourceItem.FullPath) -> $(IntermediateDir)%(IspcSourceItem.RelativeDir)%(IspcSourceItem.Filename).obj" Importance="High" />
+  </Target>
  </Project>

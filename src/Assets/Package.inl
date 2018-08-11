@@ -35,7 +35,7 @@ namespace Eldritch2 { namespace Assets {
 
 	// ---------------------------------------------------
 
-	ETInlineHint const Utf8Char* Package::GetPath() const {
+	ETInlineHint StringView<Utf8Char> Package::GetPath() const {
 		return _path;
 	}
 
@@ -48,19 +48,19 @@ namespace Eldritch2 { namespace Assets {
 	// ---------------------------------------------------
 
 	ETInlineHint ETPureFunctionHint bool operator==(const Package& lhs, const Package& rhs) {
-		return StringsEqual(lhs.GetPath(), rhs.GetPath());
+		return lhs.GetPath() == rhs.GetPath();
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint ETPureFunctionHint bool operator!=(const Package& lhs, const Package& rhs) {
-		return !StringsEqual(lhs.GetPath(), rhs.GetPath());
+		return lhs.GetPath() != rhs.GetPath();
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint ETPureFunctionHint size_t GetHashCode(const Package& package, size_t seed = 0u) {
-		return HashMemory(package.GetPath(), StringLength(package.GetPath()), seed);
+		return GetHashCode(package.GetPath(), seed);
 	}
 
 }} // namespace Eldritch2::Assets

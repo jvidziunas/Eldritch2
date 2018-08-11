@@ -17,45 +17,35 @@
 #include <XInput.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Core {
-		class	Engine;
-	}
-}
+namespace Eldritch2 { namespace Input { namespace XInput {
 
-namespace Eldritch2 {
-	namespace Input {
-		namespace XInput {
+	class XInputEngineComponent : public Core::EngineComponent {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-			class XInputEngineComponent : public Core::EngineComponent {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	public:
+		//!	Disable copy construction.
+		XInputEngineComponent(const XInputEngineComponent&) = delete;
+		//!	Constructs this @ref XInputEngineComponent instance.
+		XInputEngineComponent(const ObjectLocator& services);
 
-			public:
-			//!	Disable copy construction.
-				XInputEngineComponent(const XInputEngineComponent&) = delete;
-			//!	Constructs this @ref XInputEngineComponent instance.
-				XInputEngineComponent(const Blackboard& services);
+		~XInputEngineComponent() = default;
 
-				~XInputEngineComponent() = default;
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
-			// - ENGINE SERVICE SANDBOX METHODS ------------------
+	protected:
+		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
-			protected:
-				Result<UniquePointer<Core::WorldComponent>>	CreateWorldComponent(Allocator& allocator, const Core::World& world) override;
+		void TickEarly(Scheduling::JobExecutor& executor) override;
 
-				void										AcceptVisitor(Scheduling::JobExecutor& executor, const ServiceTickVisitor) override;
+		// ---------------------------------------------------
 
-			// ---------------------------------------------------
+		//!	Disable copy assignment.
+		XInputEngineComponent& operator=(const XInputEngineComponent&) = delete;
 
-			//!	Disable copy assignment.
-				XInputEngineComponent&	operator=(const XInputEngineComponent&) = delete;
+		// - DATA MEMBERS ------------------------------------
 
-			// - DATA MEMBERS ------------------------------------
+	private:
+		XINPUT_STATE _gamepads[4u];
+	};
 
-			private:
-				XINPUT_STATE	_gamepads[4u];
-			};
-
-		}	// namespace XInput
-	}	// namespace Input
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Input::XInput

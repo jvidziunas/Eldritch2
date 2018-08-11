@@ -12,8 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/ResidencyCoordinator.hpp>
-#include <Graphics/Vulkan/DisplayCoordinator.hpp>
+#include <Graphics/Vulkan/ResourceBus.hpp>
+#include <Graphics/Vulkan/DisplayBus.hpp>
 #include <Graphics/Vulkan/HostMixin.hpp>
 #include <Graphics/Vulkan/Gpu.hpp>
 #include <Logging/ChildLog.hpp>
@@ -31,14 +31,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using HostAllocator = HostMixin<UsageMixin<MallocAllocator>>;
-
-		enum : size_t { MaxGpus = 4u };
-
-		// ---
-
-	public:
-		class Device : public Gpu, public DisplayCoordinator, public ResidencyCoordinator {
+		class Device : public Gpu, public DisplayBus, public ResourceBus {
 			// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -60,10 +53,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			// ---------------------------------------------------
 
 		public:
+			void BeginFrame(Scheduling::JobExecutor& executor, Vulkan& vulkan);
+
+			// ---------------------------------------------------
+
+		public:
 			VkResult BindResources(VkPhysicalDevice device, VkDeviceSize heapBlockSize = HeapBlockSize, VkDeviceSize transferBufferSize = TransferBufferSize);
 
 			void FreeResources();
 		};
+
+		// ---
+
+	public:
+		using HostAllocator = HostMixin<UsageMixin<MallocAllocator>>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -112,8 +115,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		mutable Logging::ChildLog _log;
 		VkInstance                _vulkan;
 		VkDebugReportCallbackEXT  _debugCallback;
-		uint32_t                  _deviceCount;
-		Device                    _devices[MaxGpus];
+		Device                    _device;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

@@ -61,8 +61,8 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 		private:
 			/*!	Win32 raw input requires a window for input registration. The handle is exposed primarily for the
-				 *	engine component to issue a shutdown request to the sampling thread when the application terminates,
-				 *	as there is little need to push state to the window. */
+			 *	engine component to issue a shutdown request to the sampling thread when the application terminates,
+			 *	as there is little need to push state to the window. */
 			Atomic<HWND>       _window;
 			DeviceCoordinator* _devices;
 		};
@@ -71,7 +71,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 	public:
 		//!	Constructs this @ref Win32InputEngineComponent instance.
-		Win32InputEngineComponent(const Blackboard& services, Logging::Log& log);
+		Win32InputEngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		Win32InputEngineComponent(const Win32InputEngineComponent&) = delete;
 
@@ -80,10 +80,11 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	protected:
-		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const Core::World& world) override;
+		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const InitializationVisitor) override;
-		void AcceptVisitor(Blackboard& services) override;
+		void BindResourcesEarly(Scheduling::JobExecutor& executor) override;
+
+		void PublishServices(ObjectLocator& services) override;
 
 		// ---------------------------------------------------
 

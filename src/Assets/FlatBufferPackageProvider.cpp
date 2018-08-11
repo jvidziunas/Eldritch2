@@ -8,7 +8,6 @@
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -18,161 +17,134 @@
 #include <Flatbuffers/PackageIndex_generated.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Assets {
-		namespace {
+namespace Eldritch2 { namespace Assets {
 
-			enum { PathTempBufferSize = Package::MaxPathLength + 32u };
+	using namespace ::Eldritch2::Assets::FlatBuffers;
+	using namespace ::Eldritch2::Logging;
+	using namespace ::flatbuffers;
 
-		// ---
+	namespace {
 
-			ETInlineHint ETPureFunctionHint float32 AsMilliseconds(uint64 microseconds) {
-				static constexpr float32	MicrosecondsPerMillisecond = 1000.0f;
+		ETInlineHint ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime microseconds) {
+			return AsFloat(microseconds) / /*microseconds per millisecond*/ 1000.0f;
+		}
 
-				return microseconds / MicrosecondsPerMillisecond;
+	} // anonymous namespace
+
+	FlatBufferPackageProvider::FlatBufferPackageProvider() :
+		_log(),
+		_assetDatabase(),
+		_packageDatabase() {}
+
+	// ---------------------------------------------------
+
+	void FlatBufferPackageProvider::ScanPackages() {
+		PackageDatabase::LoadableSet packages(MallocAllocator("Package Set Allocator"));
+		Path<>                       specifier;
+
+		_log.Write(MessageType::Message, "Scanning packages." UTF8_NEWLINE);
+		ForEachFile(specifier.Assign(KnownDirectory::Packages, L"*.e2index"), [this, &packages](StringView<PlatformChar> path) {
+			String<> name(path);
+
+			if (Package::MaxPathLength < name.GetLength()) {
+				_log.Write(MessageType::Message, "\tPackage name '{}' exceeds maximum length {}; ignoring." UTF8_NEWLINE, name, Package::MaxPathLength);
+				return;
 			}
 
-		}	// anonymous namespace
+			_log.Write(MessageType::Message, "\tDiscovered package '{}'." UTF8_NEWLINE, name);
+			packages.Emplace(name);
+		});
 
-		using namespace ::Eldritch2::Assets::FlatBuffers;
-		using namespace ::Eldritch2::Logging;
-		using namespace ::flatbuffers;
-
-		FlatBufferPackageProvider::FlatBufferPackageProvider() : _log(), _assetDatabase(), _packageDatabase() {}
+		_log.Write(MessageType::Message, "Package scan complete; found {} package(s)." UTF8_NEWLINE, packages.GetSize());
+		_packageDatabase.BindResources(eastl::move(packages));
+	}
 
 	// ---------------------------------------------------
 
-		PackageDatabase& FlatBufferPackageProvider::GetPackageDatabase() {
-			return _packageDatabase;
+	ErrorCode FlatBufferPackageProvider::BindResources() {
+		Move(KnownDirectory::Logs, L"ContentLog.old.txt", L"ContentLog.txt");
+		ET_FAIL_UNLESS(_log.BindResources(L"ContentLog.txt"));
+
+		_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
+		_log.Write(MessageType::Message, "\t| INITIALIZING LOG                                   |" UTF8_NEWLINE);
+		_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
+
+		return Error::None;
+	}
+
+	// ---------------------------------------------------
+
+	void FlatBufferPackageProvider::FreeResources() {
+		_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
+		_log.Write(MessageType::Message, "\t| TERMINATING LOG                                    |" UTF8_NEWLINE);
+		_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
+
+		_log.FreeResources();
+	}
+
+	// ---------------------------------------------------
+
+	void FlatBufferPackageProvider::SatisfyLoad() {
+		PackageDatabase::LoadRequest request;
+
+		if (_packageDatabase.PopRequest(request)) {
+			request.callback(eastl::move(request.package), DeserializeAssets(*request.package));
 		}
+	}
 
 	// ---------------------------------------------------
 
-		AssetDatabase& FlatBufferPackageProvider::GetAssetDatabase() {
-			return _assetDatabase;
-		}
-
-	// ---------------------------------------------------
-
-		FileSystem& FlatBufferPackageProvider::GetFileSystem() {
-			return _fileSystem;
-		}
-
-	// ---------------------------------------------------
-
-		void FlatBufferPackageProvider::ScanPackages() {
-			PackageDatabase::LoadableSet	packages(MallocAllocator("Loadable Package Collection Allocator"));
-			String<>						indexFilter(MallocAllocator(""));
-
-			_log.Write(MessageType::Message, "Scanning packages." UTF8_NEWLINE);
-
-			indexFilter.Format("*{}", PackageIndexExtension());
-
-			_fileSystem.EnumerateMatchingFiles(KnownDirectory::Packages, indexFilter.AsCString(), [this, &packages](const Utf8Char* path) {
-				_log.Write(MessageType::Message, "\tDiscovered package '{}'." UTF8_NEWLINE, path);
-
-				Utf8Char	name[Package::MaxPathLength];
-
-			//	Strip the extension from the path and terminate.
-				CopyAndTerminate(path, FindLastInstance(path, PackageIndexExtension()), name, '\0');
-
-				packages.Emplace(name);
-			});
-
-			_log.Write(MessageType::Message, "Package scan complete; found {} package(s)." UTF8_NEWLINE, packages.GetSize());
-
-			_packageDatabase.SetPackages(eastl::move(packages), [this](Package& package) {
-				return this->Load(package);
-			});
-		}
-
-	// ---------------------------------------------------
-
-		ErrorCode FlatBufferPackageProvider::BindResources() {
-			const PlatformString<>	logPath(_fileSystem.GetAbsolutePath(KnownDirectory::Logs, "ContentLog.txt"));
-
-			_fileSystem.Move(KnownDirectory::Logs, "ContentLog.old.txt", "ContentLog.txt");
-			ET_FAIL_UNLESS(_log.BindResources(logPath.AsCString()));
-
-			_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
-			_log.Write(MessageType::Message, "\t| INITIALIZING LOG                                   |" UTF8_NEWLINE);
-			_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
-
+	ErrorCode FlatBufferPackageProvider::DeserializeAssets(Package& package) {
+		if (package.IsLoaded()) {
 			return Error::None;
 		}
 
-	// ---------------------------------------------------
+		MappedFile diskIndex, diskBlob;
+		Stopwatch  loadTimer;
+		Path<>     path;
 
-		void FlatBufferPackageProvider::FreeResources() {
-			_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
-			_log.Write(MessageType::Message, "\t| TERMINATING LOG                                    |" UTF8_NEWLINE);
-			_log.Write(MessageType::Message, "\t======================================================" UTF8_NEWLINE);
-
-			_log.FreeResources();
+		{
+			const ErrorCode result(diskIndex.Open(MappedFile::Read, path.Assign(KnownDirectory::Packages, L"{}.e2index", package.GetPath())));
+			if (Failed(result)) {
+				_log.Write(MessageType::Error, "\tError opening {}: {}; aborting load." UTF8_NEWLINE, path, result);
+				return result;
+			}
 		}
-
-	// ---------------------------------------------------
-
-		void FlatBufferPackageProvider::Load(Package& package) {
-			String<>	path(MallocAllocator("Path Allocator"));
-			Stopwatch	loadTimer;
-
-			_log.Write(MessageType::Message, "Loading package {}." UTF8_NEWLINE, package.GetPath());
-
-		//	Open the index file.
-			MappedFile indexFile;
-			path.Format("{}{}", package.GetPath(), PackageIndexExtension());
-			{	const ErrorCode result(indexFile.Open(MappedFile::Read, _fileSystem.GetAbsolutePath(KnownDirectory::Packages, path.AsCString()).AsCString()));
+		{
+			const ErrorCode result(diskBlob.Open(MappedFile::Read, path.Assign(KnownDirectory::Packages, L"{}", package.GetPath())));
 			if (Failed(result)) {
-				_log.Write(MessageType::Error, "\tError opening {}: {}; aborting load." UTF8_NEWLINE, path.AsCString(), AsCString(result));
-				return;
+				_log.Write(MessageType::Error, "\tError opening {}: {}; aborting load." UTF8_NEWLINE, path, result);
+				return result;
 			}
-			}
-
-		//	Open the data blob.
-			MappedFile blobFile;
-			path.Assign(package.GetPath());
-			{	const ErrorCode result(blobFile.Open(MappedFile::Read, _fileSystem.GetAbsolutePath(KnownDirectory::Packages, path.AsCString()).AsCString()));
-			if (Failed(result)) {
-				_log.Write(MessageType::Error, "\tError opening {}: {}; aborting load." UTF8_NEWLINE, path.AsCString(), AsCString(result));
-				return;
-			}
-			}
+		}
 
 		/*	Ensure the data we're working with can plausibly represent a package index. Since verification of asset contents requires specific knowledge of asset
 		 *	structure it is left as an exercise to listeners instead of being performed here. */
-			Verifier verifier(indexFile.GetAtOffset<const uint8_t>(MappedFile::StartOfFile), indexFile.GetSizeInBytes());
-			if (!VerifyPackageIndexBuffer(verifier)) {
-				_log.Write(MessageType::Error, "\tPackage {} contains malformed index data; aborting load." UTF8_NEWLINE, package.GetPath());
-				return;
-			}
-
-			const PackageIndex&	index(*GetPackageIndex(indexFile.GetAtOffset<const uint8_t>(MappedFile::StartOfFile)));
-			Package::AssetList	assets(MallocAllocator("Package Asset List Allocator"));
-
-			_log.Write(MessageType::Message, "\tPackage {} contains {} asset(s)." UTF8_NEWLINE, package.GetPath(), index.Assets()->size());
-
-			for (const AssetDescriptor* source : *index.Assets()) {
-				if (blobFile.GetSizeInBytes() < (source->Offset() + source->Length())) {
-					_log.Write(MessageType::Error, "\tAsset {} in package {} references out-of-bounds data!." UTF8_NEWLINE, source->Name()->c_str(), package.GetPath());
-					continue;
-				}
-
-				if (UniquePointer<Asset> asset = _assetDatabase.CreateAsset(source->Name()->c_str())) {
-					const auto begin(blobFile.GetAtOffset<const char>(source->Offset()));
-
-					if (Succeeded(asset->BindResources(Asset::Builder(_log, begin, begin + source->Length())))) {
-						assets.Append(eastl::move(asset));
-					}
-				}
-			}
-
-			_log.Write(MessageType::Message, "Load complete for package {} in {:.2f}ms ({} asset(s)/{} source(s))." UTF8_NEWLINE,
-					   package.GetPath(), AsMilliseconds(loadTimer.GetDuration()), assets.GetSize(), index.Assets()->size()
-			);
-
-			package.BindAssets(eastl::move(assets));
+		Verifier verifier(diskIndex.Get<const uint8_t>(0u), diskIndex.GetSizeInBytes());
+		if (!VerifyPackageIndexBuffer(verifier)) {
+			_log.Write(MessageType::Error, "\tPackage {} contains malformed index data; aborting load." UTF8_NEWLINE, package.GetPath());
+			return Error::Unspecified;
 		}
 
-	}	// namespace Assets
-}	// namespace Eldritch2
+		const PackageIndex* index(GetPackageIndex(diskIndex.Get<const uint8_t>(0u)));
+		Package::AssetList  assets(MallocAllocator("Package Asset List Allocator"));
+		for (const AssetDescriptor* sourceAsset : *index->Assets()) {
+			if (diskBlob.GetSizeInBytes() < sourceAsset->Offset() + sourceAsset->Length()) {
+				_log.Write(MessageType::Error, "\tAsset {} in package {} references out-of-bounds data!." UTF8_NEWLINE, sourceAsset->Name()->c_str(), package.GetPath());
+				continue;
+			}
+
+			Asset::Builder       builder(_log, diskBlob.GetRange<const char>(sourceAsset->Offset(), sourceAsset->Length()));
+			UniquePointer<Asset> asset(_assetDatabase.Insert(package, StringView<Utf8Char>(sourceAsset->Name()->c_str(), sourceAsset->Name()->size())));
+			if (asset && Succeeded(asset->BindResources(builder))) {
+				assets.Append(eastl::move(asset));
+			}
+		}
+
+		_log.Write(MessageType::Message, "Deserialized package {} in {:.2f}ms ({} created/{} source(s))." UTF8_NEWLINE, package.GetPath(), AsMilliseconds(loadTimer.GetDuration()), assets.GetSize(), index->Assets()->size());
+
+		assets.ShrinkToFit();
+		package.BindAssets(eastl::move(assets));
+	}
+
+}} // namespace Eldritch2::Assets

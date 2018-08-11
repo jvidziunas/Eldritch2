@@ -17,46 +17,45 @@
 
 namespace Eldritch2 { namespace Assets {
 
-	ETInlineHint Asset::Builder::Builder(Logging::Log& log, const char* begin, const char* end) :
+	ETInlineHint Asset::Builder::Builder(Logging::Log& log, Range<const char*> bytes) :
 		_log(log),
-		_begin(begin),
-		_end(end) {}
+		_bytes(bytes) {}
 
 	// ---------------------------------------------------
 
 	ETInlineHint const char* Asset::Builder::Begin() const {
-		return _begin;
+		return _bytes.Begin();
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint const char* Asset::Builder::End() const {
-		return _end;
+		return _bytes.End();
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint size_t Asset::Builder::GetSize() const {
-		return _end - _begin;
+		return _bytes.GetSize();
 	}
 
 	// ---------------------------------------------------
 
-	template <size_t formatSize, typename... Arguments>
-	ETInlineHint void Asset::Builder::WriteLog(Logging::MessageType severity, const Utf8Char (&formatString)[formatSize], Arguments&&... arguments) const {
-		_log.Write(severity, formatString, eastl::forward<Arguments>(arguments)...);
+	template <typename... Arguments>
+	ETInlineHint void Asset::Builder::WriteLog(Logging::MessageType severity, StringView<Utf8Char> format, Arguments&&... arguments) const {
+		_log.Write(severity, format, eastl::forward<Arguments>(arguments)...);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Asset::Asset(const Utf8Char* const filePath) {
-		CopyString(_path, filePath);
+	ETInlineHint Asset::Asset(StringView<Utf8Char> path) {
+		CopyString(_path, path);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint const Utf8Char* const Asset::GetPath() const {
-		return eastl::begin(_path);
+	ETInlineHint StringView<Utf8Char> Asset::GetPath() const {
+		return _path;
 	}
 
 }} // namespace Eldritch2::Assets

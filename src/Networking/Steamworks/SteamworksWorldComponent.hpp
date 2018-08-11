@@ -31,18 +31,28 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		//!	Disable copy construction.
 		SteamworksWorldComponent(const SteamworksWorldComponent&) = delete;
 		//!	Constructs this @ref SteamworksWorldComponent instance.
-		SteamworksWorldComponent(const Core::World& owner);
+		SteamworksWorldComponent(const ObjectLocator& services);
 
 		~SteamworksWorldComponent();
 
 		// ---------------------------------------------------
 
 	protected:
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const LateInitializationVisitor) override;
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const VariableTickVisitor&) override;
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const LateTickVisitor&) override;
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const TearDownVisitor) override;
-		void AcceptVisitor(Scripting::Wren::ApiBuilder& api) override;
+		void BindResources(Scheduling::JobExecutor& executor) override;
+
+		void FreeResources(Scheduling::JobExecutor& executor) override;
+
+		// ---------------------------------------------------
+
+	protected:
+		void OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction) override;
+
+		void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime delta) override;
+
+		// ---------------------------------------------------
+
+	protected:
+		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
 
 		// ---------------------------------------------------
 
@@ -61,7 +71,6 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		//!	Mutable so logs can be written even if we only have a const reference to the @ref SteamworksWorldComponent.
 		mutable Logging::ChildLog _log;
 		bool                      _connectedToSteam;
 		HSteamPipe                _pipe;

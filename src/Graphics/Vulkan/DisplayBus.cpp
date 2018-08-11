@@ -5,59 +5,65 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2018 Eldritch Entertainment, LLC.
+  ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
-#pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Graphics/Vulkan/GraphicsPipelineBuilder.hpp>
+#include <Graphics/Vulkan/VulkanTools.hpp>
 #include <Graphics/Vulkan/DisplayBus.hpp>
+#include <Graphics/Vulkan/Gpu.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	DisplayBus::DisplayBus(
-		DisplayMap<>& displayByName,
-		Mutex&        mutex) :
-		_displayByName(eastl::addressof(displayByName)),
-		_displayMutex(eastl::addressof(mutex)) {
+	DisplayBus::DisplayBus() :
+		_displayByName(MallocAllocator("Display Bus Display by Name Map Allocator")) {
 	}
 
 	// ---------------------------------------------------
 
-	bool DisplayBus::TryAcquireDisplay(const Utf8Char* name, DisplaySource& source) {
-		Lock _(*_displayMutex);
+	VkResult DisplayBus::AcquireImages(Vulkan& vulkan, Gpu& gpu) {
+		Lock _(_displayMutex);
+		for (DisplayMap<>::Iterator output(_displayByName.Begin()); output != _displayByName.End();) {
+			Display& display(output->second);
 
-		DisplayMap<>::Iterator candidate(_displayByName->Find(name, Hash<decltype(name)>(), EqualTo<decltype(name)>()));
+			if (display.ShouldDestroy()) {
+				display.FreeResources(vulkan, gpu);
+				output = _displayByName.Erase(output);
 
-		if (candidate == _displayByName->End()) {
-			candidate = CreateDisplay(name);
+				continue;
+			}
+
+			ET_FAIL_UNLESS(display.AcquireImage(vulkan, gpu));
+			++output;
 		}
 
-		return candidate->second.TryAcquire(source);
+		return VK_SUCCESS;
 	}
 
 	// ---------------------------------------------------
 
-	void DisplayBus::ReleaseDisplay(const Utf8Char* const name, DisplaySource& source) {
-		Lock _(*_displayMutex);
+	VkResult DisplayBus::BindResources(Gpu& gpu) {
+		GraphicsPipelineBuilder builder;
+		builder.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, 1.0f, 1.0f, "FramebufferComposite");
+		builder.AppendColorOutput(/*attachment =*/builder.DefineAttachment(VK_FORMAT_R8G8B8A8_SRGB, VK_SAMPLE_COUNT_1_BIT));
+		builder.Finish(/*andOptimize =*/false); // Skip optimization, it's assumed we know what we're doing/this is a 'trusted' source
 
-		DisplayMap<>::Iterator candidate(_displayByName->Find(name, Hash<decltype(name)>(), EqualTo<decltype(name)>()));
+		GraphicsPipeline compositor;
+		ET_FAIL_UNLESS(compositor.BindResources(gpu, builder));
+		ET_AT_SCOPE_EXIT(compositor.FreeResources(gpu));
 
-		if (candidate == _displayByName->End()) {
-			return;
-		}
-
-		candidate->second.Release(source);
+		Swap(_compositor, compositor);
+		return VK_SUCCESS;
 	}
 
 	// ---------------------------------------------------
 
-	DisplayMap<>::Iterator DisplayBus::CreateDisplay(const Utf8Char* name) {
-		//  It is assumed that this function is called within @ref TryAcquireDisplay()/@ref ReleaseDisplay() and as such we do not acquire a lock here.
-
-		return _displayByName->Emplace(String<>(name, MallocAllocator("Display Name Allocator"))).first;
+	void DisplayBus::FreeResources(Gpu& gpu) {
+		_compositor.FreeResources(gpu);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

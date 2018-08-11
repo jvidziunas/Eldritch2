@@ -31,14 +31,8 @@ namespace AssetViews {
 
 	namespace {
 
-		ETInlineHint ETPureFunctionHint void ParseImageAttachment(GraphicsPipelineBuilder& builder, VkFormat format, bool allowMsaa, const Dynamic* size) {
-			builder.DefineAttachment(format, allowMsaa, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, size->Width(), size->Height(), size->Depth());
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ETPureFunctionHint void ParseImageAttachment(GraphicsPipelineBuilder& builder, VkFormat format, bool allowMsaa, const Static* size) {
-			builder.DefineAttachment(format, allowMsaa, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, VkExtent3D{ size->Width(), size->Height(), size->Depth() });
+		ETInlineHint void ParseAttachment(GraphicsPipelineBuilder& builder, VkFormat format, VkSampleCountFlags msaa) {
+			builder.DefineAttachment(format, msaa);
 		}
 
 		// ---------------------------------------------------
@@ -46,26 +40,24 @@ namespace AssetViews {
 		ETInlineHint void ParseAttachments(GraphicsPipelineBuilder& builder, const GraphicsPipeline* pipeline) {
 			const auto attachments(pipeline->Attachments());
 			for (uoffset_t id(0u); id < attachments->size(); ++id) {
-				const auto attachment(attachments->Get(id));
+				//const auto attachment(attachments->Get(id));
 
-				const VkSampleCountFlags msaaQuality(VK_SAMPLE_COUNT_1_BIT);
-				const VkFormat           format(VK_FORMAT_UNDEFINED);
-
-				switch (attachment->Size_type()) {
-				case AttachmentSize::NONE: break;
-				case AttachmentSize::Dynamic: ParseImageAttachment(builder, format, msaaQuality, attachment->Size_as<Dynamic>()); break;
-				case AttachmentSize::Static: ParseImageAttachment(builder, format, msaaQuality, attachment->Size_as<Static>()); break;
-				} // switch (attachment->Size_type())
+				ParseAttachment(builder, VK_FORMAT_UNDEFINED, VK_SAMPLE_COUNT_1_BIT);
 			}
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ErrorCode ParseStage(GraphicsPipelineBuilder& builder, uoffset_t stageId, const DrawStage* stage) {
-			builder.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, stage->ShaderUsageName()->c_str());
+		ETInlineHint ErrorCode ParseStage(GraphicsPipelineBuilder& builder, uoffset_t /*stageIndex*/, const DrawStage* stage) {
+			switch (stage->Dimensions_type()) {
+			case PassDimensions::Dynamic: break;
+			case PassDimensions::Static: break;
+			default: return Error::Unspecified;
+			};
+			builder.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, 1.0f, 1.0f, stage->ShaderUsageName()->c_str());
 
 			for (uint32 id : *stage->InputAttachments()) {
-				builder.AttachInput(id, VK_IMAGE_LAYOUT_GENERAL);
+				builder.AppendInput(id, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 				/*	if (images.GetSize() <= id) {
 					asset.WriteLog(MessageType::Error, "Graphics pipeline {} references out-of-bounds input attachment {} in pass {}!" UTF8_NEWLINE, GetPath(), id, pass);
 					return Error::InvalidParameter;
@@ -73,7 +65,7 @@ namespace AssetViews {
 			}
 
 			for (uint32 id : *stage->ColorAttachments()) {
-				builder.AttachColorOutput(id, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+				builder.AppendColorOutput(id, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 				/*	if (images.GetSize() <= id) {
 					asset.WriteLog(MessageType::Error, "Graphics pipeline {} references out-of-bounds color attachment {} in pass {}!" UTF8_NEWLINE, GetPath(), id, pass);
 					return Error::InvalidParameter;
@@ -83,7 +75,7 @@ namespace AssetViews {
 
 			if (stage->DepthAttachment() != VK_ATTACHMENT_UNUSED) {
 				const uint32 id(stage->DepthAttachment());
-				builder.AttachDepthStencilBuffer(id, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+				builder.SetDepthStencilBuffer(id, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 				/*	if (images.GetSize() <= id) {
 					asset.WriteLog(MessageType::Error, "Graphics pipeline {} references out-of-bounds depth/stencil attachment {} in pass {}!" UTF8_NEWLINE, GetPath(), id, pass);
 					return Error::InvalidParameter;
@@ -96,7 +88,7 @@ namespace AssetViews {
 
 		// ---------------------------------------------------
 
-		ETInlineHint ErrorCode ParseStage(GraphicsPipelineBuilder& builder, uoffset_t stageId, const CopyStage* stage) {
+		ETInlineHint ErrorCode ParseStage(GraphicsPipelineBuilder& builder, uoffset_t /*stageIndex*/, const CopyStage* stage) {
 			const uint32 source(stage->Source());
 			const uint32 target(stage->Target());
 
@@ -112,9 +104,7 @@ namespace AssetViews {
 			}
 			*/
 
-			builder.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, "Copy");
-			builder.AttachInput(source, VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-			builder.AttachInput(target, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+			builder.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, VkExtent3D { 1u, 1u, 1u }, "Copy");
 
 			return Error::None;
 		}
@@ -122,10 +112,9 @@ namespace AssetViews {
 		// ---------------------------------------------------
 
 		ETInlineHint ErrorCode ParseStage(GraphicsPipelineBuilder& builder, uoffset_t stageId, const ComputeStage* stage) {
-			builder.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, stage->ShaderName()->c_str());
+			builder.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, VkExtent3D { 1u, 1u, 1u }, stage->ShaderName()->c_str());
 
 			for (uint32 attachment : *stage->Attachments()) {
-				builder.AttachInput(attachment, VK_IMAGE_LAYOUT_GENERAL);
 				/*
 				if (images.GetSize() <= id) {
 					asset.WriteLog(MessageType::Error, "Graphics pipeline {} references out-of-bounds input attachment {} in stage {}!" UTF8_NEWLINE, GetPath(), attachment, stageId);
@@ -145,12 +134,12 @@ namespace AssetViews {
 
 			for (uoffset_t stage(0u); stage < stages->size(); ++stage) {
 				switch (types->GetEnum<PipelineStage>(stage)) {
-				case PipelineStage::NONE:
-				default: return Error::InvalidParameter;
+				case PipelineStage::NONE: return Error::InvalidParameter; break;
 				case PipelineStage::DrawStage: ET_FAIL_UNLESS(ParseStage(builder, stage, stages->GetAs<DrawStage>(stage))); break;
 				case PipelineStage::CopyStage: ET_FAIL_UNLESS(ParseStage(builder, stage, stages->GetAs<CopyStage>(stage))); break;
 				case PipelineStage::ComputeStage: ET_FAIL_UNLESS(ParseStage(builder, stage, stages->GetAs<ComputeStage>(stage))); break;
-				} // switch (types->GetEnum<GraphicsStage>(stage))
+				default: return Error::InvalidParameter;
+				} // switch (types->GetEnum<PipelineStage>(stage))
 			}
 
 			return Error::None;
@@ -173,8 +162,7 @@ namespace AssetViews {
 		}
 
 		const FlatBuffers::GraphicsPipeline* const pipeline(GetGraphicsPipeline(asset.Begin()));
-
-		GraphicsPipelineBuilder pipelineBuilder;
+		GraphicsPipelineBuilder                    pipelineBuilder;
 
 		ParseAttachments(pipelineBuilder, pipeline);
 		ParseStages(pipelineBuilder, pipeline);
@@ -188,8 +176,6 @@ namespace AssetViews {
 
 	// ---------------------------------------------------
 
-	void GraphicsPipelineAsset::FreeResources() {
-		_pipelineBuilder.Clear();
-	}
+	void GraphicsPipelineAsset::FreeResources() {}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

@@ -17,6 +17,7 @@
 
 namespace Eldritch2 { namespace Assets {
 	class AssetDatabase;
+	class Package;
 	class Asset;
 }} // namespace Eldritch2::Assets
 
@@ -26,9 +27,8 @@ namespace Eldritch2 { namespace Assets {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		template <typename Value, typename Allocator = MallocAllocator>
-		using ExtensionMap = CachingHashMap<Utf8Literal, Value, Hash<Utf8Literal>, EqualTo<Utf8Literal>, Allocator>;
-		using AssetFactory = Function<UniquePointer<Asset>(Allocator&, const Utf8Char*)>;
+		using AssetFactory = Function<UniquePointer<Asset>(Allocator& /*allocator*/, const Package& /*package*/, StringView<Utf8Char> /*path*/)>;
+		using FactoryMap   = CachingHashMap<StringView<Utf8Char>, AssetFactory>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -46,12 +46,12 @@ namespace Eldritch2 { namespace Assets {
 		/*!	@param[in] extension @ref Utf8Literal containing the extension of the asset to listen for. This string should include a
 				leading dot character.
 			@returns A reference to *this for method chaining. */
-		AssetApiBuilder& DefineType(Utf8Literal extension, AssetFactory factory);
+		AssetApiBuilder& DefineType(StringView<Utf8Char> extension, AssetFactory factory);
 
 		// ---------------------------------------------------
 
 	public:
-		ExtensionMap<AssetFactory>& GetFactories();
+		FactoryMap& GetFactories();
 
 		// ---------------------------------------------------
 
@@ -67,7 +67,7 @@ namespace Eldritch2 { namespace Assets {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ExtensionMap<AssetFactory> _factoriesByExtension;
+		FactoryMap _factoriesByExtension;
 	};
 
 	// ---
@@ -77,7 +77,7 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		struct AssetEqual {
-			ETPureFunctionHint bool operator()(const Asset*, const Utf8Char*) const;
+			ETPureFunctionHint bool operator()(const Asset*, StringView<Utf8Char>) const;
 			ETPureFunctionHint bool operator()(const Asset*, const Asset*) const;
 		};
 
@@ -85,7 +85,7 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		struct AssetHash {
-			ETPureFunctionHint size_t operator()(const Utf8Char*, size_t seed = 0u) const;
+			ETPureFunctionHint size_t operator()(StringView<Utf8Char>, size_t seed = 0u) const;
 			ETPureFunctionHint size_t operator()(const Asset*, size_t seed = 0u) const;
 		};
 
@@ -93,10 +93,8 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		using AssetFactory = AssetApiBuilder::AssetFactory;
-		template <typename Value>
-		using ExtensionMap = AssetApiBuilder::ExtensionMap<Value>;
-		template <typename Value>
-		using ResidentSet = CachingHashSet<Value*, AssetHash, AssetEqual>;
+		using FactoryMap   = AssetApiBuilder::FactoryMap;
+		using ResidentSet  = CachingHashSet<Asset*, AssetHash, AssetEqual>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -112,24 +110,22 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		//!	Locates an existing asset in the database.
-		/*!	@param[in] path A null-terminated UTF-8-encoded character sequence containing the name of the resource to search for.
+		/*!	@param[in] path UTF-8-encoded string view containing the name of the resource to search for.
 			@returns A pointer to the asset, if successful, or null in the event no matching asset was found.
 			@remarks Thread-safe. */
-		const Asset* Find(const Utf8Char* const path) const;
+		const Asset* Find(StringView<Utf8Char> path) const;
 
 		// ---------------------------------------------------
 
 	public:
-		UniquePointer<Asset> CreateAsset(const Utf8Char* path);
-
-		bool Insert(Asset& asset);
+		UniquePointer<Asset> Insert(const Package& package, StringView<Utf8Char> path);
 
 		void Erase(Asset& asset);
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(ExtensionMap<AssetFactory> factoryByExtension);
+		ErrorCode BindResources(FactoryMap factoryByExtension);
 
 		void FreeResources();
 
@@ -143,8 +139,8 @@ namespace Eldritch2 { namespace Assets {
 	private:
 		mutable UsageMixin<MallocAllocator> _allocator;
 		mutable Mutex                       _assetsMutex;
-		ResidentSet<Asset>                  _assets;
-		ExtensionMap<AssetFactory>          _factoryByExtension;
+		ResidentSet                         _assets;
+		FactoryMap                          _factoryByExtension;
 	};
 
 }} // namespace Eldritch2::Assets

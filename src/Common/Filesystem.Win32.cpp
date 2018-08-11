@@ -71,7 +71,7 @@ namespace {
 
 	// ---------------------------------------------------
 
-	static ETInlineHint void EnsureDirectoryExists(const PlatformString<>& path) {
+	static ETInlineHint void EnsureDirectoryExists(const Path<>& path) {
 		CreateDirectoryW(path, nullptr);
 	}
 
@@ -89,57 +89,52 @@ namespace {
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint PlatformString<> GetUserDocumentsDirectory() {
-		//	Retrieve the Documents library path for this machine.
-		PlatformString<> path(MallocAllocator("User Documents Directory Path Allocator"));
-		const auto       base(GetKnownFolderPath(FOLDERID_Documents));
+	static ETPureFunctionHint Path<> GetUserDocumentsDirectory() {
+		Path<>     directory(MallocAllocator("User Documents Directory Path Allocator"));
+		const auto base(GetKnownFolderPath(FOLDERID_Documents));
 
-		path.Append(base.Begin(), base.End()).Append(L"/My Games/" WPROJECT_NAME L"/");
+		directory.Append(base.Begin(), base.End()).Append(L"/My Games/" WPROJECT_NAME L"/");
 
 		//	Ensure the directory exists.
-		EnsureDirectoryExists(path);
+		EnsureDirectoryExists(directory);
 
-		return eastl::move(path);
+		return eastl::move(directory);
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint PlatformString<> GetLocalAppDataDirectory() {
-		//	Retrieve the AppDataLocal library path for this machine.
-		PlatformString<> path(MallocAllocator("Local App Data Directory Path Allocator"));
-		const auto       base(GetKnownFolderPath(FOLDERID_LocalAppData));
+	static ETPureFunctionHint Path<> GetLocalAppDataDirectory() {
+		Path<>     directory(MallocAllocator("Local App Data Directory Path Allocator"));
+		const auto base(GetKnownFolderPath(FOLDERID_LocalAppData));
 
-		path.Append(base.Begin(), base.End()).Append(L"/" WPROJECT_NAME L"/");
+		directory.Append(base.Begin(), base.End()).Append(L"/" WPROJECT_NAME L"/");
 
-		//	Ensure the directory exists.
-		EnsureDirectoryExists(path);
+		EnsureDirectoryExists(directory);
 
-		return eastl::move(path);
+		return eastl::move(directory);
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint PlatformString<> GetSharedAppDataDirectory() {
-		//	Retrieve the AppDataRoaming library path for this machine.
-		PlatformString<> path(MallocAllocator("Local App Data Directory Path Allocator"));
-		const auto       base(GetKnownFolderPath(FOLDERID_RoamingAppData));
+	static ETPureFunctionHint Path<> GetSharedAppDataDirectory() {
+		Path<>     directory(MallocAllocator("Local App Data Directory Path Allocator"));
+		const auto base(GetKnownFolderPath(FOLDERID_RoamingAppData));
 
-		path.Append(base.Begin(), base.End()).Append(L"/" WPROJECT_NAME L"/");
+		directory.Append(base.Begin(), base.End()).Append(L"/" WPROJECT_NAME L"/");
 
-		//	Ensure the directory exists.
-		EnsureDirectoryExists(path);
+		EnsureDirectoryExists(directory);
 
-		return eastl::move(path);
+		return eastl::move(directory);
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint PlatformString<> GetWorkingDirectory() {
+	static ETPureFunctionHint Path<> GetWorkingDirectory() {
 		PlatformChar path[MAX_PATH];
-		auto         pathLength(GetCurrentDirectoryW(static_cast<DWORD>(_countof(path)), path));
+		auto         pathLength(GetCurrentDirectoryW(DWORD(_countof(path)), path));
 
 		if (pathLength == 0) {
-			return PlatformString<>(MallocAllocator("Working Directory Path Allocator"));
+			return Path<>(MallocAllocator("Working Directory Path Allocator"));
 		}
 
 		//	Ensure the path ends with a directory separator.
@@ -148,14 +143,13 @@ namespace {
 			++pathLength;
 		}
 
-		return PlatformString<>(path, path + pathLength, MallocAllocator("Working Directory Path Allocator"));
+		return Path<>(path, path + pathLength, MallocAllocator("Working Directory Path Allocator"));
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint PlatformString<> GetPackageDirectory(const PlatformString<>& workingDirectoryPath) {
-		PlatformString<> path(workingDirectoryPath, MallocAllocator("Package Directory Path Allocator"));
-
+	static ETPureFunctionHint Path<> GetPackageDirectory(const Path<>& workingDirectory) {
+		Path<> path(workingDirectory, MallocAllocator("Package Directory Path Allocator"));
 		path.Append(L"Content/");
 
 		return eastl::move(path);
@@ -163,9 +157,8 @@ namespace {
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint PlatformString<> GetDownloadedPackagesDirectoryPath(const PlatformString<>& documentsPath) {
-		PlatformString<> path(documentsPath, MallocAllocator("Downloaded Packages Directory Path Allocator"));
-
+	static ETPureFunctionHint Path<> GetDownloadedPackagesDirectoryPath(const Path<>& documentsDirectory) {
+		Path<> path(documentsDirectory, MallocAllocator("Downloaded Packages Directory Path Allocator"));
 		path.Append(L"DownloadedPackages/");
 
 		//	Ensure the directory exists.
@@ -176,8 +169,8 @@ namespace {
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint PlatformString<> GetLogDirectory(const PlatformString<>& documentsPath) {
-		PlatformString<> path(documentsPath, MallocAllocator("Log Directory Path Allocator"));
+	static ETPureFunctionHint Path<> GetLogDirectory(const Path<>& documentsDirectory) {
+		Path<> path(documentsDirectory, MallocAllocator("Log Directory Path Allocator"));
 
 		path.Append(L"Logs/");
 
@@ -189,96 +182,55 @@ namespace {
 
 } // anonymous namespace
 
-FileSystem::FileSystem() :
-	_workingDirectory(GetWorkingDirectory()),
-	_userDocumentsDirectory(GetUserDocumentsDirectory()),
-	_localAppDataDirectory(GetLocalAppDataDirectory()),
-	_sharedAppDataDirectory(GetSharedAppDataDirectory()),
-	_packageDirectory(GetPackageDirectory(_workingDirectory)),
-	_downloadedPackageDirectory(GetDownloadedPackagesDirectoryPath(_userDocumentsDirectory)),
-	_logDirectory(GetLogDirectory(_userDocumentsDirectory)) {
+void Copy(KnownDirectory destination, StringView<PlatformChar> destinationPath, KnownDirectory source, StringView<PlatformChar> sourcePath, CopyMode mode) {
+	Path<> sourceAbsolutePath, destinationAbsolutePath;
+
+	sourceAbsolutePath.Assign(destination, destinationPath);
+	destinationAbsolutePath.Assign(source, sourcePath);
+
+	CopyFileW(sourceAbsolutePath, destinationAbsolutePath, mode == CopyMode::SkipIfExists ? TRUE : FALSE);
 }
 
 // ---------------------------------------------------
 
-void FileSystem::Copy(
-	KnownDirectory        destination,
-	const Utf8Char* const destinationPath,
-	KnownDirectory        source,
-	const Utf8Char* const sourcePath,
-	OverwriteBehavior     overwriteBehavior) {
-	const auto sourceAbsolutePath(GetAbsolutePath(source, sourcePath));
-	const auto destinationAbsolutePath(GetAbsolutePath(destination, destinationPath));
+void Move(KnownDirectory destination, StringView<PlatformChar> destinationPath, KnownDirectory source, StringView<PlatformChar> sourcePath) {
+	Path<> sourceAbsolutePath, destinationAbsolutePath;
 
-	CopyFileW(sourceAbsolutePath, destinationAbsolutePath, OverwriteBehavior::SkipIfExists == overwriteBehavior ? TRUE : FALSE);
-}
-
-// ---------------------------------------------------
-
-void FileSystem::Move(
-	KnownDirectory        destination,
-	const Utf8Char* const destinationPath,
-	KnownDirectory        source,
-	const Utf8Char* const sourcePath) {
-	const auto sourceAbsolutePath(GetAbsolutePath(source, sourcePath));
-	const auto destinationAbsolutePath(GetAbsolutePath(destination, destinationPath));
+	sourceAbsolutePath.Assign(source, sourcePath);
+	destinationAbsolutePath.Assign(destination, destinationPath);
 
 	MoveFileExW(sourceAbsolutePath, destinationAbsolutePath, MOVEFILE_REPLACE_EXISTING);
 }
 
 // ---------------------------------------------------
 
-void FileSystem::Delete(KnownDirectory directory, const Utf8Char* const path) {
-	const auto absolutePath(GetAbsolutePath(directory, path));
+void Delete(KnownDirectory directory, StringView<PlatformChar> path) {
+	Path<> absolutePath;
+
+	absolutePath.Assign(directory, path);
 
 	DeleteFileW(absolutePath);
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileSystem::EnumerateMatchingFiles(KnownDirectory directory, const Utf8Char* const path, Function<void(const Utf8Char* /*packagePath*/)> handler) const {
-	WIN32_FIND_DATAW findData;
-	Utf8Char         utf8Path[MAX_PATH];
-	const auto       absolutePathSpecifier(GetAbsolutePath(directory, path));
-	const auto       findHandle(
-        FindFirstFileExW(
-            absolutePathSpecifier,
-            FindExInfoBasic,
-            &findData,
-            FindExSearchNameMatch,
-            nullptr,
-            FIND_FIRST_EX_CASE_SENSITIVE | FIND_FIRST_EX_LARGE_FETCH));
+ErrorCode ForEachFile(StringView<PlatformChar> specifier, Function<void(StringView<PlatformChar> /*path*/)> handler) {
+	WIN32_FIND_DATAW result;
+	PlatformChar*    terminated(ETStackAlloc(PlatformChar, specifier.GetLength() + 1u));
 
-	if (INVALID_HANDLE_VALUE == findHandle) {
+	CopyAndTerminate(specifier.Begin(), specifier.End(), terminated, L'\0');
+
+	const auto find(FindFirstFileExW(terminated, FindExInfoBasic, &result, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_CASE_SENSITIVE | FIND_FIRST_EX_LARGE_FETCH));
+	if (ET_UNLIKELY(INVALID_HANDLE_VALUE == find)) {
 		return Error::Unspecified;
 	}
 
+	ET_AT_SCOPE_EXIT(FindClose(find));
 	do {
-		if (Utf8FromWideChar(utf8Path, findData.cFileName) == 0) {
-			break;
-		}
+		handler(StringView<PlatformChar>(result.cFileName, FindTerminator(result.cFileName)));
+	} while (FindNextFileW(find, &result) != 0);
 
-		handler(utf8Path);
-	} while (FindNextFileW(findHandle, &findData) != 0);
-
-	const auto findError(GetLastError());
-
-	FindClose(findHandle);
-
-	return findError == ERROR_NO_MORE_FILES ? Error::None : Error::Unspecified;
-}
-
-// ---------------------------------------------------
-
-ETPureFunctionHint PlatformString<> FileSystem::GetAbsolutePath(KnownDirectory directory, const Utf8Char* path) const {
-	PlatformString<> absolutePath(GetPath(directory), MallocAllocator("Path Allocator"));
-	PlatformChar     widePath[MAX_PATH];
-
-	if (WideCharFromUtf8(widePath, path) != 0) {
-		absolutePath.Append(widePath);
-	}
-
-	return eastl::move(absolutePath);
+	return GetLastError() == ERROR_NO_MORE_FILES ? Error::None : Error::Unspecified;
 }
 
 } // namespace Eldritch2

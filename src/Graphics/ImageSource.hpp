@@ -21,12 +21,10 @@ namespace Eldritch2 { namespace Graphics {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		struct Dimensions {
+		struct SubimageDescription {
 			uint32 widthInTexels;
 			uint32 heightInTexels;
 			uint32 depthInTexels;
-			uint16 sliceCount;
-			uint16 mips;
 		};
 
 		// ---
@@ -34,10 +32,8 @@ namespace Eldritch2 { namespace Graphics {
 		struct StreamRequest {
 			uint32 scanlineStrideInBytes;
 			uint32 sliceStrideInBytes;
-			uint16 mip;
-			uint16 arraySlice;
-
-			void* target;
+			uint32 subimageId;
+			void*  target;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -53,9 +49,23 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		virtual Dimensions GetDimensions() const abstract;
+		virtual SubimageDescription GetDescription(uint32 subimageId) const abstract;
+
+		virtual uint32 GetSliceCount() const abstract;
+
+		virtual uint32 GetMipCount() const abstract;
 
 		virtual void StreamTexels(const StreamRequest& request) const abstract;
 	};
 
+	// ---
+
+	ETPureFunctionHint uint32 GetSubimageIndex(uint32 slice, uint32 mip, uint32 totalMips);
+
 }} // namespace Eldritch2::Graphics
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Graphics/ImageSource.inl>
+//------------------------------------------------------------------//

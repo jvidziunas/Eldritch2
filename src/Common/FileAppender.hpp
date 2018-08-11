@@ -42,16 +42,16 @@ public:
 	// ---------------------------------------------------
 
 public:
+	ErrorCode Append(const void* const sourceData, size_t writeLengthInBytes);
+
+	// ---------------------------------------------------
+
+public:
 	ErrorCode CreateOrTruncate(const PlatformChar* path);
 
 	ErrorCode OpenOrCreate(const PlatformChar* path);
 
 	ErrorCode Open(const PlatformChar* path);
-
-	// ---------------------------------------------------
-
-public:
-	ErrorCode Append(const void* const sourceData, size_t writeLengthInBytes);
 
 	// ---------------------------------------------------
 

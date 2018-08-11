@@ -71,22 +71,19 @@ namespace Vulkan {
 
 		// ---------------------------------------------------
 
-	public:
-		void RecordDraws(CommandList& commands, const View& view, VertexBuffer& vertices, IndexBuffer& indices) const;
-
-		// ---------------------------------------------------
-
 		//!	Disable copy assignment.
 		BatchCoordinator& operator=(const BatchCoordinator&) = delete;
-
-		friend void Swap(BatchCoordinator&, BatchCoordinator&);
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		//!	Container for draw call parameters to be passed to the GPU.
-		UniformBuffer             _drawParameters;
-		ArrayMap<void*, uint32_t> _countsByThing;
+		UniformBuffer           _drawParameters;
+		ArrayMap<void*, uint32> _countsByThing;
+
+		// ---------------------------------------------------
+
+		friend void Swap(BatchCoordinator&, BatchCoordinator&);
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

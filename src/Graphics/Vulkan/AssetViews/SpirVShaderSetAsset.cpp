@@ -18,29 +18,37 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
+
+	using namespace ::Eldritch2::Graphics::Vulkan::FlatBuffers;
+	using namespace ::Eldritch2::Graphics::FlatBuffers;
+	using namespace ::Eldritch2::Logging;
+	using namespace ::Eldritch2::Assets;
+	using namespace ::flatbuffers;
+
 	namespace {
 
-		using namespace ::Eldritch2::Graphics::Vulkan::FlatBuffers;
-		using namespace ::Eldritch2::Graphics::FlatBuffers;
+		constexpr VkPipelineColorBlendAttachmentState BlendDisabled { /*blendEnable =*/VK_FALSE };
 
-		static ETInlineHint ETPureFunctionHint VkStencilOp AsStencilOp(StencilOperation operation) {
+		// ---------------------------------------------------
+
+		static ETInlineHint ETPureFunctionHint VkStencilOp ParseStencilOp(StencilOperation operation) {
 			switch (operation) {
 			case StencilOperation::KeepExisting: return VK_STENCIL_OP_KEEP;
 			case StencilOperation::SetZero: return VK_STENCIL_OP_ZERO;
 			case StencilOperation::ReplaceExisting: return VK_STENCIL_OP_REPLACE;
-			case StencilOperation::IncrementAndSaturate: return VK_STENCIL_OP_INCREMENT_AND_CLAMP;
-			case StencilOperation::DecrementAndSaturate: return VK_STENCIL_OP_DECREMENT_AND_CLAMP;
+			case StencilOperation::IncrementWithSaturate: return VK_STENCIL_OP_INCREMENT_AND_CLAMP;
+			case StencilOperation::DecrementWithSaturate: return VK_STENCIL_OP_DECREMENT_AND_CLAMP;
 			case StencilOperation::InvertExisting: return VK_STENCIL_OP_INVERT;
 			case StencilOperation::IncrementWithWrap: return VK_STENCIL_OP_INCREMENT_AND_WRAP;
 			case StencilOperation::DecrementWithWrap:
 				return VK_STENCIL_OP_DECREMENT_AND_WRAP;
 				ET_NO_DEFAULT_CASE;
-			}; // switch( operation )
+			}; // switch(operation)
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkCompareOp AsComparisonOp(ComparisonFunction function) {
+		static ETInlineHint ETPureFunctionHint VkCompareOp ParseComparisonOp(ComparisonFunction function) {
 			switch (function) {
 			case ComparisonFunction::NeverPass: return VK_COMPARE_OP_NEVER;
 			case ComparisonFunction::PassIfLess: return VK_COMPARE_OP_LESS;
@@ -52,12 +60,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case ComparisonFunction::AlwaysPass:
 				return VK_COMPARE_OP_ALWAYS;
 				ET_NO_DEFAULT_CASE;
-			};
+			}; // switch(function)
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkBlendOp AsBlendOp(BlendOperator operation) {
+		static ETInlineHint ETPureFunctionHint VkBlendOp ParseBlendOp(BlendOperator operation) {
 			switch (operation) {
 			case BlendOperator::Add: return VK_BLEND_OP_ADD;
 			case BlendOperator::Subtract: return VK_BLEND_OP_SUBTRACT;
@@ -66,12 +74,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case BlendOperator::Maximum:
 				return VK_BLEND_OP_MAX;
 				ET_NO_DEFAULT_CASE;
-			}; // switch( operation )
+			}; // switch(operation)
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkBlendFactor AsBlendFactor(ColorBlendFactor factor) {
+		static ETInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(ColorBlendFactor factor) {
 			switch (factor) {
 			case ColorBlendFactor::Zero: return VK_BLEND_FACTOR_ZERO;
 			case ColorBlendFactor::One: return VK_BLEND_FACTOR_ONE;
@@ -94,12 +102,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case ColorBlendFactor::OneMinusDualSourceAlpha:
 				return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
 				ET_NO_DEFAULT_CASE;
-			}; // switch( factor )
+			}; // switch(factor)
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkBlendFactor AsBlendFactor(AlphaBlendFactor factor) {
+		static ETInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(AlphaBlendFactor factor) {
 			switch (factor) {
 			case AlphaBlendFactor::Zero: return VK_BLEND_FACTOR_ZERO;
 			case AlphaBlendFactor::One: return VK_BLEND_FACTOR_ONE;
@@ -114,12 +122,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case AlphaBlendFactor::OneMinusDualSourceAlpha:
 				return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
 				ET_NO_DEFAULT_CASE;
-			}; // switch( factor )
+			}; // switch(factor)
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkColorComponentFlags AsWriteMask(ChannelWriteMask mask) {
+		static ETInlineHint ETPureFunctionHint VkColorComponentFlags ParseWriteMask(ChannelWriteMask mask) {
 			using FlagBits = eastl::underlying_type<ChannelWriteMask>::type;
 
 			// ---
@@ -147,27 +155,27 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkPipelineColorBlendAttachmentState AsColorBlendState(const OutputState* definition) {
-			return VkPipelineColorBlendAttachmentState{
+		static ETInlineHint ETPureFunctionHint VkPipelineColorBlendAttachmentState ParseColorBlendState(const OutputState* state) {
+			return VkPipelineColorBlendAttachmentState {
 				/*blendEnable =*/VK_TRUE,
-				AsBlendFactor(definition->SourceColorBlendFactor()),
-				AsBlendFactor(definition->DestinationColorBlendFactor()),
-				AsBlendOp(definition->ColorBlendOperator()),
-				AsBlendFactor(definition->SourceAlphaBlendFactor()),
-				AsBlendFactor(definition->DestinationAlphaBlendFactor()),
-				AsBlendOp(definition->AlphaBlendOperator()),
-				AsWriteMask(definition->WriteMask())
+				ParseBlendFactor(state->SourceColorBlendFactor()),
+				ParseBlendFactor(state->DestinationColorBlendFactor()),
+				ParseBlendOp(state->ColorBlendOperator()),
+				ParseBlendFactor(state->SourceAlphaBlendFactor()),
+				ParseBlendFactor(state->DestinationAlphaBlendFactor()),
+				ParseBlendOp(state->AlphaBlendOperator()),
+				ParseWriteMask(state->WriteMask())
 			};
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkStencilOpState AsStencilOpState(uint8 readMask, uint8 writeMask, uint8 stencilReference, const StencilBehavior* const definition) {
-			return VkStencilOpState{
-				AsStencilOp(definition->StencilAndDepthFailBehavior()),
-				AsStencilOp(definition->StencilAndDepthPassBehavior()),
-				AsStencilOp(definition->StencilPassDepthFailBehavior()),
-				AsComparisonOp(definition->StencilComparisonFunction()),
+		static ETInlineHint ETPureFunctionHint VkStencilOpState ParseStencilOpState(uint8 readMask, uint8 writeMask, uint8 stencilReference, const StencilBehavior* const state) {
+			return VkStencilOpState {
+				ParseStencilOp(state->StencilAndDepthFailBehavior()),
+				ParseStencilOp(state->StencilAndDepthPassBehavior()),
+				ParseStencilOp(state->StencilPassDepthFailBehavior()),
+				ParseComparisonOp(state->StencilComparisonFunction()),
 				readMask,
 				writeMask,
 				stencilReference
@@ -176,45 +184,45 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkPolygonMode AsPolygonMode(PolygonFillMode mode) {
+		static ETInlineHint ETPureFunctionHint VkPolygonMode ParsePolygonMode(PolygonFillMode mode) {
 			switch (mode) {
 			case PolygonFillMode::Wireframe: return VK_POLYGON_MODE_LINE;
 			case PolygonFillMode::Solid:
 				return VK_POLYGON_MODE_FILL;
 				ET_NO_DEFAULT_CASE;
-			}; // switch( mode )
+			}; // switch(mode)
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkCullModeFlags AsCullMode(FaceCullMode mode) {
+		static ETInlineHint ETPureFunctionHint VkCullModeFlags ParseCullMode(FaceCullMode mode) {
 			switch (mode) {
 			case FaceCullMode::FrontFace: return VK_CULL_MODE_FRONT_BIT;
 			case FaceCullMode::BackFace: return VK_CULL_MODE_BACK_BIT;
 			case FaceCullMode::None:
 				return VK_CULL_MODE_NONE;
 				ET_NO_DEFAULT_CASE;
-			}; // switch( mode )
+			}; // switch(mode)
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkPipelineDepthStencilStateCreateInfo ParseDepthStencilState(const DepthStencilState* const definition) {
+		static ETInlineHint ETPureFunctionHint VkPipelineDepthStencilStateCreateInfo ParseDepthStencilState(const DepthStencilState* const state) {
 			using FlagBits = eastl::underlying_type<DepthStencilFlags>::type;
 
 			// ---
 
-			return VkPipelineDepthStencilStateCreateInfo{
+			return VkPipelineDepthStencilStateCreateInfo {
 				VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 				/*pNext =*/nullptr,
 				/*flags =*/0,
-				VkBool32(static_cast<FlagBits>(definition->Flags()) & static_cast<FlagBits>(DepthStencilFlags::DepthTestEnable) ? VK_TRUE : VK_FALSE),
-				VkBool32(static_cast<FlagBits>(definition->Flags()) & static_cast<FlagBits>(DepthStencilFlags::DepthWriteEnable) ? VK_TRUE : VK_FALSE),
-				AsComparisonOp(definition->DepthComparisonFunction()),
+				VkBool32(static_cast<FlagBits>(state->Flags()) & static_cast<FlagBits>(DepthStencilFlags::DepthTestEnable) ? VK_TRUE : VK_FALSE),
+				VkBool32(static_cast<FlagBits>(state->Flags()) & static_cast<FlagBits>(DepthStencilFlags::DepthWriteEnable) ? VK_TRUE : VK_FALSE),
+				ParseComparisonOp(state->DepthComparisonFunction()),
 				/*depthBoundsTestEnable =*/VK_FALSE,
-				VkBool32(static_cast<FlagBits>(definition->Flags()) & static_cast<FlagBits>(DepthStencilFlags::StencilTestEnable) ? VK_TRUE : VK_FALSE),
-				AsStencilOpState(0xFF, 0xFF, 0xFF, definition->FrontFaceBehavior()),
-				AsStencilOpState(0xFF, 0xFF, 0xFF, definition->BackFaceBehavior()),
+				VkBool32(static_cast<FlagBits>(state->Flags()) & static_cast<FlagBits>(DepthStencilFlags::StencilTestEnable) ? VK_TRUE : VK_FALSE),
+				ParseStencilOpState(0xFF, 0xFF, 0xFF, state->FrontFaceBehavior()),
+				ParseStencilOpState(0xFF, 0xFF, 0xFF, state->BackFaceBehavior()),
 				/*minDepthBounds =*/0.0f,
 				/*maxDepthBounds =*/1.0f
 			};
@@ -222,33 +230,63 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
-		static ETInlineHint ETPureFunctionHint VkPipelineRasterizationStateCreateInfo ParseRasterizationState(const RasterizationState* const definition) {
-			return VkPipelineRasterizationStateCreateInfo{
+		static ETInlineHint ETPureFunctionHint VkPipelineRasterizationStateCreateInfo ParseRasterizationState(const RasterizationState* const state) {
+			return VkPipelineRasterizationStateCreateInfo {
 				VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 				/*pNext =*/nullptr,
 				/*flags =*/0,
 				/*depthClampEnable =*/VK_FALSE,
-				/*rasterizerDiscardEnable =*/VK_FALSE, //
-				AsPolygonMode(definition->FillMode()),
-				AsCullMode(definition->CullMode()),
+				/*rasterizerDiscardEnable =*/VK_FALSE,
+				ParsePolygonMode(state->FillMode()),
+				ParseCullMode(state->CullMode()),
 				VK_FRONT_FACE_CLOCKWISE,
-				VkBool32(definition->DepthBias() != 0 ? VK_TRUE : VK_FALSE),
-				static_cast<const float&>(definition->DepthBias()),
-				definition->DepthBiasClamp(),
-				definition->SlopeScaledDepthBias(),
+				VkBool32(state->DepthBias() != 0 ? VK_TRUE : VK_FALSE),
+				static_cast<const float&>(state->DepthBias()),
+				state->DepthBiasClamp(),
+				state->SlopeScaledDepthBias(),
 				/*lineWidth =*/1.0f
 			};
 		}
 
+		// ---------------------------------------------------
+
+		static ETInlineHint void ParseBytecode(ArrayList<uint32>& bytecode, const flatbuffers::Vector<uint32>* spirv) {
+			bytecode.Assign(spirv->data(), spirv->data() + spirv->size());
+		}
+
+		// ---------------------------------------------------
+
+		static ETInlineHint void ParseUsage(ArrayList<SpirVShaderSetAsset::Usage>& usages, const UsageDescriptor* usage) {
+			// Typedef here because compiler has a hard time dealing with array literals.
+			using BlendList = VkPipelineColorBlendAttachmentState[SpirVShaderSetAsset::Usage::MaxColorAttachments];
+
+			const uint32 blendCount(usage->Outputs()->size());
+			usages.EmplaceBack(
+				BlendList {
+					blendCount > 0u ? ParseColorBlendState(usage->Outputs()->Get(0)) : BlendDisabled,
+					blendCount > 1u ? ParseColorBlendState(usage->Outputs()->Get(1)) : BlendDisabled,
+					blendCount > 2u ? ParseColorBlendState(usage->Outputs()->Get(2)) : BlendDisabled,
+					blendCount > 3u ? ParseColorBlendState(usage->Outputs()->Get(3)) : BlendDisabled },
+				VK_SHADER_STAGE_ALL_GRAPHICS,
+				VkPipelineMultisampleStateCreateInfo {},
+				ParseRasterizationState(usage->RasterizationBehavior()),
+				ParseDepthStencilState(usage->DepthStencilBehavior()));
+		}
+
+		// ---------------------------------------------------
+
+		static ETInlineHint void ParseUsages(ArrayList<SpirVShaderSetAsset::Usage>& usages, CachingHashMap<String<>, uint32>& indexByName, const flatbuffers::Vector<Offset<UsageDescriptor>>* assets) {
+			for (uint32 index(0u); index < assets->size(); ++index) {
+				const UsageDescriptor* usage(assets->Get(index));
+
+				indexByName.Emplace(String<>(usage->Name()->c_str(), MallocAllocator("Usage Name Allocator")), index);
+				ParseUsage(usages, usage);
+			}
+		}
+
 	} // anonymous namespace
 
-	using namespace ::Eldritch2::Graphics::Vulkan::FlatBuffers;
-	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
-	using namespace ::flatbuffers;
-
-	SpirVShaderSetAsset::UsageAsset::UsageAsset(
-		const Utf8Char* name,
+	SpirVShaderSetAsset::Usage::Usage(
 		const VkPipelineColorBlendAttachmentState (&blends)[MaxColorAttachments],
 		VkShaderStageFlagBits                         enabledShaders,
 		const VkPipelineMultisampleStateCreateInfo&   multisampleInfo,
@@ -258,7 +296,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		multisampleInfo(multisampleInfo),
 		rasterizationInfo(rasterizationInfo),
 		depthStencilInfo(depthStencilInfo) {
-		CopyString(this->name, name, _countof(this->name));
 		CopyArrayNonTemporal(this->blends, blends);
 	}
 
@@ -266,8 +303,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 	SpirVShaderSetAsset::SpirVShaderSetAsset(const Utf8Char* const path) :
 		Asset(path),
-		_usages(MallocAllocator("SPIR-V Shader Package Usage Set Allocator")),
-		_bytecode(MallocAllocator("SPIR-V Shader Package Bytecode Allocator")) {}
+		_bytecode(MallocAllocator("SPIR-V Shader Package Bytecode Allocator")),
+		_usages(MallocAllocator("SPIR-V Shader Package Usage List Allocator")),
+		_indexByName(MallocAllocator("SPIR-V Shader Package Usage Name Table Allocator")) {}
 
 	// ---------------------------------------------------
 
@@ -279,26 +317,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			return Error::InvalidParameter;
 		}
 
-		const SpirVShaderSet* set(GetSpirVShaderSet(asset.Begin()));
-
 		ArrayList<uint32> bytecode(_bytecode.GetAllocator());
-		bytecode.Resize(set->Bytecode()->size());
-		CopyArrayNonTemporal(bytecode.GetData(), set->Bytecode()->data(), bytecode.GetSize());
+		ParseBytecode(bytecode, GetSpirVShaderSet(asset.Begin())->Bytecode());
 
-		UsageSet usages(_usages.GetAllocator());
-		for (const UsageDescriptor* usage : *set->Usages()) {
-			VkPipelineColorBlendAttachmentState colorBlendStates[UsageAsset::MaxColorAttachments];
-			usages.Emplace(
-				usage->Name()->c_str(),
-				colorBlendStates,
-				VK_SHADER_STAGE_ALL_GRAPHICS,
-				VkPipelineMultisampleStateCreateInfo{},
-				ParseRasterizationState(usage->RasterizationBehavior()),
-				ParseDepthStencilState(usage->DepthStencilBehavior()));
-		}
+		ArrayList<Usage>                 usages(_usages.GetAllocator());
+		CachingHashMap<String<>, uint32> indexByName(_indexByName.GetAllocator());
+		ParseUsages(usages, indexByName, GetSpirVShaderSet(asset.Begin())->Usages());
 
 		Swap(_bytecode, bytecode);
 		Swap(_usages, usages);
+		Swap(_indexByName, indexByName);
 
 		return Error::None;
 	}
@@ -306,7 +334,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	// ---------------------------------------------------
 
 	void SpirVShaderSetAsset::FreeResources() {
+		_indexByName.Clear();
 		_usages.Clear();
+		_bytecode.Clear();
 	}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

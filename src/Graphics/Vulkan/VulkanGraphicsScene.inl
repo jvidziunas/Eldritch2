@@ -17,14 +17,14 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint Transformation PlayerView::GetLocalToWorld() const {
-		return _localToWorld;
+	ETInlineHint Transformation PlayerView::GetWorldToView() const {
+		return _worldToView;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void PlayerView::SetLocalToWorld(Transformation localToWorld) {
-		_localToWorld = localToWorld;
+	ETInlineHint void PlayerView::SetWorldToView(Transformation worldToView) {
+		_worldToView = worldToView;
 	}
 
 	// ---------------------------------------------------

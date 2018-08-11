@@ -18,13 +18,13 @@
 namespace Eldritch2 {
 
 template <typename Struct>
-ETInlineHint Range<Struct*> MappedFile::GetRangeAtOffset(size_t offsetInBytes, size_t lengthInElements) const {
+ETInlineHint Range<Struct*> MappedFile::GetRange(size_t offsetInBytes, size_t lengthInElements) const {
 	//	Only allow const access unless we created the mapping with write permissions.
 	if (!eastl::is_const<Struct>::value && !HasAccessLevel(AccessMode::Write)) {
 		return Range<Struct*>();
 	}
 
-	Struct* const end(static_cast<Struct*>(GetAddressForByteOffset(offsetInBytes + (sizeof(Struct) * lengthInElements))));
+	Struct* const end(static_cast<Struct*>(Get(offsetInBytes + (sizeof(Struct) * lengthInElements))));
 
 	return end ? Range<Struct*>(end - lengthInElements, end) : Range<Struct*>();
 }
@@ -32,8 +32,8 @@ ETInlineHint Range<Struct*> MappedFile::GetRangeAtOffset(size_t offsetInBytes, s
 // ---------------------------------------------------
 
 template <typename Struct>
-ETInlineHint Struct* MappedFile::GetAtOffset(size_t offsetInBytes) const {
-	return GetAddressForByteOffset(offsetInBytes + sizeof(Struct)) ? static_cast<Struct*>(GetAddressForByteOffset(offsetInBytes)) : nullptr;
+ETInlineHint Struct* MappedFile::Get(size_t offsetInBytes) const {
+	return Get(offsetInBytes + sizeof(Struct)) ? static_cast<Struct*>(Get(offsetInBytes)) : nullptr;
 }
 
 } // namespace Eldritch2

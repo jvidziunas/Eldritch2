@@ -1,0 +1,74 @@
+include			"Eldritch2Types.fbs";
+include			"GraphicsTypes.fbs";
+
+file_identifier	"E2GP";
+file_extension	".e2graphicspipeline";
+
+namespace Eldritch2.Graphics.FlatBuffers;
+
+enum AttachmentFlags : uint (bit_flags) {
+	ClearOnBegin,
+	StoreOnFinish
+}
+
+enum SourceConcept : ubyte {
+	StaticMeshes,
+	Meshes
+}
+
+struct Dynamic {
+	Width  : float = 1.0;
+	Height : float = 1.0;
+	Depth  : float = 1.0;
+}
+
+struct Static {
+	Width  : uint;
+	Height : uint;
+	Depth  : uint = 1;
+}
+
+union PassDimensions {
+	Dynamic,
+	Static
+}
+
+table DrawStage {
+	Dimensions       : PassDimensions  (required);
+	ShaderUsageName  : string          (required);
+	SourceConcepts   : [SourceConcept] (required);
+	InputAttachments : [uint]          (required);
+	ColorAttachments : [uint]          (required);
+	DepthAttachment  : uint = 0x;
+}
+
+table CopyStage {
+	Source : uint;
+	Target : uint;
+}
+
+table ComputeStage {
+	Dimensions  : PassDimensions (required);
+	ShaderName  : string         (required);
+	Attachments : [uint]         (required);
+}
+
+union PipelineStage {
+	DrawStage,
+	CopyStage,
+	ComputeStage
+}
+
+table Attachment {
+	Name   : string (required, key);
+	Format : GpuFormat;
+	Flags  : AttachmentFlags;
+}
+
+table GraphicsPipeline {
+	Attachments  : [Attachment]    (required);
+	SharedImages : [uint]          (required);
+	Stages       : [PipelineStage] (required);
+}
+
+root_type GraphicsPipeline;

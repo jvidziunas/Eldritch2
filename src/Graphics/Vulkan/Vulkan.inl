@@ -25,7 +25,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	// ---------------------------------------------------
 
 	ETInlineHint Vulkan::Device& Vulkan::GetPrimaryDevice() {
-		return _devices[0];
+		return _device;
 	}
 
 	// ---------------------------------------------------

@@ -86,7 +86,7 @@ ETInlineHint void Stack<Value, Container>::Push(const ValueType& value) {
 // ---------------------------------------------------
 
 template <typename Value, class Container>
-ETInlineHint void Stack<Value, Container>::Push(ValueType&& x) {
+ETInlineHint void Stack<Value, Container>::Push(ValueType&& value) {
 	c.Append(eastl::move(value));
 }
 

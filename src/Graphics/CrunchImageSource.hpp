@@ -35,7 +35,11 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		Dimensions GetDimensions() const override;
+		SubimageDescription GetDescription(uint32 subimageId) const override;
+
+		uint32 GetSliceCount() const override;
+
+		uint32 GetMipCount() const override;
 
 		void StreamTexels(const StreamRequest& request) const override;
 
@@ -55,7 +59,10 @@ namespace Eldritch2 { namespace Graphics {
 
 	private:
 		crnd::crnd_unpack_context _context;
-		Dimensions                _dimensions;
+		uint32                    _width;
+		uint32                    _height;
+		uint32                    _mips;
+		uint32                    _slices;
 	};
 
 }} // namespace Eldritch2::Graphics

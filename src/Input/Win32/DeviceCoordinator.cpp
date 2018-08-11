@@ -228,7 +228,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		}
 
 		//	Fill a temporary array with more detailed information about each device, including its type and the Win32 handle.
-		RAWINPUTDEVICELIST* const devices(static_cast<RAWINPUTDEVICELIST*>(_alloca(count * sizeof(RAWINPUTDEVICELIST))));
+		RAWINPUTDEVICELIST* const devices(ETStackAlloc(RAWINPUTDEVICELIST, count));
 		if (GetRawInputDeviceList(devices, &count, sizeof(RAWINPUTDEVICELIST)) == static_cast<UINT>(-1)) {
 			_log.Write(MessageType::Error, "Failed to enumerate Win32 input devices!" UTF8_NEWLINE);
 			return false;

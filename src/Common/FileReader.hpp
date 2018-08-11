@@ -42,15 +42,10 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ErrorCode Open(const PlatformChar* path);
-
-	// ---------------------------------------------------
-
-public:
 	//! Performs a blocking read operation to the output device this @ref FileReader uses as its backing.
-	ErrorCode Read(void* const destinationBuffer, size_t lengthToReadInBytes, uint64 fileOffsetInBytes);
+	ErrorCode Read(void* const destination, size_t lengthToReadInBytes, uint64 fileOffsetInBytes);
 	//! Performs a blocking read operation to the output device this @ref FileReader uses as its backing.
-	ErrorCode Read(void* const destinationBuffer, size_t lengthToReadInBytes);
+	ErrorCode Read(void* const destination, size_t lengthToReadInBytes);
 
 	// ---------------------------------------------------
 
@@ -59,6 +54,11 @@ public:
 	/*!	@returns On disk size of the file, in bytes.
 		@remarks Thread-safe. */
 	uint64 GetSizeInBytes() const;
+
+	// ---------------------------------------------------
+
+public:
+	ErrorCode Open(const PlatformChar* path);
 
 	// ---------------------------------------------------
 

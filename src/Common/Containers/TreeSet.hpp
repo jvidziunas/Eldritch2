@@ -40,7 +40,7 @@ public:
 
 public:
 	//!	Constructs this @ref TreeSet instance.
-	explicit TreeSet(const AllocatorType& allocator);
+	TreeSet(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref TreeSet instance.
 	TreeSet(const TreeSet&) = default;
 	//!	Constructs this @ref TreeSet instance.

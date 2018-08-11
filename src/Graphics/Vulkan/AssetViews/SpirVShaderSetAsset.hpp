@@ -23,72 +23,55 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class UsageAsset {
+		class Usage {
 			// - TYPE PUBLISHING ---------------------------------
 
 		public:
 			enum : size_t {
-				MaxColorAttachments = 8u,
-				MaxNameLength       = 64u
+				MaxColorAttachments = 4u
 			};
 
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Constructs this @ref Usage instance.
-			UsageAsset(
-				const Utf8Char* name,
+			Usage(
 				const VkPipelineColorBlendAttachmentState (&blends)[MaxColorAttachments],
 				VkShaderStageFlagBits                         enabledShaders,
 				const VkPipelineMultisampleStateCreateInfo&   multisampleInfo,
 				const VkPipelineRasterizationStateCreateInfo& rasterizationInfo,
 				const VkPipelineDepthStencilStateCreateInfo&  depthStencilInfo);
 			//!	Constructs this @ref Usage instance.
-			UsageAsset(const UsageAsset&) = default;
+			Usage(const Usage&) = default;
 
-			~UsageAsset() = default;
+			~Usage() = default;
 
 			// ---------------------------------------------------
 
+		public:
 			const uint32* GetBytecode() const;
 
-			uint32 GetBytecodeSize() const;
+			uint32 GetBytecodeSizeInBytes() const;
 
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			Utf8Char                               name[MaxNameLength];
 			VkPipelineColorBlendAttachmentState    blends[MaxColorAttachments];
-			VkShaderStageFlagBits                  enabledShaders;
 			VkPipelineMultisampleStateCreateInfo   multisampleInfo;
 			VkPipelineRasterizationStateCreateInfo rasterizationInfo;
 			VkPipelineDepthStencilStateCreateInfo  depthStencilInfo;
 			VkPipelineColorBlendStateCreateInfo    colorBlendInfo;
-			const uint32*                          bytecodeBegin;
+			VkShaderStageFlagBits                  enabledShaders;
+			const uint32*                          bytecode;
 			const uint32*                          bytecodeEnd;
 		};
 
 		// ---
 
 	public:
-		struct UsageEqual {
-			ETPureFunctionHint bool operator()(const UsageAsset&, const Utf8Char*) const;
-			ETPureFunctionHint bool operator()(const UsageAsset&, const UsageAsset&) const;
+		enum : uint32 {
+			InvalidUsageId = ~0u
 		};
-
-		// ---
-
-	public:
-		struct UsageHash {
-			ETPureFunctionHint size_t operator()(const Utf8Char*, size_t seed = 0u) const;
-			ETPureFunctionHint size_t operator()(const UsageAsset&, size_t seed = 0u) const;
-		};
-
-		// ---
-
-	public:
-		using UsageSet      = CachingHashSet<UsageAsset, UsageHash, UsageEqual>;
-		using UsageIterator = typename UsageSet::ConstIterator;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -103,7 +86,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		// ---------------------------------------------------
 
 	public:
-		UsageIterator Find(const Utf8Char* name) const;
+		const Usage& operator[](uint32 usage) const;
+
+		uint32 Find(const Utf8Char* name) const;
 
 		// ---------------------------------------------------
 
@@ -120,8 +105,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<uint32> _bytecode;
-		UsageSet          _usages;
+		ArrayList<uint32>                _bytecode;
+		ArrayList<Usage>                 _usages;
+		CachingHashMap<String<>, uint32> _indexByName;
 	};
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

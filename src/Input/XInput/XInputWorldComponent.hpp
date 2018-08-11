@@ -24,14 +24,14 @@ namespace Eldritch2 { namespace Input { namespace XInput {
 		//!	Disable copy construction.
 		XInputWorldComponent(const XInputWorldComponent&) = delete;
 		//!	Constructs this @ref XInputWorldComponent instance.
-		XInputWorldComponent(const Core::World& world);
+		XInputWorldComponent(const ObjectLocator& services);
 
 		~XInputWorldComponent() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		void AcceptVisitor(Scripting::Wren::ApiBuilder& api) override;
+		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
 	};
 
 }}} // namespace Eldritch2::Input::XInput

@@ -57,23 +57,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	//---------------------------------------------------
 
 	void BatchCoordinator::ResetCounts() {
-		for (ArrayMap<void*, uint32_t>::ValueType& value : _countsByThing) {
+		for (ArrayMap<void*, uint32>::ValueType& value : _countsByThing) {
 			value.second = 0u;
 		}
-	}
-
-	//---------------------------------------------------
-
-	void BatchCoordinator::RecordDraws(CommandList& commands, const View& view, VertexBuffer& vertices, IndexBuffer& indices) const {
-		commands.BindBuffers({ vertices.Get() }, indices.Get(), VK_INDEX_TYPE_UINT16);
-		commands.SetStencilReference(VK_STENCIL_FRONT_AND_BACK, view.id);
-		commands.SetStencilWriteMask(VK_STENCIL_FRONT_AND_BACK, 0xFFFF);
-		commands.SetStencilReadMask(VK_STENCIL_FRONT_AND_BACK, 0xFFFF);
-		commands.SetScissors(0u, 1u, &view.scissorRect);
-		commands.SetDepthBias(0.0f, 0.0f, 0.0f);
-
-		//	commands.DrawIndexedIndirect(_drawParameters, 0u, _countsByThing.GetSize());
-		//	commands.Draw(0u, 0u, 0u, 0u);
 	}
 
 	//---------------------------------------------------

@@ -42,15 +42,6 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ErrorCode CreateOrTruncate(const PlatformChar* path);
-
-	ErrorCode CreateOrOpen(const PlatformChar* path);
-
-	ErrorCode Open(const PlatformChar* path);
-
-	// ---------------------------------------------------
-
-public:
 	//!	Performs a blocking write operation to the output device the @ref FileWriter uses as its backing.
 	/*!	@param[in] sourceBuffer Pointer to a region of memory containing the bit patterns to be written.
 		@param[in] lengthToWriteInBytes Number of bytes to write.
@@ -77,6 +68,15 @@ public:
 	//!	Extends or truncates the backing file so it exactly occupies the specified amount of space on the backing storage.
 	/*!	@param[in] sizeInBytes The amount of valid data to mark the backing file as possessing. Note that this does _not_ need to be a multiple of the media sector size. */
 	void SetSize(uint64 sizeInBytes);
+
+	// ---------------------------------------------------
+
+public:
+	ErrorCode CreateOrTruncate(const PlatformChar* path);
+
+	ErrorCode CreateOrOpen(const PlatformChar* path);
+
+	ErrorCode Open(const PlatformChar* path);
 
 	// ---------------------------------------------------
 

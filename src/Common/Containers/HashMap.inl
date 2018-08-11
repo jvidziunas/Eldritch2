@@ -359,8 +359,8 @@ ETInlineHint typename const HashMap<Key, Value, HashPredicate, KeyEqualityPredic
 // ---------------------------------------------------
 
 template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint typename const HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashPredicateType& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::GetHashPredicate() const {
-	return _container.hash_predicate();
+ETInlineHint typename const HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::HashPredicateType& HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>::GetHashFunction() const {
+	return _container.hash_function();
 }
 
 // ---------------------------------------------------

@@ -49,7 +49,7 @@ public:
 	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
 	TreeMap(const TreeMap&, const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref TreeMap instance.
-	explicit TreeMap(const AllocatorType& allocator = AllocatorType());
+	TreeMap(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref TreeMap instance.
 	TreeMap(TreeMap&&) = default;
 

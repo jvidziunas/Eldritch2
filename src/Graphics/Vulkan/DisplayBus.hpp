@@ -5,13 +5,14 @@
 
 
   ------------------------------------------------------------------
-  ©2010-2018 Eldritch Entertainment, LLC.
+  ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 #pragma once
 
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Graphics/Vulkan/GraphicsPipeline.hpp>
 #include <Graphics/Vulkan/Display.hpp>
 //------------------------------------------------------------------//
 
@@ -21,30 +22,49 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref DisplayBus instance.
-		DisplayBus(DisplayMap<>& displayByName, Mutex& mutex);
-		//!	Disable copy construction.
+		//! Disable copy construction.
 		DisplayBus(const DisplayBus&) = delete;
+		//! Constructs this @ref DisplayCoordinator instance.
+		DisplayBus();
 
 		~DisplayBus() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		bool TryAcquireDisplay(const Utf8Char* const name, DisplaySource& source);
-
-		void ReleaseDisplay(const Utf8Char* const name, DisplaySource& source);
+		VkResult AcquireImages(Vulkan& vulkan, Gpu& gpu);
 
 		// ---------------------------------------------------
 
-	private:
-		DisplayMap<>::Iterator CreateDisplay(const Utf8Char* name);
+	public:
+		DisplayMap<>& GetDisplays();
+
+		Mutex& GetDisplaysMutex();
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu);
+
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+		//! Disable copy assignment.
+		DisplayBus& operator=(const DisplayBus&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		DisplayMap<>* _displayByName;
-		Mutex*        _displayMutex;
+		GraphicsPipeline _compositor;
+		mutable Mutex    _displayMutex;
+		DisplayMap<>     _displayByName;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Graphics/Vulkan/DisplayBus.inl>
+//------------------------------------------------------------------//

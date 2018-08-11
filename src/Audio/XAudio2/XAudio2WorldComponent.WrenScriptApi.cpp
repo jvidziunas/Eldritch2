@@ -25,7 +25,7 @@ namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
 	using namespace Eldritch2::Scripting::Wren;
 
-	void XAudio2WorldComponent::AcceptVisitor(ApiBuilder& api) {
+	void XAudio2WorldComponent::DefineScriptApi(ApiBuilder& api) {
 		ET_REGISTER_WREN_CLASS(XAudio2AudioScene, api);
 		ET_REGISTER_WREN_CLASS(XAudio2Listener, api);
 

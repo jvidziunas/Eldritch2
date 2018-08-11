@@ -18,7 +18,6 @@
 #if ET_PLATFORM_WINDOWS
 #	include <vulkan/vulkan_win32.h>
 #endif
-#include <microprofile/microprofile.h>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -28,9 +27,11 @@ ET_LINK_LIBRARY("vulkan-1.lib")
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	namespace {
 
-		using namespace ::Eldritch2::Logging;
+	using namespace ::Eldritch2::Scheduling;
+	using namespace ::Eldritch2::Logging;
+
+	namespace {
 
 		static ETInlineHint ETPureFunctionHint MessageType AsMessageType(VkDebugReportFlagsEXT flags) {
 			return flags & VK_DEBUG_REPORT_ERROR_BIT_EXT ? MessageType::Error : MessageType::Warning;
@@ -39,7 +40,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 		static ETInlineHint VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT& createInfo, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback) {
-			const auto implementation(reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT")));
+			const auto implementation(PFN_vkCreateDebugReportCallbackEXT(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT")));
 			if (!implementation) {
 				return VK_ERROR_EXTENSION_NOT_PRESENT;
 			}
@@ -50,8 +51,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 		static ETInlineHint void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* allocator) {
-			const auto implementation(reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT")));
-
+			const auto implementation(PFN_vkDestroyDebugReportCallbackEXT(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT")));
 			if (!implementation) {
 				return;
 			}
@@ -62,18 +62,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 		static ETInlineHint VkResult CreateLogCallback(VkInstance instance, Vulkan& vulkan, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback) {
-			const VkDebugReportCallbackCreateInfoEXT createInfo{
+			const auto Callback([](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*source*/, uint64_t /*object*/, size_t /*location*/, int32_t /*code*/, const char* /*layer*/, const char* message, void* vulkan) -> VkBool32 {
+				static_cast<Vulkan*>(vulkan)->WriteLog(AsMessageType(flags), "{}" UTF8_NEWLINE, message);
+				if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+					ET_TRIGGER_DEBUGBREAK();
+				}
+
+				return VK_FALSE;
+			});
+
+			const VkDebugReportCallbackCreateInfoEXT createInfo {
 				VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
 				/*pNext =*/nullptr,
 				VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
-				[](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*source*/, uint64_t /*object*/, size_t /*location*/, int32_t /*code*/, const char* /*layer*/, const char* message, void* vulkan) -> VkBool32 {
-					static_cast<Vulkan*>(vulkan)->WriteLog(AsMessageType(flags), "{}" UTF8_NEWLINE, message);
-					if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
-						ET_TRIGGER_DEBUGBREAK();
-					}
-
-					return VK_FALSE;
-				},
+				Callback,
 				/*pUserData =*/eastl::addressof(vulkan)
 			};
 
@@ -82,13 +84,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	} // anonymous namespace
 
-	using namespace ::Eldritch2::Scheduling;
-	using namespace ::Eldritch2::Logging;
+	void Vulkan::Device::BeginFrame(JobExecutor& executor, Vulkan& vulkan) {
+		executor.AwaitWork(
+			[this](JobExecutor& executor) { SubmitFrameIo(executor, *this); },
+			[this, &vulkan](JobExecutor& /*executor*/) {
+				AcquireImages(vulkan, *this);
+				ET_PROFILE_FRAME_BEGIN_GPU(nullptr);
+			});
+	}
+
+	// ---------------------------------------------------
 
 	VkResult Vulkan::Device::BindResources(VkPhysicalDevice device, VkDeviceSize heapBlockSize, VkDeviceSize transferBufferSize) {
 		ET_FAIL_UNLESS(Gpu::BindResources(device, heapBlockSize, 2u));
-		ET_FAIL_UNLESS(DisplayCoordinator::BindResources(*this));
-		ET_FAIL_UNLESS(ResidencyCoordinator::BindResources(*this, transferBufferSize));
+		ET_FAIL_UNLESS(DisplayBus::BindResources(*this));
+		ET_FAIL_UNLESS(ResourceBus::BindResources(*this, transferBufferSize));
 
 		return VK_SUCCESS;
 	}
@@ -96,8 +106,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	// ---------------------------------------------------
 
 	void Vulkan::Device::FreeResources() {
-		ResidencyCoordinator::FreeResources(*this);
-		DisplayCoordinator::FreeResources(*this);
+		ResourceBus::FreeResources(*this);
+		DisplayBus::FreeResources(*this);
 		Gpu::FreeResources();
 	}
 
@@ -108,8 +118,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		_allocator("Vulkan Root Allocator"),
 		_log(log),
 		_vulkan(nullptr),
-		_debugCallback(nullptr),
-		_deviceCount(0u) {
+		_debugCallback(nullptr) {
 	}
 
 	// ---------------------------------------------------
@@ -117,17 +126,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	Vulkan::~Vulkan() {
 		ET_ASSERT(_vulkan == nullptr, "Leaking Vulkan instance!");
 		ET_ASSERT(_debugCallback == nullptr, "Leaking Vulkan log callback!");
-		ET_ASSERT(_deviceCount == 0, "Leaking Vulkan GPUs!");
 	}
 
 	// ---------------------------------------------------
 
 	void Vulkan::BeginFrame(JobExecutor& executor) {
-		executor.ForEach<1u>(_devices, (_devices + _deviceCount), [this](JobExecutor& executor, Device& device) {
-			executor.AwaitWork(
-				[&](JobExecutor& executor) { device.SubmitFrameIo(executor, device); },
-				[&](JobExecutor& /*executor*/) { device.AcquireImages(*this, device); });
-		});
+		_device.BeginFrame(executor, *this);
 	}
 
 	// ---------------------------------------------------
@@ -135,29 +139,27 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	VkResult Vulkan::BindResources(JobExecutor& executor, const VkApplicationInfo& applicationInfo) {
 		using ::Eldritch2::Swap;
 
-		const std::initializer_list<const char*> layers = {
-			"VK_LAYER_LUNARG_standard_validation"
-		};
+		ArrayList<const char*> layers;
+		layers.Append("VK_LAYER_LUNARG_standard_validation");
 
-		const std::initializer_list<const char*> extensions = {
-			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
-			VK_KHR_SURFACE_EXTENSION_NAME,
+		ArrayList<const char*> extensions;
+		extensions.Append(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		extensions.Append(VK_KHR_SURFACE_EXTENSION_NAME);
 #if ET_PLATFORM_WINDOWS
-			VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+		extensions.Append(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #endif
-		};
 
 		VkInstance vulkan;
 		{
-			const VkInstanceCreateInfo vulkanInfo{
+			const VkInstanceCreateInfo vulkanInfo {
 				VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-				nullptr,
-				0,
+				/*pNext =*/nullptr,
+				/*flags =*/0u,
 				&applicationInfo,
-				static_cast<uint32_t>(layers.size()),
-				layers.begin(),
-				static_cast<uint32_t>(extensions.size()),
-				extensions.begin()
+				uint32_t(layers.GetSize()),
+				layers.GetData(),
+				uint32_t(extensions.GetSize()),
+				extensions.GetData()
 			};
 
 			const VkResult result(vkCreateInstance(&vulkanInfo, _allocator, &vulkan));
@@ -182,26 +184,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		}
 
 		//	Allocate an array large enough to hold all the physical device handles.
-		VkPhysicalDevice* const devices(static_cast<VkPhysicalDevice*>(_alloca(gpuCount * sizeof(VkPhysicalDevice))));
+		VkPhysicalDevice* const devices(ETStackAlloc(VkPhysicalDevice, gpuCount));
 		//	Fill the array with physical device handles.
 		if (Failed(vkEnumeratePhysicalDevices(vulkan, &gpuCount, devices))) {
 			WriteLog(MessageType::Error, "Unable to query Vulkan physical devices!" UTF8_NEWLINE);
 			return VK_ERROR_INITIALIZATION_FAILED;
 		}
 
-		gpuCount = Min<uint32>(gpuCount, _countof(_devices));
+		if (Failed(_device.BindResources(devices[0], Device::HeapBlockSize, Device::TransferBufferSize))) {
+			WriteLog(MessageType::Error, "Error binding GPU!" UTF8_NEWLINE);
+		}
 
-		executor.ForEach<1u>(_devices, (_devices + gpuCount), devices, [this](JobExecutor& /*executor*/, Device& gpu, VkPhysicalDevice physicalDevice) {
-			if (Failed(gpu.BindResources(physicalDevice, Device::HeapBlockSize, Device::TransferBufferSize))) {
-				WriteLog(MessageType::Error, "Error binding GPU!" UTF8_NEWLINE);
-			}
-		});
-
+		//	MicroProfileGpuInitVulkan()
 		//	Commit the changes to the object.
 		Swap(_vulkan, vulkan);
 		Swap(_debugCallback, debugCallback);
-
-		_deviceCount = gpuCount;
 
 		return VK_SUCCESS;
 	}
@@ -209,9 +206,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	// ---------------------------------------------------
 
 	void Vulkan::FreeResources(JobExecutor& executor) {
-		executor.ForEach<1u>(_devices, (_devices + eastl::exchange(_deviceCount, 0u)), [this](JobExecutor& /*executor*/, Device& gpu) {
-			gpu.FreeResources();
-		});
+		_device.FreeResources();
 
 		DestroyDebugReportCallbackEXT(_vulkan, eastl::exchange(_debugCallback, nullptr), _allocator);
 		vkDestroyInstance(eastl::exchange(_vulkan, nullptr), _allocator);

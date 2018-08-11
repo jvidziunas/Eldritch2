@@ -20,69 +20,85 @@ namespace Vulkan {
 
 	namespace {
 
-		constexpr GraphicsPipelineBuilder::AttachmentReference InvalidAttachment{ VK_ATTACHMENT_UNUSED, VK_IMAGE_LAYOUT_UNDEFINED };
+		constexpr GraphicsPipelineBuilder::AttachmentReference InvalidAttachment { VK_ATTACHMENT_UNUSED, VK_IMAGE_LAYOUT_UNDEFINED };
 
-		template <uint32 size>
-		ETInlineHint void PatchAttachmentReferences(GraphicsPipelineBuilder::AttachmentReference (&references)[size], const ArrayMap<uint32, uint32>& remapTable) {
-			for (GraphicsPipelineBuilder::AttachmentReference& reference : references) {
-				if (reference.index != VK_ATTACHMENT_UNUSED) {
-					reference.index = remapTable[reference.index];
-				}
-			}
+		template <uint32 count>
+		GraphicsPipelineBuilder::AttachmentReference* FindSlot(GraphicsPipelineBuilder::AttachmentReference (&attachments)[count]) {
+			return FindIf(eastl::begin(attachments), eastl::end(attachments), [](const GraphicsPipelineBuilder::AttachmentReference& reference) {
+				return reference.globalIndex == VK_ATTACHMENT_UNUSED;
+			});
 		}
 
 	} // anonymous namespace
 
-	GraphicsPipelineBuilder::Attachment::Attachment(VkFormat format, VkSampleCountFlags quality, float32 widthScale, float32 heightScale, float32 depthScale) :
+	GraphicsPipelineBuilder::AttachmentDescription::AttachmentDescription(VkFormat format, VkSampleCountFlags quality) :
 		format(format),
 		flags(0u),
 		usages(0u),
-		firstPass(~0u),
-		lastPass(0u),
+		firstWrite(~0u),
+		lastWrite(0u),
 		msaaQuality(quality),
-		staticResolution(0u) {
-		scale[0] = widthScale;
-		scale[1] = heightScale;
-		scale[2] = depthScale;
+		isPersistent(1u),
+		staticDimensions(0u) {
+		scales[0] = 0.0f;
+		scales[1] = 0.0f;
 	}
 
 	// ---------------------------------------------------
 
-	GraphicsPipelineBuilder::Attachment::Attachment(VkFormat format, VkSampleCountFlags quality, VkExtent3D dimensions) :
-		format(format),
-		flags(0u),
-		usages(0u),
-		firstPass(~0u),
-		lastPass(0u),
-		msaaQuality(quality),
-		staticResolution(1u) {
-		this->dimensions = dimensions;
-	}
-
-	// ---------------------------------------------------
-
-	void GraphicsPipelineBuilder::Attachment::MarkUsed(uint32 pass, VkImageUsageFlags usage) {
+	void GraphicsPipelineBuilder::AttachmentDescription::MarkUsed(uint32 pass, VkImageUsageFlags usage) {
 		usages |= usage;
 
-		firstPass = Min(pass, firstPass);
-		lastPass  = Max(pass, lastPass);
+		firstRead  = Min(pass, firstRead);
+		lastRead   = Max(pass, lastRead);
+		firstWrite = Min(pass, firstWrite);
+		lastWrite  = Max(pass, lastWrite);
 	}
 
 	// ---------------------------------------------------
 
-	GraphicsPipelineBuilder::Buffer::Buffer(VkDeviceSize sizeInBytes) :
-		sizeInBytes(sizeInBytes),
-		flags(0u),
-		usages(0u) {}
+	void GraphicsPipelineBuilder::AttachmentDescription::MarkWritten(uint32 pass, VkImageUsageFlags usage) {
+		usages |= usage;
+
+		firstWrite = Min(pass, firstWrite);
+		lastWrite  = Max(pass, lastWrite);
+	}
 
 	// ---------------------------------------------------
 
-	GraphicsPipelineBuilder::Pass::Pass(const Utf8Char* const name) :
-		inputAttachmentCount(0u),
-		attachmentCount(0u),
-		inputAttachments{ InvalidAttachment },
-		attachments{ InvalidAttachment },
+	void GraphicsPipelineBuilder::AttachmentDescription::MarkRead(uint32 pass, VkImageUsageFlags usage) {
+		usages |= usage;
+
+		firstRead = Min(pass, firstRead);
+		lastRead  = Max(pass, lastRead);
+	}
+
+	// ---------------------------------------------------
+
+	GraphicsPipelineBuilder::BufferDescription::BufferDescription(VkDeviceSize sizeInBytes) :
+		sizeInBytes(sizeInBytes),
+		flags(0u),
+		usages(0u) {
+	}
+
+	// ---------------------------------------------------
+
+	GraphicsPipelineBuilder::PassDescription::PassDescription(float32 widthScale, float32 heightScale, const Utf8Char* name) :
+		inputAttachments { InvalidAttachment, InvalidAttachment, InvalidAttachment, InvalidAttachment },
+		colorAttachments { InvalidAttachment, InvalidAttachment, InvalidAttachment, InvalidAttachment },
 		depthStencilAttachment(InvalidAttachment) {
+		this->widthScale  = widthScale;
+		this->heightScale = heightScale;
+		CopyString(this->name, name);
+	}
+
+	// ---------------------------------------------------
+
+	GraphicsPipelineBuilder::PassDescription::PassDescription(VkExtent3D dimensions, const Utf8Char* const name) :
+		inputAttachments { InvalidAttachment, InvalidAttachment, InvalidAttachment, InvalidAttachment },
+		colorAttachments { InvalidAttachment, InvalidAttachment, InvalidAttachment, InvalidAttachment },
+		depthStencilAttachment(InvalidAttachment) {
+		this->dimensions = dimensions;
 		CopyString(this->name, name);
 	}
 
@@ -102,61 +118,62 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void GraphicsPipelineBuilder::Begin(VkPipelineBindPoint bindPoint, const Utf8Char* name) {
-		_attachments.Clear();
-		_passes.Clear();
-
-		BeginPass(bindPoint, name);
+	void GraphicsPipelineBuilder::BeginPass(VkPipelineBindPoint bindPoint, float32 width, float32 height, const Utf8Char* name) {
+		_passes.EmplaceBack(width, height, name);
 	}
 
 	// ---------------------------------------------------
 
-	void GraphicsPipelineBuilder::BeginPass(VkPipelineBindPoint bindPoint, const Utf8Char* name) {
-		_passes.EmplaceBack(name);
+	void GraphicsPipelineBuilder::BeginPass(VkPipelineBindPoint bindPoint, VkExtent3D resolution, const Utf8Char* name) {
+		_passes.EmplaceBack(resolution, name);
 	}
 
 	// ---------------------------------------------------
 
-	bool GraphicsPipelineBuilder::AttachInput(uint32 index, VkImageLayout layout) {
-		enum : uint32 { MaxInputAttachments = _countof(Pass::inputAttachments) };
-
-		Pass& pass(_passes.Back());
-		if (pass.inputAttachmentCount == MaxInputAttachments || _attachments.GetSize() <= index) {
+	bool GraphicsPipelineBuilder::AppendInput(uint32 attachment, VkImageLayout layout) {
+		PassDescription&           pass(_passes.Back());
+		AttachmentReference* const slot(FindSlot(pass.inputAttachments));
+		if (slot == eastl::end(pass.inputAttachments)) {
 			return false;
 		}
 
-		pass.inputAttachments[pass.inputAttachmentCount++] = AttachmentReference{ index, layout };
-		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT);
+		ET_ASSERT(_attachments.GetSize() <= attachment, "Attachment index {} out of range", attachment);
+
+		*slot = AttachmentReference { attachment, layout };
+		_attachments[attachment].MarkRead(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT);
 
 		return true;
 	}
 
 	// ---------------------------------------------------
 
-	bool GraphicsPipelineBuilder::AttachColorOutput(uint32 index, VkImageLayout layout) {
-		enum : uint32 { MaxAttachments = _countof(Pass::attachments) };
-
-		Pass& pass(_passes.Back());
-		if (pass.inputAttachmentCount == MaxAttachments || _attachments.GetSize() <= index) {
+	bool GraphicsPipelineBuilder::AppendColorOutput(uint32 attachment, VkImageLayout layout) {
+		PassDescription&           pass(_passes.Back());
+		AttachmentReference* const slot(FindSlot(pass.colorAttachments));
+		if (slot == eastl::end(pass.colorAttachments)) {
 			return false;
 		}
 
-		pass.attachments[pass.attachmentCount++] = AttachmentReference{ index, layout };
-		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
+		ET_ASSERT(_attachments.GetSize() <= attachment, "Attachment index {} out of range", attachment);
+
+		*slot = AttachmentReference { attachment, layout };
+		_attachments[attachment].MarkWritten(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
 		return true;
 	}
 
 	// ---------------------------------------------------
 
-	bool GraphicsPipelineBuilder::AttachDepthStencilBuffer(uint32 index, VkImageLayout layout) {
-		Pass& pass(_passes.Back());
-		if (_attachments.GetSize() <= index || pass.depthStencilAttachment.index != VK_ATTACHMENT_UNUSED) {
+	bool GraphicsPipelineBuilder::SetDepthStencilBuffer(uint32 attachment, VkImageLayout layout) {
+		PassDescription& pass(_passes.Back());
+		if (pass.depthStencilAttachment.globalIndex != VK_ATTACHMENT_UNUSED) {
 			return false;
 		}
 
-		pass.depthStencilAttachment = AttachmentReference{ index, layout };
-		_attachments[index].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		ET_ASSERT(_attachments.GetSize() <= attachment, "Attachment index {} out of range", attachment);
+
+		pass.depthStencilAttachment = AttachmentReference { attachment, layout };
+		_attachments[attachment].MarkUsed(uint32(_passes.GetSize() - 1u), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
 		return true;
 	}
@@ -164,36 +181,45 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	void GraphicsPipelineBuilder::Finish(bool andOptimize) {
-		if (!andOptimize) {
-			return;
+		if (andOptimize) {
+			StripUnusedResources();
 		}
-
-		StripUnusedResources();
 	}
 
 	// ---------------------------------------------------
 
 	void GraphicsPipelineBuilder::StripUnusedResources() {
-		ArrayMap<uint32, uint32> remapTable(MallocAllocator("Graphics Pipeline Remap Table Allocator"));
-		remapTable.Reserve(_attachments.GetSize());
+		const auto PatchReference([](AttachmentReference& source, const ArrayMap<uint32, uint32>& indexBySource) {
+			if (source.globalIndex == VK_ATTACHMENT_UNUSED) {
+				return;
+			}
 
-		// We need to figure out the new index of each attachment after all dead elements have been removed.
-		for (uint32 index(0u), validIndex(0u); index < _attachments.GetSize(); ++index) {
-			remapTable.Insert(index, validIndex);
+			source.globalIndex = indexBySource.Find(source.globalIndex)->second;
+		});
 
-			if (attachments[index].IsReferenced()) {
+		ArrayMap<uint32, uint32> indexBySource(MallocAllocator("Graphics Pipeline Remap Table Allocator"));
+		indexBySource.Reserve(_attachments.GetSize());
+
+		// Determine the new index of each source attachment after all dead elements have been removed.
+		for (uint32 source(0u), validIndex(0u); source < _attachments.GetSize(); ++source) {
+			indexBySource.Emplace(source, validIndex);
+
+			if (_attachments[source].IsReferenced()) {
 				++validIndex;
 			}
 		}
 
-		_passes.Erase(RemoveIf(_passes.Begin(), _passes.End(), [](const Attachment& attachment) { return attachment.IsReferenced() == false; }), _passes.End());
+		_attachments.Erase(RemoveIf(_attachments.Begin(), _attachments.End(), [](const AttachmentDescription& attachment) { return !attachment.IsReferenced(); }), _attachments.End());
 
-		for (Pass& pass : _passes) {
-			PatchAttachmentReferences(pass.attachments, remapTable);
-			PatchAttachmentReferences(pass.inputAttachments, remapTable);
-			if (pass.depthStencilAttachment.index != VK_ATTACHMENT_UNUSED) {
-				pass.depthStencilAttachment.index.index = remapTable[pass.depthStencilAttachment.index.index];
+		for (PassDescription& pass : _passes) {
+			for (AttachmentReference& source : pass.colorAttachments) {
+				PatchReference(source, indexBySource);
 			}
+			for (AttachmentReference& source : pass.inputAttachments) {
+				PatchReference(source, indexBySource);
+			}
+
+			PatchReference(pass.depthStencilAttachment, indexBySource);
 		}
 	}
 

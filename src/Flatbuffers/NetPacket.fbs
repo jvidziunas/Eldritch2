@@ -1,0 +1,21 @@
+namespace Eldritch2.Core.FlatBuffers;
+
+table AttachPlayer {
+	Id       : ulong;
+	GameData : [ubyte] (flexbuffer);
+}
+
+table DetachPlayer {
+	Id : ulong;
+}
+
+union NetMessage {
+	AttachPlayer,
+	DetachPlayer
+}
+
+table NetPacket {
+	Messages : [NetMessage];
+}
+
+root_type NetPacket;

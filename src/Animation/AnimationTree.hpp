@@ -12,74 +12,78 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/Blend.hpp>
-#include <Animation/Clip.hpp>
+#include <Animation/AnimationTypes.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-namespace Scheduling {
-class JobExecutor;
-}
-} // namespace Eldritch2
-
-namespace ispc {
-struct GpuTransformWithVelocity;
-struct GpuTransform;
-} // namespace ispc
 
 namespace Eldritch2 {
 namespace Animation {
 
-class AnimationTree {
-    // - CONSTRUCTOR/DESTRUCTOR --------------------------
+	template <typename Allocator = MallocAllocator>
+	class AnimationTree {
+		// - TYPE PUBLISHING ---------------------------------
 
-public:
-    //! Disable copy construction.
-    AnimationTree(const AnimationTree&) = delete;
-    //! Constructs this @ref AnimationTree instance.
-    AnimationTree();
+	public:
+		using AllocatorType = Allocator;
 
-    ~AnimationTree();
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-    // ---------------------------------------------------
+	public:
+		//! Constructs this @ref AnimationTree instance.
+		AnimationTree(const AllocatorType& allocator);
+		//! Disable copy construction.
+		AnimationTree(const AnimationTree&) = delete;
 
-public:
-    void WarmClips(Scheduling::JobExecutor& executor, uint64 worldTimeBegin, uint64 worldTimeEnd);
+		~AnimationTree() = default;
 
-    void EvaluatePose(Transformation localToWorld, BoneIndex maximumBoneToAnimate, ispc::GpuTransformWithVelocity transforms[]) const;
-    void EvaluatePose(Transformation localToWorld, BoneIndex maximumBoneToAnimate, ispc::GpuTransform transforms[]) const;
+		// ---------------------------------------------------
 
-    // ---------------------------------------------------
+	public:
+		const KnotCache& GetKnots() const;
 
-public:
-    template <typename PublicBlend, typename... ConstructorArguments>
-    void AddBlend(ConstructorArguments&&... arguments);
+		const Blend* GetRoot() const;
 
-    template <typename PublicClip, typename... ConstructorArguments>
-    void AddClip(ConstructorArguments&&... arguments);
+		// ---------------------------------------------------
 
-    void SetRoot(const Blend& root);
+	public:
+		void FetchKnots(uint64 time, BoneIndex maximumBone);
 
-    // ---------------------------------------------------
+		// ---------------------------------------------------
 
-public:
-    void Reset();
+	public:
+		template <typename PublicBlend, typename... ConstructorArguments>
+		PublicBlend& InsertBlend(ConstructorArguments&&... arguments);
 
-    // - DATA MEMBERS ------------------------------------
+		template <typename PublicClip, typename... ConstructorArguments>
+		PublicClip& InsertClip(ConstructorArguments&&... arguments);
 
-private:
-    mutable ArenaChildAllocator _allocator;
-    //	To consider: Can we sort clips/blends for better cache behavior?
-    //!	Collection of all animation data sources feeding this @ref AnimationTree.
-    ArrayList<Clip*> _clips;
-    //!	Collection of @ref Blend objects describing how to combine @ref Clip instances to form the final pose.
-    ArrayList<Blend*> _blends;
-    //!	Root @ref Blend for the tree. The pose will be evaluated starting from this element.
-    const Blend* _root;
-};
+		void SetRoot(uint32 index);
 
-} // namespace Animation
-} // namespace Eldritch2
+		// ---------------------------------------------------
+
+	public:
+		void Clear();
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		AnimationTree& operator=(const AnimationTree&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		mutable Allocator                               _allocator;
+		KnotCache                                       _knots;
+		ArrayList<UniquePointer<Clip>, ChildAllocator>  _clips;
+		ArrayList<UniquePointer<Blend>, ChildAllocator> _blends;
+		uint32                                          _root;
+
+		// ---------------------------------------------------
+
+		template <typename Allocator>
+		friend void Swap(AnimationTree<Allocator>&, AnimationTree<Allocator>&);
+	};
+
+}} // namespace Eldritch2::Animation
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

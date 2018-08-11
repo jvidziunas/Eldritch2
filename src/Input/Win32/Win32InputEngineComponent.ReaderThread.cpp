@@ -15,7 +15,6 @@
 //==================================================================//
 #include <Input/Win32/Win32InputEngineComponent.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
 #include <windowsx.h>
 #include <Windows.h>
 //------------------------------------------------------------------//
@@ -86,9 +85,9 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 	void Win32InputEngineComponent::ReaderThread::Run() {
 		/*	Since we operate in short bursts of work before sleeping, boost thread priority slightly to reduce the amount of downtime before the
-			 *	scheduler will queue us for execution. Windows internally does some priority boosting for us behind the scenes when we receive input,
-			 *	this is designed to supplement that behavior. */
-		//	SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_HIGHEST );
+		 *	scheduler will queue us for execution. Windows internally does some priority boosting for us behind the scenes when we receive input,
+		 *	this is designed to supplement that behavior. */
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 		const LPCWSTR windowClass(RegisterWindowClass(L"MessageWindow", &DefWindowProcW, GetModuleByAddress(&DefWindowProcW)));
 		ET_AT_SCOPE_EXIT(UnregisterClassW(windowClass, GetModuleByAddress(&DefWindowProcW)));
 

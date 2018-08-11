@@ -299,6 +299,9 @@
 #	define ETNoexceptHintIf(condition)
 #endif
 
+#define ETConstexpr constexpr
+#define ETCpp14Constexpr constexpr
+
 using ETPostfixOperatorHint = int;
 
 namespace Eldritch2 {

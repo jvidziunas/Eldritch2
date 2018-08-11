@@ -74,7 +74,7 @@ private:
 #endif
 };
 
-// ---------------------------------------------------
+// ---
 
 class Lock {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -85,7 +85,6 @@ public:
 	//!	Disable copy construction.
 	Lock(const Lock&) = delete;
 
-	//!	Destroys this @ref Lock instance.
 	~Lock();
 
 	// ---------------------------------------------------
@@ -101,10 +100,10 @@ public:
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	Mutex& _mutex;
+	Mutex* _mutex;
 };
 
-// ---------------------------------------------------
+// ---
 
 class ReadLock {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -115,7 +114,6 @@ public:
 	//!	Disable copy construction.
 	ReadLock(const ReadLock&) = delete;
 
-	//!	Destroys this @ref ReadLock instance.
 	~ReadLock();
 
 	// ---------------------------------------------------
@@ -131,7 +129,7 @@ public:
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	const Mutex& _mutex;
+	const Mutex* _mutex;
 };
 
 } // namespace Eldritch2

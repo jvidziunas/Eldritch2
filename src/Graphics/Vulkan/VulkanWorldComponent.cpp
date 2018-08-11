@@ -17,47 +17,46 @@
 #include <Graphics/Vulkan/Vulkan.hpp>
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Core;
 
-	VulkanWorldComponent::VulkanWorldComponent(const World& owner) :
-		WorldComponent(owner.GetServices()),
+	VulkanWorldComponent::VulkanWorldComponent(const ObjectLocator& services) :
+		WorldComponent(services),
 		_scene(nullptr),
-		_displayBus(nullptr) {}
+		_displays(nullptr) {}
 
 	// ---------------------------------------------------
 
-	void VulkanWorldComponent::AcceptVisitor(JobExecutor& executor, const LateInitializationVisitor) {
-		MICROPROFILE_SCOPEI("World/LateInitialization", "Bind Vulkan scene resources", 0x0C11F0);
-
+	void VulkanWorldComponent::BindResources(JobExecutor& executor) {
+		ET_PROFILE_SCOPE("World/LateInitialization", "Bind Vulkan scene resources", 0x0C11F0);
 		Vulkan::Device& device(FindService<Vulkan>().GetPrimaryDevice());
-		if (_scene && Failed(_scene->BindResources(executor, device, device.GetBus()))) {
+
+		if (_scene == nullptr || Failed(_scene->BindResources(executor, device, device.GetTransferBus()))) {
 			return FindService<World>().SetShouldShutDown();
 		}
 	}
 
 	// ---------------------------------------------------
 
-	void VulkanWorldComponent::AcceptVisitor(JobExecutor& executor, const VariableTickVisitor&) {
-		MICROPROFILE_SCOPEI("World/VariableTick", "Draw scene", 0x0C11F0);
+	void VulkanWorldComponent::FreeResources(JobExecutor& executor) {
+		if (VulkanGraphicsScene* const scene = eastl::exchange(_scene, nullptr)) {
+			Vulkan::Device& device(FindService<Vulkan>().GetPrimaryDevice());
 
-		Vulkan::Device& device(FindService<Vulkan>().GetPrimaryDevice());
-		_scene->SubmitViewIndependentCommands(executor, device);
-		_scene->SubmitViewDependentCommands(executor, device);
+			scene->FreeResources(executor, device, device.GetTransferBus());
+		}
 	}
 
 	// ---------------------------------------------------
 
-	void VulkanWorldComponent::AcceptVisitor(JobExecutor& executor, const TearDownVisitor) {
-		if (_scene) {
-			Vulkan::Device& device(FindService<Vulkan>().GetPrimaryDevice());
-			_scene->FreeResources(executor, device, device.GetBus());
-		}
+	void VulkanWorldComponent::OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime /*tickDuration*/, float32 /*residualFraction*/) {
+		ET_PROFILE_SCOPE("World/VariableTick", "Draw scene", 0x0C11F0);
+		Vulkan::Device& device(FindService<Vulkan>().GetPrimaryDevice());
+
+		_scene->SubmitViewIndependentCommands(executor, device);
+		_scene->SubmitViewDependentCommands(executor, device);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

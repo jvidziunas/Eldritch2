@@ -33,8 +33,8 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		//! Constructs this @ref Package instance.
-		/*!	@param[in] path Null-terminated, UTF-8-encoded character sequence containing the file system path to the package. */
-		Package(const Utf8Char* const path);
+		/*!	@param[in] path UTF-8-encoded string view containing the file name of the package, without any directory or extension. */
+		Package(StringView<Utf8Char> path);
 		//! Disable copy construction.
 		Package(const Package&) = delete;
 
@@ -52,7 +52,7 @@ namespace Eldritch2 { namespace Assets {
 		// ---------------------------------------------------
 
 	public:
-		const Utf8Char* GetPath() const;
+		StringView<Utf8Char> GetPath() const;
 
 		// ---------------------------------------------------
 

@@ -34,69 +34,72 @@ namespace Core {
 namespace Eldritch2 { namespace Core {
 
 	class ETPureAbstractHint EngineComponent {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		struct InitializationVisitor {};
-		struct ConfigurationBroadcastVisitor {};
-		struct LateInitializationVisitor {};
-		struct ServiceTickVisitor {};
-		struct WorldTickVisitor {};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref EngineComponent instance.
-		EngineComponent(const Blackboard& services);
+		EngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		EngineComponent(const EngineComponent&) = delete;
 
 		~EngineComponent() = default;
+
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
+
+	public:
+		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+			@remark The default implementation does nothing.
+			@see @ref Scheduling::JobExecutor */
+		virtual void TickEarly(Scheduling::JobExecutor& executor);
+		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+			@remark The default implementation does nothing.
+			@see @ref Scheduling::JobExecutor */
+		virtual void Tick(Scheduling::JobExecutor& executor);
+
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
+
+	public:
+		virtual UniquePointer<WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services);
+
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
+
+	public:
+		//! Interested service classes should override this method to schedule simple bootstrap tasks with no additional data dependencies.
+		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+			@remark The default implementation does nothing.
+			@see @ref Scheduling::JobExecutor */
+		virtual void BindResourcesEarly(Scheduling::JobExecutor& executor);
+
+		//! Interested service classes should override this method to schedule initialization tasks that require the use of user-configurable variables.
+		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+			@remark The default implementation does nothing.
+			@see @ref Scheduling::JobExecutor */
+		virtual void BindConfigurableResources(Scheduling::JobExecutor& executor);
+
+		//! Interested service classes should override this method in order to perform any final initialization that interacts with other attached services.
+		/*!	@remark The default implementation does nothing. */
+		virtual void BindResources(Scheduling::JobExecutor& executor);
+
+		//! Interested service classes should override this method in order to participate in configurable variable setup.
+		/*!	@remark The default implementation does nothing.
+			@see @ref Core::PropertyRegistrar */
+		virtual void PublishConfiguration(Core::PropertyRegistrar& properties);
+
+		//! Interested service classes should override this method in order to participate in resource/world view creation.
+		/*!	@remark The default implementation does nothing.
+			@see @ref Assets::AssetFactoryRegistrar */
+		virtual void PublishAssetTypes(Assets::AssetApiBuilder& factories);
+
+		//!	Interested service classes should override this method in order to participate in world service location.
+		/*!	@remark the default implementation does nothing.
+			@see @ref Core::Blackboard */
+		virtual void PublishServices(ObjectLocator& services);
 
 		// ---------------------------------------------------
 
 	protected:
 		template <typename ServiceType>
 		ServiceType& FindService() const;
-
-		// - ENGINE SERVICE SANDBOX METHODS ------------------
-
-	public:
-		virtual Result<UniquePointer<WorldComponent>> CreateWorldComponent(Allocator& allocator, const Core::World& world);
-
-		//! Interested service classes should override this method to schedule simple bootstrap tasks with no additional data dependencies.
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
-			@remark The default implementation does nothing.
-			@see @ref Scheduling::JobExecutor */
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const InitializationVisitor);
-		//! Interested service classes should override this method to schedule initialization tasks that require the use of user-configurable variables.
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
-			@remark The default implementation does nothing.
-			@see @ref Scheduling::JobExecutor */
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const ConfigurationBroadcastVisitor);
-		//! Interested service classes should override this method in order to participate in configurable variable setup.
-		/*!	@remark The default implementation does nothing.
-			@see @ref Core::PropertyRegistrar */
-		virtual void AcceptVisitor(Core::PropertyRegistrar& properties);
-		//! Interested service classes should override this method in order to participate in resource/world view creation.
-		/*!	@remark The default implementation does nothing.
-			@see @ref Assets::AssetFactoryRegistrar */
-		virtual void AcceptVisitor(Assets::AssetApiBuilder& factories);
-		//!	Interested service classes should override this method in order to participate in world service location.
-		/*!	@remark the default implementation does nothing.
-			@see @ref Core::Blackboard */
-		virtual void AcceptVisitor(Blackboard& services);
-		//! Interested service classes should override this method in order to perform any final initialization that interacts with other attached services.
-		/*!	@remark The default implementation does nothing. */
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const LateInitializationVisitor);
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
-			@remark The default implementation does nothing.
-			@see @ref Scheduling::JobExecutor */
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const ServiceTickVisitor);
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
-			@remark The default implementation does nothing.
-			@see @ref Scheduling::JobExecutor */
-		virtual void AcceptVisitor(Scheduling::JobExecutor& executor, const WorldTickVisitor);
 
 		// ---------------------------------------------------
 
@@ -106,7 +109,7 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const Blackboard* _services;
+		const ObjectLocator* _services;
 	};
 
 }} // namespace Eldritch2::Core

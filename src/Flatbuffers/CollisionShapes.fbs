@@ -1,0 +1,22 @@
+include "Eldritch2Types.fbs";
+
+namespace Eldritch2.Physics.FlatBuffers;
+
+table SphereShape {
+	Radius		: float;
+}
+
+table BoxShape {
+	HalfExtent	: Eldritch2.FlatBuffers.Float3;
+}
+
+table CapsuleShape {
+	Radius		: float;
+	Height		: float;
+}
+
+union CollisionShape {
+	SphereShape,
+	BoxShape,
+	CapsuleShape
+}

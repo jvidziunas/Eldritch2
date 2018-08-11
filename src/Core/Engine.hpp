@@ -42,10 +42,16 @@ namespace Eldritch2 { namespace Core {
 			// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 		protected:
-			void AcceptVisitor(Scheduling::JobExecutor& executor, const InitializationVisitor) override;
-			void AcceptVisitor(Scheduling::JobExecutor& executor, const ServiceTickVisitor) override;
-			void AcceptVisitor(Scheduling::JobExecutor& executor, const WorldTickVisitor) override;
-			void AcceptVisitor(Core::PropertyRegistrar& properties) override;
+			void BindResourcesEarly(Scheduling::JobExecutor& executor) override;
+
+			void PublishConfiguration(Core::PropertyRegistrar& properties) override;
+
+			// - ENGINE SERVICE SANDBOX METHODS ------------------
+
+		protected:
+			void TickEarly(Scheduling::JobExecutor& executor) override;
+
+			void Tick(Scheduling::JobExecutor& executor) override;
 
 			// ---------------------------------------------------
 
@@ -56,14 +62,14 @@ namespace Eldritch2 { namespace Core {
 
 		private:
 			Engine* _owner;
-			size_t  _maxPackagesSweptPerFrame;
+			size_t  _packageSweepLimitPerFrame;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref Engine instance.
-		/*!	@param[in] scheduler @ref Scheduling::Scheduler instance the new @ref Engine will use to launch operating system threads. */
+		/*!	@param[in] scheduler @ref Scheduling::JobSystem instance the new @ref Engine will use to launch operating system threads. */
 		Engine(Scheduling::JobSystem& scheduler);
 		//!	Disable copy construction.
 		Engine(const Engine&) = delete;
@@ -73,11 +79,9 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
-		const Blackboard& GetBlackboard() const;
+		const ObjectLocator& GetServiceLocator() const;
 
 		Logging::Log& GetLog() const;
-
-		Allocator& GetAllocator() const;
 
 		// - WORLD MANAGEMENT --------------------------------
 
@@ -98,7 +102,7 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode ApplyConfiguration(const Utf8Char* const path);
+		ErrorCode ApplyConfiguration(StringView<PlatformChar> path);
 
 		// ---------------------------------------------------
 
@@ -110,28 +114,23 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	private:
+		void RunFrame(Scheduling::JobExecutor& executor);
+
 		void TickWorlds(Scheduling::JobExecutor& executor);
+
+		void SweepPackages(size_t collectionLimit);
 
 		// ---------------------------------------------------
 
 	private:
-		void SweepPackages(size_t collectionLimit);
-
-		void BuildAssetApi();
-
 		void ScanPackages();
 
 		// ---------------------------------------------------
 
 	private:
-		void InitializeComponents(Scheduling::JobExecutor& executor);
+		void BindComponents(Scheduling::JobExecutor& executor);
 
 		void CreateBootWorld(Scheduling::JobExecutor& executor);
-
-		// ---------------------------------------------------
-
-	private:
-		void RunFrame(Scheduling::JobExecutor& executor);
 
 		// ---------------------------------------------------
 
@@ -142,7 +141,7 @@ namespace Eldritch2 { namespace Core {
 
 	private:
 		mutable UsageMixin<MallocAllocator> _allocator;
-		Blackboard                          _services;
+		ObjectLocator                       _services;
 		Assets::FlatBufferPackageProvider   _packageProvider;
 		mutable Logging::FileLog            _log;
 		mutable Atomic<bool>                _shouldRun;

@@ -17,19 +17,43 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint bool GraphicsPipelineBuilder::Attachment::IsReferenced() const {
-		return firstPass <= lastPass;
+	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(float32 widthScale, float32 heightScale) const {
+		return staticDimensions == 0 && (scales[0] == widthScale && scales[1] == heightScale);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool GraphicsPipelineBuilder::Attachment::ShouldPreserveInPass(uint32 pass) const {
-		return firstPass < pass && pass < lastPass;
+	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(VkExtent3D dispatchDimensions) const {
+		return staticDimensions != 0 && OrderBuffers(&dimensions, &dispatchDimensions, sizeof(VkExtent3D)) == 0;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint const GraphicsPipelineBuilder::Pass& GraphicsPipelineBuilder::operator[](uint32 pass) const {
+	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsReferenced() const {
+		return IsWritten() | IsRead();
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsWritten() const {
+		return firstWrite <= lastWrite;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsRead() const {
+		return firstRead <= lastRead;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::ShouldPreserveInPass(uint32 pass) const {
+		return isPersistent || (firstWrite < pass && pass < lastRead);
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint const GraphicsPipelineBuilder::PassDescription& GraphicsPipelineBuilder::operator[](uint32 pass) const {
 		return _passes[pass];
 	}
 
@@ -41,7 +65,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	ETInlineHint const GraphicsPipelineBuilder::Attachment& GraphicsPipelineBuilder::GetAttachment(uint32 attachment) const {
+	ETInlineHint const GraphicsPipelineBuilder::AttachmentDescription& GraphicsPipelineBuilder::GetAttachment(uint32 attachment) const {
 		return _attachments[attachment];
 	}
 
@@ -53,11 +77,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	template <typename... Args>
-	ETInlineHint void GraphicsPipelineBuilder::DefineAttachment(VkFormat format, VkSampleCountFlags quality, VkImageLayout initial, VkImageLayout final, Args&&... args) {
-		const VkAttachmentLoadOp loadOperation(initial != VK_IMAGE_LAYOUT_UNDEFINED ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_DONT_CARE);
-
+	template <typename... Args, class /*SFINAE*/>
+	ETInlineHint uint32 GraphicsPipelineBuilder::DefineAttachment(VkFormat format, VkSampleCountFlags quality, Args&&... args) {
 		_attachments.EmplaceBack(format, quality, eastl::forward<Args>(args)...);
+
+		return uint32(_attachments.GetSize() - 1u);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

@@ -12,8 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/PlatformString.hpp>
 #include <Common/Containers/ArrayList.hpp>
+#include <Common/Containers/String.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
 
@@ -40,9 +40,9 @@ namespace Eldritch2 { namespace Tools {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<PlatformString<>> _exports;
-		PlatformString<>            _indexPath;
-		PlatformString<>            _blobPath;
+		ArrayList<Path<>> _exports;
+		Path<>            _indexPath;
+		Path<>            _blobPath;
 	};
 
 }} // namespace Eldritch2::Tools

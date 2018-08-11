@@ -41,29 +41,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const Framebuffer& GetFramebuffer() const;
+		VkRect2D GetOwnedRegion() const;
 
-		VkExtent2D GetValidExtent() const;
-
-		void SetValidExtent(VkExtent2D extent);
-
-		// ---------------------------------------------------
-
-	public:
-		virtual VkExtent2D GetFramebufferExtent(VkExtent2D extent) const abstract;
-
-		// ---------------------------------------------------
-
-	public:
-		VkResult BindResources(Gpu& gpu, VkExtent2D extent);
-
-		void FreeResources(Gpu& gpu);
+		void SetOwnedRegion(VkRect2D region);
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Framebuffer _framebuffer;
-		VkExtent2D  _validExtent;
+		VkRect2D _ownedRegion;
 
 		// ---------------------------------------------------
 
@@ -77,6 +62,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	public:
 		enum : uint32_t { MaxQueueDepth = 3u };
+
+		// ---
+
+		struct CompositeInfo {
+			VkCommandPool   blitPool;
+			VkCommandBuffer blitCommands;
+			VkSemaphore     imageReady;
+		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -107,7 +100,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	public:
 		VkResult AcquireImage(Vulkan& vulkan, Gpu& gpu);
 
-		VkResult SubmitImage(Gpu& gpu);
+		VkResult PresentImage(Gpu& gpu);
 
 		// ---------------------------------------------------
 
@@ -121,6 +114,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	private:
 		VkResult ResizeSwapchain(Gpu& gpu);
 
+		// ---------------------------------------------------
+
 		//!	Disable copy assignment.
 		Display& operator=(const Display&) = delete;
 
@@ -132,13 +127,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		VkSurfaceFormatKHR _format;
 		VkPresentModeKHR   _presentMode;
 		VkSwapchainKHR     _swapchain;
-		uint32_t           _currentImage;
-		VkCommandPool      _blitPool;
-		VkCommandBuffer    _blitCommands[MaxQueueDepth];
-		VkImage            _images[MaxQueueDepth];
-		VkImageView        _views[MaxQueueDepth];
+		uint32_t           _swapchainIndex;
+		uint32_t           _presentCount;
+		VkImageView        _imageViews[MaxQueueDepth];
 		VkFramebuffer      _framebuffers[MaxQueueDepth];
-		VkSemaphore        _imageReady[MaxQueueDepth];
+		CompositeInfo      _compositeInfos[MaxQueueDepth];
 		DisplaySource*     _sources[4];
 
 		// ---------------------------------------------------

@@ -17,8 +17,8 @@
 
 namespace Eldritch2 { namespace Core {
 
-	ETInlineHint EngineComponent::EngineComponent(const Blackboard& services) :
-		_services(&services) {}
+	ETInlineHint EngineComponent::EngineComponent(const ObjectLocator& services) :
+		_services(eastl::addressof(services)) {}
 
 	// ---------------------------------------------------
 

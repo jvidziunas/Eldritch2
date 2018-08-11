@@ -55,7 +55,7 @@ public:
 	ArrayList(SizeType capacityHint, const AllocatorType& allocator);
 	//! Constructs this @ref ArrayList instance.
 	/*!	@param[in] allocator Allocator template for the container. */
-	ArrayList(const AllocatorType& allocator);
+	ArrayList(const AllocatorType& allocator = AllocatorType());
 	//! Constructs this @ref ArrayList instance.
 	ArrayList(const ArrayList&);
 	//! Constructs this @ref ArrayList instance.
@@ -162,9 +162,9 @@ public:
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	void Insert(Iterator start, SizeType itemCount, const ValueType& item);
 	template <typename InputIterator>
 	void     Insert(Iterator position, InputIterator first, InputIterator last);
+	void     Insert(Iterator position, SizeType itemCount, const ValueType& item);
 	Iterator Insert(Iterator position, const ValueType& item);
 	Iterator Insert(Iterator position, ValueType&& item);
 

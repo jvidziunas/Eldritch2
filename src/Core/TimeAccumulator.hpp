@@ -31,6 +31,8 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
+		float32 GetResidualBlendFactor() const;
+
 		uint64 GetResidualTime() const;
 
 		bool ShouldTick() const;

@@ -21,26 +21,37 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		enum : uint32 {
+			MaxAttachmentsPerPass = 4u
+		};
+
+		// ---
+
+	public:
 		struct AttachmentReference {
-			uint32        index;
+			uint32        globalIndex;
 			VkImageLayout layout;
 		};
 
 		// ---
 
 	public:
-		class Attachment {
+		class AttachmentDescription {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this @ref Attachment instance.
-			Attachment(VkFormat format, VkSampleCountFlags quality, float32 widthScale = 1.0f, float32 heightScale = 1.0f, float32 depthScale = 1.0f);
-			//! Constructs this @ref Attachment instance.
-			Attachment(VkFormat format, VkSampleCountFlags quality, VkExtent3D dimensions);
-			//! Constructs this @ref Attachment instance.
-			Attachment(const Attachment&) = default;
+			//! Constructs this @ref AttachmentDescription instance.
+			AttachmentDescription(VkFormat format, VkSampleCountFlags quality);
+			//! Constructs this @ref AttachmentDescription instance.
+			AttachmentDescription(const AttachmentDescription&) = default;
 
-			~Attachment() = default;
+			~AttachmentDescription() = default;
+
+			// ---------------------------------------------------
+
+		public:
+			bool SupportsResolution(float32 widthScale, float32 heightScale) const;
+			bool SupportsResolution(VkExtent3D dimensions) const;
 
 			// ---------------------------------------------------
 
@@ -48,6 +59,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			bool ShouldPreserveInPass(uint32 pass) const;
 
 			bool IsReferenced() const;
+
+			bool IsWritten() const;
+
+			bool IsRead() const;
+
+			// ---------------------------------------------------
+
+		public:
+			void MarkWritten(uint32 pass, VkImageUsageFlags usage);
+
+			void MarkRead(uint32 pass, VkImageUsageFlags usage);
 
 			void MarkUsed(uint32 pass, VkImageUsageFlags usage);
 
@@ -57,26 +79,33 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			VkFormat           format;
 			VkImageCreateFlags flags;
 			VkImageUsageFlags  usages;
-			uint32             firstPass : 10;
-			uint32             lastPass : 10;
+			uint32             firstRead;
+			uint32             lastRead;
+			uint32             firstWrite;
+			uint32             lastWrite;
 			uint32             msaaQuality : 8;
-			uint32             staticResolution : 1;
+			uint32             isExport : 1;
+			uint32             isPersistent : 1;
+			uint32             staticDimensions : 1;
 			union {
-				float32    scale[3];
 				VkExtent3D dimensions;
+				float32    scales[2];
 			};
 		};
 
-		class Buffer {
+		// ---
+
+	public:
+		class BufferDescription {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//! Constructs this @ref Buffer instance.
-			Buffer(VkDeviceSize sizeInBytes);
-			//! Constructs this @ref Buffer instance.
-			Buffer(const Buffer&) = default;
+			//! Constructs this @ref BufferDescription instance.
+			BufferDescription(VkDeviceSize sizeInBytes);
+			//! Constructs this @ref BufferDescription instance.
+			BufferDescription(const BufferDescription&) = default;
 
-			~Buffer() = default;
+			~BufferDescription() = default;
 
 			// - DATA MEMBERS ------------------------------------
 
@@ -84,32 +113,42 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			VkDeviceSize        sizeInBytes;
 			VkBufferCreateFlags flags;
 			VkBufferUsageFlags  usages;
-			uint32              firstPass : 10;
-			uint32              lastPass : 10;
+			uint32              firstRead;
+			uint32              lastRead;
+			uint32              firstWrite;
+			uint32              lastWrite;
 		};
 
 		// ---
 
 	public:
-		class Pass {
+		class PassDescription {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref Pass instance.
-			Pass(const Utf8Char* const name);
-			//!	Constructs this @ref Pass instance.
-			Pass(const Pass&) = default;
+			//!	Constructs this @ref PassDescription instance.
+			PassDescription(float32 widthScale, float32 heightScale, const Utf8Char* const name);
+			//!	Constructs this @ref PassDescription instance.
+			PassDescription(VkExtent3D dimensions, const Utf8Char* const name);
+			//!	Constructs this @ref PassDescription instance.
+			PassDescription(const PassDescription&) = default;
 
-			~Pass() = default;
+			~PassDescription() = default;
 
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			Utf8Char            name[64u];
-			uint32              attachmentCount;
-			uint32              inputAttachmentCount;
-			AttachmentReference attachments[4u];
-			AttachmentReference inputAttachments[4u];
+			Utf8Char name[64u];
+			uint32   staticDimensions : 1;
+			union {
+				VkExtent3D dimensions;
+				struct {
+					float32 widthScale;
+					float32 heightScale;
+				};
+			};
+			AttachmentReference colorAttachments[MaxAttachmentsPerPass];
+			AttachmentReference inputAttachments[MaxAttachmentsPerPass];
 			AttachmentReference depthStencilAttachment;
 		};
 
@@ -128,32 +167,31 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const Pass& operator[](uint32 pass) const;
+		const PassDescription& operator[](uint32 pass) const;
 
 		uint32 GetPassCount() const;
 
 		// ---------------------------------------------------
 
 	public:
-		const Attachment& GetAttachment(uint32 attachment) const;
+		const AttachmentDescription& GetAttachment(uint32 attachment) const;
 
 		uint32 GetAttachmentCount() const;
 
 		// ---------------------------------------------------
 
 	public:
-		template <typename... Args>
-		void DefineAttachment(VkFormat format, VkSampleCountFlags quality, VkImageLayout initial, VkImageLayout final, Args&&... args);
+		template <typename... Args, class = eastl::enable_if_t<eastl::is_constructible<AttachmentDescription, VkFormat, VkSampleCountFlags, Args...>::value>>
+		uint32 DefineAttachment(VkFormat format, VkSampleCountFlags quality, Args&&... args);
 
-		void Begin(VkPipelineBindPoint bindPoint, const Utf8Char* name);
+		void BeginPass(VkPipelineBindPoint bindPoint, float32 width, float32 height, const Utf8Char* name);
+		void BeginPass(VkPipelineBindPoint bindPoint, VkExtent3D resolution, const Utf8Char* name);
 
-		void BeginPass(VkPipelineBindPoint bindPoint, const Utf8Char* name);
+		bool AppendInput(uint32 attachment, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-		bool AttachInput(uint32 index, VkImageLayout layout);
+		bool AppendColorOutput(uint32 attachment, VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-		bool AttachColorOutput(uint32 index, VkImageLayout layout);
-
-		bool AttachDepthStencilBuffer(uint32 index, VkImageLayout layout);
+		bool SetDepthStencilBuffer(uint32 attachment, VkImageLayout layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
 		void Finish(bool andOptimize = true);
 
@@ -170,9 +208,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<Attachment> _attachments;
-		ArrayList<Buffer>     _buffer;
-		ArrayList<Pass>       _passes;
+		ArrayList<AttachmentDescription> _attachments;
+		ArrayList<BufferDescription>     _buffers;
+		ArrayList<PassDescription>       _passes;
 
 		// ---------------------------------------------------
 

@@ -15,59 +15,57 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Logging {
+namespace Eldritch2 { namespace Logging {
 
-		enum class MessageType {
-			VerboseWarning = 0,
-			Warning,
-			Error,
-			Message
-		};
+	enum class MessageType {
+		VerboseWarning = 0,
+		Warning,
+		Error,
+		Message
+	};
 
 	// ---
 
-		class ETPureAbstractHint Log {
+	class ETPureAbstractHint Log {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		protected:
+	protected:
 		//! Constructs this @ref Log instance.
 		/*!	Designed to be called from subclasses. */
-			Log(const Log&) = delete;
+		Log(const Log&) = delete;
 		//! Constructs this @ref Log instance.
 		/*!	Designed to be called from subclasses. */
-			Log();
+		Log();
 
-			~Log() = default;
+		~Log() = default;
 
 		// ---------------------------------------------------
 
-		public:
-			virtual void	Write(const Utf8Char* const string, size_t lengthInOctets) abstract;
+	public:
+		virtual void Write(const Utf8Char* const string, size_t lengthInOctets) abstract;
 
-			template <size_t formatSize, typename... Arguments>
-			void			Write(MessageType type, const Utf8Char(&formatString)[formatSize], Arguments&&... arguments);
+		template <typename... Arguments>
+		void Write(MessageType type, StringView<Utf8Char> format, Arguments&&... arguments);
 
 		// ---------------------------------------------------
 
-		public:
-			MessageType	GetMuteThreshold() const;
+	public:
+		MessageType GetMuteThreshold() const;
 
-			void		SetMuteThreshold(MessageType threshold);
+		void SetWriteThreshold(MessageType threshold);
 
 		// ---------------------------------------------------
 
 		//!	Disable assignment.
-			Log&	operator=(const Log&) = delete;
+		Log& operator=(const Log&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
-		private:
-			Atomic<Logging::MessageType>	_muteThreshold;
-		};
+	private:
+		Atomic<MessageType> _muteThreshold;
+	};
 
-	}	// namespace Logging
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Logging
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

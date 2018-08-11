@@ -62,7 +62,7 @@ public:
 	//! Constructs this @ref Cache instance.
 	Cache(Cache&&, const AllocatorType& allocator);
 	//! Constructs this @ref Cache instance.
-	explicit Cache(const AllocatorType& allocator);
+	Cache(const AllocatorType& allocator = AllocatorType());
 	//! Constructs this @ref Cache instance.
 	Cache(const Cache&);
 	//! Constructs this @ref Cache instance.

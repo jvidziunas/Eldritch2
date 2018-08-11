@@ -211,6 +211,20 @@ ETInlineHint typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator A
 // ---------------------------------------------------
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
+ETInlineHint typename ArrayMap<Key, Value, SortPredicate, Allocator>::MappedType& ArrayMap<Key, Value, SortPredicate, Allocator>::operator[](const KeyType& key) {
+	return _container[key];
+}
+
+// ---------------------------------------------------
+
+template <typename Key, typename Value, typename SortPredicate, class Allocator>
+ETInlineHint typename ArrayMap<Key, Value, SortPredicate, Allocator>::MappedType& ArrayMap<Key, Value, SortPredicate, Allocator>::operator[](KeyType&& key) {
+	return _container[eastl::forward<KeyType>(key)];
+}
+
+// ---------------------------------------------------
+
+template <typename Key, typename Value, typename SortPredicate, class Allocator>
 ETInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator, bool> ArrayMap<Key, Value, SortPredicate, Allocator>::Insert(const ValueType& value) {
 	return _container.insert(value);
 }

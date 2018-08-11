@@ -107,6 +107,8 @@ namespace Detail {
 		}
 
 		static ETInlineHint ETPureFunctionHint size_t Invoke(const KeyType& key, size_t seed, const eastl::false_type /*hasMemberHash*/) {
+			using ::Eldritch2::GetHashCode;
+
 			return GetHashCode(key, seed);
 		}
 	};

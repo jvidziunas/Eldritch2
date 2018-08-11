@@ -309,9 +309,6 @@
     <ClCompile Include="src\Scripting\Wren\AssetViews\ScriptAsset.cpp">
       <Filter>Source Files\Scripting\Wren\AssetViews</Filter>
     </ClCompile>
-    <ClCompile Include="src\Animation\AnimationTree.cpp">
-      <Filter>Source Files\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="src\Animation\AssetViews\AnimationTreeAsset.cpp">
       <Filter>Source Files\Animation\AssetViews</Filter>
     </ClCompile>
@@ -355,9 +352,6 @@
       <Filter>Source Files\Scheduling</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\Memory.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Common\Blackboard.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\Mpl\Matrices.cpp">
@@ -636,9 +630,6 @@
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.UniformBuffer.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\ResidencyCoordinator.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scripting\Wren\ActionSet.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
@@ -660,9 +651,6 @@
     <ClCompile Include="src\Input\Win32\Win32InputWorldComponent.WrenScriptApi.cpp">
       <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\ShaderPipeline.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphics\ResolutionScale.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -683,9 +671,6 @@
     </ClCompile>
     <ClCompile Include="src\Physics\PhysX\TriggerArea.WrenScriptApi.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Common\Eastl.cpp">
-      <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\Precompiled.cpp">
       <Filter>Source Files\Common</Filter>
@@ -717,9 +702,6 @@
     <ClCompile Include="src\Graphics\Vulkan\AssetViews\GraphicsPipelineAsset.cpp">
       <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\DisplayBus.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Eldritch2.Win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -741,35 +723,14 @@
     <ClCompile Include="src\Input\InputDevice.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\DisplayBus.WrenScriptApi.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\InputBus.WrenScriptApi.cpp">
-      <Filter>Source Files\Input</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scripting\Wren\Dispatcher.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
     <ClCompile Include="src\Scripting\Wren\Dispatcher.WrenScriptApi.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
-    <ClCompile Include="src\Assets\PackageManager.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Assets\PackageManager.WrenScriptApi.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Microprofile.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input\Win32\DeviceCoordinator.cpp">
       <Filter>Source Files\Input\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Assets\AssetManager.WrenScriptApi.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\DisplayCoordinator.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Input\InputDevice.InputHandler.cpp">
       <Filter>Source Files\Input</Filter>
@@ -778,9 +739,6 @@
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\Display.Win32.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\GpuResourceBus.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\GpuResources.Mesh.cpp">
@@ -796,6 +754,42 @@
       <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\GraphicsPipeline.Framebuffer.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\GraphicsPipeline.ShaderPipeline.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\PackageLocator.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\AssetLocator.WrenScriptApi.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\PackageLocator.WrenScriptApi.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\String.Win32.cpp">
+      <Filter>Source Files\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\ObjectLocator.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\DisplayLocator.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\DeviceLocator.WrenScriptApi.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\DisplayLocator.WrenScriptApi.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\DisplayBus.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\FrameTransferBus.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\ResourceBus.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1001,9 +995,6 @@
     <ClInclude Include="src\Common\Containers\AbstractString.hpp">
       <Filter>Header Files\Common\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\Containers\PlatformString.hpp">
-      <Filter>Header Files\Common\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physics\PhysX\AssetViews\PhysicsAsset.hpp">
       <Filter>Header Files\Physics\PhysX\AssetViews</Filter>
     </ClInclude>
@@ -1082,9 +1073,6 @@
     <ClInclude Include="src\Common\Memory.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\Blackboard.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Mpl\Matrices.hpp">
       <Filter>Header Files\Common\Mpl</Filter>
     </ClInclude>
@@ -1111,12 +1099,6 @@
     </ClInclude>
     <ClInclude Include="src\Physics\PhysX\Physics.hpp">
       <Filter>Header Files\Physics\PhysX</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Animation\Blend.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Animation\Clip.hpp">
-      <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="src\Animation\KeyframeClip.hpp">
       <Filter>Header Files\Animation</Filter>
@@ -1283,9 +1265,6 @@
     <ClInclude Include="src\Common\Memory\Allocator.hpp">
       <Filter>Header Files\Common\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\ResidencyCoordinator.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\HostMixin.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
@@ -1302,12 +1281,6 @@
       <Filter>Header Files\Input\Win32</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\ResolutionScale.hpp">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\ShaderPipeline.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\PortalView.hpp">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Win32Tools.hpp">
@@ -1355,9 +1328,6 @@
     <ClInclude Include="src\Graphics\Vulkan\AssetViews\GraphicsPipelineAsset.hpp">
       <Filter>Header Files\Graphics\Vulkan\AssetViews</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\DisplayBus.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Containers\Cache.hpp">
       <Filter>Header Files\Common\Containers</Filter>
     </ClInclude>
@@ -1370,9 +1340,6 @@
     <ClInclude Include="src\Input\InputDevice.hpp">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\Input\InputBus.hpp">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Ratio.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
@@ -1382,22 +1349,10 @@
     <ClInclude Include="src\Scripting\Wren\Dispatcher.hpp">
       <Filter>Header Files\Scripting\Wren</Filter>
     </ClInclude>
-    <ClInclude Include="src\Assets\PackageManager.hpp">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Assets\AssetManager.hpp">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="src\Input\Win32\DeviceCoordinator.hpp">
       <Filter>Header Files\Input\Win32</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\DisplayCoordinator.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\Display.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\GpuResourceBus.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.hpp">
@@ -1405,6 +1360,36 @@
     </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\AssetViews\SpirVShaderSetAsset.hpp">
       <Filter>Header Files\Graphics\Vulkan\AssetViews</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Profiler.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\AssetLocator.hpp">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\PackageLocator.hpp">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\StringView.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\ObjectLocator.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Vulkan\DisplayLocator.hpp">
+      <Filter>Header Files\Graphics\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\DeviceLocator.hpp">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Vulkan\DisplayBus.hpp">
+      <Filter>Header Files\Graphics\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Vulkan\FrameTransferBus.hpp">
+      <Filter>Header Files\Graphics\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Vulkan\ResourceBus.hpp">
+      <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1572,9 +1557,6 @@
     <None Include="src\Common\Math.inl">
       <Filter>Source Files\Common</Filter>
     </None>
-    <None Include="src\Common\Blackboard.inl">
-      <Filter>Source Files\Common</Filter>
-    </None>
     <None Include="src\Common\Mpl\Matrices.inl">
       <Filter>Source Files\Common\Mpl</Filter>
     </None>
@@ -1704,12 +1686,6 @@
     <None Include="src\Scripting\Wren\Dispatcher.inl">
       <Filter>Source Files\Scripting\Wren</Filter>
     </None>
-    <None Include="src\Assets\AssetManager.inl">
-      <Filter>Source Files\Assets</Filter>
-    </None>
-    <None Include="src\Input\InputBus.inl">
-      <Filter>Source Files\Input</Filter>
-    </None>
     <None Include="src\Input\Win32\DeviceCoordinator.inl">
       <Filter>Source Files\Input\Win32</Filter>
     </None>
@@ -1717,20 +1693,50 @@
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </None>
     <None Include=".clang-format" />
-    <None Include="src\Graphics\Vulkan\DisplayCoordinator.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
-    <None Include="src\Graphics\Vulkan\ResidencyCoordinator.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
     <None Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
-    <None Include="src\Graphics\Vulkan\GpuResourceBus.inl">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </None>
     <None Include="src\Graphics\Vulkan\AssetViews\SpirVShaderSetAsset.inl">
       <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
+    </None>
+    <None Include="src\Eldritch2Math.isph">
+      <Filter>IPSC Kernels</Filter>
+    </None>
+    <None Include="src\Animation\AnimationTypes.inl">
+      <Filter>Source Files\Animation</Filter>
+    </None>
+    <None Include="src\Eldritch2Types.isph">
+      <Filter>IPSC Kernels</Filter>
+    </None>
+    <None Include="src\Graphics\ImageSource.inl">
+      <Filter>Source Files\Graphics</Filter>
+    </None>
+    <None Include="src\Assets\AssetLocator.inl">
+      <Filter>Source Files\Assets</Filter>
+    </None>
+    <None Include="src\Assets\FlatBufferPackageProvider.inl">
+      <Filter>Source Files\Assets</Filter>
+    </None>
+    <None Include="src\Common\Containers\String.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\ObjectLocator.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Input\DeviceLocator.inl">
+      <Filter>Source Files\Input</Filter>
+    </None>
+    <None Include="src\Graphics\Vulkan\DisplayBus.inl">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </None>
+    <None Include="src\Graphics\Vulkan\FrameTransferBus.inl">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </None>
+    <None Include="src\Graphics\Vulkan\ResourceBus.inl">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </None>
+    <None Include="src\Common\Containers\StringView.inl">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1739,70 +1745,74 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Animation.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\NetPacket.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Armature.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\NuklearUi.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\CollisionShapes.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\PackageIndex.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Eldritch2Types.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\PhysicsBody.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\Mesh.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SerializedWorld.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\NuklearUi.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\ShaderSetTypes.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\SerializedWorld.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SoundBank.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\SoundBank.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\SpirVShaderSet.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PackageIndex.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Mesh.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PhysicsBody.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsTypes.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\AnimationTree.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsPipeline.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsPipeline.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Eldritch2Types.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\GraphicsTypes.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\DxbcShaderSet.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PlayerData.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\CollisionShapes.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\DialogueSet.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\DialogueSet.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\ShaderSetTypes.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Armature.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\DxbcShaderSet.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\AnimationTree.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\SpirVShaderSet.fbc">
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Animation.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
   </ItemGroup>
   <ItemGroup>
-    <IspcSourceItem Include="src\Animation\AnimateSkeletons.ispc">
+    <IspcSourceItem Include="src\Common\Containers\SimdSort.ispc">
       <Filter>IPSC Kernels</Filter>
     </IspcSourceItem>
-    <IspcSourceItem Include="src\Common\Containers\SimdSort.ispc">
+    <IspcSourceItem Include="src\Animation\AnimateSkeleton.ispc">
       <Filter>IPSC Kernels</Filter>
     </IspcSourceItem>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Eldritch2Types.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="IspcSource.xml" />
+    <Xml Include="FlatBufferSchema.xml" />
   </ItemGroup>
 </Project>

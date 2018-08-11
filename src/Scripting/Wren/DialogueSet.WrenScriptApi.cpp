@@ -14,7 +14,7 @@
 #include <Scripting/Wren/AssetViews/DialogueSetAsset.hpp>
 #include <Scripting/Wren/DialogueSet.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
-#include <Assets/AssetManager.hpp>
+#include <Assets/AssetLocator.hpp>
 //------------------------------------------------------------------//
 
 WrenHandle* wrenGetSlotHandle(WrenVM* vm, int slot);

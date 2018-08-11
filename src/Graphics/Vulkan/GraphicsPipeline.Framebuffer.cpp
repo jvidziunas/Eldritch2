@@ -19,82 +19,26 @@
 
 #define MAKE_CASE(is2D, isArray) (static_cast<int>(is2D) << 1u) | static_cast<int>(isArray)
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	namespace {
 
-		ETInlineHint ETPureFunctionHint VkImageViewType GetAttachmentViewType(VkExtent3D extent, VkImageCreateFlags createFlags, bool isArray) {
-			if (createFlags & VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) {
+		ETInlineHint ETPureFunctionHint VkImageViewType GetViewType(VkExtent3D extent, VkImageCreateFlags flags, bool isArray) {
+			if (flags & VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) {
 				return isArray ? VK_IMAGE_VIEW_TYPE_CUBE_ARRAY : VK_IMAGE_VIEW_TYPE_CUBE;
 			}
 
-			if (createFlags & VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT) {
+			if (flags & VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT) {
 				return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
 			}
 
-			switch (MAKE_CASE(/*is2D =*/extent.height > 1, isArray)) { // clang-format off
+			switch (MAKE_CASE(/*is2D =*/extent.height > 1, isArray)) {
 			case MAKE_CASE(/*is2D =*/false, /*isArray =*/false): return VK_IMAGE_VIEW_TYPE_1D;
 			case MAKE_CASE(/*is2D =*/false, /*isArray =*/true): return VK_IMAGE_VIEW_TYPE_1D_ARRAY;
 			case MAKE_CASE(/*is2D =*/true, /*isArray =*/false): return VK_IMAGE_VIEW_TYPE_2D;
-			case MAKE_CASE(/*is2D =*/true, /*isArray =*/true): return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-			ET_NO_DEFAULT_CASE;
-			} // switch (MAKE_CASE(is2D, isArray)) // clang-format on										
-		}
-
-	// ---------------------------------------------------
-
-		ETInlineHint VkResult BindAttachments(Gpu& gpu, ArrayList<Framebuffer::Attachment>& attachments, const GraphicsPipelineBuilder& pipeline, VkExtent2D baseDimensions, uint32 arrayLayers) {
-			attachments.Resize(pipeline.GetAttachmentCount());
-
-			for (uint32 index(0u); index < pipeline.GetAttachmentCount(); ++index) {
-				const GraphicsPipelineBuilder::Attachment& attachment(pipeline.GetAttachment(index));
-				const VkExtent3D                           dimensions{};
-
-				if (!attachment.IsReferenced()) {
-					continue;
-				}
-
-				ET_FAIL_UNLESS(attachments[index].BindResources(gpu, attachment.format, attachment.flags, VkSampleCountFlags(attachment.msaaQuality), attachment.usages, dimensions, arrayLayers ));
-			}
-
-			return VK_SUCCESS;
-		}
-
-	// ---------------------------------------------------
-		
-		ETInlineHint VkResult BindFramebuffers(Gpu &gpu, ArrayList<VkFramebuffer>& framebufferByPass, const ArrayList<Framebuffer::Attachment>& combinedAttachments, const GraphicsPipeline& pipeline, const GraphicsPipelineBuilder& source, VkExtent2D baseDimensions, uint32 arrayLayers) {
-			enum : uint32 { MaxBindingsPerPass = _countof(GraphicsPipelineBuilder::Pass::attachments) + _countof(GraphicsPipelineBuilder::Pass::inputAttachments) + 1u };
-			framebufferByPass.Resize(source.GetPassCount());
-
-			for (uint32 passId(0u); passId < source.GetPassCount(); ++passId) {
-				const GraphicsPipelineBuilder::Pass& pass(source[passId]);
-				VkImageView                          attachments[MaxBindingsPerPass] = { VK_NULL_HANDLE };
-				
-				for (uint32 i(0u); i < pass.attachmentCount; ++i) {
-					attachments[i] = combinedAttachments[pass.attachments[i].index].view;
-				}
-
-				if (pass.depthStencilAttachment.index != VK_ATTACHMENT_UNUSED) {
-					attachments[_countof(attachments) - 1u] = combinedAttachments[pass.depthStencilAttachment.index].view;
-				}
-
-				VkFramebuffer                 framebuffer;
-				const VkFramebufferCreateInfo framebufferInfo{
-					VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-					/*pNext =*/nullptr,
-					/*flags =*/0u,
-					pipeline[passId].renderPass,
-					pass.attachmentCount,
-					attachments,
-					baseDimensions.width,
-					baseDimensions.height,
-					arrayLayers
-				};
-				ET_FAIL_UNLESS(vkCreateFramebuffer(gpu, &framebufferInfo, gpu.GetAllocationCallbacks(), &framebufferByPass[passId]));
-			}
-
-			return VK_SUCCESS;
+			case MAKE_CASE(/*is2D =*/true, /*isArray =*/true):
+				return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+				ET_NO_DEFAULT_CASE;
+			} // switch (MAKE_CASE(is2D, isArray))
 		}
 
 	} // anonymous namespace
@@ -108,7 +52,8 @@ namespace Vulkan {
 
 	Framebuffer::Attachment::Attachment() :
 		image(nullptr),
-		view(nullptr) {}
+		view(nullptr) {
+	}
 
 	// ---------------------------------------------------
 
@@ -119,22 +64,25 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult Framebuffer::Attachment::BindResources(Gpu& gpu, VkFormat format, VkImageCreateFlags flags, VkImageUsageFlags usage, VkSampleCountFlags msaaFlags, VkExtent3D extent, uint32_t arrayLayers) {
+	VkResult Framebuffer::Attachment::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, uint32 attachmentIndex, VkExtent2D baseDimensions, uint32 arrayLayers) {
 		using ::Eldritch2::Swap;
 
+		const GraphicsPipeline::AttachmentDescription& attachment(pipeline.GetFramebufferAttachments()[attachmentIndex]);
+		const VkExtent3D                               dimensions(attachment.GetDimensions(baseDimensions, arrayLayers));
+
 		VkImage                 image;
-		const VkImageCreateInfo imageInfo{
+		const VkImageCreateInfo imageInfo {
 			VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 			/*pNext =*/nullptr,
-			flags,
-			GetImageType(extent),
-			format,
-			extent,
+			attachment.flags,
+			GetImageType(dimensions),
+			attachment.format,
+			dimensions,
 			/*mipLevels =*/1u,
-			GetImageType(extent) != VK_IMAGE_TYPE_3D ? arrayLayers : 1u,
-			VkSampleCountFlagBits(msaaFlags),
+			GetImageType(dimensions) != VK_IMAGE_TYPE_3D ? arrayLayers : 1u,
+			VkSampleCountFlagBits(attachment.msaaFlags),
 			VK_IMAGE_TILING_OPTIMAL,
-			usage,
+			attachment.usages,
 			VK_SHARING_MODE_EXCLUSIVE,
 			/*queueFamilyIndexCount =*/0u,
 			/*pQueueFamilyIndices =*/nullptr,
@@ -144,51 +92,18 @@ namespace Vulkan {
 		ET_AT_SCOPE_EXIT(vkDestroyImage(gpu, image, gpu.GetAllocationCallbacks()));
 
 		VkImageView                 view;
-		const VkImageViewCreateInfo viewInfo{
+		const VkImageViewCreateInfo viewInfo {
 			VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 			/*pNext =*/nullptr,
 			/*flags =*/0u,
 			image,
-			GetAttachmentViewType(extent, flags, arrayLayers > 1u),
-			format,
+			GetViewType(dimensions, attachment.flags, arrayLayers > 1u),
+			attachment.format,
 			MakeIdentitySwizzle(),
-			VkImageSubresourceRange{
-				IsDepthStencilFormat(format) ? VkImageAspectFlags(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT) : VK_IMAGE_ASPECT_COLOR_BIT,
+			VkImageSubresourceRange {
+				GetAspectsByUsage(attachment.usages),
 				/*baseMipLevel =*/0u,
 				/*levelCount =*/1u, // Vulkan requires all image views bound as output attachments have exactly 1 MIP level.
-				/*baseArrayLayer =*/0u,
-				VK_REMAINING_ARRAY_LAYERS }
-		};
-		ET_FAIL_UNLESS(vkCreateImageView(gpu, &viewInfo, gpu.GetAllocationCallbacks(), &view));
-		ET_AT_SCOPE_EXIT(vkDestroyImageView(gpu, view, gpu.GetAllocationCallbacks()));
-
-		Swap(this->image, image);
-		Swap(this->view, view);
-
-		return VK_SUCCESS;
-	}
-
-	// ---------------------------------------------------
-
-	VkResult Framebuffer::Attachment::BindResources(Gpu& gpu, VkFormat format, VkImageViewCreateFlags flags, VkImage image, VkImageViewType type) {
-		using ::Eldritch2::Swap;
-
-		VkImage image(nullptr);
-		ET_AT_SCOPE_EXIT(vkDestroyImage(gpu, image, gpu.GetAllocationCallbacks()));
-
-		VkImageView view;
-		const VkImageViewCreateInfo viewInfo{
-			VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			/*pNext =*/nullptr,
-			/*flags =*/0u,
-			image,
-			type,
-			format,
-			MakeIdentitySwizzle(),
-			VkImageSubresourceRange{
-				IsDepthStencilFormat(format) ? VkImageAspectFlags(VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT) : VK_IMAGE_ASPECT_COLOR_BIT,
-				/*baseMipLevel =*/0u,
-				/*levelCount =*/1u,
 				/*baseArrayLayer =*/0u,
 				VK_REMAINING_ARRAY_LAYERS }
 		};
@@ -210,6 +125,94 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
+	Framebuffer::Pass::Pass(Pass&& pass) :
+		Pass() {
+		Swap(*this, pass);
+	}
+
+	// ---------------------------------------------------
+
+	Framebuffer::Pass::Pass() :
+		nativeFramebuffer(nullptr),
+		granularity {},
+		nativeArea {} {}
+
+	// ---------------------------------------------------
+
+	Framebuffer::Pass::~Pass() {
+		ET_ASSERT(nativeFramebuffer == nullptr, "Leaking Vulkan framebuffer!");
+	}
+
+	// ---------------------------------------------------
+
+	VkRect2D Framebuffer::Pass::GetRenderArea() const {
+		uint32 scaledWidth(nativeArea.extent.width);
+		uint32 scaledHeight(nativeArea.extent.height);
+
+		scaler.Scale(scaledWidth, scaledHeight);
+
+		return VkRect2D { nativeArea.offset, VkExtent2D { scaledWidth, scaledHeight } };
+	}
+
+	// ---------------------------------------------------
+
+	VkResult Framebuffer::Pass::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, const ArrayList<Attachment>& attachments, uint32 passIndex) {
+		using ::Eldritch2::Swap;
+		using PipelinePass = GraphicsPipeline::PassDescription;
+
+		const PipelinePass& pass(pipeline.GetPasses()[passIndex]);
+		VkImageView         views[PipelinePass::MaxTotalAttachments];
+		uint32              totalViews(0u);
+
+		for (uint32 attachment : pass.colorAttachments) {
+			if (attachment == VK_ATTACHMENT_UNUSED) {
+				continue;
+			}
+
+			views[totalViews++] = attachments[attachment].view;
+		}
+
+		for (uint32 attachment : pass.inputAttachments) {
+			if (attachment == VK_ATTACHMENT_UNUSED) {
+				continue;
+			}
+
+			views[totalViews++] = attachments[attachment].view;
+		}
+
+		if (pass.depthStencilAttachment != VK_ATTACHMENT_UNUSED) {
+			views[totalViews++] = attachments[pass.depthStencilAttachment].view;
+		}
+
+		VkFramebuffer                 nativeFramebuffer;
+		const VkFramebufferCreateInfo nativeFramebufferInfo {
+			VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+			/*pNext =*/nullptr,
+			/*flags =*/0u,
+			pass.renderPass,
+			totalViews,
+			views,
+			nativeArea.extent.width,
+			nativeArea.extent.height,
+			/*layers =*/1u
+		};
+		ET_FAIL_UNLESS(vkCreateFramebuffer(gpu, &nativeFramebufferInfo, gpu.GetAllocationCallbacks(), &nativeFramebuffer));
+		ET_AT_SCOPE_EXIT(vkDestroyFramebuffer(gpu, nativeFramebuffer, gpu.GetAllocationCallbacks()));
+
+		Swap(this->nativeFramebuffer, nativeFramebuffer);
+		vkGetRenderAreaGranularity(gpu, pass.renderPass, &granularity);
+
+		return VK_SUCCESS;
+	}
+
+	// ---------------------------------------------------
+
+	void Framebuffer::Pass::FreeResources(Gpu& gpu) {
+		vkDestroyFramebuffer(gpu, eastl::exchange(nativeFramebuffer, nullptr), gpu.GetAllocationCallbacks());
+	}
+
+	// ---------------------------------------------------
+
 	Framebuffer::Framebuffer(Framebuffer&& framebuffer) :
 		Framebuffer() {
 		Swap(*this, framebuffer);
@@ -218,38 +221,76 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	Framebuffer::Framebuffer() :
-		_combinedAttachments(MallocAllocator("Vulkan Framebuffer Attachment List Allocator")),
+		_attachments(MallocAllocator("Vulkan Framebuffer Attachment List Allocator")),
 		_allocations(MallocAllocator("Vulkan Framebuffer Memory Allocation List Allocator")),
-		_framebufferByPass(MallocAllocator("Vulkan Framebuffer By Pass List Allocator")) {
+		_passes(MallocAllocator("Vulkan Framebuffer Pass Info List Allocator")),
+		_timingPool(nullptr) {
 	}
 
 	// ---------------------------------------------------
 
 	Framebuffer::~Framebuffer() {
-		ET_ASSERT(_combinedAttachments.IsEmpty(), "Leaking Vulkan framebuffer attachments!");
+		ET_ASSERT(_attachments.IsEmpty(), "Leaking Vulkan framebuffer attachments!");
 		ET_ASSERT(_allocations.IsEmpty(), "Leaking Vulkan memory allocations!");
-		ET_ASSERT(_framebufferByPass.IsEmpty(), "Leaking Vulkan framebuffers!");
+		ET_ASSERT(_passes.IsEmpty(), "Leaking Vulkan framebuffers!");
+		ET_ASSERT(_timingPool == nullptr, "Leaking Vulkan query pool!");
 	}
 
 	// ---------------------------------------------------
 
-	VkResult Framebuffer::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, const GraphicsPipelineBuilder& pipelineSource, VkExtent2D baseDimensions, uint32 arrayLayers) {
+	VkResult Framebuffer::UpdateDynamicScaling(Gpu& gpu) {
+		const uint32  timingCount(2u * _passes.GetSize());
+		uint64* const timings(ETStackAlloc(uint64, timingCount));
+		ET_FAIL_UNLESS(vkGetQueryPoolResults(gpu, _timingPool, 0u, timingCount, timingCount * sizeof(*timings), timings, sizeof(*timings), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT));
+
+		for (uint32 pass(0u); pass < _passes.GetSize(); ++pass) {
+			_passes[pass].scaler.UpdateTime(timings[2u * pass + 1u] - timings[2u * pass]);
+		}
+
+		return VK_SUCCESS;
+	}
+
+	// ---------------------------------------------------
+
+	VkResult Framebuffer::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, VkExtent2D baseDimensions, uint32 arrayLayers) {
 		using ::Eldritch2::Swap;
 
-		ArrayList<Attachment> combinedAttachments(_combinedAttachments.GetAllocator());
-		ET_AT_SCOPE_EXIT(for (Attachment& attachment : combinedAttachments) attachment.FreeResources(gpu));
-		ET_FAIL_UNLESS(BindAttachments(gpu, combinedAttachments, pipelineSource, baseDimensions, arrayLayers));
+		VkQueryPool                 timingPool;
+		const VkQueryPoolCreateInfo timingPoolInfo {
+			VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO,
+			/*pNext =*/nullptr,
+			/*flags =*/0u,
+			VK_QUERY_TYPE_TIMESTAMP,
+			/*queryCount =*/uint32(2u * pipeline.GetPassCount()), // Start/stop timestamp for each pass.
+			/*pipelineStatistics =*/0u                            // Timestamp queries do not have flags.
+		};
+		ET_FAIL_UNLESS(vkCreateQueryPool(gpu, &timingPoolInfo, gpu.GetAllocationCallbacks(), &timingPool));
+		ET_AT_SCOPE_EXIT(vkDestroyQueryPool(gpu, timingPool, gpu.GetAllocationCallbacks()));
 
-		ArrayList<VkFramebuffer> framebufferByPass(_framebufferByPass.GetAllocator());
-		ET_AT_SCOPE_EXIT(for (VkFramebuffer framebuffer : framebufferByPass) vkDestroyFramebuffer(gpu, framebuffer, gpu.GetAllocationCallbacks()));
-		ET_FAIL_UNLESS(BindFramebuffers(gpu, framebufferByPass, combinedAttachments, pipeline, pipelineSource, baseDimensions, arrayLayers));
-		
+		ArrayList<Attachment> combinedAttachments(_attachments.GetAllocator());
+		ET_AT_SCOPE_EXIT(for (Attachment& attachment
+							  : combinedAttachments) attachment.FreeResources(gpu));
+		combinedAttachments.Resize(pipeline.GetFramebufferAttachmentCount());
+		for (uint32 attachment(0u); attachment < pipeline.GetFramebufferAttachmentCount(); ++attachment) {
+			ET_FAIL_UNLESS(combinedAttachments[attachment].BindResources(gpu, pipeline, attachment, baseDimensions, arrayLayers));
+		}
+
+		ArrayList<Pass> passes(_passes.GetAllocator());
+		ET_AT_SCOPE_EXIT(for (Pass& pass
+							  : passes) pass.FreeResources(gpu));
+		passes.Resize(pipeline.GetPassCount());
+		for (uint32 pass(0u); pass < pipeline.GetPassCount(); ++pass) {
+			ET_FAIL_UNLESS(passes[pass].BindResources(gpu, pipeline, combinedAttachments, pass));
+		}
+
 		ArrayList<VmaAllocation> allocations(_allocations.GetAllocator());
-		ET_AT_SCOPE_EXIT(for (VmaAllocation allocation : allocations) vmaFreeMemory(gpu, allocation));
+		ET_AT_SCOPE_EXIT(for (VmaAllocation allocation
+							  : allocations) vmaFreeMemory(gpu, allocation));
 
-		Swap(_combinedAttachments, combinedAttachments);
+		Swap(_timingPool, timingPool);
+		Swap(_attachments, combinedAttachments);
 		Swap(_allocations, allocations);
-		Swap(_framebufferByPass, framebufferByPass);
+		Swap(_passes, passes);
 
 		return VK_SUCCESS;
 	}
@@ -257,11 +298,11 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	void Framebuffer::FreeResources(Gpu& gpu) {
-		for (VkFramebuffer framebuffer : _framebufferByPass) {
-			vkDestroyFramebuffer(gpu, framebuffer, gpu.GetAllocationCallbacks());
+		for (Pass& pass : _passes) {
+			pass.FreeResources(gpu);
 		}
 
-		for (Attachment& attachment : _combinedAttachments) {
+		for (Attachment& attachment : _attachments) {
 			attachment.FreeResources(gpu);
 		}
 
@@ -269,8 +310,10 @@ namespace Vulkan {
 			gpu.AddGarbage(allocation);
 		}
 
-		_framebufferByPass.Clear(ReleaseMemorySemantics());
-		_combinedAttachments.Clear(ReleaseMemorySemantics());
+		vkDestroyQueryPool(gpu, eastl::exchange(_timingPool, nullptr), gpu.GetAllocationCallbacks());
+
+		_passes.Clear(ReleaseMemorySemantics());
+		_attachments.Clear(ReleaseMemorySemantics());
 		_allocations.Clear(ReleaseMemorySemantics());
 	}
 
@@ -285,12 +328,24 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
+	void Swap(Framebuffer::Pass& lhs, Framebuffer::Pass& rhs) {
+		using ::Eldritch2::Swap;
+
+		Swap(lhs.scaler, rhs.scaler);
+		Swap(lhs.nativeFramebuffer, rhs.nativeFramebuffer);
+		Swap(lhs.granularity, rhs.granularity);
+		Swap(lhs.nativeArea, rhs.nativeArea);
+	}
+
+	// ---------------------------------------------------
+
 	void Swap(Framebuffer& lhs, Framebuffer& rhs) {
 		using ::Eldritch2::Swap;
 
-		Swap(lhs._combinedAttachments, rhs._combinedAttachments);
+		Swap(lhs._timingPool, rhs._timingPool);
+		Swap(lhs._attachments, rhs._attachments);
 		Swap(lhs._allocations, rhs._allocations);
-		Swap(lhs._framebufferByPass, rhs._framebufferByPass);
+		Swap(lhs._passes, rhs._passes);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

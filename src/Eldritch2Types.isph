@@ -1,2 +1,19 @@
-typedef int16		half;
-typedef float<4>	Quaternion;
+#ifndef ELDRITCH2_TYPES_H
+#define ELDRITCH2_TYPES_H
+
+typedef unsigned int8 uint8;
+typedef unsigned int16 uint16;
+typedef unsigned int32 uint32;
+
+typedef unsigned int16 half;
+typedef int16<2> half2;
+typedef int16<3> half3;
+typedef int16<4> half4;
+
+typedef float<2> float2;
+typedef float<3> float3;
+typedef float<4> float4;
+
+typedef float<4> Quaternion;
+
+#endif // ifndef ELDRITCH2_TYPES_H

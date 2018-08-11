@@ -25,6 +25,7 @@
 #include <Common/Mpl/Vectors.hpp>
 
 //	Containers library
+#include <Common/Containers/AbstractString.hpp>
 #include <Common/Containers/ArrayBvh.hpp>
 #include <Common/Containers/ArrayList.hpp>
 #include <Common/Containers/ArrayMap.hpp>
@@ -37,12 +38,12 @@
 #include <Common/Containers/IntrusiveForwardList.hpp>
 #include <Common/Containers/IntrusiveLinkedList.hpp>
 #include <Common/Containers/LinkedList.hpp>
-#include <Common/Containers/PlatformString.hpp>
 #include <Common/Containers/PriorityQueue.hpp>
 #include <Common/Containers/Queue.hpp>
 #include <Common/Containers/Range.hpp>
 #include <Common/Containers/Stack.hpp>
 #include <Common/Containers/String.hpp>
+#include <Common/Containers/StringView.hpp>
 #include <Common/Containers/TreeMap.hpp>
 #include <Common/Containers/TreeSet.hpp>
 
@@ -64,7 +65,6 @@
 #include <Common/Angle.hpp>
 #include <Common/Assert.hpp>
 #include <Common/Atomic.hpp>
-#include <Common/Blackboard.hpp>
 #include <Common/ComPointer.hpp>
 #include <Common/CountedPointer.hpp>
 #include <Common/EqualTo.hpp>
@@ -83,6 +83,7 @@
 #include <Common/Math.hpp>
 #include <Common/Memory.hpp>
 #include <Common/Mutex.hpp>
+#include <Common/ObjectLocator.hpp>
 #include <Common/Pair.hpp>
 #include <Common/Platform.hpp>
 #include <Common/Ratio.hpp>
@@ -100,4 +101,7 @@
 #include <Common/WaitableEvent.hpp>
 #include <Common/Win32Tools.hpp>
 #include <Common/Window.hpp>
+
+// Performance profiling library
+#include <Common/Profiler.hpp>
 //------------------------------------------------------------------//

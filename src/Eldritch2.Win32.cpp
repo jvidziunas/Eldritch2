@@ -8,7 +8,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -53,36 +52,36 @@ using namespace ::Eldritch2;
 
 namespace {
 
-	class Application {
+class Application {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref Application instance.
-		Application(
-		) : _jobSystem(),
-			_engine(_jobSystem),
-			_managementComponent(_engine),
-			_xinputComponent(_engine.GetBlackboard()),
-			_navigationComponent(_engine.GetBlackboard()),
-			_win32InputComponent(_engine.GetBlackboard(), _engine.GetLog()),
-			_steamworksComponent(_engine.GetBlackboard(), _engine.GetLog()),
-			_wrenComponent(_engine.GetBlackboard()),
-			_physxComponent(_engine.GetBlackboard(), _engine.GetLog()),
-			_vulkanComponent(_engine.GetBlackboard(), _engine.GetLog()),
-			_xaudio2Component(_engine.GetBlackboard(), _engine.GetLog()) {
-		}
+	Application() :
+		_jobSystem(),
+		_engine(_jobSystem),
+		_managementComponent(_engine),
+		_xinputComponent(_engine.GetServiceLocator()),
+		_navigationComponent(_engine.GetServiceLocator()),
+		_win32InputComponent(_engine.GetServiceLocator(), _engine.GetLog()),
+		_steamworksComponent(_engine.GetServiceLocator(), _engine.GetLog()),
+		_wrenComponent(_engine.GetServiceLocator()),
+		_physxComponent(_engine.GetServiceLocator(), _engine.GetLog()),
+		_vulkanComponent(_engine.GetServiceLocator(), _engine.GetLog()),
+		_xaudio2Component(_engine.GetServiceLocator(), _engine.GetLog()) {
+	}
 
-		~Application() = default;
+	~Application() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		int Run() {
-			return _jobSystem.Boot(Max(GetCoreInfo().physicalCores, 2u) - 1u, [this](JobExecutor& executor) {
-				MicroProfileInit();
+public:
+	int Run() {
+		return _jobSystem.Boot(Max(GetCoreInfo().physicalCores, 2u) - 1u, [this](JobExecutor& executor) {
+			MicroProfileInit();
 
-				_jobSystem.SetShouldShutDown(
-					_engine.BootOnCaller(
+			_jobSystem.SetShouldShutDown(
+				_engine.BootOnCaller(
 					executor,
 					_managementComponent,
 					_xinputComponent,
@@ -92,35 +91,32 @@ namespace {
 					_wrenComponent,
 					_physxComponent,
 					_vulkanComponent,
-					_xaudio2Component
-				)
-				);
+					_xaudio2Component));
 
-				MicroProfileShutdown();
-			});
-		}
+			MicroProfileShutdown();
+		});
+	}
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		FiberJobSystem				_jobSystem;
-		Engine						_engine;
+private:
+	FiberJobSystem              _jobSystem;
+	Engine                      _engine;
+	Engine::ManagementComponent _managementComponent;
+	XInputEngineComponent       _xinputComponent;
+	RecastEngineComponent       _navigationComponent;
+	Win32InputEngineComponent   _win32InputComponent;
+	SteamworksEngineComponent   _steamworksComponent;
+	WrenEngineComponent         _wrenComponent;
+	PhysxEngineComponent        _physxComponent;
+	VulkanEngineComponent       _vulkanComponent;
+	XAudio2EngineComponent      _xaudio2Component;
+};
 
-		Engine::ManagementComponent	_managementComponent;
-		XInputEngineComponent		_xinputComponent;
-		RecastEngineComponent		_navigationComponent;
-		Win32InputEngineComponent	_win32InputComponent;
-		SteamworksEngineComponent	_steamworksComponent;
-		WrenEngineComponent			_wrenComponent;
-		PhysxEngineComponent		_physxComponent;
-		VulkanEngineComponent		_vulkanComponent;
-		XAudio2EngineComponent		_xaudio2Component;
-	};
+} // anonymous namespace
 
-}	// anonymous namespace
-
-int WINAPI wWinMain(__in HINSTANCE/* hInstance*/, __in_opt HINSTANCE/* hPrevInstance*/, __in LPWSTR/* lpCmdLine*/, __in int/* nCmdShow*/) {
-/*	While the Application structure is pretty big overall, the fiber scheduler means this thread gets a "fresh" stack during bootstrap.
- *	Thus, it makes more sense to put this on the stack rather than in the image data segment. */
+int WINAPI wWinMain(__in HINSTANCE /* hInstance*/, __in_opt HINSTANCE /* hPrevInstance*/, __in LPWSTR /* lpCmdLine*/, __in int /* nCmdShow*/) {
+	/*	While the Application structure is pretty big overall, the fiber scheduler means this thread gets a "fresh" stack during bootstrap.
+		Thus, it makes more sense to put this on the stack rather than in the image data segment. */
 	return Application().Run();
 }

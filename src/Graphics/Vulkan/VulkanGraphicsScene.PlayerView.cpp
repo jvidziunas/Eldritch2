@@ -19,18 +19,24 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	PlayerView::PlayerView(
 		Angle verticalFov) :
-		_scaler(),
-		_localToWorld(Transformation::MakeIdentity()),
+		_worldToView(Transformation::MakeIdentity()),
 		_verticalFov(verticalFov) {
 	}
 
 	// ---------------------------------------------------
 
-	VkExtent2D PlayerView::GetFramebufferExtent(VkExtent2D baseExtent) const {
-		//	Resources must be sized according to the largest possible dynamic resolution.
-		_scaler.ScaleMax(baseExtent.width, baseExtent.height);
+	VkResult PlayerView::UpdateResources(Gpu& gpu) {
+		const VkExtent2D dimensions(GetOwnedRegion().extent);
 
-		return baseExtent;
+		_framebuffer.UpdateDynamicScaling(gpu);
+
+		return VK_SUCCESS;
+	}
+
+	// ---------------------------------------------------
+
+	void PlayerView::FreeResources(Gpu& gpu) {
+		_framebuffer.FreeResources(gpu);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

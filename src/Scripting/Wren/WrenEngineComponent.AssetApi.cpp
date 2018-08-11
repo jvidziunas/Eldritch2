@@ -8,7 +8,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -20,20 +19,16 @@
 #include <microprofile/microprofile.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Scripting {
-		namespace Wren {
+namespace Eldritch2 { namespace Scripting { namespace Wren {
 
-			using namespace ::Eldritch2::Scripting::Wren::AssetViews;
-			using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Scripting::Wren::AssetViews;
+	using namespace ::Eldritch2::Assets;
 
-			void WrenEngineComponent::AcceptVisitor(AssetApiBuilder& factories) {
-				MICROPROFILE_SCOPEI("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
+	void WrenEngineComponent::PublishAssetTypes(AssetApiBuilder& factories) {
+		ET_PROFILE_SCOPE("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
 
-				factories.DefineType(DialogueSetAsset::GetExtension(), AssetApiBuilder::DefaultFactory<DialogueSetAsset>());
-				factories.DefineType(ScriptAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ScriptAsset>());
-			}
+		factories.DefineType(DialogueSetAsset::GetExtension(), AssetApiBuilder::DefaultFactory<DialogueSetAsset>());
+		factories.DefineType(ScriptAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ScriptAsset>());
+	}
 
-		}	// namespace Wren
-	}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren

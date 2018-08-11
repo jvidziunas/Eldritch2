@@ -25,31 +25,31 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	ETInlineHint Dispatcher::Event::Event(Timestamp dispatchTime, WrenHandle* receiver) :
-		dispatchTime(dispatchTime),
+	ETInlineHint Dispatcher::Event::Event(ScriptTime when, WrenHandle* receiver) :
+		when(when),
 		receiver(receiver) {}
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool Dispatcher::Event::ShouldDispatch(Timestamp now) const {
-		return dispatchTime <= now;
+	ETInlineHint bool Dispatcher::Event::ShouldDispatch(ScriptTime now) const {
+		return when <= now;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Dispatcher::Timestamp Dispatcher::GetNow() const {
-		return AsTimestamp(_gameTime);
+	ETInlineHint Dispatcher::ScriptTime Dispatcher::GetNow() const {
+		return AsScriptTime(_gameTime);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint uint64 Dispatcher::SetGameTime(uint64 microseconds) {
+	ETInlineHint MicrosecondTime Dispatcher::SetGameTime(MicrosecondTime microseconds) {
 		return eastl::exchange(_gameTime, microseconds);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Dispatcher::CallAtGameTime(Timestamp time, WrenHandle* receiver) {
+	ETInlineHint void Dispatcher::CallAtGameTime(ScriptTime time, WrenHandle* receiver) {
 		_events.Emplace(time, receiver);
 	}
 
@@ -57,22 +57,22 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	ETInlineHint ETPureFunctionHint bool operator<(const Dispatcher::Event& event0, const Dispatcher::Event& event1) {
 		/*	The comparison ordering here is somewhat unintutitive at first; conceptually we want the list ordered by ascending dispatch time such that events scheduled
-			 *	to complete sooner sort before those completing later. However, the semantics of @ref PriorityQueue mean that a call to Top() returns the element with greatest
-			 *	priority, i.e. with lowest timestamp. Naive semantics result in the exact opposite invariant; the elements with the largest timestamp will be returned before
-			 *	others. */
-		return event1.dispatchTime < event0.dispatchTime;
+		 *	to complete sooner sort before those completing later. However, the semantics of @ref PriorityQueue mean that a call to Top() returns the element with greatest
+		 *	priority, i.e. with smallest timestamp. Naive semantics result in the exact opposite invariant; the elements with the greatest timestamp will be returned before
+		 *	others. */
+		return event1.when < event0.when;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETPureFunctionHint Dispatcher::Timestamp AsTimestamp(uint64 microseconds) {
-		return static_cast<Dispatcher::Timestamp>(microseconds / MicrosecondsPerTick);
+	ETInlineHint ETPureFunctionHint Dispatcher::ScriptTime AsScriptTime(MicrosecondTime when) {
+		return Dispatcher::ScriptTime(when / MicrosecondsPerTick);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETPureFunctionHint uint64 AsMicroseconds(Dispatcher::Timestamp timestamp) {
-		return timestamp * TicksPerSecond * MicrosecondsPerSecond;
+	ETInlineHint ETPureFunctionHint MicrosecondTime AsMicroseconds(Dispatcher::ScriptTime when) {
+		return when * TicksPerSecond * MicrosecondsPerSecond;
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

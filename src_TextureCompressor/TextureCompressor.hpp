@@ -17,41 +17,43 @@
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Tools {
+namespace Eldritch2 { namespace Tools {
 
 	class TextureCompressor : public CrtpTool<TextureCompressor> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref TextureCompressor instance.
+		//!	Disable copy construction.
+		TextureCompressor(const TextureCompressor&) = delete;
+		//!	Constructs this @ref TextureCompressor instance.
 		TextureCompressor();
 
 		~TextureCompressor() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		Allocator&	GetAllocator() const;
+		void RegisterOptions(OptionRegistrar& options);
 
-	// ---------------------------------------------------
+		int ProcessImage(const Utf8Char* path);
 
-	public:
-		void	RegisterOptions( OptionRegistrar& options );
+		int Process();
 
-		int		ProcessFile( const Utf8Char* path );
+		// ---------------------------------------------------
 
-		int		Process();
+		//!	Disable copy assignment.
+		TextureCompressor& operator=(const TextureCompressor&) = delete;
 
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		uint32				_quality;
-		bool				_isPerceptualData;
-		bool				_useMipmaps;
-		
-		HashSet<String<>>	_sourcePaths;
+		HashSet<String<>> _sourcePaths;
+		uint32            _threadCount;
+		uint32            _imageQuality;
+		uint32            _mipLevels;
+		uint32            _alphaToCoverageSamplesPerPixel;
+		bool              _correctAlphaTestDistribution;
+		bool              _isColorData;
 	};
 
-}	// namespace Tools
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Tools

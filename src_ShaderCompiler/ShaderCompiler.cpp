@@ -254,7 +254,7 @@ namespace Tools {
 			defines.Append({ L"DIRECT3D", L"1" });
 			for (DxcInvocation& dxc : invocations) {
 				ET_FAIL_UNLESS2(dxc(compiler.Get(), hlsl.Get(), _hlslPath, _shaderModel, arguments, defines));
-				dxc.WriteErrors(std::cout);
+				dxc.WriteErrors();
 			}
 
 			FlatBufferBuilder       flatbuffer;
@@ -282,7 +282,7 @@ namespace Tools {
 			defines.Append({ L"VULKAN", L"1" });
 			for (DxcInvocation& dxc : invocations) {
 				ET_FAIL_UNLESS2(dxc(compiler.Get(), hlsl.Get(), _hlslPath, _shaderModel, arguments, defines));
-				dxc.WriteErrors(std::cout);
+				dxc.WriteErrors();
 			}
 
 			FlatBufferBuilder        flatbuffer;

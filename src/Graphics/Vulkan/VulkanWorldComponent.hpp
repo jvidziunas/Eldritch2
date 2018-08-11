@@ -17,7 +17,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	class VulkanGraphicsScene;
-	class DisplayBus;
+	class DisplayLocator;
 }}} // namespace Eldritch2::Graphics::Vulkan
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
@@ -29,17 +29,26 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		VulkanWorldComponent(const VulkanWorldComponent&) = delete;
 		//!	Constructs this @ref VulkanWorldComponent instance.
-		VulkanWorldComponent(const Core::World& owner);
+		VulkanWorldComponent(const ObjectLocator& services);
 
 		~VulkanWorldComponent() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const LateInitializationVisitor) override;
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const VariableTickVisitor&) override;
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const TearDownVisitor) override;
-		void AcceptVisitor(Scripting::Wren::ApiBuilder& api) override;
+		void BindResources(Scheduling::JobExecutor& executor) override;
+
+		void FreeResources(Scheduling::JobExecutor& executor) override;
+
+		// ---------------------------------------------------
+
+	public:
+		void OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction) override;
+
+		// ---------------------------------------------------
+
+	public:
+		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
 
 		// ---------------------------------------------------
 
@@ -50,7 +59,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	private:
 		VulkanGraphicsScene* _scene;
-		DisplayBus*          _displayBus;
+		DisplayLocator*      _displays;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

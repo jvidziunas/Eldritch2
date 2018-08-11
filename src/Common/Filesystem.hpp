@@ -12,86 +12,32 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/PlatformString.hpp>
+#include <Common/Containers/AbstractString.hpp>
 #include <Common/Mpl/IntTypes.hpp>
 #include <Common/Function.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+enum class KnownDirectory : uint32;
 class ErrorCode;
-}
+} // namespace Eldritch2
 
 namespace Eldritch2 {
 
-enum class KnownDirectory : uint32 {
-	UserDocuments,
-	AppDataLocal,
-	AppDataShared,
-	Packages,
-	DownloadedPackages,
-	WorkingDirectory,
-	Logs
-};
-
-// ---
-
-enum class OverwriteBehavior : uint32 {
+enum class CopyMode : uint32 {
 	SkipIfExists,
 	OverwriteIfExists
 };
 
-// ---
+ErrorCode ForEachFile(StringView<PlatformChar> specifier, Function<void(StringView<PlatformChar> /*path*/)> handler);
 
-class FileSystem {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+void Copy(KnownDirectory destinationDirectory, StringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, StringView<PlatformChar> sourcePath, CopyMode mode);
+void Copy(KnownDirectory directory, StringView<PlatformChar> destinationPath, StringView<PlatformChar> sourcePath, CopyMode mode);
 
-public:
-	//!	Disable copy construction.
-	FileSystem(const FileSystem&) = delete;
-	//!	Constructs this @ref FileSystem instance.
-	FileSystem();
+void Move(KnownDirectory destinationDirectory, StringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, StringView<PlatformChar> sourcePath);
+void Move(KnownDirectory directory, StringView<PlatformChar> destinationPath, StringView<PlatformChar> sourcePath);
 
-	~FileSystem() = default;
-
-	// ---------------------------------------------------
-
-public:
-	ETPureFunctionHint const PlatformString<>& GetPath(KnownDirectory directory) const;
-
-	ETPureFunctionHint PlatformString<> GetAbsolutePath(KnownDirectory directory, const Utf8Char* path) const;
-
-	// ---------------------------------------------------
-
-public:
-	ErrorCode EnumerateMatchingFiles(KnownDirectory directory, const Utf8Char* const path, Function<void(const Utf8Char* /*path*/)> handler) const;
-
-	// ---------------------------------------------------
-
-public:
-	void Copy(KnownDirectory destinationDirectory, const Utf8Char* const destinationPath, KnownDirectory sourceDirectory, const Utf8Char* const sourcePath, OverwriteBehavior overwriteBehavior);
-	void Copy(KnownDirectory directory, const Utf8Char* const destinationPath, const Utf8Char* const sourcePath, OverwriteBehavior overwriteBehavior);
-
-	void Move(KnownDirectory destinationDirectory, const Utf8Char* const destinationPath, KnownDirectory sourceDirectory, const Utf8Char* const sourcePath);
-	void Move(KnownDirectory directory, const Utf8Char* const destinationPath, const Utf8Char* const sourcePath);
-
-	void Delete(KnownDirectory directory, const Utf8Char* const path);
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-	FileSystem& operator=(const FileSystem&) = delete;
-
-	// - DATA MEMBERS ------------------------------------
-
-private:
-	const PlatformString<> _workingDirectory;
-	const PlatformString<> _userDocumentsDirectory;
-	const PlatformString<> _localAppDataDirectory;
-	const PlatformString<> _sharedAppDataDirectory;
-	const PlatformString<> _packageDirectory;
-	const PlatformString<> _downloadedPackageDirectory;
-	const PlatformString<> _logDirectory;
-};
+void Delete(KnownDirectory directory, StringView<PlatformChar> path);
 
 } // namespace Eldritch2
 

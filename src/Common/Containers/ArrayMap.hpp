@@ -103,6 +103,9 @@ public:
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
+	MappedType& operator[](const KeyType& key);
+	MappedType& operator[](KeyType&& key);
+
 	Pair<Iterator, bool> Insert(const ValueType& value);
 	Pair<Iterator, bool> Insert(ValueType&& value);
 

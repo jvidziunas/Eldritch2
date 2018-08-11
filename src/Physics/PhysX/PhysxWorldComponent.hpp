@@ -27,20 +27,24 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
+		//!	Constructs this @ref PhysXWorldComponent instance.
+		PhysxWorldComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		PhysxWorldComponent(const PhysxWorldComponent&) = delete;
-		//!	Constructs this @ref PhysXWorldComponent instance.
-		/*!	@param[in] owner @ref World that controls the lifetime of the @ref PhysxWorldComponent.*/
-		PhysxWorldComponent(const Core::World& owner);
 
 		~PhysxWorldComponent() = default;
 
 		// ---------------------------------------------------
 
-	public:
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const EarlyTickVisitor&) override;
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const LateTickVisitor&) override;
-		void AcceptVisitor(Scripting::Wren::ApiBuilder& api) override;
+	protected:
+		void OnFixedRateTickEarly(Scheduling::JobExecutor& executor, MicrosecondTime duration) override;
+
+		void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime duration) override;
+
+		// ---------------------------------------------------
+
+	protected:
+		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
 
 		// ---------------------------------------------------
 
@@ -50,7 +54,6 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		//!	Mutable so logs can be written even in const methods.
 		mutable Logging::ChildLog _log;
 		bool                      _shouldJoinScene;
 		PhysicsScene*             _scene;

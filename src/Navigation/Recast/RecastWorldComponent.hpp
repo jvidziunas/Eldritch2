@@ -25,18 +25,22 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
+		//!	Constructs this @ref RecastWorldComponent instance.
+		RecastWorldComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		RecastWorldComponent(const RecastWorldComponent&) = delete;
-		//!	Constructs this @ref RecastWorldComponent instance.
-		RecastWorldComponent(const Core::World& owner);
 
 		~RecastWorldComponent() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		void AcceptVisitor(Scheduling::JobExecutor& executor, const LateTickVisitor&) override;
-		void AcceptVisitor(Scripting::Wren::ApiBuilder& api) override;
+		void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime duration) override;
+
+		// ---------------------------------------------------
+
+	public:
+		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
 
 		// - DATA MEMBERS ------------------------------------
 

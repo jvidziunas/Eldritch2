@@ -26,7 +26,7 @@ namespace Eldritch2 { namespace Assets {
 
 		public:
 			//!	Constructs this @ref Builder instance.
-			Builder(Logging::Log& log, const char* begin, const char* end);
+			Builder(Logging::Log& log, Range<const char*> bytes);
 			//!	Constructs this @ref Builder instance.
 			Builder(const Builder&) = default;
 
@@ -35,8 +35,8 @@ namespace Eldritch2 { namespace Assets {
 			// ---------------------------------------------------
 
 		public:
-			template <size_t formatSize, typename... Arguments>
-			void WriteLog(Logging::MessageType severity, const Utf8Char (&formatString)[formatSize], Arguments&&... arguments) const;
+			template <typename... Arguments>
+			void WriteLog(Logging::MessageType severity, StringView<Utf8Char> format, Arguments&&... arguments) const;
 
 			// ---------------------------------------------------
 
@@ -50,8 +50,7 @@ namespace Eldritch2 { namespace Assets {
 
 		private:
 			mutable Logging::ChildLog _log;
-			const char*               _begin;
-			const char*               _end;
+			Range<const char*>        _bytes;
 		};
 
 		// ---
@@ -65,9 +64,8 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		//! Constructs this @ref Asset instance.
-		/*!	@param[in] path Null-terminated, UTF-8-encoded character sequence containing the file system path to the resource the
-				@ref Asset describes. */
-		Asset(const Utf8Char* const path);
+		/*!	@param[in] path UTF-8-encoded string view containing the file system path to the resource the @ref Asset describes. */
+		Asset(StringView<Utf8Char> path);
 		//!	Disable copy construction.
 		Asset(const Asset&) = delete;
 
@@ -77,10 +75,9 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		//! Gets the file system filePath to the asset.
-		/*! @returns Null-terminated, UTF-8-encoded character sequence containing the file system
-				path to the resource this @ref Asset describes.
+		/*! @returns UTF-8-encoded string view containing the file system path to the resource this @ref Asset describes.
 			@remarks Thread-safe. */
-		const Utf8Char* const GetPath() const;
+		StringView<Utf8Char> GetPath() const;
 
 		// ---------------------------------------------------
 

@@ -16,7 +16,7 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Input {
-	class InputBus;
+	class DeviceLocator;
 }} // namespace Eldritch2::Input
 
 struct WrenHandle;
@@ -47,8 +47,8 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---
 
 		struct DeviceBinding {
-			Input::InputBus* bus;
-			Input::DeviceId  id;
+			Input::DeviceLocator* locator;
+			Input::DeviceId       id;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -75,14 +75,14 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	public:
 		//!	Invokes input event handlers for all actions attached to this @ref ActionSet.
 		/*!	@param[in] vm Wren virtual machine object that will execute script code.
-				@param[in] arity3Call Wren call handle with signature `call(_,_,_)`
-				@returns true if all listeners executed successfully, or false if a runtime exception occurred. */
+			@param[in] arity3Call Wren call handle with signature `call(_,_,_)`
+			@returns true if all listeners executed successfully, or false if a runtime exception occurred. */
 		bool DispatchEvents(WrenVM* vm, WrenHandle* arity3Call);
 
 		// ---------------------------------------------------
 
 	public:
-		bool TryAcquireDevice(Input::InputBus& bus, Input::DeviceId id);
+		bool TryAcquireDevice(Input::DeviceLocator& locator, Input::DeviceId id);
 
 		void ReleaseDevices();
 

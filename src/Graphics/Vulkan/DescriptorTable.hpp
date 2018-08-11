@@ -37,6 +37,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
+		VkDescriptorSet GetDescriptorSet() const;
+
+		// ---------------------------------------------------
+
+	public:
 		void PushDescriptors(Gpu& gpu, uint32_t slot, uint32_t count, const VkDescriptorImageInfo* images);
 		template <uint32_t count>
 		void PushDescriptors(Gpu& gpu, uint32_t slot, const VkDescriptorImageInfo (&images)[count]);

@@ -56,3 +56,5 @@
 #define ETIsPlatform32Bit() ET_PLATFORM_32BIT
 #define ETIsPlatformX86Derivative() ET_PLATFORM_X86
 #define ETIsPlatformPowerPCDerivative() ET_PLATFORM_POWERPC
+
+#define ETStackAlloc(type, count) static_cast<type*>(_alloca(sizeof(type) * (count)))

@@ -17,13 +17,12 @@
 #include <Graphics/Vulkan/DescriptorTable.hpp>
 #include <Graphics/Vulkan/GpuResources.hpp>
 #include <Graphics/Vulkan/CommandList.hpp>
-#include <Graphics/ResolutionScale.hpp>
 #include <Graphics/Vulkan/Display.hpp>
 #include <Graphics/GraphicsScene.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class GpuResourceBus;
+	class FrameTransferBus;
 }}} // namespace Eldritch2::Graphics::Vulkan
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
@@ -42,9 +41,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		Transformation ETSimdCall GetLocalToWorld() const;
+		Transformation ETSimdCall GetWorldToView() const;
 
-		void ETSimdCall SetLocalToWorld(Transformation localToWorld);
+		void ETSimdCall SetWorldToView(Transformation worldToView);
 
 		Angle GetVerticalFov() const;
 
@@ -53,7 +52,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkExtent2D GetFramebufferExtent(VkExtent2D baseExtent) const override;
+		VkResult UpdateResources(Gpu& gpu);
+
+		void FreeResources(Gpu& gpu);
 
 		// ---------------------------------------------------
 
@@ -63,9 +64,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ResolutionScale _scaler;
-		Transformation  _localToWorld;
-		Angle           _verticalFov;
+		Transformation _worldToView;
+		Angle          _verticalFov;
+		Framebuffer    _framebuffer;
 	};
 
 	// ---
@@ -113,7 +114,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		public:
 			CommandList _commands;
-			VkFence     _commandsConsumed;
+			VkFence     _drawsConsumed;
+			VkSemaphore _startExecution;
+			VkSemaphore _finishExecution;
 
 			// ---------------------------------------------------
 
@@ -140,9 +143,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Scheduling::JobExecutor& executor, Gpu& gpu, GpuResourceBus& bus, VkDeviceSize transformArenaSize = DefaultTransformArenaSize);
+		VkResult BindResources(Scheduling::JobExecutor& executor, Gpu& gpu, FrameTransferBus& bus, VkDeviceSize transformArenaSize = DefaultTransformArenaSize);
 
-		void FreeResources(Scheduling::JobExecutor& executor, Gpu& gpu, GpuResourceBus& bus);
+		void FreeResources(Scheduling::JobExecutor& executor, Gpu& gpu, FrameTransferBus& bus);
 
 		// ---------------------------------------------------
 
@@ -152,6 +155,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
+		ArrayList<PlayerView*> _rootViews;
 		VkSemaphore            _resourcesReady;
 		UniformBuffer          _transforms;
 		BatchCoordinator       _opaqueBatches;
@@ -159,7 +163,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		Framebuffer            _shadowAtlas;
 		GraphicsPipeline       _mainPipeline;
 		DescriptorTable        _resourceDescriptors;
-		ArrayList<PlayerView*> _playerViews;
 		uint32                 _frameId;
 		Frame                  _queuedFrames[MaxQueuedFrames];
 	};

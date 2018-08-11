@@ -17,20 +17,22 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint VkExtent2D DisplaySource::GetValidExtent() const {
-		return _validExtent;
+	ETInlineHint VkRect2D DisplaySource::GetOwnedRegion() const {
+		return _ownedRegion;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void DisplaySource::SetValidExtent(VkExtent2D extent) {
-		_validExtent = extent;
+	ETInlineHint void DisplaySource::SetOwnedRegion(VkRect2D region) {
+		_ownedRegion = region;
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint bool Display::ShouldDestroy() const {
-		return eastl::end(_sources) == FindIf(eastl::begin(_sources), eastl::end(_sources), [](DisplaySource* source) { return source != nullptr; });
+		auto IsOpen([](DisplaySource* source) { return source != nullptr; });
+
+		return FindIf(eastl::begin(_sources), eastl::end(_sources), IsOpen) == eastl::end(_sources);
 	}
 
 	// ---------------------------------------------------
@@ -50,15 +52,25 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	ETInlineHint void Display::Release(DisplaySource& source) {
 		enum : size_t { LastElement = _countof(_sources) - 1 };
+		constexpr VkRect2D EmptyRect{ { 0, 0 }, { 0u, 0u } };
 
 		using ::Eldritch2::Swap;
 
 		for (DisplaySource*& candidate : _sources) {
 			if (candidate == eastl::addressof(source)) {
 				candidate = eastl::exchange(_sources[LastElement], nullptr);
+				source.SetOwnedRegion(EmptyRect);
 				return;
 			}
 		}
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint void Swap(DisplaySource& lhs, DisplaySource& rhs) {
+		using ::Eldritch2::Swap;
+
+		Swap(lhs._ownedRegion, rhs._ownedRegion);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

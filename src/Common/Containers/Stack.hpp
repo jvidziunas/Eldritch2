@@ -33,17 +33,17 @@ public:
 public:
 	//!	Constructs this @ref Stack instance.
 	template <class AllocatorType>
-	Stack(const Stack&, const AllocatorType& allocator);
+	Stack(const Stack&, const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref Stack instance.
 	template <class AllocatorType>
 	Stack(Stack&&, const AllocatorType& allocator);
 	//!	Constructs this @ref Stack instance.
 	template <class AllocatorType>
-	explicit Stack(const AllocatorType& allocator);
+	Stack(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref Stack instance.
-	explicit Stack(const ContainerType&);
+	Stack(const ContainerType&);
 	//!	Constructs this @ref Stack instance.
-	explicit Stack(ContainerType&&);
+	Stack(ContainerType&&);
 	//!	Constructs this @ref Stack instance.
 	Stack() = default;
 

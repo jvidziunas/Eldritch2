@@ -58,11 +58,11 @@ public:
 		const EqualityPredicateType& equalityPredicate = EqualityPredicateType(),
 		const AllocatorType&         allocator         = AllocatorType());
 	//! Constructs this @ref HashMap instance.
-	HashMap(const HashPredicateType& hash, const EqualityPredicateType& equalityPredicate, const AllocatorType& allocator);
+	HashMap(const HashPredicateType& hash, const EqualityPredicateType& equalityPredicate, const AllocatorType& allocator = AllocatorType());
 	//! Constructs this @ref HashMap instance.
 	HashMap(HashMap&&, const AllocatorType& allocator);
 	//! Constructs this @ref HashMap instance.
-	explicit HashMap(const AllocatorType& allocator);
+	HashMap(const AllocatorType& allocator = AllocatorType());
 	//! Constructs this @ref HashMap instance.
 	HashMap(const HashMap&);
 	//! Constructs this @ref HashMap instance.
@@ -156,7 +156,7 @@ public:
 public:
 	const EqualityPredicateType& GetKeyEqualityPredicate() const;
 
-	const HashPredicateType& GetHashPredicate() const;
+	const HashPredicateType& GetHashFunction() const;
 
 	const AllocatorType& GetAllocator() const;
 

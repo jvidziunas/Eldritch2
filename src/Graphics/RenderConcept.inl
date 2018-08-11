@@ -75,7 +75,7 @@ namespace Eldritch2 { namespace Graphics {
 
 	template <typename Instance, class Allocator, typename Extractor>
 	ETInlineHint void Rebuild(Scheduling::JobExecutor& executor, RenderConcept<Instance, Allocator>& concept, Extractor extractor) {
-		//	executor.Transform( concept.Begin(), concept.End(), nullptr, extractor );
+		//	executor.Transform(concept.Begin(), concept.End(), nullptr, extractor);
 	}
 
 }} // namespace Eldritch2::Graphics

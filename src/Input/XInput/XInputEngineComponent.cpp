@@ -14,8 +14,6 @@
 #include <Input/XInput/XInputEngineComponent.hpp>
 #include <Input/XInput/XInputWorldComponent.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
-//------------------------------------------------------------------//
 
 //==================================================================//
 // LIBRARIES
@@ -32,26 +30,19 @@ namespace Eldritch2 { namespace Input { namespace XInput {
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Core;
 
-	XInputEngineComponent::XInputEngineComponent(const Blackboard& services) :
+	XInputEngineComponent::XInputEngineComponent(const ObjectLocator& services) :
 		EngineComponent(services) {}
 
 	// ---------------------------------------------------
 
-	Result<UniquePointer<WorldComponent>> XInputEngineComponent::CreateWorldComponent(Allocator& allocator, const World& world) {
-		UniquePointer<WorldComponent> inputComponent(MakeUnique<XInputWorldComponent>(allocator, world));
-
-		if (inputComponent == nullptr) {
-			return Error::OutOfMemory;
-		}
-
-		return eastl::move(inputComponent);
+	UniquePointer<WorldComponent> XInputEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
+		return MakeUnique<XInputWorldComponent>(allocator, services);
 	}
 
 	// ---------------------------------------------------
 
-	void XInputEngineComponent::AcceptVisitor(JobExecutor& /*executor*/, const ServiceTickVisitor) {
-		MICROPROFILE_SCOPEI("Engine/ServiceTick", "Sample XInput pad state", 0xFFFFFF);
-
+	void XInputEngineComponent::TickEarly(JobExecutor& /*executor*/) {
+		ET_PROFILE_SCOPE("Engine/ServiceTick", "Sample XInput pad state", 0xFFFFFF);
 		for (DWORD pad(0u); pad < _countof(_gamepads); ++pad) {
 			XInputGetState(pad, &_gamepads[pad]);
 		}

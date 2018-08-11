@@ -21,128 +21,129 @@
 
 namespace {
 
-	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
-	using namespace ::Eldritch2::Core;
-	using namespace ::Eldritch2;
+using namespace ::Eldritch2::Logging;
+using namespace ::Eldritch2::Assets;
+using namespace ::Eldritch2::Core;
+using namespace ::Eldritch2;
 
-	static ETInlineHint UniquePointer<const Package, NoopDeleter> CreatePackage( Allocator& allocator, const Utf8Char* const path, ResidencyState state ) {
-		const auto	package( new(allocator.Allocate( sizeof(Package) )) Package( allocator, path ) );
+static ETInlineHint UniquePointer<const Package, NoopDeleter> CreatePackage(Allocator& allocator, const Utf8Char* const path, ResidencyState state) {
+	const auto package(new (allocator.Allocate(sizeof(Package))) Package(allocator, path));
 
-		if( state != ResidencyState::QueuedForLoad ) {
-			package->CompleteLoad( state );
-		}
-
-		return { package };
+	if (state != ResidencyState::QueuedForLoad) {
+		package->CompleteLoad(state);
 	}
+
+	return { package };
+}
 
 // ---------------------------------------------------
 
-	class NullLog : public Log {
+class NullLog : public Log {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref NullLog instance.
-		NullLog() = default;
+	NullLog() = default;
 
-		~NullLog() = default;
+	~NullLog() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		void Write( const Utf8Char* const /*string*/, size_t /*lengthInOctets*/ ) override {
+public:
+	void Write(const Utf8Char* const /*string*/, size_t /*lengthInOctets*/) override {
 		//	This space intentionally blank.
-		}
-	};
+	}
+};
 
-}	// anonymous namespace
+} // anonymous namespace
 
-#define ETImplementValue(x) case x:	return #x
+#define ETImplementValue(x) \
+	case x: return #x
 
 namespace Catch {
 
-	template<>
-	struct StringMaker<World::State> {
-    	ETPureFunctionHint static std::string convert( World::State state ) {
-			switch (state) {
-				ETImplementValue( World::State::Loading );
-				ETImplementValue( World::State::Running );
-				ETImplementValue( World::State::ShutDown );
-				default:	return "<unimplemented>";
-			};
-        } 
-    };
+template <>
+struct StringMaker<World::State> {
+	ETPureFunctionHint static std::string convert(World::State state) {
+		switch (state) {
+			ETImplementValue(World::State::Loading);
+			ETImplementValue(World::State::Running);
+			ETImplementValue(World::State::ShutDown);
+		default: return "<unimplemented>";
+		};
+	}
+};
 
-}	// namespace Catch
+} // namespace Catch
 
-TEST_CASE( "World functionality", "[Worlds]" ) {
+TEST_CASE("World functionality", "[Worlds]") {
 	using namespace ::Eldritch2::Core;
 	using namespace ::Eldritch2;
 
-	MallocAllocator	allocator( "Test Allocator" );
-	Blackboard		blackboard( allocator );
-	NullLog			log;
+	MallocAllocator allocator("Test Allocator");
+	ObjectLocator   locator(allocator);
+	NullLog         log;
 
-	GIVEN( "a World" ) {
-		World	testWorld( allocator, blackboard, log );
+	GIVEN("a World") {
+		World testWorld(allocator, locator, log);
 
-		WHEN( "no dependencies are added" ) {
-			THEN( "the world should be in an executable state" ) {
-				REQUIRE( testWorld.GetLoadStatus() == World::State::Running );
+		WHEN("no dependencies are added") {
+			THEN("the world should be in an executable state") {
+				REQUIRE(testWorld.GetLoadStatus() == World::State::Running);
 
-				AND_WHEN( "additional dependencies are added" ) {
-					testWorld.AddRootPackage( CreatePackage( allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad ) );
+				AND_WHEN("additional dependencies are added") {
+					testWorld.AddRootPackage(CreatePackage(allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad));
 
-					THEN( "the world should no longer be in an executable state" ) {
-						REQUIRE( testWorld.GetLoadStatus() == World::State::Loading );
+					THEN("the world should no longer be in an executable state") {
+						REQUIRE(testWorld.GetLoadStatus() == World::State::Loading);
 					}
 				}
 			}
 		}
 
-		WHEN( "loaded dependencies are present" ) {
-			testWorld.AddRootPackage( CreatePackage( allocator, "TestLoadedPackage", ResidencyState::Published ) );
+		WHEN("loaded dependencies are present") {
+			testWorld.AddRootPackage(CreatePackage(allocator, "TestLoadedPackage", ResidencyState::Published));
 
-			THEN( "the world should be in an executable state" ) {
-				REQUIRE( testWorld.GetLoadStatus() == World::State::Running );
+			THEN("the world should be in an executable state") {
+				REQUIRE(testWorld.GetLoadStatus() == World::State::Running);
 
-				AND_WHEN( "additional dependencies are added" ) {
-					testWorld.AddRootPackage( CreatePackage( allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad ) );
+				AND_WHEN("additional dependencies are added") {
+					testWorld.AddRootPackage(CreatePackage(allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad));
 
-					THEN( "the world should no longer be in an executable state" ) {
-						REQUIRE( testWorld.GetLoadStatus() == World::State::Loading );
+					THEN("the world should no longer be in an executable state") {
+						REQUIRE(testWorld.GetLoadStatus() == World::State::Loading);
 					}
 				}
 			}
 		}
 
-		WHEN( "unloaded dependencies are present" ) {
-			auto	unloadedDependency( CreatePackage( allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad ) );
-			auto	unloadedPackage( unloadedDependency.Get() );
+		WHEN("unloaded dependencies are present") {
+			auto unloadedDependency(CreatePackage(allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad));
+			auto unloadedPackage(unloadedDependency.Get());
 
-			testWorld.AddRootPackage( CreatePackage( allocator, "TestLoadedPackage", ResidencyState::Published ) );
-			testWorld.AddRootPackage( eastl::move( unloadedDependency ) );
+			testWorld.AddRootPackage(CreatePackage(allocator, "TestLoadedPackage", ResidencyState::Published));
+			testWorld.AddRootPackage(eastl::move(unloadedDependency));
 
-			THEN( "the world should not be in an executable state" ) {
-				REQUIRE( testWorld.GetLoadStatus() == World::State::Loading );
+			THEN("the world should not be in an executable state") {
+				REQUIRE(testWorld.GetLoadStatus() == World::State::Loading);
 
-				AND_WHEN( "loads are completed" ) {
-					unloadedPackage->CompleteLoad( ResidencyState::Published );
+				AND_WHEN("loads are completed") {
+					unloadedPackage->CompleteLoad(ResidencyState::Published);
 
-					THEN( "the world should be in an executable state" ) {
-						REQUIRE( testWorld.GetLoadStatus() == World::State::Running );
+					THEN("the world should be in an executable state") {
+						REQUIRE(testWorld.GetLoadStatus() == World::State::Running);
 					}
 				}
 			}
 		}
 
-		WHEN( "failed dependencies are present" ) {
-			testWorld.AddRootPackage( CreatePackage( allocator, "TestLoadedPackage", ResidencyState::Published ) );
-			testWorld.AddRootPackage( CreatePackage( allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad ) );
-			testWorld.AddRootPackage( CreatePackage( allocator, "TestFailedPackage", ResidencyState::Failed ) );
+		WHEN("failed dependencies are present") {
+			testWorld.AddRootPackage(CreatePackage(allocator, "TestLoadedPackage", ResidencyState::Published));
+			testWorld.AddRootPackage(CreatePackage(allocator, "TestUnloadedPackage", ResidencyState::QueuedForLoad));
+			testWorld.AddRootPackage(CreatePackage(allocator, "TestFailedPackage", ResidencyState::Failed));
 
-			THEN( "the world should cease execution" ) {
-				REQUIRE( testWorld.GetLoadStatus() == World::State::ShutDown );
+			THEN("the world should cease execution") {
+				REQUIRE(testWorld.GetLoadStatus() == World::State::ShutDown);
 			}
 		}
 	}

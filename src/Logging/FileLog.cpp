@@ -27,10 +27,11 @@ namespace Eldritch2 { namespace Logging {
 
 	// ---------------------------------------------------
 
-	ErrorCode FileLog::BindResources(const PlatformChar* path) {
+	ErrorCode FileLog::BindResources(StringView<PlatformChar> path) {
 		FileAppender appender;
-		ET_FAIL_UNLESS(appender.CreateOrTruncate(path));
+		Path<>       absolutePath;
 
+		ET_FAIL_UNLESS(appender.CreateOrTruncate(absolutePath.Assign(KnownDirectory::Logs, path)));
 		Swap(_appender, appender);
 
 		return Error::None;

@@ -22,7 +22,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	public:
 		//! Constructs this @ref WrenEngineComponent instance.
-		WrenEngineComponent(const Blackboard& services);
+		WrenEngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		WrenEngineComponent(const WrenEngineComponent&) = delete;
 
@@ -31,9 +31,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
-		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const Core::World& world) override;
+		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
-		void AcceptVisitor(Assets::AssetApiBuilder& factories) override;
+		void PublishAssetTypes(Assets::AssetApiBuilder& factories) override;
 
 		// ---------------------------------------------------
 

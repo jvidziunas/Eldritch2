@@ -11,7 +11,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -22,132 +21,115 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-	namespace Core {
-		namespace {
+namespace Core {
 
-			enum : size_t {
-				HighParallelismSplit = 1u,
-				LowParallelismSplit = 2u
-			};
+	using namespace ::Eldritch2::Scheduling;
+	using namespace ::Eldritch2::Scripting;
+	using namespace ::Eldritch2::Logging;
+	using namespace ::Eldritch2::Assets;
 
-			enum : uint32 { DefaultFixedTickFramerate = 60u };
+	namespace {
+
+		enum : size_t {
+			HighParallelismSplit = 1u,
+			LowParallelismSplit  = 2u
+		};
 
 		// ---
 
-			ETInlineHint ETPureFunctionHint float32 AsMilliseconds(uint64 microseconds) {
-				static constexpr float32	MicrosecondsPerMillisecond = 1000.0f;
-
-				return microseconds / MicrosecondsPerMillisecond;
-			}
-
-		}	// anonymous namespace
-
-		using namespace ::Eldritch2::Scheduling;
-		using namespace ::Eldritch2::Scripting;
-		using namespace ::Eldritch2::Logging;
-		using namespace ::Eldritch2::Assets;
-
-	// ---------------------------------------------------
-
-		World::World(
-			const Blackboard& services,
-			Log& log
-		) : _allocator("World Root Allocator"),
-			_log(log),
-			_shouldShutDown(false),
-			_pauseCounter(0u),
-			_services(services),
-			_timeAccumulator(DefaultFixedTickFramerate, 1.0f),
-			_components(MallocAllocator("World Services Collection Allocator")) {
-			_services.Publish<World>(*this);
+		ETInlineHint ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime microseconds) {
+			return AsFloat(microseconds) / /*microseconds per millisecond*/ 1000.0f;
 		}
 
+	} // anonymous namespace
+
+	World::World(const ObjectLocator& services) :
+		_allocator("World Root Allocator"),
+		_services(services),
+		_log(services.Find<Engine>().GetLog()),
+		_shouldShutDown(false),
+		_pauseCounter(0u),
+		_timeAccumulator(/*default fixed tick framerate*/ 60u, 1.0f),
+		_components(MallocAllocator("World Services Collection Allocator")) {
+		_services.PublishService<World>(*this);
+	}
+
 	// ---------------------------------------------------
 
-		void World::Tick(JobExecutor& executor) {
+	void World::Tick(JobExecutor& executor) {
 		//	Avoid spiral of death by capping the number of fixed-rate ticks that can be run per main loop invocation.
-			enum : uint32 { MaxFixedTicksPerInvocation = 3 };
+		enum : uint32 { MaxFixedTicksPerInvocation = 3 };
 
-			Stopwatch	wallTimer;
-
+		Stopwatch timer;
 		/*	Execute a variable-rate tick exactly once per main loop iteration. Variable-rate ticks handle real-time
 		 *	update tasks like rendering to the screen, mixing sound or polling the network. */
-			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [residualTime = _timeAccumulator.GetResidualTime()](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-				component->AcceptVisitor(executor, WorldComponent::VariableTickVisitor(residualTime));
-			});
+		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [this](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
+			component->OnVariableRateTick(executor, _timeAccumulator.GetTickDurationInMicroseconds(), _timeAccumulator.GetResidualBlendFactor());
+		});
 
 		/*	Execute fixed-rate ticks until we are caught up with the real-time clock or no longer have enough time left to account
 		 *	for a full frame. The residual time will be carried over into the next @ref World::Tick() invocation(s). */
-			for (uint32 tick(0u); IsRunning() && tick < MaxFixedTicksPerInvocation; ++tick) {
-				if (ShouldPause() == false) {
-					_timeAccumulator.AddWallTime(wallTimer.GetDurationAndZero());
-				}
-
-				if (!_timeAccumulator.ShouldTick()) {
-					break;
-				}
-
-				const uint32 duration(_timeAccumulator.GetTickDurationInMicroseconds());
-
-				_timeAccumulator.DeductTime(duration);
-
-				executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [duration](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-					component->AcceptVisitor(executor, WorldComponent::EarlyTickVisitor(duration));
-				});
-				executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [duration](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-					component->AcceptVisitor(executor, WorldComponent::StandardTickVisitor(duration));
-				});
-				executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [duration](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-					component->AcceptVisitor(executor, WorldComponent::LateTickVisitor(duration));
-				});
+		for (uint32 tick(0u); IsRunning() && tick < MaxFixedTicksPerInvocation; ++tick) {
+			if (ShouldRun()) {
+				_timeAccumulator.AddWallTime(timer.GetDurationAndZero());
 			}
+
+			if (!_timeAccumulator.ShouldTick()) {
+				break;
+			}
+
+			const MicrosecondTime delta(_timeAccumulator.GetTickDurationInMicroseconds());
+			_timeAccumulator.DeductTime();
+
+			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [delta](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
+				component->OnFixedRateTickEarly(executor, delta);
+			});
+			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [delta](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
+				component->OnFixedRateTick(executor, delta);
+			});
+			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [delta](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
+				component->OnFixedRateTickLate(executor, delta);
+			});
 		}
+	}
 
 	// ---------------------------------------------------
 
-		ErrorCode World::BindResources(JobExecutor& executor) {
-			Stopwatch	timer;
-
-			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-				component->AcceptVisitor(executor, WorldComponent::EarlyInitializationVisitor());
-			});
-			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-				component->AcceptVisitor(executor, WorldComponent::LateInitializationVisitor());
-			});
+	ErrorCode World::BindResources(JobExecutor& executor) {
+		Stopwatch timer;
+		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
+			component->BindResourcesEarly(executor);
+		});
+		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
+			component->BindResources(executor);
+		});
 
 		//	Components indicate unsuccessful initialization by requesting that the world shut down.
-			if (!ShouldShutDown()) {
-				_log.Write(MessageType::Message, "Initialized world {} in {:.2f}ms." UTF8_NEWLINE, fmt::ptr(this), AsMilliseconds(timer.GetDuration()));
-			}
-
-			return Error::None;
+		if (ShouldShutDown()) {
+			return Error::Unspecified;
 		}
+
+		_log.Write(MessageType::Message, "Initialized world {} in {:.2f}ms." UTF8_NEWLINE, fmt::ptr(this), AsMilliseconds(timer.GetDuration()));
+		return Error::None;
+	}
 
 	// ---------------------------------------------------
 
-		void World::FreeResources(JobExecutor& executor) {
-			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-				component->AcceptVisitor(executor, WorldComponent::TearDownVisitor());
-			});
+	void World::FreeResources(JobExecutor& executor) {
+		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
+			component->FreeResources(executor);
+		});
 
-			_components.Clear(ReleaseMemorySemantics());
-		}
-
-	// ---------------------------------------------------
-
-		void World::SetShouldShutDown(bool andEngine) const {
-			_shouldShutDown.store(true, std::memory_order_release);
-
-			if (andEngine) {
-				_services.Find<Engine>().SetShouldShutDown();
-			}
-		}
+		_components.Clear(ReleaseMemorySemantics());
+	}
 
 	// ---------------------------------------------------
 
-		void World::SetShouldPause() {
-			_pauseCounter.fetch_add(1u, std::memory_order_relaxed);
+	void World::SetShouldShutDown(bool andEngine) const {
+		_shouldShutDown.store(true, std::memory_order_release);
+		if (andEngine) {
+			_services.Find<Engine>().SetShouldShutDown();
 		}
+	}
 
-	}	// namespace Core
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Core

@@ -37,8 +37,7 @@ public:
 
 public:
 	enum : size_t {
-		StartOfFile = 0u,
-		EndOfFile   = ~static_cast<size_t>(0)
+		EndOfFile = ~static_cast<size_t>(0)
 	};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -58,18 +57,18 @@ public:
 public:
 	ErrorCode ClearOrCreate(AccessMode accessMode, const PlatformChar* path, size_t fileSizeInBytes);
 
-	ErrorCode Open(AccessMode accessMode, const PlatformChar* path, uint64 offsetInBytes = StartOfFile, size_t mappedLengthInBytes = EndOfFile);
+	ErrorCode Open(AccessMode accessMode, const PlatformChar* path, uint64 offsetInBytes = 0u, size_t mappedLengthInBytes = EndOfFile);
 
 	// ---------------------------------------------------
 
 public:
 	template <typename Struct>
-	Range<Struct*> GetRangeAtOffset(size_t offsetInBytes, size_t lengthInElements) const;
+	Range<Struct*> GetRange(size_t byteOffset, size_t lengthInElements) const;
 
 	template <typename Struct>
-	Struct* GetAtOffset(size_t offsetInBytes) const;
+	Struct* Get(size_t byteOffset) const;
 
-	void* GetAddressForByteOffset(size_t rawFileOffsetInBytes) const;
+	void* Get(size_t byteOffset) const;
 
 	// ---------------------------------------------------
 

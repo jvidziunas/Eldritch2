@@ -33,14 +33,8 @@ namespace Eldritch2 { namespace Core {
 
 	} // namespace Detail
 
-	ETInlineHint const Blackboard& Engine::GetBlackboard() const {
+	ETInlineHint const ObjectLocator& Engine::GetServiceLocator() const {
 		return _services;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint Allocator& Engine::GetAllocator() const {
-		return _allocator;
 	}
 
 	// ---------------------------------------------------
@@ -68,9 +62,7 @@ namespace Eldritch2 { namespace Core {
 		ArrayList<EngineComponent*> components(sizeof...(clientComponents), _components.GetAllocator());
 
 		Detail::CopyComponents(components.Begin(), clientComponents...);
-
 		Swap(_components, components);
-
 		return BootOnCaller(executor);
 	}
 

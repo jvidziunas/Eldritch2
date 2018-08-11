@@ -85,4 +85,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		return static_cast<VkSampleCountFlags>(sampleCount | (sampleCount - 1u));
 	}
 
+	// ---------------------------------------------------
+
+	ETPureFunctionHint VkImageAspectFlags GetAspectsByUsage(VkImageUsageFlags usages) {
+		VkImageAspectFlags flags(0u);
+
+		const bool hasColorAspect(usages & VK_IMAGE_USAGE_SAMPLED_BIT | usages & VK_IMAGE_USAGE_STORAGE_BIT | usages & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
+		const bool hasDepthStencilAspect(usages & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
+		return (hasColorAspect ? VK_IMAGE_ASPECT_COLOR_BIT : 0u) | (hasDepthStencilAspect ? VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT : 0u);
+	}
+
 }}} // namespace Eldritch2::Graphics::Vulkan

@@ -18,7 +18,6 @@
 #include <Scheduling/JobSystem.hpp>
 #include <Core/Engine.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
 #include <Windowsx.h>
 #include <Windows.h>
 //------------------------------------------------------------------//
@@ -36,12 +35,12 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 				switch (wParam) {
 				case WM_KEYDOWN:
 				case WM_KEYUP: {
-					const KBDLLHOOKSTRUCT& hook(*reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam));
-					const bool             isWindowsKey((VK_LWIN == hook.vkCode) | (VK_RWIN == hook.vkCode));
-					const bool             isRealKeypress(!(hook.dwExtraInfo & LLMHF_INJECTED));
+					const auto hook { LPKBDLLHOOKSTRUCT(lParam) };
+					const bool isWindowsKey((VK_LWIN == hook->vkCode) | (VK_RWIN == hook->vkCode));
+					const bool isRealKeypress(!(hook->dwExtraInfo & LLMHF_INJECTED));
 					/*	Verify that this was an actual keypress, *not* a specially-injected Windows key event.
-						 *	We're interested in stopping the cases whereupon a user accidentally fat-fingers the Windows key
-						 *	when they actually meant to press the control or alt keys. */
+					 *	We're interested in stopping the cases whereupon a user accidentally fat-fingers the Windows key
+					 *	when they actually meant to press the control or alt keys. */
 					if (ET_UNLIKELY(isRealKeypress & isWindowsKey)) {
 						return 1;
 					}
@@ -54,14 +53,10 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 	} // anonymous namespace
 
-	// ---------------------------------------------------
-
-	Win32InputEngineComponent::Win32InputEngineComponent(
-		const Blackboard& services,
-		Log&              log) :
+	Win32InputEngineComponent::Win32InputEngineComponent(const ObjectLocator& services) :
 		EngineComponent(services),
 		_keyboardHook(SetWindowsHookExW(WH_KEYBOARD_LL, &WindowsKeyHook, GetModuleByAddress(&WindowsKeyHook), 0)),
-		_devices(log),
+		_devices(FindService<Engine>().GetLog()),
 		_inputReader(_devices) {
 	}
 
@@ -70,27 +65,22 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 	Win32InputEngineComponent::~Win32InputEngineComponent() {
 		_inputReader.AwaitCompletion();
 
-		//	Remove the hook that allowed us to selectively ignore Windows key press events.
 		if (_keyboardHook) {
+			//	Remove the hook that allowed us to selectively ignore Windows key press events.
 			UnhookWindowsHookEx(_keyboardHook);
 		}
 	}
 
 	// ---------------------------------------------------
 
-	Result<UniquePointer<WorldComponent>> Win32InputEngineComponent::CreateWorldComponent(Allocator& allocator, const World& world) {
-		UniquePointer<WorldComponent> inputComponent(MakeUnique<Win32InputWorldComponent>(allocator, world));
-		if (inputComponent == nullptr) {
-			return Error::OutOfMemory;
-		}
-
-		return eastl::move(inputComponent);
+	UniquePointer<WorldComponent> Win32InputEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
+		return MakeUnique<Win32InputWorldComponent>(allocator, services);
 	}
 
 	// ---------------------------------------------------
 
-	void Win32InputEngineComponent::AcceptVisitor(JobExecutor& /*executor*/, const InitializationVisitor) {
-		MICROPROFILE_SCOPEI("Engine/Initialization", "Initialize Win32 input", 0xBBBBBB);
+	void Win32InputEngineComponent::BindResourcesEarly(JobExecutor& /*executor*/) {
+		ET_PROFILE_SCOPE("Engine/Initialization", "Initialize Win32 input", 0xBBBBBB);
 
 		if (Failed(FindService<JobSystem>().Launch(_inputReader))) {
 			return FindService<Engine>().SetShouldShutDown();
@@ -99,8 +89,8 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 	// ---------------------------------------------------
 
-	void Win32InputEngineComponent::AcceptVisitor(Blackboard& services) {
-		services.Publish<DeviceCoordinator>(_devices);
+	void Win32InputEngineComponent::PublishServices(ObjectLocator& services) {
+		services.PublishService<DeviceCoordinator>(_devices);
 	}
 
 }}} // namespace Eldritch2::Input::Win32

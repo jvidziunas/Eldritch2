@@ -282,9 +282,7 @@ ETInlineHint ETPureFunctionHint bool operator>=(const UniquePointer<T, Deleter>&
 
 template <typename Object, typename... Args>
 ETInlineHint UniquePointer<Object, InstanceDeleter> MakeUnique(Allocator& allocator, Args&&... args) {
-	const auto object(static_cast<Object*>(allocator.Allocate(sizeof(Object))));
-
-	return { new (object) Object(eastl::forward<Args>(args)...), InstanceDeleter(allocator, object) };
+	return { new (allocator.Allocate(sizeof(Object))) Object(eastl::forward<Args>(args)...), InstanceDeleter(allocator, object) };
 }
 
 // ---------------------------------------------------
@@ -292,10 +290,6 @@ ETInlineHint UniquePointer<Object, InstanceDeleter> MakeUnique(Allocator& alloca
 template <typename Object, typename... Args>
 ETInlineHint UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, size_t sizeInElements, Args&&... args) {
 	const auto objects(static_cast<Object*>(allocator.Allocate(sizeInElements * sizeof(Object))));
-	if (!objects) {
-		return nullptr;
-	}
-
 	eastl::for_each(objects, objects + sizeInElements, [&](Object& object) {
 		new (eastl::addressof(object)) Object(eastl::forward<Args>(args)...);
 	});
@@ -306,16 +300,12 @@ ETInlineHint UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Alloc
 // ---------------------------------------------------
 
 template <typename Object, typename Iterator>
-ETInlineHint UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, Iterator firstElement, Iterator lastElement) {
-	const auto sizeInElements(eastl::distance(firstElement, lastElement));
-	const auto objects(static_cast<Object*>(allocator.Allocate(sizeInElements * sizeof(Object))));
-	if (!objects) {
-		return nullptr;
-	}
+ETInlineHint UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, Iterator first, Iterator last) {
+	const auto size(eastl::distance(first, last));
+	const auto objects(static_cast<Object*>(allocator.Allocate(size * sizeof(Object))));
 
-	eastl::uninitialized_move(firstElement, lastElement, objects);
-
-	return { objects, InstanceArrayDeleter(allocator, objects, static_cast<size_t>(sizeInElements)) };
+	eastl::uninitialized_move(first, last, objects);
+	return { objects, InstanceArrayDeleter(allocator, objects, static_cast<size_t>(size)) };
 }
 
 } // namespace Eldritch2
