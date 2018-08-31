@@ -21,17 +21,13 @@
 #include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Scheduling {
-	class JobExecutor;
-}} // namespace Eldritch2::Scheduling
-
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class Device : public Gpu, public DisplayBus, public ResourceBus {
+		class Device : public Gpu, public ResourceBus, public DisplayBus {
 			// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -53,12 +49,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			// ---------------------------------------------------
 
 		public:
-			void BeginFrame(Scheduling::JobExecutor& executor, Vulkan& vulkan);
-
-			// ---------------------------------------------------
-
-		public:
-			VkResult BindResources(VkPhysicalDevice device, VkDeviceSize heapBlockSize = HeapBlockSize, VkDeviceSize transferBufferSize = TransferBufferSize);
+			VkResult BindResources(VkInstance vulkan, VkPhysicalDevice device, VkDeviceSize heapBlockSize = HeapBlockSize, VkDeviceSize transferBufferSize = TransferBufferSize);
 
 			void FreeResources();
 		};
@@ -81,27 +72,22 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		template <size_t formatSize, typename... Arguments>
-		void WriteLog(Logging::MessageType type, const Utf8Char (&format)[formatSize], Arguments&&... arguments) const;
+		template <typename... Arguments>
+		void WriteLog(Logging::Severity type, StringView format, Arguments&&... arguments) const;
 
 		// ---------------------------------------------------
 
 	public:
-		Device& GetPrimaryDevice();
+		Device& GetPrimaryDevice() ETNoexceptHint;
 
-		operator VkInstance();
-
-		// ---------------------------------------------------
-
-	public:
-		void BeginFrame(Scheduling::JobExecutor& executor);
+		operator VkInstance() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Scheduling::JobExecutor& executor, const VkApplicationInfo& applicationInfo);
+		VkResult BindResources();
 
-		void FreeResources(Scheduling::JobExecutor& executor);
+		void FreeResources();
 
 		// ---------------------------------------------------
 

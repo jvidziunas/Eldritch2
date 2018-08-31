@@ -14,35 +14,12 @@
 //==================================================================//
 #include <Graphics/Vulkan/GpuResources.hpp>
 //------------------------------------------------------------------//
-#include <vulkan/vulkan_core.h>
-//------------------------------------------------------------------//
-
-namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class CommandList;
-}}} // namespace Eldritch2::Graphics::Vulkan
 
 namespace Eldritch2 {
 namespace Graphics {
 namespace Vulkan {
 
-	struct View {
-		//!  Set of planes to clip objects against.
-		Vector   frustumPlanes[6];
-		VkRect2D scissorRect;
-		uint8    id;
-	};
-
-	// ---
-
 	class BatchCoordinator {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		enum : VkDeviceSize {
-			InstanceBufferSize  = 2u * 1024u * 1024u, /*  2MB */
-			ParameterBufferSize = 16u * 1024u         /* 16KB */
-		};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -58,7 +35,7 @@ namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu);
+		VkResult BindResources(Gpu& gpu, VkDeviceSize parameterBufferSize, VkDeviceSize instanceBufferSize);
 
 		void FreeResources(Gpu& gpu);
 

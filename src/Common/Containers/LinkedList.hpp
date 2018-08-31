@@ -31,36 +31,39 @@ protected:
 public:
 	using AllocatorType  = typename UnderlyingContainer::allocator_type::PublicType;
 	using ValueType      = typename UnderlyingContainer::value_type;
-	using ConstReference = const ValueType&;
-	using Reference      = ValueType&;
 	using ConstIterator  = typename UnderlyingContainer::const_iterator;
 	using Iterator       = typename UnderlyingContainer::iterator;
 	using SizeType       = typename UnderlyingContainer::size_type;
+	using ConstReference = const ValueType&;
+	using Reference      = ValueType&;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//! Constructs this @ref LinkedList instance.
 	template <typename InputIterator>
-	LinkedList(InputIterator first, InputIterator last, const AllocatorType& allocator = AllocatorType());
+	LinkedList(const AllocatorType& allocator, InputIterator first, InputIterator last);
 	//! Constructs this @ref LinkedList instance.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	LinkedList(const LinkedList&, const AllocatorType& allocator);
+	LinkedList(const AllocatorType& allocator, std::initializer_list<ValueType>);
 	//! Constructs this @ref LinkedList instance.
-	explicit LinkedList(const AllocatorType& allocator = AllocatorType());
+	LinkedList(const AllocatorType& allocator, const LinkedList&);
 	//! Constructs this @ref LinkedList instance.
-	LinkedList(LinkedList&&);
+	LinkedList(const AllocatorType& allocator = AllocatorType());
+	//! Constructs this @ref LinkedList instance.
+	LinkedList(const LinkedList&) = default;
+	//! Constructs this @ref LinkedList instance.
+	LinkedList(LinkedList&&) = default;
 
 	~LinkedList() = default;
 
 	// - ALGORITHMS --------------------------------------
 
 public:
-	ConstIterator Find(ConstReference itemTemplate, ConstIterator searchHint) const;
-	Iterator      Find(ConstReference itemTemplate, Iterator searchHint);
+	ConstIterator Find(ConstReference value, ConstIterator where) const;
+	Iterator      Find(ConstReference value, Iterator where);
 
-	template <typename ItemPredicate>
-	Iterator EraseIf(ItemPredicate itemPredicate);
+	template <typename UnaryPredicate>
+	Iterator EraseIf(UnaryPredicate condition);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -95,18 +98,16 @@ public:
 	Reference Back();
 
 	//!	Adds a duplicate of the passed-in item to the head of this @ref LinkedList.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	void Prepend(ConstReference itemTemplate);
+	void Prepend(ConstReference value);
 
 	//!	Adds a duplicate of the passed-in item to the tail of this @ref LinkedList.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	void Append(ConstReference itemTemplate);
+	void Append(ConstReference value);
 
-	template <typename... ElementConstructorArguments>
-	void EmplaceFront(ElementConstructorArguments&&... elementConstructorArguments);
+	template <typename... Arguments>
+	void EmplaceFront(Arguments&&... arguments);
 
-	template <typename... ElementConstructorArguments>
-	void EmplaceBack(ElementConstructorArguments&&... elementConstructorArguments);
+	template <typename... Arguments>
+	void EmplaceBack(Arguments&&... arguments);
 
 	//!	Removes the head element of this @ref LinkedList, reducing its size by one element.
 	void PopFront();
@@ -118,16 +119,15 @@ public:
 
 public:
 	//!	Inserts an element at the position specified, shifting all antecedent elements down one position.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	Iterator Insert(Iterator location, ConstReference itemTemplate);
+	Iterator Insert(Iterator where, ConstReference value);
 
-	template <typename... ElementConstructorArguments>
-	Iterator Emplace(Iterator location, ElementConstructorArguments&&... elementConstructorArguments);
+	template <typename... Arguments>
+	Iterator Emplace(Iterator where, Arguments&&... arguments);
 
 	//!	Removes a range of elements in the range [first, last), reducing the size of the @ref LinkedList by <<distance( first, last )>>
 	Iterator Erase(Iterator first, Iterator last);
 	//!	Removes an element at the position specified, reducing the size of the @ref LinkedList by one element.
-	Iterator Erase(Iterator location);
+	Iterator Erase(Iterator where);
 
 	//!	Removes all elements from the @ref LinkedList.
 	void Clear();
@@ -135,9 +135,8 @@ public:
 	// - CONTAINER DUPLICATION ---------------------------
 
 public:
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	LinkedList& operator=(const LinkedList&);
-	LinkedList& operator=(LinkedList&&);
+	LinkedList& operator=(const LinkedList&) = default;
+	LinkedList& operator=(LinkedList&&) = default;
 
 	// - CONTENT QUERY -----------------------------------
 

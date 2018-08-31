@@ -25,9 +25,9 @@ class Range {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using IteratorType = Iterator;
 	using ValueType    = typename eastl::iterator_traits<Iterator>::value_type;
 	using Reference    = typename eastl::iterator_traits<Iterator>::reference;
+	using IteratorType = Iterator;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -35,57 +35,57 @@ public:
 	//! Constructs this @ref Range instance.
 	/*!	@param[in] begin Beginning of the elements contained by the new @ref Range.
 		@param[in] end One past the last valid element contained by the new @ref Range. */
-	Range(Iterator begin, Iterator end);
+	ETConstexpr Range(Iterator begin, Iterator end);
 	//! Constructs this @ref Range instance.
-	Range(const Range&) = default;
+	ETConstexpr Range(const Range&) = default;
 	//! Constructs this @ref Range instance.
-	Range();
+	ETConstexpr Range();
 
 	~Range() = default;
 
 	// ---------------------------------------------------
 
 public:
-	Iterator Begin() const;
+	ETConstexpr Iterator Begin() const;
 
-	Iterator End() const;
-
-	// ---------------------------------------------------
-
-public:
-	void SetBegin(Iterator newValue);
-
-	void SetEnd(Iterator newValue);
+	ETConstexpr Iterator End() const;
 
 	// ---------------------------------------------------
 
 public:
-	//! Checks to see if this @ref Range contains any elements (begin and end do not point to the same element)
-	explicit operator bool() const;
+	ETConstexpr void SetBegin(Iterator begin);
 
-	//! Checks to see if this @ref Range is the empty set (begin and end point to the same element)
-	bool IsEmpty() const;
-
-	size_t GetSize() const;
-
-	// ---------------------------------------------------
-
-public:
-	Range& operator=(const Range&) = default;
+	ETConstexpr void SetEnd(Iterator end);
 
 	// ---------------------------------------------------
 
 public:
 	//!	Tests to see if the passed-in @ref Range is a subset of this @ref Range instance.
-	bool Covers(const Range& range) const;
+	ETConstexpr bool Covers(const Range& range) const;
 	//!	Tests to see if the passed in @ref Iterator references an element within the bounds specified by this @ref Range.
-	bool Covers(Iterator element) const;
+	ETConstexpr bool Covers(Iterator element) const;
 
 	//!	Optimized containment check if the end of both @ref Range instances is known beforehand.
-	bool CoversBegin(const Range& range) const;
+	ETConstexpr bool CoversBegin(const Range& range) const;
 
 	//!	Optimized containment check if the beginning of both @ref Range instances is known beforehand.
-	bool CoversEnd(const Range& range) const;
+	ETConstexpr bool CoversEnd(const Range& range) const;
+
+	// ---------------------------------------------------
+
+public:
+	//! Checks to see if this @ref Range contains any elements (begin and end do not point to the same element)
+	ETConstexpr explicit operator bool() const;
+
+	//! Checks to see if this @ref Range is the empty set (begin and end point to the same element)
+	ETConstexpr bool IsEmpty() const;
+
+	ETConstexpr size_t GetSize() const;
+
+	// ---------------------------------------------------
+
+public:
+	Range& operator=(const Range&) = default;
 
 	// - DATA MEMBERS ------------------------------------
 

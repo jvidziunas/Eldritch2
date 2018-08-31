@@ -21,10 +21,10 @@
 
 namespace Eldritch2 {
 
-ETPureFunctionHint size_t StringLength(const wchar_t* string);
-ETPureFunctionHint size_t StringLength(const char* string);
+ETPureFunctionHint size_t StringLength(const wchar_t* string) ETNoexceptHint;
+ETPureFunctionHint size_t StringLength(const char* string) ETNoexceptHint;
 
-ETPureFunctionHint size_t HashMemory(const void* memory, size_t sizeInBytes, size_t seed);
+ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t sizeInBytes, size_t seed) ETNoexceptHint;
 
 } // namespace Eldritch2
 

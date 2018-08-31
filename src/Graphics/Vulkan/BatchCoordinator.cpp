@@ -13,7 +13,6 @@
 //==================================================================//
 #include <Graphics/Vulkan/BatchCoordinator.hpp>
 #include <Graphics/Vulkan/VulkanTools.hpp>
-#include <Graphics/Vulkan/CommandList.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
@@ -24,17 +23,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	//---------------------------------------------------
 
-	BatchCoordinator::BatchCoordinator(BatchCoordinator&& coordinator) :
+	BatchCoordinator::BatchCoordinator(BatchCoordinator&& batches) :
 		BatchCoordinator() {
-		Swap(*this, coordinator);
+		Swap(*this, batches);
 	}
 
 	//---------------------------------------------------
 
-	VkResult BatchCoordinator::BindResources(Gpu& gpu) {
+	VkResult BatchCoordinator::BindResources(Gpu& gpu, VkDeviceSize parameterBufferSize, VkDeviceSize /*instanceBufferSize*/) {
 		UniformBuffer drawParameters;
 
-		ET_FAIL_UNLESS(drawParameters.BindResources(gpu, ParameterBufferSize));
+		ET_ABORT_UNLESS(drawParameters.BindResources(gpu, parameterBufferSize));
 		ET_AT_SCOPE_EXIT(drawParameters.FreeResources(gpu));
 
 		Swap(_drawParameters, drawParameters);

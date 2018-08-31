@@ -19,14 +19,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	using namespace ::Eldritch2::Logging;
 	using namespace ::Eldritch2::Assets;
 
-	ImageAsset::ImageAsset(const Utf8Char* const path) :
+	ImageAsset::ImageAsset(StringView path) :
 		Asset(path) {}
 
 	// ---------------------------------------------------
 
 	ErrorCode ImageAsset::BindResources(const Builder& asset) {
 		if (Failed(CrunchImageSource::BindResources(asset.Begin(), asset.End()))) {
-			asset.WriteLog(MessageType::Error, "Data integrity check failed for {}, aborting load." UTF8_NEWLINE, GetPath());
+			asset.WriteLog(Severity::Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath());
 			return Error::Unspecified;
 		}
 
@@ -37,6 +37,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 	void ImageAsset::FreeResources() {
 		CrunchImageSource::FreeResources();
+	}
+
+	// ---------------------------------------------------
+
+	ETPureFunctionHint StringView ImageAsset::GetExtension() ETNoexceptHint {
+		return ".e2image";
 	}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

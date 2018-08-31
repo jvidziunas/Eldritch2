@@ -33,9 +33,9 @@ public:
 	//!	Disable copy construction.
 	FileReader(const FileReader&) = delete;
 	//!	Constructs this @ref FileReader instance.
-	FileReader(FileReader&&);
+	FileReader(FileReader&&) ETNoexceptHint;
 	//!	Constructs this @ref FileReader instance.
-	FileReader();
+	FileReader() ETNoexceptHint;
 
 	~FileReader();
 
@@ -43,9 +43,9 @@ public:
 
 public:
 	//! Performs a blocking read operation to the output device this @ref FileReader uses as its backing.
-	ErrorCode Read(void* const destination, size_t lengthToReadInBytes, uint64 fileOffsetInBytes);
+	ErrorCode Read(void* const destination, size_t lengthToReadInBytes, uint64 fileOffsetInBytes) ETNoexceptHint;
 	//! Performs a blocking read operation to the output device this @ref FileReader uses as its backing.
-	ErrorCode Read(void* const destination, size_t lengthToReadInBytes);
+	ErrorCode Read(void* const destination, size_t lengthToReadInBytes) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -53,12 +53,12 @@ public:
 	//!	Retrieves the total on-disk size of the file/pseudofile being accessed.
 	/*!	@returns On disk size of the file, in bytes.
 		@remarks Thread-safe. */
-	uint64 GetSizeInBytes() const;
+	uint64 GetSizeInBytes() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode Open(const PlatformChar* path);
+	ErrorCode Open(const PlatformChar* path) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -73,6 +73,10 @@ private:
 #else
 	static_assert(false, "FileReader needs implementation for target platform!");
 #endif
+
+	// ---------------------------------------------------
+
+	friend void Swap(FileReader&, FileReader&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

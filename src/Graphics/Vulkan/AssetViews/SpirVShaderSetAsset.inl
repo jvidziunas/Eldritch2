@@ -24,14 +24,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	// ---------------------------------------------------
 
 	ETInlineHint uint32 SpirVShaderSetAsset::Usage::GetBytecodeSizeInBytes() const {
-		return static_cast<uint32>(eastl::distance(bytecode, bytecodeEnd) * sizeof(uint32));
+		return uint32(eastl::distance(bytecode, bytecodeEnd) * sizeof(uint32));
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint uint32 SpirVShaderSetAsset::Find(const Utf8Char* name) const {
-		const auto candidate(_indexByName.Find(name, _indexByName.GetHashFunction(), _indexByName.GetKeyEqualityPredicate()));
-
+	ETInlineHint uint32 SpirVShaderSetAsset::Find(StringView name) const {
+		const auto candidate(_indexByName.Find(name, _indexByName.GetHash(), _indexByName.GetEqualityPredicate()));
 		return candidate != _indexByName.End() ? candidate->second : InvalidUsageId;
 	}
 

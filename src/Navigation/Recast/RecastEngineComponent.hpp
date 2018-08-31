@@ -31,7 +31,7 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		// ---------------------------------------------------
 
 	public:
-		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
+		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
 		// ---------------------------------------------------
 

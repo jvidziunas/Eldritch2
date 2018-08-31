@@ -16,12 +16,11 @@
 #include <Animation/AnimationTypes.hpp>
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6326)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <cloth/PxCloth.h>
 #include <PxShape.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace physx {
@@ -48,7 +47,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 			//!	Constructs this @ref RigidShape instance.
 			RigidShape(RigidShape&&) ETNoexceptHint = default;
 			//!	Constructs this @ref RigidShape instance.
-			RigidShape() = default;
+			RigidShape() ETNoexceptHint = default;
 
 			~RigidShape() = default;
 
@@ -71,7 +70,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 			//!	Constructs this @ref ClothShape instance.
 			ClothShape(ClothShape&&) ETNoexceptHint = default;
 			//!	Constructs this @ref ClothShape instance.
-			ClothShape() = default;
+			ClothShape() ETNoexceptHint = default;
 
 			~ClothShape() = default;
 		};
@@ -79,11 +78,11 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref PhysicsAsset instance.
-		/*!	@param[in] filePath Null-terminated, UTF-8-encoded character sequence containing the file system path to the resource. */
-		PhysicsAsset(const Utf8Char* const filePath);
 		//!	Disable copy construction.
 		PhysicsAsset(const PhysicsAsset&) = delete;
+		//!	Constructs this @ref PhysicsAsset instance.
+		/*!	@param[in] path UTF-8-encoded character sequence containing the file system path to the resource. */
+		PhysicsAsset(StringView path);
 
 		~PhysicsAsset() override = default;
 
@@ -104,7 +103,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		// ---------------------------------------------------
 
 	public:
-		static Utf8Literal GetExtension();
+		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

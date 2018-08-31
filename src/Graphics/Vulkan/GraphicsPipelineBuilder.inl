@@ -17,71 +17,81 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(float32 widthScale, float32 heightScale) const {
-		return staticDimensions == 0 && (scales[0] == widthScale && scales[1] == heightScale);
+	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(GraphicsPassScale desired) const ETNoexceptHint {
+		return !IsUsed() || (staticResolution == 0 && OrderBuffers(ETAddressOf(scale), ETAddressOf(desired), sizeof(desired)) == 0);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(VkExtent3D dispatchDimensions) const {
-		return staticDimensions != 0 && OrderBuffers(&dimensions, &dispatchDimensions, sizeof(VkExtent3D)) == 0;
+	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(VkExtent3D desired) const ETNoexceptHint {
+		return !IsUsed() || (staticResolution != 0 && OrderBuffers(ETAddressOf(resolution), ETAddressOf(desired), sizeof(desired)) == 0);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsReferenced() const {
-		return IsWritten() | IsRead();
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsWritten() const {
-		return firstWrite <= lastWrite;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsRead() const {
-		return firstRead <= lastRead;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::ShouldPreserveInPass(uint32 pass) const {
+	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::ShouldPreserve(uint32 pass) const ETNoexceptHint {
 		return isPersistent || (firstWrite < pass && pass < lastRead);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint const GraphicsPipelineBuilder::PassDescription& GraphicsPipelineBuilder::operator[](uint32 pass) const {
+	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsWritten() const ETNoexceptHint {
+		return firstWrite <= lastWrite;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsRead() const ETNoexceptHint {
+		return firstRead <= lastRead;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsUsed() const ETNoexceptHint {
+		return IsWritten() | IsRead();
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint const GraphicsPipelineBuilder::PassDescription& GraphicsPipelineBuilder::operator[](uint32 pass) const ETNoexceptHint {
 		return _passes[pass];
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint uint32 GraphicsPipelineBuilder::GetPassCount() const {
+	ETInlineHint ETForceInlineHint uint32 GraphicsPipelineBuilder::GetPassCount() const ETNoexceptHint {
 		return uint32(_passes.GetSize());
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint const GraphicsPipelineBuilder::AttachmentDescription& GraphicsPipelineBuilder::GetAttachment(uint32 attachment) const {
+	ETInlineHint ETForceInlineHint const GraphicsPipelineBuilder::AttachmentDescription& GraphicsPipelineBuilder::GetAttachment(uint32 attachment) const ETNoexceptHint {
 		return _attachments[attachment];
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint uint32 GraphicsPipelineBuilder::GetAttachmentCount() const {
+	ETInlineHint ETForceInlineHint uint32 GraphicsPipelineBuilder::GetAttachmentCount() const ETNoexceptHint {
 		return uint32(_attachments.GetSize());
 	}
 
 	// ---------------------------------------------------
 
-	template <typename... Args, class /*SFINAE*/>
-	ETInlineHint uint32 GraphicsPipelineBuilder::DefineAttachment(VkFormat format, VkSampleCountFlags quality, Args&&... args) {
-		_attachments.EmplaceBack(format, quality, eastl::forward<Args>(args)...);
-
+	ETInlineHint ETForceInlineHint uint32 GraphicsPipelineBuilder::DefineAttachment(VkFormat format) {
+		_attachments.EmplaceBack(format);
 		return uint32(_attachments.GetSize() - 1u);
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator==(const GraphicsPipelineBuilder::AttachmentReference& lhs, const GraphicsPipelineBuilder::AttachmentReference& rhs) {
+		return lhs.globalIndex == rhs.globalIndex;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator!=(const GraphicsPipelineBuilder::AttachmentReference& lhs, const GraphicsPipelineBuilder::AttachmentReference& rhs) {
+		return !(lhs == rhs);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

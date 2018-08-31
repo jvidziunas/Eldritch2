@@ -20,6 +20,11 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+template <typename Character>
+class AbstractStringView;
+}
+
+namespace Eldritch2 {
 
 enum class Error : int32 {
 	Timeout              = -8,
@@ -40,30 +45,26 @@ class ErrorCode {
 
 public:
 	//!	Constructs this @ref ErrorCode instance.
-	ErrorCode(Error bitfield = Error::None);
+	ETConstexpr ErrorCode(Error bitfield = Error::None) ETNoexceptHint;
 	//!	Constructs this @ref ErrorCode instance.
-	ErrorCode(const ErrorCode&) = default;
+	ETConstexpr ErrorCode(const ErrorCode&) ETNoexceptHint = default;
 
 	~ErrorCode() = default;
 
 	// - ASSIGNMENT --------------------------------------
 
 public:
-	ErrorCode& operator=(const ErrorCode&) = default;
+	ETConstexpr ErrorCode& operator=(const ErrorCode&) ETNoexceptHint = default;
 
 	// - DEBUG/LOGGING INFORMATION -----------------------
 
-	//!	Gets a human-readable string describing the result condition this @ref ErrorCode instance represents.
-	/*!	@returns A null-terminated string of static storage duration containing the error description. */
-	friend ETPureFunctionHint const Utf8Char* AsCString(ErrorCode code);
+	friend ETConstexpr ETPureFunctionHint int AsPosixInt(ErrorCode code) ETNoexceptHint;
 
-	friend ETPureFunctionHint int AsPosixInt(ErrorCode code);
+	friend ETConstexpr ETPureFunctionHint bool Succeeded(ErrorCode code) ETNoexceptHint;
 
-	friend ETPureFunctionHint bool Succeeded(ErrorCode code);
+	friend ETConstexpr ETPureFunctionHint bool Failed(ErrorCode code) ETNoexceptHint;
 
-	friend ETPureFunctionHint bool Failed(ErrorCode code);
-
-	friend ETPureFunctionHint bool operator==(ErrorCode code, ErrorCode code1);
+	friend ETConstexpr ETPureFunctionHint bool operator==(ErrorCode code, ErrorCode code1) ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -73,13 +74,24 @@ private:
 
 } // namespace Eldritch2
 
-#if !defined(ET_FAIL_UNLESS)
-#	define ET_FAIL_UNLESS(condition)              \
-		{                                          \
-			const auto tempResult(condition);      \
-			if (ET_UNLIKELY(Failed(tempResult))) { \
-				return tempResult;                 \
-			}                                      \
+#if !defined(ET_ABORT_UNLESS)
+#	define ET_ABORT_UNLESS(condition)         \
+		{                                      \
+			const auto result(condition);      \
+			if (ET_UNLIKELY(Failed(result))) { \
+				return result;                 \
+			}                                  \
+		}
+#endif
+
+#if !defined(ET_ABORT_UNLESS_MSG)
+#	define ET_ABORT_UNLESS_MSG(condition, log, ...)                           \
+		{                                                                      \
+			const auto result(condition);                                      \
+			if (ET_UNLIKELY(Failed(result))) {                                 \
+				log.Write(::Eldritch2::Logging::Severity::Error, __VA_ARGS__); \
+				return result;                                                 \
+			}                                                                  \
 		}
 #endif
 

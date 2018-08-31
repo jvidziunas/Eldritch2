@@ -46,7 +46,7 @@ namespace Core {
 	World::World(const ObjectLocator& services) :
 		_allocator("World Root Allocator"),
 		_services(services),
-		_log(services.Find<Engine>().GetLog()),
+		_log(services.Find<Engine>()->GetLog()),
 		_shouldShutDown(false),
 		_pauseCounter(0u),
 		_timeAccumulator(/*default fixed tick framerate*/ 60u, 1.0f),
@@ -73,7 +73,6 @@ namespace Core {
 			if (ShouldRun()) {
 				_timeAccumulator.AddWallTime(timer.GetDurationAndZero());
 			}
-
 			if (!_timeAccumulator.ShouldTick()) {
 				break;
 			}
@@ -104,12 +103,12 @@ namespace Core {
 			component->BindResources(executor);
 		});
 
-		//	Components indicate unsuccessful initialization by requesting that the world shut down.
 		if (ShouldShutDown()) {
+			//	Components indicate unsuccessful initialization by requesting that the world shut down.
 			return Error::Unspecified;
 		}
 
-		_log.Write(MessageType::Message, "Initialized world {} in {:.2f}ms." UTF8_NEWLINE, fmt::ptr(this), AsMilliseconds(timer.GetDuration()));
+		_log.Write(Severity::Message, "Initialized world {} in {:.2f}ms." ET_NEWLINE, fmt::ptr(this), AsMilliseconds(timer.GetDuration()));
 		return Error::None;
 	}
 
@@ -128,7 +127,7 @@ namespace Core {
 	void World::SetShouldShutDown(bool andEngine) const {
 		_shouldShutDown.store(true, std::memory_order_release);
 		if (andEngine) {
-			_services.Find<Engine>().SetShouldShutDown();
+			_services.Find<Engine>()->SetShouldShutDown();
 		}
 	}
 

@@ -13,29 +13,21 @@
 //==================================================================//
 #include <Physics/PhysX/PhysXWorldComponent.hpp>
 #include <Physics/PhysX/PhysicsScene.hpp>
+#include <Scheduling/JobExecutor.hpp>
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
-	using namespace ::physx;
-
-	namespace {
-
-		static ETInlineHint ETPureFunctionHint PxReal AsSeconds(MicrosecondTime microseconds) {
-			return PxReal(AsFloat(microseconds) / /*seconds per microsecond*/ 1000000.0f);
-		}
-
-	} // anonymous namespace
 
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Logging;
 	using namespace ::Eldritch2::Core;
+	using namespace ::physx;
 
 	PhysxWorldComponent::PhysxWorldComponent(const ObjectLocator& services) :
 		WorldComponent(services),
 		CpuDispatcher(4u),
-		_log(FindService<World>().GetLog()),
-		_shouldJoinScene(false),
+		_log(FindService<World>()->GetLog()),
 		_scene(nullptr) {
 	}
 
@@ -43,13 +35,10 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	void PhysxWorldComponent::OnFixedRateTickEarly(JobExecutor& executor, MicrosecondTime duration) {
 		ET_PROFILE_SCOPE("World/EarlyTick/PhysX", "Join simulation", 0x32AACD);
-		const bool shouldJoin(eastl::exchange(_shouldJoinScene, false));
-
-		if (shouldJoin && Failed(_scene->JoinSimulation(executor))) {
-			World& world(FindService<World>());
-
-			_log.Write(MessageType::Error, "PhysX hardware error simulating world {}, terminating." UTF8_NEWLINE, fmt::ptr(&world));
-			world.SetShouldShutDown();
+		executor.AwaitCondition(_scene->IsSimulationComplete());
+		if (Failed(_scene->FinishSimulation())) {
+			_log.Write(Severity::Error, "PhysX hardware error simulating scene {}, terminating." ET_NEWLINE, fmt::ptr(_scene));
+			FindService<World>()->SetShouldShutDown();
 		}
 	}
 
@@ -57,8 +46,23 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	void PhysxWorldComponent::OnFixedRateTickLate(JobExecutor& executor, MicrosecondTime duration) {
 		ET_PROFILE_SCOPE("World/LateTick/PhysX", "Start simulation", 0x32AACD);
-		_scene->BeginSimulation(executor, AsSeconds(duration));
-		_shouldJoinScene = true;
+		if (Failed(_scene->StartSimulation(AsSeconds(duration)))) {
+			FindService<World>()->SetShouldShutDown();
+		}
+	}
+
+	// ---------------------------------------------------
+
+	void PhysxWorldComponent::BindResources(JobExecutor& /*executor*/) {}
+
+	// ---------------------------------------------------
+
+	void PhysxWorldComponent::FreeResources(JobExecutor& executor) {
+		if (_scene) {
+			executor.AwaitCondition(_scene->IsSimulationComplete());
+		}
+
+		executor.AwaitFence(GetTasksCompletedFence());
 	}
 
 }}} // namespace Eldritch2::Physics::PhysX

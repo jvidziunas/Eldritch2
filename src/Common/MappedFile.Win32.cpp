@@ -21,14 +21,14 @@
 #include <Windows.h>
 //------------------------------------------------------------------//
 
-#if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-#	define WIN8_MEMORY_MAPPED_FILE_AVAILABLE 1
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+#	define PREFETCHVIRTUALMEMORY_AVAILABLE 1
 #else
-#	define WIN8_MEMORY_MAPPED_FILE_AVAILABLE 0
-COMPILERMESSAGEGENERIC("Windows 8 PrefetchVirtualMemory-optimized file mapping object unavailable, use the Windows 8 SDK or newer to enable")
+#	define PREFETCHVIRTUALMEMORY_AVAILABLE 0
 #endif
 
 namespace Eldritch2 {
+
 namespace {
 
 	enum : size_t {
@@ -37,148 +37,129 @@ namespace {
 
 	// ---
 
-	static ETInlineHint ETPureFunctionHint DWORD FilePermissionsFromAccessMode(MappedFile::AccessMode mode) {
-		return mode < MappedFile::AccessMode::Write ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
+	ETConstexpr ETInlineHint ETPureFunctionHint DWORD PermissionsFromAccess(MappedFile::AccessType access) ETNoexceptHint {
+		return access < MappedFile::AccessType::Write ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 	}
 
 	// ---------------------------------------------------
 
-	static ETInlineHint ETPureFunctionHint DWORD ProtectModeFromAccessMode(MappedFile::AccessMode mode) {
-		return mode < MappedFile::AccessMode::Write ? PAGE_READONLY : PAGE_READWRITE;
+	ETConstexpr ETInlineHint ETPureFunctionHint DWORD ProtectModeFromAccess(MappedFile::AccessType access) ETNoexceptHint {
+		return access < MappedFile::AccessType::Write ? PAGE_READONLY : PAGE_READWRITE;
 	}
 
 	// ---------------------------------------------------
 
-	static ETInlineHint ETPureFunctionHint DWORD MapModeFromAccessMode(MappedFile::AccessMode mode) {
+	ETConstexpr ETInlineHint ETPureFunctionHint DWORD MapModeFromAccess(MappedFile::AccessType access) ETNoexceptHint {
 		//	Officially, FILE_MAP_WRITE implies FILE_MAP_READ but this is still a little more clear.
-		return mode < MappedFile::AccessMode::Write ? FILE_MAP_READ : (FILE_MAP_READ | FILE_MAP_WRITE);
+		return access < MappedFile::AccessType::Write ? FILE_MAP_READ : (FILE_MAP_READ | FILE_MAP_WRITE);
 	}
 
 	// ---------------------------------------------------
 
-	static ETInlineHint ETPureFunctionHint Range<char*> MapFile(const PlatformChar* const path, DWORD creationDisposition, MappedFile::AccessMode accessMode, uint64 offsetInBytes, size_t mappingSizeInBytes) {
-		//	Begin by creating a handle to the file.
-		const HANDLE file(CreateFileW(path, FilePermissionsFromAccessMode(accessMode), FILE_SHARE_READ, nullptr, creationDisposition, FILE_FLAG_POSIX_SEMANTICS, nullptr));
-		if (file == INVALID_HANDLE_VALUE) {
-			return Range<char*>();
-		}
+	ETInlineHint ETPureFunctionHint ErrorCode MapFile(Range<char*>& outMapping, const PlatformChar* const path, DWORD disposition, MappedFile::AccessType access, uint64 byteOffset, size_t byteSize) ETNoexceptHint {
+		const HANDLE file(CreateFileW(path, PermissionsFromAccess(access), FILE_SHARE_READ, /*lpSecurityAttributes =*/nullptr, disposition, FILE_FLAG_POSIX_SEMANTICS, /*hTemplateFile =*/nullptr));
+		ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::Unspecified);
 		ET_AT_SCOPE_EXIT(CloseHandle(file));
 
-		if (mappingSizeInBytes == 0u) {
+		if (byteSize == MappedFile::LengthOfFile) {
 			BY_HANDLE_FILE_INFORMATION fileInfo;
-
-			if (GetFileInformationByHandle(file, &fileInfo) == 0) {
-				return Range<char*>();
-			}
-
-			mappingSizeInBytes = (static_cast<uint64>(fileInfo.nFileSizeHigh) << 32u) | fileInfo.nFileSizeLow;
+			ET_ABORT_UNLESS((GetFileInformationByHandle(file, ETAddressOf(fileInfo)) != 0) ? Error::None : Error::Unspecified);
+			byteSize = (uint64(fileInfo.nFileSizeHigh) << 32u) | fileInfo.nFileSizeLow;
 		}
 
 		//	Next, map a range of the file according to the desired size.
 		ULARGE_INTEGER sizeHelper;
-		sizeHelper.QuadPart = mappingSizeInBytes;
+		sizeHelper.QuadPart = byteSize;
 
-		const HANDLE mapping(CreateFileMappingW(file, nullptr, ProtectModeFromAccessMode(accessMode), sizeHelper.HighPart, sizeHelper.LowPart, nullptr));
-		if (!mapping) {
-			return Range<char*>();
-		}
+		const HANDLE mapping(CreateFileMappingW(file, /*lpFileMappingAttributes =*/nullptr, ProtectModeFromAccess(access), sizeHelper.HighPart, sizeHelper.LowPart, /*lpName =*/nullptr));
+		ET_ABORT_UNLESS(mapping != nullptr ? Error::None : Error::Unspecified);
 		ET_AT_SCOPE_EXIT(CloseHandle(mapping));
 
 		ULARGE_INTEGER offsetHelper;
-		offsetHelper.QuadPart = offsetInBytes;
+		offsetHelper.QuadPart = byteOffset;
+		const auto view(static_cast<char*>(MapViewOfFile(mapping, MapModeFromAccess(access), offsetHelper.HighPart, offsetHelper.LowPart, byteSize)));
+		ET_ABORT_UNLESS(view ? Error::None : Error::Unspecified);
 
-		char* const view(static_cast<char*>(MapViewOfFile(mapping, MapModeFromAccessMode(accessMode), offsetHelper.HighPart, offsetHelper.LowPart, mappingSizeInBytes)));
-		if (!view) {
-			return Range<char*>();
-		}
-
-		return { view, view + mappingSizeInBytes };
+		outMapping = { view, view + byteSize };
+		return Error::None;
 	}
 
 } // anonymous namespace
 
-MappedFile::MappedFile(MappedFile&& other) :
-	_access(other._access),
-	_region(eastl::exchange(other._region, Range<char*>())) {}
+MappedFile::MappedFile() ETNoexceptHint : _access(), _mapping(nullptr, nullptr) {}
 
 // ---------------------------------------------------
 
-MappedFile::MappedFile() :
-	_access(),
-	_region() {}
+MappedFile::MappedFile(MappedFile&& file) ETNoexceptHint : MappedFile() {
+	Swap(*this, file);
+}
 
 // ---------------------------------------------------
 
 MappedFile::~MappedFile() {
-	if (_region.IsEmpty()) {
+	if (_mapping.IsEmpty()) {
 		return;
 	}
 
-	UnmapViewOfFile(_region.Begin());
+	UnmapViewOfFile(_mapping.Begin());
 }
 
 // ---------------------------------------------------
 
-ErrorCode MappedFile::ClearOrCreate(AccessMode accessMode, const PlatformChar* path, size_t fileSizeInBytes) {
+ErrorCode MappedFile::ClearOrCreate(AccessType accessMode, const PlatformChar* path, size_t byteLength) ETNoexceptHint {
 	/*	The client must explicitly specify a size when creating a file; we cannot infer a value based on the size of the file since we may not be opening
-	 *	something that already exists. */
-	if (fileSizeInBytes == EndOfFile || fileSizeInBytes == 0u) {
+	 *	something that already exists. Likewise, we cannot create a file with 0 size. */
+	if (byteLength == LengthOfFile || byteLength == 0u) {
 		return Error::InvalidParameter;
 	}
 
-	Range<char*> region(MapFile(path, TRUNCATE_EXISTING, accessMode, 0u, fileSizeInBytes));
-	ET_FAIL_UNLESS(region.IsEmpty() ? Error::InvalidParameter : Error::None);
+	Range<char*> mapping(nullptr, nullptr);
+	ET_ABORT_UNLESS(MapFile(mapping, path, TRUNCATE_EXISTING, accessMode, 0u, byteLength));
+	ET_AT_SCOPE_EXIT(if (mapping) UnmapViewOfFile(mapping.Begin()));
 
-	Swap(_region, region);
-
-	if (!region.IsEmpty()) {
-		UnmapViewOfFile(region.Begin());
-	}
+	Swap(_mapping, mapping);
 
 	return Error::None;
 }
 
 // ---------------------------------------------------
 
-ErrorCode MappedFile::Open(AccessMode accessMode, const PlatformChar* path, uint64 offsetInBytes /*= StartOfFile*/, size_t mappedLengthInBytes /*= EndOfFile */) {
-	Range<char*> region(MapFile(path, OPEN_EXISTING, accessMode, offsetInBytes, (EndOfFile == mappedLengthInBytes ? 0u : mappedLengthInBytes)));
-	ET_FAIL_UNLESS(region.IsEmpty() ? Error::InvalidParameter : Error::None);
+ErrorCode MappedFile::Open(AccessType access, const PlatformChar* path, uint64 byteOffset, size_t byteLength) ETNoexceptHint {
+	Range<char*> mapping(nullptr, nullptr);
+	ET_ABORT_UNLESS(MapFile(mapping, path, OPEN_EXISTING, access, byteOffset, byteLength));
+	ET_AT_SCOPE_EXIT(if (mapping) UnmapViewOfFile(mapping.Begin()));
 
-	Swap(_region, region);
-
-	if (!region.IsEmpty()) {
-		UnmapViewOfFile(region.Begin());
-	}
+	Swap(_mapping, mapping);
 
 	return Error::None;
 }
 
 // ---------------------------------------------------
 
-bool MappedFile::HasAccessLevel(AccessMode access) const {
+bool MappedFile::HasAccess(AccessType access) const ETNoexceptHint {
 	return access <= _access;
 }
 
 // ---------------------------------------------------
 
-size_t MappedFile::GetSizeInBytes() const {
-	return _region.GetSize();
+size_t MappedFile::GetSizeInBytes() const ETNoexceptHint {
+	return _mapping.GetSize();
 }
 
 // ---------------------------------------------------
 
-void MappedFile::Prefetch(size_t offsetInBytes, size_t rangeSizeInBytes) const {
-	Prefetch(GetRange<const char>(offsetInBytes, rangeSizeInBytes));
+void MappedFile::Prefetch(size_t byteOffset, size_t byteLength) const ETNoexceptHint {
+	Prefetch(GetRange<const char>(byteOffset, byteLength));
 }
 
 // ---------------------------------------------------
 
-void MappedFile::Prefetch(Range<const char*> range) const {
-#if WIN8_MEMORY_MAPPED_FILE_AVAILABLE
+void MappedFile::Prefetch(Range<const char*> range) const ETNoexceptHint {
+#if PREFETCHVIRTUALMEMORY_AVAILABLE
 	WIN32_MEMORY_RANGE_ENTRY ranges[] = { { const_cast<char*>(range.Begin()), range.GetSize() } };
-
-	PrefetchVirtualMemory(GetCurrentProcess(), _countof(ranges), ranges, 0);
+	PrefetchVirtualMemory(GetCurrentProcess(), ETCountOf(ranges), ranges, 0);
 #else
+	COMPILERMESSAGEGENERIC("Windows 8 PrefetchVirtualMemory-optimized file mapping object unavailable, use the Windows 8 SDK or newer to enable")
 	while (range) {
 		//	TODO: Is it possible to use prefetch instructions to avoid polluting the processor caches?
 		register int readTarget(*reinterpret_cast<const volatile char*>(range.Begin()));
@@ -186,40 +167,33 @@ void MappedFile::Prefetch(Range<const char*> range) const {
 
 		range.SetBegin(Min(range.Begin() + PrefetchStride, range.End()));
 	}
-#endif
+#endif // if PREFETCHVIRTUALMEMORY_AVAILABLE
 }
 
 // ---------------------------------------------------
 
-void MappedFile::Evict(size_t offsetInBytes, size_t rangeSizeInBytes) const {
-	Evict(GetRange<const char>(offsetInBytes, rangeSizeInBytes));
+void MappedFile::Evict(size_t byteOffset, size_t byteLength) const ETNoexceptHint {
+	Evict(GetRange<const char>(byteOffset, byteLength));
 }
 
 // ---------------------------------------------------
 
-void MappedFile::Evict(Range<const char*> /*range*/) const {
+void MappedFile::Evict(Range<const char*> /*range*/) const ETNoexceptHint {
 	//	Unlike POSIX, Windows lacks any mechanism to evict pages from the cache, so this is a no-op.
 }
 
 // ---------------------------------------------------
 
-void* MappedFile::Get(size_t rawFileOffsetInBytes) const {
-	char* const result(_region.Begin() + rawFileOffsetInBytes);
-
-	return result <= _region.End() ? result : nullptr;
+void* MappedFile::Get(size_t byteOffset) const ETNoexceptHint {
+	char* const result(_mapping.Begin() + byteOffset);
+	return result <= _mapping.End() ? result : nullptr;
 }
 
 // ---------------------------------------------------
 
-MappedFile& MappedFile::operator=(MappedFile&& other) {
-	if (_region) {
-		UnmapViewOfFile(_region.Begin());
-	}
-
-	_access = eastl::move(other._access);
-	_region = eastl::exchange(other._region, Range<char*>());
-
-	return *this;
+void Swap(MappedFile& lhs, MappedFile& rhs) ETNoexceptHint {
+	Swap(lhs._access, rhs._access);
+	Swap(lhs._mapping, rhs._mapping);
 }
 
 } // namespace Eldritch2

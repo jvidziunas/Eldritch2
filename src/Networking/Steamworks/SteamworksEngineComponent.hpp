@@ -16,33 +16,24 @@
 #include <Core/EngineComponent.hpp>
 #include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6340) Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6340)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6340)
 #include <steamclientpublic.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
+	using NetworkPort = uint16;
+
+	// ---
+
 	class SteamworksEngineComponent : public Core::EngineComponent {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using Port = uint16;
-
-	public:
-		enum : Port {
-			DefaultWorldPortBegin = 6670u,
-			DefaultWorldPortEnd   = 6689u,
-			DefaultSteamPort      = 6690u
-		};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref SteamworksEngineComponent instance.
-		SteamworksEngineComponent(const ObjectLocator& services, Logging::Log& log);
+		SteamworksEngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		SteamworksEngineComponent(const SteamworksEngineComponent&) = delete;
 
@@ -76,10 +67,10 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	private:
 		//!	Mutable so logs can be written in const methods.
-		mutable Logging::ChildLog _log;
-		Port                      _steamPort;
-		IdentifierPool<Port>      _worldPorts;
-		HashSet<CSteamID>         _bannedIds;
+		mutable Logging::ChildLog   _log;
+		NetworkPort                 _steamPort;
+		IdentifierPool<NetworkPort> _worldPorts;
+		HashSet<CSteamID>           _bannedIds;
 	};
 
 }}} // namespace Eldritch2::Networking::Steamworks

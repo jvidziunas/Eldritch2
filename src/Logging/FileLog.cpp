@@ -21,17 +21,17 @@ namespace Eldritch2 { namespace Logging {
 
 	// ---------------------------------------------------
 
-	void FileLog::Write(const Utf8Char* const string, size_t lengthInOctets) {
+	void FileLog::Write(const Utf8Char* string, size_t lengthInOctets) ETNoexceptHint {
 		_appender.Append(string, lengthInOctets);
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode FileLog::BindResources(StringView<PlatformChar> path) {
+	ErrorCode FileLog::BindResources(PlatformStringView path) {
+		const Path   absolutePath(MallocAllocator("Log Path Temporary Allocator"), KnownDirectory::Logs, path);
 		FileAppender appender;
-		Path<>       absolutePath;
 
-		ET_FAIL_UNLESS(appender.CreateOrTruncate(absolutePath.Assign(KnownDirectory::Logs, path)));
+		ET_ABORT_UNLESS(appender.CreateOrTruncate(absolutePath));
 		Swap(_appender, appender);
 
 		return Error::None;

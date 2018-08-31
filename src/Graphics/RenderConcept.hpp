@@ -15,20 +15,18 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Scheduling {
+namespace Eldritch2 { namespace Scheduling {
 	class JobExecutor;
-}
-} // namespace Eldritch2::Scheduling
+}} // namespace Eldritch2::Scheduling
 
 namespace Eldritch2 { namespace Graphics {
 
 	template <typename Instance, class Allocator = Eldritch2::MallocAllocator>
-	class RenderConcept : public ArrayBvh<Instance*, Allocator> {
+	class RenderConcept : public ArrayBvh<Instance, Allocator> {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using HierarchyType = ArrayBvh<Instance*, Allocator>;
+		using HierarchyType = ArrayBvh<Instance, Allocator>;
 		using AllocatorType = typename HierarchyType::AllocatorType;
 		using ValueType     = typename HierarchyType::ValueType;
 
@@ -54,7 +52,7 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		bool ShouldRebuildHierarchy(MemoryOrder order = std::memory_order_consume);
+		bool ShouldRebuildHierarchy(MemoryOrder order = std::memory_order_consume) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -90,9 +88,9 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		ConstIterator Begin() const;
+		ConstIterator Begin() const ETNoexceptHint;
 
-		ConstIterator End() const;
+		ConstIterator End() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 

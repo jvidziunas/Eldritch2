@@ -18,20 +18,14 @@
 namespace Eldritch2 {
 
 template <typename Value, typename Allocator, typename Container>
-ETInlineHint Queue<Value, Allocator, Container>::Queue(const Queue<Value, Allocator, Container>& queue, const AllocatorType& allocator) :
-	c(queue.c, allocator) {}
+ETInlineHint Queue<Value, Allocator, Container>::Queue(const AllocatorType& allocator, const Queue<Value, Allocator, Container>& queue) :
+	c(allocator, queue.c) {}
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator, typename Container>
 ETInlineHint Queue<Value, Allocator, Container>::Queue(const AllocatorType& allocator) :
 	c(allocator) {}
-
-// ---------------------------------------------------
-
-template <typename Value, typename Allocator, typename Container>
-ETInlineHint Queue<Value, Allocator, Container>::Queue(Queue<Value, Allocator, Container>&& queue) :
-	c(eastl::move(queue.c)) {}
 
 // ---------------------------------------------------
 
@@ -64,9 +58,9 @@ ETInlineHint typename Queue<Value, Allocator, Container>::ValueType& Queue<Value
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator, typename Container>
-template <typename... Args>
-ETInlineHint void Queue<Value, Allocator, Container>::EmplaceBack(Args&&... args) {
-	c.EmplaceBack(eastl::forward<Args>(args)...);
+template <typename... Arguments>
+ETInlineHint void Queue<Value, Allocator, Container>::EmplaceBack(Arguments&&... arguments) {
+	c.EmplaceBack(eastl::forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
@@ -80,7 +74,7 @@ ETInlineHint void Queue<Value, Allocator, Container>::Push(const ValueType& valu
 
 template <typename Value, typename Allocator, typename Container>
 ETInlineHint void Queue<Value, Allocator, Container>::Push(ValueType&& value) {
-	c.Append(eastl::forward<ValueType>(value));
+	c.Append(eastl::move(value));
 }
 
 // ---------------------------------------------------
@@ -128,7 +122,9 @@ ETInlineHint bool Queue<Value, Allocator, Container>::IsEmpty() const {
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator, typename Container>
-ETInlineHint void Swap(Queue<Value, Allocator, Container>& queue0, Queue<Value, Allocator, Container>& queue1) {
+ETInlineHint void Swap(Queue<Value, Allocator, Container>& lhs, Queue<Value, Allocator, Container>& rhs) {
+	using ::Eldritch2::Swap;
+
 	Swap(c, queue.c);
 }
 

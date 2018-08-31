@@ -24,9 +24,9 @@ class MallocAllocator : public Allocator {
 
 public:
 	//!	Constructs this @ref MallocAllocator instance.
-	MallocAllocator(const Utf8Char* name = "<unnamed allocator>");
+	MallocAllocator(const Utf8Char* name = "<unnamed allocator>") ETNoexceptHint;
 	//!	Constructs this @ref MallocAllocator instance.
-	MallocAllocator(const MallocAllocator&);
+	MallocAllocator(const MallocAllocator&) ETNoexceptHint;
 
 	~MallocAllocator() = default;
 
@@ -44,11 +44,17 @@ public:
 	// ---------------------------------------------------
 
 public:
-	MallocAllocator& operator=(const MallocAllocator&);
+	MallocAllocator& operator=(const MallocAllocator&) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	friend void Swap(MallocAllocator&, MallocAllocator&);
+	friend void Swap(MallocAllocator&, MallocAllocator&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Common/Memory/MallocAllocator.inl>
+//------------------------------------------------------------------//

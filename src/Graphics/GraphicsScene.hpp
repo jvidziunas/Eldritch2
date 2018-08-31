@@ -32,28 +32,28 @@ namespace Graphics {
 
 namespace Eldritch2 { namespace Graphics {
 
-	enum class GeometryType {
+	enum GeometryType {
 		StaticMeshes,
 		Meshes,
 
-		COUNT
+		GeometryTypes
 	};
 
 	// ---
 
-	enum class LightType {
+	enum LightType {
 		StaticLights,
 		DynamicLights,
 
-		COUNT
+		LightTypes
 	};
 
 	// ---
 
-	enum class PortalViewType {
+	enum PortalViewType {
 		PortalViews,
 
-		COUNT
+		PortalViewTypes
 	};
 
 	// ---
@@ -109,12 +109,13 @@ namespace Eldritch2 { namespace Graphics {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		template <typename Code>
 		class LeafExtractor {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Constructs this @ref LeafExtractor instance.
-			LeafExtractor(const LeafExtractor&) = default;
+			LeafExtractor(const LeafExtractor&) ETNoexceptHint = default;
 			//!	Constructs this @ref LeafExtractor instance.
 			LeafExtractor(Vector cellLength);
 
@@ -123,13 +124,13 @@ namespace Eldritch2 { namespace Graphics {
 			// ---------------------------------------------------
 
 		public:
-			uintptr operator()(const MeshInstance& geometry) const;
-			uintptr operator()(const Light& light) const;
+			Code operator()(const MeshInstance& geometry) const ETNoexceptHint;
+			Code operator()(const Light& light) const ETNoexceptHint;
 
 			// - DATA MEMBERS ------------------------------------
 
 		private:
-			Vector _inverseCellLength;
+			Vector _reciprocalLength;
 		};
 
 		// ---
@@ -152,14 +153,14 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		const PortalViewConcept& GetConcept(PortalViewType concept) const;
-		const GeometryConcept&   GetConcept(GeometryType concept) const;
-		const LightConcept&      GetConcept(LightType concept) const;
+		const PortalViewConcept& GetConcept(PortalViewType concept) const ETNoexceptHint;
+		const GeometryConcept&   GetConcept(GeometryType concept) const ETNoexceptHint;
+		const LightConcept&      GetConcept(LightType concept) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void BuildAccelerators(Scheduling::JobExecutor& executor);
+		void UpdateAccelerators(Scheduling::JobExecutor& executor);
 
 		// ---------------------------------------------------
 
@@ -171,9 +172,9 @@ namespace Eldritch2 { namespace Graphics {
 	private:
 		Vector            _geometryCellExtent;
 		Vector            _lightCellExtent;
-		PortalViewConcept _portalViewConcepts[PortalViewType::COUNT];
-		GeometryConcept   _geometryConcepts[GeometryType::COUNT];
-		LightConcept      _lightConcepts[LightType::COUNT];
+		PortalViewConcept _portalViewConcepts[PortalViewTypes];
+		GeometryConcept   _geometryConcepts[GeometryTypes];
+		LightConcept      _lightConcepts[LightTypes];
 	};
 
 }} // namespace Eldritch2::Graphics

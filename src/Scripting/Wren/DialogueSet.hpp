@@ -15,10 +15,6 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetViews {
-	class DialogueSetAsset;
-}}}} // namespace Eldritch2::Scripting::Wren::AssetViews
-
 struct WrenHandle;
 struct WrenVM;
 
@@ -61,21 +57,12 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 		// ---------------------------------------------------
 
-	public:
-		template <class Allocator>
-		MatchList<Allocator> MatchAll(const Allocator& allocator, WrenHandle* facts) const;
-
-		RuleIterator Match(WrenHandle* facts) const;
-
-		// ---------------------------------------------------
-
 		//!	Disable copy assignment.
 		DialogueSet& operator=(const DialogueSet&) = delete;
 
-		// - DATA MEMBERS ------------------------------------
+		// ---------------------------------------------------
 
-	private:
-		const AssetViews::DialogueSetAsset* _asset;
+		friend void Swap(DialogueSet&, DialogueSet&);
 	};
 
 }}} // namespace Eldritch2::Scripting::Wren

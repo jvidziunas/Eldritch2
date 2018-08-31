@@ -16,39 +16,39 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Common/Algorithms.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
 ETInlineHint AbstractArenaAllocator::ScopedCheckpoint::ScopedCheckpoint(AbstractArenaAllocator& arena) :
-	_arena(eastl::addressof(arena)),
+	_arena(ETAddressOf(arena)),
 	_checkpoint(arena.CreateCheckpoint()) {}
 
 // ---------------------------------------------------
 
-ETInlineHint AbstractArenaAllocator::ScopedCheckpoint::~ScopedCheckpoint() {
+ETInlineHint ETForceInlineHint AbstractArenaAllocator::ScopedCheckpoint::~ScopedCheckpoint() {
 	_arena->RestoreCheckpoint(_checkpoint);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint const char* AbstractArenaAllocator::GetCurrent(MemoryOrder order) const {
+ETInlineHint ETForceInlineHint const char* AbstractArenaAllocator::GetCurrent(MemoryOrder order) const {
 	return _arena.load(order);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint const char* AbstractArenaAllocator::GetEnd() const {
+ETInlineHint ETForceInlineHint const char* AbstractArenaAllocator::GetEnd() const {
 	return _arenaEnd;
 }
 
 // ---------------------------------------------------
 
 template <size_t sizeInBytes>
-ETInlineHint StackAllocator<sizeInBytes>::StackAllocator(const Utf8Char* const name) :
+ETInlineHint ETForceInlineHint StackAllocator<sizeInBytes>::StackAllocator(const Utf8Char* const name) :
 	AbstractArenaAllocator(name) {
-	Reset(eastl::begin(_stack), eastl::end(_stack));
+	Reset(Begin(_stack), End(_stack));
 }
 
 } // namespace Eldritch2

@@ -16,116 +16,114 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class GraphicsPipeline;
 	class Gpu;
 }}} // namespace Eldritch2::Graphics::Vulkan
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	namespace Detail {
 
-		class ETPureAbstractHint AbstractBuffer {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	class ETPureAbstractHint AbstractBuffer {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		protected:
-			//!	Disable copy construction.
-			AbstractBuffer(const AbstractBuffer&) = delete;
-			//!	Disable move construction; clients should implement themselves via Swap().
-			AbstractBuffer(AbstractBuffer&&) = delete;
-			//!	Constructs this @ref AbstractBuffer instance.
-			AbstractBuffer();
+	protected:
+		//!	Disable copy construction.
+		AbstractBuffer(const AbstractBuffer&) = delete;
+		//!	Disable move construction; clients should implement themselves via Swap().
+		AbstractBuffer(AbstractBuffer&&) = delete;
+		//!	Constructs this @ref AbstractBuffer instance.
+		AbstractBuffer();
 
-			~AbstractBuffer();
+		~AbstractBuffer();
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		public:
-			VkBuffer Get() ETNoexceptHint;
+	public:
+		VkBuffer Get() const ETNoexceptHint;
 
-			operator VkBuffer() ETNoexceptHint;
+		operator VkBuffer() const ETNoexceptHint;
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		public:
-			void FreeResources(Gpu& gpu);
+	public:
+		void FreeResources(Gpu& gpu);
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		protected:
-			VkResult BindResources(Gpu& gpu, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo);
+	protected:
+		VkResult BindResources(Gpu& gpu, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo);
 
-			void GetAllocationInfo(Gpu& gpu, VmaAllocationInfo& info);
+		void GetAllocationInfo(Gpu& gpu, VmaAllocationInfo& info);
 
-			VkResult MapHostPointer(Gpu& gpu, void*& outBase) const;
+		VkResult MapHostPointer(Gpu& gpu, void*& outBase) const;
 
-			void UnmapHostPointer(Gpu& gpu) const;
+		void UnmapHostPointer(Gpu& gpu) const;
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-			//!	Disable copy assignment.
-			AbstractBuffer& operator=(const AbstractBuffer&) = delete;
+		//!	Disable copy assignment.
+		AbstractBuffer& operator=(const AbstractBuffer&) = delete;
 
-			// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
-		private:
-			VmaAllocation _backing;
-			VkBuffer      _buffer;
+	private:
+		VmaAllocation _backing;
+		VkBuffer      _buffer;
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-			friend void Swap(AbstractBuffer&, AbstractBuffer&);
-		};
+		friend void Swap(AbstractBuffer&, AbstractBuffer&);
+	};
 
-		// ---
+	// ---
 
-		class ETPureAbstractHint AbstractImage {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	class ETPureAbstractHint AbstractImage {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		protected:
-			//!	Disable copy construction.
-			AbstractImage(const AbstractImage&) = delete;
-			//!	Disable move construction; clients should implement themselves via Swap().
-			AbstractImage(AbstractImage&&) = delete;
-			//!	Constructs this @ref AbstractImage instance.
-			AbstractImage();
+	protected:
+		//!	Disable copy construction.
+		AbstractImage(const AbstractImage&) = delete;
+		//!	Disable move construction; clients should implement themselves via Swap().
+		AbstractImage(AbstractImage&&) = delete;
+		//!	Constructs this @ref AbstractImage instance.
+		AbstractImage();
 
-			~AbstractImage();
+		~AbstractImage();
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		public:
-			VkImage Get() ETNoexceptHint;
+	public:
+		VkImage Get() const ETNoexceptHint;
 
-			operator VkImage() ETNoexceptHint;
+		operator VkImage() const ETNoexceptHint;
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		public:
-			void FreeResources(Gpu& gpu);
+	public:
+		void FreeResources(Gpu& gpu);
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-		protected:
-			VkResult BindResources(Gpu& gpu, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo);
+	protected:
+		VkResult BindResources(Gpu& gpu, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo);
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-			//!	Disable copy assignment.
-			AbstractImage& operator=(const AbstractImage&) = delete;
+		//!	Disable copy assignment.
+		AbstractImage& operator=(const AbstractImage&) = delete;
 
-			// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
-		private:
-			VmaAllocation _backing;
-			VkImage       _image;
+	private:
+		VmaAllocation _backing;
+		VkImage       _image;
 
-			// ---------------------------------------------------
+		// ---------------------------------------------------
 
-			friend void Swap(AbstractImage&, AbstractImage&);
-		};
+		friend void Swap(AbstractImage&, AbstractImage&);
+	};
 
-	} // namespace Detail
+	// ---
 
-	class VertexBuffer : public Detail::AbstractBuffer {
+	class VertexBuffer : public AbstractBuffer {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -155,7 +153,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
-	class IndexBuffer : public Detail::AbstractBuffer {
+	class IndexBuffer : public AbstractBuffer {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -185,7 +183,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
-	class TransferBuffer : public Detail::AbstractBuffer {
+	class TransferBuffer : public AbstractBuffer {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -201,8 +199,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		using Detail::AbstractBuffer::MapHostPointer;
-		using Detail::AbstractBuffer::UnmapHostPointer;
+		using AbstractBuffer::MapHostPointer;
+		using AbstractBuffer::UnmapHostPointer;
 
 		// ---------------------------------------------------
 
@@ -221,7 +219,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
-	class UniformBuffer : public Detail::AbstractBuffer {
+	class UniformBuffer : public AbstractBuffer {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -237,8 +235,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		using Detail::AbstractBuffer::MapHostPointer;
-		using Detail::AbstractBuffer::UnmapHostPointer;
+		using AbstractBuffer::MapHostPointer;
+		using AbstractBuffer::UnmapHostPointer;
 
 		// ---------------------------------------------------
 
@@ -257,6 +255,60 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
+	class VertexCache {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		VertexCache(const VertexCache&) = delete;
+		//! Constructs this @ref VertexCache instance.
+		VertexCache();
+
+		~VertexCache() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult AllocateVertices(VkDeviceSize& outOffset, uint32 size);
+		VkResult AllocateIndices(VkDeviceSize& outOffset, uint32 size);
+
+		void DeallocateVertices(VkDeviceSize offset, uint32 size);
+		void DeallocateIndices(VkDeviceSize offset, uint32 size);
+
+		// ---------------------------------------------------
+
+	public:
+		VkBuffer GetVertexBuffer() const ETNoexceptHint;
+
+		VkBuffer GetIndexBuffer() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, VkDeviceSize vertexCacheSize, VkDeviceSize indexCacheSize);
+
+		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		VertexCache& operator=(const VertexCache&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		VertexBuffer                 _vertices;
+		IdentifierPool<VkDeviceSize> _vertexRanges;
+		IndexBuffer                  _indices;
+		IdentifierPool<VkDeviceSize> _indexRanges;
+
+		// ---------------------------------------------------
+
+		friend void Swap(VertexCache&, VertexCache&);
+	};
+
+	// ---
+
 	class Mesh {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -266,25 +318,31 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Constructs this @ref Mesh instance.
 		Mesh(Mesh&&);
 		//!	Constructs this @ref Mesh instance.
-		Mesh() = default;
+		Mesh() ETNoexceptHint;
 
 		~Mesh() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		const VertexBuffer& GetVertices() const;
-		VertexBuffer&       GetVertices();
+		VkBuffer GetVertices() const ETNoexceptHint;
 
-		const IndexBuffer& GetIndices() const;
-		IndexBuffer&       GetIndices();
+		VkBuffer GetIndices() const ETNoexceptHint;
+
+		VkDeviceSize GetVertexOffset() const ETNoexceptHint;
+
+		VkDeviceSize GetIndexOffset() const ETNoexceptHint;
+
+		VkDeviceSize GetVerticesSize() const ETNoexceptHint;
+
+		VkDeviceSize GetIndicesSize() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, uint32_t vertexCount, uint32_t indexCount);
+		VkResult BindResources(VertexCache& cache, uint32 verticesSize, uint32 indicesSize);
 
-		void FreeResources(Gpu& gpu);
+		void FreeResources(VertexCache& cache);
 
 		// ---------------------------------------------------
 
@@ -294,17 +352,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VertexBuffer _vertices;
-		IndexBuffer  _indices;
+		VkBuffer     _vertices;
+		VkBuffer     _indices;
+		VkDeviceSize _verticesOffset;
+		VkDeviceSize _indicesOffset;
+		uint32       _verticesSize;
+		uint32       _indicesSize;
 
 		// ---------------------------------------------------
 
-		friend void Swap(Mesh&, Mesh&);
+		friend void Swap(Mesh&, Mesh&) ETNoexceptHint;
 	};
 
 	// ---
 
-	class SparseTileCache : public Detail::AbstractBuffer {
+	class SparseTileCache : public AbstractBuffer {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -339,22 +401,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		using Detail::AbstractBuffer::MapHostPointer;
-		using Detail::AbstractBuffer::UnmapHostPointer;
+		using AbstractBuffer::MapHostPointer;
+		using AbstractBuffer::UnmapHostPointer;
 
 		// ---------------------------------------------------
 
 	public:
-		bool ShouldCacheTile(Tile tile, VkDeviceSize& reservedOffset);
-
-		void NotifyCached(Tile tile, VkDeviceSize offset);
-
-		// ---------------------------------------------------
-
-	public:
-		bool IsCached(Tile tile, VkDeviceSize& offset) const ETNoexceptHint;
+		bool IsCached(VkDeviceSize& outOffset, Tile tile) const ETNoexceptHint;
 
 		bool IsLoading(Tile tile) const ETNoexceptHint;
+
+		void NotifyCached(VkDeviceSize offset, Tile tile);
 
 		// ---------------------------------------------------
 
@@ -365,7 +422,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		//!	 Disable copy assignment.
+		//! Disable copy assignment.
 		SparseTileCache& operator=(const SparseTileCache&) = delete;
 
 		// ---------------------------------------------------
@@ -381,7 +438,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
-	class ShaderImage : public Detail::AbstractImage {
+	class ShaderImage : public AbstractImage {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -397,7 +454,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers = 1u);
+		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers);
 
 		// ---------------------------------------------------
 
@@ -438,21 +495,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		VkOffset3D GetTexel(Tile tile) const ETNoexceptHint;
 
-		Tile GetTile(VkOffset3D texel, uint32_t mip = 0) const ETNoexceptHint;
+		Tile GetTile(VkOffset3D texel, uint32_t subresource = 0) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkExtent3D GetImageExtentInTexels() const ETNoexceptHint;
+		VkExtent3D GetImageExtent() const ETNoexceptHint;
 
-		VkExtent3D GetTileExtentInTexels() const ETNoexceptHint;
+		VkExtent3D GetTileExtent() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		bool TouchTile(Tile tile) ETNoexceptHint;
+		bool Touch(Tile tile) ETNoexceptHint;
 
-		Tile EvictTile(Tile tile) ETNoexceptHint;
+		void ReplaceLru(Tile tile) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -474,7 +531,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
-	class SparseShaderImage : public Detail::AbstractImage {
+	class SparseShaderImage : public AbstractImage {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
@@ -499,12 +556,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const TileManager& GetTileManager() const;
+		const TileManager& GetTileManager() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		CacheResult MakeResident(const SparseTileCache& cache, VkOffset3D texel, uint32_t mip);
+		CacheResult MakeResident(const SparseTileCache& cache, VkOffset3D texel, uint32_t subresource);
 		CacheResult MakeResident(const SparseTileCache& cache, TileManager::Tile tile);
 
 		// ---------------------------------------------------

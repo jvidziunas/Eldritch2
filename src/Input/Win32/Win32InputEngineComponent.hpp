@@ -16,7 +16,6 @@
 //==================================================================//
 #include <Input/Win32/DeviceCoordinator.hpp>
 #include <Core/EngineComponent.hpp>
-#include <Scheduling/Thread.hpp>
 #include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 
@@ -29,28 +28,23 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// - TYPE PUBLISHING ---------------------------------
 
 	private:
-		class ReaderThread : public Scheduling::Thread {
+		class ReaderThread : public Thread {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
+			//!	Constructs this @ref ReaderThread instance.
+			ReaderThread(DeviceCoordinator& devices) ETNoexceptHint;
 			//!	Disable copy construction.
 			ReaderThread(const ReaderThread&) = delete;
-			//!	Constructs this @ref ReaderThread instance.
-			ReaderThread(DeviceCoordinator& devices);
 
 			~ReaderThread() = default;
 
 			// ---------------------------------------------------
 
 		public:
-			Utf8Literal GetName() const override sealed;
+			void SetShouldShutDown() ETNoexceptHint override;
 
-			// ---------------------------------------------------
-
-		public:
-			void SetShouldShutDown() override;
-
-			void Run() override sealed;
+			ErrorCode EnterOnCaller() override sealed;
 
 			// ---------------------------------------------------
 
@@ -61,8 +55,8 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 		private:
 			/*!	Win32 raw input requires a window for input registration. The handle is exposed primarily for the
-			 *	engine component to issue a shutdown request to the sampling thread when the application terminates,
-			 *	as there is little need to push state to the window. */
+				engine component to issue a shutdown request to the sampling thread when the application terminates,
+				as there is little need to push state to the window. */
 			Atomic<HWND>       _window;
 			DeviceCoordinator* _devices;
 		};
@@ -70,10 +64,10 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Win32InputEngineComponent instance.
-		Win32InputEngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		Win32InputEngineComponent(const Win32InputEngineComponent&) = delete;
+		//!	Constructs this @ref Win32InputEngineComponent instance.
+		Win32InputEngineComponent(const ObjectLocator& services);
 
 		~Win32InputEngineComponent();
 

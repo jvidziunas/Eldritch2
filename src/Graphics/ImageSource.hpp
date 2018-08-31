@@ -29,10 +29,18 @@ namespace Eldritch2 { namespace Graphics {
 
 		// ---
 
+		struct ImageDescription {
+			GpuFormat format;
+			uint32    slices;
+			uint32    mips;
+		};
+
+		// ---
+
 		struct StreamRequest {
+			uint32 subimageId;
 			uint32 scanlineStrideInBytes;
 			uint32 sliceStrideInBytes;
-			uint32 subimageId;
 			void*  target;
 		};
 
@@ -50,17 +58,14 @@ namespace Eldritch2 { namespace Graphics {
 
 	public:
 		virtual SubimageDescription GetDescription(uint32 subimageId) const abstract;
-
-		virtual uint32 GetSliceCount() const abstract;
-
-		virtual uint32 GetMipCount() const abstract;
+		virtual ImageDescription    GetDescription() const abstract;
 
 		virtual void StreamTexels(const StreamRequest& request) const abstract;
 	};
 
 	// ---
 
-	ETPureFunctionHint uint32 GetSubimageIndex(uint32 slice, uint32 mip, uint32 totalMips);
+	ETPureFunctionHint uint32 GetSubimageIndex(uint32 slice, uint32 mip, uint32 imageMips) ETNoexceptHint;
 
 }} // namespace Eldritch2::Graphics
 

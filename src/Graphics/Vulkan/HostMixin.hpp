@@ -15,44 +15,37 @@
 #include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	template <class EldritchAllocator>
 	class HostMixin : public EldritchAllocator {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref HostMixin instance.
+		//!	Constructs this @ref HostMixin instance.
 		template <typename... Arguments, class = eastl::enable_if<eastl::is_constructible<EldritchAllocator, Arguments...>::value>::type>
 		HostMixin(Arguments&&... arguments);
-	//!	Disable copy construction.
+		//!	Disable copy construction.
 		HostMixin(const HostMixin&) = delete;
-	//!	Constructs this @ref HostMixin instance.
+		//!	Constructs this @ref HostMixin instance.
 		HostMixin(HostMixin&&);
 
 		~HostMixin() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		const VkAllocationCallbacks*	AsAllocationCallbacks() const;
+		const VkAllocationCallbacks* GetCallbacks() const ETNoexceptHint;
 
-	// ---------------------------------------------------
+		operator const VkAllocationCallbacks*() const ETNoexceptHint;
 
-	public:
-		operator	const VkAllocationCallbacks*() const;
-
-	// - DATA MEMBERS ------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VkAllocationCallbacks	_callbacks;
+		VkAllocationCallbacks _callbacks;
 	};
 
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Graphics::Vulkan
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

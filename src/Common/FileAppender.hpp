@@ -33,25 +33,25 @@ public:
 	//!	Disable copy construction.
 	FileAppender(const FileAppender&) = delete;
 	//!	Constructs this @ref FileAppender instance.
-	FileAppender(FileAppender&&);
+	FileAppender(FileAppender&&) ETNoexceptHint;
 	//!	Constructs this @ref FileAppender instance.
-	FileAppender();
+	FileAppender() ETNoexceptHint;
 
 	~FileAppender();
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode Append(const void* const sourceData, size_t writeLengthInBytes);
+	ErrorCode Append(const void* const sourceData, size_t writeLengthInBytes) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode CreateOrTruncate(const PlatformChar* path);
+	ErrorCode CreateOrTruncate(const PlatformChar* path) ETNoexceptHint;
 
-	ErrorCode OpenOrCreate(const PlatformChar* path);
+	ErrorCode OpenOrCreate(const PlatformChar* path) ETNoexceptHint;
 
-	ErrorCode Open(const PlatformChar* path);
+	ErrorCode Open(const PlatformChar* path) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -70,7 +70,7 @@ private:
 
 	// ---------------------------------------------------
 
-	friend void Swap(FileAppender&, FileAppender&);
+	friend void Swap(FileAppender&, FileAppender&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

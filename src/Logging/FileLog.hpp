@@ -31,13 +31,13 @@ namespace Eldritch2 { namespace Logging {
 		// ---------------------------------------------------
 
 	public:
-		void Write(const Utf8Char* const string, size_t lengthInOctets) override sealed;
+		void Write(const Utf8Char* string, size_t lengthInOctets) ETNoexceptHint override sealed;
 		using Log::Write;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(StringView<PlatformChar> path);
+		ErrorCode BindResources(PlatformStringView path);
 
 		void FreeResources();
 

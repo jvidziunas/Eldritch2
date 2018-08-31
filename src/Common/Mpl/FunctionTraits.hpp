@@ -13,68 +13,62 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Mpl/TypeTraits.hpp>
-//------------------------------------------------------------------//
-#include <eastl/tuple.h>
+#include <Common/Tuple.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-template <typename Function>
+struct HasDistinctSimdCall : public IntegralConstant<bool, !eastl::is_same<void (*)(), void(ETSimdCall*)()>::value> {};
+
+template <typename Function, bool enabled = true>
 struct FunctionTraits;
 
 // ---
 
 template <typename Return, typename... Arguments>
-struct FunctionTraits<Return(Arguments...)> {
-	static constexpr size_t Arity         = IntegralConstant<size_t, sizeof...(Arguments)>::Value;
-	static constexpr bool   IsConstMethod = false;
-
+struct FunctionTraits<Return(Arguments...), true> {
 	template <size_t index>
-	using ArgumentType = typename eastl::tuple_element<index, eastl::tuple<Arguments...>>::type;
-	using ReturnType   = Return;
+	using ArgumentType   = typename TupleElement<index, Tuple<Arguments...>>::Type;
+	using ArgumentsTuple = Tuple<Arguments...>;
+	using SignatureType  = Return (*)(Arguments...);
+	using ReturnType     = Return;
+
+	static ETConstexpr size_t Arity         = IntegralConstant<size_t, sizeof...(Arguments)>::Value;
+	static ETConstexpr bool   IsConstMethod = false;
 };
 
 // ---
 
 template <typename Return, typename... Arguments>
-struct FunctionTraits<Return (*)(Arguments...)> : public FunctionTraits<Return(Arguments...)> {
-	using NativeSignatureType = Return (*)(Arguments...);
-};
+struct FunctionTraits<Return (*)(Arguments...), true> : public FunctionTraits<Return(Arguments...)> {};
 
-//	Specialization for member functions.
-template <typename Return, class Class, typename... Arguments>
-struct FunctionTraits<Return (Class::*)(Arguments...)> : public FunctionTraits<Return(Arguments...)> {
-	using NativeSignatureType = Return (Class::*)(Arguments...);
-	using ClassType           = Class;
-};
-
-//	Specialization for const member functions.
-template <typename Return, class Class, typename... Arguments>
-struct FunctionTraits<Return (Class::*)(Arguments...) const> : public FunctionTraits<Return (Class::*)(Arguments...)> {
-	static constexpr bool IsConstMethod = true;
-
-	using NativeSignatureType = Return (Class::*)(Arguments...) const;
-	using ClassType           = Class;
-};
-
-#if ET_COMPILER_IS_MSVC
-//	Specialization for SimdCall functions.
 template <typename Return, typename... Arguments>
-struct FunctionTraits<Return(ETSimdCall*)(Arguments...)> : public FunctionTraits<Return(Arguments...)> {
-	using NativeSignatureType = Return(ETSimdCall*)(Arguments...);
+struct FunctionTraits<Return(ETSimdCall*)(Arguments...), HasDistinctSimdCall::Value> : public FunctionTraits<Return(Arguments...)> {
+	using SignatureType = Return(ETSimdCall*)(Arguments...);
 };
 
-//	Specialization for SimdCall member functions.
 template <typename Return, class Class, typename... Arguments>
-struct FunctionTraits<Return (ETSimdCall Class::*)(Arguments...)> : public FunctionTraits<Return (Class::*)(Arguments...)> {
-	using NativeSignatureType = Return (ETSimdCall Class::*)(Arguments...);
+struct FunctionTraits<Return (Class::*)(Arguments...), true> : public FunctionTraits<Return(Arguments...)> {
+	using SignatureType = Return (Class::*)(Arguments...);
+	using ClassType     = Class;
 };
 
-//	Specialization for SimdCall const member functions.
 template <typename Return, class Class, typename... Arguments>
-struct FunctionTraits<Return (ETSimdCall Class::*)(Arguments...) const> : public FunctionTraits<Return (Class::*)(Arguments...) const> {
-	using NativeSignatureType = Return (ETSimdCall Class::*)(Arguments...) const;
+struct FunctionTraits<Return (ETSimdCall Class::*)(Arguments...), HasDistinctSimdCall::Value> : public FunctionTraits<Return (Class::*)(Arguments...)> {
+	using SignatureType = Return (ETSimdCall Class::*)(Arguments...);
 };
-#endif // if ET_COMPILER_IS_MSVC
+
+template <typename Return, class Class, typename... Arguments>
+struct FunctionTraits<Return (Class::*)(Arguments...) const, true> : public FunctionTraits<Return (Class::*)(Arguments...)> {
+	static ETConstexpr bool IsConstMethod = true;
+
+	using SignatureType = Return (Class::*)(Arguments...) const;
+	using ClassType     = Class;
+};
+
+template <typename Return, class Class, typename... Arguments>
+struct FunctionTraits<Return (ETSimdCall Class::*)(Arguments...) const, HasDistinctSimdCall::Value> : public FunctionTraits<Return (Class::*)(Arguments...) const> {
+	using SignatureType = Return (ETSimdCall Class::*)(Arguments...) const;
+};
 
 } // namespace Eldritch2

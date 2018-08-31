@@ -139,7 +139,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Cosine(float64 value) 
 // ---------------------------------------------------
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Tangent(Angle value) {
-	return Tangent(static_cast<float32>(value));
+	return Tangent(float32(value));
 }
 
 // ---------------------------------------------------
@@ -163,14 +163,14 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Tangent(float64 value)
 // ---------------------------------------------------
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ApproxSine(Angle value) {
-	return ApproxSine(static_cast<float32>(value));
+	return ApproxSine(float32(value));
 }
 
 // ---------------------------------------------------
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ApproxSine(float32 value) {
-	static const float32 fourOverPi(1.2732395447351626861510701069801f);
 	static const float32 fourOverPiSquared(-0.40528473456935108577551785283891f);
+	static const float32 fourOverPi(1.2732395447351626861510701069801f);
 
 	return (fourOverPi * value + (fourOverPiSquared * value) * AbsoluteValue(value));
 }
@@ -178,8 +178,8 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ApproxSine(float32 val
 // ---------------------------------------------------
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 ApproxSine(float64 value) {
-	static const float64 fourOverPi(1.2732395447351626861510701069801);
 	static const float64 fourOverPiSquared(-0.40528473456935108577551785283891);
+	static const float64 fourOverPi(1.2732395447351626861510701069801);
 
 	return (fourOverPi * value + (fourOverPiSquared * value) * AbsoluteValue(value));
 }
@@ -187,7 +187,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 ApproxSine(float64 val
 // ---------------------------------------------------
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ApproxCosine(Angle value) {
-	return ApproxCosine(static_cast<float32>(value));
+	return ApproxCosine(float32(value));
 }
 
 // ---------------------------------------------------
@@ -196,7 +196,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ApproxCosine(float32 v
 	static const float32 piOverTwo(1.5707963267948966192313216916398f);
 	static const float32 twoPi(6.283185307179586476925286766559f);
 	const float32        temp(value + piOverTwo);
-	const int32          temp2(reinterpret_cast<const int32&>(twoPi) & static_cast<int32>(temp > twoPi));
+	const int32          temp2(reinterpret_cast<const int32&>(twoPi) & int32(temp > twoPi));
 
 	return ApproxSine(temp - reinterpret_cast<const float32&>(temp2));
 }
@@ -207,7 +207,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 ApproxCosine(float64 v
 	static const float64 piOverTwo(1.5707963267948966192313216916398f);
 	static const float64 twoPi(6.283185307179586476925286766559f);
 	const float64        temp(value + piOverTwo);
-	const int64          temp2(reinterpret_cast<const int64&>(twoPi) & static_cast<int64>(temp > twoPi));
+	const int64          temp2(reinterpret_cast<const int64&>(twoPi) & int64(temp > twoPi));
 
 	return ApproxSine(temp - reinterpret_cast<const float64&>(temp2));
 }
@@ -215,7 +215,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 ApproxCosine(float64 v
 // ---------------------------------------------------
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ApproxTangent(Angle value) {
-	return ApproxTangent(static_cast<float32>(value));
+	return ApproxTangent(float32(value));
 }
 
 // ---------------------------------------------------
@@ -302,15 +302,8 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Sqrt(float64 value) {
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ReciprocalSqrt(float32 value) {
 #if ET_PLATFORM_X86
 #	if 0
-		union {
-			float32	f;
-			uint32	ul;
-		} y;
-
-		y.f = value;
-		y.ul = (0xBE6EB50C - y.ul) >> 1;
-		y.f = 0.5f * y.f * (3.0f - value * y.f * y.f);
-		return y.f;
+		const float32 temp(AsFloatBits((0xBE6EB50C - AsIntBits(value)) >> 1));
+		return 0.5f * temp * (3.0f - value * temp * temp);
 #	else
 	return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_load_ss(&value)));
 #	endif
@@ -323,15 +316,8 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 ReciprocalSqrt(float32
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 ReciprocalSqrt(float64 value) {
 #if ET_PLATFORM_X86
-	union {
-		float64 f;
-		uint64  ul;
-	} y;
-
-	y.f  = value;
-	y.ul = (0xBFCDD6A18F6A6F54 - y.ul) >> 1;
-	y.f  = static_cast<float64>(0.5) * y.f * (static_cast<float64>(3.0) - value * y.f * y.f);
-	return y.f;
+	const float64 temp(AsFloatBits((0xBFCDD6A18F6A6F54 - AsIntBits(value)) >> 1));
+	return 0.5 * temp * (3.0 - value * temp * temp);
 #else
 	return (1.0 / Sqrt(value));
 #endif
@@ -380,87 +366,81 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Exp2(float64 value) {
 // ---------------------------------------------------
 
 template <typename T>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint T Min(const T lValue, const T rValue) {
-	return lValue < rValue ? lValue : rValue;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint T Min(T lhs, T rhs) {
+	return lhs < rhs ? lhs : rhs;
 }
 
 // ---------------------------------------------------
 
-template <>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Min<float32>(const float32 lValue, const float32 rValue) {
+ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Min(float32 lhs, float32 rhs) {
 #if (ET_PLATFORM_X86)
-	return _mm_cvtss_f32(_mm_min_ss(_mm_set_ss(lValue), _mm_set_ss(rValue)));
+	return _mm_cvtss_f32(_mm_min_ss(_mm_set_ss(lhs), _mm_set_ss(rhs)));
 #else
-	return lValue > rValue ? rValue : lValue;
+	return lhs > rhs ? rhs : lhs;
 #endif
 }
 
 // ---------------------------------------------------
 
-template <>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Min<float64>(const float64 lValue, const float64 rValue) {
+ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Min(float64 lhs, float64 rhs) {
 #if ET_PLATFORM_X86
-	return _mm_cvtsd_f64(_mm_min_sd(_mm_set_sd(lValue), _mm_set_sd(rValue)));
+	return _mm_cvtsd_f64(_mm_min_sd(_mm_set_sd(lhs), _mm_set_sd(rhs)));
 #else
-	return lValue > rValue ? rValue : lValue;
-#endif
-}
-
-// ---------------------------------------------------
-
-template <typename T>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint T Max(const T lValue, const T rValue) {
-	return lValue < rValue ? rValue : lValue;
-}
-
-// ---------------------------------------------------
-
-template <>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Max<float32>(const float32 lValue, const float32 rValue) {
-#if ET_PLATFORM_X86
-	return _mm_cvtss_f32(_mm_max_ss(_mm_set_ss(lValue), _mm_set_ss(rValue)));
-#else
-	return lValue > rValue ? lValue : rValue;
-#endif
-}
-
-// ---------------------------------------------------
-
-template <>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Max<float64>(const float64 lValue, const float64 rValue) {
-#if ET_PLATFORM_X86
-	return _mm_cvtsd_f64(_mm_max_sd(_mm_set_sd(lValue), _mm_set_sd(rValue)));
-#else
-	return lValue > rValue ? lValue : rValue;
+	return lhs > rhs ? rhs : lhs;
 #endif
 }
 
 // ---------------------------------------------------
 
 template <typename T>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint T Clamp(const T value, const T minValue, const T maxValue) {
-	return Max(Min(maxValue, value), minValue);
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint T Max(T lhs, T rhs) {
+	return lhs < rhs ? rhs : lhs;
 }
 
 // ---------------------------------------------------
 
-template <>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Clamp<float32>(const float32 value, const float32 minValue, const float32 maxValue) {
+ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Max(float32 lhs, float32 rhs) {
 #if ET_PLATFORM_X86
-	return _mm_cvtss_f32(_mm_min_ss(_mm_max_ss(_mm_set_ss(value), _mm_set_ss(minValue)), _mm_set_ss(maxValue)));
+	return _mm_cvtss_f32(_mm_max_ss(_mm_set_ss(lhs), _mm_set_ss(rhs)));
 #else
-	return Min(Max(value, minValue), maxValue);
+	return lhs > rhs ? lhs : rhs;
 #endif
 }
 
 // ---------------------------------------------------
 
-template <>
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Clamp<float64>(const float64 value, const float64 minValue, const float64 maxValue) {
+ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Max(float64 lhs, float64 rhs) {
 #if ET_PLATFORM_X86
-	return _mm_cvtsd_f64(_mm_min_sd(_mm_max_sd(_mm_set_sd(value), _mm_set_sd(minValue)), _mm_set_sd(maxValue)));
+	return _mm_cvtsd_f64(_mm_max_sd(_mm_set_sd(lhs), _mm_set_sd(rhs)));
 #else
-	return Min(Max(value, minValue), maxValue);
+	return lhs > rhs ? lhs : rhs;
+#endif
+}
+
+// ---------------------------------------------------
+
+template <typename T>
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint T Clamp(T value, T min, T max) {
+	return Max(Min(max, value), min);
+}
+
+// ---------------------------------------------------
+
+ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Clamp(float32 value, float32 min, float32 max) {
+#if ET_PLATFORM_X86
+	return _mm_cvtss_f32(_mm_min_ss(_mm_max_ss(_mm_set_ss(value), _mm_set_ss(min)), _mm_set_ss(max)));
+#else
+	return Min(Max(value, min), max);
+#endif
+}
+
+// ---------------------------------------------------
+
+ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Clamp(float64 value, float64 min, float64 max) {
+#if ET_PLATFORM_X86
+	return _mm_cvtsd_f64(_mm_min_sd(_mm_max_sd(_mm_set_sd(value), _mm_set_sd(min)), _mm_set_sd(max)));
+#else
+	return Min(Max(value, min), max);
 #endif
 }
 
@@ -478,38 +458,38 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Saturate(float64 value
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Sign(float32 value) {
-	return value != 0.0f ? (value / AbsoluteValue(value)) : 0.0f;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 Sign(float32 value) {
+	return value != 0.0f ? value < 0.0f ? -1.0f : 1.0f : 0.0f;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Sign(float64 value) {
-	return value != 0.0f ? (value / AbsoluteValue(value)) : 0.0f;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 Sign(float64 value) {
+	return value != 0.0 ? value < 0.0 ? -1.0 : 1.0 : 0.0;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int8 Sign(int8 value) {
-	return value != 0 ? (value / AbsoluteValue(value)) : 0;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int8 Sign(int8 value) {
+	return int8(value != 0 ? value < 0 ? -1 : 1 : 0);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int16 Sign(int16 value) {
-	return value != 0 ? (value / AbsoluteValue(value)) : 0;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int16 Sign(int16 value) {
+	return int16(value != 0 ? value < 0 ? -1 : 1 : 0);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int32 Sign(int32 value) {
-	return value != 0 ? (value / AbsoluteValue(value)) : 0;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int32 Sign(int32 value) {
+	return value != 0 ? value < 0 ? -1 : 1 : 0;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int64 Sign(int64 value) {
-	return value != 0 ? (value / AbsoluteValue(value)) : 0;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int64 Sign(int64 value) {
+	return value != 0 ? value < 0 ? -1 : 1 : 0;
 }
 
 // ---------------------------------------------------
@@ -534,26 +514,26 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AbsoluteValue(float64 
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int8 AbsoluteValue(int8 value) {
-	return value > 0 ? value : -value;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int8 AbsoluteValue(int8 value) {
+	return value < 0 ? -value : value;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int16 AbsoluteValue(int16 value) {
-	return value > 0 ? value : -value;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int16 AbsoluteValue(int16 value) {
+	return value < 0 ? -value : value;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int32 AbsoluteValue(int32 value) {
-	return value > 0 ? value : -value;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int32 AbsoluteValue(int32 value) {
+	return value < 0 ? -value : value;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint int64 AbsoluteValue(int64 value) {
-	return value > 0 ? value : -value;
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint int64 AbsoluteValue(int64 value) {
+	return value < 0 ? -value : value;
 }
 
 // ---------------------------------------------------
@@ -681,7 +661,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint int32 AsInt(float32 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86
 	return _mm_cvttss_si32(_mm_set_ss(value));
 #else
-	return static_cast<int32>(value);
+	return int32(value);
 #endif
 }
 
@@ -691,7 +671,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint int32 AsInt(float64 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86
 	return _mm_cvttsd_si32(_mm_set_sd(value));
 #else
-	return static_cast<int32>(value);
+	return int32(value);
 #endif
 }
 
@@ -701,7 +681,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint int64 AsInt64(float32 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
 	return _mm_cvttsd_si64(_mm_cvtps_pd(_mm_set_ss(value)));
 #else
-	return static_cast<int64>(value);
+	return int64(value);
 #endif
 }
 
@@ -711,34 +691,29 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint int64 AsInt64(float64 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
 	return _mm_cvttsd_si64(_mm_set_sd(value));
 #else
-	return static_cast<int64>(value);
+	return int64(value);
 #endif
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint32 AsIntBits(float32 value) {
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint32 AsIntBits(float32 value) {
 	return reinterpret_cast<const uint32&>(value);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint64 AsIntBits(float64 value) {
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint64 AsIntBits(float64 value) {
 	return reinterpret_cast<const uint64&>(value);
 }
 
 // ---------------------------------------------------
 
-ET_PUSH_COMPILER_WARNING_STATE()
-/*	MSVC doesn't like that we use 'temp' in the below functions without initializing it,
-	 *	but for these specific use cases it doesn't actually matter, since we're writing the value. */
-ET_SET_MSVC_WARNING_STATE(disable : 4700)
-
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloat(int32 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86
 	return _mm_cvtss_f32(_mm_cvtsi32_ss(_mm_setzero_ps(), value));
 #else
-	return static_cast<float32>(value);
+	return float32(value);
 #endif
 }
 
@@ -746,9 +721,9 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloat(int32 value) {
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloat(uint32 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86
-	return _mm_cvtss_f32(_mm_cvtsi32_ss(_mm_setzero_ps(), static_cast<int32>(value)));
+	return _mm_cvtss_f32(_mm_cvtsi32_ss(_mm_setzero_ps(), int32(value)));
 #else
-	return static_cast<float32>(value);
+	return float32(value);
 #endif
 }
 
@@ -758,7 +733,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloat(int64 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
 	return _mm_cvtss_f32(_mm_cvtpd_ps(_mm_cvtsi64_sd(_mm_setzero_pd(), value)));
 #else
-	return static_cast<float32>(value);
+	return float32(value);
 #endif
 }
 
@@ -766,21 +741,21 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloat(int64 value) {
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloat(uint64 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
-	return _mm_cvtss_f32(_mm_cvtpd_ps(_mm_cvtsi64_sd(_mm_setzero_pd(), static_cast<int64>(value))));
+	return _mm_cvtss_f32(_mm_cvtpd_ps(_mm_cvtsi64_sd(_mm_setzero_pd(), int64(value))));
 #else
-	return static_cast<float32>(value);
+	return float32(value);
 #endif
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloatBits(uint32 value) {
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint float32 AsFloatBits(uint32 value) {
 	return reinterpret_cast<const float32&>(value);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloatBits(uint64 value) {
+ETConstexpr ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloatBits(uint64 value) {
 	return reinterpret_cast<const float64&>(value);
 }
 
@@ -788,9 +763,9 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloatBits(uint64 val
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloat64(int32 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
-	return _mm_cvtsd_f64(_mm_cvtsi64_sd(_mm_setzero_pd(), static_cast<int64>(value)));
+	return _mm_cvtsd_f64(_mm_cvtsi64_sd(_mm_setzero_pd(), int64(value)));
 #else
-	return static_cast<float64>(value);
+	return float64(value);
 #endif
 }
 
@@ -798,9 +773,9 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloat64(int32 value)
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloat64(uint32 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
-	return _mm_cvtsd_f64(_mm_cvtsi64_sd(_mm_setzero_pd(), static_cast<int64>(value)));
+	return _mm_cvtsd_f64(_mm_cvtsi64_sd(_mm_setzero_pd(), int64(value)));
 #else
-	return static_cast<float64>(value);
+	return float64(value);
 #endif
 }
 
@@ -810,7 +785,7 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloat64(int64 value)
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
 	return _mm_cvtsd_f64(_mm_cvtsi64_sd(_mm_setzero_pd(), value));
 #else
-	return static_cast<float64>(value);
+	return float64(value);
 #endif
 }
 
@@ -818,9 +793,9 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloat64(int64 value)
 
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloat64(uint64 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86 && ET_PLATFORM_64BIT
-	return _mm_cvtsd_f64(_mm_cvtsi64_sd(_mm_setzero_pd(), static_cast<int64>(value)));
+	return _mm_cvtsd_f64(_mm_cvtsi64_sd(_mm_setzero_pd(), int64(value)));
 #else
-	return static_cast<float64>(value);
+	return float64(value);
 #endif
 }
 
@@ -829,7 +804,6 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint float64 AsFloat64(uint64 value
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint32 CountLeadingZeroes(uint32 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86
 	unsigned long index;
-
 	return _BitScanForward(&index, value) != 0 ? index : 32u;
 #else
 #	error CountLeadingZeroes() needs implementation for your platform!
@@ -841,13 +815,10 @@ ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint32 CountLeadingZeroes(uint
 ETPureFunctionHint ETNeverThrowsHint ETInlineHint uint32 CountLeadingZeroes(uint64 value) {
 #if ET_COMPILER_IS_MSVC && ET_PLATFORM_X86
 	unsigned long index;
-
 	return _BitScanForward64(&index, value) != 0 ? index : 64u;
 #else
 #	error CountLeadingZeroes() needs implementation for your platform!
 #endif
 }
-
-ET_POP_COMPILER_WARNING_STATE()
 
 } // namespace Eldritch2

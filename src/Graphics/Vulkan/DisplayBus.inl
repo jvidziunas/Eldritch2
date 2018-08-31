@@ -17,13 +17,13 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint DisplayMap<>& DisplayBus::GetDisplays() {
-		return _displayByName;
+	ETInlineHint DisplayList& DisplayBus::GetDisplays() ETNoexceptHint {
+		return _displays;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Mutex& DisplayBus::GetDisplaysMutex() {
+	ETInlineHint Mutex& DisplayBus::GetDisplaysMutex() ETNoexceptHint {
 		return _displayMutex;
 	}
 

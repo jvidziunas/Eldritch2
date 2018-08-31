@@ -51,21 +51,45 @@
     </Expand>
   </Type>
   <Type Name="Eldritch2::AbstractString&lt;char,*&gt;">
-  	<DisplayString>{_container.mPair.mFirst.mpBegin,s8}</DisplayString>
-    <StringView>_container.mPair.mFirst.mpBegin,s8</StringView>
+    <DisplayString>{_container.mPair.mFirst.heap.mpBegin,s8}</DisplayString>
     <Expand>
-      <Item Name="length">_container.mPair.mFirst.mpEnd-_container.mPair.mFirst.mpBegin</Item>
-      <Item Name="capacity">_container.mPair.mFirst.mpCapacity-_container.mPair.mFirst.mpBegin</Item>
-      <Item Name="value">_container.mPair.mFirst.mpBegin,sb</Item>
+      <Item Name="length"   Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.heap.mnSize</Item>
+      <Item Name="capacity" Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">(_container.mPair.mFirst.heap.mnCapacity &amp; ~UnderlyingContainer::kHeapMask)</Item>
+      <Item Name="value"    Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.heap.mpBegin,sb</Item>
+
+      <Item Name="length"   Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.sso.mSizeField.mnSize</Item>
+      <Item Name="capacity" Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">UnderlyingContainer::SSOLayout::SSO_CAPACITY</Item>
+      <Item Name="value"    Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.sso.mData,sb</Item>
+
+      <Item Name="uses heap">!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)</Item>
     </Expand>
   </Type>
   <Type Name="Eldritch2::AbstractString&lt;wchar_t,*&gt;">
-    <DisplayString>{_container.mPair.mFirst.mpBegin,su}</DisplayString>
-    <StringView>_container.mPair.mFirst.mpBegin,su</StringView>
+    <DisplayString>{_container.mPair.mFirst.heap.mpBegin,su}</DisplayString>
     <Expand>
-      <Item Name="length">_container.mPair.mFirst.mpEnd-_container.mPair.mFirst.mpBegin</Item>
-      <Item Name="capacity">_container.mPair.mFirst.mpCapacity-_container.mPair.mFirst.mpBegin</Item>
-      <Item Name="value">_container.mPair.mFirst.mpBegin,sub</Item>
+      <Item Name="length"   Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.heap.mnSize</Item>
+      <Item Name="capacity" Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">(_container.mPair.mFirst.heap.mnCapacity &amp; ~UnderlyingContainer::kHeapMask)</Item>
+      <Item Name="value"    Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.heap.mpBegin,sb</Item>
+
+      <Item Name="length"   Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.sso.mSizeField.mnSize</Item>
+      <Item Name="capacity" Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">UnderlyingContainer::SSOLayout::SSO_CAPACITY</Item>
+      <Item Name="value"    Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.sso.mData,sb</Item>
+
+      <Item Name="uses heap">!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)</Item>
+    </Expand>
+  </Type>
+  <Type Name="Eldritch2::Path&lt;*&gt;">
+    <DisplayString>{_container.mPair.mFirst.heap.mpBegin,su}</DisplayString>
+    <Expand>
+      <Item Name="length"   Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.heap.mnSize</Item>
+      <Item Name="capacity" Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">(_container.mPair.mFirst.heap.mnCapacity &amp; ~UnderlyingContainer::kHeapMask)</Item>
+      <Item Name="value"    Condition="!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.heap.mpBegin,sb</Item>
+
+      <Item Name="length"   Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.sso.mSizeField.mnSize</Item>
+      <Item Name="capacity" Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">UnderlyingContainer::SSOLayout::SSO_CAPACITY</Item>
+      <Item Name="value"    Condition="!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)">_container.mPair.mFirst.sso.mData,sb</Item>
+
+      <Item Name="uses heap">!!(_container.mPair.mFirst.sso.mSizeField.mnSize &amp; UnderlyingContainer::kSSOMask)</Item>
     </Expand>
   </Type>
   <Type Name="Eldritch2::UniquePointer&lt;*,Eldritch2::InstanceArrayDeleter&gt;">

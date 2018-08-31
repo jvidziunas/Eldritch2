@@ -28,9 +28,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		enum : VkMemoryPropertyFlags { InferFromUsage = 0u };
 
 		TileManager tileManager(format, tileExtent, extent);
-		ET_FAIL_UNLESS(AbstractImage::BindResources(
+		ET_ABORT_UNLESS(AbstractImage::BindResources(
 			gpu,
-			VkImageCreateInfo{
+			VkImageCreateInfo {
 				VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 				/*pNext =*/nullptr,
 				VK_IMAGE_CREATE_SPARSE_BINDING_BIT | VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT,
@@ -46,7 +46,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*queueFamilyIndexCount =*/0u,    // Exclusive sharing.
 				/*pQueueFamilyIndices =*/nullptr, // Exclusive sharing.
 				VK_IMAGE_LAYOUT_UNDEFINED },
-			VmaAllocationCreateInfo{
+			VmaAllocationCreateInfo {
 				/*flags =*/0u,
 				VMA_MEMORY_USAGE_GPU_ONLY,
 				/*requiredFlags =*/InferFromUsage,

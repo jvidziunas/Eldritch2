@@ -18,20 +18,22 @@
 namespace Eldritch2 {
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
-ETInlineHint TreeMap<Key, Value, SortPredicate, Allocator>::TreeMap(
-	const AllocatorType& allocator) :
-	_container(allocator) {
-}
+ETInlineHint TreeMap<Key, Value, SortPredicate, Allocator>::TreeMap(const AllocatorType& allocator, const SortPredicate& sort) :
+	_container(sort, allocator) {}
 
 // ---------------------------------------------------
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 template <typename InputIterator>
-ETInlineHint TreeMap<Key, Value, SortPredicate, Allocator>::TreeMap(
-	InputIterator        begin,
-	InputIterator        end,
-	const AllocatorType& allocator) :
-	_container(begin, end, allocator) {
+ETInlineHint TreeMap<Key, Value, SortPredicate, Allocator>::TreeMap(const AllocatorType& allocator, const SortPredicate& sort, InputIterator begin, InputIterator end) :
+	_container(begin, end, sort, allocator) {
+}
+
+// ---------------------------------------------------
+
+template <typename Key, typename Value, typename SortPredicate, class Allocator>
+ETInlineHint TreeMap<Key, Value, SortPredicate, Allocator>::TreeMap(const AllocatorType& allocator, const SortPredicate& sort, std::initializer_list<ValueType> map) :
+	_container(map, sort, allocator) {
 }
 
 // ---------------------------------------------------
@@ -51,10 +53,10 @@ ETInlineHint typename TreeMap<Key, Value, SortPredicate, Allocator>::ConstIterat
 // ---------------------------------------------------
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
-template <typename Predicate>
-ETInlineHint void TreeMap<Key, Value, SortPredicate, Allocator>::EraseIf(Predicate filter) {
+template <typename UnaryPredicate>
+ETInlineHint void TreeMap<Key, Value, SortPredicate, Allocator>::EraseIf(UnaryPredicate condition) {
 	for (auto element(_container.begin()), end(_container.end()); element != end;) {
-		if (filter(*element)) {
+		if (condition(*element)) {
 			element = _container.erase(element);
 		} else {
 			++element;
@@ -107,7 +109,6 @@ ETInlineHint typename TreeMap<Key, Value, SortPredicate, Allocator>::ConstIterat
 // ---------------------------------------------------
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
-template <class /*SFINAE*/>
 ETInlineHint typename TreeMap<Key, Value, SortPredicate, Allocator>::MappedType& TreeMap<Key, Value, SortPredicate, Allocator>::operator[](const KeyType& key) {
 	return _container[key];
 }
@@ -136,8 +137,8 @@ ETInlineHint typename TreeMap<Key, Value, SortPredicate, Allocator>::Iterator Tr
 // ---------------------------------------------------
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
-ETInlineHint typename TreeMap<Key, Value, SortPredicate, Allocator>::Iterator TreeMap<Key, Value, SortPredicate, Allocator>::Erase(Iterator position) {
-	return _container.erase(position);
+ETInlineHint typename TreeMap<Key, Value, SortPredicate, Allocator>::Iterator TreeMap<Key, Value, SortPredicate, Allocator>::Erase(Iterator where) {
+	return _container.erase(where);
 }
 
 // ---------------------------------------------------
@@ -178,8 +179,8 @@ ETInlineHint typename const TreeMap<Key, Value, SortPredicate, Allocator>::Alloc
 // ---------------------------------------------------
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
-ETInlineHint void Swap(TreeMap<Key, Value, SortPredicate, Allocator>& map0, TreeMap<Key, Value, SortPredicate, Allocator>& map1) {
-	eastl::swap(map0._container, map1._container);
+ETInlineHint void Swap(TreeMap<Key, Value, SortPredicate, Allocator>& lhs, TreeMap<Key, Value, SortPredicate, Allocator>& rhs) {
+	lhs._container.swap(rhs._container);
 }
 
 } // namespace Eldritch2

@@ -15,6 +15,7 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scheduling {
+
 	namespace Detail {
 
 #if ET_ENABLE_JOB_DEBUGGING
@@ -32,8 +33,9 @@ namespace Eldritch2 { namespace Scheduling {
 		_suspendedJobs(MallocAllocator("Suspended Context Collection Allocator")),
 		_pooledFibers(MallocAllocator("Pooled Fiber Collection Allocator")),
 		_bootFiber(nullptr),
-		_transitionTarget(nullptr),
-		_switchFiber(nullptr) {
+		_waitFiber(nullptr),
+		_switchFiber(nullptr),
+		_transitionTarget(nullptr) {
 		_jobs.Reserve(64u);
 	}
 

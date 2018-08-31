@@ -20,26 +20,30 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+
 namespace {
 
-	ETInlineHint HANDLE MakeWriter(const wchar_t* const path, DWORD creationDisposition) {
-		enum : DWORD {
-			FileShareNone = 0,
-			OpenSemantics = FILE_FLAG_POSIX_SEMANTICS
-		};
+	static ETConstexpr LARGE_INTEGER ZeroOffset { 0, 0 };
 
-		return CreateFileW(path, GENERIC_WRITE, FileShareNone, nullptr, creationDisposition, OpenSemantics, nullptr);
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint HANDLE MakeWriter(const wchar_t* const path, DWORD creationDisposition) {
+		return CreateFileW(path, GENERIC_WRITE, /*dwShareMode =*/0u, /*lpSecurityAttributes =*/nullptr, creationDisposition, FILE_FLAG_POSIX_SEMANTICS, /*hTemplateFile =*/nullptr);
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint ETPureFunctionHint DWORD ClampDword(size_t size) {
+		return DWORD(Min<size_t>(size, DWORD(-1)));
 	}
 
 } // anonymous namespace
 
-FileWriter::FileWriter(FileWriter&& writer) :
-	_file(eastl::exchange(writer._file, INVALID_HANDLE_VALUE)) {}
+FileWriter::FileWriter(FileWriter&& file) ETNoexceptHint : _file(eastl::exchange(file._file, INVALID_HANDLE_VALUE)) {}
 
 // ---------------------------------------------------
 
-FileWriter::FileWriter() :
-	_file(INVALID_HANDLE_VALUE) {}
+FileWriter::FileWriter() ETNoexceptHint : _file(INVALID_HANDLE_VALUE) {}
 
 // ---------------------------------------------------
 
@@ -53,69 +57,29 @@ FileWriter::~FileWriter() {
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::CreateOrTruncate(const PlatformChar* path) {
-	HANDLE file(MakeWriter(path, CREATE_ALWAYS));
-	ET_FAIL_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+ErrorCode FileWriter::Write(const void* source, size_t byteLength, uint64 fileByteOffset) ETNoexceptHint {
+	LARGE_INTEGER newOffset;
+	newOffset.QuadPart = fileByteOffset;
 
-	Swap(_file, file);
-	if (file != INVALID_HANDLE_VALUE) {
-		CloseHandle(file);
+	if (SetFilePointerEx(_file, newOffset, /*lpNewFilePointer =*/nullptr, FILE_BEGIN) == FALSE) {
+		return Error::Unspecified;
 	}
 
-	return Error::None;
+	return Append(source, byteLength);
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::CreateOrOpen(const PlatformChar* path) {
-	HANDLE file(MakeWriter(path, OPEN_ALWAYS));
-	ET_FAIL_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+ErrorCode FileWriter::Append(const void* source, size_t byteLength) ETNoexceptHint {
+	const char* end(static_cast<const char*>(source) + byteLength);
+	while (byteLength) {
+		DWORD bytesWritten;
 
-	Swap(_file, file);
-	if (file != INVALID_HANDLE_VALUE) {
-		CloseHandle(file);
-	}
-
-	return Error::None;
-}
-
-// ---------------------------------------------------
-
-ErrorCode FileWriter::Open(const PlatformChar* path) {
-	HANDLE file(MakeWriter(path, OPEN_EXISTING));
-	ET_FAIL_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
-
-	Swap(_file, file);
-	if (file != INVALID_HANDLE_VALUE) {
-		CloseHandle(file);
-	}
-
-	return Error::None;
-}
-
-// ---------------------------------------------------
-
-ErrorCode FileWriter::Append(const void* const sourceBuffer, size_t lengthToWriteInBytes) {
-	enum : size_t {
-		//	Maximum size of a system write operation, specified in bytes.
-		MaximumWriteSizeInBytes = static_cast<DWORD>(-1)
-	};
-
-	// ---
-
-	const char* readPointer(static_cast<const char*>(sourceBuffer));
-
-	//	Since Windows can only work with reads representable with a DWORD, we need to loop to accommodate (potential) values held in a 64-bit size_t.
-	while ((static_cast<size_t>(readPointer - static_cast<const char*>(sourceBuffer)) < lengthToWriteInBytes)) {
-		//	Cap the read at the maximum representable value held in a DWORD. Remember to round *after* the promotion!
-		const DWORD numberOfBytesToWrite(static_cast<DWORD>(Min<size_t>(lengthToWriteInBytes, MaximumWriteSizeInBytes)));
-		DWORD       numberOfBytesReadThisIteration;
-
-		if (WriteFile(_file, readPointer, numberOfBytesToWrite, &numberOfBytesReadThisIteration, nullptr) == FALSE) {
+		if (WriteFile(_file, end - byteLength, ClampDword(byteLength), ETAddressOf(bytesWritten), /*lpOverlapped =*/nullptr) == FALSE) {
 			return Error::Unspecified;
 		}
 
-		readPointer += numberOfBytesReadThisIteration;
+		byteLength -= bytesWritten;
 	}
 
 	return Error::None;
@@ -123,15 +87,79 @@ ErrorCode FileWriter::Append(const void* const sourceBuffer, size_t lengthToWrit
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::Write(const void* const sourceBuffer, size_t lengthToWriteInBytes, uint64 fileOffsetInBytes) {
-	LARGE_INTEGER fileOffsetHelper;
-	LARGE_INTEGER tempOffset;
+uint64 FileWriter::GetFileCursorInBytes() const ETNoexceptHint {
+	LARGE_INTEGER cursor { 0, 0 };
 
-	fileOffsetHelper.QuadPart = fileOffsetInBytes;
+	/* Win32 APIs combine set/get file pointer into SetFilePointer()/SetFilePointerEx().
+	 * See https://docs.microsoft.com/en-us/windows/desktop/FileIO/positioning-a-file-pointer for details. */
+	SetFilePointerEx(_file, ZeroOffset, ETAddressOf(cursor), FILE_CURRENT);
 
-	//	Update the file pointer to reference the desired offset then take the traditional write path.
-	SetFilePointerEx(_file, fileOffsetHelper, &tempOffset, FILE_BEGIN);
-	return Append(sourceBuffer, lengthToWriteInBytes);
+	return uint64(cursor.QuadPart);
+}
+
+// ---------------------------------------------------
+
+void FileWriter::AdvanceToEnd() ETNoexceptHint {
+	SetFilePointerEx(_file, ZeroOffset, /*lpNewFilePointer =*/nullptr, FILE_END);
+}
+
+// ---------------------------------------------------
+
+void FileWriter::SetSize(uint64 sizeInBytes) ETNoexceptHint {
+	LARGE_INTEGER cursor { 0, 0 };
+	SetFilePointerEx(_file, ZeroOffset, ETAddressOf(cursor), FILE_CURRENT);
+
+	LARGE_INTEGER newCursor;
+	newCursor.QuadPart = sizeInBytes;
+	SetFilePointerEx(_file, newCursor, /*lpNewFilePointer =*/nullptr, FILE_BEGIN);
+	SetEndOfFile(_file);
+
+	// Restore old file pointer, if still valid.
+	if (uint64(cursor.QuadPart) < sizeInBytes) {
+		SetFilePointerEx(_file, cursor, /*lpNewFilePointer =*/nullptr, FILE_BEGIN);
+	}
+}
+
+// ---------------------------------------------------
+
+ErrorCode FileWriter::CreateOrTruncate(const PlatformChar* path) ETNoexceptHint {
+	HANDLE file(MakeWriter(path, CREATE_ALWAYS));
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+
+	Swap(_file, file);
+	if (file != INVALID_HANDLE_VALUE) {
+		CloseHandle(file);
+	}
+
+	return Error::None;
+}
+
+// ---------------------------------------------------
+
+ErrorCode FileWriter::CreateOrOpen(const PlatformChar* path) ETNoexceptHint {
+	HANDLE file(MakeWriter(path, OPEN_ALWAYS));
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+
+	Swap(_file, file);
+	if (file != INVALID_HANDLE_VALUE) {
+		CloseHandle(file);
+	}
+
+	return Error::None;
+}
+
+// ---------------------------------------------------
+
+ErrorCode FileWriter::Open(const PlatformChar* path) ETNoexceptHint {
+	HANDLE file(MakeWriter(path, OPEN_EXISTING));
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+
+	Swap(_file, file);
+	if (file != INVALID_HANDLE_VALUE) {
+		CloseHandle(file);
+	}
+
+	return Error::None;
 }
 
 } // namespace Eldritch2

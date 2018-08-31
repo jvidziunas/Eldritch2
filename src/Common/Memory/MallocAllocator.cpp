@@ -25,16 +25,6 @@
 
 namespace Eldritch2 {
 
-MallocAllocator::MallocAllocator(const Utf8Char* name) :
-	Allocator(name) {}
-
-// ---------------------------------------------------
-
-MallocAllocator::MallocAllocator(const MallocAllocator& allocator) :
-	Allocator(allocator) {}
-
-// ---------------------------------------------------
-
 ETRestrictHint void* MallocAllocator::Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration) {
 	if (((offsetInBytes % alignmentInBytes) == 0) && (alignmentInBytes <= 16u)) {
 		return Allocate(sizeInBytes, duration);
@@ -54,15 +44,5 @@ ETRestrictHint void* MallocAllocator::Allocate(SizeType sizeInBytes, AllocationD
 void MallocAllocator::Deallocate(void* const address, SizeType /*sizeInBytes*/) {
 	free(address);
 }
-
-// ---------------------------------------------------
-
-MallocAllocator& MallocAllocator::operator=(const MallocAllocator& /*allocator*/) {
-	return *this;
-}
-
-// ---------------------------------------------------
-
-void Swap(MallocAllocator& /*allocator0*/, MallocAllocator& /*allocator1*/) {}
 
 } // namespace Eldritch2

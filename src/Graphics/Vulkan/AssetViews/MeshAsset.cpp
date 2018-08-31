@@ -23,8 +23,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	using namespace ::Eldritch2::Assets;
 	using namespace ::flatbuffers;
 
-	MeshAsset::MeshAsset(
-		const Utf8Char* const path) :
+	MeshAsset::MeshAsset(StringView path) :
 		Asset(path),
 		_attributes(MallocAllocator("Mesh Asset Attribute Collection Allocator")),
 		_surfaces(MallocAllocator("Mesh Asset Element Collection Allocator")) {
@@ -32,13 +31,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 	// ---------------------------------------------------
 
-	MeshSource::Dimensions MeshAsset::GetDimensions() const {
-		return { 0u, 0u };
-	}
+	void MeshAsset::Stream(const VertexStreamRequest& /*request*/) const ETNoexceptHint {}
 
 	// ---------------------------------------------------
 
-	void MeshAsset::Stream(const VertexStreamRequest& /*vertices*/, const IndexStreamRequest& /*indices*/) const {}
+	void MeshAsset::Stream(const IndexStreamRequest& /*request*/) const ETNoexceptHint {}
 
 	// ---------------------------------------------------
 
@@ -46,12 +43,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		//	Verify the data we're working with can plausibly represent a mesh.
 		Verifier verifier(reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize());
 		if (!VerifyMeshBuffer(verifier)) {
-			asset.WriteLog(MessageType::Error, "Mesh {} is malformed!" UTF8_NEWLINE, GetPath());
+			asset.WriteLog(Severity::Error, "Mesh {} is malformed!" ET_NEWLINE, GetPath());
 			return Error::Unspecified;
 		}
 
-		ArrayList<Attribute> attributes(_attributes.GetAllocator());
-		ArrayList<Surface>   surfaces(_surfaces.GetAllocator());
+		ArrayList<Attribute>          attributes(_attributes.GetAllocator());
+		ArrayList<SurfaceDescription> surfaces(_surfaces.GetAllocator());
 
 		Swap(_attributes, attributes);
 		Swap(_surfaces, surfaces);
@@ -68,8 +65,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 	// ---------------------------------------------------
 
-	Utf8Literal MeshAsset::GetExtension() {
-		return Utf8Literal(MeshExtension());
+	ETPureFunctionHint StringView MeshAsset::GetExtension() ETNoexceptHint {
+		return { MeshExtension(), StringLength(MeshExtension()) };
 	}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

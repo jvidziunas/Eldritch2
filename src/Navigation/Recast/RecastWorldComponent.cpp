@@ -27,7 +27,7 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	// ---------------------------------------------------
 
-	void RecastWorldComponent::OnFixedRateTickLate(JobExecutor& executor, MicrosecondTime duration) {
+	void RecastWorldComponent::OnFixedRateTickLate(JobExecutor& /*executor*/, MicrosecondTime duration) {
 		ET_PROFILE_SCOPE("World/LateTick", "Update Recast navigation", 0xBBBBBB);
 		_scene->Simulate(AsFloat(duration) / 1000000.0f /*Seconds per microsecond*/);
 	}

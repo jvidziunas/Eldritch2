@@ -31,11 +31,13 @@ public:
 
 public:
 	//!	Constructs this @ref Queue instance.
-	Queue(const Queue&, const AllocatorType& allocator = AllocatorType());
+	Queue(const AllocatorType& allocator, const Queue&);
 	//!	Constructs this @ref Queue instance.
 	Queue(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref Queue instance.
-	Queue(Queue&&);
+	Queue(const Queue&) = default;
+	//!	Constructs this @ref Queue instance.
+	Queue(Queue&&) = default;
 
 	~Queue() = default;
 
@@ -48,8 +50,8 @@ public:
 	const ValueType& Back() const;
 	ValueType&       Back();
 
-	template <typename... Args>
-	void EmplaceBack(Args&&... args);
+	template <typename... Arguments>
+	void EmplaceBack(Arguments&&... arguments);
 
 	void Push(const ValueType& value);
 	void Push(ValueType&& value);

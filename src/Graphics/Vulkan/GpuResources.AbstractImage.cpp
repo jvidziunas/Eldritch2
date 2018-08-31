@@ -16,7 +16,7 @@
 #include <Graphics/Vulkan/Gpu.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	AbstractImage::AbstractImage() :
 		_backing(nullptr),
@@ -31,27 +31,26 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
 
 	// ---------------------------------------------------
 
-	void AbstractImage::FreeResources(Gpu& gpu) {
-		if (VkImage image = eastl::exchange(_image, nullptr)) {
-			gpu.AddGarbage(image, eastl::exchange(_backing, nullptr));
-		}
-	}
-
-	// ---------------------------------------------------
-
 	VkResult AbstractImage::BindResources(Gpu& gpu, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo) {
 		using ::Eldritch2::Swap;
 
 		VmaAllocation backing;
 		VkImage       image;
-
-		ET_FAIL_UNLESS(vmaCreateImage(gpu, &imageInfo, &allocationInfo, &image, &backing, nullptr));
+		ET_ABORT_UNLESS(vmaCreateImage(gpu, ETAddressOf(imageInfo), ETAddressOf(allocationInfo), ETAddressOf(image), ETAddressOf(backing), /*pAllocationInfo =*/nullptr));
 		ET_AT_SCOPE_EXIT(vmaDestroyImage(gpu, image, backing));
 
 		Swap(_image, image);
 		Swap(_backing, backing);
 
 		return VK_SUCCESS;
+	}
+
+	// ---------------------------------------------------
+
+	void AbstractImage::FreeResources(Gpu& gpu) {
+		if (VkImage image = eastl::exchange(_image, nullptr)) {
+			gpu.AddGarbage(image, eastl::exchange(_backing, nullptr));
+		}
 	}
 
 	// ---------------------------------------------------
@@ -63,4 +62,4 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
 		Swap(lhs._backing, rhs._backing);
 	}
 
-}}}} // namespace Eldritch2::Graphics::Vulkan::Detail
+}}} // namespace Eldritch2::Graphics::Vulkan

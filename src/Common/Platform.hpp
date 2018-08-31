@@ -58,4 +58,9 @@ ETPureFunctionHint bool IsPosix();
 
 ETPureFunctionHint bool IsMacOsX();
 
+// - TIME UNIT CONVERSION ----------------------------
+
+ETConstexpr ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime microseconds) ETNoexceptHint;
+ETConstexpr ETPureFunctionHint float32 AsSeconds(MicrosecondTime microseconds) ETNoexceptHint;
+
 } // namespace Eldritch2

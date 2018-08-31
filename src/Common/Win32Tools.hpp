@@ -17,29 +17,15 @@
 
 using HINSTANCE = struct HINSTANCE__*;
 
-#if defined GetCommandLine
-#	undef GetCommandLine
-#endif
-
 namespace Eldritch2 {
 
 void ETNeverThrowsHint StoreMainArguments(HINSTANCE hInstance, int nCmdShow);
 
-// ---------------------------------------------------
-
-const wchar_t* GetWideCommandLine();
-
-const char* GetCommandLine();
+int ETPureFunctionHint ETNeverThrowsHint GetCmdShow();
 
 bool ETNeverThrowsHint CommandLineContains(wchar_t* option);
 bool ETNeverThrowsHint CommandLineContains(char* option);
 
-// ---------------------------------------------------
-
 HINSTANCE ETNeverThrowsHint GetModuleByAddress(void* addressOfItemInModule = nullptr);
-
-// ---------------------------------------------------
-
-int ETPureFunctionHint ETNeverThrowsHint GetCmdShow();
 
 } // namespace Eldritch2

@@ -72,6 +72,9 @@
     <ClCompile Include="src\Common\FileWriter.Win32.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tools\ConsoleLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src_ShaderCompiler\ShaderCompiler.hpp">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="src\Common\FileWriter.hpp">
       <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tools\ConsoleLog.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

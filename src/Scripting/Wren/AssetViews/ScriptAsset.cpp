@@ -8,49 +8,45 @@
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/AssetViews/ScriptAsset.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Scripting {
-		namespace Wren {
-			namespace AssetViews {
+namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetViews {
 
-				using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Assets;
 
-				ScriptAsset::ScriptAsset(const Utf8Char* const path) : Asset(path), _source(MallocAllocator("Wren Script Asset Source Allocator")) {}
+	ScriptAsset::ScriptAsset(StringView path) :
+		AbstractString<char>(MallocAllocator("Wren Script Asset Source Allocator")),
+		Asset(path) {
+	}
 
-			// ---------------------------------------------------
+	// ---------------------------------------------------
 
-				ETPureFunctionHint Utf8Literal ScriptAsset::GetExtension() {
-					return ".wren";
-				}
+	ErrorCode ScriptAsset::BindResources(const Builder& asset) {
+		if (asset.GetSize() == 0u) {
+			return Error::InvalidParameter;
+		}
 
-			// ---------------------------------------------------
+		String source(GetAllocator(), asset.Begin(), asset.End());
 
-				ErrorCode ScriptAsset::BindResources(const Builder& asset) {
-					if (asset.GetSize() == 0u) {
-						return Error::InvalidParameter;
-					}
+		Swap(*this, source);
 
-					String<> source(asset.Begin(), asset.End(), _source.GetAllocator());
+		return Error::None;
+	}
 
-					Swap(_source, source);
+	// ---------------------------------------------------
 
-					return Error::None;
-				}
+	void ScriptAsset::FreeResources() {
+		Clear();
+	}
 
-			// ---------------------------------------------------
+	// ---------------------------------------------------
 
-				void ScriptAsset::FreeResources() {
-					_source.Clear();
-				}
+	ETPureFunctionHint StringView ScriptAsset::GetExtension() ETNoexceptHint {
+		return ".wren";
+	}
 
-			}	// namespace AssetViews
-		}	// namespace Wren
-	}	// namespace Scripting
-}	// namespace Eldritch2
+}}}} // namespace Eldritch2::Scripting::Wren::AssetViews

@@ -16,6 +16,8 @@ table RigidBody {
 }
 
 table ClothBody {
+	Postions        : [ubyte] (required);
+	VertexStride    : uint;
 }
 
 table PhysicsBody {

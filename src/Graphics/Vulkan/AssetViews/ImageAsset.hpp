@@ -16,37 +16,36 @@
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
-namespace AssetViews {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	class ImageAsset : public Assets::Asset, public CrunchImageSource {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	class ImageAsset : public CrunchImageSource, public Assets::Asset {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref ImageAsset instance.
-	/*!	@param[in] path Null-terminated, UTF-8-encoded file system path to the asset this @ref ImageAsset describes. */
-		ImageAsset(const Utf8Char* const path);
-	//!	Disable copy construction.
+		//!	Disable copy construction.
 		ImageAsset(const ImageAsset&) = delete;
+		//!	Constructs this @ref ImageAsset instance.
+		/*!	@param[in] path String view containing the file system path to the asset the @ref ImageAsset describes. */
+		ImageAsset(StringView path);
 
 		~ImageAsset() override = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources(const Builder& builder) override;
+		ErrorCode BindResources(const Builder& builder) override;
 
-		void		FreeResources() override;
+		void FreeResources() override;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
-	//!	Disable copy assignment.
-		ImageAsset&	operator=(const ImageAsset&) = delete;
+	public:
+		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		ImageAsset& operator=(const ImageAsset&) = delete;
 	};
 
-}	// namespace AssetViews
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

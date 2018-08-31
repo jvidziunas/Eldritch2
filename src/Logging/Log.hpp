@@ -17,7 +17,7 @@
 
 namespace Eldritch2 { namespace Logging {
 
-	enum class MessageType {
+	enum Severity {
 		VerboseWarning = 0,
 		Warning,
 		Error,
@@ -35,24 +35,24 @@ namespace Eldritch2 { namespace Logging {
 		Log(const Log&) = delete;
 		//! Constructs this @ref Log instance.
 		/*!	Designed to be called from subclasses. */
-		Log();
+		Log() ETNoexceptHint;
 
 		~Log() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		virtual void Write(const Utf8Char* const string, size_t lengthInOctets) abstract;
+		virtual void Write(const Utf8Char* string, size_t lengthInOctets) ETNoexceptHint abstract;
 
 		template <typename... Arguments>
-		void Write(MessageType type, StringView<Utf8Char> format, Arguments&&... arguments);
+		void Write(Severity severity, StringView format, Arguments&&... arguments);
 
 		// ---------------------------------------------------
 
 	public:
-		MessageType GetMuteThreshold() const;
+		Severity GetWriteThreshold() const ETNoexceptHint;
 
-		void SetWriteThreshold(MessageType threshold);
+		void SetWriteThreshold(Severity threshold) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -62,7 +62,7 @@ namespace Eldritch2 { namespace Logging {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Atomic<MessageType> _muteThreshold;
+		Atomic<Severity> _writeThreshold;
 	};
 
 }} // namespace Eldritch2::Logging

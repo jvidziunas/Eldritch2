@@ -23,7 +23,7 @@ namespace Eldritch2 { namespace Core {
 
 	// ---------------------------------------------------
 
-	bool PropertyDatabase::SetValue(StringView<Utf8Char> group, StringView<Utf8Char> name, StringView<Utf8Char> value) {
+	bool PropertyDatabase::SetValue(StringView group, StringView name, StringView value) ETNoexceptHint {
 		{
 			//	Try to find a setter for the specific key/section pair we're working with.
 			const auto candidate(_settersByKey.Find({ group, name }));

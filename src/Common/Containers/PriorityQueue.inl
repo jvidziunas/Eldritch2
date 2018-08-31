@@ -20,12 +20,9 @@ namespace Eldritch2 {
 
 template <typename Value, class Container, typename Comparator>
 template <typename InputIterator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	InputIterator         first,
-	InputIterator         last,
-	const ComparatorType& sorter,
-	const ContainerType&  container) :
-	PriorityQueue(sorter, container) {
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(const ContainerType& queue, const ComparatorType& sort, InputIterator first, InputIterator last) :
+	c(queue),
+	comp(sort) {
 	c.Insert(c.End(), first, last);
 	eastl::make_heap(c.Begin(), c.End(), comp);
 }
@@ -34,12 +31,9 @@ ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
 
 template <typename Value, class Container, typename Comparator>
 template <class InputIterator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	InputIterator         first,
-	InputIterator         last,
-	const ComparatorType& sorter,
-	ContainerType&&       container) :
-	PriorityQueue(sorter, eastl::move(container)) {
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(ContainerType&& queue, const ComparatorType& sort, InputIterator first, InputIterator last) :
+	c(eastl::move(queue)),
+	comp(sort) {
 	c.Insert(c.End(), first, last);
 	eastl::make_heap(c.Begin(), c.End(), comp);
 }
@@ -47,94 +41,48 @@ ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
 // ---------------------------------------------------
 
 template <typename Value, class Container, typename Comparator>
-template <typename InputIterator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	InputIterator         first,
-	InputIterator         last,
-	const ComparatorType& sorter) :
-	c(first, last),
-	comp(sorter) {
-	eastl::make_heap(c.Begin(), c.End(), comp);
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Container, typename Comparator>
-template <typename InputIterator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	InputIterator first,
-	InputIterator last) :
-	c(first, last),
-	comp() {
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Container, typename Comparator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	const ComparatorType& sorter,
-	ContainerType&&       container) :
-	c(eastl::move(container)),
-	comp(sorter) {
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Container, typename Comparator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	const ComparatorType& sorter,
-	const ContainerType&  container) :
-	c(container),
-	comp(sorter) {
-}
+template <class Allocator, typename InputIterator>
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(const Allocator& allocator, const ComparatorType& sort, InputIterator first, InputIterator last) :
+	c(allocator, first, last),
+	comp(sort) {}
 
 // ---------------------------------------------------
 
 template <typename Value, class Container, typename Comparator>
 template <class Allocator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	const PriorityQueue<Value, Container, Comparator>& queue,
-	const Allocator&                                   allocator) :
-	c(queue.c, allocator),
-	comp(queue.comp) {
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Container, typename Comparator>
-template <class Allocator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	PriorityQueue<Value, Container, Comparator>&& queue,
-	const Allocator&                              allocator) :
-	c(eastl::move(queue.c), allocator),
-	comp(eastl::move(comp)) {
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Container, typename Comparator>
-template <class Allocator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	const Allocator& allocator) :
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(const Allocator& allocator, const ComparatorType& sort) :
 	c(allocator),
-	comp() {
-}
+	comp(sort) {}
 
 // ---------------------------------------------------
 
 template <typename Value, class Container, typename Comparator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(
-	const ComparatorType& sorter) :
-	c(),
-	comp(sorter) {
-}
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(const ContainerType& queue, const ComparatorType& sort) :
+	c(queue),
+	comp(sort) {}
 
 // ---------------------------------------------------
 
 template <typename Value, class Container, typename Comparator>
-ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue() :
-	c(),
-	comp() {}
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(ContainerType&& queue, const ComparatorType& sort) :
+	c(eastl::move(queue)),
+	comp(sort) {}
+
+// ---------------------------------------------------
+
+template <typename Value, class Container, typename Comparator>
+template <class Allocator>
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(const Allocator& allocator, const PriorityQueue& queue) :
+	c(allocator, queue.c),
+	comp(queue.comp) {}
+
+// ---------------------------------------------------
+
+template <typename Value, class Container, typename Comparator>
+template <class Allocator>
+ETInlineHint PriorityQueue<Value, Container, Comparator>::PriorityQueue(const Allocator& allocator, PriorityQueue&& queue) :
+	c(allocator, eastl::move(queue.c)),
+	comp(eastl::move(queue.comp)) {}
 
 // ---------------------------------------------------
 
@@ -244,6 +192,8 @@ ETInlineHint typename PriorityQueue<Value, Container, Comparator>::ContainerType
 
 template <typename Value, class Container, typename Comparator>
 ETInlineHint void Swap(PriorityQueue<Value, Container, Comparator>& queue0, PriorityQueue<Value, Container, Comparator>& queue1) {
+	using ::Eldritch2::Swap;
+
 	Swap(queue0.c, queue1.c);
 	Swap(queue0.comp, queue1.comp);
 }

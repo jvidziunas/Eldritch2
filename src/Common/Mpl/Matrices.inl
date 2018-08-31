@@ -119,7 +119,7 @@ ETInlineHint ETPureFunctionHint Matrix4x4 ETSimdCall operator*(Matrix4x4 operand
 
 	/*	Since _mm_dp_ps zeroes out all the elements not masked out, we can simply do a bitwise or and work on an individual component at a time instead of playing shuffling games.
 	 *	This has the added beneficial side effect of allowing the processor to execute several dot products in parallel as there are fewer data dependencies over a naive implementation. */
-	for (size_t row(0); row < _countof(operand0.rows); ++row) {
+	for (size_t row(0); row < ETCountOf(operand0.rows); ++row) {
 		operand0.rows[row] = _mm_or_ps(
 			_mm_or_ps(_mm_dp_ps(operand1.rows[0], operand0.rows[row], X_MASK), _mm_dp_ps(operand1.rows[1], operand0.rows[row], Y_MASK)),
 			_mm_or_ps(_mm_dp_ps(operand1.rows[2], operand0.rows[row], Z_MASK), _mm_dp_ps(operand1.rows[3], operand0.rows[row], W_MASK)));
@@ -182,7 +182,7 @@ ETInlineHint Matrix4x4& ETSimdCall Matrix4x4::operator*=(Matrix4x4 matrix) {
 
 	/*	Since _mm_dp_ps zeroes out all the elements not masked out, we can simply do a bitwise or and work on an individual component at a time instead of playing shuffling games.
 	 *	This has the added beneficial side effect of allowing the processor to execute several dot products in parallel as there are fewer data dependencies over a naive implementation. */
-	for (size_t row(0); row < _countof(rows); ++row) {
+	for (size_t row(0); row < ETCountOf(rows); ++row) {
 		rows[row] = _mm_or_ps(
 			_mm_or_ps(_mm_dp_ps(matrix.rows[0], rows[row], X_MASK), _mm_dp_ps(matrix.rows[1], rows[row], Y_MASK)),
 			_mm_or_ps(_mm_dp_ps(matrix.rows[2], rows[row], Z_MASK), _mm_dp_ps(matrix.rows[3], rows[row], W_MASK)));

@@ -24,7 +24,7 @@ namespace Eldritch2 { namespace Audio {
 	// ---------------------------------------------------
 
 	template <typename Voice>
-	ETInlineHint const typename Listener<Voice>::VoiceList& Listener<Voice>::GetActiveVoices() const {
+	ETInlineHint const ArrayList<Voice>& Listener<Voice>::GetActiveVoices() const {
 		return _activeVoices;
 	}
 

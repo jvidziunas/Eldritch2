@@ -31,7 +31,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
-		Result<UniquePointer<Core::WorldComponent>> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
+		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
 
 		void PublishAssetTypes(Assets::AssetApiBuilder& factories) override;
 

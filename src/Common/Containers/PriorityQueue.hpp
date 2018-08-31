@@ -35,33 +35,28 @@ public:
 public:
 	//!	Constructs this @ref PriorityQueue instance.
 	template <typename InputIterator>
-	PriorityQueue(InputIterator first, InputIterator last, const ComparatorType& sorter, const ContainerType& container);
+	PriorityQueue(const ContainerType& queue, const ComparatorType& sort, InputIterator first, InputIterator last);
 	//!	Constructs this @ref PriorityQueue instance.
 	template <class InputIterator>
-	PriorityQueue(InputIterator first, InputIterator last, const ComparatorType& sorter, ContainerType&& container);
+	PriorityQueue(ContainerType&& queue, const ComparatorType& sort, InputIterator first, InputIterator last);
 	//!	Constructs this @ref PriorityQueue instance.
-	template <typename InputIterator>
-	PriorityQueue(InputIterator first, InputIterator last, const ComparatorType& sorter);
-	//!	Constructs this @ref PriorityQueue instance.
-	template <typename InputIterator>
-	PriorityQueue(InputIterator first, InputIterator last);
-	//!	Constructs this @ref PriorityQueue instance.
-	explicit PriorityQueue(const ComparatorType& sorter, ContainerType&& container);
-	//!	Constructs this @ref PriorityQueue instance.
-	PriorityQueue(const ComparatorType& sorter, const ContainerType& container);
+	template <class Allocator, typename InputIterator>
+	PriorityQueue(const Allocator& allocator, const ComparatorType& sort, InputIterator first, InputIterator last);
 	//!	Constructs this @ref PriorityQueue instance.
 	template <class Allocator>
-	PriorityQueue(const PriorityQueue& x, const Allocator& allocator = AllocatorType());
+	explicit PriorityQueue(const Allocator& allocator, const ComparatorType& sort = ComparatorType());
+	//!	Constructs this @ref PriorityQueue instance.
+	PriorityQueue(const ContainerType& queue, const ComparatorType& sort);
+	//!	Constructs this @ref PriorityQueue instance.
+	PriorityQueue(ContainerType&& queue, const ComparatorType& sort);
 	//!	Constructs this @ref PriorityQueue instance.
 	template <class Allocator>
-	PriorityQueue(PriorityQueue&&, const Allocator& allocator = AllocatorType());
-	//!	Constructs this @ref PriorityQueue instance.
-	explicit PriorityQueue(const ComparatorType& sorter);
+	PriorityQueue(const Allocator& allocator, const PriorityQueue&);
 	//!	Constructs this @ref PriorityQueue instance.
 	template <class Allocator>
-	PriorityQueue(const Allocator& allocator);
+	PriorityQueue(const Allocator& allocator, PriorityQueue&&);
 	//!	Constructs this @ref PriorityQueue instance.
-	PriorityQueue();
+	PriorityQueue() = default;
 
 	~PriorityQueue() = default;
 
@@ -86,8 +81,8 @@ public:
 	void Push(const ValueType& value);
 	void Push(ValueType&& value);
 
-	template <class... Args>
-	void Emplace(Args&&... args);
+	template <class... Arguments>
+	void Emplace(Arguments&&... arguments);
 
 	void Pop(ValueType& value);
 	void Pop();

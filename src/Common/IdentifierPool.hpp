@@ -13,119 +13,130 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Containers/ArrayList.hpp>
-#include <Common/Pair.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Detail {
 
-	template <typename Identifier>
-	class IdentifierPool {
+	template <typename Value>
+	struct ValueRange {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using IdentifierType = Identifier;
+		using ValueType = Value;
 
-		// ---
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		struct ValueRange {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+	public:
+		//!	Constructs this @ref ValueRange instance.
+		ValueRange(Value begin, Value end) ETNoexceptHint;
+		//!	Constructs this @ref ValueRange instance.
+		ValueRange() ETNoexceptHint = default;
 
-		public:
-			//!	Constructs this @ref ValueRange instance.
-			ValueRange(IdentifierType first, IdentifierType last);
-			//!	Constructs this @ref ValueRange instance.
-			ValueRange() = default;
+		~ValueRange() = default;
 
-			~ValueRange() = default;
+		// ---------------------------------------------------
 
-			// ---------------------------------------------------
+	public:
+		bool Contains(Value value) const ETNoexceptHint;
 
-		public:
-			bool CanMergeForwardWith(const ValueRange& range) const;
+		// ---------------------------------------------------
 
-			// ---------------------------------------------------
+	public:
+		ValueType GetSize() const ETNoexceptHint;
 
-		public:
-			IdentifierType GetSize() const;
+		bool IsEmpty() const ETNoexceptHint;
 
-			// ---------------------------------------------------
+		// - DATA MEMBERS ------------------------------------
 
-		public:
-			bool Contains(IdentifierType identifier) const;
+	public:
+		ValueType begin;
+		ValueType end;
 
-			bool IsEmpty() const;
+		// ---------------------------------------------------
 
-			// - DATA MEMBERS ------------------------------------
+		template <typename Value>
+		friend bool IsContiguous(const ValueRange<Value>& lhs, const ValueRange<Value>& rhs) ETNoexceptHint;
 
-		public:
-			IdentifierType first;
-			IdentifierType last;
-		};
+		template <typename Value>
+		friend ValueRange<Value> Union(const ValueRange<Value>& lhs, const ValueRange<Value>& rhs) ETNoexceptHint;
+
+		template <typename Value>
+		friend bool operator<(const ValueRange<Value>&, const ValueRange<Value>&) ETNoexceptHint;
 	};
 
 } // namespace Detail
 
 template <typename Identifier, class Allocator = MallocAllocator>
-class IdentifierPool : Detail::IdentifierPool<Identifier> {
+class IdentifierPool {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using ValueRange     = typename Detail::IdentifierPool<Identifier>::ValueRange;
-	using IdentifierType = typename Detail::IdentifierPool<Identifier>::IdentifierType;
-	using AllocatorType  = Allocator;
+	using RangeList     = ArrayList<Detail::ValueRange<Identifier>, Allocator>;
+	using RangeType     = typename RangeList::ValueType;
+	using AllocatorType = typename RangeList::AllocatorType;
+	using ValueType     = typename RangeType::ValueType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref IdentifierPool instance.
-	explicit IdentifierPool(std::initializer_list<ValueRange> ranges, const AllocatorType& allocator);
+	IdentifierPool(const AllocatorType& allocator, ValueType begin, ValueType end);
 	//!	Constructs this @ref IdentifierPool instance.
-	explicit IdentifierPool(ValueRange initialRange, const AllocatorType& allocator);
+	IdentifierPool(const AllocatorType& allocator, std::initializer_list<RangeType> ranges);
 	//!	Constructs this @ref IdentifierPool instance.
-	explicit IdentifierPool(const AllocatorType& allocator);
+	IdentifierPool(const AllocatorType& allocator);
 	//!	Constructs this @ref IdentifierPool instance.
-	IdentifierPool(IdentifierPool&&);
-	//!	Disable copy construction.
-	IdentifierPool(const IdentifierPool&) = delete;
+	IdentifierPool(const IdentifierPool&) = default;
+	//!	Constructs this @ref IdentifierPool instance.
+	IdentifierPool(IdentifierPool&&) = default;
 
 	~IdentifierPool() = default;
 
 	// ---------------------------------------------------
 
 public:
-	Pair<Identifier, bool> Allocate();
+	Pair<ValueType, bool> Allocate(ValueType count);
+	Pair<ValueType, bool> Allocate();
 
-	Pair<Identifier, bool> AllocateRange(IdentifierType sizeInElements);
-
-	void ReleaseRange(ValueRange range);
-
-	void Release(IdentifierType identifier);
+	void Deallocate(ValueType identifier);
+	void Deallocate(RangeType range);
 
 	// ---------------------------------------------------
 
 public:
+	bool IsEmpty() const ETNoexceptHint;
+
 	void Clear();
 
 	// ---------------------------------------------------
 
 public:
-	bool IsEmpty() const;
-
-	// ---------------------------------------------------
-
-	//!	Disable copy assignment.
-	IdentifierPool& operator=(const IdentifierPool&) = delete;
+	ValueType GetLargestRange() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	IdentifierType GetLargestSpanLength() const;
+	const AllocatorType& GetAllocator() const ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+public:
+	IdentifierPool& Assign(std::initializer_list<RangeType> ranges);
+	IdentifierPool& Assign(ValueType begin, ValueType end);
+
+	IdentifierPool& operator=(const IdentifierPool&) = default;
+	IdentifierPool& operator=(IdentifierPool&&) = default;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	ArrayList<ValueRange, AllocatorType> _freeRanges;
+	RangeList _ranges;
+
+	// ---------------------------------------------------
+
+	template <typename Identifier, class Allocator>
+	friend void Swap(IdentifierPool<Identifier, Allocator>&, IdentifierPool<Identifier, Allocator>&);
 };
 
 } // namespace Eldritch2

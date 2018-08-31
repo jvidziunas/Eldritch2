@@ -13,541 +13,403 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Containers/RangeAdapters.hpp>
-#include <Common/Memory.hpp>
+#include <Common/Algorithms.hpp>
 //------------------------------------------------------------------//
-#include <eastl/algorithm.h>
-ET_PUSH_COMPILER_WARNING_STATE()
-ET_SET_MSVC_WARNING_STATE(disable : 4459 4244)
+ET_PUSH_MSVC_WARNING_STATE(disable : 4459 4244)
 #include <fmt/format.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-
 template <typename T>
 class Hash;
 
 template <typename T>
 class EqualTo;
 
+ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t sizeInBytes, size_t seed) ETNoexceptHint;
+} // namespace Eldritch2
+
+namespace Eldritch2 {
+
 template <typename Character, class Allocator>
-template <typename AlternateCharacter>
-ETInlineHint AbstractString<Character, Allocator>::AbstractString(
-	const AlternateCharacter* const begin,
-	const AlternateCharacter* const end,
-	const AllocatorType&            allocator) :
-	_container(UnderlyingContainer::CtorConvert(), begin, eastl::distance(begin, end), allocator) {
+template <typename... Arguments>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::AbstractString(const AllocatorType& allocator, AbstractStringView<CharacterType> format, Arguments&&... arguments) :
+	_container(allocator) {
+	Assign(format, eastl::forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>::AbstractString(
-	const CharacterType* const begin,
-	const CharacterType* const end,
-	const AllocatorType&       allocator) :
-	_container(begin, end, allocator) {
+template <typename Character2>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::AbstractString(const AllocatorType& allocator, AbstractStringView<Character2> string) :
+	_container(UnderlyingContainer::CtorConvert(), string.ConstBegin(), string.GetLength(), allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>::AbstractString(
-	const CharacterType* const string,
-	const AllocatorType&       allocator) :
-	_container(string, allocator) {
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-template <typename AlternateCharacter>
-ETInlineHint AbstractString<Character, Allocator>::AbstractString(
-	const AlternateCharacter* const string,
-	const AllocatorType&            allocator) :
-	_container(UnderlyingContainer::CtorConvert(), string, StringLength(string), allocator) {
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>::AbstractString(
-	const AbstractString<Character, Allocator>& string,
-	const AllocatorType&                        allocator) :
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::AbstractString(const AllocatorType& allocator, AbstractStringView<CharacterType> string) :
 	_container(string.Begin(), string.End(), allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>::AbstractString(
-	SizeType             reservedLength,
-	const AllocatorType& allocator) :
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::AbstractString(const AllocatorType& allocator, const AbstractString<Character, Allocator>& string) :
+	_container(string.Begin(), string.End(), allocator) {
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+template <typename InputIterator>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::AbstractString(const AllocatorType& allocator, InputIterator begin, InputIterator end) :
+	_container(begin, end, allocator) {
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::AbstractString(const AllocatorType& allocator, SizeType reservedLength) :
 	_container(UnderlyingContainer::CtorDoNotInitialize(), reservedLength, allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>::AbstractString(
-	const AllocatorType& allocator) :
-	_container(allocator) {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::Find(AbstractStringView<CharacterType> needle, SizeType offset) const {
+	return _container.find(needle.Begin(), offset, needle.GetLength());
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindFirstInstance(ConstIterator start, const CharacterType* const needle, const ReturnEndOfNeedleSemantics) const {
-	const Character* const needleEnd(FindTerminator(needle));
-	const Character* const position(eastl::search(start, _container.cend(), needle, needleEnd));
-
-	return eastl::min(_container.cend(), position + (needleEnd - needle));
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::Find(CharacterType value, SizeType offset) const {
+	return _container.find(value, offset);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindFirstInstance(ConstIterator start, const CharacterType* const needle) const {
-	return eastl::search(start, _container.cend(), needle, Eldritch2::FindTerminator(needle));
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::FindLast(AbstractStringView<CharacterType> needle, SizeType offset) const {
+	return _container.rfind(needle.Begin(), offset, needle.GetLength());
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindFirstInstance(const CharacterType* const needle, const ReturnEndOfNeedleSemantics semantics) const {
-	return this->FindFirstInstance(_container.cbegin(), needle, semantics);
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::FindLast(CharacterType value, SizeType offset) const {
+	return _container.rfind(value, offset);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindFirstInstance(const CharacterType* const needle) const {
-	return this->FindFirstInstance(_container.cbegin(), needle);
+ETInlineHint ETForceInlineHint bool AbstractString<Character, Allocator>::Contains(AbstractStringView<CharacterType> needle) const {
+	return this->Find(needle) != SizeType(-1);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindFirstInstance(ConstIterator start, CharacterType character) const {
-	return eastl::find(start, _container.cend(), character);
+ETInlineHint ETForceInlineHint bool AbstractString<Character, Allocator>::Contains(CharacterType value) const {
+	return this->Find(value) != SizeType(-1);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindFirstInstance(CharacterType character) const {
-	return this->FindFirstInstance(_container.cbegin(), character);
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindLastInstance(const CharacterType* const needle, const ReturnEndOfNeedleSemantics semantics) const {
-	return this->FindLastInstance(Begin(), needle, semantics);
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindLastInstance(const CharacterType* const needle) const {
-	return this->FindLastInstance(Begin(), needle);
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindLastInstance(ConstIterator start, const CharacterType* const needle, const ReturnEndOfNeedleSemantics) const {
-	const Character* const position(::Eldritch2::FindLastInstance(start, needle));
-
-	return position ? position + StringLength(needle) : End();
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindLastInstance(ConstIterator start, const CharacterType* const needle) const {
-	const Character* const position(::Eldritch2::FindLastInstance(start, needle));
-
-	return position ? position : End();
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindLastInstance(ConstIterator start, CharacterType character) const {
-	const Character* const position(::Eldritch2::FindLastInstance(start, character));
-
-	return position ? position : End();
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::FindLastInstance(CharacterType character) const {
-	return this->FindLastInstance(Begin(), character);
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint bool AbstractString<Character, Allocator>::Contains(const CharacterType* const needle) const {
-	return _container.cend() != this->FindFirstInstance(needle);
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint bool AbstractString<Character, Allocator>::Contains(CharacterType character) const {
-	return _container.cend() != this->FindFirstInstance(character);
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::MakeLowerCase() {
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::MakeLowerCase() {
 	_container.make_lower();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::MakeUpperCase() {
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::MakeUpperCase() {
 	_container.make_upper();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::Replace(CharacterType source, CharacterType replacement) {
-	Iterator position(_container.begin());
-	Iterator end(_container.end());
-
-	while (position != end) {
-		position = eastl::find(position, end, source);
-		if (position != end) {
-			*position++ = replacement;
-		}
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::ReplaceAll(CharacterType value, CharacterType replacement) {
+	for (SizeType position(_container.find(value, 0u)); position != SizeType(-1); position = _container.find(value, position)) {
+		_container[position++] = replacement;
 	}
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint bool AbstractString<Character, Allocator>::HasPrefix(const CharacterType* const needle) const {
-	const SizeType needleLength(StringLength(needle));
-
-	return (needleLength <= GetLength()) ? StringsEqual(AsCString(), needle, needleLength) : false;
+ETInlineHint ETForceInlineHint bool AbstractString<Character, Allocator>::StartsWith(AbstractStringView<CharacterType> needle) const {
+	return needle.GetLength() <= this->GetLength() ? StringsEqual(needle.GetData(), this->GetData(), needle.GetLength()) : false;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint bool AbstractString<Character, Allocator>::HasPrefix(CharacterType character) const {
-	return (*this)[0] == character;
+ETInlineHint ETForceInlineHint bool AbstractString<Character, Allocator>::StartsWith(CharacterType value) const {
+	return bool(*this) ? this->Front() == value : false;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint bool AbstractString<Character, Allocator>::HasSuffix(const CharacterType* const needle) const {
-	const SizeType needleLength(StringLength(needle));
-
-	return (needleLength <= GetLength()) ? StringsEqual(End() - needleLength, needle, needleLength) : false;
+ETInlineHint ETForceInlineHint bool AbstractString<Character, Allocator>::EndsWith(AbstractStringView<CharacterType> needle) const {
+	return needle.GetLength() <= this->GetLength() ? StringsEqual(needle.GetData(), this->End() - needle.GetLength(), needle.GetLength()) : false;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint bool AbstractString<Character, Allocator>::HasSuffix(const CharacterType character) const {
-	return (*this) ? (End()[-1] == character) : false;
+ETInlineHint ETForceInlineHint bool AbstractString<Character, Allocator>::EndsWith(CharacterType character) const {
+	return bool(*this) ? this->Back() == character : false;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::Erase(ConstIterator begin, ConstIterator end) {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::Erase(ConstIterator begin, ConstIterator end) {
 	return _container.erase(begin, end);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::Erase(ConstIterator position) {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::Erase(ConstIterator position) {
 	return _container.erase(position);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::Begin() const {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::Begin() const {
 	return _container.begin();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::End() const {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::End() const {
 	return _container.end();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::ConstBegin() const {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstReverseIterator AbstractString<Character, Allocator>::ReverseBegin() const {
+	return _container.rbegin();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstReverseIterator AbstractString<Character, Allocator>::ReverseEnd() const {
+	return _container.rend();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::ConstBegin() const {
 	return _container.cbegin();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::ConstEnd() const {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstIterator AbstractString<Character, Allocator>::ConstEnd() const {
 	return _container.cend();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator=(const AbstractString<Character, Allocator>& string) {
-	_container = string._container;
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstReverseIterator AbstractString<Character, Allocator>::ConstReverseBegin() const {
+	return _container.crbegin();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::ConstReverseIterator AbstractString<Character, Allocator>::ConstReverseEnd() const {
+	return _container.crend();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::CharacterType AbstractString<Character, Allocator>::Front() const {
+	return _container.front();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::CharacterType AbstractString<Character, Allocator>::Back() const {
+	return _container.back();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator=(AbstractStringView<CharacterType> string) {
+	_container.assign(string.GetData(), string.GetLength());
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator=(AbstractString<Character, Allocator>&& string) {
-	_container = eastl::move(string._container);
+template <typename... Arguments>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(AbstractStringView<CharacterType> format, Arguments&&... arguments) {
+	Clear();
+	return Append(format, eastl::forward<Arguments>(arguments)...);
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+template <typename Character2>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(AbstractStringView<Character2> string) {
+	_container.assign_convert(string.GetData(), string.GetLength());
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator=(const CharacterType* const string) {
-	_container = string;
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(AbstractStringView<CharacterType> string) {
+	_container.assign(string.GetData(), string.GetLength());
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-template <size_t formatSize, typename... Arguments>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(const CharacterType (&string)[formatSize], Arguments&&... arguments) {
-	_container.clear();
-	return Append(string, eastl::forward<Arguments>(arguments)...);
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::EnsurePrefix(AbstractStringView<CharacterType> prefix) {
+	return StartsWith(prefix) ? *this : Prepend(prefix);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-template <typename AlternateCharacter>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(const AlternateCharacter* const begin, const AlternateCharacter* const end) {
-	_container.assign_convert(begin, eastl::distance(begin, end));
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::EnsurePrefix(CharacterType prefix) {
+	return StartsWith(prefix) ? *this : Prepend(prefix);
+}
 
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::EnsureSuffix(AbstractStringView<CharacterType> suffix) {
+	return EndsWith(suffix) ? *this : Append(suffix);
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::EnsureSuffix(CharacterType suffix) {
+	return EndsWith(suffix) ? *this : Append(suffix);
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Prepend(AbstractStringView<CharacterType> string) {
+	_container.insert(/*position =*/SizeType(0u), string.Begin(), string.GetLength());
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(const CharacterType* const begin, const CharacterType* const end) {
-	_container.assign(begin, end);
-
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Prepend(CharacterType value) {
+	_container.insert(/*position =*/SizeType(0u), /*n =*/SizeType(1u), value);
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-template <typename AlternateCharacter, typename AlternateAllocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(const AbstractString<AlternateCharacter, AlternateAllocator>& string) {
-	_container.assign(string._container);
-
+template <typename... Arguments>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(AbstractStringView<CharacterType> format, Arguments&&... arguments) {
+	fmt::format_to(std::back_inserter(_container), fmt::basic_string_view<CharacterType>(format.GetData(), format.GetLength()), arguments...);
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-template <typename AlternateCharacter>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(const AlternateCharacter* const string) {
-	_container.assign_convert(string);
-
+template <typename Character2>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(AbstractStringView<Character2> string) {
+	_container.append_convert(string.GetData(), string.GetLength());
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Assign(const CharacterType* const string) {
-	_container.assign(string);
-
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(AbstractStringView<CharacterType> string) {
+	_container.append(string.GetData(), string.GetLength());
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-template <size_t formatSize, typename... Arguments>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(const Character (&formatString)[formatSize], Arguments&&... arguments) {
-	fmt::format_to(std::back_inserter(_container), fmt::basic_string_view<Character>(formatString), eastl::forward<Arguments>(arguments)...);
+template <typename InputIterator>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(InputIterator begin, InputIterator end) {
+	_container.append_convert(begin, SizeType(eastl::distance(begin, end)));
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-template <typename AlternateCharacter>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(const AlternateCharacter* const begin, const AlternateCharacter* const end) {
-	_container.append_convert(begin, eastl::distance(begin, end));
-
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(CharacterType value) {
+	_container.push_back(value);
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(const CharacterType* const begin, const CharacterType* const end) {
-	_container.append(begin, end);
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-template <typename AlternateCharacter>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(const AlternateCharacter* const string) {
-	_container.append_convert(string);
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(const CharacterType* const string) {
-	_container.append(string);
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-template <typename AlternateCharacter, class AlternateAllocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(const AbstractString<AlternateCharacter, AlternateAllocator>& string) {
-	_container.append_convert(string._container);
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(const AbstractString<Character, Allocator>& string) {
-	_container.append(string._container);
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::Append(CharacterType character) {
-	_container.push_back(character);
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::EnsureSuffix(const CharacterType* const string) {
-	if (!HasSuffix(string)) {
-		Append(string);
-	}
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::EnsureSuffix(CharacterType character) {
-	if (!HasSuffix(character)) {
-		Append(character);
-	}
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-template <typename AlternateCharacter, class AlternateAllocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(const AbstractString<AlternateCharacter, AlternateAllocator>& string) {
+template <typename Character2>
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(AbstractStringView<Character2> string) {
 	_container.append_convert(string.Begin(), string.GetLength());
-
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(const AbstractString<Character, Allocator>& string) {
-	_container += string._container;
-
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(AbstractStringView<CharacterType> string) {
+	_container.append(string.Begin(), string.GetLength());
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-template <typename AlternateCharacter>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(const AlternateCharacter* const string) {
-	_container.append_convert(string);
-
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(CharacterType value) {
+	_container.push_back(value);
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(const CharacterType* const string) {
-	_container += string;
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>& AbstractString<Character, Allocator>::operator+=(CharacterType character) {
-	_container.push_back(character);
-
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-template <size_t formatCount, typename... Arguments>
-ETInlineHint static typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::GetFormattedLength(const Character (&string)[formatCount], Arguments&&... arguments) {
-	return fmt::formatted_size(fmt::basic_string_view<Character>(formatString), eastl::forward<Arguments>(arguments)...);
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::Clear() {
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::Clear() {
 	_container.clear();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::Trim(SizeType charactersToAdvanceBeginning, SizeType charactersToRemoveFromEnd) {
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::Trim(SizeType charactersToAdvanceBeginning, SizeType charactersToRemoveFromEnd) {
 	_container.erase(_container.end() - charactersToRemoveFromEnd, _container.end());
 	_container.erase(_container.begin(), _container.begin() + charactersToAdvanceBeginning);
 }
@@ -555,7 +417,7 @@ ETInlineHint void AbstractString<Character, Allocator>::Trim(SizeType characters
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::Trim(ConstIterator newBegin, ConstIterator newEnd) {
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::Trim(ConstIterator newBegin, ConstIterator newEnd) {
 	_container.erase(newEnd, _container.end());
 	_container.erase(_container.begin(), newBegin);
 }
@@ -563,183 +425,160 @@ ETInlineHint void AbstractString<Character, Allocator>::Trim(ConstIterator newBe
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::Resize(const SizeType size) {
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::ForceSize(SizeType size) {
+	_container.force_size(size);
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::Resize(SizeType size) {
 	_container.resize(size);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint int AbstractString<Character, Allocator>::Compare(const CharacterType* const string) const {
-	return OrderStrings(this->AsCString(), string);
+ETInlineHint ETForceInlineHint int AbstractString<Character, Allocator>::Compare(AbstractStringView<CharacterType> string) const {
+	const intptr diff(intptr(GetLength()) - intptr(string.GetLength()));
+	return diff < 0 ? -1 : diff > 0 ? 1 : OrderStrings(*this, string.GetData(), string.GetLength());
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint int AbstractString<Character, Allocator>::Compare(const AbstractString<Character, Allocator>& string) const {
-	return OrderStrings(this->AsCString(), string.AsCString());
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::CharacterType AbstractString<Character, Allocator>::operator[](SizeType offset) const {
+	return _container[offset];
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::CharacterType AbstractString<Character, Allocator>::operator[](SizeType indexInCharacters) const {
-	return _container[indexInCharacters];
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::operator AbstractStringView<typename AbstractString<Character, Allocator>::CharacterType>() const {
+	return { _container.c_str(), _container.length() };
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>::operator typename const AbstractString<Character, Allocator>::CharacterType*() const {
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::operator typename const AbstractString<Character, Allocator>::CharacterType*() const {
 	return _container.c_str();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename const AbstractString<Character, Allocator>::CharacterType* AbstractString<Character, Allocator>::AsCString() const {
+ETInlineHint ETForceInlineHint typename const AbstractString<Character, Allocator>::CharacterType* AbstractString<Character, Allocator>::AsCString() const {
 	return _container.c_str();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename const AbstractString<Character, Allocator>::CharacterType* AbstractString<Character, Allocator>::GetData() {
+ETInlineHint ETForceInlineHint typename const AbstractString<Character, Allocator>::CharacterType* AbstractString<Character, Allocator>::GetData() const {
 	return _container.data();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::GetLength() const {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::CharacterType* AbstractString<Character, Allocator>::GetData() {
+	return _container.begin();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::GetLength() const {
 	return _container.length();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint bool AbstractString<Character, Allocator>::IsEmpty() const {
+ETInlineHint ETForceInlineHint bool AbstractString<Character, Allocator>::IsEmpty() const {
 	return _container.empty();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint AbstractString<Character, Allocator>::operator bool() const {
+ETInlineHint ETForceInlineHint AbstractString<Character, Allocator>::operator bool() const {
 	return !_container.empty();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void AbstractString<Character, Allocator>::Reserve(SizeType capacityInCharacters) {
+ETInlineHint ETForceInlineHint void AbstractString<Character, Allocator>::Reserve(SizeType capacityInCharacters) {
 	_container.reserve(capacityInCharacters);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::GetCapacityInCharacters() const {
+ETInlineHint ETForceInlineHint typename AbstractString<Character, Allocator>::SizeType AbstractString<Character, Allocator>::GetCapacityInCharacters() const {
 	return _container.capacity();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint const typename AbstractString<Character, Allocator>::AllocatorType& AbstractString<Character, Allocator>::GetAllocator() const {
+ETInlineHint ETForceInlineHint const typename AbstractString<Character, Allocator>::AllocatorType& AbstractString<Character, Allocator>::GetAllocator() const {
 	return _container.get_allocator();
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class StringAllocator>
-ETInlineHint ETPureFunctionHint bool operator==(const AbstractString<Character, StringAllocator>& string0, const AbstractString<Character, StringAllocator>& string1) {
-	return string0.Compare(string1) == 0;
+ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator==(const AbstractString<Character, StringAllocator>& lhs, const Character* const rhs) {
+	return lhs.Compare(rhs) == 0;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class StringAllocator>
-ETInlineHint ETPureFunctionHint bool operator==(const AbstractString<Character, StringAllocator>& string0, const Character* const string1) {
-	return string0.Compare(string1) == 0;
+ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator==(const AbstractString<Character, StringAllocator>& lhs, AbstractStringView<Character> rhs) {
+	return lhs.Compare(rhs) == 0;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class StringAllocator>
-ETInlineHint ETPureFunctionHint bool operator==(const Character* const string0, const AbstractString<Character, StringAllocator>& string1) {
-	return string1.Compare(string0) == 0;
+ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator!=(const AbstractString<Character, StringAllocator>& lhs, const AbstractString<Character, StringAllocator>& rhs) {
+	return lhs.Compare(rhs) != 0;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class StringAllocator>
-ETInlineHint ETPureFunctionHint bool operator!=(const AbstractString<Character, StringAllocator>& string0, const AbstractString<Character, StringAllocator>& string1) {
-	return string0.Compare(string1) != 0;
+ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator!=(const AbstractString<Character, StringAllocator>& lhs, const Character* const rhs) {
+	return lhs.Compare(rhs) != 0;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class StringAllocator>
-ETInlineHint ETPureFunctionHint bool operator!=(const AbstractString<Character, StringAllocator>& string0, const Character* const string1) {
-	return string0.Compare(string1) != 0;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class StringAllocator>
-ETInlineHint ETPureFunctionHint bool operator!=(const Character* const string0, const AbstractString<Character, StringAllocator>& string1) {
-	return string1.Compare(string0) != 0;
-}
-
-// ---------------------------------------------------
-
-template <typename Character, class StringAllocator>
-ETInlineHint ETPureFunctionHint size_t GetHashCode(const AbstractString<Character, StringAllocator>& string, size_t hashSeed) {
-	return HashMemory(string.AsCString(), string.GetLength() * sizeof(Character), hashSeed);
+ETInlineHint ETForceInlineHint ETPureFunctionHint size_t GetHashCode(const AbstractString<Character, StringAllocator>& string, size_t seed) {
+	return Eldritch2::HashMemory(string.AsCString(), string.GetLength() * sizeof(Character), seed);
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void Swap(AbstractString<Character, Allocator>& string0, AbstractString<Character, Allocator>& string1) {
-	eastl::swap(string0._container, string1._container);
+ETInlineHint ETForceInlineHint void Swap(AbstractString<Character, Allocator>& lhs, AbstractString<Character, Allocator>& rhs) {
+	lhs._container.swap(rhs._container);
 }
 
-// ---
+} // namespace Eldritch2
 
 template <typename Character, class Allocator>
-class Hash<AbstractString<Character, Allocator>> {
+class ::Eldritch2::EqualTo<::Eldritch2::AbstractString<Character, Allocator>> {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
-	//!	Constructs this @ref Hash instance.
-	Hash(const Hash&) = default;
-	//!	Constructs this @ref Hash instance.
-	Hash() = default;
-
-	~Hash() = default;
-
-	// ---------------------------------------------------
-
-public:
-	ETInlineHint ETPureFunctionHint size_t operator()(const AbstractString<Character, Allocator>& string, size_t seed = 0u) const {
-		return GetHashCode(string, seed);
-	}
-
-	ETInlineHint ETPureFunctionHint size_t operator()(const Character* const string, size_t seed = 0u) const {
-		return HashMemory(string, StringLength(string) * sizeof(Character), seed);
-	}
-};
-
-// ---
-
-template <typename Character, class Allocator>
-class EqualTo<AbstractString<Character, Allocator>> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-public:
+	//!	Constructs this @ref EqualTo instance.
+	EqualTo(const EqualTo&) = default;
 	//!	Constructs this @ref EqualTo instance.
 	EqualTo() = default;
 
@@ -748,20 +587,20 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ETInlineHint ETPureFunctionHint bool operator()(const AbstractString<Character, Allocator>& lhs, const AbstractString<Character, Allocator>& rhs) const {
+	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator()(const ::Eldritch2::AbstractString<Character, Allocator>& lhs, const ::Eldritch2::AbstractString<Character, Allocator>& rhs) const {
 		return lhs == rhs;
 	}
 
-	ETInlineHint ETPureFunctionHint bool operator()(const Character* const lhs, const AbstractString<Character, Allocator>& rhs) const {
-		return lhs == rhs;
-	}
-
-	ETInlineHint ETPureFunctionHint bool operator()(const AbstractString<Character, Allocator>& lhs, const Character* const rhs) const {
+	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator()(const ::Eldritch2::AbstractString<Character, Allocator>& lhs, AbstractStringView<Character> rhs) const {
 		return lhs == rhs;
 	}
 };
 
-} // namespace Eldritch2
+template <typename Character, class Allocator>
+class ::Eldritch2::Hash<::Eldritch2::AbstractString<Character, Allocator>> : public ::Eldritch2::Hash<::Eldritch2::AbstractStringView<Character>> {};
 
 template <typename Character, typename Allocator>
-struct fmt::v5::is_contiguous<eastl::basic_string<Character, Allocator>> : std::true_type {};
+struct ::fmt::v5::is_contiguous<::eastl::basic_string<Character, Allocator>> : public ::eastl::true_type {};
+
+template <typename Character, class Allocator, typename OutCharacter>
+struct ::fmt::v5::formatter<::Eldritch2::AbstractString<Character, Allocator>, OutCharacter> : public ::fmt::v5::formatter<::Eldritch2::AbstractStringView<Character>, OutCharacter> {};

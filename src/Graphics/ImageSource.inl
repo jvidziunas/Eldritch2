@@ -17,8 +17,8 @@
 
 namespace Eldritch2 { namespace Graphics {
 
-	ETPureFunctionHint ETInlineHint uint32 GetSubimageIndex(uint32 slice, uint32 mip, uint32 totalMips) {
-		return slice * totalMips + mip;
+	ETInlineHint ETForceInlineHint ETPureFunctionHint uint32 GetSubimageIndex(uint32 slice, uint32 mip, uint32 imageMips) ETNoexceptHint {
+		return slice * imageMips + mip;
 	}
 
 }} // namespace Eldritch2::Graphics

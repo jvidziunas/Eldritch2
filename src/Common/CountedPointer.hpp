@@ -97,6 +97,9 @@ private:
 
 	template <class Object2, typename Disposer2>
 	friend class ::Eldritch2::CountedPointer;
+
+	template <class Object, typename Disposer>
+	friend void Swap(CountedPointer<Object, Disposer>&, CountedPointer<Object, Disposer>&);
 };
 
 } // namespace Eldritch2

@@ -23,25 +23,18 @@ namespace Eldritch2 { namespace Tools {
 	namespace Detail {
 
 		template <typename Option>
-		Tool::OptionRegistrar& Tool::OptionRegistrar::Register(const Utf8Char* const name, Option& option) {
-			_options.EmplaceBack(name, [&option](Range<const Utf8Char*> value) -> int {
+		Tool::OptionRegistrar& Tool::OptionRegistrar::Register(PlatformStringView const name, Option& option) {
+			_options.EmplaceBack(name, [&option](StringView<PlatformChar> value) -> int {
 				using namespace ::boost::iostreams;
 
 				// ---
 
-				basic_array_source<Utf8Char> source(value.Begin(), value.End());
-				stream<decltype(source)>     stream(source);
-				Argument                     optionValue;
+				basic_array_source<PlatformChar> source(value.Begin(), value.End());
+				stream<decltype(source)>         stream(source);
 
-				stream >> optionValue;
+				stream >> value;
 
-				if (stream.fail()) {
-					return AsPosixInt(Error::InvalidParameter);
-				}
-
-				option = optionValue;
-
-				return 0;
+				return stream.fail() ? Error::InvalidParameter : Error::None;
 			});
 
 			return *this;
@@ -50,27 +43,18 @@ namespace Eldritch2 { namespace Tools {
 		// ---------------------------------------------------
 
 		template <typename Option>
-		Tool::OptionRegistrar& Tool::OptionRegistrar::Register(const Utf8Char* const name, const Utf8Char* const shortName, Option& option) {
+		Tool::OptionRegistrar& Tool::OptionRegistrar::Register(PlatformStringView name, PlatformStringView shortName, Option& option) {
 			return Register(name, option).Register(shortName, option);
-		}
-
-		// ---------------------------------------------------
-
-		template <typename ArgumentIterator>
-		int Tool::OptionRegistrar::Dispatch(ArgumentIterator begin, ArgumentIterator end) {
-			Utf8Char* const arguments(ETStackAlloc(Utf8Char*, eastl::distance(begin, end)));
-			return Dispatch({ arguments, eastl::uninitialized_copy(begin, end, arguments) });
 		}
 
 	} // namespace Detail
 
 	template <typename ImplementingType>
-	template <typename ArgumentIterator>
-	int CrtpTool<ImplementingType>::Run(ArgumentIterator begin, ArgumentIterator end) {
+	int CrtpTool<ImplementingType>::Run(int argc, PlatformChar** argv) {
 		{
 			OptionRegistrar registrar;
 			static_cast<ImplementingType&>(*this).RegisterOptions(registrar);
-			registrar.Dispatch(begin, end);
+			registrar.Dispatch(argc, argv);
 		}
 
 		return AsPosixInt(static_cast<ImplementingType&>(*this).Process());

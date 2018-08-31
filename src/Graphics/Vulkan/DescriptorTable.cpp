@@ -40,7 +40,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	// ---------------------------------------------------
 
 	void DescriptorTable::PushDescriptors(Gpu& gpu, uint32_t slot, uint32_t count, const VkDescriptorImageInfo* images) {
-		const VkWriteDescriptorSet write{
+		const VkWriteDescriptorSet write {
 			VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			/*pNext =*/nullptr,
 			_descriptors,
@@ -53,7 +53,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			/*pTexelBufferView =*/nullptr
 		};
 
-		vkUpdateDescriptorSets(gpu, 1u, &write, 0u, nullptr);
+		vkUpdateDescriptorSets(gpu, /*descriptorWriteCount =*/1u, ETAddressOf(write), /*descriptorCopyCount =*/0u, /*pDescriptorCopies =*/nullptr);
 	}
 
 	// ---------------------------------------------------
@@ -62,26 +62,26 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		using ::Eldritch2::Swap;
 
 		VkDescriptorPool                 pool;
-		const VkDescriptorPoolCreateInfo poolInfo{
+		const VkDescriptorPoolCreateInfo poolInfo {
 			VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			/*pNext =*/nullptr,
 			/*flags =*/0u,
 			/*maxSets =*/1u, // We always allocate exactly one descriptor set (see below) from the pool.
-			poolCount,
-			pools
+			poolCount, pools
 		};
-		ET_FAIL_UNLESS(vkCreateDescriptorPool(gpu, &poolInfo, gpu.GetAllocationCallbacks(), &pool));
+		ET_ABORT_UNLESS(vkCreateDescriptorPool(gpu, ETAddressOf(poolInfo), gpu.GetAllocationCallbacks(), ETAddressOf(pool)));
 		ET_AT_SCOPE_EXIT(vkDestroyDescriptorPool(gpu, pool, gpu.GetAllocationCallbacks()));
 
 		VkDescriptorSet                   descriptors;
-		const VkDescriptorSetAllocateInfo descriptorsInfo{
+		const VkDescriptorSetAllocateInfo descriptorsInfo {
 			VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 			/*pNext =*/nullptr,
 			pool,
-			1u, &layout
+			/*descriptorSetCount =*/1u,
+			ETAddressOf(layout)
 		};
-		ET_FAIL_UNLESS(vkAllocateDescriptorSets(gpu, &descriptorsInfo, &descriptors));
-		ET_AT_SCOPE_EXIT(if (pool) vkFreeDescriptorSets(gpu, pool, 1u, &descriptors));
+		ET_ABORT_UNLESS(vkAllocateDescriptorSets(gpu, ETAddressOf(descriptorsInfo), ETAddressOf(descriptors)));
+		ET_AT_SCOPE_EXIT(if (pool) vkFreeDescriptorSets(gpu, pool, /*descriptorSetCount =*/1u, ETAddressOf(descriptors)));
 
 		Swap(_pool, pool);
 		Swap(_descriptors, descriptors);
@@ -97,7 +97,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			return;
 		}
 
-		vkFreeDescriptorSets(gpu, pool, 1u, &_descriptors);
+		vkFreeDescriptorSets(gpu, pool, /*descriptorSetCount =*/1u, ETAddressOf(_descriptors));
 		vkDestroyDescriptorPool(gpu, pool, gpu.GetAllocationCallbacks());
 	}
 

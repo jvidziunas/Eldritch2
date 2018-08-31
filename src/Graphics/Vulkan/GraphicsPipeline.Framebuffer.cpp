@@ -17,12 +17,13 @@
 #include <Graphics/Vulkan/Gpu.hpp>
 //------------------------------------------------------------------//
 
-#define MAKE_CASE(is2D, isArray) (static_cast<int>(is2D) << 1u) | static_cast<int>(isArray)
+#define MAKE_CASE(is2D, isArray) (int(is2D) << 1u) | int(isArray)
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+
 	namespace {
 
-		ETInlineHint ETPureFunctionHint VkImageViewType GetViewType(VkExtent3D extent, VkImageCreateFlags flags, bool isArray) {
+		ETInlineHint ETForceInlineHint ETPureFunctionHint VkImageViewType GetViewType(VkExtent3D extent, VkImageCreateFlags flags, bool isArray) ETNoexceptHint {
 			if (flags & VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) {
 				return isArray ? VK_IMAGE_VIEW_TYPE_CUBE_ARRAY : VK_IMAGE_VIEW_TYPE_CUBE;
 			}
@@ -43,17 +44,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	} // anonymous namespace
 
-	Framebuffer::Attachment::Attachment(Attachment&& attachment) :
-		Attachment() {
+	Framebuffer::Attachment::Attachment(Attachment&& attachment) ETNoexceptHint : Attachment() {
 		Swap(*this, attachment);
 	}
 
 	// ---------------------------------------------------
 
-	Framebuffer::Attachment::Attachment() :
-		image(nullptr),
-		view(nullptr) {
-	}
+	Framebuffer::Attachment::Attachment() ETNoexceptHint : image(nullptr), view(nullptr) {}
 
 	// ---------------------------------------------------
 
@@ -64,53 +61,38 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult Framebuffer::Attachment::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, uint32 attachmentIndex, VkExtent2D baseDimensions, uint32 arrayLayers) {
+	VkResult Framebuffer::Attachment::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, uint32 attachmentIndex, VkExtent2D baseDimensions, uint32 layers) {
 		using ::Eldritch2::Swap;
 
 		const GraphicsPipeline::AttachmentDescription& attachment(pipeline.GetFramebufferAttachments()[attachmentIndex]);
-		const VkExtent3D                               dimensions(attachment.GetDimensions(baseDimensions, arrayLayers));
-
-		VkImage                 image;
-		const VkImageCreateInfo imageInfo {
-			VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-			/*pNext =*/nullptr,
-			attachment.flags,
-			GetImageType(dimensions),
-			attachment.format,
-			dimensions,
-			/*mipLevels =*/1u,
-			GetImageType(dimensions) != VK_IMAGE_TYPE_3D ? arrayLayers : 1u,
-			VkSampleCountFlagBits(attachment.msaaFlags),
-			VK_IMAGE_TILING_OPTIMAL,
-			attachment.usages,
-			VK_SHARING_MODE_EXCLUSIVE,
-			/*queueFamilyIndexCount =*/0u,
-			/*pQueueFamilyIndices =*/nullptr,
-			VK_IMAGE_LAYOUT_UNDEFINED
-		};
-		ET_FAIL_UNLESS(vkCreateImage(gpu, &imageInfo, gpu.GetAllocationCallbacks(), &image));
+		VkImage                                        image;
+		const VkImageCreateInfo                        imageInfo(attachment.GetImageCreateInfo(baseDimensions, layers));
+		ET_ABORT_UNLESS(vkCreateImage(gpu, ETAddressOf(imageInfo), gpu.GetAllocationCallbacks(), ETAddressOf(image)));
 		ET_AT_SCOPE_EXIT(vkDestroyImage(gpu, image, gpu.GetAllocationCallbacks()));
 
 		VkImageView                 view;
-		const VkImageViewCreateInfo viewInfo {
-			VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			/*pNext =*/nullptr,
-			/*flags =*/0u,
-			image,
-			GetViewType(dimensions, attachment.flags, arrayLayers > 1u),
-			attachment.format,
-			MakeIdentitySwizzle(),
-			VkImageSubresourceRange {
-				GetAspectsByUsage(attachment.usages),
-				/*baseMipLevel =*/0u,
-				/*levelCount =*/1u, // Vulkan requires all image views bound as output attachments have exactly 1 MIP level.
-				/*baseArrayLayer =*/0u,
-				VK_REMAINING_ARRAY_LAYERS }
-		};
-		ET_FAIL_UNLESS(vkCreateImageView(gpu, &viewInfo, gpu.GetAllocationCallbacks(), &view));
+		const VkImageViewCreateInfo viewInfo(attachment.GetImageViewCreateInfo(image, /*mip =*/0u));
+		ET_ABORT_UNLESS(vkCreateImageView(gpu, ETAddressOf(viewInfo), gpu.GetAllocationCallbacks(), ETAddressOf(view)));
 		ET_AT_SCOPE_EXIT(vkDestroyImageView(gpu, view, gpu.GetAllocationCallbacks()));
 
 		Swap(this->image, image);
+		Swap(this->view, view);
+
+		return VK_SUCCESS;
+	}
+
+	// ---------------------------------------------------
+
+	VkResult Framebuffer::Attachment::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, uint32 attachmentIndex, VkImage image) {
+		using ::Eldritch2::Swap;
+
+		const GraphicsPipeline::AttachmentDescription& attachment(pipeline.GetFramebufferAttachments()[attachmentIndex]);
+		VkImageView                                    view;
+		const VkImageViewCreateInfo                    viewInfo(attachment.GetImageViewCreateInfo(image, /*mip =*/0u));
+		ET_ABORT_UNLESS(vkCreateImageView(gpu, ETAddressOf(viewInfo), gpu.GetAllocationCallbacks(), ETAddressOf(view)));
+		ET_AT_SCOPE_EXIT(vkDestroyImageView(gpu, view, gpu.GetAllocationCallbacks()));
+
+		image = VK_NULL_HANDLE;
 		Swap(this->view, view);
 
 		return VK_SUCCESS;
@@ -125,17 +107,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	Framebuffer::Pass::Pass(Pass&& pass) :
-		Pass() {
+	Framebuffer::Pass::Pass(Pass&& pass) ETNoexceptHint : Pass() {
 		Swap(*this, pass);
 	}
 
 	// ---------------------------------------------------
 
-	Framebuffer::Pass::Pass() :
-		nativeFramebuffer(nullptr),
-		granularity {},
-		nativeArea {} {}
+	Framebuffer::Pass::Pass() ETNoexceptHint : nativeFramebuffer(nullptr),
+											   granularity { 0u, 0u },
+											   nativeArea { 0u, 0u } {}
 
 	// ---------------------------------------------------
 
@@ -145,7 +125,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkRect2D Framebuffer::Pass::GetRenderArea() const {
+	VkRect2D Framebuffer::Pass::GetRenderArea() const ETNoexceptHint {
 		uint32 scaledWidth(nativeArea.extent.width);
 		uint32 scaledHeight(nativeArea.extent.height);
 
@@ -196,7 +176,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			nativeArea.extent.height,
 			/*layers =*/1u
 		};
-		ET_FAIL_UNLESS(vkCreateFramebuffer(gpu, &nativeFramebufferInfo, gpu.GetAllocationCallbacks(), &nativeFramebuffer));
+		ET_ABORT_UNLESS(vkCreateFramebuffer(gpu, ETAddressOf(nativeFramebufferInfo), gpu.GetAllocationCallbacks(), ETAddressOf(nativeFramebuffer)));
 		ET_AT_SCOPE_EXIT(vkDestroyFramebuffer(gpu, nativeFramebuffer, gpu.GetAllocationCallbacks()));
 
 		Swap(this->nativeFramebuffer, nativeFramebuffer);
@@ -239,11 +219,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	// ---------------------------------------------------
 
 	VkResult Framebuffer::UpdateDynamicScaling(Gpu& gpu) {
-		const uint32  timingCount(2u * _passes.GetSize());
+		const uint32  timingCount(uint32(_passes.GetSize()) * 2u);
 		uint64* const timings(ETStackAlloc(uint64, timingCount));
-		ET_FAIL_UNLESS(vkGetQueryPoolResults(gpu, _timingPool, 0u, timingCount, timingCount * sizeof(*timings), timings, sizeof(*timings), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT));
+		ET_ABORT_UNLESS(vkGetQueryPoolResults(gpu, _timingPool, 0u, timingCount, timingCount * sizeof(*timings), timings, sizeof(*timings), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT));
 
 		for (uint32 pass(0u); pass < _passes.GetSize(); ++pass) {
+			// Static analyzer doesn't correctly determine read bounds.
+			ET_SUPPRESS_MSVC_WARNINGS(6385)
 			_passes[pass].scaler.UpdateTime(timings[2u * pass + 1u] - timings[2u * pass]);
 		}
 
@@ -252,7 +234,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult Framebuffer::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, VkExtent2D baseDimensions, uint32 arrayLayers) {
+	VkResult Framebuffer::BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, VkExtent2D dimensions, uint32 arrayLayers, ExternalImageMap externalImages) {
 		using ::Eldritch2::Swap;
 
 		VkQueryPool                 timingPool;
@@ -264,15 +246,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			/*queryCount =*/uint32(2u * pipeline.GetPassCount()), // Start/stop timestamp for each pass.
 			/*pipelineStatistics =*/0u                            // Timestamp queries do not have flags.
 		};
-		ET_FAIL_UNLESS(vkCreateQueryPool(gpu, &timingPoolInfo, gpu.GetAllocationCallbacks(), &timingPool));
+		ET_ABORT_UNLESS(vkCreateQueryPool(gpu, ETAddressOf(timingPoolInfo), gpu.GetAllocationCallbacks(), ETAddressOf(timingPool)));
 		ET_AT_SCOPE_EXIT(vkDestroyQueryPool(gpu, timingPool, gpu.GetAllocationCallbacks()));
 
 		ArrayList<Attachment> combinedAttachments(_attachments.GetAllocator());
+		combinedAttachments.Resize(pipeline.GetFramebufferAttachmentCount());
 		ET_AT_SCOPE_EXIT(for (Attachment& attachment
 							  : combinedAttachments) attachment.FreeResources(gpu));
-		combinedAttachments.Resize(pipeline.GetFramebufferAttachmentCount());
 		for (uint32 attachment(0u); attachment < pipeline.GetFramebufferAttachmentCount(); ++attachment) {
-			ET_FAIL_UNLESS(combinedAttachments[attachment].BindResources(gpu, pipeline, attachment, baseDimensions, arrayLayers));
+			ET_ABORT_UNLESS(combinedAttachments[attachment].BindResources(gpu, pipeline, attachment, dimensions, arrayLayers));
 		}
 
 		ArrayList<Pass> passes(_passes.GetAllocator());
@@ -280,7 +262,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 							  : passes) pass.FreeResources(gpu));
 		passes.Resize(pipeline.GetPassCount());
 		for (uint32 pass(0u); pass < pipeline.GetPassCount(); ++pass) {
-			ET_FAIL_UNLESS(passes[pass].BindResources(gpu, pipeline, combinedAttachments, pass));
+			ET_ABORT_UNLESS(passes[pass].BindResources(gpu, pipeline, combinedAttachments, pass));
 		}
 
 		ArrayList<VmaAllocation> allocations(_allocations.GetAllocator());
@@ -319,7 +301,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(Framebuffer::Attachment& lhs, Framebuffer::Attachment& rhs) {
+	void Swap(Framebuffer::Attachment& lhs, Framebuffer::Attachment& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs.image, rhs.image);
@@ -328,7 +310,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(Framebuffer::Pass& lhs, Framebuffer::Pass& rhs) {
+	void Swap(Framebuffer::Pass& lhs, Framebuffer::Pass& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs.scaler, rhs.scaler);
@@ -339,7 +321,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(Framebuffer& lhs, Framebuffer& rhs) {
+	void Swap(Framebuffer& lhs, Framebuffer& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs._timingPool, rhs._timingPool);

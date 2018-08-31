@@ -46,11 +46,18 @@ public:
 
 public:
 	//!	Constructs this @ref Dequeue instance.
-	Dequeue(const Dequeue&, const AllocatorType& allocator);
+	template <typename InputIterator>
+	Dequeue(const AllocatorType& allocator, InputIterator begin, InputIterator end);
+	//!	Constructs this @ref Dequeue instance.
+	Dequeue(const AllocatorType& allocator, std::initializer_list<ValueType>);
+	//!	Constructs this @ref Dequeue instance.
+	Dequeue(const AllocatorType& allocator, const Dequeue&);
 	//!	Constructs this @ref Dequeue instance.
 	Dequeue(const AllocatorType& allocator = AllocatorType());
 	//!	Constructs this @ref Dequeue instance.
-	Dequeue(Dequeue&&);
+	Dequeue(const Dequeue&) = default;
+	//!	Constructs this @ref Dequeue instance.
+	Dequeue(Dequeue&&) = default;
 
 	~Dequeue() = default;
 

@@ -24,28 +24,27 @@ namespace Eldritch2 { namespace Logging {
 		//!	Constructs this @ref ChildLog instance.
 		ChildLog(const ChildLog&) = delete;
 		//!	Constructs this @ref ChildLog instance.
-		ChildLog(Log& parent);
+		ChildLog(Log& parent) ETNoexceptHint;
 
 		~ChildLog() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		Log& SetParent(Log& parent);
+		Log* SetParent(Log& parent) ETNoexceptHint;
 
-		Log& GetParent() const;
+		Log* GetParent() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
+		void Write(const Utf8Char* string, size_t lengthInOctets) ETNoexceptHint override;
 		using Log::Write;
 
-		void Write(const Utf8Char* const string, size_t lengthInOctets) override sealed;
-
 		// ---------------------------------------------------
 
 	public:
-		ChildLog& operator=(const ChildLog&) = default;
+		ChildLog& operator=(const ChildLog&) ETNoexceptHint = default;
 
 		// - DATA MEMBERS ------------------------------------
 

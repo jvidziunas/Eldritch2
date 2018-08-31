@@ -16,6 +16,8 @@
 //------------------------------------------------------------------//
 
 #define ET_PROFILE_SCOPE(group, name, debugHexColor) MICROPROFILE_SCOPEI(group, name, debugHexColor)
+#define ET_PROFILE_APP_BEGIN(name) MicroProfileInit()
+#define ET_PROFILE_APP_END() MicroProfileShutdown()
 #define ET_PROFILE_THREAD_BEGIN(name) MicroProfileOnThreadCreate(name)
 #define ET_PROFILE_THREAD_END() MicroProfileOnThreadExit()
 #define ET_PROFILE_FRAME_BEGIN_CPU()

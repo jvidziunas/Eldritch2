@@ -26,66 +26,66 @@
 
 namespace Eldritch2 {
 
-ETForceInlineHint ETPureFunctionHint void* CopyMemory(void* ETRestrictPtrHint destinationBuffer, const void* ETRestrictPtrHint sourceBuffer, size_t lengthInBytes) {
-	return std::memcpy(destinationBuffer, sourceBuffer, lengthInBytes);
+ETForceInlineHint ETPureFunctionHint void* CopyMemory(void* ETRestrictPtrHint destination, const void* ETRestrictPtrHint source, size_t lengthInBytes) ETNoexceptHint {
+	return std::memcpy(destination, source, lengthInBytes);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint void* CopyMemoryNonTemporal(void* ETRestrictPtrHint destinationBuffer, const void* ETRestrictPtrHint sourceBuffer, size_t lengthInBytes) {
-	return std::memcpy(destinationBuffer, sourceBuffer, lengthInBytes);
+ETForceInlineHint ETPureFunctionHint void* CopyMemoryNonTemporal(void* ETRestrictPtrHint destination, const void* ETRestrictPtrHint source, size_t lengthInBytes) ETNoexceptHint {
+	return std::memcpy(destination, source, lengthInBytes);
 }
 
 // ---------------------------------------------------
 
 template <typename T>
-ETForceInlineHint ETPureFunctionHint T* CopyArray(T* ETRestrictPtrHint destination, const T* ETRestrictPtrHint source, size_t sizeInElements) {
+ETForceInlineHint ETPureFunctionHint T* CopyArray(T* ETRestrictPtrHint destination, const T* ETRestrictPtrHint source, size_t sizeInElements) ETNoexceptHint {
 	return static_cast<T*>(Eldritch2::CopyMemory(destination, source, sizeInElements * sizeof(T)));
 }
 
 // ---------------------------------------------------
 
 template <typename T, size_t sizeInElements>
-ETForceInlineHint ETPureFunctionHint auto CopyArray(T (&destinationArray)[sizeInElements], const T (&sourceArray)[sizeInElements]) -> decltype(destinationArray) {
-	return (Eldritch2::CopyArray(destinationArray, sourceArray, sizeInElements), destinationArray);
+ETForceInlineHint ETPureFunctionHint auto CopyArray(T (&destination)[sizeInElements], const T (&source)[sizeInElements]) ETNoexceptHint -> decltype(destination) {
+	return (Eldritch2::CopyArray(destination, source, sizeInElements), destination);
 }
 
 // ---------------------------------------------------
 
 template <typename T>
-ETForceInlineHint ETPureFunctionHint T* CopyArrayNonTemporal(T* ETRestrictPtrHint destination, const T* ETRestrictPtrHint source, size_t sizeInElements) {
+ETForceInlineHint ETPureFunctionHint T* CopyArrayNonTemporal(T* ETRestrictPtrHint destination, const T* ETRestrictPtrHint source, size_t sizeInElements) ETNoexceptHint {
 	return static_cast<T*>(Eldritch2::CopyMemoryNonTemporal(destination, source, sizeInElements * sizeof(T)));
 }
 
 // ---------------------------------------------------
 
-template <typename T, size_t sizeInElements>
-ETForceInlineHint ETPureFunctionHint auto CopyArrayNonTemporal(T (&destination)[sizeInElements], const T (&source)[sizeInElements]) -> decltype(destination) {
-	return (Eldritch2::CopyArrayNonTemporal(destination, source, sizeInElements), destination);
+template <typename T, size_t size>
+ETForceInlineHint ETPureFunctionHint auto CopyArrayNonTemporal(T (&destination)[size], const T (&source)[size]) ETNoexceptHint -> decltype(destination) {
+	return (Eldritch2::CopyArrayNonTemporal(destination, source, size), destination);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint void* MoveMemory(void* destinationBuffer, const void* sourceBuffer, size_t lengthInBytes) {
-	return std::memmove(destinationBuffer, sourceBuffer, lengthInBytes);
+ETForceInlineHint ETPureFunctionHint void* MoveMemory(void* destination, const void* source, size_t lengthInBytes) ETNoexceptHint {
+	return std::memmove(destination, source, lengthInBytes);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint void* MoveMemoryNonTemporal(void* destinationBuffer, const void* sourceBuffer, size_t lengthInBytes) {
-	return Eldritch2::MoveMemory(destinationBuffer, sourceBuffer, lengthInBytes);
+ETForceInlineHint ETPureFunctionHint void* MoveMemoryNonTemporal(void* destination, const void* source, size_t lengthInBytes) ETNoexceptHint {
+	return Eldritch2::MoveMemory(destination, source, lengthInBytes);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint void* SetMemory(void* destination, int bitPattern, size_t lengthInBytes) {
+ETForceInlineHint ETPureFunctionHint void* SetMemory(void* destination, int bitPattern, size_t lengthInBytes) ETNoexceptHint {
 	return std::memset(destination, bitPattern, lengthInBytes);
 }
 
 // ---------------------------------------------------
 
 template <typename T>
-ETForceInlineHint ETPureFunctionHint T* ZeroMemory(T* destination, size_t sizeInElements) {
+ETForceInlineHint ETPureFunctionHint T* ZeroMemory(T* destination, size_t sizeInElements) ETNoexceptHint {
 	static_assert(eastl::is_trivially_copyable<T>::value, "Zeroing polymorphic types destroys virtual function tables and is disabled.");
 
 	// ---
@@ -96,528 +96,456 @@ ETForceInlineHint ETPureFunctionHint T* ZeroMemory(T* destination, size_t sizeIn
 // ---------------------------------------------------
 
 //	Semi-hack: Define a specialization for the void type for compatibility with the more conventional usage
-template <>
-ETForceInlineHint ETPureFunctionHint void* ZeroMemory<void>(void* destination, size_t bufferSizeInBytes) {
+ETForceInlineHint ETPureFunctionHint void* ZeroMemory(void* destination, size_t bufferSizeInBytes) ETNoexceptHint {
 	return Eldritch2::SetMemory(destination, 0, bufferSizeInBytes);
 }
 
 // ---------------------------------------------------
 
-template <typename T, size_t sizeInElements>
-ETForceInlineHint ETPureFunctionHint auto ZeroMemory(T (&destination)[sizeInElements]) -> decltype(destination) {
-	return (Eldritch2::ZeroMemory(static_cast<T*>(destination), sizeInElements), destination);
+template <typename T, size_t size>
+ETForceInlineHint ETPureFunctionHint auto ZeroMemory(T (&destination)[size]) ETNoexceptHint -> decltype(destination) {
+	return (Eldritch2::ZeroMemory(static_cast<T*>(destination), size), destination);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderBuffersCaseInsensitive(const void* buffer0, const void* buffer1, size_t spanInBytes) {
-	return _memicmp(buffer0, buffer1, spanInBytes);
+ETForceInlineHint ETPureFunctionHint int OrderBuffersCaseInsensitive(const void* lhs, const void* rhs, size_t spanInBytes) ETNoexceptHint {
+	return _memicmp(lhs, rhs, spanInBytes);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderBuffers(const void* buffer0, const void* buffer1, size_t spanInBytes) {
-	return std::memcmp(buffer0, buffer1, spanInBytes);
+ETForceInlineHint ETPureFunctionHint int OrderBuffers(const void* lhs, const void* rhs, size_t spanInBytes) ETNoexceptHint {
+	return std::memcmp(lhs, rhs, spanInBytes);
 }
 
 // ---------------------------------------------------
 
 template <typename T>
-ETForceInlineHint ETPureFunctionHint int OrderArrays(const T* array0, const T* array1, size_t sizeInElements) {
-	return Eldritch2::CompareMemory(array0, array1, sizeInElements * sizeof(T));
+ETForceInlineHint ETPureFunctionHint int OrderArrays(const T* lhs, const T* rhs, size_t sizeInElements) ETNoexceptHint {
+	return Eldritch2::CompareMemory(lhs, rhs, sizeInElements * sizeof(T));
 }
 
 // ---------------------------------------------------
 
-template <typename T, size_t sizeInElements>
-ETForceInlineHint ETPureFunctionHint int OrderArrays(const T (&array0)[sizeInElements], const T (&array1)[sizeInElements]) {
-	return Eldritch2::CompareArray(static_cast<const T*>(array0), static_cast<const T*>(array1), sizeInElements);
+template <typename T, size_t size>
+ETForceInlineHint ETPureFunctionHint int OrderArrays(const T (&lhs)[size], const T (&rhs)[size]) ETNoexceptHint {
+	return Eldritch2::CompareArray(static_cast<const T*>(lhs), static_cast<const T*>(rhs), size);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStrings(const char* string0, const char* string1) {
-	return std::strcmp(string0, string1);
+ETForceInlineHint ETPureFunctionHint int OrderStrings(const char* lhs, const char* rhs) ETNoexceptHint {
+	return std::strcmp(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStrings(const wchar_t* string0, const wchar_t* string1) {
-	return std::wcscmp(string0, string1);
+ETForceInlineHint ETPureFunctionHint int OrderStrings(const wchar_t* lhs, const wchar_t* rhs) ETNoexceptHint {
+	return std::wcscmp(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStrings(const char* string0, const char* string1, size_t lengthInCharacters) {
-	return std::strncmp(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint int OrderStrings(const char* lhs, const char* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return std::strncmp(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStrings(const wchar_t* string0, const wchar_t* string1, size_t lengthInCharacters) {
-	return std::wcsncmp(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint int OrderStrings(const wchar_t* lhs, const wchar_t* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return std::wcsncmp(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint int OrderStrings(const char (&string0)[lengthInCharacters], const char (&string1)[lengthInCharacters]) {
-	return Eldritch2::OrderStrings(static_cast<const char*>(string0), static_cast<const char*>(string1), lengthInCharacters);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint int OrderStrings(const char (&lhs)[length], const char (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::OrderStrings(static_cast<const char*>(lhs), static_cast<const char*>(rhs), lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint int OrderStrings(const wchar_t (&string0)[lengthInCharacters], const wchar_t (&string1)[lengthInCharacters]) {
-	return Eldritch2::OrderStrings(static_cast<const wchar_t*>(string0), static_cast<const wchar_t*>(string1), lengthInCharacters);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint int OrderStrings(const wchar_t (&lhs)[length], const wchar_t (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::OrderStrings(static_cast<const wchar_t*>(lhs), static_cast<const wchar_t*>(rhs), length);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const char* string0, const char* string1) {
-	return _stricmp(string0, string1);
+ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const char* lhs, const char* rhs) ETNoexceptHint {
+	return _stricmp(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const wchar_t* string0, const wchar_t* string1) {
-	return _wcsicmp(string0, string1);
+ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const wchar_t* lhs, const wchar_t* rhs) ETNoexceptHint {
+	return _wcsicmp(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const char* string0, const char* string1, size_t lengthInCharacters) {
-	return _strnicmp(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const char* lhs, const char* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return _strnicmp(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const wchar_t* string0, const wchar_t* string1, size_t lengthInCharacters) {
-	return _wcsnicmp(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const wchar_t* lhs, const wchar_t* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return _wcsnicmp(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const char (&string0)[lengthInCharacters], const char (&string1)[lengthInCharacters]) {
-	return std::_memicmp(string0, string1, lengthInCharacters);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const char (&lhs)[length], const char (&rhs)[length]) ETNoexceptHint {
+	return std::_memicmp(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const wchar_t (&string0)[lengthInCharacters], const wchar_t (&string1)[lengthInCharacters]) {
-	return Eldritch2::OrderStringsCaseInsensitive(static_cast<const wchar_t*>(string0), static_cast<const wchar_t*>(string1));
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint int OrderStringsCaseInsensitive(const wchar_t (&lhs)[length], const wchar_t (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::OrderStringsCaseInsensitive(static_cast<const wchar_t*>(lhs), static_cast<const wchar_t*>(rhs));
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqual(const char* string0, const char* string1) {
-	return 0 == Eldritch2::OrderStrings(string0, string1);
+ETForceInlineHint ETPureFunctionHint bool StringsEqual(const char* lhs, const char* rhs) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStrings(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqual(const wchar_t* string0, const wchar_t* string1) {
-	return 0 == Eldritch2::OrderStrings(string0, string1);
+ETForceInlineHint ETPureFunctionHint bool StringsEqual(const wchar_t* lhs, const wchar_t* rhs) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStrings(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqual(const char* string0, const char* string1, size_t lengthInCharacters) {
-	return 0 == Eldritch2::OrderStrings(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint bool StringsEqual(const char* lhs, const char* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStrings(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqual(const wchar_t* string0, const wchar_t* string1, size_t lengthInCharacters) {
-	return 0 == Eldritch2::OrderStrings(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint bool StringsEqual(const wchar_t* lhs, const wchar_t* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStrings(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint bool StringsEqual(const char (&string0)[lengthInCharacters], const char (&string1)[lengthInCharacters]) {
-	return Eldritch2::StringsEqual(static_cast<const char*>(string0), static_cast<const char*>(string1), lengthInCharacters);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint bool StringsEqual(const char (&lhs)[length], const char (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::StringsEqual(static_cast<const char*>(lhs), static_cast<const char*>(rhs), lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint bool StringsEqual(const wchar_t (&string0)[lengthInCharacters], const wchar_t (&string1)[lengthInCharacters]) {
-	return Eldritch2::StringsEqual(static_cast<const wchar_t*>(string0), static_cast<const wchar_t*>(string1), lengthInCharacters);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint bool StringsEqual(const wchar_t (&lhs)[length], const wchar_t (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::StringsEqual(static_cast<const wchar_t*>(lhs), static_cast<const wchar_t*>(rhs), lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const char* string0, const char* string1) {
-	return 0 == Eldritch2::OrderStringsCaseInsensitive(string0, string1);
+ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const char* lhs, const char* rhs) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStringsCaseInsensitive(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const wchar_t* string0, const wchar_t* string1) {
-	return 0 == Eldritch2::OrderStringsCaseInsensitive(string0, string1);
+ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const wchar_t* lhs, const wchar_t* rhs) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStringsCaseInsensitive(lhs, rhs);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const char* string0, const char* string1, size_t lengthInCharacters) {
-	return 0 == Eldritch2::OrderStringsCaseInsensitive(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const char* lhs, const char* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStringsCaseInsensitive(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const wchar_t* string0, const wchar_t* string1, size_t lengthInCharacters) {
-	return 0 == Eldritch2::OrderStringsCaseInsensitive(string0, string1, lengthInCharacters);
+ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const wchar_t* lhs, const wchar_t* rhs, size_t lengthInCharacters) ETNoexceptHint {
+	return 0 == Eldritch2::OrderStringsCaseInsensitive(lhs, rhs, lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const char (&string0)[lengthInCharacters], const char (&string1)[lengthInCharacters]) {
-	return Eldritch2::StringsEqualCaseInsensitive(static_cast<const char*>(string0), static_cast<const char*>(string1), lengthInCharacters);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const char (&lhs)[length], const char (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::StringsEqualCaseInsensitive(static_cast<const char*>(lhs), static_cast<const char*>(rhs), lengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const wchar_t (&string0)[lengthInCharacters], const wchar_t (&string1)[lengthInCharacters]) {
-	return Eldritch2::StringsEqualCaseInsensitive(static_cast<const wchar_t*>(string0), static_cast<const wchar_t*>(string1), lengthInCharacters);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const wchar_t (&lhs)[length], const wchar_t (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::StringsEqualCaseInsensitive(static_cast<const wchar_t*>(lhs), static_cast<const wchar_t*>(rhs), length);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const char* string) {
+ETForceInlineHint ETPureFunctionHint size_t StringLength(const char* string) ETNoexceptHint {
 	return std::strlen(string);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const wchar_t* string) {
+ETForceInlineHint ETPureFunctionHint size_t StringLength(const wchar_t* string) ETNoexceptHint {
 	return std::wcslen(string);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const char (&string)[lengthInCharacters]) {
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint size_t StringLength(const char (&string)[length]) ETNoexceptHint {
 	return Eldritch2::StringLength(static_cast<const char*>(string));
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const wchar_t (&string)[lengthInCharacters]) {
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint size_t StringLength(const wchar_t (&string)[length]) ETNoexceptHint {
 	return Eldritch2::StringLength(static_cast<const wchar_t*>(string));
 }
 
 // ---------------------------------------------------
 
-#if (ET_COMPILER_IS_MSVC)
-//	(4996) MSVC yells at us for using the insecure string functions here.
-#	pragma warning(push)
-#	pragma warning(disable : 4996)
-#endif
-
-ETForceInlineHint ETPureFunctionHint char* CopyString(char* destinationString, const char* sourceString, size_t maxLengthInCharacters) {
-	return std::strncpy(destinationString, sourceString, maxLengthInCharacters);
+ET_PUSH_MSVC_WARNING_STATE(disable : 4996)
+ETForceInlineHint ETPureFunctionHint char* CopyString(char* destination, const char* source, size_t maxLengthInCharacters) ETNoexceptHint {
+	return std::strncpy(destination, source, maxLengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint wchar_t* CopyString(wchar_t* destinationString, const wchar_t* sourceString, size_t maxLengthInCharacters) {
-	return std::wcsncpy(destinationString, sourceString, maxLengthInCharacters);
+ETForceInlineHint ETPureFunctionHint wchar_t* CopyString(wchar_t* destination, const wchar_t* source, size_t maxLengthInCharacters) ETNoexceptHint {
+	return std::wcsncpy(destination, source, maxLengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint auto CopyString(char (&destinationString)[lengthInCharacters], const char* sourceString) -> decltype(destinationString) {
-	return (Eldritch2::CopyString(static_cast<char*>(destinationString), sourceString, lengthInCharacters), destinationString);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint auto CopyString(char (&destination)[length], const char* source) ETNoexceptHint -> decltype(destination) {
+	return (Eldritch2::CopyString(static_cast<char*>(destination), source, length), destination);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint auto CopyString(wchar_t (&destinationString)[lengthInCharacters], const wchar_t* sourceString) -> decltype(destinationString) {
-	return (Eldritch2::CopyString(static_cast<wchar_t*>(destinationString), sourceString, lengthInCharacters), destinationString);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint auto CopyString(wchar_t (&destination)[length], const wchar_t* source) ETNoexceptHint -> decltype(destination) {
+	return (Eldritch2::CopyString(static_cast<wchar_t*>(destination), source, length), destination);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint char* AppendString(char* destinationString, const char* sourceString, size_t maxLengthInCharacters) {
-	return std::strncat(destinationString, sourceString, maxLengthInCharacters);
+ETForceInlineHint ETPureFunctionHint char* AppendString(char* destination, const char* source, size_t maxLengthInCharacters) ETNoexceptHint {
+	return std::strncat(destination, source, maxLengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint wchar_t* AppendString(wchar_t* destinationString, const wchar_t* sourceString, size_t maxLengthInCharacters) {
-	return std::wcsncat(destinationString, sourceString, maxLengthInCharacters);
+ETForceInlineHint ETPureFunctionHint wchar_t* AppendString(wchar_t* destination, const wchar_t* source, size_t maxLengthInCharacters) ETNoexceptHint {
+	return std::wcsncat(destination, source, maxLengthInCharacters);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint auto AppendString(char (&destinationString)[lengthInCharacters], const char* sourceString) -> decltype(destinationString) {
-	return (Eldritch2::AppendString(static_cast<char*>(destinationString), sourceString, lengthInCharacters), destinationString);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint auto AppendString(char (&destination)[length], const char* source) ETNoexceptHint -> decltype(destination) {
+	return (Eldritch2::AppendString(static_cast<char*>(destination), source, length), destination);
 }
 
 // ---------------------------------------------------
 
-template <size_t lengthInCharacters>
-ETForceInlineHint ETPureFunctionHint auto AppendString(wchar_t (&destinationString)[lengthInCharacters], const wchar_t* sourceString) -> decltype(destinationString) {
-	return (Eldritch2::AppendString(static_cast<wchar_t*>(destinationString), sourceString, lengthInCharacters), destinationString);
+template <size_t length>
+ETForceInlineHint ETPureFunctionHint auto AppendString(wchar_t (&destination)[length], const wchar_t* source) ETNoexceptHint -> decltype(destination) {
+	return (Eldritch2::AppendString(static_cast<wchar_t*>(destination), source, length), destination);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint char* FindFirstInstance(char* string, const char character) {
+ETForceInlineHint ETPureFunctionHint char* Find(char* string, const char character) ETNoexceptHint {
 	return std::strchr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const char* FindFirstInstance(const char* string, const char character) {
+ETForceInlineHint ETPureFunctionHint const char* Find(const char* string, const char character) ETNoexceptHint {
 	return std::strchr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint char* FindFirstInstance(char* string, const char* substring) {
+ETForceInlineHint ETPureFunctionHint char* Find(char* string, const char* substring) ETNoexceptHint {
 	return std::strstr(string, substring);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const char* FindFirstInstance(const char* string, const char* substring) {
+ETForceInlineHint ETPureFunctionHint const char* Find(const char* string, const char* substring) ETNoexceptHint {
 	return std::strstr(string, substring);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint wchar_t* FindFirstInstance(wchar_t* string, const wchar_t character) {
+ETForceInlineHint ETPureFunctionHint wchar_t* Find(wchar_t* string, const wchar_t character) ETNoexceptHint {
 	return std::wcschr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const wchar_t* FindFirstInstance(const wchar_t* string, const wchar_t character) {
+ETForceInlineHint ETPureFunctionHint const wchar_t* Find(const wchar_t* string, const wchar_t character) ETNoexceptHint {
 	return std::wcschr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint wchar_t* FindFirstInstance(wchar_t* string, const wchar_t* substring) {
+ETForceInlineHint ETPureFunctionHint wchar_t* Find(wchar_t* string, const wchar_t* substring) ETNoexceptHint {
 	return std::wcsstr(string, substring);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const wchar_t* FindFirstInstance(const wchar_t* string, const wchar_t* substring) {
+ETForceInlineHint ETPureFunctionHint const wchar_t* Find(const wchar_t* string, const wchar_t* substring) ETNoexceptHint {
 	return std::wcsstr(string, substring);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint char* FindLastInstance(char* string, const char character) {
+ETForceInlineHint ETPureFunctionHint char* FindLast(char* string, const char character) ETNoexceptHint {
 	return std::strrchr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const char* FindLastInstance(const char* string, const char character) {
+ETForceInlineHint ETPureFunctionHint const char* FindLast(const char* string, const char character) ETNoexceptHint {
 	return std::strrchr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint char* FindLastInstance(char* string, const char* substring) {
-	return const_cast<char*>(Eldritch2::FindLastInstance(const_cast<const char*>(string), substring));
+ETForceInlineHint ETPureFunctionHint char* FindLast(char* string, const char* substring) ETNoexceptHint {
+	return std::find_end(string, FindTerminator(string), substring, FindTerminator(substring));
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const char* FindLastInstance(const char* string, const char* substring) {
-	if (!substring || ('\0' == substring[0])) {
-		return nullptr;
-	}
-
-	const auto substringLength(Eldritch2::StringLength(substring));
-	const auto stringLength(Eldritch2::StringLength(string));
-
-	if (stringLength < substringLength) {
-		return nullptr;
-	}
-
-	for (auto cursor(string + stringLength - substringLength); cursor >= string; --cursor) {
-		if (StringsEqual(cursor, substring, substringLength)) {
-			return cursor;
-		}
-	}
-
-	return nullptr;
+ETForceInlineHint ETPureFunctionHint const char* FindLast(const char* string, const char* substring) ETNoexceptHint {
+	return std::find_end(string, FindTerminator(string), substring, FindTerminator(substring));
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint wchar_t* FindLastInstance(wchar_t* string, const wchar_t character) {
+ETForceInlineHint ETPureFunctionHint wchar_t* FindLast(wchar_t* string, const wchar_t character) ETNoexceptHint {
 	return std::wcsrchr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const wchar_t* FindLastInstance(const wchar_t* string, const wchar_t character) {
+ETForceInlineHint ETPureFunctionHint const wchar_t* FindLast(const wchar_t* string, const wchar_t character) ETNoexceptHint {
 	return std::wcsrchr(string, character);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint wchar_t* FindLastInstance(wchar_t* string, const wchar_t* substring) {
-	return const_cast<wchar_t*>(Eldritch2::FindLastInstance(const_cast<const wchar_t*>(string), substring));
+ETForceInlineHint ETPureFunctionHint wchar_t* FindLast(wchar_t* string, const wchar_t* substring) ETNoexceptHint {
+	return std::find_end(string, FindTerminator(string), substring, FindTerminator(substring));
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const wchar_t* FindLastInstance(const wchar_t* string, const wchar_t* substring) {
-	if (!substring || (L'\0' == substring[0])) {
-		return nullptr;
-	}
-
-	const auto substringLength(StringLength(substring));
-	const auto stringLength(StringLength(string));
-
-	if (stringLength < substringLength) {
-		return nullptr;
-	}
-
-	for (auto cursor(string + stringLength - substringLength); cursor >= string; --cursor) {
-		if (StringsEqual(cursor, substring, substringLength)) {
-			return cursor;
-		}
-	}
-
-	return nullptr;
+ETForceInlineHint ETPureFunctionHint const wchar_t* FindLast(const wchar_t* string, const wchar_t* substring) ETNoexceptHint {
+	return std::find_end(string, FindTerminator(string), substring, FindTerminator(substring));
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint char* FindTerminator(char* string) {
+ETForceInlineHint ETPureFunctionHint char* FindTerminator(char* string) ETNoexceptHint {
 	return string + Eldritch2::StringLength(string);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const char* FindTerminator(const char* string) {
+ETForceInlineHint ETPureFunctionHint const char* FindTerminator(const char* string) ETNoexceptHint {
 	return string + Eldritch2::StringLength(string);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint wchar_t* FindTerminator(wchar_t* string) {
+ETForceInlineHint ETPureFunctionHint wchar_t* FindTerminator(wchar_t* string) ETNoexceptHint {
 	return string + Eldritch2::StringLength(string);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const wchar_t* FindTerminator(const wchar_t* string) {
+ETForceInlineHint ETPureFunctionHint const wchar_t* FindTerminator(const wchar_t* string) ETNoexceptHint {
 	return string + Eldritch2::StringLength(string);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const char* TrimLeadingWhitespace(const char* string, const char* const stringEnd) {
-	for (; string != stringEnd && (0 != std::isspace(static_cast<int>(*string))); ++string) {
-	}
-
-	return string;
+ETForceInlineHint ETPureFunctionHint const char* TrimLeadingWhitespace(const char* begin, const char* const end) ETNoexceptHint {
+	return std::find_if(begin, end, [](char character) { return std::isspace(int(character)) != 0; });
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const wchar_t* TrimLeadingWhitespace(const wchar_t* string, const wchar_t* const stringEnd) {
-	for (; string != stringEnd && (0 != std::iswspace(static_cast<::wint_t>(*string))); ++string) {
-	}
-
-	return string;
+ETForceInlineHint ETPureFunctionHint const wchar_t* TrimLeadingWhitespace(const wchar_t* begin, const wchar_t* const end) ETNoexceptHint {
+	return std::find_if(begin, end, [](wchar_t character) { return std::iswspace(::wint_t(character)) != 0; });
 }
 
 // ---------------------------------------------------
 
-#if (ET_COMPILER_IS_MSVC)
-//	MSVC complains needlessly about a harmless type promotion for std::isspace().
-#	pragma warning(push)
-#	pragma warning(disable : 6330)
-#endif
-ETForceInlineHint ETPureFunctionHint const char* TrimTrailingWhitespace(const char* const string, const char* stringEnd) {
-	for (; string != stringEnd && std::isspace(stringEnd[-1]); --stringEnd) {
-	}
-
-	return stringEnd;
-}
-#if (ET_COMPILER_IS_MSVC)
-#	pragma warning(pop)
-#endif
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint const wchar_t* TrimTrailingWhitespace(const wchar_t* const string, const wchar_t* stringEnd) {
-	for (; string != stringEnd && std::iswspace(stringEnd[-1]); --stringEnd) {
-	}
-
-	return stringEnd;
+ETForceInlineHint ETPureFunctionHint const char* TrimTrailingWhitespace(const char* const begin, const char* end) ETNoexceptHint {
+	return std::find_if(std::make_reverse_iterator(end), std::make_reverse_iterator(begin), [](char character) { return std::isspace(int(character)) != 0; }).base();
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const wchar_t* EmptyForNull(const wchar_t* string) {
+ETForceInlineHint ETPureFunctionHint const wchar_t* TrimTrailingWhitespace(const wchar_t* const begin, const wchar_t* end) ETNoexceptHint {
+	return std::find_if(std::make_reverse_iterator(end), std::make_reverse_iterator(begin), [](wchar_t character) { return std::iswspace(::wint_t(character)) != 0; }).base();
+}
+
+// ---------------------------------------------------
+
+ETConstexpr ETForceInlineHint ETPureFunctionHint const wchar_t* EmptyForNull(const wchar_t* string) ETNoexceptHint {
 	return string ? string : L"";
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint const char* EmptyForNull(const char* string) {
+ETConstexpr ETForceInlineHint ETPureFunctionHint const char* EmptyForNull(const char* string) ETNoexceptHint {
 	return string ? string : "";
 }
 
 // ---------------------------------------------------
 
 template <typename T>
-ETForceInlineHint ETPureFunctionHint const T* FindArrayDifference(T* ETRestrictPtrHint array0, T* ETRestrictPtrHint array1, size_t sizeInElements) {
-	for (T* ETRestrictPtrHint const end(array0 + sizeInElements); array0 != end; ++array0, ++array1) {
-		if (*array0 != *array1) {
-			return array0;
-		}
-	}
-
-	return nullptr;
+ETForceInlineHint ETPureFunctionHint const T* FindArrayDifference(const T* ETRestrictPtrHint lhs, const T* ETRestrictPtrHint rhs, size_t sizeInElements) ETNoexceptHint {
+	return std::mismatch(lhs, lhs + sizeInElements, rhs, rhs + sizeInElements).first;
 }
 
 // ---------------------------------------------------
 
 template <typename T>
-ETForceInlineHint ETPureFunctionHint const T* FindArrayDifference(const T* ETRestrictPtrHint array0, const T* ETRestrictPtrHint array1, size_t sizeInElements) {
-	for (const T* ETRestrictPtrHint const end(array0 + sizeInElements); array0 != end; ++array0, ++array1) {
-		if (*array0 != *array1) {
-			return array0;
-		}
-	}
-
-	return nullptr;
+ETForceInlineHint ETPureFunctionHint T* FindArrayDifference(T* ETRestrictPtrHint lhs, T* ETRestrictPtrHint rhs, size_t sizeInElements) ETNoexceptHint {
+	return std::mismatch(lhs, lhs + sizeInElements, rhs, rhs + sizeInElements).first;
 }
 
 // ---------------------------------------------------
 
-template <typename T, size_t sizeInElements>
-ETForceInlineHint ETPureFunctionHint T* FindArrayDifference(T (&array0)[sizeInElements], T (&array1)[sizeInElements]) {
-	return Eldritch2::FindArrayDifference(static_cast<T*>(array0), static_cast<T*>(array1), sizeInElements);
+template <typename T, size_t length>
+ETForceInlineHint ETPureFunctionHint const T* FindArrayDifference(const T (&lhs)[length], const T (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::FindArrayDifference(static_cast<const T*>(lhs), static_cast<const T*>(rhs), length);
 }
 
 // ---------------------------------------------------
 
-template <typename T, size_t sizeInElements>
-ETForceInlineHint ETPureFunctionHint const T* FindArrayDifference(const T (&array0)[sizeInElements], const T (&array1)[sizeInElements]) {
-	return Eldritch2::FindArrayDifference(static_cast<const T*>(array0), static_cast<const T*>(array1), sizeInElements);
+template <typename T, size_t length>
+ETForceInlineHint ETPureFunctionHint T* FindArrayDifference(T (&lhs)[length], T (&rhs)[length]) ETNoexceptHint {
+	return Eldritch2::FindArrayDifference(static_cast<T*>(lhs), static_cast<T*>(rhs), length);
 }
 
 } // namespace Eldritch2

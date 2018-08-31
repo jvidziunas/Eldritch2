@@ -19,6 +19,10 @@ double wrenGetSlotDouble(WrenVM* vm, int slot);
 void   wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+
+	using namespace ::Eldritch2::Scripting::Wren;
+	using namespace ::Eldritch2::Scripting;
+
 	namespace {
 
 		struct Light : public Graphics::Light {
@@ -28,25 +32,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	} // anonymous namespace
 
-	using namespace ::Eldritch2::Scripting::Wren;
-	using namespace ::Eldritch2::Scripting;
-
-	ET_IMPLEMENT_WREN_CLASS(Light) {
-		// clang-format off
+	ET_IMPLEMENT_WREN_CLASS(Light) { // clang-format off
 		api.CreateClass<Light>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "Light",
-			{ /*	Constructors */
+			{ /* Constructors */
 				ConstructorMethod("new(_,_,_)", [](WrenVM* vm) {
 					SetReturn<Light>(vm, GetSlotAs<Transformation>(vm, 2), GetSlotAs<RgbColor>(vm, 3), float16(wrenGetSlotDouble(vm, 4)));
-				})
-			},
-			{ /*	Static methods */ },
-			{ /*	Properties */
+				})},
+			{ /* Static methods */ },
+			{ /* Properties */
 				DefineProperty("color",
 					//	Getter
 					[](WrenVM* vm) {
 						Light& self(GetSlotAs<Light>(vm, 0));
 
-						wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<RgbColor>());
+						wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<RgbColor>());
 						SetReturn<RgbColor>(vm, self.color);
 					},
 					//	Setter
@@ -58,15 +57,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 					[](WrenVM* vm) {
 						Light& self(GetSlotAs<Light>(vm, 0));
 
-						wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
+						wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Transformation>());
 						SetReturn<Transformation>(vm, self.localToWorld);
 					},
 					//	Setter
 					[](WrenVM* vm) {
 						GetSlotAs<Light>(vm, 0).localToWorld = GetSlotAs<Transformation>(vm, 1);
-					})
-			},
-			{ /*	Methods */ }); // clang-format on
-	}
+					})},
+			{ /* Methods */ });
+	} // clang-format on
 
 }}} // namespace Eldritch2::Graphics::Vulkan

@@ -36,6 +36,11 @@ namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 		// ---------------------------------------------------
 
 	public:
+		void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime delta) override;
+
+		// ---------------------------------------------------
+
+	public:
 		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
 
 		// - DATA MEMBERS ------------------------------------

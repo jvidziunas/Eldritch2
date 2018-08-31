@@ -87,9 +87,9 @@
 #	else
 #		error Update Compiler.hpp to include an inline debug break for the Intel compiler collection.
 #	endif
-#	define ET_PUSH_COMPILER_WARNING_STATE() _ET_NULL_DEFINE
-#	define ET_POP_COMPILER_WARNING_STATE() _ET_NULL_DEFINE
-#	define ET_SET_MSVC_WARNING_STATE(x) _ET_NULL_DEFINE
+#	define ET_PUSH_MSVC_WARNING_STATE(x) _ET_NULL_DEFINE
+#	define ET_POP_MSVC_WARNING_STATE() _ET_NULL_DEFINE
+#	define ET_SUPPRESS_MSVC_WARNINGS(x) _ET_NULL_DEFINE
 #	define abstract = 0
 #	define override _ET_NULL_DEFINE
 #	define ENUM_CLASS(type) enum
@@ -171,9 +171,10 @@
 #	define COMPILERMESSAGEKNOWNBUG(x) __pragma(message(__FILE__ "(" __LINE_STRING__ ") BUG: " x))
 #	define ET_LINK_LIBRARY(x) __pragma(comment(lib, x))
 #	define ET_TRIGGER_DEBUGBREAK() __debugbreak()
-#	define ET_PUSH_COMPILER_WARNING_STATE() __pragma(warning(push))
-#	define ET_SET_MSVC_WARNING_STATE(x) __pragma(warning(x))
-#	define ET_POP_COMPILER_WARNING_STATE() __pragma(warning(push))
+#	define ET_PUSH_MSVC_WARNING_STATE(x) __pragma(warning(push)) __pragma(warning(x))
+#	define ET_POP_MSVC_WARNING_STATE() __pragma(warning(pop))
+#	define ET_SUPPRESS_MSVC_WARNINGS(x) __pragma(warning(suppress \
+														  : x))
 //	We don't need to do anything for the abstract/override keyword support.
 #	if 0
 #		define abstract abstract
@@ -238,9 +239,9 @@
 #	define COMPILERMESSAGEHACK(x) _ET_NULL_DEFINE
 #	define COMPILERMESSAGETODO(x) _ET_NULL_DEFINE
 #	define COMPILERMESSAGEKNOWNBUG(x) _ET_NULL_DEFINE
-#	define ET_PUSH_COMPILER_WARNING_STATE() _ET_NULL_DEFINE
-#	define ET_POP_COMPILER_WARNING_STATE() _ET_NULL_DEFINE
-#	define ET_SET_MSVC_WARNING_STATE(x) _ET_NULL_DEFINE
+#	define ET_PUSH_MSVC_WARNING_STATE(x) _ET_NULL_DEFINE
+#	define ET_POP_MSVC_WARNING_STATE() _ET_NULL_DEFINE
+#	define ET_SUPPRESS_MSVC_WARNINGS(x) _ET_NULL_DEFINE
 #	define ET_LINK_LIBRARY(x) _ET_NULL_DEFINE
 #	if ET_PLATFORM_POWERPC
 #		define ET_TRIGGER_DEBUGBREAK() asm(".long 0")
@@ -302,6 +303,8 @@
 #define ETConstexpr constexpr
 #define ETCpp14Constexpr constexpr
 
+#define ETInfiniteLoop for (;;)
+
 using ETPostfixOperatorHint = int;
 
 namespace Eldritch2 {
@@ -325,7 +328,9 @@ namespace Detail {
 }
 } // namespace Eldritch2::Detail
 
-#define ET_ALIGN_OF(type) static_cast<size_t>(::Eldritch2::Detail::AlignmentOf<type>::Value)
+#define ETAlignOf(type) static_cast<size_t>(::Eldritch2::Detail::AlignmentOf<type>::Value)
+#define ETAddressOf(value) __builtin_addressof(value)
+#define ETCountOf(value) _countof(value)
 
 /*	Since the override specifiers and enum class language extensions are safely wrapped away in here, turn off the warnings.
  *	(4505) Some template classes will have unreferenced inline members. The optimizer/linker will strip these out, so we don't need to worry.
@@ -334,7 +339,7 @@ namespace Detail {
  *	this will just result in an error if you try to do it. Why Microsoft thinks they need to warn you on top of this is baffling.
  *	(4324) Another annoying warning of questionable utility. This one is about the compiler doing what you asked it to re: data alignment.
  *	(6255) _alloca() usage is assumed to be the informed result of a deliberate tradeoff; we understand stack overflows are possible. */
-ET_SET_MSVC_WARNING_STATE(disable : 4480 4481 4505 4127 4510 4610 4512 4324 6255)
+ET_PUSH_MSVC_WARNING_STATE(disable : 4480 4481 4505 4127 4510 4610 4512 4324 6255)
 
 //==================================================================//
 // STATIC ANALYSIS

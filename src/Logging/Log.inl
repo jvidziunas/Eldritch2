@@ -17,42 +17,43 @@
 
 namespace Eldritch2 { namespace Logging {
 
-	ETInlineHint Log::Log() :
-		_muteThreshold(Logging::MessageType::VerboseWarning) {}
+	ETInlineHint ETForceInlineHint Log::Log() ETNoexceptHint : _writeThreshold(VerboseWarning) {}
 
 	// ---------------------------------------------------
 
 	template <typename... Arguments>
-	ETInlineHint void Log::Write(Logging::MessageType type, StringView<Utf8Char> format, Arguments&&... arguments) {
-		static const Utf8Char prefixes[][8] = {
+	ETInlineHint ETForceInlineHint void Log::Write(Severity severity, StringView format, Arguments&&... arguments) {
+		using namespace ::fmt;
+
+		static ETConstexpr StringView prefixes[] = {
 			"[WARN] ",
 			"[WARN] ",
 			"[ERR ] ",
 			"[INFO] "
 		};
 
-		if (type < GetMuteThreshold()) {
+		if (severity < GetWriteThreshold()) {
 			return;
 		}
 
-		fmt::memory_buffer output;
-		const auto&        prefix(prefixes[static_cast<size_t>(type)]);
+		const StringView& prefix(prefixes[severity]);
+		memory_buffer     output;
 
-		output.append(eastl::begin(prefix), eastl::end(prefix) - 1);
-		fmt::format_to(output, format, eastl::forward<Arguments>(arguments)...);
+		output.append(prefix.Begin(), prefix.End());
+		fmt::format_to(output, string_view(format.GetData(), format.GetLength()), eastl::forward<Arguments>(arguments)...);
 		Write(output.data(), output.size());
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint MessageType Log::GetMuteThreshold() const {
-		return _muteThreshold.load(std::memory_order_acquire);
+	ETInlineHint ETForceInlineHint Severity Log::GetWriteThreshold() const ETNoexceptHint {
+		return _writeThreshold.load(std::memory_order_acquire);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Log::SetWriteThreshold(MessageType threshold) {
-		_muteThreshold.store(threshold, std::memory_order_release);
+	ETInlineHint ETForceInlineHint void Log::SetWriteThreshold(Severity threshold) ETNoexceptHint {
+		_writeThreshold.store(threshold, std::memory_order_release);
 	}
 
 }} // namespace Eldritch2::Logging

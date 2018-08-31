@@ -27,7 +27,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		SparseBinding,
 		Transfer,
 
-		COUNT
+		QueueConcepts
 	};
 
 	// ---
@@ -36,7 +36,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using HostAllocator = HostMixin<UsageMixin<MallocAllocator>>;
+		using AllocatorType = HostMixin<UsageMixin<MallocAllocator>>;
 
 		// ---
 
@@ -60,14 +60,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			std::atomic_flag lock;
-			uint32_t         family;
-			VkQueue          queue;
+			Mutex    mutex;
+			uint32_t family;
+			VkQueue  queue;
 		};
+
+		// ---
 
 	public:
 		union QueueIndices {
-			uint8_t byConcept[QueueConcept::COUNT];
+			uint8_t byConcept[QueueConcepts];
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -83,21 +85,28 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult SubmitAsync(QueueConcept target, VkFence commandsConsumed, uint32_t submitCount, const VkSubmitInfo* begin);
+		VkResult SubmitAsync(QueueConcept target, VkFence commandsConsumed, uint32_t submitCount, const VkSubmitInfo* begin) ETNoexceptHint;
 		template <uint32_t count>
-		VkResult SubmitAsync(QueueConcept target, VkFence commandsConsumed, const VkSubmitInfo (&submits)[count]);
+		VkResult SubmitAsync(QueueConcept target, VkFence commandsConsumed, const VkSubmitInfo (&submits)[count]) ETNoexceptHint;
 
-		VkResult BindAsync(QueueConcept target, VkFence commandsConsumed, uint32_t bindCount, const VkBindSparseInfo* begin);
+		VkResult BindAsync(QueueConcept target, VkFence commandsConsumed, uint32_t bindCount, const VkBindSparseInfo* begin) ETNoexceptHint;
 		template <uint32_t count>
-		VkResult BindAsync(QueueConcept target, VkFence commandsConsumed, const VkBindSparseInfo (&binds)[count]);
+		VkResult BindAsync(QueueConcept target, VkFence commandsConsumed, const VkBindSparseInfo (&binds)[count]) ETNoexceptHint;
 
 #if VK_KHR_swapchain
-		VkResult PresentAsync(QueueConcept target, const VkPresentInfoKHR& submit);
+		VkResult PresentAsync(QueueConcept target, const VkPresentInfoKHR& submit) ETNoexceptHint;
 #endif // VK_KHR_swapchain
 
 		// ---------------------------------------------------
 
 	public:
+		uint32 GetFrameAfrDeviceMask() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult AllocateMemory(const VmaAllocationCreateInfo& allocationInfo) ETNoexceptHint;
+
 		void AddGarbage(VkBuffer buffer, VmaAllocation backing);
 		void AddGarbage(VkImage image, VmaAllocation backing);
 		void AddGarbage(VmaAllocation allocation);
@@ -109,27 +118,29 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const VkAllocationCallbacks* GetAllocationCallbacks() const;
+		const VkAllocationCallbacks* GetAllocationCallbacks() const ETNoexceptHint;
 
-		VkPipelineCache GetPipelineCache();
+		VkPipelineCache GetPipelineCache() ETNoexceptHint;
 
-		operator VkPhysicalDevice();
+		operator VkPhysicalDevice() ETNoexceptHint;
 
-		operator VmaAllocator();
+		operator VmaAllocator() ETNoexceptHint;
 
-		operator VkDevice();
+		operator VkInstance() ETNoexceptHint;
 
-		// ---------------------------------------------------
-
-	public:
-		uint32_t GetQueueFamilyByConcept(QueueConcept concept) const;
-
-		bool SharesQueues(QueueConcept first, QueueConcept second) const;
+		operator VkDevice() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(VkPhysicalDevice physicalDevice, VkDeviceSize heapBlockSize, uint32 frameUseCount);
+		uint32_t GetQueueFamilyByConcept(QueueConcept concept) const ETNoexceptHint;
+
+		bool SharesQueues(QueueConcept first, QueueConcept second) const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(VkInstance vulkan, VkPhysicalDevice physicalDevice, VkDeviceSize heapBlockSize, uint32 frameUseCount);
 
 		void FreeResources();
 
@@ -141,12 +152,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable HostAllocator    _allocator;
+		mutable AllocatorType    _allocator;
+		VkInstance               _vulkan;
 		VkPhysicalDevice         _physicalDevice;
 		VkDevice                 _device;
 		VkPipelineCache          _pipelineCache;
 		QueueIndices             _indices;
-		CommandQueue             _queues[QueueConcept::COUNT];
+		CommandQueue             _queues[QueueConcepts];
 		mutable Mutex            _gpuAllocatorMutex;
 		VmaAllocator             _gpuAllocator;
 		mutable Mutex            _garbageMutex;

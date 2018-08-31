@@ -14,7 +14,7 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Assert.hpp>
-#include <Common/Memory.hpp>
+#include <Common/Atomic.hpp>
 //------------------------------------------------------------------//
 #if ET_PLATFORM_WINDOWS
 #	ifndef NOMINMAX
@@ -27,12 +27,10 @@
 namespace Eldritch2 {
 namespace {
 
-	static AssertionHandler handler = [](const char* condition, const char* file, uint32 line, const char* message) -> AssertionFailure {
+	Atomic<AssertionHandler> handler = [](StringView condition, StringView file, uint32 line, StringView message) -> AssertionFailure {
 #if ET_PLATFORM_WINDOWS
 		fmt::memory_buffer string;
-
-		fmt::format_to(string, fmt::string_view("{}({}): [{}] {}"), file, line, condition, EmptyForNull(message));
-
+		fmt::format_to(string, fmt::string_view("{}({}): [{}] {}"), file, line, condition, message);
 		OutputDebugStringA(string.data());
 #endif
 
@@ -41,14 +39,14 @@ namespace {
 
 } // anonymous namespace
 
-void InstallHandler(AssertionHandler newHandler) {
-	handler = newHandler;
+AssertionHandler InstallHandler(AssertionHandler newHandler) {
+	return handler.exchange(newHandler, std::memory_order_acq_rel);
 }
 
 // ---------------------------------------------------
 
-AssertionFailure ReportFailure(const char* condition, const char* file, uint32 line, const char* message) {
-	return handler(condition, file, line, message);
+AssertionFailure ReportFailure(StringView condition, StringView file, uint32 line, StringView message) {
+	return handler.load(std::memory_order_acquire)(condition, file, line, message);
 }
 
 } // namespace Eldritch2

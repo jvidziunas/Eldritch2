@@ -18,7 +18,20 @@
 namespace Eldritch2 {
 
 template <typename Value, class Allocator, unsigned int granularity>
-ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const Dequeue<Value, Allocator, granularity>& dequeue, const AllocatorType& allocator) :
+template <typename InputIterator>
+ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const AllocatorType& allocator, InputIterator begin, InputIterator end) :
+	_container(begin, end, allocator) {}
+
+// ---------------------------------------------------
+
+template <typename Value, class Allocator, unsigned int granularity>
+ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const AllocatorType& allocator, std::initializer_list<ValueType> dequeue) :
+	_container(dequeue, allocator) {}
+
+// ---------------------------------------------------
+
+template <typename Value, class Allocator, unsigned int granularity>
+ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const AllocatorType& allocator, const Dequeue<Value, Allocator, granularity>& dequeue) :
 	_container(dequeue, allocator) {}
 
 // ---------------------------------------------------
@@ -26,12 +39,6 @@ ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const Dequeue<Value
 template <typename Value, class Allocator, unsigned int granularity>
 ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const AllocatorType& allocator) :
 	_container(allocator) {}
-
-// ---------------------------------------------------
-
-template <typename Value, class Allocator, unsigned int granularity>
-ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(Dequeue<Value, Allocator, granularity>&& dequeue) :
-	_container(eastl::move(dequeue._container)) {}
 
 // ---------------------------------------------------
 
@@ -398,8 +405,8 @@ ETInlineHint typename const Dequeue<Value, Allocator, granularity>::AllocatorTyp
 // ---------------------------------------------------
 
 template <typename Value, class Allocator, unsigned int granularity>
-ETInlineHint void Swap(Dequeue<Value, Allocator, granularity>& dequeue0, Dequeue<Value, Allocator, granularity>& dequeue1) {
-	eastl::swap(dequeue0._container, dequeue1._container);
+ETInlineHint void Swap(Dequeue<Value, Allocator, granularity>& lhs, Dequeue<Value, Allocator, granularity>& rhs) {
+	lhs._container.swap(rhs._container);
 }
 
 } // namespace Eldritch2

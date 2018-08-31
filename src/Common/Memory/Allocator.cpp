@@ -22,7 +22,7 @@
 
 namespace Eldritch2 {
 
-Allocator::Allocator(const Utf8Char* const name) {
+Allocator::Allocator(const Utf8Char* const name) ETNoexceptHint {
 #if ET_DEBUG_BUILD
 	_name = name;
 #else
@@ -32,7 +32,7 @@ Allocator::Allocator(const Utf8Char* const name) {
 
 // ---------------------------------------------------
 
-const Utf8Char* Allocator::GetName() const {
+const Utf8Char* Allocator::GetName() const ETNoexceptHint {
 #if ET_DEBUG_BUILD
 	return _name;
 #else

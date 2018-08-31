@@ -1,5 +1,5 @@
 /*==================================================================*\
-  DisplayBus.cpp
+  DisplayLocator.cpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -17,42 +17,22 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	DisplayLocator::DisplayLocator(
-		DisplayMap<>& displayByName,
-		Mutex&        mutex) :
-		_displayByName(eastl::addressof(displayByName)),
-		_displayMutex(eastl::addressof(mutex)) {
+	DisplayLocator::DisplayLocator(DisplayList& displays, Mutex& mutex) :
+		_displays(ETAddressOf(displays)),
+		_displayMutex(ETAddressOf(mutex)) {
 	}
 
 	// ---------------------------------------------------
 
-	bool DisplayLocator::TryAcquireDisplay(StringView<Utf8Char> name, DisplaySource& source) {
-		Lock                   _(*_displayMutex);
-		DisplayMap<>::Iterator candidate(_displayByName->Find(name, Hash<decltype(name)>(), EqualTo<decltype(name)>()));
-		if (candidate == _displayByName->End()) {
-			candidate = CreateDisplay(name);
+	UniquePointer<Viewport, ViewportDisposer> DisplayLocator::TryAcquireViewport(const GraphicsPipeline& pipeline) {
+		Lock _(*_displayMutex);
+		for (auto display(_displays->Get<Display>()), end(display + _displays->GetSize()); display != end; ++display) {
+			if (const auto viewport = display->TryAcquireViewport(pipeline)) {
+				return viewport;
+			}
 		}
 
-		return candidate->second.TryAcquire(source);
-	}
-
-	// ---------------------------------------------------
-
-	void DisplayLocator::ReleaseDisplay(StringView<Utf8Char> name, DisplaySource& source) {
-		Lock                   _(*_displayMutex);
-		DisplayMap<>::Iterator candidate(_displayByName->Find(name, Hash<decltype(name)>(), EqualTo<decltype(name)>()));
-		if (candidate == _displayByName->End()) {
-			return;
-		}
-
-		candidate->second.Release(source);
-	}
-
-	// ---------------------------------------------------
-
-	DisplayMap<>::Iterator DisplayLocator::CreateDisplay(StringView<Utf8Char> name) {
-		//  It is assumed that this function is called within @ref TryAcquireDisplay()/@ref ReleaseDisplay() and as such we do not acquire a lock here.
-		return _displayByName->Emplace(String<>(name, MallocAllocator("Display Name Allocator"))).first;
+		return nullptr;
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

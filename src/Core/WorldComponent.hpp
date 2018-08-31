@@ -73,7 +73,7 @@ namespace Eldritch2 { namespace Core {
 
 	protected:
 		template <typename ServiceType>
-		ServiceType& FindService() const;
+		ServiceType* FindService() const;
 
 		// ---------------------------------------------------
 

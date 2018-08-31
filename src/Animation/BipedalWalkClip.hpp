@@ -21,17 +21,17 @@ namespace Eldritch2 { namespace Animation {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum : size_t {
-			FootCount = 2u
+		struct FootstepState {
+			uint64  endTime;
+			Vector  centerOfMassPosition;
+			float16 centerOfMassVelocity[3];
 		};
 
 		// ---
 
 	public:
-		struct FootstepState {
-			uint64  endTime;
-			Vector  centerOfMassPosition;
-			float16 centerOfMassVelocity[3];
+		enum : size_t {
+			FootCount = 2u
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------

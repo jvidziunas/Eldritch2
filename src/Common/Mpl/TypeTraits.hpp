@@ -17,18 +17,20 @@
 
 namespace Eldritch2 {
 
-template <typename T, T v>
+template <typename T, T value>
 struct IntegralConstant {
-	static constexpr T Value = v;
-
+public:
 	using ValueType = T;
-	using Type      = IntegralConstant<T, v>;
+	using Type      = IntegralConstant<T, value>;
 
-	constexpr operator ValueType() const ETNoexceptHint {
-		return value;
+	static ETConstexpr ValueType Value = value;
+
+	ETConstexpr operator ValueType() const ETNoexceptHint {
+		return Value;
 	}
-	constexpr ValueType operator()() const ETNoexceptHint {
-		return value;
+
+	ETConstexpr ValueType operator()() const ETNoexceptHint {
+		return Value;
 	}
 };
 

@@ -18,8 +18,7 @@
 namespace Eldritch2 {
 
 template <typename Character, class Allocator>
-ETInlineHint SymbolTable<Character, Allocator>::SymbolTable(
-	const AllocatorType& allocator) :
+ETInlineHint SymbolTable<Character, Allocator>::SymbolTable(const AllocatorType& allocator) :
 	_allocator(allocator),
 	_symbols(ChildAllocator(_allocator, "Symbol Table Bucket Allocator")) {
 }
@@ -27,27 +26,21 @@ ETInlineHint SymbolTable<Character, Allocator>::SymbolTable(
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Find(const CharacterType* string) const {
-	auto candidate(_symbols.Find(string, Hash<const CharacterType*>(), eastl::equal_to_2<StringType, const CharacterType*>()));
-
-	if (candidate == _symbols.End()) {
-		return nullptr;
-	}
-
-	return reinterpret_cast<Symbol>(candidate->AsCString());
+ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Find(AbstractStringView<CharacterType> string) const {
+	auto candidate(_symbols.Find(string, _symbols.GetHash(), _symbols.GetEqualityPredicate()));
+	return candidate != _symbols.End() ? Symbol(*candidate) : nullptr;
 }
 
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Intern(const CharacterType* string) {
-	auto candidate(_symbols.Find(string, Hash<const CharacterType*>(), eastl::equal_to_2<StringType, const CharacterType*>()));
-
+ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Intern(AbstractStringView<CharacterType> string) {
+	auto candidate(_symbols.Find(string, _symbols.GetHash(), _symbols.GetEqualityPredicate()));
 	if (candidate == _symbols.End()) {
-		candidate = _symbols.Emplace(string, FindTerminator(string), ChildAllocator(_allocator, "Symbol String Allocator")).first;
+		candidate = _symbols.Emplace(ChildAllocator(_allocator, "Symbol String Allocator"), string).first;
 	}
 
-	return reinterpret_cast<Symbol>(candidate->AsCString());
+	return Symbol(*candidate);
 }
 
 // ---------------------------------------------------

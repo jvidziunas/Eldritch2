@@ -17,6 +17,13 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
+	struct GraphicsPassScale {
+		float32 width;
+		float32 height;
+	};
+
+	// ---
+
 	class GraphicsPipelineBuilder {
 		// - TYPE PUBLISHING ---------------------------------
 
@@ -41,55 +48,55 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		public:
 			//! Constructs this @ref AttachmentDescription instance.
-			AttachmentDescription(VkFormat format, VkSampleCountFlags quality);
-			//! Constructs this @ref AttachmentDescription instance.
 			AttachmentDescription(const AttachmentDescription&) = default;
+			//! Constructs this @ref AttachmentDescription instance.
+			AttachmentDescription(VkFormat format) ETNoexceptHint;
 
 			~AttachmentDescription() = default;
 
 			// ---------------------------------------------------
 
 		public:
-			bool SupportsResolution(float32 widthScale, float32 heightScale) const;
-			bool SupportsResolution(VkExtent3D dimensions) const;
+			bool SupportsResolution(GraphicsPassScale scale) const ETNoexceptHint;
+			bool SupportsResolution(VkExtent3D resolution) const ETNoexceptHint;
 
 			// ---------------------------------------------------
 
 		public:
-			bool ShouldPreserveInPass(uint32 pass) const;
+			bool ShouldPreserve(uint32 thisPass) const ETNoexceptHint;
 
-			bool IsReferenced() const;
+			bool IsWritten() const ETNoexceptHint;
 
-			bool IsWritten() const;
+			bool IsRead() const ETNoexceptHint;
 
-			bool IsRead() const;
+			bool IsUsed() const ETNoexceptHint;
 
 			// ---------------------------------------------------
 
 		public:
-			void MarkWritten(uint32 pass, VkImageUsageFlags usage);
+			void MarkWritten(uint32 pass, VkSampleCountFlagBits sampleRate, VkImageUsageFlags usage) ETNoexceptHint;
 
-			void MarkRead(uint32 pass, VkImageUsageFlags usage);
+			void MarkRead(uint32 pass, VkSampleCountFlagBits sampleRate, VkImageUsageFlags usage) ETNoexceptHint;
 
-			void MarkUsed(uint32 pass, VkImageUsageFlags usage);
+			void MarkUsed(uint32 pass, VkSampleCountFlagBits sampleRate, VkImageUsageFlags usage) ETNoexceptHint;
 
 			// - DATA MEMBERS ------------------------------------
 
 		public:
 			VkFormat           format;
+			VkSampleCountFlags sampleRates;
 			VkImageCreateFlags flags;
 			VkImageUsageFlags  usages;
 			uint32             firstRead;
 			uint32             lastRead;
 			uint32             firstWrite;
 			uint32             lastWrite;
-			uint32             msaaQuality : 8;
 			uint32             isExport : 1;
 			uint32             isPersistent : 1;
-			uint32             staticDimensions : 1;
+			uint32             staticResolution : 1;
 			union {
-				VkExtent3D dimensions;
-				float32    scales[2];
+				VkExtent3D        resolution;
+				GraphicsPassScale scale;
 			};
 		};
 
@@ -101,7 +108,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		public:
 			//! Constructs this @ref BufferDescription instance.
-			BufferDescription(VkDeviceSize sizeInBytes);
+			BufferDescription(VkDeviceSize sizeInBytes) ETNoexceptHint;
 			//! Constructs this @ref BufferDescription instance.
 			BufferDescription(const BufferDescription&) = default;
 
@@ -127,29 +134,27 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		public:
 			//!	Constructs this @ref PassDescription instance.
-			PassDescription(float32 widthScale, float32 heightScale, const Utf8Char* const name);
+			PassDescription(GraphicsPassScale scale, VkSampleCountFlagBits samples, StringView name) ETNoexceptHint;
 			//!	Constructs this @ref PassDescription instance.
-			PassDescription(VkExtent3D dimensions, const Utf8Char* const name);
+			PassDescription(VkExtent3D resolution, VkSampleCountFlagBits samples, StringView name) ETNoexceptHint;
 			//!	Constructs this @ref PassDescription instance.
-			PassDescription(const PassDescription&) = default;
+			PassDescription(const PassDescription&) ETNoexceptHint = default;
 
 			~PassDescription() = default;
 
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			Utf8Char name[64u];
-			uint32   staticDimensions : 1;
+			Utf8Char              name[64u];
+			AttachmentReference   colorAttachments[MaxAttachmentsPerPass];
+			AttachmentReference   inputAttachments[MaxAttachmentsPerPass];
+			AttachmentReference   depthStencilAttachment;
+			VkSampleCountFlagBits samples;
+			uint32                staticResolution : 1;
 			union {
-				VkExtent3D dimensions;
-				struct {
-					float32 widthScale;
-					float32 heightScale;
-				};
+				VkExtent3D        resolution;
+				GraphicsPassScale scale;
 			};
-			AttachmentReference colorAttachments[MaxAttachmentsPerPass];
-			AttachmentReference inputAttachments[MaxAttachmentsPerPass];
-			AttachmentReference depthStencilAttachment;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -167,33 +172,32 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const PassDescription& operator[](uint32 pass) const;
+		const PassDescription& operator[](uint32 pass) const ETNoexceptHint;
 
-		uint32 GetPassCount() const;
-
-		// ---------------------------------------------------
-
-	public:
-		const AttachmentDescription& GetAttachment(uint32 attachment) const;
-
-		uint32 GetAttachmentCount() const;
+		uint32 GetPassCount() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		template <typename... Args, class = eastl::enable_if_t<eastl::is_constructible<AttachmentDescription, VkFormat, VkSampleCountFlags, Args...>::value>>
-		uint32 DefineAttachment(VkFormat format, VkSampleCountFlags quality, Args&&... args);
+		const AttachmentDescription& GetAttachment(uint32 attachment) const ETNoexceptHint;
 
-		void BeginPass(VkPipelineBindPoint bindPoint, float32 width, float32 height, const Utf8Char* name);
-		void BeginPass(VkPipelineBindPoint bindPoint, VkExtent3D resolution, const Utf8Char* name);
+		uint32 GetAttachmentCount() const ETNoexceptHint;
 
-		bool AppendInput(uint32 attachment, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		// ---------------------------------------------------
 
-		bool AppendColorOutput(uint32 attachment, VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+	public:
+		uint32 DefineAttachment(VkFormat format);
 
-		bool SetDepthStencilBuffer(uint32 attachment, VkImageLayout layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+		void BeginPass(VkPipelineBindPoint target, VkExtent3D resolution, VkSampleCountFlagBits sampleRate, StringView name);
+		void BeginPass(VkPipelineBindPoint target, GraphicsPassScale scale, VkSampleCountFlagBits sampleRate, StringView name);
 
-		void Finish(bool andOptimize = true);
+		bool AppendInput(uint32 globalId, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+		bool AppendColorOutput(uint32 globalId, VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+		bool SetDepthStencilBuffer(uint32 globalId, VkImageLayout layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
+		VkResult Finish(bool andOptimize = true);
 
 		// ---------------------------------------------------
 

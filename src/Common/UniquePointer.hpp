@@ -60,7 +60,7 @@ public:
 	UniquePointer& operator=(UniquePointer<AlternateObject, AlternateDeleter>&&);
 	//!	Disable copy assignment.
 	UniquePointer& operator=(const UniquePointer&) = delete;
-	UniquePointer& operator                        =(UniquePointer&&);
+	UniquePointer& operator=(UniquePointer&&) = default;
 
 	// ---------------------------------------------------
 
@@ -147,7 +147,7 @@ public:
 	UniquePointer& operator=(UniquePointer<T[], AlternateDeleter>&&);
 	//!	Disable copy assignment.
 	UniquePointer& operator=(const UniquePointer&) = delete;
-	UniquePointer& operator                        =(UniquePointer&&);
+	UniquePointer& operator=(UniquePointer&&) = default;
 
 	// ---------------------------------------------------
 
@@ -190,7 +190,7 @@ template <typename Object, typename... Args>
 UniquePointer<Object, InstanceDeleter> MakeUnique(Allocator& allocator, Args&&... args);
 
 template <typename Object, typename... Args>
-UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, size_t arraySizeInElements, Args&&... args);
+UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, size_t arraySizeInElements, Args&... args);
 
 template <typename Object, typename Iterator>
 UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, Iterator firstElement, Iterator lastElement);

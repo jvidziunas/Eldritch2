@@ -15,7 +15,7 @@
 #include <Scripting/Wren/WrenWorldComponent.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
 #include <Scripting/Wren/Dispatcher.hpp>
-#include <Assets/PackageLocator.hpp>
+#include <Assets/ContentLocator.hpp>
 #include <Assets/AssetDatabase.hpp>
 #include <Scripting/Wren/Game.hpp>
 #include <Core/World.hpp>
@@ -33,18 +33,11 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	using namespace ::Eldritch2::Assets;
 	using namespace ::Eldritch2::Core;
 
-	namespace {
-
-		enum : size_t { WrenHeapSizeInBytes = 2u * 1024u * 1024u /* 2MB*/ };
-
-	} // anonymous namespace
-
 	WrenWorldComponent::WrenWorldComponent(const ObjectLocator& services) :
 		WorldComponent(services),
 		_vm(nullptr),
-		_wren(FindService<AssetDatabase>(), FindService<World>().GetLog()),
-		_packageLocator(nullptr),
-		_assetLocator(nullptr),
+		_wren(*FindService<AssetDatabase>(), FindService<World>()->GetLog()),
+		_contentLocator(nullptr),
 		_dispatcher(nullptr) {
 	}
 
@@ -54,22 +47,21 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		ET_PROFILE_SCOPE("World/EarlyInitialization", "Wren API registration", 0xCBABCB);
 		WrenConfiguration configuration;
 
-		wrenInitConfiguration(&configuration);
-		configuration.userData            = eastl::addressof(_wren);
+		wrenInitConfiguration(ETAddressOf(configuration));
+		configuration.userData            = ETAddressOf(_wren);
 		configuration.bindForeignClassFn  = nullptr;
 		configuration.bindForeignMethodFn = nullptr;
-		configuration.initialHeapSize     = WrenHeapSizeInBytes;
-		configuration.minHeapSize         = WrenHeapSizeInBytes;
-		configuration.reallocateFn        = [](void* memory, size_t newSize) {
-            return _aligned_realloc(memory, newSize, 16u);
+		configuration.initialHeapSize     = 2u * 1024u * 1024u /* 2MB*/;
+		configuration.minHeapSize         = 2u * 1024u * 1024u /* 2MB*/;
+		configuration.reallocateFn        = [](void* memory, size_t size) {
+            return _aligned_realloc(memory, size, 16u);
 		};
 
 		configuration.loadModuleFn = [](WrenVM* vm, const char* module) -> char* {
-			char path[Asset::MaxPathLength];
+			String path;
+			path.Append(module, FindTerminator(module)).Append(ScriptAsset::GetExtension());
 
-			AppendString(CopyString(path, module), ScriptAsset::GetExtension());
-
-			const ScriptAsset* script(AsContext(vm).FindScriptModule(path));
+			const ScriptAsset* script(GetContext(vm)->FindScriptModule(path));
 			if (!script) {
 				return nullptr;
 			}
@@ -84,24 +76,23 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		};
 
 		configuration.writeFn = [](WrenVM* vm, const char* text) {
-			AsContext(vm).WriteLog(text, StringLength(text));
+			GetContext(vm)->WriteLog(text, StringLength(text));
 		};
 
 		configuration.errorFn = [](WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message) {
 			switch (type) {
-			case WREN_ERROR_COMPILE: AsContext(vm).WriteLog(MessageType::Error, "{} ({}:{})" UTF8_NEWLINE, message, module, line); break;
-			case WREN_ERROR_RUNTIME: AsContext(vm).WriteLog(MessageType::Error, "Wren runtime error: {}" UTF8_NEWLINE, message); break;
-			case WREN_ERROR_STACK_TRACE: AsContext(vm).WriteLog(MessageType::Error, "\tin {} ({}:{})" UTF8_NEWLINE, message, module, line); break;
+			case WREN_ERROR_COMPILE: GetContext(vm)->WriteLog(Severity::Error, "{} ({}:{})" ET_NEWLINE, message, module, line); break;
+			case WREN_ERROR_RUNTIME: GetContext(vm)->WriteLog(Severity::Error, "Wren runtime error: {}" ET_NEWLINE, message); break;
+			case WREN_ERROR_STACK_TRACE: GetContext(vm)->WriteLog(Severity::Error, "\tin {} ({}:{})" ET_NEWLINE, message, module, line); break;
 			} // switch (type)
 		};
 
-		WrenVM* const vm = wrenNewVM(&configuration);
-
+		WrenVM* const vm(wrenNewVM(ETAddressOf(configuration)));
 		_wren.BindResources(vm);
 
 		//	Build the list of application script types. This is single-threaded to avoid contention on the type and method tables.
 		ApiBuilder api(vm, _wren);
-		for (const UniquePointer<WorldComponent>& component : FindService<World>().GetComponents()) {
+		for (const UniquePointer<WorldComponent>& component : FindService<World>()->GetComponents()) {
 			component->DefineScriptApi(api);
 		}
 
@@ -112,12 +103,8 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	void WrenWorldComponent::BindResources(JobExecutor& /*executor*/) {
 		ET_PROFILE_SCOPE("World/Initialization", "Wren world boot", 0xCBABCB);
-		if (Failed(_packageLocator->BindResources())) {
-			FindService<World>().SetShouldShutDown();
-		}
-
-		if (Failed(_game.BindResources(_vm))) {
-			return FindService<World>().SetShouldShutDown();
+		if (Failed(_contentLocator->BindResources()) || Failed(_game.BindResources(_vm))) {
+			FindService<World>()->SetShouldShutDown();
 		}
 	}
 
@@ -133,7 +120,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 			dispatcher->FreeResources(vm);
 		}
 
-		if (PackageLocator* const locator = eastl::exchange(_packageLocator, nullptr)) {
+		if (ContentLocator* const locator = eastl::exchange(_contentLocator, nullptr)) {
 			locator->FreeResources();
 		}
 
@@ -144,9 +131,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	void WrenWorldComponent::OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction) {
+	void WrenWorldComponent::OnVariableRateTick(JobExecutor& /*executor*/, MicrosecondTime /*tickDuration*/, float32 /*residualFraction*/) {
 		ET_PROFILE_SCOPE("World/Tick", "Wren script execution", 0xCBABCB);
-		_packageLocator->PollLoadStatus();
+		_contentLocator->RequirementsComplete();
 	}
 
 	// ---------------------------------------------------

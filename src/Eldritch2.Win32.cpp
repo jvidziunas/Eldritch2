@@ -22,7 +22,6 @@
 #include <Scheduling/Win32/FiberJobSystem.hpp>
 #include <Core/Engine.hpp>
 //------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
 #include <shellapi.h>
 #include <windows.h>
 #include <Shlwapi.h>
@@ -56,19 +55,21 @@ class Application {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
+	//!	Disable copy construction.
+	Application(const Application&) = delete;
 	//!	Constructs this @ref Application instance.
 	Application() :
 		_jobSystem(),
-		_engine(_jobSystem),
+		_engine(),
 		_managementComponent(_engine),
 		_xinputComponent(_engine.GetServiceLocator()),
 		_navigationComponent(_engine.GetServiceLocator()),
-		_win32InputComponent(_engine.GetServiceLocator(), _engine.GetLog()),
-		_steamworksComponent(_engine.GetServiceLocator(), _engine.GetLog()),
+		_win32InputComponent(_engine.GetServiceLocator()),
+		_steamworksComponent(_engine.GetServiceLocator()),
 		_wrenComponent(_engine.GetServiceLocator()),
-		_physxComponent(_engine.GetServiceLocator(), _engine.GetLog()),
-		_vulkanComponent(_engine.GetServiceLocator(), _engine.GetLog()),
-		_xaudio2Component(_engine.GetServiceLocator(), _engine.GetLog()) {
+		_physxComponent(_engine.GetServiceLocator()),
+		_vulkanComponent(_engine.GetServiceLocator()),
+		_xaudio2Component(_engine.GetServiceLocator()) {
 	}
 
 	~Application() = default;
@@ -76,26 +77,26 @@ public:
 	// ---------------------------------------------------
 
 public:
-	int Run() {
-		return _jobSystem.Boot(Max(GetCoreInfo().physicalCores, 2u) - 1u, [this](JobExecutor& executor) {
-			MicroProfileInit();
-
-			_jobSystem.SetShouldShutDown(
-				_engine.BootOnCaller(
-					executor,
-					_managementComponent,
-					_xinputComponent,
-					_navigationComponent,
-					_win32InputComponent,
-					_steamworksComponent,
-					_wrenComponent,
-					_physxComponent,
-					_vulkanComponent,
-					_xaudio2Component));
-
-			MicroProfileShutdown();
+	ErrorCode BootOnCaller() {
+		return _jobSystem.BootOnCaller(Max(GetCoreInfo().physicalCores, 2u) - 1u, [this](JobExecutor& executor) {
+			_jobSystem.SetShouldShutDown(_engine.BootOnCaller(
+				executor,
+				_managementComponent,
+				_xinputComponent,
+				_navigationComponent,
+				_win32InputComponent,
+				_steamworksComponent,
+				_wrenComponent,
+				_physxComponent,
+				_vulkanComponent,
+				_xaudio2Component));
 		});
 	}
+
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+	Application& operator=(const Application&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -115,8 +116,10 @@ private:
 
 } // anonymous namespace
 
-int WINAPI wWinMain(__in HINSTANCE /* hInstance*/, __in_opt HINSTANCE /* hPrevInstance*/, __in LPWSTR /* lpCmdLine*/, __in int /* nCmdShow*/) {
+int WINAPI wWinMain(__in HINSTANCE /*hInstance*/, __in_opt HINSTANCE /*hPrevInstance*/, __in LPWSTR /*lpCmdLine*/, __in int /*nCmdShow*/) {
+	ET_PROFILE_APP_BEGIN("Eldritch2");
+	ET_AT_SCOPE_EXIT(ET_PROFILE_APP_END());
 	/*	While the Application structure is pretty big overall, the fiber scheduler means this thread gets a "fresh" stack during bootstrap.
-		Thus, it makes more sense to put this on the stack rather than in the image data segment. */
-	return Application().Run();
+	 *	Thus, it makes more sense to put this on the stack rather than in the image data segment. */
+	return AsPosixInt(Application().BootOnCaller());
 }

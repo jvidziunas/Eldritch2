@@ -20,12 +20,11 @@
 #	define EA_COMPILER_HAS_C99_FORMAT_MACROS
 #endif
 #include <EABase/eabase.h>
-ET_PUSH_COMPILER_WARNING_STATE()
 /* (4804) Disable warning about booleans being used as an argument to the shift operator.
  * (6326) Disable warning about comparing constants with other constants. */
-ET_SET_MSVC_WARNING_STATE(disable : 4804 6326)
+ET_PUSH_MSVC_WARNING_STATE(disable : 4804 6326)
 #include <half/include/half.hpp>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {

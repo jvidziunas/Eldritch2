@@ -41,7 +41,7 @@ namespace Eldritch2 { namespace Core {
 	// ---------------------------------------------------
 
 	template <typename Iterator>
-	ETInlineHint ErrorCode World::BindResources(JobExecutor& executor, Iterator firstComponent, Iterator lastComponent) {
+	ETInlineHint ErrorCode World::BindResources(Scheduling::JobExecutor& executor, Iterator firstComponent, Iterator lastComponent) {
 		ComponentList<> components(_components.GetAllocator());
 		components.Reserve(eastl::distance(firstComponent, lastComponent));
 

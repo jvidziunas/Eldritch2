@@ -16,10 +16,6 @@
 #include <Core/EngineComponent.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Logging {
-	class Log;
-}} // namespace Eldritch2::Logging
-
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class VulkanEngineComponent : public Core::EngineComponent {
@@ -27,7 +23,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	public:
 		//!	Constructs this @ref VulkanEngineComponent instance.
-		VulkanEngineComponent(const ObjectLocator& services, Logging::Log& log);
+		VulkanEngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		VulkanEngineComponent(const VulkanEngineComponent&) = delete;
 
@@ -59,10 +55,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Vulkan            _vulkan;
-		HashSet<String<>> _instanceLayers;
-		HashSet<String<>> _deviceLayers;
-		String<>          _preferredGpu;
+		Vulkan          _vulkan;
+		String          _preferredGpu;
+		HashSet<String> _instanceLayers;
+		HashSet<String> _deviceLayers;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

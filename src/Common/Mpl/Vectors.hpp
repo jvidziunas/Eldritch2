@@ -35,13 +35,13 @@ public:
 
 public:
 	//!	Constructs this @ref Vector instance.
-	constexpr Vector(float32 x, float32 y, float32 z, float32 w);
+	ETConstexpr Vector(float32 x, float32 y, float32 z, float32 w);
 	//!	Constructs this @ref Vector instance.
-	constexpr Vector(const float32* values);
+	ETConstexpr Vector(const float32* values);
 	//!	Constructs this @ref Vector instance.
-	constexpr Vector(const Vector&) = default;
+	ETConstexpr Vector(const Vector&) = default;
 	//!	Constructs this @ref Vector instance.
-	constexpr Vector(const __m128&);
+	ETConstexpr Vector(const __m128&);
 	//!	Constructs this @ref Vector instance.
 	Vector() = default;
 
@@ -119,13 +119,13 @@ class Quaternion {
 
 public:
 	//!	Constructs this @ref Quaternion instance.
-	constexpr Quaternion(float32 i, float32 j, float32 k, float32 w);
+	ETConstexpr Quaternion(float32 i, float32 j, float32 k, float32 w);
 	//!	Constructs this @ref Quaternion instance.
-	constexpr Quaternion(const float32* values);
+	ETConstexpr Quaternion(const float32* values);
 	//!	Constructs this @ref Quaternion instance.
-	constexpr Quaternion(const Quaternion&) = default;
+	ETConstexpr Quaternion(const Quaternion&) = default;
 	//!	Constructs this @ref Quaternion instance.
-	constexpr Quaternion(const __m128&);
+	ETConstexpr Quaternion(const __m128&);
 	//!	Constructs this @ref Quaternion instance.
 	Quaternion() = default;
 

@@ -16,23 +16,22 @@
 #include <Graphics/Vulkan/GraphicsPipeline.hpp>
 #include <Graphics/Vulkan/DescriptorTable.hpp>
 #include <Graphics/Vulkan/GpuResources.hpp>
-#include <Graphics/Vulkan/CommandList.hpp>
-#include <Graphics/Vulkan/Display.hpp>
 #include <Graphics/GraphicsScene.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class FrameTransferBus;
-}}} // namespace Eldritch2::Graphics::Vulkan
 
-namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class PlayerView {
+		// - TYPE PUBLISHING ---------------------------------
 
-	class PlayerView : public DisplaySource {
+	public:
+		using ViewportReference = UniquePointer<const Viewport, ViewportDisposer>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref PlayerView instance.
-		PlayerView(Angle verticalFov);
+		PlayerView(ViewportReference target, Transformation worldToView, Angle verticalFov);
 		//! Disable copy construction.
 		PlayerView(const PlayerView&) = delete;
 
@@ -41,20 +40,18 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		Transformation ETSimdCall GetWorldToView() const;
-
-		void ETSimdCall SetWorldToView(Transformation worldToView);
-
-		Angle GetVerticalFov() const;
-
-		void SetVerticalFov(Angle angle);
+		const Framebuffer& GetTarget() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult UpdateResources(Gpu& gpu);
+		Transformation ETSimdCall GetWorldToView() const ETNoexceptHint;
 
-		void FreeResources(Gpu& gpu);
+		void ETSimdCall SetWorldToView(Transformation worldToView) ETNoexceptHint;
+
+		Angle GetVerticalFov() const ETNoexceptHint;
+
+		void SetVerticalFov(Angle angle) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -64,65 +61,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Transformation _worldToView;
-		Angle          _verticalFov;
-		Framebuffer    _framebuffer;
+		ViewportReference _target;
+		Transformation    _worldToView;
+		Angle             _verticalFov;
 	};
 
 	// ---
 
 	class VulkanGraphicsScene : public GraphicsScene {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		enum : uint32 { MaxQueuedFrames = 2u };
-		enum : VkDeviceSize {
-			DefaultTransformArenaSize = 16u * 1024u * 1024u, /*  16MB */
-		};
-
-		// ---
-
-	public:
-		class Frame {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-		public:
-			//!	Disable copy construction.
-			Frame(const Frame&) = delete;
-			//!	Constructs this @ref Frame instance.
-			Frame();
-
-			~Frame() = default;
-
-			// ---------------------------------------------------
-
-		public:
-			bool CheckCommandsConsumed(Gpu& gpu) const;
-
-			// ---------------------------------------------------
-
-		public:
-			VkResult SubmitCommands(Gpu& gpu, const VulkanGraphicsScene& scene);
-
-			// ---------------------------------------------------
-
-		public:
-			VkResult BindResources(Gpu& gpu);
-
-			void FreeResources(Gpu& gpu);
-
-			// - DATA MEMBERS ------------------------------------
-
-		public:
-			CommandList _commands;
-			VkFence     _drawsConsumed;
-			VkSemaphore _startExecution;
-			VkSemaphore _finishExecution;
-
-			// ---------------------------------------------------
-
-			friend void Swap(Frame&, Frame&);
-		};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -136,16 +82,24 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult SubmitViewIndependentCommands(Scheduling::JobExecutor& executor, Gpu& gpu);
+		const ArrayList<PlayerView*> GetRootViews() const ETNoexceptHint;
 
-		VkResult SubmitViewDependentCommands(Scheduling::JobExecutor& executor, Gpu& gpu);
+		const BatchCoordinator& GetOpaqueBatches() const ETNoexceptHint;
+
+		const DescriptorTable& GetShaderResources() const ETNoexceptHint;
+
+		const GraphicsPipeline& GetOpaqueLitPipeline() const ETNoexceptHint;
+
+		const GraphicsPipeline& GetShadowPipeline() const ETNoexceptHint;
+
+		const Framebuffer& GetShadowAtlas() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Scheduling::JobExecutor& executor, Gpu& gpu, FrameTransferBus& bus, VkDeviceSize transformArenaSize = DefaultTransformArenaSize);
+		VkResult BindResources(Gpu& gpu, VkExtent2D shadowResolution, VkDeviceSize transformArenaSize);
 
-		void FreeResources(Scheduling::JobExecutor& executor, Gpu& gpu, FrameTransferBus& bus);
+		void FreeResources(Gpu& gpu);
 
 		// ---------------------------------------------------
 
@@ -156,15 +110,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	private:
 		ArrayList<PlayerView*> _rootViews;
-		VkSemaphore            _resourcesReady;
 		UniformBuffer          _transforms;
 		BatchCoordinator       _opaqueBatches;
 		GraphicsPipeline       _shadowPipeline;
 		Framebuffer            _shadowAtlas;
-		GraphicsPipeline       _mainPipeline;
-		DescriptorTable        _resourceDescriptors;
-		uint32                 _frameId;
-		Frame                  _queuedFrames[MaxQueuedFrames];
+		GraphicsPipeline       _opaqueLitPipeline;
+		DescriptorTable        _shaderResources;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

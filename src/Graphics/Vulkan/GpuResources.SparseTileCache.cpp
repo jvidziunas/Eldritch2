@@ -30,20 +30,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	bool SparseTileCache::ShouldCacheTile(Tile tile, VkDeviceSize& reservedOffset) {
-		if (IsLoading(tile)) {
-			return false;
-		}
-
-		_loadingTiles.Insert(tile);
-		reservedOffset = 0u;
-
-		return true;
-	}
-
-	// ---------------------------------------------------
-
-	void SparseTileCache::NotifyCached(Tile tile, VkDeviceSize offset) {
+	void SparseTileCache::NotifyCached(VkDeviceSize offset, Tile tile) {
 		_loadingTiles.Erase(tile);
 		_cachedPagesByTile.Emplace(tile, offset);
 	}
@@ -53,22 +40,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	VkResult SparseTileCache::BindResources(Gpu& gpu, VkDeviceSize tileSizeInBytes, uint32_t cachedTileLimit) {
 		enum : VkMemoryPropertyFlags { InferFromUsage = 0u };
 
-		ET_FAIL_UNLESS(AbstractBuffer::BindResources(gpu, VkBufferCreateInfo{
-															  VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-															  /*pNext =*/nullptr,
-															  /*flags =*/0u, tileSizeInBytes * cachedTileLimit, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_SHARING_MODE_EXCLUSIVE,
-															  /*queueFamilyIndexCount =*/0u,   // Exclusive sharing.
-															  /*pQueueFamilyIndices =*/nullptr // Exclusive sharing.
-														  },
-													 VmaAllocationCreateInfo{ VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_CPU_ONLY,
-																			  /*requiredFlags =*/InferFromUsage,
-																			  /*preferredFlags =*/InferFromUsage,
-																			  /*memoryTypeBits =*/0u,
-																			  /*pool =*/VK_NULL_HANDLE,
-																			  /*pUserData =*/this }));
-
 		HashMap<Tile, VkDeviceSize> cachedPagesByTile(_cachedPagesByTile.GetAllocator());
 		HashSet<Tile>               loadingTiles(_loadingTiles.GetAllocator());
+
+		ET_ABORT_UNLESS(AbstractBuffer::BindResources(gpu, // clang-format off
+			VkBufferCreateInfo { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+								/*pNext =*/nullptr,
+								/*flags =*/0u, tileSizeInBytes * cachedTileLimit, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_SHARING_MODE_EXCLUSIVE,
+								/*queueFamilyIndexCount =*/0u,
+								/*pQueueFamilyIndices =*/nullptr },
+			VmaAllocationCreateInfo { VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_CPU_ONLY,
+									/*requiredFlags =*/InferFromUsage,
+									/*preferredFlags =*/InferFromUsage,
+									/*memoryTypeBits =*/0u,
+									/*pool =*/VK_NULL_HANDLE,
+									/*pUserData =*/this })); // clang-format on
 
 		Swap(_cachedPagesByTile, cachedPagesByTile);
 		Swap(_loadingTiles, loadingTiles);

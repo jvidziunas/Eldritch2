@@ -23,24 +23,24 @@ namespace Eldritch2 { namespace Scheduling {
 #endif
 
 		template <class Collection, typename Argument>
-		void VariadicEmplaceBack(Collection& /*collection*/, Argument& /*argument*/) {}
+		ETInlineHint ETForceInlineHint void VariadicEmplaceBack(Collection& /*collection*/, Argument& /*argument*/) {}
 
 		// ---------------------------------------------------
 
 		template <class Collection, typename Argument, typename Work, typename... ExtraWork>
-		void VariadicEmplaceBack(Collection& collection, Argument& argument, Work&& work, ExtraWork&&... extraWork) {
+		ETInlineHint ETForceInlineHint void VariadicEmplaceBack(Collection& collection, Argument& argument, Work&& work, ExtraWork&&... extraWork) {
 			(collection.EmplaceBack(argument, eastl::forward<Work>(work)), VariadicEmplaceBack(collection, argument, eastl::forward<ExtraWork>(extraWork)...));
 		}
 
 	} // namespace Detail
 
-	ETInlineHint JobExecutor::JobClosure::JobClosure(JobFence& completedFence, Function<void(JobExecutor&)> work) :
-		completedFence(&completedFence),
+	ETInlineHint ETForceInlineHint JobExecutor::JobClosure::JobClosure(JobFence& completedFence, Function<void(JobExecutor&) ETNoexceptHint> work) :
+		completedFence(ETAddressOf(completedFence)),
 		work(eastl::move(work)) {}
 
 	// ---------------------------------------------------
 
-	ETInlineHint JobExecutor::SuspendedJob::SuspendedJob(const char* file, int line, Detail::PlatformFiber fiber, Function<bool()> shouldResume) :
+	ETInlineHint ETForceInlineHint JobExecutor::SuspendedJob::SuspendedJob(const char* file, int line, Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume) :
 		SuspendedJob(fiber, eastl::move(shouldResume)) {
 #if ET_ENABLE_JOB_DEBUGGING
 		this->file   = file;
@@ -54,16 +54,15 @@ namespace Eldritch2 { namespace Scheduling {
 
 	// ---------------------------------------------------
 
-	ETInlineHint JobExecutor::SuspendedJob::SuspendedJob(Detail::PlatformFiber fiber, Function<bool()> shouldResume) :
+	ETInlineHint ETForceInlineHint JobExecutor::SuspendedJob::SuspendedJob(Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume) :
 		fiber(fiber),
 		shouldResume(eastl::move(shouldResume)) {}
 
 	// ---------------------------------------------------
 
 	template <typename... WorkItems>
-	ETInlineHint void JobExecutor::StartAsync(JobFence& completed, Function<void(JobExecutor&)> workItem, WorkItems&&... workItems) {
-		completed.fetch_add(static_cast<int>(1 + sizeof...(workItems)), std::memory_order_relaxed);
-
+	ETInlineHint ETForceInlineHint void JobExecutor::StartAsync(JobFence& completed, Function<void(JobExecutor&) ETNoexceptHint> workItem, WorkItems&&... workItems) {
+		completed.fetch_add(static_cast<int>(sizeof...(workItems) + 1), std::memory_order_relaxed);
 		Detail::VariadicEmplaceBack(_jobs, completed, eastl::move(workItem), eastl::forward<WorkItems>(workItems)...);
 	}
 
@@ -76,30 +75,17 @@ namespace Eldritch2 { namespace Scheduling {
 			InputIterator          end;
 			AlternateInputIterator alternateBegin;
 			OutputIterator         out;
-			TrinaryPredicate*      transformer;
-		} splits[4u];
+			TrinaryPredicate       transformer;
+		};
 
-		JobFence   splitsCompleted(0);
-		const auto inputsPerSplit(Max(static_cast<size_t>(end - begin) / _countof(splits), splitSize));
-
-		//	Start [0 - countof(splits)) subtasks to exploit data-level parallelism.
-		for (auto& split : splits) {
-			if (static_cast<size_t>(end - begin) <= splitSize) {
-				break;
-			}
-
-			split.begin          = begin;
-			split.end            = begin + inputsPerSplit;
-			split.alternateBegin = alternateBegin + inputsPerSplit;
-			split.out            = out;
-			split.transformer    = &transformer;
-
-			begin += inputsPerSplit;
-			out += inputsPerSplit;
-			alternateBegin += inputsPerSplit;
-
-			StartAsync(splitsCompleted, [&split](JobExecutor& executor) {
-				executor.Transform<splitSize>(split.begin, split.end, split.alternateBegin, split.out, *split.transformer);
+		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
+		JobFence   completed(0);
+		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
+		for (Split* split(splits); end - begin < splitSize; begin += splitSize, alternateBegin += splitSize, out += splitSize, ++split) {
+			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, alternateBegin, out, transformer }](JobExecutor& executor) {
+				executor.Transform<splitSize, InputIterator, OutputIterator, AlternateInputIterator, TrinaryPredicate>(
+					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->alternateBegin), eastl::move(current->out), eastl::move(current->transformer));
+				current->~Split();
 			});
 		}
 
@@ -115,32 +101,21 @@ namespace Eldritch2 { namespace Scheduling {
 
 	template <size_t splitSize, typename InputIterator, typename OutputIterator, typename BinaryPredicate>
 	ETInlineHint void JobExecutor::Transform(InputIterator begin, InputIterator end, OutputIterator out, BinaryPredicate transformer) {
-		struct {
-			InputIterator    begin;
-			InputIterator    end;
-			OutputIterator   out;
-			BinaryPredicate* transformer;
-		} splits[4u];
+		struct Split {
+			InputIterator   begin;
+			InputIterator   end;
+			OutputIterator  out;
+			BinaryPredicate transformer;
+		};
 
-		JobFence   splitsCompleted(0);
-		const auto inputsPerSplit(Max(static_cast<size_t>(end - begin) / _countof(splits), splitSize));
-
-		//	Start [0 - countof(splits)) subtasks to exploit data-level parallelism.
-		for (auto& split : splits) {
-			if (static_cast<size_t>(end - begin) <= splitSize) {
-				break;
-			}
-
-			split.begin       = begin;
-			split.end         = begin + inputsPerSplit;
-			split.out         = out;
-			split.transformer = &transformer;
-
-			begin += inputsPerSplit;
-			out += inputsPerSplit;
-
-			StartAsync(splitsCompleted, [&split](JobExecutor& executor) {
-				executor.Transform<splitSize>(split.begin, split.end, split.out, *split.transformer);
+		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
+		JobFence   completed(0);
+		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
+		for (Split* split(splits); end - begin < splitSize; begin += splitSize, out += splitSize, ++split) {
+			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, out, transformer }](JobExecutor& executor) {
+				executor.Transform<splitSize, InputIterator, OutputIterator, BinaryPredicate>(
+					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->out), eastl::move(current->transformer));
+				current->~Split();
 			});
 		}
 
@@ -149,82 +124,60 @@ namespace Eldritch2 { namespace Scheduling {
 			*out++ = transformer(*this, *begin++);
 		}
 
-		AwaitFence(splitsCompleted);
+		AwaitFence(completed);
 	}
 
 	// ---------------------------------------------------
 
 	template <size_t splitSize, typename InputIterator, typename AlternateInputIterator, typename QuaternaryPredicate>
 	ETInlineHint void JobExecutor::ForEachSplit(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, QuaternaryPredicate predicate) {
-		struct {
+		struct Split {
 			InputIterator          begin;
 			InputIterator          end;
 			AlternateInputIterator alternateBegin;
-			QuaternaryPredicate*   predicate;
-		} splits[4u];
+			QuaternaryPredicate    predicate;
+		};
 
-		JobFence   splitsCompleted(0);
-		const auto inputsPerSplit(Max(static_cast<size_t>(end - begin) / _countof(splits), splitSize));
-
-		//	Start [0 - countof(splits)) subtasks to exploit data-level parallelism.
-		for (auto& split : splits) {
-			if (static_cast<size_t>(end - begin) <= splitSize) {
-				break;
-			}
-
-			split.begin          = begin;
-			split.end            = begin + inputsPerSplit;
-			split.alternateBegin = alternateBegin + inputsPerSplit;
-			split.predicate      = &predicate;
-
-			begin += inputsPerSplit;
-			alternateBegin += inputsPerSplit;
-
-			StartAsync(splitsCompleted, [&split](JobExecutor& executor) {
-				executor.ForEachSplit<splitSize>(split.begin, split.end, split.alternateBegin, *split.predicate);
+		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
+		JobFence   completed(0);
+		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
+		for (Split* split(splits); end - begin < splitSize; begin += splitSize, alternateBegin += splitSize, ++split) {
+			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, alternateBegin, predicate }](JobExecutor& executor) {
+				executor.ForEachSplit<splitSize, InputIterator, AlternateInputIterator, QuaternaryPredicate>(
+					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->alternateBegin), eastl::move(current->predicate));
+				current->~Split();
 			});
 		}
-
 		//	Finish off the remaining [0-splitSize) transform operations.
 		predicate(*this, begin, end, alternateBegin);
 
-		this->AwaitFence(splitsCompleted);
+		this->AwaitFence(completed);
 	}
 
 	// ---------------------------------------------------
 
 	template <size_t splitSize, typename InputIterator, typename TernaryPredicate>
 	ETInlineHint void JobExecutor::ForEachSplit(InputIterator begin, InputIterator end, TernaryPredicate predicate) {
-		struct {
-			InputIterator     begin;
-			InputIterator     end;
-			TernaryPredicate* predicate;
-		} splits[4u];
+		struct Split {
+			InputIterator    begin;
+			InputIterator    end;
+			TernaryPredicate predicate;
+		};
 
-		JobFence   splitsCompleted(0);
-		const auto inputsPerSplit(Max(static_cast<size_t>(end - begin) / _countof(splits), splitSize));
-
-		//	Start [0 - countof(splits)) subtasks to exploit data-level parallelism.
-		for (auto& split : splits) {
-			if (static_cast<size_t>(end - begin) <= splitSize) {
-				break;
-			}
-
-			split.begin     = begin;
-			split.end       = begin + inputsPerSplit;
-			split.predicate = &predicate;
-
-			begin += inputsPerSplit;
-
-			StartAsync(splitsCompleted, [&split](JobExecutor& executor) {
-				executor.ForEachSplit<splitSize>(split.begin, split.end, *split.predicate);
+		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
+		JobFence   completed(0);
+		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
+		for (Split* split(splits); end - begin < splitSize; begin += splitSize, ++split) {
+			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, predicate }](JobExecutor& executor) {
+				executor.ForEachSplit<splitSize, InputIterator, TernaryPredicate>(
+					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->predicate));
+				current->~Split();
 			});
 		}
-
 		//	Finish off the remaining [0-splitSize) transform operations.
 		predicate(*this, begin, end);
 
-		this->AwaitFence(splitsCompleted);
+		this->AwaitFence(completed);
 	}
 
 	// ---------------------------------------------------
@@ -252,27 +205,20 @@ namespace Eldritch2 { namespace Scheduling {
 	// ---------------------------------------------------
 
 	template <typename... WorkItems>
-	ETInlineHint void JobExecutor::Await_(const char* file, int line, Function<void(JobExecutor&)> workItem, WorkItems&&... workItems) {
-		Scheduling::JobFence workCompleted(0);
+	ETInlineHint void JobExecutor::Await_(const char* file, int line, Function<void(JobExecutor&) ETNoexceptHint> workItem, WorkItems&&... workItems) {
+		Scheduling::JobFence completed(0);
 
-		this->StartAsync(workCompleted, eastl::move(workItem), eastl::forward<WorkItems>(workItems)...);
-
-		Await_(file, line, workCompleted);
+		this->StartAsync(completed, eastl::move(workItem), eastl::move(workItems)...);
+		Await_(file, line, completed);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void JobExecutor::Await_(const char* file, int line, JobFence& fence) {
+	ETInlineHint ETForceInlineHint void JobExecutor::Await_(const char* file, int line, JobFence& fence) {
 		return Await_(file, line, [&fence]() -> bool {
-#if ET_ENABLE_JOB_DEBUGGING
 			const int value(fence.load(std::memory_order_consume));
-
 			ET_ASSERT(value >= 0, "Reference count mismatch for job fence!");
-
 			return value == 0;
-#else
-			return fence.load(std::memory_order_consume) == 0;
-#endif
 		});
 	}
 

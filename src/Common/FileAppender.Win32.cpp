@@ -21,19 +21,19 @@
 namespace Eldritch2 {
 namespace {
 
-	static ETInlineHint HANDLE MakeAppender(const wchar_t* const path, DWORD creationDisposition) {
+	ETInlineHint ETForceInlineHint HANDLE MakeAppender(const wchar_t* const path, DWORD creationDisposition) ETNoexceptHint {
 		return CreateFileW(path, FILE_APPEND_DATA, FILE_SHARE_READ, nullptr, creationDisposition, FILE_FLAG_POSIX_SEMANTICS, nullptr);
 	}
 
 } // anonymous namespace
 
-FileAppender::FileAppender() :
-	_file(INVALID_HANDLE_VALUE) {}
+FileAppender::FileAppender() ETNoexceptHint : _file(INVALID_HANDLE_VALUE) {}
 
 // ---------------------------------------------------
 
-FileAppender::FileAppender(FileAppender&& appender) :
-	_file(eastl::exchange(appender._file, INVALID_HANDLE_VALUE)) {}
+FileAppender::FileAppender(FileAppender&& appender) ETNoexceptHint : FileAppender() {
+	Swap(*this, appender);
+}
 
 // ---------------------------------------------------
 
@@ -47,11 +47,19 @@ FileAppender::~FileAppender() {
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::CreateOrTruncate(const PlatformChar* path) {
+ErrorCode FileAppender::Append(const void* const sourceData, size_t lengthToWriteInBytes) ETNoexceptHint {
+	DWORD writtenLengthInBytes;
+
+	return WriteFile(_file, sourceData, DWORD(lengthToWriteInBytes), ETAddressOf(writtenLengthInBytes), nullptr) != FALSE ? Error::None : Error::Unspecified;
+}
+
+// ---------------------------------------------------
+
+ErrorCode FileAppender::CreateOrTruncate(const PlatformChar* path) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
 	HANDLE file(MakeAppender(path, CREATE_ALWAYS));
-	ET_FAIL_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
 
 	Swap(_file, file);
 	if (file != INVALID_HANDLE_VALUE) {
@@ -63,11 +71,11 @@ ErrorCode FileAppender::CreateOrTruncate(const PlatformChar* path) {
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::OpenOrCreate(const PlatformChar* path) {
+ErrorCode FileAppender::OpenOrCreate(const PlatformChar* path) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
 	HANDLE file(MakeAppender(path, OPEN_ALWAYS));
-	ET_FAIL_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
 
 	Swap(_file, file);
 	if (file != INVALID_HANDLE_VALUE) {
@@ -79,11 +87,11 @@ ErrorCode FileAppender::OpenOrCreate(const PlatformChar* path) {
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::Open(const PlatformChar* path) {
+ErrorCode FileAppender::Open(const PlatformChar* path) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
 	HANDLE file(MakeAppender(path, OPEN_EXISTING));
-	ET_FAIL_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
 
 	Swap(_file, file);
 	if (file != INVALID_HANDLE_VALUE) {
@@ -95,18 +103,10 @@ ErrorCode FileAppender::Open(const PlatformChar* path) {
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::Append(const void* const sourceData, size_t lengthToWriteInBytes) {
-	DWORD writtenLengthInBytes;
-
-	return WriteFile(_file, sourceData, static_cast<DWORD>(lengthToWriteInBytes), &writtenLengthInBytes, nullptr) != FALSE ? Error::None : Error::Unspecified;
-}
-
-// ---------------------------------------------------
-
-void Swap(FileAppender& file0, FileAppender& file1) {
+void Swap(FileAppender& lhs, FileAppender& rhs) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
-	Swap(file0._file, file1._file);
+	Swap(lhs._file, rhs._file);
 }
 
 } // namespace Eldritch2

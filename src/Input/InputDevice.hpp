@@ -23,12 +23,9 @@ namespace Eldritch2 { namespace Input {
 
 	// ---
 
-	ET_PUSH_COMPILER_WARNING_STATE()
-	ET_SET_MSVC_WARNING_STATE(disable : 4369 4309)
-
-	enum : ActionId { InvalidActionId = ~0u };
-
-	ET_POP_COMPILER_WARNING_STATE()
+	ET_PUSH_MSVC_WARNING_STATE(disable : 4369 4309)
+	enum : ActionId { InvalidActionId = ActionId(-1) };
+	ET_POP_MSVC_WARNING_STATE()
 
 	// ---
 
@@ -75,8 +72,7 @@ namespace Eldritch2 { namespace Input {
 		// ---
 
 	public:
-		template <class Allocator = MallocAllocator>
-		using BindingMap = ArrayMap<ScanCode, Binding, LessThan<ScanCode>, Allocator>;
+		using BindingMap = ArrayMap<ScanCode, Binding, LessThan<ScanCode>, MallocAllocator>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -96,7 +92,7 @@ namespace Eldritch2 { namespace Input {
 		// ---------------------------------------------------
 
 	public:
-		bool TryAcquire(BindingMap<> bindingByScanCode, InputHandler& handler);
+		bool TryAcquire(BindingMap actionByScanCode, InputHandler& handler);
 
 		void Release();
 
@@ -108,7 +104,7 @@ namespace Eldritch2 { namespace Input {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		BindingMap<>  _bindingByScanCode;
+		BindingMap    _actionByScanCode;
 		InputHandler* _handler;
 	};
 

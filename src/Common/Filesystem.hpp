@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/AbstractString.hpp>
+#include <Common/Containers/AbstractStringView.hpp>
 #include <Common/Mpl/IntTypes.hpp>
 #include <Common/Function.hpp>
 //------------------------------------------------------------------//
@@ -29,15 +29,17 @@ enum class CopyMode : uint32 {
 	OverwriteIfExists
 };
 
-ErrorCode ForEachFile(StringView<PlatformChar> specifier, Function<void(StringView<PlatformChar> /*path*/)> handler);
+ErrorCode ForEachFile(AbstractStringView<PlatformChar> specifier, Function<void(AbstractStringView<PlatformChar> /*path*/) ETNoexceptHint> handler);
 
-void Copy(KnownDirectory destinationDirectory, StringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, StringView<PlatformChar> sourcePath, CopyMode mode);
-void Copy(KnownDirectory directory, StringView<PlatformChar> destinationPath, StringView<PlatformChar> sourcePath, CopyMode mode);
+ErrorCode Copy(KnownDirectory destinationDirectory, AbstractStringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, AbstractStringView<PlatformChar> sourcePath, CopyMode mode);
+ErrorCode Copy(KnownDirectory directory, AbstractStringView<PlatformChar> destinationPath, AbstractStringView<PlatformChar> sourcePath, CopyMode mode);
 
-void Move(KnownDirectory destinationDirectory, StringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, StringView<PlatformChar> sourcePath);
-void Move(KnownDirectory directory, StringView<PlatformChar> destinationPath, StringView<PlatformChar> sourcePath);
+ErrorCode Move(KnownDirectory destinationDirectory, AbstractStringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, AbstractStringView<PlatformChar> sourcePath);
+ErrorCode Move(KnownDirectory directory, AbstractStringView<PlatformChar> destinationPath, AbstractStringView<PlatformChar> sourcePath);
 
-void Delete(KnownDirectory directory, StringView<PlatformChar> path);
+ErrorCode EnsureDirectoryExists(KnownDirectory root, AbstractStringView<PlatformChar> path = L"");
+
+ErrorCode Delete(KnownDirectory directory, AbstractStringView<PlatformChar> path);
 
 } // namespace Eldritch2
 

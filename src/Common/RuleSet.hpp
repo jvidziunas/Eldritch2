@@ -41,9 +41,10 @@ class QueryBuilder {
 public:
 	using SymbolTableType = SymbolTable;
 	using AllocatorType   = Allocator;
-	using CharacterType   = typename SymbolTableType::CharacterType;
-	using SymbolType      = typename SymbolTable::Symbol;
-	using FactSetType     = ArrayMap<SymbolType, QueryFact<SymbolType>, LessThan<SymbolType>, AllocatorType>;
+	using SymbolType      = typename SymbolTableType::Symbol;
+	using FactType        = QueryFact<SymbolType>;
+	using FactMapType     = ArrayMap<SymbolType, FactType, LessThan<SymbolType>, AllocatorType>;
+	using FactNameType    = AbstractStringView<typename SymbolTableType::CharacterType>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -58,27 +59,27 @@ public:
 	// ---------------------------------------------------
 
 public:
-	const FactSetType& GetFacts() const;
+	const FactMapType& GetFacts() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
 	//!	Publishes a pattern for matching with various @ref Rule instances.
-	/*!	@param[in] name Null-terminated C string containing the name of the fact to be added.
+	/*!	@param[in] name String view containing the name of the fact to be added.
 		@param[in] value Fact value.
 		@returns A reference to *this for method chaining. */
-	QueryBuilder& InsertFact(const CharacterType* name, SymbolType value);
-	QueryBuilder& InsertFact(const CharacterType* name, float64 value);
-	QueryBuilder& InsertFact(const CharacterType* name, uint64 value);
-	QueryBuilder& InsertFact(const CharacterType* name, int64 value);
-	QueryBuilder& InsertFact(const CharacterType* name, bool value);
-	QueryBuilder& InsertFact(const CharacterType* name);
+	QueryBuilder& Insert(FactNameType name, SymbolType value);
+	QueryBuilder& Insert(FactNameType name, float64 value);
+	QueryBuilder& Insert(FactNameType name, uint64 value);
+	QueryBuilder& Insert(FactNameType name, int64 value);
+	QueryBuilder& Insert(FactNameType name, bool value);
+	QueryBuilder& Insert(FactNameType name);
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
 	const SymbolTable* _symbols;
-	FactSetType        _facts;
+	FactMapType        _facts;
 };
 
 // ---
@@ -90,9 +91,9 @@ class RuleBuilder {
 public:
 	using SymbolTableType = SymbolTable;
 	using AllocatorType   = Allocator;
-	using CharacterType   = typename SymbolTableType::CharacterType;
 	using SymbolType      = typename SymbolTable::Symbol;
-	using CriteriaSetType = ArrayMap<SymbolType, Function<bool(const QueryFact<SymbolType>&)>, LessThan<SymbolType>, AllocatorType>;
+	using CriteriaSetType = ArrayMap<SymbolType, Function<bool(const QueryFact<SymbolType>&) ETNoexceptHint>, LessThan<SymbolType>, AllocatorType>;
+	using FactNameType    = AbstractStringView<typename SymbolTableType::CharacterType>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -107,14 +108,14 @@ public:
 	// ---------------------------------------------------
 
 public:
-	const CriteriaSetType& GetCriteria() const;
-	CriteriaSetType&       GetCriteria();
+	const CriteriaSetType& GetCriteria() const ETNoexceptHint;
+	CriteriaSetType&       GetCriteria() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	RuleBuilder& InsertCriterion(const CharacterType* name, typename CriteriaSetType::MappedType evaluator);
-	RuleBuilder& InsertCriterion(const CharacterType* name);
+	RuleBuilder& Insert(FactNameType name, typename CriteriaSetType::MappedType evaluator);
+	RuleBuilder& Insert(FactNameType name);
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -130,15 +131,13 @@ class RuleSet {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
+	using AllocatorType    = Allocator;
 	using SymbolTableType  = SymbolTable<Utf8Char, ChildAllocator>;
 	using SymbolType       = typename SymbolTableType::Symbol;
 	using QueryBuilderType = QueryBuilder<SymbolTableType, MallocAllocator>;
 	using RuleBuilderType  = RuleBuilder<SymbolTableType, MallocAllocator>;
 	using Rule             = Pair<typename RuleBuilderType::CriteriaSetType, Response>;
-	using AllocatorType    = Allocator;
 	using RuleIterator     = typename ArrayList<Rule>::ConstIterator;
-	template <typename Allocator>
-	using MatchList = ArrayList<RuleIterator, Allocator>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -153,21 +152,21 @@ public:
 	// ---------------------------------------------------
 
 public:
-	const SymbolTableType& GetSymbols() const;
-	SymbolTableType&       GetSymbols();
+	const SymbolTableType& GetSymbols() const ETNoexceptHint;
+	SymbolTableType&       GetSymbols() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	RuleIterator Begin() const;
+	RuleIterator Begin() const ETNoexceptHint;
 
-	RuleIterator End() const;
+	RuleIterator End() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
 	template <class TemporaryAllocator>
-	MatchList<TemporaryAllocator> MatchAll(const TemporaryAllocator& allocator, const QueryBuilderType& query) const;
+	ArrayList<RuleIterator, TemporaryAllocator> MatchAll(const TemporaryAllocator& allocator, const QueryBuilderType& query) const;
 
 	template <class TemporaryAllocator>
 	RuleIterator Match(const TemporaryAllocator& allocator, const QueryBuilderType& query) const;

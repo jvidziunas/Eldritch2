@@ -17,39 +17,33 @@
 #include <Scripting/Wren/Context.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Audio {
-namespace XAudio2 {
+void wrenSetSlotHandle(WrenVM*, int, WrenHandle*);
+
+namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
 	using namespace ::Eldritch2::Scripting::Wren;
 
-	ET_IMPLEMENT_WREN_CLASS(XAudio2Listener) {
-		// clang-format off
+	ET_IMPLEMENT_WREN_CLASS(XAudio2Listener) { // clang-format off
 		api.CreateClass<XAudio2Listener>(ET_BUILTIN_WREN_MODULE_NAME(Audio), "AudioListener",
-			{ /*	Constructors */
+			{ /* Constructors */
 				ConstructorMethod("new(_,_)", [](WrenVM* vm) {
 					SetReturn<XAudio2Listener>(vm, GetSlotAs<Transformation>(vm, 2));
-				})
-			},
-			{ /*	Static methods */ },
-			{ /*	Properties */
+				})},
+			{ /* Static methods */ },
+			{ /* Properties */
 				DefineGetter("localToWorld", [](WrenVM* vm) {
 					const XAudio2Listener& self(GetSlotAs<XAudio2Listener>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Transformation>());
 					SetReturn<Transformation>(vm, self.GetLocalToWorld());
 				}),
 				DefineGetter("worldToLocal", [](WrenVM* vm) {
 					const XAudio2Listener& self(GetSlotAs<XAudio2Listener>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Transformation>());
 					SetReturn<Transformation>(vm, self.GetWorldToLocal());
-				})
-			},
-			{ /*	Methods */ });
-		// clang-format on
-	}
+				})},
+			{ /* Methods */ });
+	} // clang-format on
 
-}
-}
-} // namespace Eldritch2::Audio::XAudio2
+}}} // namespace Eldritch2::Audio::XAudio2

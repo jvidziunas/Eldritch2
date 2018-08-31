@@ -16,23 +16,25 @@
 #include <Graphics/Vulkan/VulkanTools.hpp>
 #include <Core/PropertyRegistrar.hpp>
 #include <Core/Engine.hpp>
-#include <Build.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
+// LIBRARIES
+//==================================================================//
+ET_LINK_LIBRARY("vulkan-1.lib")
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	using namespace ::Eldritch2::Scheduling;
-	using namespace ::Eldritch2::Scripting;
-	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
 	using namespace ::Eldritch2::Core;
 
-	VulkanEngineComponent::VulkanEngineComponent(const ObjectLocator& services, Log& log) :
+	VulkanEngineComponent::VulkanEngineComponent(const ObjectLocator& services) :
 		EngineComponent(services),
-		_vulkan(log),
+		_vulkan(FindService<Engine>()->GetLog()),
+		_preferredGpu(MallocAllocator("Vulkan Preferred Adapter Name Allocator")),
 		_instanceLayers(MallocAllocator("Vulkan Instance Layers Collection Allocator")),
-		_deviceLayers(MallocAllocator("Vulkan Device Layers Collection Allocator")),
-		_preferredGpu(MallocAllocator("Vulkan Preferred Adapter Name Allocator")) {
+		_deviceLayers(MallocAllocator("Vulkan Device Layers Collection Allocator")) {
 	}
 
 	// ---------------------------------------------------
@@ -43,10 +45,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void VulkanEngineComponent::BindConfigurableResources(JobExecutor& executor) {
+	void VulkanEngineComponent::BindConfigurableResources(JobExecutor& /*executor*/) {
 		ET_PROFILE_SCOPE("Engine/Initialization", "Initialize Vulkan", 0xBBBBBB);
-		if (Failed(_vulkan.BindResources(executor, VkApplicationInfo { VK_STRUCTURE_TYPE_APPLICATION_INFO, nullptr, PROJECT_NAME, 1, "Eldritch2", 1, VK_MAKE_VERSION(1, 1, 0) }))) {
-			FindService<Engine>().SetShouldShutDown();
+		if (Failed(_vulkan.BindResources())) {
+			FindService<Engine>()->SetShouldShutDown();
 			return;
 		}
 	}
@@ -56,19 +58,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	void VulkanEngineComponent::PublishConfiguration(PropertyRegistrar& properties) {
 		ET_PROFILE_SCOPE("Engine/Initialization/Properties/Vulkan", "Property registration", 0xBBBBBB);
 		properties.BeginSection("Vulkan")
-			.DefineProperty("PreferredGpu", [this](StringView<Utf8Char> value) {
+			.DefineProperty("PreferredGpu", [this](StringView value) {
 				_preferredGpu = value;
 			});
-
-		//	Debug/validation layers.
 		properties.BeginSection("Vulkan.InstanceLayers")
-			.DefineDynamicProperty([this](StringView<Utf8Char> name, StringView<Utf8Char> /*value*/) {
-				_instanceLayers.Emplace(name, MallocAllocator("Vulkan Instance Layer Name Allocator"));
+			.DefineDynamicProperty([this](StringView name, StringView /*value*/) {
+				_instanceLayers.Emplace(MallocAllocator("Vulkan Instance Layer Name Allocator"), name);
 			});
-
 		properties.BeginSection("Vulkan.DeviceLayers")
-			.DefineDynamicProperty([this](StringView<Utf8Char> name, StringView<Utf8Char> /*value*/) {
-				_deviceLayers.Emplace(name, MallocAllocator("Vulkan Device Layer Name Allocator"));
+			.DefineDynamicProperty([this](StringView name, StringView /*value*/) {
+				_deviceLayers.Emplace(MallocAllocator("Vulkan Device Layer Name Allocator"), name);
 			});
 	}
 
@@ -82,7 +81,18 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	void VulkanEngineComponent::TickEarly(JobExecutor& executor) {
 		ET_PROFILE_SCOPE("Engine/ServiceTick/Vulkan", "Begin frame", 0xBBBBBB);
-		_vulkan.BeginFrame(executor);
+		auto& gpu(_vulkan.GetPrimaryDevice());
+
+		executor.AwaitWork(
+			[&](JobExecutor& executor) {
+				executor.AwaitCondition(gpu.GetTransfersConsumed(gpu));
+				gpu.SubmitFrameIo(gpu);
+			},
+			[&](JobExecutor& /*executor*/) {
+				gpu.PresentSwapchainImages(gpu);
+				// ET_PROFILE_FRAME_BEGIN_GPU(nullptr);
+				gpu.AcquireSwapchainImages(gpu);
+			});
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

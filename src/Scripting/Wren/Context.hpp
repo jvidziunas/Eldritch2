@@ -16,9 +16,7 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting {
-namespace Wren {
-namespace AssetViews {
+namespace Scripting { namespace Wren { namespace AssetViews {
 	class ScriptAsset;
 }}} // namespace Scripting::Wren::AssetViews
 namespace Assets {
@@ -36,8 +34,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		template <typename Value, typename Allocator = MallocAllocator>
-		using TypeMap = CachingHashMap<Type, Value, Hash<Type>, EqualTo<Type>, Allocator>;
+		using ClassMap = CachingHashMap<CppType, WrenHandle*, Hash<CppType>, EqualTo<CppType>, MallocAllocator>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -53,30 +50,30 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	public:
 		template <size_t arity>
-		WrenHandle* GetCallStubForArity() const;
+		WrenHandle* GetCallStubForArity() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		template <typename Type>
-		WrenHandle* FindForeignClass() const;
-
-		WrenHandle* CreateForeignClass(WrenVM* vm, const char* module, const char* name, Type type);
-
-		void* CreateVariable(WrenVM* vm, const char* module, const char* name, WrenHandle* klass, size_t size);
-		void  CreateVariable(WrenVM* vm, const char* module, const char* name, double value);
+		template <typename... Arguments>
+		void WriteLog(Logging::Severity type, StringView format, Arguments&&... arguments) const;
+		void WriteLog(const Utf8Char* const string, size_t lengthInOctets) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		const AssetViews::ScriptAsset* FindScriptModule(const char* path) const;
+		template <typename CppType>
+		WrenHandle* FindForeignClass() const ETNoexceptHint;
+
+		WrenHandle* CreateForeignClass(WrenVM* vm, StringView module, StringView name, CppType type);
+
+		void*  CreateVariable(WrenVM* vm, StringView module, StringView name, WrenHandle* wrenClass, size_t size) ETNoexceptHint;
+		double CreateVariable(WrenVM* vm, StringView module, StringView name, double value) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		template <size_t formatSize, typename... Arguments>
-		void WriteLog(Logging::MessageType type, const Utf8Char (&format)[formatSize], Arguments&&... arguments) const;
-		void WriteLog(const Utf8Char* const string, size_t lengthInOctets) const;
+		const AssetViews::ScriptAsset* FindScriptModule(StringView path) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -88,18 +85,15 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		//!	Log used to track errors and print debug messages.
-		mutable Logging::ChildLog _log;
-		//!	@ref AssetDatabase used to service asset/script import requests. Never null.
+		mutable Logging::ChildLog    _log;
 		const Assets::AssetDatabase* _assets;
-		//!	Database of Wren classes indexed by C++ type.
-		TypeMap<WrenHandle*> _classesByType;
-		WrenHandle*          _callStubByArity[16];
+		ClassMap                     _classesByType;
+		WrenHandle*                  _callStubByArity[16];
 	};
 
 	// ---------------------------------------------------
 
-	Context& AsContext(WrenVM* vm);
+	ETPureFunctionHint Context* GetContext(WrenVM* vm) ETNoexceptHint;
 
 }}} // namespace Eldritch2::Scripting::Wren
 

@@ -43,9 +43,9 @@ public:
 
 protected:
 	//! Constructs this @ref Allocator instance.
-	Allocator(const Utf8Char* const name);
+	Allocator(const Utf8Char* const name) ETNoexceptHint;
 	//! Constructs this @ref Allocator instance.
-	Allocator(const Allocator&) = default;
+	Allocator(const Allocator&) ETNoexceptHint = default;
 
 	~Allocator() = default;
 
@@ -64,7 +64,7 @@ public:
 
 public:
 	//! Gets a human-readable string identifying the allocator.
-	const Utf8Char* GetName() const;
+	const Utf8Char* GetName() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 

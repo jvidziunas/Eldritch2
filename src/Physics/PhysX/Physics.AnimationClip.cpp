@@ -15,20 +15,14 @@
 #include <Physics/PhysX/Physics.hpp>
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6326)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <PxArticulationLink.h>
 #include <PxRigidBody.h>
 #include <PxPhysics.h>
 #include <PxScene.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
-
-using namespace ::Eldritch2::Physics::PhysX::AssetViews;
-using namespace ::Eldritch2::Animation;
-using namespace ::physx;
-using namespace ::ispc;
 
 // PhysX quaternion integration:
 #if 0
@@ -64,33 +58,39 @@ if (w != 0.0f)
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
+	using namespace ::Eldritch2::Physics::PhysX::AssetViews;
 	using namespace ::Eldritch2::Animation;
+	using namespace ::physx;
+	using namespace ::ispc;
 
-	Physics::AnimationClip::AnimationClip(PhysxPointer<PxArticulation> articulation, const Animation::Armature& target) :
+	Physics::AnimationClip::AnimationClip(PhysxPointer<PxArticulation> articulation, const Armature& target) :
 		_articulation(eastl::move(articulation)),
-		_target(eastl::addressof(target)) {}
+		_target(ETAddressOf(target)) {}
 
 	// ---------------------------------------------------
 
-	void Physics::AnimationClip::FetchKnots(KnotCache& knots, uint64 time, BoneIndex maximumBone) {
-		enum : uint32 { TracksPerBone = 8u };
-
+	void Physics::AnimationClip::FetchKnots(KnotCache& knots, BoneIndex maximumBone, uint64 time) {
 		PxArticulationLink** const links(ETStackAlloc(PxArticulationLink*, _articulation->getNbLinks()));
+		const Transformation       worldToLocal(_target->GetWorldToLocal());
+
 		_articulation->getLinks(links, _articulation->getNbLinks());
-
-		const Transformation worldToLocal(_target->GetWorldToLocal());
-		float32              startTimes[TracksPerBone];
-		float32              endTimes[TracksPerBone];
-		uint16               startValues[TracksPerBone];
-		uint16               endValues[TracksPerBone];
-		uint16               startTangents[TracksPerBone];
-		uint16               endTangents[TracksPerBone];
-
 		for (BoneIndex bone(1u); bone < maximumBone; ++bone) {
 			const Transformation poseToLocal(AsTransformation(links[bone]->getGlobalPose()) * worldToLocal);
+			auto                 knot(knots.Get(_firstKnot));
 
-			knots.PushKnots(_firstKnot + (bone * TracksPerBone), startTimes, endTimes, startValues, endValues, startTangents, endTangents);
+			eastl::fill_n(eastl::get<KnotCache::StartTimes>(knot), TracksPerBone, 0.0f);
+			eastl::fill_n(eastl::get<KnotCache::ReciprocalDurations>(knot), TracksPerBone, 0.0f);
+			eastl::fill_n(eastl::get<KnotCache::StartValues>(knot), TracksPerBone, 0.0f);
+			eastl::fill_n(eastl::get<KnotCache::EndValues>(knot), TracksPerBone, 0.0f);
+			eastl::fill_n(eastl::get<KnotCache::StartTangents>(knot), TracksPerBone, 0.0f);
+			eastl::fill_n(eastl::get<KnotCache::EndTangents>(knot), TracksPerBone, 0.0f);
 		}
+	}
+
+	// ---------------------------------------------------
+
+	void Physics::AnimationClip::Attach(KnotCache& knots) {
+		_firstKnot = knots.Append(_articulation->getNbLinks() * TracksPerBone, nullptr);
 	}
 
 }}} // namespace Eldritch2::Physics::PhysX

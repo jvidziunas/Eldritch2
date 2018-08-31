@@ -24,7 +24,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	namespace {
 
 		ETInlineHint VkResult CreatePipeline(Gpu& gpu, const VkSpecializationInfo& specializations, VkRenderPass renderPass, VkPipelineLayout layout, VkPipeline base, const SpirVShaderSetAsset::Usage& asset, ShaderPipeline::Usage& usage, VkPipeline& outPipeline) {
-			static const VkDynamicState dynamicStates[] = {
+			static ETConstexpr VkDynamicState dynamicStates[] = {
 				VK_DYNAMIC_STATE_VIEWPORT,
 				VK_DYNAMIC_STATE_SCISSOR,
 				VK_DYNAMIC_STATE_DEPTH_BIAS,
@@ -32,17 +32,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				VK_DYNAMIC_STATE_STENCIL_WRITE_MASK,
 				VK_DYNAMIC_STATE_STENCIL_REFERENCE
 			};
-			static const VkPipelineDynamicStateCreateInfo dynamicStateInfo {
+			static ETConstexpr VkPipelineDynamicStateCreateInfo dynamicStateInfo {
 				VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 				/*pNext =*/nullptr,
 				/*flags =*/0u,
-				_countof(dynamicStates), dynamicStates
+				ETCountOf(dynamicStates), dynamicStates
 			};
-			static const VkPipelineVertexInputStateCreateInfo vertexInputInfo {};
-			VkPipelineShaderStageCreateInfo                   stages[_countof(ShaderPipeline::Usage::shaders)];
-			char                                              entryPoints[32u][_countof(stages)];
+			static ETConstexpr VkPipelineVertexInputStateCreateInfo vertexInputInfo {};
+			VkPipelineShaderStageCreateInfo                         stages[ETCountOf(ShaderPipeline::Usage::shaders)];
+			char                                                    entryPoints[32u][ETCountOf(stages)];
 
-			for (uint32 shader(0u); shader < _countof(stages); ++shader) {
+			for (uint32 shader(0u); shader < ETCountOf(stages); ++shader) {
 				stages[shader] = VkPipelineShaderStageCreateInfo {
 					VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 					/*pNext =*/nullptr,
@@ -60,15 +60,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*flags =*/VkPipelineCreateFlags(base ? VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT : VK_PIPELINE_CREATE_DERIVATIVE_BIT),
 				/*stageCount =*/0u,
 				/*pStages =*/stages,
-				eastl::addressof(vertexInputInfo),
+				ETAddressOf(vertexInputInfo),
 				/*pInputAssemblyState =*/nullptr,
 				/*pTessellationState =*/nullptr,
 				/*pViewportState =*/nullptr, // Viewport state is dynamic.
-				eastl::addressof(asset.rasterizationInfo),
-				eastl::addressof(asset.multisampleInfo),
-				eastl::addressof(asset.depthStencilInfo),
-				eastl::addressof(asset.colorBlendInfo),
-				eastl::addressof(dynamicStateInfo),
+				ETAddressOf(asset.rasterizationInfo),
+				ETAddressOf(asset.multisampleInfo),
+				ETAddressOf(asset.depthStencilInfo),
+				ETAddressOf(asset.colorBlendInfo),
+				ETAddressOf(dynamicStateInfo),
 				layout,
 				renderPass,
 				/*subpass=*/0u,
@@ -81,15 +81,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	} // anonymous namespace
 
-	ShaderPipeline::Usage::Usage(Usage&& usage) :
-		Usage() {
+	ShaderPipeline::Usage::Usage(Usage&& usage) ETNoexceptHint : Usage() {
 		Swap(*this, usage);
 	}
 
 	// ---------------------------------------------------
 
-	ShaderPipeline::Usage::Usage() :
-		shaders { nullptr } {}
+	ShaderPipeline::Usage::Usage() ETNoexceptHint : shaders { nullptr } {}
 
 	// ---------------------------------------------------
 
@@ -101,12 +99,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult ShaderPipeline::Usage::BindResources(Gpu& gpu, const SpirVShaderSetAsset& set, uint32 usageIndex) {
+	VkResult ShaderPipeline::Usage::BindResources(Gpu& gpu, const SpirVShaderSetAsset& source, uint32 usageIndex) {
 		using ::Eldritch2::Swap;
 
-		const SpirVShaderSetAsset::Usage& usage(set[usageIndex]);
-		VkShaderModule                    shaders[_countof(this->shaders)];
-		uint32                            shaderCount(0u);
+		const auto&    usage(source[usageIndex]);
+		VkShaderModule shaders[ETCountOf(this->shaders)];
+		uint32         shaderCount(0u);
 
 		ET_AT_SCOPE_EXIT(for (VkShaderModule shader
 							  : shaders) vkDestroyShaderModule(gpu, shader, gpu.GetAllocationCallbacks()));
@@ -122,7 +120,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				usage.GetBytecodeSizeInBytes(),
 				usage.GetBytecode()
 			};
-			ET_FAIL_UNLESS(vkCreateShaderModule(gpu, &shaderInfo, gpu.GetAllocationCallbacks(), &shaders[shaderCount++]));
+			ET_ABORT_UNLESS(vkCreateShaderModule(gpu, &shaderInfo, gpu.GetAllocationCallbacks(), &shaders[shaderCount++]));
 		}
 
 		Swap(this->shaders, shaders);
@@ -173,10 +171,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 			/*pNext =*/nullptr,
 			/*flags =*/0u,
-			_countof(layouts), layouts,
-			_countof(constantRanges), constantRanges
+			ETCountOf(layouts), layouts,
+			ETCountOf(constantRanges), constantRanges
 		};
-		ET_FAIL_UNLESS(vkCreatePipelineLayout(gpu, &pipelineLayoutInfo, gpu.GetAllocationCallbacks(), &pipelineLayout));
+		ET_ABORT_UNLESS(vkCreatePipelineLayout(gpu, &pipelineLayoutInfo, gpu.GetAllocationCallbacks(), &pipelineLayout));
 		ET_AT_SCOPE_EXIT(vkDestroyPipelineLayout(gpu, pipelineLayout, gpu.GetAllocationCallbacks()));
 
 		ArrayList<VkPipeline> pipelinesByPass(_pipelinesByPass.GetAllocator());
@@ -202,8 +200,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				continue;
 			}
 
-			ET_FAIL_UNLESS(usagesByPass[pass].BindResources(gpu, set, usage));
-			ET_FAIL_UNLESS(CreatePipeline(gpu, specializations, passes[pass].renderPass, pipelineLayout, basePipeline, set[usage], usagesByPass[pass], pipelinesByPass[pass]));
+			ET_ABORT_UNLESS(usagesByPass[pass].BindResources(gpu, set, usage));
+			ET_ABORT_UNLESS(CreatePipeline(gpu, specializations, passes[pass].renderPass, pipelineLayout, basePipeline, set[usage], usagesByPass[pass], pipelinesByPass[pass]));
 			if (basePipeline == nullptr) {
 				basePipeline = pipelinesByPass[pass];
 			}
@@ -233,7 +231,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(ShaderPipeline::Usage& lhs, ShaderPipeline::Usage& rhs) {
+	void Swap(ShaderPipeline::Usage& lhs, ShaderPipeline::Usage& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs.shaders, rhs.shaders);

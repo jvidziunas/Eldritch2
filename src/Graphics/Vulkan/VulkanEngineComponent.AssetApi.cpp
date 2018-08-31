@@ -29,11 +29,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	void VulkanEngineComponent::PublishAssetTypes(AssetApiBuilder& types) {
 		ET_PROFILE_SCOPE("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
-		types.DefineType(".e2graphicspipeline", AssetApiBuilder::DefaultFactory<GraphicsPipelineAsset>());
-		types.DefineType(".spirv.e2shaderset", AssetApiBuilder::DefaultFactory<SpirVShaderSetAsset>());
-		types.DefineType(".e2anim", AssetApiBuilder::DefaultFactory<KeyframeClipAsset>());
-		types.DefineType(".e2image", AssetApiBuilder::DefaultFactory<ImageAsset>());
-		types.DefineType(".e2mesh", AssetApiBuilder::DefaultFactory<MeshAsset>());
+		types.DefineType(GraphicsPipelineAsset::GetExtension(), AssetApiBuilder::DefaultFactory<GraphicsPipelineAsset>());
+		types.DefineType(SpirVShaderSetAsset::GetExtension(), AssetApiBuilder::DefaultFactory<SpirVShaderSetAsset>());
+		types.DefineType(KeyframeClipAsset::GetExtension(), AssetApiBuilder::DefaultFactory<KeyframeClipAsset>());
+		types.DefineType(ImageAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ImageAsset>());
+		types.DefineType(MeshAsset::GetExtension(), AssetApiBuilder::DefaultFactory<MeshAsset>());
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

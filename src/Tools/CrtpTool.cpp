@@ -11,7 +11,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/Range.hpp>
+#include <Common/Containers/String.hpp>
 #include <Tools/CrtpTool.hpp>
 #include <Common/Memory.hpp>
 //------------------------------------------------------------------//
@@ -30,14 +30,14 @@ namespace Eldritch2 { namespace Tools { namespace Detail {
 
 	// ---------------------------------------------------
 
-	Tool::OptionRegistrar& Tool::OptionRegistrar::Register(StringView<Utf8Char> name, Setter setter) {
+	Tool::OptionRegistrar& Tool::OptionRegistrar::Register(PlatformStringView name, Setter setter) {
 		_options.EmplaceBack(eastl::move(name), eastl::move(setter));
 		return *this;
 	}
 
 	// ---------------------------------------------------
 
-	Tool::OptionRegistrar& Tool::OptionRegistrar::Register(StringView<Utf8Char> name, StringView<Utf8Char> shortName, Setter setter) {
+	Tool::OptionRegistrar& Tool::OptionRegistrar::Register(PlatformStringView name, PlatformStringView shortName, Setter setter) {
 		//	Create one copy for the long name argument...
 		_options.EmplaceBack(name, setter);
 		//	... and directly move the argument for the short name.
@@ -54,25 +54,28 @@ namespace Eldritch2 { namespace Tools { namespace Detail {
 
 	// ---------------------------------------------------
 
-	int Tool::OptionRegistrar::Dispatch(Range<Utf8Char**> programArguments) {
-		using OptionGlobber = CSimpleGlobTempl<Utf8Char>;
-		using OptionParser  = CSimpleOptTempl<Utf8Char>;
+	int Tool::OptionRegistrar::Dispatch(int argc, PlatformChar** argv) {
+		using OptionGlobber = CSimpleGlobTempl<PlatformChar>;
+		using OptionParser  = CSimpleOptTempl<PlatformChar>;
 
 		// ---
 
-		ArrayList<OptionParser::SOption> convertedOptions(MallocAllocator("OptionRegistrar::Dispatch() Converted Option Allocator"));
+		ArrayList<OptionParser::SOption> convertedOptions;
+		ArrayList<PlatformString>        terminatedOptions;
 		int                              index(0);
 
 		//	Converted option count should be one larger than the number of registered options, as the parser library uses a sentinel to delimit the end of registered options.
-		convertedOptions.Reserve(_options.GetSize() + 1);
+		convertedOptions.SetCapacity(_options.GetSize() + 1);
+		terminatedOptions.SetCapacity(_options.GetSize());
 		for (const Option& option : _options) {
-			convertedOptions.Append({ index++, option.first, SO_REQ_SEP });
+			terminatedOptions.EmplaceBack(MallocAllocator(), option.first);
+			convertedOptions.EmplaceBack(index++, terminatedOptions.Back().AsCString(), SO_REQ_SEP);
 		}
 		//	Terminate the list to be handed off to the option parser.
 		convertedOptions.Append(SO_END_OF_OPTIONS);
 
 		{
-			OptionParser  parser(int(programArguments.GetSize()), programArguments.Begin(), convertedOptions.GetData(), SO_O_SHORTARG | SO_O_CLUMP);
+			OptionParser  parser(argc, argv, convertedOptions.GetData(), SO_O_SHORTARG | SO_O_CLUMP);
 			OptionGlobber globber;
 
 			while (parser.Next()) {

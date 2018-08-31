@@ -1,5 +1,5 @@
 /*==================================================================*\
-  DisplayBus.hpp
+  DisplayLocator.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -21,8 +21,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref DisplayBus instance.
-		DisplayLocator(DisplayMap<>& displayByName, Mutex& mutex);
+		//!	Constructs this @ref DisplayLocator instance.
+		DisplayLocator(DisplayList& displays, Mutex& mutex);
 		//!	Disable copy construction.
 		DisplayLocator(const DisplayLocator&) = delete;
 
@@ -31,20 +31,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		bool TryAcquireDisplay(StringView<Utf8Char> name, DisplaySource& source);
-
-		void ReleaseDisplay(StringView<Utf8Char> name, DisplaySource& source);
-
-		// ---------------------------------------------------
-
-	private:
-		DisplayMap<>::Iterator CreateDisplay(StringView<Utf8Char> name);
+		UniquePointer<Viewport, ViewportDisposer> TryAcquireViewport(const GraphicsPipeline& pipeline);
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		DisplayMap<>* _displayByName;
-		Mutex*        _displayMutex;
+		DisplayList* _displays;
+		Mutex*       _displayMutex;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

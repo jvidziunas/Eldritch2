@@ -43,13 +43,16 @@ public:
 
 public:
 	//!	Constructs this @ref TreeMap instance.
+	TreeMap(const AllocatorType& allocator = AllocatorType(), const SortPredicate& sort = SortPredicate());
+	//!	Constructs this @ref TreeMap instance.
 	template <typename InputIterator>
-	TreeMap(InputIterator begin, InputIterator end, const AllocatorType& allocator = AllocatorType());
+	TreeMap(const AllocatorType& allocator, const SortPredicate& sort, InputIterator begin, InputIterator end);
 	//!	Constructs this @ref TreeMap instance.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	TreeMap(const TreeMap&, const AllocatorType& allocator = AllocatorType());
+	TreeMap(const AllocatorType& allocator, const SortPredicate& sort, std::initializer_list<ValueType>);
 	//!	Constructs this @ref TreeMap instance.
-	TreeMap(const AllocatorType& allocator = AllocatorType());
+	TreeMap(const AllocatorType& allocator, const TreeMap&);
+	//!	Constructs this @ref TreeMap instance.
+	TreeMap(const TreeMap&) = default;
 	//!	Constructs this @ref TreeMap instance.
 	TreeMap(TreeMap&&) = default;
 
@@ -61,8 +64,8 @@ public:
 	ConstIterator Find(const KeyType& key) const;
 	Iterator      Find(const KeyType& key);
 
-	template <typename Predicate>
-	void EraseIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void EraseIf(UnaryPredicate condition);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -80,7 +83,6 @@ public:
 	// - ELEMENT ACCESS ----------------------------------
 
 public:
-	template <class = eastl::is_default_constructible<ValueType>::value>
 	MappedType& operator[](const KeyType& key);
 
 	// - CONTAINER DUPLICATION ---------------------------
@@ -92,14 +94,14 @@ public:
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	template <typename... ConstructorArguments>
-	Pair<Iterator, bool> Emplace(ConstructorArguments&&... constructorArguments);
+	template <typename... Arguments>
+	Pair<Iterator, bool> Emplace(Arguments&&... arguments);
 
 	Pair<Iterator, bool> Insert(const ValueType& value);
 	Pair<Iterator, bool> Insert(ValueType&& value);
 
 	Iterator Erase(Iterator begin, Iterator end);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 	SizeType Erase(const KeyType& key);
 
 	void Clear();

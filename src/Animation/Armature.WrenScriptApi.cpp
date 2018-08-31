@@ -23,13 +23,12 @@ namespace Eldritch2 { namespace Animation {
 	using namespace ::Eldritch2::Scripting::Wren;
 	using namespace ::Eldritch2::Scripting;
 
-	ET_IMPLEMENT_WREN_CLASS(Armature) {
-		api.CreateClass<Armature>(ET_BUILTIN_WREN_MODULE_NAME(Animation), "Armature", // clang-format off
+	ET_IMPLEMENT_WREN_CLASS(Armature) { // clang-format off
+		api.CreateClass<Armature>(ET_BUILTIN_WREN_MODULE_NAME(Animation), "Armature",
 			{/* Constructors */
 				ConstructorMethod("new(_)", [](WrenVM* vm) {
 					SetReturn<Armature>(vm, GetSlotAs<Transformation>(vm, 1));
-				})
-			},
+				})},
 			{/*	Static methods */ },
 			{/*	Properties */
 				DefineProperty("localToWorld",
@@ -37,7 +36,7 @@ namespace Eldritch2 { namespace Animation {
 					[](WrenVM* vm) {
 						Armature&	self(GetSlotAs<Armature>(vm, 0));
 
-						wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
+						wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Transformation>());
 						SetReturn<Transformation>(vm, self.GetLocalToWorld());
 					},
 				//	Setter
@@ -48,11 +47,10 @@ namespace Eldritch2 { namespace Animation {
 				DefineGetter("worldToLocal", [](WrenVM* vm) {
 					Armature&	self(GetSlotAs<Armature>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Transformation>());
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Transformation>());
 					SetReturn<Transformation>(vm, self.GetWorldToLocal());
-				})
-			},
-			{/*	Methods */ }); // clang-format on
-	}
+				})},
+			{/*	Methods */ });
+	} // clang-format on
 
 }} // namespace Eldritch2::Animation

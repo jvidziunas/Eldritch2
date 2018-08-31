@@ -20,30 +20,46 @@
 namespace Eldritch2 {
 
 template <typename Value, class SortPredicate, class Allocator>
-ETInlineHint TreeSet<Value, SortPredicate, Allocator>::TreeSet(const AllocatorType& allocator) :
-	_container(allocator) {}
-
-// ---------------------------------------------------
-
-template <typename Value, class SortPredicate, class Allocator>
-ETInlineHint typename TreeSet<Value, SortPredicate, Allocator>::Iterator TreeSet<Value, SortPredicate, Allocator>::Find(const ValueType& itemTemplate) {
-	return _container.find(itemTemplate);
+template <typename InputIterator>
+ETInlineHint TreeSet<Value, SortPredicate, Allocator>::TreeSet(const AllocatorType& allocator, const SortPredicate& sort, InputIterator begin, InputIterator end) :
+	_container(begin, end, sort, allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class SortPredicate, class Allocator>
-ETInlineHint typename TreeSet<Value, SortPredicate, Allocator>::ConstIterator TreeSet<Value, SortPredicate, Allocator>::Find(const ValueType& itemTemplate) const {
-	return _container.find(itemTemplate);
+ETInlineHint TreeSet<Value, SortPredicate, Allocator>::TreeSet(const AllocatorType& allocator, const SortPredicate& sort, std::initializer_list<ValueType> set) :
+	_container(set, sort, allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class SortPredicate, class Allocator>
-template <typename Predicate>
-ETInlineHint void TreeSet<Value, SortPredicate, Allocator>::RemoveIf(Predicate predicate) {
+ETInlineHint TreeSet<Value, SortPredicate, Allocator>::TreeSet(const AllocatorType& allocator, const SortPredicate& sort) :
+	_container(sort, allocator) {
+}
+
+// ---------------------------------------------------
+
+template <typename Value, class SortPredicate, class Allocator>
+ETInlineHint typename TreeSet<Value, SortPredicate, Allocator>::Iterator TreeSet<Value, SortPredicate, Allocator>::Find(const ValueType& value) {
+	return _container.find(value);
+}
+
+// ---------------------------------------------------
+
+template <typename Value, class SortPredicate, class Allocator>
+ETInlineHint typename TreeSet<Value, SortPredicate, Allocator>::ConstIterator TreeSet<Value, SortPredicate, Allocator>::Find(const ValueType& value) const {
+	return _container.find(value);
+}
+
+// ---------------------------------------------------
+
+template <typename Value, class SortPredicate, class Allocator>
+template <typename UnaryPredicate>
+ETInlineHint void TreeSet<Value, SortPredicate, Allocator>::RemoveIf(UnaryPredicate condition) {
 	for (Iterator element(_container.begin()), end(_container.end()); element != end;) {
-		if (predicate(*element)) {
+		if (condition(*element)) {
 			element = _container.erase(element);
 		} else {
 			++element;
@@ -103,8 +119,8 @@ ETInlineHint Pair<typename TreeSet<Value, SortPredicate, Allocator>::Iterator, b
 // ---------------------------------------------------
 
 template <typename Value, class SortPredicate, class Allocator>
-ETInlineHint typename TreeSet<Value, SortPredicate, Allocator>::Iterator TreeSet<Value, SortPredicate, Allocator>::Erase(Iterator position) {
-	return _container.erase(position);
+ETInlineHint typename TreeSet<Value, SortPredicate, Allocator>::Iterator TreeSet<Value, SortPredicate, Allocator>::Erase(Iterator where) {
+	return _container.erase(where);
 }
 
 // ---------------------------------------------------
@@ -152,8 +168,8 @@ ETInlineHint typename const TreeSet<Value, SortPredicate, Allocator>::AllocatorT
 // ---------------------------------------------------
 
 template <typename Value, class SortPredicate, class Allocator>
-ETInlineHint void Swap(TreeSet<Value, SortPredicate, Allocator>& map0, TreeSet<Value, SortPredicate, Allocator>& map1) {
-	eastl::swap(map0._container, map1._container);
+ETInlineHint void Swap(TreeSet<Value, SortPredicate, Allocator>& lhs, TreeSet<Value, SortPredicate, Allocator>& rhs) {
+	lhs._container.swap(rhs._container);
 }
 
 } // namespace Eldritch2

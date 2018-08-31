@@ -15,7 +15,6 @@
 //==================================================================//
 #include <Scheduling/JobExecutor.hpp>
 #include <Scheduling/JobSystem.hpp>
-#include <Scheduling/Thread.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scheduling { namespace Win32 {
@@ -29,7 +28,7 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 		// ---
 
-		class JobThread : public Scheduling::Thread, public Scheduling::JobExecutor {
+		class JobThread : public Thread, public Scheduling::JobExecutor {
 			// - TYPE PUBLISHING ---------------------------------
 
 		public:
@@ -52,27 +51,22 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 			// ---------------------------------------------------
 
 		public:
-			Utf8Literal GetName() const override sealed;
+			void SetShouldShutDown() ETNoexceptHint override sealed;
+
+			ErrorCode EnterOnCaller() override sealed;
 
 			// ---------------------------------------------------
 
 		public:
-			void Run() override sealed;
-
-			void SetShouldShutDown() override sealed;
-
-			// ---------------------------------------------------
-
-		public:
-			bool BeginShareWith(JobThread& thief);
+			bool BeginShareWith(JobThread& thief) ETNoexceptHint;
 
 			void StealFrom(JobThread& victim);
 
-			bool ShouldAwaitTransfer() const;
+			bool ShouldAwaitTransfer() const ETNoexceptHint;
 
-			void EnableSharing();
+			void EnableSharing() ETNoexceptHint;
 
-			void DisableSharing();
+			void DisableSharing() ETNoexceptHint;
 
 			// ---------------------------------------------------
 
@@ -100,25 +94,18 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 		~FiberJobSystem();
 
-		// - THREAD SCHEDULING -------------------------------
-
-	public:
-		ErrorCode LaunchOnCaller(Scheduling::Thread& thread) override sealed;
-
-		ErrorCode Launch(Scheduling::Thread& thread) override sealed;
-
 		// ---------------------------------------------------
 
 	public:
 		template <typename WorkItem>
-		int Boot(size_t workerCount, WorkItem&& initialTask);
+		ErrorCode BootOnCaller(size_t workerCount, WorkItem bootTask);
 
-		void SetShouldShutDown(int shutdownCode) override sealed;
+		void SetShouldShutDown(ErrorCode result) ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		void BackOff(BackoffContext& context) override sealed;
+		void BackOff(BackoffContext& context) ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
@@ -130,9 +117,9 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 		// ---------------------------------------------------
 
 	public:
-		JobThread& FindVictim(size_t& victimSeed);
+		JobThread& FindVictim(size_t& victimSeed) ETNoexceptHint;
 
-		size_t GetMaximumParallelism() const override sealed;
+		size_t GetMaximumParallelism() const ETNoexceptHint override sealed;
 
 		// ---------------------------------------------------
 
@@ -142,10 +129,8 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable MallocAllocator    _allocator;
-		UniquePointer<JobThread[]> _workers;
-		JobFence                   _dummy;
-		Atomic<int>                _shutdownCode;
+		JobFence             _dummy;
+		ArrayList<JobThread> _workers;
 	};
 
 }}} // namespace Eldritch2::Scheduling::Win32

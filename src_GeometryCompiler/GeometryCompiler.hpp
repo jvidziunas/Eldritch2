@@ -18,32 +18,40 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+class ErrorCode;
+}
+
+namespace Eldritch2 {
 namespace Tools {
 
 	class GeometryCompiler : public CrtpTool<GeometryCompiler> {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-	//!	Constructs this @ref GeometryCompiler instance.
+		//!	Disable copy construction.
+		GeometryCompiler(const GeometryCompiler&) = delete;
+		//!	Constructs this @ref GeometryCompiler instance.
 		GeometryCompiler();
 
 		~GeometryCompiler() = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		void	RegisterOptions( OptionRegistrar& visitor );
+		void RegisterOptions(OptionRegistrar& visitor);
 
-		int		Process();
+		ErrorCode ProcessMesh(StringView<PlatformChar> path);
 
-	// - DATA MEMBERS ------------------------------------
+		ErrorCode Process();
+
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		String<>			_password;
-		HashSet<String<>>	_sourcePaths;
-		bool				_skipTextureCoordinates;
-		bool				_skipOrientation;
+		HashSet<PlatformString<>> _sourcePaths;
+		String<>                  _password;
+		bool                      _skipTextureCoordinates;
+		bool                      _skipOrientation;
 	};
 
-}	// namespace Tools
-}	// namespace Eldritch2
+}
+} // namespace Eldritch2::Tools

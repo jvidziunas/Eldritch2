@@ -16,12 +16,13 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scheduling { namespace Win32 {
+
 	namespace {
 
-		static ETInlineHint ETPureFunctionHint size_t GetRandom(size_t& seed) {
+		ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint size_t GetRandom(size_t& seed) {
 			enum : size_t {
-				Shift = static_cast<size_t>(sizeof(size_t) == sizeof(uint64) ? 32u : 16u),
-				Mask  = static_cast<size_t>(sizeof(size_t) == sizeof(uint64) ? 0x7FFFFFFF : 0x7FFF)
+				Shift = size_t(sizeof(size_t) == sizeof(uint64) ? 32u : 16u),
+				Mask  = size_t(sizeof(size_t) == sizeof(uint64) ? 0x7FFFFFFF : 0x7FFF)
 			};
 
 			seed = (214013u * seed + 2531011u);
@@ -30,19 +31,19 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 	} // anonymous namespace
 
-	ETInlineHint bool FiberJobSystem::JobThread::ShouldAwaitTransfer() const {
+	ETInlineHint ETForceInlineHint bool FiberJobSystem::JobThread::ShouldAwaitTransfer() const ETNoexceptHint {
 		return _transferCell.load(std::memory_order_consume) == TransferState::AwaitingTransfer;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void FiberJobSystem::JobThread::EnableSharing() {
+	ETInlineHint ETForceInlineHint void FiberJobSystem::JobThread::EnableSharing() ETNoexceptHint {
 		_thief.store(nullptr, std::memory_order_release);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void FiberJobSystem::JobThread::DisableSharing() {
+	ETInlineHint ETForceInlineHint void FiberJobSystem::JobThread::DisableSharing() ETNoexceptHint {
 		if (JobThread* const thief = _thief.exchange(this, std::memory_order_consume)) {
 			thief->_transferCell.store(TransferState::Complete, std::memory_order_relaxed);
 		}
@@ -50,39 +51,36 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool FiberJobSystem::JobThread::BeginShareWith(JobThread& thief) {
-		JobThread* expected(nullptr);
+	ETInlineHint ETForceInlineHint void FiberJobSystem::JobThread::SetShouldShutDown() ETNoexceptHint {
+		_runBehavior.store(RunBehavior::Terminate, std::memory_order_release);
+	}
 
-		return _thief.compare_exchange_weak(expected, eastl::addressof(thief), std::memory_order_acq_rel, std::memory_order_relaxed);
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint bool FiberJobSystem::JobThread::BeginShareWith(JobThread& thief) ETNoexceptHint {
+		JobThread* expected(nullptr);
+		return _thief.compare_exchange_weak(expected, ETAddressOf(thief), std::memory_order_acq_rel, std::memory_order_relaxed);
 	}
 
 	// ---------------------------------------------------
 
 	template <typename WorkItem>
-	ETInlineHint int FiberJobSystem::Boot(size_t totalWorkerCount, WorkItem&& initialTask) {
-		ET_ASSERT(_workers == nullptr, "Duplicate scheduler boot operation!");
+	ETInlineHint ErrorCode FiberJobSystem::BootOnCaller(size_t totalWorkerCount, WorkItem initialTask) {
+		ET_ASSERT(_workers.IsEmpty(), "Duplicate scheduler boot operation!");
 
-		JobFence dummy(0);
-
-		_workers = MakeUniqueArray<JobThread>(_allocator, Max<size_t>(totalWorkerCount, 2u), *this);
-
+		_workers.Resize(Max<size_t>(totalWorkerCount, 2u), JobThread(*this));
 		//	Attach all worker threads that *aren't* run on the main thread...
-		ForEach(_workers.Begin() + 1, _workers.End(), [this](JobThread& worker) {
-			this->Launch(worker);
-		});
-
+		for (size_t worker(1u); worker < _workers.GetSize(); ++worker) {
+			_workers[worker].Boot("Worker Thread");
+		}
 		//	Queue the first task...
-		_workers[0].StartAsync(dummy, eastl::forward<WorkItem>(initialTask));
-
-		// ... and finally kick off the thread!
-		this->LaunchOnCaller(_workers[0]);
-
-		return _shutdownCode.load(std::memory_order_acquire);
+		_workers.Front().StartAsync(_dummy, eastl::move(initialTask));
+		return _workers.Front().BootOnCaller("Main Thread");
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint FiberJobSystem::JobThread& FiberJobSystem::FindVictim(size_t& victimSeed) {
+	ETInlineHint ETForceInlineHint FiberJobSystem::JobThread& FiberJobSystem::FindVictim(size_t& victimSeed) ETNoexceptHint {
 		return _workers[GetRandom(victimSeed) % _workers.GetSize()];
 	}
 

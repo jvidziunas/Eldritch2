@@ -19,7 +19,7 @@ namespace Eldritch2 { namespace Animation {
 
 	using namespace ::Eldritch2::Animation::AssetViews;
 
-	void KeyframeClip::FetchKnots(KnotCache& knots, uint64 time, BoneIndex maximumBone) {
+	void KeyframeClip::FetchKnots(KnotCache& knots, BoneIndex maximumBone, uint64 time) {
 		const float32 localTime(AsLocalTime(time));
 
 		for (BoneIndex bone(0u); bone < maximumBone; ++bone) {

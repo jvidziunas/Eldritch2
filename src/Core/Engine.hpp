@@ -12,15 +12,11 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Assets/FlatBufferPackageProvider.hpp>
+#include <Flatbuffers/FlatBufferPackageProvider.hpp>
 #include <Core/EngineComponent.hpp>
 #include <Logging/FileLog.hpp>
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 { namespace Scheduling {
-	class JobSystem;
-}} // namespace Eldritch2::Scheduling
 
 namespace Eldritch2 { namespace Core {
 
@@ -68,11 +64,10 @@ namespace Eldritch2 { namespace Core {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Engine instance.
-		/*!	@param[in] scheduler @ref Scheduling::JobSystem instance the new @ref Engine will use to launch operating system threads. */
-		Engine(Scheduling::JobSystem& scheduler);
 		//!	Disable copy construction.
 		Engine(const Engine&) = delete;
+		//!	Constructs this @ref Engine instance.
+		Engine();
 
 		~Engine() = default;
 
@@ -95,21 +90,21 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
-		void SetShouldShutDown() const;
+		void SetShouldShutDown(MemoryOrder order = std::memory_order_release) const;
 
-		bool ShouldRun() const;
+		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode ApplyConfiguration(StringView<PlatformChar> path);
+		ErrorCode ApplyConfiguration(PlatformStringView filePath);
 
 		// ---------------------------------------------------
 
 	public:
 		template <class... Components>
-		int BootOnCaller(Scheduling::JobExecutor& executor, Components&... components);
-		int BootOnCaller(Scheduling::JobExecutor& executor);
+		ErrorCode BootOnCaller(Scheduling::JobExecutor& executor, Components&... components);
+		ErrorCode BootOnCaller(Scheduling::JobExecutor& executor);
 
 		// ---------------------------------------------------
 
@@ -118,12 +113,7 @@ namespace Eldritch2 { namespace Core {
 
 		void TickWorlds(Scheduling::JobExecutor& executor);
 
-		void SweepPackages(size_t collectionLimit);
-
-		// ---------------------------------------------------
-
-	private:
-		void ScanPackages();
+		void DestroyGarbage(size_t collectionLimit);
 
 		// ---------------------------------------------------
 
@@ -140,14 +130,14 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable UsageMixin<MallocAllocator> _allocator;
-		ObjectLocator                       _services;
-		Assets::FlatBufferPackageProvider   _packageProvider;
-		mutable Logging::FileLog            _log;
-		mutable Atomic<bool>                _shouldRun;
-		mutable Mutex                       _worldsMutex;
-		ArrayList<UniquePointer<World>>     _worlds;
-		ArrayList<EngineComponent*>         _components;
+		mutable UsageMixin<MallocAllocator>    _allocator;
+		ObjectLocator                          _services;
+		mutable Logging::FileLog               _log;
+		mutable Atomic<bool>                   _shouldRun;
+		FlatBuffers::FlatBufferPackageProvider _packageProvider;
+		ArrayList<EngineComponent*>            _components;
+		mutable Mutex                          _worldsMutex;
+		ArrayList<UniquePointer<World>>        _worlds;
 	};
 
 }} // namespace Eldritch2::Core

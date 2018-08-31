@@ -21,6 +21,7 @@
     <ClCompile Include="src\Common\Memory\Allocator.cpp" />
     <ClCompile Include="src\Common\Memory\ChildAllocator.cpp" />
     <ClCompile Include="src\Common\Memory\MallocAllocator.cpp" />
+    <ClCompile Include="src\Tools\ConsoleLog.cpp" />
     <ClCompile Include="src\Tools\CrtpTool.cpp" />
     <ClCompile Include="src_ShaderCompiler\ShaderCompiler.cpp" />
     <ClCompile Include="src_ShaderCompiler\ShaderCompiler.Win32.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="src\Common\Memory\ChildAllocator.hpp" />
     <ClInclude Include="src\Common\Memory\EastlAllocatorAdapterMixin.hpp" />
     <ClInclude Include="src\Common\Memory\MallocAllocator.hpp" />
+    <ClInclude Include="src\Tools\ConsoleLog.hpp" />
     <ClInclude Include="src\Tools\CrtpTool.hpp" />
     <ClInclude Include="src_ShaderCompiler\ShaderCompiler.hpp" />
   </ItemGroup>

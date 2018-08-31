@@ -79,7 +79,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		//!	Disable copy construction.
 		SpirVShaderSetAsset(const SpirVShaderSetAsset&) = delete;
 		//!	Constructs this @ref SpirVShaderPackageAsset instance.
-		SpirVShaderSetAsset(const Utf8Char* const path);
+		SpirVShaderSetAsset(StringView path);
 
 		~SpirVShaderSetAsset() override = default;
 
@@ -88,7 +88,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	public:
 		const Usage& operator[](uint32 usage) const;
 
-		uint32 Find(const Utf8Char* name) const;
+		uint32 Find(StringView name) const;
 
 		// ---------------------------------------------------
 
@@ -99,15 +99,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
+	public:
+		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
 		//!	Disable copy assignment.
 		SpirVShaderSetAsset& operator=(const SpirVShaderSetAsset&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<uint32>                _bytecode;
-		ArrayList<Usage>                 _usages;
-		CachingHashMap<String<>, uint32> _indexByName;
+		ArrayList<uint32>              _bytecode;
+		ArrayList<Usage>               _usages;
+		CachingHashMap<String, uint32> _indexByName;
 	};
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

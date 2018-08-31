@@ -17,8 +17,39 @@
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
+	ETInlineHint ETForceInlineHint physx::PxControllerManager& PhysicsScene::GetControllerManager() {
+		return *_controllerManager;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint physx::PxMaterial& PhysicsScene::GetCharacterMaterial() const {
+		return *_characterMaterial;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint physx::PxMaterial& PhysicsScene::GetTriggerMaterial() const {
+		return *_triggerMaterial;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint physx::PxScene& PhysicsScene::GetScene() {
+		return *_scene;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint bool PhysicsScene::IsSimulationComplete() const {
+		return _scene->checkResults(/*block =*/false);
+	}
+
+	// ---------------------------------------------------
+
 	template <typename Callback>
-	ETInlineHint bool PhysicsScene::SweepGeometry(
+	ETInlineHint ETForceInlineHint bool ForEachOverlap(
+		const physx::PxScene&           scene,
 		const physx::PxGeometry&        geometry,
 		const physx::PxTransform&       pose,
 		const physx::PxVec3&            direction,
@@ -29,25 +60,27 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		physx::PxQueryFilterCallback*   filter,
 		const physx::PxQueryCache*      cache,
 		float32                         inflation) const {
-		return _scene->sweep(geometry, pose, direction, distance, callback, hitFlags, filterData, filter, cache, inflation);
+		return scene.sweep(geometry, pose, direction, distance, callback, hitFlags, filterData, filter, cache, inflation);
 	}
 
 	// ---------------------------------------------------
 
 	template <typename Callback>
-	ETInlineHint bool PhysicsScene::CheckOverlap(
+	ETInlineHint ETForceInlineHint bool ForEachOverlap(
+		const physx::PxScene&           scene,
 		const physx::PxGeometry&        geometry,
 		const physx::PxTransform&       pose,
 		Callback                        callback,
 		const physx::PxQueryFilterData& filterData,
 		physx::PxQueryFilterCallback*   filter) const {
-		return _scene->overlap(geometry, pose, callback, filterData, filter);
+		return scene.overlap(geometry, pose, callback, filterData, filter);
 	}
 
 	// ---------------------------------------------------
 
 	template <typename Callback>
-	ETInlineHint bool PhysicsScene::SweepRay(
+	ETInlineHint ETForceInlineHint bool ForEachAlongRay(
+		const physx::PxScene&           scene,
 		const physx::PxVec3&            origin,
 		const physx::PxVec3&            direction,
 		float32                         distance,
@@ -56,37 +89,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		const physx::PxQueryFilterData& filterData,
 		physx::PxQueryFilterCallback*   filter,
 		const physx::PxQueryCache*      cache) const {
-		return _scene->raycast(origin, direction, distance, callback, hitFlags, filterData, filter, cache);
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint physx::PxControllerManager& PhysicsScene::GetControllerManager() {
-		return *_controllerManager;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint physx::PxMaterial& PhysicsScene::GetCharacterMaterial() const {
-		return *_characterMaterial;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint physx::PxMaterial& PhysicsScene::GetTriggerMaterial() const {
-		return *_triggerMaterial;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint physx::PxScene& PhysicsScene::GetScene() {
-		return *_scene;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint bool PhysicsScene::IsSimulationComplete() const {
-		return _scene->checkResults();
+		return scene.raycast(origin, direction, distance, callback, hitFlags, filterData, filter, cache);
 	}
 
 }}} // namespace Eldritch2::Physics::PhysX

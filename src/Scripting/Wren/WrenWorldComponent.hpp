@@ -24,8 +24,7 @@ namespace Wren {
 }} // namespace Scripting::Wren
 
 namespace Assets {
-	class PackageLocator;
-	class AssetLocator;
+	class ContentLocator;
 } // namespace Assets
 } // namespace Eldritch2
 
@@ -77,8 +76,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		WrenVM*                 _vm;
 		Context                 _wren;
 		Game                    _game;
-		Assets::PackageLocator* _packageLocator;
-		Assets::AssetLocator*   _assetLocator;
+		Assets::ContentLocator* _contentLocator;
 		Dispatcher*             _dispatcher;
 	};
 

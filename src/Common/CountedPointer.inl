@@ -44,15 +44,14 @@ ETInlineHint CountedPointer<Object, Disposer>::CountedPointer(const CountedPoint
 template <class Object, typename Disposer>
 template <typename CompatibleObject, typename CompatibleDeleter>
 ETInlineHint CountedPointer<Object, Disposer>::CountedPointer(CountedPointer<CompatibleObject, CompatibleDeleter>&& pointer) :
-	CountedPointer(nullptr) {
-	eastl::swap(_pointerAndDeleter, pointer._pointerAndDeleter);
+	CountedPointer(pointer.Release(), pointer.GetDisposer()) {
 }
 
 // ---------------------------------------------------
 
 template <class Object, typename Disposer>
 ETInlineHint CountedPointer<Object, Disposer>::CountedPointer(CountedPointer<Object, Disposer>&& pointer) ETNoexceptHint : CountedPointer(nullptr) {
-	eastl::swap(_pointerAndDeleter, pointer._pointerAndDeleter);
+	Swap(*this, pointer);
 }
 
 // ---------------------------------------------------
@@ -86,14 +85,13 @@ ETInlineHint Object* CountedPointer<Object, Disposer>::Get() const ETNoexceptHin
 
 template <class Object, typename Disposer>
 ETInlineHint void CountedPointer<Object, Disposer>::Reset(Object* pointer) {
-	const auto old(eastl::exchange(_pointerAndDeleter.first(), pointer));
-
-	if (old && (old->ReleaseReference() == 1u)) {
-		GetDisposer()(*old);
-	}
-
 	if (pointer) {
 		pointer->AddReference();
+	}
+
+	const auto old(eastl::exchange(_pointerAndDeleter.first(), pointer));
+	if (old && (old->ReleaseReference() == 1u)) {
+		GetDisposer()(*old);
 	}
 }
 
@@ -130,9 +128,8 @@ ETInlineHint CountedPointer<Object, Disposer>::operator bool() const ETNoexceptH
 template <class Object, typename Disposer>
 template <typename CompatibleObject, typename CompatibleDeleter>
 ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=(const CountedPointer<CompatibleObject, CompatibleDeleter>& pointer) ETNoexceptHint {
-	Reset(pointer._pointerAndDeleter.first());
-
-	_pointerAndDeleter.second() = pointer._pointerAndDeleter.second();
+	Reset(pointer.Get());
+	_pointerAndDeleter.second() = pointer.GetDisposer();
 
 	return *this;
 }
@@ -141,9 +138,8 @@ ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>:
 
 template <class Object, typename Disposer>
 ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=(const CountedPointer<Object, Disposer>& pointer) ETNoexceptHint {
-	Reset(pointer._pointerAndDeleter.first());
-
-	_pointerAndDeleter.second() = pointer._pointerAndDeleter.second();
+	Reset(pointer.Get());
+	_pointerAndDeleter.second() = pointer.GetDisposer();
 
 	return *this;
 }
@@ -153,9 +149,9 @@ ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>:
 template <class Object, typename Disposer>
 template <typename CompatibleObject, typename CompatibleDeleter>
 ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=(CountedPointer<CompatibleObject, CompatibleDeleter>&& pointer) ETNoexceptHint {
-	Reset(eastl::exchange(pointer._pointerAndDeleter.first(), nullptr));
-
-	_pointerAndDeleter.second() = eastl::move(handle._pointerAndDeleter.second());
+	Reset();
+	_pointerAndDeleter.first()  = pointer.Release();
+	_pointerAndDeleter.second() = eastl::move(pointer._pointerAndDeleter.second());
 
 	return *this;
 }
@@ -164,9 +160,9 @@ ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>:
 
 template <class Object, typename Disposer>
 ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=(CountedPointer<Object, Disposer>&& pointer) ETNoexceptHint {
-	Reset(eastl::exchange(pointer._pointerAndDeleter.first(), nullptr));
-
-	_pointerAndDeleter = eastl::move(pointer._pointerAndDeleter);
+	Reset();
+	_pointerAndDeleter.first()  = pointer.Release();
+	_pointerAndDeleter.second() = eastl::move(pointer._pointerAndDeleter.second());
 
 	return *this;
 }
@@ -177,71 +173,56 @@ template <class Object, typename Disposer>
 template <typename CompatibleObject>
 ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=(CompatibleObject* object) ETNoexceptHint {
 	Reset(object);
-
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator<(const CountedPointer<Object, Disposer>& object0, const CountedPointer<Object, Disposer>& object1) {
-	return object0.Get() < object1.Get();
+ETInlineHint ETPureFunctionHint bool operator<(const CountedPointer<Object, Disposer>& lhs, const CountedPointer<Object, Disposer>& rhs) {
+	return lhs.Get() < rhs.Get();
 }
 
 // ---------------------------------------------------
 
 template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator<=(const CountedPointer<Object, Disposer>& object0, const CountedPointer<Object, Disposer>& object1) {
-	return object0.Get() <= object1.Get();
+ETInlineHint ETPureFunctionHint bool operator==(const CountedPointer<Object, Disposer>& lhs, const CountedPointer<Object, Disposer>& rhs) {
+	return lhs.Get() == rhs.Get();
 }
 
 // ---------------------------------------------------
 
 template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator==(const CountedPointer<Object, Disposer>& object0, const CountedPointer<Object, Disposer>& object1) {
-	return object0.Get() == object1.Get();
+ETInlineHint ETPureFunctionHint bool operator==(const CountedPointer<Object, Disposer>& lhs, const Object* rhs) {
+	return lhs.Get() == rhs;
 }
 
 // ---------------------------------------------------
 
 template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator==(const CountedPointer<Object, Disposer>& object0, const Object* object1) {
-	return object0.Get() == object1;
+ETInlineHint ETPureFunctionHint bool operator!=(const CountedPointer<Object, Disposer>& lhs, const CountedPointer<Object, Disposer>& rhs) {
+	return !(lhs == rhs);
 }
 
 // ---------------------------------------------------
 
 template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator!=(const CountedPointer<Object, Disposer>& object0, const CountedPointer<Object, Disposer>& object1) {
-	return object0.Get() != object1.Get();
-}
-
-// ---------------------------------------------------
-
-template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator!=(const CountedPointer<Object, Disposer>& object0, const Object* object1) {
-	return object0.Get() != object1;
-}
-
-// ---------------------------------------------------
-
-template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator>=(const CountedPointer<Object, Disposer>& object0, const CountedPointer<Object, Disposer>& object1) {
-	return object0.Get() >= object1.Get();
-}
-
-// ---------------------------------------------------
-
-template <class Object, typename Disposer>
-ETInlineHint ETPureFunctionHint bool operator>(const CountedPointer<Object, Disposer>& object0, const CountedPointer<Object, Disposer>& object1) {
-	return object0.Get() > object1.Get();
+ETInlineHint ETPureFunctionHint bool operator!=(const CountedPointer<Object, Disposer>& lhs, const Object* rhs) {
+	return !(lhs.Get() == rhs);
 }
 
 // ---------------------------------------------------
 
 template <class Object, typename Disposer>
 ETInlineHint ETPureFunctionHint size_t GetHashCode(const CountedPointer<Object, Disposer>& object, size_t seed = 0u) {
-	return seed + 31 * (reinterpret_cast<uintptr>(object.Get()) / sizeof(object));
+	return seed + 31 * (uintptr(object.Get()) / sizeof(object));
+}
+
+// ---------------------------------------------------
+
+template <class Object, typename Disposer>
+ETInlineHint void Swap(CountedPointer<Object, Disposer>& lhs, CountedPointer<Object, Disposer>& rhs) {
+	eastl::swap(lhs._pointerAndDeleter, rhs._pointerAndDeleter);
 }
 
 } // namespace Eldritch2

@@ -14,12 +14,11 @@
 #include <Physics/PhysX/CpuDispatcher.hpp>
 #include <Scheduling/JobExecutor.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 /*	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does.
-	We can't fix this, but we can at least disable the warning. */
-ET_SET_MSVC_WARNING_STATE(disable : 6326)
+ *		We can't fix this, but we can at least disable the warning. */
+ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <task/PxTask.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 using namespace ::Eldritch2::Scheduling;
@@ -40,8 +39,8 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	// ---------------------------------------------------
 
 	void CpuDispatcher::submitTask(PxBaseTask& task) {
-		GetExecutor().StartAsync(_tasksCompleted, [&task](JobExecutor& /*executor*/) {
-			ET_PROFILE_SCOPE("PhysX", task.getName(), 0x76b900);
+		GetExecutor()->StartAsync(_tasksCompleted, [&task](JobExecutor& /*executor*/) {
+			ET_PROFILE_SCOPE("PhysX", "PhysX Task (Opaque)", 0x76b900);
 			task.run();
 			task.release();
 		});

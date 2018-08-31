@@ -26,6 +26,7 @@
 
 //	Containers library
 #include <Common/Containers/AbstractString.hpp>
+#include <Common/Containers/AbstractStringView.hpp>
 #include <Common/Containers/ArrayBvh.hpp>
 #include <Common/Containers/ArrayList.hpp>
 #include <Common/Containers/ArrayMap.hpp>
@@ -38,12 +39,13 @@
 #include <Common/Containers/IntrusiveForwardList.hpp>
 #include <Common/Containers/IntrusiveLinkedList.hpp>
 #include <Common/Containers/LinkedList.hpp>
+#include <Common/Containers/Path.hpp>
 #include <Common/Containers/PriorityQueue.hpp>
 #include <Common/Containers/Queue.hpp>
 #include <Common/Containers/Range.hpp>
+#include <Common/Containers/SoArrayList.hpp>
 #include <Common/Containers/Stack.hpp>
 #include <Common/Containers/String.hpp>
-#include <Common/Containers/StringView.hpp>
 #include <Common/Containers/TreeMap.hpp>
 #include <Common/Containers/TreeSet.hpp>
 
@@ -67,6 +69,7 @@
 #include <Common/Atomic.hpp>
 #include <Common/ComPointer.hpp>
 #include <Common/CountedPointer.hpp>
+#include <Common/CppType.hpp>
 #include <Common/EqualTo.hpp>
 #include <Common/ErrorCode.hpp>
 #include <Common/FileAppender.hpp>
@@ -87,16 +90,14 @@
 #include <Common/Pair.hpp>
 #include <Common/Platform.hpp>
 #include <Common/Ratio.hpp>
-#include <Common/Result.hpp>
 #include <Common/RuleSet.hpp>
 #include <Common/ScopeGuard.hpp>
 #include <Common/Semaphore.hpp>
 #include <Common/Sort.hpp>
 #include <Common/Stopwatch.hpp>
-#include <Common/StringLiteral.hpp>
 #include <Common/SymbolTable.hpp>
+#include <Common/Thread.hpp>
 #include <Common/Tuple.hpp>
-#include <Common/Type.hpp>
 #include <Common/UniquePointer.hpp>
 #include <Common/WaitableEvent.hpp>
 #include <Common/Win32Tools.hpp>

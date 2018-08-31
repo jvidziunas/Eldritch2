@@ -48,21 +48,25 @@ namespace Eldritch2 { namespace Assets {
 
 	// ---------------------------------------------------
 
-	ErrorCode PackageDatabase::Load(StringView<Utf8Char> path, Function<void(CountedPointer<const Package>, ErrorCode)> callback) {
+	ErrorCode PackageDatabase::Load(StringView path, PackageLoadClient& client) {
 		CountedPointer<Package> package;
 		{
-			ReadLock                    _(_packagesMutex);
-			const LoadableSet::Iterator candidate(_packages.Find(path, _packages.GetHashPredicate(), _packages.GetEqualityPredicate()));
-			if (candidate == _packages.End()) {
+			ReadLock   _(_packagesMutex);
+			const auto candidate(_packages.Find(path, _packages.GetHash(), _packages.GetEqualityPredicate()));
+			if (ET_UNLIKELY(candidate == _packages.End())) {
 				return Error::InvalidFileName;
 			}
 
 			/*	Use of const_cast is gross, but this is one of the suggested solutions in C++ Defect Report 103. We solemnly swear not to modify
 			 *	the package path. See http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#103 */
-			package = eastl::addressof(const_cast<Package&>(*candidate));
+			package = ETAddressOf(const_cast<Package&>(*candidate));
 		} // End of lock scope.
 
-		PushRequest({ eastl::move(callback), eastl::move(package) });
+		if (package->IsLoaded()) {
+			client.CompleteLoad(eastl::move(package), Error::None);
+		} else {
+			PushRequest({ ETAddressOf(client), eastl::move(package) });
+		}
 
 		return Error::None;
 	}
@@ -73,16 +77,12 @@ namespace Eldritch2 { namespace Assets {
 		using ::Eldritch2::Swap;
 
 		LoadableSet::Iterator gcCursor(packages.Begin());
-
 		{
-			Lock _(_requestsMutex);
-
 			// Complete any outstanding load requests with a failure result.
+			Lock _(_requestsMutex);
 			ClearRequests();
-
 			{
-				Lock _(_packagesMutex);
-
+				Lock _1(_packagesMutex);
 				Swap(_packages, packages);
 				Swap(_gcCursor, gcCursor);
 			} // End of lock scope.
@@ -90,37 +90,25 @@ namespace Eldritch2 { namespace Assets {
 
 		// Destroy the previous loadable set.
 		packages.Clear();
+
+		return Error::None;
 	}
 
 	// ---------------------------------------------------
 
 	void PackageDatabase::FreeResources() {
-		LoadableSet           emptySet(_packages.GetAllocator());
-		LoadableSet::Iterator gcCursor(emptySet.Begin());
-		Lock                  _(_requestsMutex);
+		LoadableSet emptySet(_packages.GetAllocator());
+		auto        gcCursor(emptySet.Begin());
+		Lock        _(_requestsMutex);
 
 		// Complete any outstanding requests with a failure result.
 		ClearRequests();
-
 		{
-			Lock _(_packagesMutex);
+			Lock _1(_packagesMutex);
 
 			Swap(_packages, emptySet);
 			Swap(_gcCursor, gcCursor);
 		} // End of lock scope.
-	}
-
-	// ---------------------------------------------------
-
-	void PackageDatabase::ClearRequests() {
-		LoadRequest current;
-
-		while (!_requests.IsEmpty()) {
-			current = eastl::move(_requests.Top());
-			_requests.Pop();
-
-			current.callback(eastl::move(current.package), ErrorCode(Error::Unspecified));
-		}
 	}
 
 }} // namespace Eldritch2::Assets

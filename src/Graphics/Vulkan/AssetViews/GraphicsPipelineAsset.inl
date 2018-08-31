@@ -17,8 +17,8 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	ETInlineHint const GraphicsPipelineBuilder& GraphicsPipelineAsset::GetBuilder() const {
-		return _pipelineBuilder;
+	ETInlineHint GraphicsPipelineAsset::GraphicsPipelineAsset(StringView path) :
+		Assets::Asset(path) {
 	}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

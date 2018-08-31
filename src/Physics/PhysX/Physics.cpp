@@ -21,7 +21,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	using namespace ::physx;
 
 	Physics::Physics(AnimationClip& clip) :
-		_clip(eastl::addressof(clip)) {
+		_clip(ETAddressOf(clip)) {
 	}
 
 }}} // namespace Eldritch2::Physics::PhysX

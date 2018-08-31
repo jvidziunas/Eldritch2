@@ -17,23 +17,23 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint VkCommandBuffer CommandList::Get() {
-		return _commandBuffer;
+	ETInlineHint ETForceInlineHint VkCommandBuffer CommandList::Get() ETNoexceptHint {
+		return _commands;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint CommandList::operator VkCommandBuffer() {
-		return _commandBuffer;
+	ETInlineHint ETForceInlineHint CommandList::operator VkCommandBuffer() ETNoexceptHint {
+		return _commands;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Swap(CommandList& lhs, CommandList& rhs) {
+	ETInlineHint ETForceInlineHint void Swap(CommandList& lhs, CommandList& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs._pool, rhs._pool);
-		Swap(lhs._commandBuffer, rhs._commandBuffer);
+		Swap(lhs._commands, rhs._commands);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

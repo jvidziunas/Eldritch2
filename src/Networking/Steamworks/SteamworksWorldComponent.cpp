@@ -16,11 +16,10 @@
 #include <Core/World.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6340) Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6340)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6340)
 #include <steam_api.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -53,13 +52,13 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 		// ---------------------------------------------------
 
-		ETInlineHint ISteamGameServer* GetGameServer(HSteamUser user, HSteamPipe pipe) {
+		ETInlineHint ISteamGameServer* GetSteamGameServer(HSteamUser user, HSteamPipe pipe) {
 			return SteamClient()->GetISteamGameServer(user, pipe, STEAMGAMESERVER_INTERFACE_VERSION);
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ISteamNetworking* GetNetworking(HSteamUser user, HSteamPipe pipe) {
+		ETInlineHint ISteamNetworking* GetSteamNetworking(HSteamUser user, HSteamPipe pipe) {
 			return SteamClient()->GetISteamNetworking(user, pipe, STEAMNETWORKING_INTERFACE_VERSION);
 		}
 
@@ -67,7 +66,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	SteamworksWorldComponent::SteamworksWorldComponent(const ObjectLocator& services) :
 		WorldComponent(services),
-		_log(FindService<World>().GetLog()),
+		_log(FindService<World>()->GetLog()),
 		_connectedToSteam(false),
 		_gamePort(0u),
 		_queryPort(0u) {
@@ -93,7 +92,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	// ---------------------------------------------------
 
-	void SteamworksWorldComponent::OnVariableRateTick(JobExecutor& executor, MicrosecondTime /*tickDuration*/, float32 /*residualFraction*/) {
+	void SteamworksWorldComponent::OnVariableRateTick(JobExecutor& /*executor*/, MicrosecondTime /*tickDuration*/, float32 /*residualFraction*/) {
 		ET_PROFILE_SCOPE("World/Steamworks", "Pump callbacks", 0xBBBBBB);
 		if (!IsConnectedToSteam()) {
 			return;
@@ -111,7 +110,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 			return;
 		}
 
-		ISteamNetworking* const networking(GetNetworking(_serverUser, _pipe));
+		const auto networking(GetSteamNetworking(_serverUser, _pipe));
 		for (uint32 packetSize; networking->IsP2PPacketAvailable(&packetSize);) {
 			CSteamID remoteId;
 			networking->ReadP2PPacket(nullptr, 0, &packetSize, &remoteId);
@@ -138,33 +137,33 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		}
 
 		if (_gamePort == 0u || _queryPort == 0u) {
-			_log.Write(MessageType::Error, "Unable to create world Steamworks presence: No ports assigned!" UTF8_NEWLINE);
+			_log.Write(Severity::Error, "Unable to create world Steamworks presence: No ports assigned!" ET_NEWLINE);
 			return false;
 		}
 
 		HSteamPipe pipe(SteamClient()->CreateSteamPipe());
-		HSteamUser serverUser(SteamClient()->CreateLocalUser(&pipe, EAccountType::k_EAccountTypeAnonGameServer));
+		HSteamUser serverUser(SteamClient()->CreateLocalUser(ETAddressOf(pipe), EAccountType::k_EAccountTypeAnonGameServer));
 
 		/*	Game server callbacks *MUST* be registered here because of Valve's awful OpenGL-style hidden global state. Internally, Steam has a
 		 *	notion of an active thread-local callback list that's updated when a thread calls CreateSteamPipe(). Naive implementations that rely
 		 *	on the automatic registration in the constructor causes undefined behavior at program shutdown, since they will have been added to a list
 		 *	that outlives the SteamworksWorldComponent that registered them-- Valve's shutdown code then stomps all over previously-freed memory. */
-		_steamServersConnected.Register(this, &SteamworksWorldComponent::OnSteamServersConnected);
-		_steamServersConnectFailure.Register(this, &SteamworksWorldComponent::OnSteamServersConnectFailure);
-		_steamServersDisconnected.Register(this, &SteamworksWorldComponent::OnSteamServersDisconnected);
-		_peerToPeerSessionRequestInitiated.Register(this, &SteamworksWorldComponent::OnP2PSessionRequestInitiated);
-		_peerToPeerSessionConnectFail.Register(this, &SteamworksWorldComponent::OnP2PSessionConnectionFail);
-		_policyResponse.Register(this, &SteamworksWorldComponent::OnPolicyResponse);
-		_gameServerAuthTicketResponse.Register(this, &SteamworksWorldComponent::OnValidateAuthTicketResponse);
-		_clientKickRequestRecieved.Register(this, &SteamworksWorldComponent::OnClientKickRequestReceived);
+		_steamServersConnected.Register(this, ETAddressOf(SteamworksWorldComponent::OnSteamServersConnected));
+		_steamServersConnectFailure.Register(this, ETAddressOf(SteamworksWorldComponent::OnSteamServersConnectFailure));
+		_steamServersDisconnected.Register(this, ETAddressOf(SteamworksWorldComponent::OnSteamServersDisconnected));
+		_peerToPeerSessionRequestInitiated.Register(this, ETAddressOf(SteamworksWorldComponent::OnP2PSessionRequestInitiated));
+		_peerToPeerSessionConnectFail.Register(this, ETAddressOf(SteamworksWorldComponent::OnP2PSessionConnectionFail));
+		_policyResponse.Register(this, ETAddressOf(SteamworksWorldComponent::OnPolicyResponse));
+		_gameServerAuthTicketResponse.Register(this, ETAddressOf(SteamworksWorldComponent::OnValidateAuthTicketResponse));
+		_clientKickRequestRecieved.Register(this, ETAddressOf(SteamworksWorldComponent::OnClientKickRequestReceived));
 
-		ISteamGameServer* const server(GetGameServer(serverUser, pipe));
-		if (!server->InitGameServer(AnyInboundIp, _gamePort, _queryPort, 0u, SteamUtils()->GetAppID(), "0.0.0.0")) {
-			_log.Write(MessageType::Error, "Unable to bind Steam game server!" UTF8_NEWLINE);
+		const auto gameServer(GetSteamGameServer(serverUser, pipe));
+		if (!gameServer->InitGameServer(AnyInboundIp, _gamePort, _queryPort, 0u, SteamUtils()->GetAppID(), "0.0.0.0")) {
+			_log.Write(Severity::Error, "Unable to bind Steam game server!" ET_NEWLINE);
 			return false;
 		}
 
-		server->LogOnAnonymous();
+		gameServer->LogOnAnonymous();
 
 		_pipe             = pipe;
 		_serverUser       = serverUser;
@@ -180,10 +179,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 			return;
 		}
 
-		ISteamGameServer* const server(GetGameServer(_serverUser, _pipe));
-
-		if (server->BLoggedOn()) {
-			server->LogOff();
+		const auto gameServer(GetSteamGameServer(_serverUser, _pipe));
+		if (gameServer->BLoggedOn()) {
+			gameServer->LogOff();
 		}
 
 		SteamClient()->ReleaseUser(_pipe, _serverUser);
@@ -195,38 +193,37 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 	// ---------------------------------------------------
 
 	void SteamworksWorldComponent::OnSteamServersConnected(SteamServersConnected_t* /*message*/) {
-		_log.Write(MessageType::Message, "Steam connection established." UTF8_NEWLINE);
+		_log.Write(Severity::Message, "Steam connection established." ET_NEWLINE);
 	}
 
 	// ---------------------------------------------------
 
 	void SteamworksWorldComponent::OnSteamServersConnectFailure(SteamServerConnectFailure_t* /*message*/) {
-		_log.Write(MessageType::Error, "Error connecting to Steam servers!" UTF8_NEWLINE);
+		_log.Write(Severity::Error, "Error connecting to Steam servers!" ET_NEWLINE);
 	}
 
 	// ---------------------------------------------------
 
 	void SteamworksWorldComponent::OnSteamServersDisconnected(SteamServersDisconnected_t* /*message*/) {
-		_log.Write(MessageType::Message, "Disconnected from Steam servers." UTF8_NEWLINE);
-
+		_log.Write(Severity::Message, "Disconnected from Steam servers." ET_NEWLINE);
 		DisconnectFromSteam();
 	}
 
 	// ---------------------------------------------------
 
 	void SteamworksWorldComponent::OnP2PSessionRequestInitiated(P2PSessionRequest_t* message) {
-		ISteamNetworking* const networking(GetNetworking(_serverUser, _pipe));
-		if (!networking->AcceptP2PSessionWithUser(message->m_steamIDRemote)) {
+		const auto steamNetworking(GetSteamNetworking(_serverUser, _pipe));
+		if (!steamNetworking->AcceptP2PSessionWithUser(message->m_steamIDRemote)) {
 			return;
 		}
 
-		_log.Write(MessageType::Message, "Accepted peer-to-peer connection to SteamID '{}'." UTF8_NEWLINE, message->m_steamIDRemote.ConvertToUint64());
+		_log.Write(Severity::Message, "Accepted peer-to-peer connection to SteamID '{}'." ET_NEWLINE, message->m_steamIDRemote.ConvertToUint64());
 	}
 
 	// ---------------------------------------------------
 
 	void SteamworksWorldComponent::OnP2PSessionConnectionFail(P2PSessionConnectFail_t* message) {
-		_log.Write(MessageType::Warning, "Connection to SteamID '{}' dropped: {}." UTF8_NEWLINE, message->m_steamIDRemote.ConvertToUint64(), AsCString(EP2PSessionError(message->m_eP2PSessionError)));
+		_log.Write(Severity::Warning, "Connection to SteamID '{}' dropped: {}." ET_NEWLINE, message->m_steamIDRemote.ConvertToUint64(), AsCString(EP2PSessionError(message->m_eP2PSessionError)));
 	}
 
 	// ---------------------------------------------------
@@ -240,13 +237,13 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 	// ---------------------------------------------------
 
 	void SteamworksWorldComponent::OnClientKickRequestReceived(GSClientKick_t* kickedClient) {
-		ISteamNetworking* const networking(GetNetworking(_serverUser, _pipe));
-		ISteamGameServer* const server(GetGameServer(_serverUser, _pipe));
+		const auto steamNetworking(GetSteamNetworking(_serverUser, _pipe));
+		const auto gameServer(GetSteamGameServer(_serverUser, _pipe));
 		//	EDenyReason m_eDenyReason;
-		_log.Write(MessageType::Message, "Kicking user '{}'." UTF8_NEWLINE, kickedClient->m_SteamID.ConvertToUint64());
+		_log.Write(Severity::Message, "Kicking user '{}'." ET_NEWLINE, kickedClient->m_SteamID.ConvertToUint64());
 
-		networking->CloseP2PSessionWithUser(kickedClient->m_SteamID);
-		server->EndAuthSession(kickedClient->m_SteamID);
+		steamNetworking->CloseP2PSessionWithUser(kickedClient->m_SteamID);
+		gameServer->EndAuthSession(kickedClient->m_SteamID);
 	}
 
 }}} // namespace Eldritch2::Networking::Steamworks

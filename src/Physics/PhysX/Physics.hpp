@@ -35,6 +35,11 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	public:
 		class AnimationClip : public Animation::Clip {
+			// - TYPE PUBLISHING ---------------------------------
+
+		public:
+			enum : uint32 { TracksPerBone = 8u };
+
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
@@ -48,7 +53,9 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 			// ---------------------------------------------------
 
 		public:
-			void FetchKnots(Animation::KnotCache& knots, uint64 time, Animation::BoneIndex maximumBone) override;
+			void FetchKnots(Animation::KnotCache& knots, Animation::BoneIndex maximumBone, uint64 time) override;
+
+			void Attach(Animation::KnotCache& knots) override;
 
 			// - DATA MEMBERS ------------------------------------
 

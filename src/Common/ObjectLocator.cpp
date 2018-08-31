@@ -22,7 +22,7 @@ ObjectLocator::ObjectLocator() :
 
 // ---------------------------------------------------
 
-ObjectLocator& ObjectLocator::PublishService(Type type, void* service) {
+ObjectLocator& ObjectLocator::PublishService(CppType type, void* service) {
 	const auto result(_servicesByType.Emplace(type, service));
 	ET_ASSERT(result.second, "Duplicate service registration!");
 
@@ -31,7 +31,7 @@ ObjectLocator& ObjectLocator::PublishService(Type type, void* service) {
 
 // ---------------------------------------------------
 
-void* ObjectLocator::Find(Type serviceType) const {
+void* ObjectLocator::Find(CppType serviceType) const ETNoexceptHint {
 	const auto candidate(_servicesByType.Find(serviceType));
 	ET_ASSERT(candidate != _servicesByType.End(), "Unknown service!");
 

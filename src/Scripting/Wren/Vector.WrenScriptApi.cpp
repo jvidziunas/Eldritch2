@@ -8,7 +8,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -16,35 +15,23 @@
 #include <Scripting/Wren/Marshal.hpp>
 //------------------------------------------------------------------//
 
-double	wrenGetSlotDouble(WrenVM* vm, int slot);
-void	wrenSetSlotDouble(WrenVM* vm, int slot, double value);
+double wrenGetSlotDouble(WrenVM* vm, int slot);
+void   wrenSetSlotDouble(WrenVM* vm, int slot, double value);
+void   wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
 
 namespace Eldritch2 {
-	namespace Scripting {
-		namespace Wren {
+namespace Scripting {
+namespace Wren {
 
-			ET_IMPLEMENT_WREN_CLASS(Vector) {
-				api.CreateClass<Vector>(ET_BUILTIN_WREN_MODULE_NAME(Math), "Vector",
-										{/* Constructors */
-											ConstructorMethod("new(_,_,_)", [](WrenVM* vm) {
-												SetReturn<Vector>(
-													vm,
-													static_cast<float32>(wrenGetSlotDouble(vm, 1)),
-													static_cast<float32>(wrenGetSlotDouble(vm, 2)),
-													static_cast<float32>(wrenGetSlotDouble(vm, 3)),
-													0.0f
-												);
-											}),
-											ConstructorMethod("splat(_)", [](WrenVM* vm) {
-												SetReturn<Vector>(
-													vm,
-													static_cast<float32>(wrenGetSlotDouble(vm, 1)),
-													static_cast<float32>(wrenGetSlotDouble(vm, 1)),
-													static_cast<float32>(wrenGetSlotDouble(vm, 1)),
-													0.0f
-												);
-											})
-										},
+	ET_IMPLEMENT_WREN_CLASS(Vector) { // clang-format off
+		api.CreateClass<Vector>(ET_BUILTIN_WREN_MODULE_NAME(Math), "Vector",
+			{/* Constructors */
+				ConstructorMethod("new(_,_,_)", [](WrenVM* vm) {
+					SetReturn<Vector>(vm, float32(wrenGetSlotDouble(vm, 1)), float32(wrenGetSlotDouble(vm, 2)), float32(wrenGetSlotDouble(vm, 3)), 0.0f);
+				}),
+				ConstructorMethod("splat(_)", [](WrenVM* vm) {
+					SetReturn<Vector>(vm, float32(wrenGetSlotDouble(vm, 1)), float32(wrenGetSlotDouble(vm, 1)), float32(wrenGetSlotDouble(vm, 1)), 0.0f);
+				})},
 			{/*	Static methods */
 				StaticMethod("forward", [](WrenVM* vm) {
 					SetReturn<Vector>(vm, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -63,8 +50,7 @@ namespace Eldritch2 {
 				}),
 				StaticMethod("lerp(_,_,_)", [](WrenVM* vm) {
 					SetReturn<Vector>(vm, LinearInterpolate(GetSlotAs<Vector>(vm, 1), GetSlotAs<Vector>(vm, 2), wrenGetSlotDouble(vm, 3)));
-				})
-			},
+				})},
 			{/*	Properties */
 				DefineGetter("lengthSquared", [](WrenVM* vm) {
 					wrenSetSlotDouble(vm, 0, SquaredLength(GetSlotAs<Vector>(vm, 0)));
@@ -75,7 +61,7 @@ namespace Eldritch2 {
 				DefineGetter("abs", [](WrenVM* vm) {
 					const Vector&	self(GetSlotAs<Vector>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Vector>());
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Vector>());
 					SetReturn<Vector>(vm, AbsoluteValue(self));
 				}),
 				DefineGetter("toString", [](WrenVM* vm) {
@@ -83,47 +69,41 @@ namespace Eldritch2 {
 					float32				coefficients[4];
 
 					GetSlotAs<Vector>(vm, 0).ExtractCoefficients(coefficients);
-
 					fmt::format_to(string, "<x={}, y={}, z={}>", coefficients[3], coefficients[2], coefficients[1]);
 
 					wrenSetSlotBytes(vm, 0, string.data(), string.size());
-				})
-			},
+				})},
 			{/*	Methods */
 				ForeignMethod("+(_)", [](WrenVM* vm) {
 					const Vector&	self(GetSlotAs<Vector>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Vector>());
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Vector>());
 					SetReturn<Vector>(vm, self + GetSlotAs<Vector>(vm, 1));
 				}),
 				ForeignMethod("-(_)", [](WrenVM* vm) {
 					const Vector&	self(GetSlotAs<Vector>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Vector>());
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Vector>());
 					SetReturn<Vector>(vm, self - GetSlotAs<Vector>(vm, 1));
 				}),
 				ForeignMethod("*(_)", [](WrenVM* vm) {
 					const Vector&	self(GetSlotAs<Vector>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Vector>());
-					SetReturn<Vector>(vm, self * static_cast<float32>(wrenGetSlotDouble(vm, 1)));
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Vector>());
+					SetReturn<Vector>(vm, self * float32(wrenGetSlotDouble(vm, 1)));
 				}),
 				ForeignMethod("/(_)", [](WrenVM* vm) {
 					const Vector&	self(GetSlotAs<Vector>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Vector>());
-					SetReturn<Vector>(vm, self / static_cast<float32>(wrenGetSlotDouble(vm, 1)));
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Vector>());
+					SetReturn<Vector>(vm, self / float32(wrenGetSlotDouble(vm, 1)));
 				}),
 				ForeignMethod("-", [](WrenVM* vm) {
 					const Vector&	self(GetSlotAs<Vector>(vm, 0));
 
-					wrenSetSlotHandle(vm, 0, AsContext(vm).FindForeignClass<Vector>());
+					wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Vector>());
 					SetReturn<Vector>(vm, -self);
-				}),
-			}
-			);
-			}
+				})});
+	} // clang-format on
 
-		}	// namespace Wren
-	}	// namespace Scripting
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Scripting::Wren

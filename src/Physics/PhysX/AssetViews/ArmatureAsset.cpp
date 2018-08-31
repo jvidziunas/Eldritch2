@@ -15,40 +15,40 @@
 //------------------------------------------------------------------//
 #include <FlatBuffers/Armature_generated.h>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6326)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <PxArticulation.h>
 #include <PxPhysics.h>
 #include <PxScene.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Animation::FlatBuffers;
-using namespace ::Eldritch2::Logging;
-using namespace ::Eldritch2::Assets;
-using namespace ::flatbuffers;
-using namespace ::physx;
-
 namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews {
+
+	using namespace ::Eldritch2::Animation::FlatBuffers;
+	using namespace ::Eldritch2::FlatBuffers;
+	using namespace ::Eldritch2::Logging;
+	using namespace ::Eldritch2::Assets;
+	using namespace ::flatbuffers;
+	using namespace ::physx;
+
 	namespace {
 
-		ETInlineHint ETPureFunctionHint PxQuat Decompress(const FlatBuffers::CompressedUnitQuaternion& quaternion) {
+		ETInlineHint ETPureFunctionHint PxQuat Decompress(const CompressedUnitQuaternion& orientation) {
 			return PxQuat(PxIdentity);
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint PxTransform AsPxTransform(const Bone& pose) {
-			const auto& translation(pose.Translation());
-
-			return { translation.X(), translation.Y(), translation.Z(), Decompress(pose.Orientation()) };
+		ETInlineHint ETPureFunctionHint PxTransform AsPxTransform(const Bone* pose) {
+			const auto& translation(pose->Translation());
+			return { translation.X(), translation.Y(), translation.Z(), Decompress(pose->Orientation()) };
 		}
 
 	} // anonymous namespace
 
-	ArmatureAsset::ArmatureAsset(const Utf8Char* const filePath) :
-		Asset(filePath),
+	ArmatureAsset::ArmatureAsset(StringView path) :
+		Asset(path),
 		_joints(MallocAllocator("PhysX Armature Asset Joint Definition Allocator")) {}
 
 	// ---------------------------------------------------
@@ -73,16 +73,21 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		//	Ensure we're working with data that can plausibly represent an armature.
 		Verifier verifier(reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize());
 		if (!VerifyArmatureBuffer(verifier)) {
-			asset.WriteLog(MessageType::Error, "Data integrity check failed for {}, aborting load." UTF8_NEWLINE, GetPath());
+			asset.WriteLog(Severity::Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath());
 			return Error::InvalidParameter;
 		}
 
-		ArrayList<Joint> joints(_joints.GetAllocator());
+		const auto armature(GetArmature(asset.Begin()));
+		const auto descriptors(armature->Joints());
 
-		for (const JointDescriptor* joint : *GetArmature(asset.Begin())->Joints()) {
-			const Bone* pose(joint->BindPose());
+		ArrayList<Joint> joints(_joints.GetAllocator(), descriptors->size());
+		for (uoffset_t id(0u); id < descriptors->size(); ++id) {
+			const auto joint(descriptors->Get(id));
+			if (descriptors->size() <= joint->ParentIndex()) {
+				asset.WriteLog(Severity::Error, "Armature {} joint {} references out-of-bounds parent {}!" ET_NEWLINE, GetPath(), id, joint->ParentIndex());
+			}
 
-			joints.Append({ AsPxTransform(*pose), joint->ParentIndex() });
+			joints.Append({ AsPxTransform(joint->BindPose()), joint->ParentIndex() });
 		}
 
 		Swap(_joints, joints);
@@ -98,8 +103,8 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 
 	// ---------------------------------------------------
 
-	Utf8Literal ArmatureAsset::GetExtension() {
-		return Utf8Literal(ArmatureExtension());
+	ETPureFunctionHint StringView ArmatureAsset::GetExtension() ETNoexceptHint {
+		return { ArmatureExtension(), StringLength(ArmatureExtension()) };
 	}
 
 }}}} // namespace Eldritch2::Physics::PhysX::AssetViews

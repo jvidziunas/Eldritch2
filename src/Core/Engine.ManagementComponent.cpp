@@ -24,19 +24,9 @@ namespace Eldritch2 { namespace Core {
 	using namespace ::Eldritch2::Logging;
 	using namespace ::Eldritch2::Assets;
 
-	namespace {
-
-		ETInlineHint ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime delta) {
-			static constexpr float32 MicrosecondsPerMillisecond = 1000.0f;
-			return AsFloat(delta) / MicrosecondsPerMillisecond;
-		}
-
-	} // anonymous namespace
-
-	Engine::ManagementComponent::ManagementComponent(
-		Engine& owner) :
+	Engine::ManagementComponent::ManagementComponent(Engine& owner) :
 		EngineComponent(owner.GetServiceLocator()),
-		_owner(eastl::addressof(owner)),
+		_owner(ETAddressOf(owner)),
 		_packageSweepLimitPerFrame(5u) {
 	}
 
@@ -67,22 +57,14 @@ namespace Eldritch2 { namespace Core {
 				for (EngineComponent* component : _owner->_components) {
 					component->PublishAssetTypes(api);
 				}
-
 				_owner->_packageProvider.GetAssetDatabase().BindResources(eastl::move(api.GetFactories()));
-			},
-			[this](JobExecutor& /*executor*/) {
-				ET_PROFILE_SCOPE("Engine/Initialization", "Scan packages", 0xBBBBBB);
-				Stopwatch timer;
-
-				_owner->_packageProvider.ScanPackages();
-				_owner->_log.Write(MessageType::Message, "Rebuilt package listing in {:.2f}ms." UTF8_NEWLINE, AsMilliseconds(timer.GetDuration()));
 			});
 	}
 
 	// ---------------------------------------------------
 
 	void Engine::ManagementComponent::TickEarly(JobExecutor& /*executor*/) {
-		_owner->SweepPackages(_packageSweepLimitPerFrame);
+		_owner->DestroyGarbage(_packageSweepLimitPerFrame);
 	}
 
 	// ---------------------------------------------------
@@ -100,15 +82,15 @@ namespace Eldritch2 { namespace Core {
 
 		properties.BeginSection("Engine")
 			.DefineProperty("PackageSweepLimitPerFrame", _packageSweepLimitPerFrame)
-			.DefineProperty("LogThreshold", [&](StringView<Utf8Char> threshold) {
+			.DefineProperty("LogThreshold", [&](StringView threshold) {
 				if (threshold == "VerboseWarning") {
-					log.SetWriteThreshold(MessageType::VerboseWarning);
+					log.SetWriteThreshold(Severity::VerboseWarning);
 				} else if (threshold == "Warning") {
-					log.SetWriteThreshold(MessageType::Warning);
+					log.SetWriteThreshold(Severity::Warning);
 				} else if (threshold == "Error") {
-					log.SetWriteThreshold(MessageType::Error);
+					log.SetWriteThreshold(Severity::Error);
 				} else if (threshold == "Message") {
-					log.SetWriteThreshold(MessageType::Message);
+					log.SetWriteThreshold(Severity::Message);
 				}
 			});
 	}

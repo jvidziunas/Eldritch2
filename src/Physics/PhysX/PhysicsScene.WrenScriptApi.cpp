@@ -20,9 +20,11 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
-	namespace {
 
-		using namespace ::physx;
+	using namespace ::Eldritch2::Scripting::Wren;
+	using namespace ::physx;
+
+	namespace {
 
 		template <typename Hit, PxU32 bufferSize>
 		class WrenHitCallback : public PxHitCallback<Hit> {
@@ -30,10 +32,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 		public:
 			//!	Constructs this @ref WrenHitCallback instance.
-			WrenHitCallback(
-				WrenVM*     vm,
-				WrenHandle* callback,
-				WrenHandle* arity1Call) :
+			WrenHitCallback(WrenVM* vm, WrenHandle* callback, WrenHandle* arity1Call) :
 				PxHitCallback<Hit>(_buffer, bufferSize),
 				_vm(vm),
 				_callback(callback),
@@ -57,10 +56,8 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 			PxAgain processTouches(const Hit* buffer, PxU32 nbHits) override {
 				//	Set slot to contact info object.
 				wrenSetSlotNull(_vm, 1);
-
 				while (nbHits) {
 					wrenSetSlotHandle(_vm, 0, _callback);
-
 					if (wrenCall(_vm, _arity1Call) != WREN_RESULT_SUCCESS) {
 						_errorObject = wrenGetSlotHandle(_vm, 0);
 						return false;
@@ -84,47 +81,44 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	} // anonymous namespace
 
-	using namespace ::Eldritch2::Scripting::Wren;
-
 	ET_IMPLEMENT_WREN_CLASS(PhysicsScene) { // clang-format off
 		api.CreateClass<PhysicsScene>(ET_BUILTIN_WREN_MODULE_NAME(Physics), "PhysicsSceneClass",
-			{/* Constructors */ },
-			{/*	Static methods */ },
-			{/*	Properties */ },
+			{/* Constructors */},
+			{/*	Static methods */},
+			{/*	Properties */},
 			{/*	Methods */
-				ForeignMethod("eachAlongRay(_,_,_,_)", [](WrenVM* vm) {
-					GetSlotAs<PhysicsScene>(vm, 0).SweepRay(
+				ForeignMethod("eachAlongRay(_,_,_,_)", [](WrenVM* vm) ETNoexceptHint {
+					ForEachAlongRay(
+						GetSlotAs<PhysicsScene>(vm, 0).GetScene(),
 						AsPxVec3(GetSlotAs<Vector>(vm, 1)),
 						AsPxVec3(GetSlotAs<Vector>(vm, 2)),
-						static_cast<float32>(wrenGetSlotDouble(vm, 3)),
-						WrenHitCallback<PxRaycastHit, 8u>(vm, wrenGetSlotHandle(vm, 4), AsContext(vm).GetCallStubForArity<1>())
-					);
+						float32(wrenGetSlotDouble(vm, 3)),
+						WrenHitCallback<PxRaycastHit, 8u>(vm, wrenGetSlotHandle(vm, 4), GetContext(vm)->GetCallStubForArity<1>()));
 				}),
-				ForeignMethod("eachAlongRay(_,_,_)", [](WrenVM* vm) {
-					GetSlotAs<PhysicsScene>(vm, 0).SweepRay(
+				ForeignMethod("eachAlongRay(_,_,_)", [](WrenVM* vm) ETNoexceptHint {
+					ForEachAlongRay(
+						GetSlotAs<PhysicsScene>(vm, 0).GetScene(),
 						AsPxVec3(GetSlotAs<Transformation>(vm, 1).translation),
 						AsPxVec3(GetSlotAs<Transformation>(vm, 1).rotation.GetForward()),
-						static_cast<float32>(wrenGetSlotDouble(vm, 2)),
-						WrenHitCallback<PxRaycastHit, 8u>(vm, wrenGetSlotHandle(vm, 3), AsContext(vm).GetCallStubForArity<1>())
-					);
+						float32(wrenGetSlotDouble(vm, 2)),
+						WrenHitCallback<PxRaycastHit, 8u>(vm, wrenGetSlotHandle(vm, 3), GetContext(vm)->GetCallStubForArity<1>()));
 				}),
-				ForeignMethod("eachAlongShape(_,_,_,_,_)", [](WrenVM* vm) {
-					GetSlotAs<PhysicsScene>(vm, 0).SweepGeometry(
+				ForeignMethod("eachWithinShape(_,_,_,_,_)", [](WrenVM* vm) ETNoexceptHint {
+					ForEachOverlap(
+						GetSlotAs<PhysicsScene>(vm, 0).GetScene(),
 						GetSlotAs<PhysicsShape>(vm, 1).asGeometry,
 						AsPxTransform(GetSlotAs<Transformation>(vm, 2)),
 						AsPxVec3(GetSlotAs<Vector>(vm, 3)),
-						static_cast<float32>(wrenGetSlotDouble(vm, 4)),
-						WrenHitCallback<PxSweepHit, 8u>(vm, wrenGetSlotHandle(vm, 5), AsContext(vm).GetCallStubForArity<1>())
-					);
+						float32(wrenGetSlotDouble(vm, 4)),
+						WrenHitCallback<PxSweepHit, 8u>(vm, wrenGetSlotHandle(vm, 5), GetContext(vm)->GetCallStubForArity<1>()));
 				}),
-				ForeignMethod("eachWithinShape(_,_,_)", [](WrenVM* vm) {
-					GetSlotAs<PhysicsScene>(vm, 0).CheckOverlap(
+				ForeignMethod("eachWithinShape(_,_,_)", [](WrenVM* vm) ETNoexceptHint {
+					ForEachOverlap(
+						GetSlotAs<PhysicsScene>(vm, 0).GetScene(),
 						GetSlotAs<PhysicsShape>(vm, 1).asGeometry,
 						AsPxTransform(GetSlotAs<Transformation>(vm, 2)),
-						WrenHitCallback<PxOverlapHit, 8u>(vm, wrenGetSlotHandle(vm, 3), AsContext(vm).GetCallStubForArity<1>())
-					);
-				})
-			}); // clang-format on
-	}
+						WrenHitCallback<PxOverlapHit, 8u>(vm, wrenGetSlotHandle(vm, 3), GetContext(vm)->GetCallStubForArity<1>()));
+				})});
+	} // clang-format on
 
 }}} // namespace Eldritch2::Physics::PhysX

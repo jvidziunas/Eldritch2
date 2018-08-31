@@ -21,7 +21,7 @@ namespace Eldritch2 { namespace Audio {
 
 	// ---------------------------------------------------
 
-	float32 Voice::GetHdrAmplitudeScalar(float32 windowTopDb) {
+	float32 Voice::GetHdrAmplitudeScalar(float32 windowTopDb) const {
 		return Pow(10.0f, (loudnessDb - windowTopDb) / 20.0f);
 	}
 

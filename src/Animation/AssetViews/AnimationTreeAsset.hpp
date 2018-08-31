@@ -12,46 +12,45 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Precompiled.hpp>
-//------------------------------------------------------------------//
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Animation {
-namespace AssetViews {
+namespace Eldritch2 { namespace Animation { namespace AssetViews {
 
-class AnimationTreeAsset : public Assets::Asset {
-    // - TYPE PUBLISHING ---------------------------------
+	class AnimationTreeAsset : public Assets::Asset {
+		// - TYPE PUBLISHING ---------------------------------
 
-public:
-    struct Clip {};
-    struct Blend {};
+	public:
+		struct Blend {};
+		struct Clip {};
 
-    // - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-public:
-    //!	Constructs this @ref AnimationTreeAsset instance.
-    AnimationTreeAsset(const Utf8Char* const path);
-    //!	Disable copy construction.
-    AnimationTreeAsset(const AnimationTreeAsset&) = delete;
+	public:
+		//!	Disable copy construction.
+		AnimationTreeAsset(const AnimationTreeAsset&) = delete;
+		//!	Constructs this @ref AnimationTreeAsset instance.
+		AnimationTreeAsset(StringView path);
 
-    ~AnimationTreeAsset() override = default;
+		~AnimationTreeAsset() override = default;
 
-    // ---------------------------------------------------
+		// ---------------------------------------------------
 
-public:
-    ErrorCode BindResources(const Builder& builder) override;
+	public:
+		ErrorCode BindResources(const Builder& builder) override;
 
-    void FreeResources() override;
+		void FreeResources() override;
 
-    // - DATA MEMBERS ------------------------------------
+		// ---------------------------------------------------
 
-public:
-    ArrayList<Clip>  _clips;
-    ArrayList<Blend> _blends;
-};
+	public:
+		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
 
-} // namespace AssetViews
-} // namespace Animation
-} // namespace Eldritch2
+		// - DATA MEMBERS ------------------------------------
+
+	public:
+		ArrayList<Clip>  _clips;
+		ArrayList<Blend> _blends;
+	};
+
+}}} // namespace Eldritch2::Animation::AssetViews

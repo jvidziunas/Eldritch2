@@ -90,7 +90,7 @@ namespace {
 			} // case WM_CLOSE
 
 			case WM_CustomClose: {
-				PostQuitMessage(wParam);
+				PostQuitMessage(int(wParam));
 			}  // case WM_CustomClose
 			}; // switch( message )
 

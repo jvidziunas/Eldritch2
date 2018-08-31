@@ -24,7 +24,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	Result<UniquePointer<WorldComponent>> WrenEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
+	UniquePointer<WorldComponent> WrenEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
 		return MakeUnique<WrenWorldComponent>(allocator, services);
 	}
 

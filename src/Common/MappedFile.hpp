@@ -27,7 +27,7 @@ class MappedFile {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	enum AccessMode {
+	enum AccessType {
 		Read  = 0,
 		Write = 1,
 		All   = (Read | Write)
@@ -37,7 +37,7 @@ public:
 
 public:
 	enum : size_t {
-		EndOfFile = ~static_cast<size_t>(0)
+		LengthOfFile = ~size_t(0)
 	};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -46,62 +46,65 @@ public:
 	//!	Disable copy construction.
 	MappedFile(const MappedFile&) = delete;
 	//!	Constructs this @ref MappedFile instance.
-	MappedFile(MappedFile&&);
+	MappedFile(MappedFile&&) ETNoexceptHint;
 	//!	Constructs this @ref MappedFile instance.
-	MappedFile();
+	MappedFile() ETNoexceptHint;
 
 	~MappedFile();
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode ClearOrCreate(AccessMode accessMode, const PlatformChar* path, size_t fileSizeInBytes);
+	ErrorCode ClearOrCreate(AccessType access, const PlatformChar* path, size_t byteSize) ETNoexceptHint;
 
-	ErrorCode Open(AccessMode accessMode, const PlatformChar* path, uint64 offsetInBytes = 0u, size_t mappedLengthInBytes = EndOfFile);
+	ErrorCode Open(AccessType access, const PlatformChar* path, uint64 byteOffset = 0u, size_t byteSize = LengthOfFile) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
 	template <typename Struct>
-	Range<Struct*> GetRange(size_t byteOffset, size_t lengthInElements) const;
+	Range<Struct*> GetRange(size_t byteOffset, size_t lengthInElements) const ETNoexceptHint;
 
 	template <typename Struct>
-	Struct* Get(size_t byteOffset) const;
+	Struct* Get(size_t byteOffset) const ETNoexceptHint;
 
-	void* Get(size_t byteOffset) const;
-
-	// ---------------------------------------------------
-
-public:
-	size_t GetSizeInBytes() const;
-
-	bool HasAccessLevel(AccessMode access) const;
+	void* Get(size_t byteOffset) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	void Prefetch(size_t offsetInBytes, size_t lengthInBytes) const;
-	void Prefetch(Range<const char*> range) const;
+	size_t GetSizeInBytes() const ETNoexceptHint;
 
-	void Evict(size_t offsetInBytes, size_t lengthInBytes) const;
-	void Evict(Range<const char*> range) const;
+	bool HasAccess(AccessType access) const ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+public:
+	void Prefetch(size_t byteOffset, size_t byteLength) const ETNoexceptHint;
+	void Prefetch(Range<const char*> range) const ETNoexceptHint;
+
+	void Evict(size_t byteOffset, size_t byteLength) const ETNoexceptHint;
+	void Evict(Range<const char*> range) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
 	//!	Disable copy assignment.
 	MappedFile& operator=(const MappedFile&) = delete;
-	MappedFile& operator                     =(MappedFile&&);
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
 #if ET_PLATFORM_WINDOWS
-	AccessMode   _access;
-	Range<char*> _region;
+	AccessType   _access;
+	Range<char*> _mapping;
 #else
 	static_assert(false, "MappedFile needs implementation for target platform!");
 #endif // if ET_PLATFORM_WINDOWS
+
+	// ---------------------------------------------------
+
+	friend void Swap(MappedFile&, MappedFile&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

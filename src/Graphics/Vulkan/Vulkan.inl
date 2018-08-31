@@ -17,20 +17,20 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	template <size_t formatSize, typename... Arguments>
-	ETInlineHint void Vulkan::WriteLog(Logging::MessageType type, const Utf8Char (&format)[formatSize], Arguments&&... arguments) const {
-		_log.Write(type, format, eastl::forward<Arguments>(arguments)...);
+	template <typename... Arguments>
+	ETInlineHint void Vulkan::WriteLog(Logging::Severity severity, StringView format, Arguments&&... arguments) const {
+		_log.Write(severity, format, eastl::forward<Arguments>(arguments)...);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Vulkan::Device& Vulkan::GetPrimaryDevice() {
+	ETInlineHint Vulkan::Device& Vulkan::GetPrimaryDevice() ETNoexceptHint {
 		return _device;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Vulkan::operator VkInstance() {
+	ETInlineHint Vulkan::operator VkInstance() ETNoexceptHint {
 		return _vulkan;
 	}
 

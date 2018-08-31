@@ -17,7 +17,7 @@
 namespace Eldritch2 { namespace Input {
 
 	InputDevice::InputDevice() :
-		_bindingByScanCode(MallocAllocator("Input Device Binding Map Allocator")),
+		_actionByScanCode(MallocAllocator("Input Device Binding Map Allocator")),
 		_handler(nullptr) {}
 
 	// ---------------------------------------------------
@@ -28,13 +28,13 @@ namespace Eldritch2 { namespace Input {
 
 	// ---------------------------------------------------
 
-	bool InputDevice::TryAcquire(BindingMap<> bindingByScanCode, InputHandler& handler) {
+	bool InputDevice::TryAcquire(BindingMap actionByScanCode, InputHandler& handler) {
 		if (_handler != nullptr) {
 			return false;
 		}
 
-		_bindingByScanCode = eastl::move(bindingByScanCode);
-		_handler           = eastl::addressof(handler);
+		_actionByScanCode = eastl::move(actionByScanCode);
+		_handler          = ETAddressOf(handler);
 
 		handler.OnConnect();
 
@@ -44,7 +44,7 @@ namespace Eldritch2 { namespace Input {
 	// ---------------------------------------------------
 
 	void InputDevice::Release() {
-		_bindingByScanCode.Clear();
+		_actionByScanCode.Clear();
 
 		if (InputHandler* const handler = eastl::exchange(_handler, nullptr)) {
 			handler->OnDisconnect();
@@ -54,8 +54,8 @@ namespace Eldritch2 { namespace Input {
 	// ---------------------------------------------------
 
 	void InputDevice::Dispatch(ScanCode code, int32 weight) const {
-		const BindingMap<>::ConstIterator binding(_bindingByScanCode.Find(code));
-		if (ET_UNLIKELY(binding == _bindingByScanCode.End())) {
+		const auto binding(_actionByScanCode.Find(code));
+		if (ET_UNLIKELY(binding == _actionByScanCode.End())) {
 			return;
 		}
 

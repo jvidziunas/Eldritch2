@@ -12,156 +12,152 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Common/Algorithms.hpp>
 #include <Common/Assert.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 namespace Detail {
 
-	template <typename Identifier>
-	ETInlineHint IdentifierPool<Identifier>::ValueRange::ValueRange(IdentifierType first, IdentifierType last) :
-		first(first),
-		last(last) {}
+	template <typename Value>
+	ETInlineHint ETForceInlineHint ValueRange<Value>::ValueRange(Value begin, Value end) ETNoexceptHint : begin(begin),
+																										  end(end) {}
 
 	// ---------------------------------------------------
 
-	template <typename Identifier>
-	ETInlineHint bool IdentifierPool<Identifier>::ValueRange::CanMergeForwardWith(const ValueRange& range) const {
-		return last == range.first;
+	template <typename Value>
+	ETInlineHint ETForceInlineHint typename ValueRange<Value>::ValueType ValueRange<Value>::GetSize() const ETNoexceptHint {
+		return end - begin;
 	}
 
 	// ---------------------------------------------------
 
-	template <typename Identifier>
-	typename IdentifierPool<Identifier>::IdentifierType IdentifierPool<Identifier>::ValueRange::GetSize() const {
-		return last - first;
+	template <typename Value>
+	ETInlineHint ETForceInlineHint bool ValueRange<Value>::Contains(Value value) const ETNoexceptHint {
+		return (begin <= value) & (value < end);
 	}
 
 	// ---------------------------------------------------
 
-	template <typename Identifier>
-	ETInlineHint bool IdentifierPool<Identifier>::ValueRange::Contains(IdentifierType identifier) const {
-		return (first <= identifier) & (identifier < last);
+	template <typename Value>
+	ETInlineHint ETForceInlineHint bool ValueRange<Value>::IsEmpty() const ETNoexceptHint {
+		return begin == end;
 	}
 
 	// ---------------------------------------------------
 
-	template <typename Identifier>
-	ETInlineHint bool IdentifierPool<Identifier>::ValueRange::IsEmpty() const {
-		return first == last;
+	template <typename Value>
+	ETInlineHint ETForceInlineHint bool IsContiguous(const ValueRange<Value>& lhs, const ValueRange<Value>& rhs) ETNoexceptHint {
+		return lhs.end == rhs.begin;
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint ETForceInlineHint ValueRange<Value> Union(const ValueRange<Value>& lhs, const ValueRange<Value>& rhs) ETNoexceptHint {
+		return { lhs.begin, rhs.end };
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Value>
+	ETInlineHint ETForceInlineHint bool operator<(const ValueRange<Value>& lhs, const ValueRange<Value>& rhs) ETNoexceptHint {
+		return lhs.end <= rhs.begin;
 	}
 
 } // namespace Detail
 
 template <typename Identifier, class Allocator>
-ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(std::initializer_list<ValueRange> ranges, const AllocatorType& allocator) :
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator, std::initializer_list<RangeType> ranges) :
 	IdentifierPool(allocator) {
-	for (const auto& range : ranges) {
-		ReleaseRange(range);
-	}
+	Assign(ranges);
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(ValueRange initialRange, const AllocatorType& allocator) :
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator, ValueType begin, ValueType end) :
 	IdentifierPool(allocator) {
-	ReleaseRange(initialRange);
+	Assign(begin, end);
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator) :
-	_freeRanges(allocator) {}
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator) :
+	_ranges(allocator) {}
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(IdentifierPool<Identifier, Allocator>&& pool) :
-	_freeRanges(eastl::move(pool._freeRanges)) {}
-
-// ---------------------------------------------------
-
-template <typename Identifier, class Allocator>
-Pair<Identifier, bool> IdentifierPool<Identifier, Allocator>::Allocate() {
-	return AllocateRange(static_cast<Identifier>(1));
+ETInlineHint ETForceInlineHint Pair<typename IdentifierPool<Identifier, Allocator>::ValueType, bool> IdentifierPool<Identifier, Allocator>::Allocate() {
+	return Allocate(Identifier(1));
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-Pair<Identifier, bool> IdentifierPool<Identifier, Allocator>::AllocateRange(IdentifierType sizeInElements) {
-	const auto candidate(eastl::find_if(_freeRanges.Begin(), _freeRanges.End(), [sizeInElements](const ValueRange& range) {
-		return sizeInElements <= range.GetSize();
-	}));
-
-	if (candidate == _freeRanges.End()) {
+ETInlineHint ETForceInlineHint Pair<typename IdentifierPool<Identifier, Allocator>::ValueType, bool> IdentifierPool<Identifier, Allocator>::Allocate(ValueType count) {
+	const auto candidate(FindIf(_ranges.Begin(), _ranges.End(), [count](const RangeType& range) { return range.GetSize() >= count; }));
+	if (candidate == _ranges.End()) {
 		return { 0, false };
 	}
 
-	const auto firstIdentifier(candidate->first);
+	const auto id(candidate->begin);
+	candidate->begin += count;
 
-	candidate->first += sizeInElements;
-
-	if (candidate->IsEmpty() && ((candidate + 1) != _freeRanges.End())) {
+	if (candidate->IsEmpty() && ((candidate + 1) != _ranges.End())) {
 		//	If current range is full and there is another one, that will become the new current range.
-		_freeRanges.Erase(candidate);
+		_ranges.Erase(candidate);
 	}
 
-	return { firstIdentifier, true };
+	return { id, true };
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-void IdentifierPool<Identifier, Allocator>::Release(IdentifierType identifier) {
-	return ReleaseRange({ identifier, identifier + static_cast<IdentifierType>(1) });
+ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Deallocate(ValueType id) {
+	return this->Deallocate({ id, id + ValueType(1) });
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-void IdentifierPool<Identifier, Allocator>::ReleaseRange(ValueRange releasedRange) {
-	const auto candidate(eastl::lower_bound(_freeRanges.Begin(), _freeRanges.End(), releasedRange, [](const ValueRange& lhs, const ValueRange& rhs) {
-		return lhs.last <= rhs.first;
-	}));
-
-	if (candidate == _freeRanges.End()) {
-		_freeRanges.Append(releasedRange);
+ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Deallocate(RangeType range) {
+	const auto candidate(LowerBound(_ranges.Begin(), _ranges.End(), range, LessThan<RangeType>()));
+	if (candidate == _ranges.End()) {
+		_ranges.Append(range);
 		return;
 	}
 
-	if (releasedRange.CanMergeForwardWith(*candidate)) {
-		candidate->last = releasedRange.last;
-
-		if (candidate + 1 != _freeRanges.End() && candidate->CanMergeForwardWith(candidate[1])) {
-			candidate->last = candidate[1].last;
-			_freeRanges.Erase(candidate + 1);
+	if (IsContiguous(range, *candidate)) {
+		candidate->end = range.end;
+		if (candidate + 1 != _ranges.End() && IsContiguous(*candidate, candidate[1])) {
+			*candidate = Union(*candidate, candidate[1]);
+			_ranges.Erase(candidate + 1);
 		}
 
 		return;
 	}
 
-	if (candidate->CanMergeForwardWith(releasedRange)) {
-		candidate->first = releasedRange.first;
-
-		if (candidate != _freeRanges.Begin() && candidate[-1].CanMergeForwardWith(*candidate)) {
-			candidate[-1].last = candidate->first;
-			_freeRanges.Erase(candidate - 1);
+	if (IsContiguous(*candidate, range)) {
+		candidate->begin = range.begin;
+		if (candidate != _ranges.Begin() && IsContiguous(candidate[-1], *candidate)) {
+			candidate[-1] = Union(candidate[-1], *candidate);
+			_ranges.Erase(candidate);
 		}
 
 		return;
 	}
 
-	_freeRanges.Insert(candidate, releasedRange);
-
+	_ranges.Insert(candidate, range);
 #if 0
 	//	Binary search of the range list
 		AvailableRangeCollection::SizeType	i0(0);
 		AvailableRangeCollection::SizeType	i1(_availableRanges.Size() - 1);
 
-		for (; ;) {
+		for (;;) {
 			const AvailableRangeCollection::SizeType	i((i0 + i1) / 2);
 
 			if (releasedRange.firstIdentifier < _availableRanges[i].begin) {
@@ -206,27 +202,27 @@ void IdentifierPool<Identifier, Allocator>::ReleaseRange(ValueRange releasedRang
 						_availableRanges.Erase(_availableRanges.Begin() + i + 1);
 					}
 					else {
-				 //	Just grow range
+					// Just grow range
 						_availableRanges[i].end += (releasedRange.lastIdentifier - releasedRange.firstIdentifier);
 					}
 
 					break;
 				}
 				else {
-			 //	Non-neighbor id
+					// Non-neighbor id
 					if (i != i1) {
 					//	Cull bottom half of list
 						i0 = i + 1;
 					}
 					else {
-				 //	Found our position in the list, insert the deleted range here
+						// Found our position in the list, insert the deleted range here
 						_availableRanges.Insert(_availableRanges.Begin() + i + 1, AvailableRange(releasedRange.firstIdentifier, releasedRange.lastIdentifier - 1));
 						break;
 					}
 				}
 			}
 			else {
-		 //	Inside a free block, not a valid ID
+				// Inside a free block, not a valid ID
 				ETRuntimeAssert(false);
 			}
 		}
@@ -236,28 +232,56 @@ void IdentifierPool<Identifier, Allocator>::ReleaseRange(ValueRange releasedRang
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint void IdentifierPool<Identifier, Allocator>::Clear() {
-	_freeRanges.Clear();
+ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Clear() {
+	_ranges.Clear();
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint bool IdentifierPool<Identifier, Allocator>::IsEmpty() const {
-	return _freeRanges.IsEmpty();
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>& IdentifierPool<Identifier, Allocator>::Assign(ValueType begin, ValueType end) {
+	_ranges.Clear();
+	_ranges.EmplaceBack(begin, end);
+	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint typename IdentifierPool<Identifier, Allocator>::IdentifierType IdentifierPool<Identifier, Allocator>::GetLargestSpanLength() const {
-	IdentifierType longestRangeLength(0);
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>& IdentifierPool<Identifier, Allocator>::Assign(std::initializer_list<RangeType> ranges) {
+	_ranges.Clear();
+	_ranges.Assign(ranges);
+	return *this;
+}
 
-	for (const ValueRange& range : _freeRanges) {
-		longestRangeLength = Max(longestRangeLength, range.GetSize());
-	}
+// ---------------------------------------------------
 
-	return longestRangeLength;
+template <typename Identifier, class Allocator>
+ETInlineHint ETForceInlineHint bool IdentifierPool<Identifier, Allocator>::IsEmpty() const ETNoexceptHint {
+	return _ranges.IsEmpty();
+}
+
+// ---------------------------------------------------
+
+template <typename Identifier, class Allocator>
+ETInlineHint ETForceInlineHint typename IdentifierPool<Identifier, Allocator>::ValueType IdentifierPool<Identifier, Allocator>::GetLargestRange() const ETNoexceptHint {
+	return Reduce(_ranges.Begin(), _ranges.End(), [](const RangeType& range, typename RangeList::SizeType longest) ETNoexceptHint {
+		return Max(range.GetSize(), longest);
+	});
+}
+
+// ---------------------------------------------------
+
+template <typename Identifier, class Allocator>
+ETInlineHint ETForceInlineHint typename const IdentifierPool<Identifier, Allocator>::AllocatorType& IdentifierPool<Identifier, Allocator>::GetAllocator() const ETNoexceptHint {
+	return _ranges.GetAllocator();
+}
+
+// ---------------------------------------------------
+
+template <typename Identifier, class Allocator>
+ETInlineHint ETForceInlineHint void Swap(IdentifierPool<Identifier, Allocator>& lhs, IdentifierPool<Identifier, Allocator>& rhs) {
+	Swap(lhs._ranges, rhs._ranges);
 }
 
 } // namespace Eldritch2

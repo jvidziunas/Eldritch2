@@ -27,8 +27,8 @@ namespace Eldritch2 { namespace Assets {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using AssetFactory = Function<UniquePointer<Asset>(Allocator& /*allocator*/, const Package& /*package*/, StringView<Utf8Char> /*path*/)>;
-		using FactoryMap   = CachingHashMap<StringView<Utf8Char>, AssetFactory>;
+		using AssetFactory = Function<UniquePointer<Asset>(Allocator& /*allocator*/, const Package& /*package*/, StringView /*path*/) ETNoexceptHint>;
+		using FactoryMap   = CachingHashMap<StringView, AssetFactory>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -46,12 +46,12 @@ namespace Eldritch2 { namespace Assets {
 		/*!	@param[in] extension @ref Utf8Literal containing the extension of the asset to listen for. This string should include a
 				leading dot character.
 			@returns A reference to *this for method chaining. */
-		AssetApiBuilder& DefineType(StringView<Utf8Char> extension, AssetFactory factory);
+		AssetApiBuilder& DefineType(StringView extension, AssetFactory factory);
 
 		// ---------------------------------------------------
 
 	public:
-		FactoryMap& GetFactories();
+		FactoryMap& GetFactories() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -61,8 +61,8 @@ namespace Eldritch2 { namespace Assets {
 		// ---------------------------------------------------
 
 	public:
-		template <typename Type>
-		static ETPureFunctionHint AssetFactory DefaultFactory();
+		template <typename ConcreteAsset>
+		static ETPureFunctionHint AssetFactory DefaultFactory() ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -77,16 +77,16 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		struct AssetEqual {
-			ETPureFunctionHint bool operator()(const Asset*, StringView<Utf8Char>) const;
-			ETPureFunctionHint bool operator()(const Asset*, const Asset*) const;
+			ETPureFunctionHint bool operator()(const Asset*, const Asset*) const ETNoexceptHint;
+			ETPureFunctionHint bool operator()(const Asset*, StringView) const ETNoexceptHint;
 		};
 
 		// ---
 
 	public:
 		struct AssetHash {
-			ETPureFunctionHint size_t operator()(StringView<Utf8Char>, size_t seed = 0u) const;
-			ETPureFunctionHint size_t operator()(const Asset*, size_t seed = 0u) const;
+			ETPureFunctionHint size_t operator()(const Asset*, size_t seed = 0u) const ETNoexceptHint;
+			ETPureFunctionHint size_t operator()(StringView, size_t seed = 0u) const ETNoexceptHint;
 		};
 
 		// ---
@@ -113,14 +113,14 @@ namespace Eldritch2 { namespace Assets {
 		/*!	@param[in] path UTF-8-encoded string view containing the name of the resource to search for.
 			@returns A pointer to the asset, if successful, or null in the event no matching asset was found.
 			@remarks Thread-safe. */
-		const Asset* Find(StringView<Utf8Char> path) const;
+		const Asset* Find(StringView path) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		UniquePointer<Asset> Insert(const Package& package, StringView<Utf8Char> path);
+		UniquePointer<Asset> Insert(const Package& owner, StringView path);
 
-		void Erase(Asset& asset);
+		ResidentSet::SizeType Erase(Asset& asset);
 
 		// ---------------------------------------------------
 

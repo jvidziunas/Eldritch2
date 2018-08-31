@@ -26,13 +26,8 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	// ---------------------------------------------------
 
-	Result<UniquePointer<WorldComponent>> RecastEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
-		UniquePointer<WorldComponent> recastComponent(MakeUnique<RecastWorldComponent>(allocator, services));
-		if (!recastComponent) {
-			return Error::OutOfMemory;
-		}
-
-		return eastl::move(recastComponent);
+	UniquePointer<WorldComponent> RecastEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
+		return MakeUnique<RecastWorldComponent>(allocator, services);
 	}
 
 	// ---------------------------------------------------

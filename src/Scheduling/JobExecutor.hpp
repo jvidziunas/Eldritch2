@@ -15,7 +15,12 @@
 
 //------------------------------------------------------------------//
 
+#if !defined(ET_ENABLE_JOB_DEBUGGING)
+#	define ET_ENABLE_JOB_DEBUGGING ET_DEBUG_BUILD
+#endif
+
 namespace Eldritch2 { namespace Scheduling {
+
 	namespace Detail {
 
 #if ET_PLATFORM_WINDOWS
@@ -25,10 +30,6 @@ namespace Eldritch2 { namespace Scheduling {
 #endif
 
 	} // namespace Detail
-
-#if !defined(ET_ENABLE_JOB_DEBUGGING)
-#	define ET_ENABLE_JOB_DEBUGGING ET_DEBUG_BUILD
-#endif
 
 	using JobFence = Atomic<int>;
 
@@ -71,9 +72,9 @@ namespace Eldritch2 { namespace Scheduling {
 
 		public:
 			//!	Constructs this @ref SuspendedJob instance.
-			SuspendedJob(const char* file, int line, Detail::PlatformFiber fiber, Function<bool()> shouldResume);
+			SuspendedJob(const char* file, int line, Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume);
 			//!	Constructs this @ref SuspendedJob instance.
-			SuspendedJob(Detail::PlatformFiber fiber, Function<bool()> shouldResume);
+			SuspendedJob(Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume);
 			//!	Constructs this @ref SuspendedJob instance.
 			SuspendedJob(const SuspendedJob&) = default;
 			//!	Constructs this @ref SuspendedJob instance.
@@ -92,8 +93,8 @@ namespace Eldritch2 { namespace Scheduling {
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			Detail::PlatformFiber fiber;
-			Function<bool()>      shouldResume;
+			Detail::PlatformFiber           fiber;
+			Function<bool() ETNoexceptHint> shouldResume;
 #if ET_ENABLE_JOB_DEBUGGING
 			//!	Source file containing the wait instruction. Used for debugging deadlock/stalled task dependencies.
 			const char* file;
@@ -118,9 +119,9 @@ namespace Eldritch2 { namespace Scheduling {
 
 	public:
 		template <typename... WorkItems>
-		void Await_(const char* file, int line, Function<void(JobExecutor&)> workItem, WorkItems&&... workItems);
-		void Await_(const char* file, int line, Function<bool()> condition);
-		void Await_(const char* file, int line, JobFence& barrier);
+		void Await_(const char* file, int line, Function<void(JobExecutor&) ETNoexceptHint> workItem, WorkItems&&... workItems);
+		void Await_(const char* file, int line, Function<bool() ETNoexceptHint> condition);
+		void Await_(const char* file, int line, JobFence& fence);
 
 #define AwaitCondition(...) Await_(__FILE__, __LINE__, [&]() -> bool { return __VA_ARGS__; })
 #define AwaitFence(fence) Await_(__FILE__, __LINE__, fence)
@@ -134,7 +135,7 @@ namespace Eldritch2 { namespace Scheduling {
 				completion time of all work items submitted in this call to @ref StartAsync(). @endparblock
 			@param[in] workItems Variadic collection of unary functors to be executed asynchronously. */
 		template <typename... WorkItems>
-		void StartAsync(JobFence& completed, Function<void(JobExecutor&)> workItem, WorkItems&&... workItems);
+		void StartAsync(JobFence& completed, Function<void(JobExecutor&) ETNoexceptHint> workItem, WorkItems&&... workItems);
 
 		template <size_t splitSize, typename InputIterator, typename OutputIterator, typename AlternateInputIterator, typename TrinaryPredicate>
 		void Transform(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, OutputIterator out, TrinaryPredicate transformer);
@@ -156,7 +157,7 @@ namespace Eldritch2 { namespace Scheduling {
 	protected:
 		void SwitchFibers(Detail::PlatformFiber fiber);
 
-		void BootSupportFibers();
+		void BootFibers(size_t supportFiberStackSizeInBytes = 32768u, size_t fiberStackSizeInBytes = 524288u);
 
 		//!	Binds this @ref JobExecutor as the active context on the calling thread.
 		/*!	@see @ref GetExecutor */
@@ -183,12 +184,12 @@ namespace Eldritch2 { namespace Scheduling {
 	// ---------------------------------------------------
 
 	//!	Retrieves the active job fiber for the thread.
-	/*!	@returns A reference to the previously-bound @ref JobExecutor for the calling thread.
+	/*!	@returns A pointer to the previously-bound @ref JobExecutor for the calling thread.
 		@remarks @parblock This function is anticipated to be significantly slower than simply passing a value
 			into a function; it is highly recommended that alternative means of communicating this value to dependent
 			code is conveyed via alternate means wherever possible. @endparblock
 		@see @ref JobExecutor::MakeActive */
-	JobExecutor& GetExecutor();
+	JobExecutor* GetExecutor() ETNoexceptHint;
 
 }} // namespace Eldritch2::Scheduling
 

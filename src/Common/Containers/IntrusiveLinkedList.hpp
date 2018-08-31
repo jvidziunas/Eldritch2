@@ -43,7 +43,7 @@ public:
 	//!	Disable copy construction.
 	IntrusiveLinkedList(const IntrusiveLinkedList&) = delete;
 	//!	Constructs this @ref IntrusiveList instance.
-	IntrusiveLinkedList(IntrusiveLinkedList&&);
+	IntrusiveLinkedList(IntrusiveLinkedList&&) = default;
 	//!	Constructs this @ref IntrusiveList instance.
 	IntrusiveLinkedList() = default;
 
@@ -52,20 +52,20 @@ public:
 	// - ALGORITHMS --------------------------------------
 
 public:
-	template <typename Predicate>
-	ConstIterator Find(ConstIterator searchHint, Predicate predicate) const;
-	template <typename Predicate>
-	Iterator Find(Iterator searchHint, Predicate predicate);
-	template <typename Predicate>
-	ConstIterator Find(Predicate predicate) const;
-	template <typename Predicate>
-	Iterator Find(Predicate predicate);
+	template <typename UnaryPredicate>
+	ConstIterator Find(ConstIterator searchHint, UnaryPredicate condition) const;
+	template <typename UnaryPredicate>
+	Iterator Find(Iterator searchHint, UnaryPredicate condition);
+	template <typename UnaryPredicate>
+	ConstIterator Find(UnaryPredicate condition) const;
+	template <typename UnaryPredicate>
+	Iterator Find(UnaryPredicate condition);
 
-	template <typename Predicate, typename Disposer>
-	void EraseAndDisposeIf(Predicate filter, Disposer disposer);
+	template <typename UnaryPredicate, typename Disposer>
+	void EraseAndDisposeIf(UnaryPredicate condition, Disposer disposer);
 
-	template <typename Predicate>
-	void EraseIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void EraseIf(UnaryPredicate predicate);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -97,10 +97,10 @@ public:
 	Reference Back();
 
 	//	Adds the passed-in item to the head of this @ref IntrusiveList.
-	void Prepend(Reference item);
+	void Prepend(Reference value);
 
 	//	Adds the passed-in item to the tail of this @ref IntrusiveList.
-	void Append(Reference item);
+	void Append(Reference value);
 
 	//	Removes the head element of this @ref IntrusiveList, reducing its size by one element.
 	void PopFront();
@@ -120,21 +120,21 @@ public:
 
 public:
 	template <typename Disposer, typename ElementCloner>
-	void CloneFrom(const IntrusiveLinkedList& containerTemplate, Disposer disposer, ElementCloner cloner);
+	void CloneFrom(const IntrusiveLinkedList& list, Disposer disposer, ElementCloner cloner);
 
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
 	//	Inserts an element at the position specified, shifting all antecedent elements down one position.
-	Iterator Insert(Iterator location, Reference item);
+	Iterator Insert(Iterator where, Reference item);
 
 	Iterator Erase(Iterator first, Iterator last);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 
 	template <typename Disposer>
 	Iterator EraseAndDispose(Iterator first, Iterator last, Disposer disposer);
 	template <typename Disposer>
-	Iterator EraseAndDispose(Iterator position, Disposer disposer);
+	Iterator EraseAndDispose(Iterator where, Disposer disposer);
 
 	template <typename Disposer>
 	void ClearAndDispose(Disposer disposer);

@@ -18,18 +18,18 @@ namespace Eldritch2 { namespace Core {
 
 	PropertyRegistrar::PropertyRegistrar(PropertyDatabase& database) :
 		_database(&database),
-		_section("") {}
+		_section() {}
 
 	// ---------------------------------------------------
 
-	PropertyRegistrar& PropertyRegistrar::BeginSection(StringView<Utf8Char> sectionName) {
+	PropertyRegistrar& PropertyRegistrar::BeginSection(StringView sectionName) ETNoexceptHint {
 		_section = sectionName;
 		return *this;
 	}
 
 	// ---------------------------------------------------
 
-	PropertyRegistrar& PropertyRegistrar::DefineProperty(StringView<Utf8Char> name, PropertyDatabase::Setter setter) {
+	PropertyRegistrar& PropertyRegistrar::DefineProperty(StringView name, PropertyDatabase::Setter setter) {
 		auto insertResult(_database->_settersByKey.Emplace(eastl::make_pair(_section, name), eastl::move(setter)));
 		return *this;
 	}

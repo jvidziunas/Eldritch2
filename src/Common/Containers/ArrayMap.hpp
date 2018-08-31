@@ -47,13 +47,15 @@ public:
 public:
 	//! Constructs this @ref ArrayMap instance.
 	template <typename InputIterator>
-	ArrayMap(InputIterator begin, InputIterator end, const SortPredicateType& sortPredicate, const AllocatorType& allocator = AllocatorType());
+	ArrayMap(const AllocatorType& allocator, const SortPredicateType& sort, InputIterator begin, InputIterator end);
 	//! Constructs this @ref ArrayMap instance.
-	explicit ArrayMap(const AllocatorType& allocator = AllocatorType());
+	ArrayMap(const AllocatorType& allocator, const SortPredicateType& sort, std::initializer_list<ValueType>);
 	//! Constructs this @ref ArrayMap instance.
-	ArrayMap(const ArrayMap&);
+	ArrayMap(const AllocatorType& allocator = AllocatorType(), const SortPredicateType& sort = SortPredicateType(), SizeType capacity = 0u);
 	//! Constructs this @ref ArrayMap instance.
-	ArrayMap(ArrayMap&&);
+	ArrayMap(const ArrayMap&) = default;
+	//! Constructs this @ref ArrayMap instance.
+	ArrayMap(ArrayMap&&) = default;
 
 	~ArrayMap() = default;
 
@@ -66,16 +68,16 @@ public:
 	Iterator UpperBound(const KeyType& key) const;
 	Iterator UpperBound(const KeyType& key);
 
-	template <typename AlternateKeyType, typename AlternateSortPredicate>
-	ConstIterator Find(const AlternateKeyType& key, AlternateSortPredicate sortPredicate) const;
-	template <typename AlternateKeyType, typename AlternateSortPredicate>
-	Iterator      Find(const AlternateKeyType& key, AlternateSortPredicate sortPredicate);
+	template <typename Key2, typename SortPredicate2>
+	ConstIterator Find(const Key2& key, SortPredicate2 sort) const;
+	template <typename Key2, typename SortPredicate2>
+	Iterator      Find(const Key2& key, SortPredicate2 sort);
 	ConstIterator Find(const KeyType& key) const;
 	Iterator      Find(const KeyType& key);
 
-	template <typename AlternateKey, typename AlternateSortPredicate>
-	bool ContainsKey(const AlternateKey& key, const AlternateSortPredicate& sortPredicate) const;
-	bool ContainsKey(const KeyType& key) const;
+	template <typename Key2, typename SortPredicate2>
+	bool Contains(const Key2& key, SortPredicate2 sort) const;
+	bool Contains(const KeyType& key) const;
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -109,17 +111,17 @@ public:
 	Pair<Iterator, bool> Insert(const ValueType& value);
 	Pair<Iterator, bool> Insert(ValueType&& value);
 
-	template <typename... Args>
-	Pair<Iterator, bool> TryEmplace(const KeyType& key, Args&&... args);
-	template <typename... Args>
-	Pair<Iterator, bool> TryEmplace(KeyType&& key, Args&&... args);
-	template <typename... Args>
-	Pair<Iterator, bool> Emplace(ConstIterator position, Args&&... args);
-	template <typename... Args>
-	Pair<Iterator, bool> Emplace(Args&&... args);
+	template <typename... Arguments>
+	Pair<Iterator, bool> TryEmplace(const KeyType& key, Arguments&&... arguments);
+	template <typename... Arguments>
+	Pair<Iterator, bool> TryEmplace(KeyType&& key, Arguments&&... arguments);
+	template <typename... Arguments>
+	Pair<Iterator, bool> Emplace(ConstIterator position, Arguments&&... arguments);
+	template <typename... Arguments>
+	Pair<Iterator, bool> Emplace(Arguments&&... arguments);
 
 	Iterator Erase(Iterator begin, Iterator end);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 	SizeType Erase(const KeyType& key);
 
 	void Clear();
@@ -127,8 +129,8 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ArrayMap& operator=(const ArrayMap&);
-	ArrayMap& operator=(ArrayMap&&);
+	ArrayMap& operator=(const ArrayMap&) = default;
+	ArrayMap& operator=(ArrayMap&&) = default;
 
 	// ---------------------------------------------------
 

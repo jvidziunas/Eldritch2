@@ -19,11 +19,10 @@
 #include <Common/Hash.hpp>
 #include <Common/Pair.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(4800) EASTL does some int to bool coercion MSVC doesn't like.
-ET_SET_MSVC_WARNING_STATE(disable : 4800)
+ET_PUSH_MSVC_WARNING_STATE(disable : 4800)
 #include <eastl/hash_set.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -50,16 +49,18 @@ public:
 
 public:
 	//! Constructs this @ref HashSet instance.
-	HashSet(const HashPredicate& hashPredicate, const EqualityPredicate& equalityPredicate, const AllocatorType& allocator = AllocatorType());
+	HashSet(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
 	//! Constructs this @ref HashSet instance.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	HashSet(const HashSet&, const AllocatorType& allocator);
+	template <typename InputIterator>
+	HashSet(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashSet instance.
-	explicit HashSet(const AllocatorType& allocator = AllocatorType());
+	HashSet(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, std::initializer_list<ValueType>);
 	//! Constructs this @ref HashSet instance.
-	HashSet(const HashSet&);
+	HashSet(const AllocatorType& allocator, const HashSet&);
 	//! Constructs this @ref HashSet instance.
-	HashSet(HashSet&&);
+	HashSet(const HashSet&) = default;
+	//! Constructs this @ref HashSet instance.
+	HashSet(HashSet&&) = default;
 
 	~HashSet() = default;
 
@@ -67,21 +68,23 @@ public:
 
 public:
 	//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-	template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
-	ConstIterator Find(const AlternateValue& value, AlternateHashPredicate hashPredicate, AlternateEqualityPredicate equalityPredicate) const;
+	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
+	ConstIterator Find(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) const;
 	//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-	template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
-	Iterator Find(const AlternateValue& value, AlternateHashPredicate hashPredicate, AlternateEqualityPredicate equalityPredicate);
+	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
+	Iterator Find(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal);
 	//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
 	ConstIterator Find(const ValueType& value) const;
 	//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
 	Iterator Find(const ValueType& value);
 
+	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
+	bool Contains(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) const;
 	bool Contains(const ValueType& value) const;
 
 	//! Erases all elements for which the result of the predicate returns true.
-	template <typename Predicate>
-	void EraseIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void EraseIf(UnaryPredicate condition);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -114,17 +117,9 @@ public:
 	//!	Retrieves an @ref Iterator to one past the end of all elements stored in this @ref HashSet.
 	Iterator End();
 
-	// - CONTAINER DUPLICATION ---------------------------
-
-public:
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	HashSet& operator=(const HashSet&);
-	HashSet& operator=(HashSet&&);
-
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
 	Pair<Iterator, bool> Insert(const ValueType& value);
 	Pair<Iterator, bool> Insert(ValueType&& value);
 
@@ -132,7 +127,7 @@ public:
 	Pair<Iterator, bool> Emplace(Args&&... args);
 
 	Iterator Erase(Iterator begin, Iterator end);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 	SizeType Erase(const ValueType& key);
 
 	void Clear();
@@ -151,12 +146,18 @@ public:
 public:
 	void Reserve(SizeType minimumSizeHint);
 
+	// - CONTAINER DUPLICATION ---------------------------
+
+public:
+	HashSet& operator=(const HashSet&) = default;
+	HashSet& operator=(HashSet&&) = default;
+
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
 	const EqualityPredicateType& GetEqualityPredicate() const;
 
-	const HashPredicateType& GetHashPredicate() const;
+	const HashPredicateType& GetHash() const;
 
 	const AllocatorType& GetAllocator() const;
 

@@ -112,7 +112,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 				break;
 			} // switch (virtualKey)
 
-			device.Dispatch(static_cast<ScanCode>(key), packet.Flags & RI_KEY_BREAK ? 0x00 : 0xFF);
+			device.Dispatch(ScanCode(key), packet.Flags & RI_KEY_BREAK ? 0x00 : 0xFF);
 		}
 
 		// ---------------------------------------------------
@@ -179,23 +179,22 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 		// ---------------------------------------------------
 
-		ET_PUSH_COMPILER_WARNING_STATE()
 		//	(6001) MSVC doesn't like the name query code and complains that the value is being used before being initialized. This is not the case, since GetRawInputDeviceInfo() writes to the provided buffer.
 		//	(6054) MSVC complains about the name string potentially not having a null terminator; GetRawInputDeviceInfo writes the terminator for us.
-		ET_SET_MSVC_WARNING_STATE(disable : 6001 6054)
+		ET_PUSH_MSVC_WARNING_STATE(disable : 6001 6054)
 		ETInlineHint bool ShouldIgnoreDevice(const RAWINPUTDEVICELIST& device) {
 			wchar_t name[MAX_PATH];
-			UINT    nameLength(_countof(name));
+			UINT    nameLength(ETCountOf(name));
 
 			return device.dwType == RIM_TYPEHID                                                                                              /* We can only handle mice and keyboards with the current implementation. */
 				|| GetRawInputDeviceInfoW(device.hDevice, RIDI_DEVICENAME, name, &nameLength) < 0                                            /* Aggregate devices do not have a name that can be queried. */
 				|| CreateFileW(name, 0u, (FILE_SHARE_READ | FILE_SHARE_WRITE), nullptr, OPEN_EXISTING, 0u, nullptr) == INVALID_HANDLE_VALUE; /* Virtual devices cannot be opened for read with CreateFile(). */
 		}
-		ET_POP_COMPILER_WARNING_STATE()
+		ET_POP_MSVC_WARNING_STATE()
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint const char* GetDeviceTypeName(DWORD type) {
+		ETCpp14Constexpr ETInlineHint ETPureFunctionHint StringView GetDeviceTypeName(DWORD type) {
 			switch (type) {
 			case RIM_TYPEMOUSE: return "mouse";
 			case RIM_TYPEKEYBOARD: return "keyboard";
@@ -206,8 +205,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 	} // anonymous namespace
 
-	DeviceCoordinator::DeviceCoordinator(
-		Log& log) :
+	DeviceCoordinator::DeviceCoordinator(Log& log) :
 		_log(log),
 		_indexByHandle(MallocAllocator("Win32 Raw Input Device By Handle Map Allocator")),
 		_keyboards(MallocAllocator("Win32 Raw Input Keyboard List Allocator")),
@@ -217,61 +215,57 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 	// ---------------------------------------------------
 
 	bool DeviceCoordinator::Enumerate() {
-		_log.Write(MessageType::Message, "Enumerating Win32 raw input devices." UTF8_NEWLINE);
-
-		UINT count(0u);
+		_log.Write(Severity::Message, "Enumerating Win32 raw input devices." ET_NEWLINE);
 
 		//	Ask Windows how many raw input devices it knows about.
-		if (GetRawInputDeviceList(nullptr, &count, sizeof(RAWINPUTDEVICELIST)) == static_cast<UINT>(-1)) {
-			_log.Write(MessageType::Error, "Failed to enumerate Win32 input devices!" UTF8_NEWLINE);
+		UINT count(0u);
+		if (GetRawInputDeviceList(nullptr, &count, sizeof(RAWINPUTDEVICELIST)) == UINT(-1)) {
+			_log.Write(Severity::Error, "Failed to enumerate Win32 input devices!" ET_NEWLINE);
 			return false;
 		}
 
 		//	Fill a temporary array with more detailed information about each device, including its type and the Win32 handle.
 		RAWINPUTDEVICELIST* const devices(ETStackAlloc(RAWINPUTDEVICELIST, count));
-		if (GetRawInputDeviceList(devices, &count, sizeof(RAWINPUTDEVICELIST)) == static_cast<UINT>(-1)) {
-			_log.Write(MessageType::Error, "Failed to enumerate Win32 input devices!" UTF8_NEWLINE);
+		if (GetRawInputDeviceList(devices, &count, sizeof(RAWINPUTDEVICELIST)) == UINT(-1)) {
+			_log.Write(Severity::Error, "Failed to enumerate Win32 input devices!" ET_NEWLINE);
 			return false;
 		}
 
-		ArrayMap<HANDLE, UINT> indexByHandle(_indexByHandle.GetAllocator());
+		ArrayMap<HANDLE, UINT> indexByHandle(_indexByHandle.GetAllocator(), LessThan<HANDLE>(), /*capacity=*/count);
 		ArrayList<InputDevice> keyboards(_keyboards.GetAllocator());
 		ArrayList<InputDevice> mice(_mice.GetAllocator());
 
-		indexByHandle.SetCapacity(count);
-
 		for (UINT id(0u); id < count; ++id) {
 			if (ShouldIgnoreDevice(devices[id])) {
-				_log.Write(MessageType::VerboseWarning, "Ignoring unknown/virtual {} (handle: {})." UTF8_NEWLINE, GetDeviceTypeName(devices[id].dwType), devices[id].hDevice);
+				_log.Write(Severity::VerboseWarning, "Ignoring unknown/virtual {} (handle: {})." ET_NEWLINE, GetDeviceTypeName(devices[id].dwType), devices[id].hDevice);
 				continue;
 			}
 
 			UINT index;
 			switch (devices[id].dwType) {
 			case RIM_TYPEMOUSE:
-				index = mice.GetSize();
+				indexByHandle.Emplace(devices[id].hDevice, UINT(mice.GetSize()));
 				mice.EmplaceBack();
 				break;
 			case RIM_TYPEKEYBOARD:
-				index = keyboards.GetSize();
+				indexByHandle.Emplace(devices[id].hDevice, UINT(keyboards.GetSize()));
 				keyboards.EmplaceBack();
 				break;
 			default: continue;
 			} // switch( event.header.dwType )
 
-			indexByHandle.Emplace(devices[id].hDevice, index);
-			_log.Write(MessageType::Message, "Bound {} (handle: {})." UTF8_NEWLINE, GetDeviceTypeName(devices[id].dwType), devices[id].hDevice);
+			_log.Write(Severity::Message, "Bound {} (handle: {})." ET_NEWLINE, GetDeviceTypeName(devices[id].dwType), devices[id].hDevice);
 		}
-
-		//	Publish the new set of devices.
 		{
 			Lock _(_deviceMutex);
+
+			//	Publish the new set of devices.
 			Swap(_indexByHandle, indexByHandle);
 			Swap(_keyboards, keyboards);
 			Swap(_mice, mice);
 		} // End of lock scope.
 
-		_log.Write(MessageType::Message, "Win32 raw input enumeration complete." UTF8_NEWLINE);
+		_log.Write(Severity::Message, "Win32 raw input enumeration complete." ET_NEWLINE);
 		return true;
 	}
 
@@ -287,7 +281,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		switch (input.header.dwType) {
 		case RIM_TYPEMOUSE: return ReadPacket(input.data.mouse, _mice[candidate->second]);
 		case RIM_TYPEKEYBOARD: return ReadPacket(input.data.keyboard, _keyboards[candidate->second]);
-		} // switch( event.header.dwType )
+		} // switch(input.header.dwType)
 	}
 
 }}} // namespace Eldritch2::Input::Win32

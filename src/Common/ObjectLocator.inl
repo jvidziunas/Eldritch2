@@ -12,35 +12,21 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <eastl/memory.h>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
 template <typename Service>
-ETInlineHint Service& ObjectLocator::Find() const {
-	return *static_cast<Service*>(Find(typeid(Service)));
+ETInlineHint ETForceInlineHint Service* ObjectLocator::Find() const ETNoexceptHint {
+	return static_cast<Service*>(Find(typeid(Service)));
 }
 
 // ---------------------------------------------------
 
 template <typename Service>
-ETInlineHint ObjectLocator& ObjectLocator::PublishService(Service& service) {
-	return PublishService(typeid(Service), eastl::addressof(service));
-}
-
-// ---------------------------------------------------
-
-ETInlineHint ObjectLocator& ObjectLocator::operator=(const ObjectLocator& other) {
-	_servicesByType = other._servicesByType;
-	return *this;
-}
-
-// ---------------------------------------------------
-
-ETInlineHint ObjectLocator& ObjectLocator::operator=(ObjectLocator&& other) {
-	_servicesByType = eastl::move(other._servicesByType);
-	return *this;
+ETInlineHint ETForceInlineHint ObjectLocator& ObjectLocator::PublishService(Service& service) {
+	return PublishService(typeid(Service), ETAddressOf(service));
 }
 
 } // namespace Eldritch2

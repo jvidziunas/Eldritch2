@@ -16,16 +16,15 @@
 #include <Scripting/Wren/ApiBuilder.hpp>
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 /*	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does.
 	We can't fix this, but we can at least disable the warning. */
-ET_SET_MSVC_WARNING_STATE(disable : 6326)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <characterkinematic/PxControllerManager.h>
 #include <PxSceneDesc.h>
 #include <PxMaterial.h>
 #include <PxPhysics.h>
 #include <PxScene.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
@@ -47,32 +46,31 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	void PhysxWorldComponent::DefineScriptApi(ApiBuilder& api) {
 		PxSceneDesc sceneProperties(PxGetPhysics().getTolerancesScale());
 
-		sceneProperties.filterShader  = &PhysicsScene::FilterShader;
+		sceneProperties.filterShader  = ETAddressOf(PhysicsScene::FilterShader);
 		sceneProperties.cpuDispatcher = this;
 
 		//	Create the core PhysX scene object, responsible for simulation and communication across the various actors, etc. in the physics scene.
 		PhysxPointer<PxScene> scene(PxGetPhysics().createScene(sceneProperties));
 		if (!scene) {
-			FindService<World>().SetShouldShutDown();
+			FindService<World>()->SetShouldShutDown();
 			return;
 		}
 
-		//	PxControllerManagers are used to create and simulate PhysX character controllers.
 		PhysxPointer<PxControllerManager> controllerManager(PxCreateControllerManager(*scene));
 		if (!controllerManager) {
-			FindService<World>().SetShouldShutDown();
+			FindService<World>()->SetShouldShutDown();
 			return;
 		}
 
 		PhysxPointer<PxMaterial> characterMaterial(MakeCharacterMaterial());
 		if (!characterMaterial) {
-			FindService<World>().SetShouldShutDown();
+			FindService<World>()->SetShouldShutDown();
 			return;
 		}
 
 		PhysxPointer<PxMaterial> triggerMaterial(MakeTriggerMaterial());
 		if (!triggerMaterial) {
-			FindService<World>().SetShouldShutDown();
+			FindService<World>()->SetShouldShutDown();
 			return;
 		}
 

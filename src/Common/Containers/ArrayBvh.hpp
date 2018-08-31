@@ -12,10 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Common/Containers/SoArrayList.hpp>
 #include <Common/Memory/ChildAllocator.hpp>
 #include <Common/Containers/ArrayList.hpp>
-#include <Common/Mpl/IntTypes.hpp>
-#include <Common/Pair.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -25,15 +24,16 @@ class ArrayBvh {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using SplitIndex = uint32_t;
+	using LeafIndex  = uint32;
+	using SplitIndex = uint32;
 	using SortKey    = uintptr;
 
 	// ---
 
 public:
 	struct Split {
-		SplitIndex minima[3];
-		SplitIndex maxima[3];
+		LeafIndex minima[3];
+		LeafIndex maxima[3];
 
 		SplitIndex leftChild;
 		SplitIndex rightChild;
@@ -41,17 +41,25 @@ public:
 
 	// ---
 
+	enum : size_t {
+		TargetKey,
+		SourceKey,
+	};
+
+	// ---
+
 private:
-	using LeafContainer  = ArrayList<Value, ChildAllocator>;
+	using LeafContainer  = SoArrayListAlloc<ChildAllocator, SortKey /*targetKey*/, SortKey /*sourceKey*/, Value>;
 	using SplitContainer = ArrayList<Split, ChildAllocator>;
 
 public:
-	using ConstLeafIterator = typename LeafContainer::ConstIterator;
-	using LeafIterator      = typename LeafContainer::Iterator;
-	using SizeType          = typename LeafContainer::SizeType;
-	using AllocatorType     = Allocator;
-	using ValueType         = Value;
-	using LeafType          = typename LeafContainer::ValueType;
+	using SplitConstIterator = typename SplitContainer::ConstIterator;
+	using SplitIterator      = typename SplitContainer::Iterator;
+	using LeafConstIterator  = typename LeafContainer::ConstIterator;
+	using LeafIterator       = typename LeafContainer::Iterator;
+	using SizeType           = typename LeafContainer::SizeType;
+	using AllocatorType      = Allocator;
+	using ValueType          = Value;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -66,24 +74,26 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ConstLeafIterator ConstBegin() const;
+	SplitConstIterator ConstBegin() const ETNoexceptHint;
 
-	ConstLeafIterator ConstEnd() const;
+	SplitConstIterator ConstEnd() const ETNoexceptHint;
 
-	ConstLeafIterator Begin() const;
-	LeafIterator      Begin();
+	SplitConstIterator Begin() const ETNoexceptHint;
 
-	ConstLeafIterator End() const;
-	LeafIterator      End();
+	SplitConstIterator End() const ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+public:
+	LeafConstIterator Find(const ValueType& value) const ETNoexceptHint;
+	LeafIterator      Find(const ValueType& value) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
 	void Insert(const ValueType& value);
 
-	LeafIterator Find(const ValueType& value);
-
-	LeafIterator Erase(LeafIterator position);
+	LeafIterator Erase(const ValueType& value);
 
 	// ---------------------------------------------------
 

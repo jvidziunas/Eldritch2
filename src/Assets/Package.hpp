@@ -33,8 +33,8 @@ namespace Eldritch2 { namespace Assets {
 
 	public:
 		//! Constructs this @ref Package instance.
-		/*!	@param[in] path UTF-8-encoded string view containing the file name of the package, without any directory or extension. */
-		Package(StringView<Utf8Char> path);
+		/*!	@param[in] path String view containing the file name of the package, without any directory or extension. */
+		Package(StringView path);
 		//! Disable copy construction.
 		Package(const Package&) = delete;
 
@@ -43,22 +43,22 @@ namespace Eldritch2 { namespace Assets {
 		// - REFERENCE MANAGEMENT ----------------------------
 
 	public:
-		size_t AddReference(MemoryOrder order = std::memory_order_relaxed) const;
+		size_t AddReference(MemoryOrder order = std::memory_order_relaxed) const ETNoexceptHint;
 
-		size_t ReleaseReference(MemoryOrder order = std::memory_order_release) const;
+		size_t ReleaseReference(MemoryOrder order = std::memory_order_release) const ETNoexceptHint;
 
-		bool IsReferenced(MemoryOrder order = std::memory_order_consume) const;
-
-		// ---------------------------------------------------
-
-	public:
-		StringView<Utf8Char> GetPath() const;
+		bool IsReferenced(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		bool IsLoaded(MemoryOrder order = std::memory_order_consume) const;
+		bool IsLoaded(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
+		StringView GetPath() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
 		void BindAssets(AssetList assets);
 
 		AssetList FreeAssets();
@@ -73,7 +73,7 @@ namespace Eldritch2 { namespace Assets {
 	private:
 		Utf8Char               _path[MaxPathLength];
 		mutable Atomic<size_t> _referenceCount;
-		mutable Atomic<bool>   _isLoaded;
+		Atomic<bool>           _isLoaded;
 		AssetList              _assets;
 	};
 

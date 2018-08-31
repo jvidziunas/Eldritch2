@@ -56,7 +56,7 @@ namespace Eldritch2 { namespace Animation {
 		// ---------------------------------------------------
 
 	public:
-		void FetchKnots(KnotCache& knots, uint64 time, BoneIndex maximumBone) override;
+		void FetchKnots(KnotCache& knots, BoneIndex maximumBone, uint64 time) override;
 
 		// - DATA MEMBERS ------------------------------------
 

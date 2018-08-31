@@ -12,8 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/StringView.hpp>
 #include <Common/Containers/ArrayList.hpp>
+#include <Common/Containers/String.hpp>
 #include <Common/Function.hpp>
 #include <Common/Pair.hpp>
 //------------------------------------------------------------------//
@@ -29,8 +29,8 @@ namespace Eldritch2 { namespace Tools {
 				// - TYPE PUBLISHING ---------------------------------
 
 			public:
-				using Setter = Function<int(StringView<Utf8Char> /*value*/)>;
-				using Option = Pair<StringView<Utf8Char>, Setter>;
+				using Setter = Function<int(PlatformStringView /*value*/)>;
+				using Option = Pair<PlatformStringView, Setter>;
 
 				// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -45,20 +45,19 @@ namespace Eldritch2 { namespace Tools {
 				// ---------------------------------------------------
 
 			public:
-				OptionRegistrar& Register(StringView<Utf8Char> name, StringView<Utf8Char> shortName, Setter setter);
 				template <typename Option>
-				OptionRegistrar& Register(StringView<Utf8Char> name, StringView<Utf8Char> shortName, Option& podOption);
+				OptionRegistrar& Register(PlatformStringView name, PlatformStringView shortName, Option& option);
+				OptionRegistrar& Register(PlatformStringView name, PlatformStringView shortName, Setter setter);
 				template <typename Option>
-				OptionRegistrar& Register(StringView<Utf8Char> name, Option& podOption);
-				OptionRegistrar& Register(StringView<Utf8Char> name, Setter setter);
+				OptionRegistrar& Register(PlatformStringView name, Option& option);
+				OptionRegistrar& Register(PlatformStringView name, Setter setter);
 
 				OptionRegistrar& RegisterInputFileHandler(Setter setter);
 
 				// ---------------------------------------------------
 
 			public:
-				template <typename ArgumentIterator>
-				int Dispatch(ArgumentIterator begin, ArgumentIterator end);
+				int Dispatch(int argc, PlatformChar** argv);
 
 				// - DATA MEMBERS ------------------------------------
 
@@ -90,8 +89,7 @@ namespace Eldritch2 { namespace Tools {
 		// ---------------------------------------------------
 
 	public:
-		template <typename ArgumentIterator>
-		int Run(ArgumentIterator argumentBegin, ArgumentIterator argumentEnd);
+		int Run(int argc, PlatformChar** argv);
 	};
 
 }} // namespace Eldritch2::Tools

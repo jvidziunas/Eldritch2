@@ -43,7 +43,7 @@ namespace Eldritch2 { namespace Input { namespace XInput {
 
 	void XInputEngineComponent::TickEarly(JobExecutor& /*executor*/) {
 		ET_PROFILE_SCOPE("Engine/ServiceTick", "Sample XInput pad state", 0xFFFFFF);
-		for (DWORD pad(0u); pad < _countof(_gamepads); ++pad) {
+		for (DWORD pad(0u); pad < ETCountOf(_gamepads); ++pad) {
 			XInputGetState(pad, &_gamepads[pad]);
 		}
 	}

@@ -12,64 +12,20 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/GpuResources.hpp>
-//------------------------------------------------------------------//
-#include <vulkan/vulkan_core.h>
+#include <Graphics/Vulkan/GraphicsPipeline.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class GpuHeap;
-	class Vulkan;
-	class Gpu;
+	class CommandList;
 }}} // namespace Eldritch2::Graphics::Vulkan
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-
-	class ETPureAbstractHint DisplaySource {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Disable copy construction.
-		DisplaySource(const DisplaySource&) = delete;
-		//!	Construct this @ref DisplaySource instance.
-		DisplaySource(DisplaySource&&);
-		//!	Construct this @ref DisplaySource instance.
-		DisplaySource() = default;
-
-		~DisplaySource() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		VkRect2D GetOwnedRegion() const;
-
-		void SetOwnedRegion(VkRect2D region);
-
-		// - DATA MEMBERS ------------------------------------
-
-	private:
-		VkRect2D _ownedRegion;
-
-		// ---------------------------------------------------
-
-		friend void Swap(DisplaySource&, DisplaySource&);
-	};
-
-	// ---
 
 	class Display {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum : uint32_t { MaxQueueDepth = 3u };
-
-		// ---
-
-		struct CompositeInfo {
-			VkCommandPool   blitPool;
-			VkCommandBuffer blitCommands;
-			VkSemaphore     imageReady;
-		};
+		using ViewportList = Viewport[4];
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -86,33 +42,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		bool ShouldDestroy() const;
+		const ViewportList& GetViewports() const ETNoexceptHint;
+
+		Viewport* TryAcquireViewport(const GraphicsPipeline& generator) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		bool TryAcquire(DisplaySource& source);
-
-		void Release(DisplaySource& source);
+		VkResult CreateSwapchain(Gpu& gpu, VkSwapchainKHR& outSwapchain) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult AcquireImage(Vulkan& vulkan, Gpu& gpu);
+		VkResult BindResources(Gpu& gpu, bool preferVerticalSync, uint32 formatCount, const VkFormat* preferredFormats);
 
-		VkResult PresentImage(Gpu& gpu);
-
-		// ---------------------------------------------------
-
-	public:
-		VkResult BindResources(Vulkan& vulkan, Gpu& gpu);
-
-		void FreeResources(Vulkan& vulkan, Gpu& gpu);
-
-		// ---------------------------------------------------
-
-	private:
-		VkResult ResizeSwapchain(Gpu& gpu);
+		void FreeResources(Gpu& gpu);
 
 		// ---------------------------------------------------
 
@@ -126,13 +70,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		VkSurfaceKHR       _surface;
 		VkSurfaceFormatKHR _format;
 		VkPresentModeKHR   _presentMode;
-		VkSwapchainKHR     _swapchain;
-		uint32_t           _swapchainIndex;
-		uint32_t           _presentCount;
-		VkImageView        _imageViews[MaxQueueDepth];
-		VkFramebuffer      _framebuffers[MaxQueueDepth];
-		CompositeInfo      _compositeInfos[MaxQueueDepth];
-		DisplaySource*     _sources[4];
+		ViewportList       _viewports;
 
 		// ---------------------------------------------------
 
@@ -141,8 +79,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
-	template <class Allocator = MallocAllocator>
-	using DisplayMap = CachingHashMap<String<>, Display, Hash<String<>>, EqualTo<String<>>, Allocator>;
+	using ImageList   = SoArrayList<VkImageView /*view*/, Framebuffer /*backbuffer*/, CommandList /*commands*/>;
+	using DisplayList = SoArrayList<Display /*display*/, VkResult /*presentResult*/, VkSwapchainKHR /*swapchain*/, VkSemaphore /*ready*/, uint32 /*index*/, ImageList /*images*/>;
 
 }}} // namespace Eldritch2::Graphics::Vulkan
 

@@ -42,7 +42,7 @@ namespace Eldritch2 { namespace Audio {
 		// ---------------------------------------------------
 
 	public:
-		float32 GetHdrAmplitudeScalar(float32 windowTopDb);
+		float32 GetHdrAmplitudeScalar(float32 windowTopDb) const;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -54,12 +54,6 @@ namespace Eldritch2 { namespace Audio {
 
 	template <typename Voice>
 	class Listener {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using VoiceList = ArrayList<Voice>;
-		using VoiceType = typename VoiceList::ValueType;
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -73,7 +67,7 @@ namespace Eldritch2 { namespace Audio {
 		// ---------------------------------------------------
 
 	public:
-		const VoiceList& GetActiveVoices() const;
+		const ArrayList<Voice>& GetActiveVoices() const;
 
 		// ---------------------------------------------------
 
@@ -86,11 +80,13 @@ namespace Eldritch2 { namespace Audio {
 
 	private:
 		//!	Playing sounds, ordered by logical volume.
-		VoiceList _activeVoices;
-		float32   _perceivedLoudnessDb;
-		float32   _minimumPerceivedLoudnessDb;
-		float32   _windowBottomDb;
+		ArrayList<Voice> _activeVoices;
+		float32          _perceivedLoudnessDb;
+		float32          _minimumPerceivedLoudnessDb;
+		float32          _windowBottomDb;
 	};
+
+	// ---
 
 	template <typename Iterator>
 	float32 GetLoudnessDb(Iterator begin, Iterator end);

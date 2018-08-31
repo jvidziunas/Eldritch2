@@ -13,13 +13,12 @@
 //==================================================================//
 #include <Graphics/CrunchImageSource.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 /*	(6001) Bogus uninitialized memory warnings for Crunch.
 	(6201) Array indexing in template class is unsafe for some (assumed known) template values.
 	(6326) Switch statement involves non-type template parameter value; whining ensues. Non-idiomatic C++, but safe. */
-ET_SET_MSVC_WARNING_STATE(disable : 6001 6201 6326)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6001 6201 6326)
 #include <crunch/inc/crn_decomp.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics {

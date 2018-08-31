@@ -54,7 +54,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		ET_REGISTER_WREN_CLASS(Armature, api);
 		ET_REGISTER_WREN_CLASS(Light, api);
 
-		Vulkan::Device& device(FindService<Vulkan>().GetPrimaryDevice());
+		Vulkan::Device& device(FindService<Vulkan>()->GetPrimaryDevice());
 
 		_scene    = api.CreateVariable<VulkanGraphicsScene>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "GraphicsScene");
 		_displays = api.CreateVariable<DisplayLocator>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "Displays", device.GetDisplays(), device.GetDisplaysMutex());

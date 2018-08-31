@@ -24,9 +24,9 @@ public:
 	//! Constructs this @ref ChildAllocator instance.
 	/*! @param[in] parent @ref Allocator the @ref ChildAllocator should forward requests to.
 		@param[in] name @ref Null-terminated C string containing a human-readable C string describing the purpose for which the @ref ChildAllocator is being created. */
-	ChildAllocator(Allocator& parent, const Utf8Char* const name);
+	ChildAllocator(Allocator& parent, const Utf8Char* const name) ETNoexceptHint;
 	//! Constructs this @ref ChildAllocator instance.
-	ChildAllocator(const ChildAllocator&) = default;
+	ChildAllocator(const ChildAllocator&) ETNoexceptHint = default;
 
 	~ChildAllocator() = default;
 
@@ -41,13 +41,14 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ChildAllocator& operator=(const ChildAllocator&);
+	//!	Gets a reference to the @ref Allocator that owns this @ref ChildAllocator.
+	/*!	@returns A reference to the @ref Allocator instance this @ref ChildAllocator forwards allocation requests to. */
+	Allocator& GetParent() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	//!	Gets a reference to the @ref Allocator that owns this @ref ChildAllocator.
-	/*!	@returns A reference to the @ref Allocator instance this @ref ChildAllocator forwards allocation requests to. */
-	Allocator& GetParent() const;
+public:
+	ChildAllocator& operator=(const ChildAllocator&) ETNoexceptHint = default;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -56,7 +57,7 @@ private:
 
 	// ---------------------------------------------------
 
-	friend void Swap(ChildAllocator&, ChildAllocator&);
+	friend void Swap(ChildAllocator&, ChildAllocator&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

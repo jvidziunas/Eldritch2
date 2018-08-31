@@ -16,16 +16,15 @@
 
 namespace Eldritch2 { namespace Input {
 
-	ETInlineHint DeviceLocator::DeviceLocator(const Mutex& mutex, ArrayList<InputDevice>& devices) :
-		_mutex(eastl::addressof(mutex)),
-		_devices(eastl::addressof(devices)) {
+	ETInlineHint ETForceInlineHint DeviceLocator::DeviceLocator(const Mutex& mutex, ArrayList<InputDevice>& devices) :
+		_mutex(ETAddressOf(mutex)),
+		_devices(ETAddressOf(devices)) {
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool DeviceLocator::TryAcquireDevice(DeviceId id, InputDevice::BindingMap<> bindingByCode, InputHandler& handler) {
+	ETInlineHint ETForceInlineHint bool DeviceLocator::TryAcquireDevice(DeviceId id, InputDevice::BindingMap bindingByCode, InputHandler& handler) {
 		ReadLock _(*_mutex);
-
 		if (_devices->GetSize() <= id) {
 			return false;
 		}
@@ -35,9 +34,8 @@ namespace Eldritch2 { namespace Input {
 
 	// ---------------------------------------------------
 
-	ETInlineHint void DeviceLocator::ReleaseDevice(DeviceId id) {
+	ETInlineHint ETForceInlineHint void DeviceLocator::ReleaseDevice(DeviceId id) {
 		ReadLock _(*_mutex);
-
 		if (_devices->GetSize() <= id) {
 			return;
 		}
@@ -47,9 +45,8 @@ namespace Eldritch2 { namespace Input {
 
 	// ---------------------------------------------------
 
-	ETInlineHint size_t DeviceLocator::GetDeviceCount() const {
+	ETInlineHint ETForceInlineHint size_t DeviceLocator::GetDeviceCount() const {
 		ReadLock _(*_mutex);
-
 		return _devices->GetSize();
 	}
 

@@ -15,7 +15,6 @@
 //==================================================================//
 #include <Input/Win32/Win32InputEngineComponent.hpp>
 #include <Input/Win32/Win32InputWorldComponent.hpp>
-#include <Scheduling/JobSystem.hpp>
 #include <Core/Engine.hpp>
 //------------------------------------------------------------------//
 #include <Windowsx.h>
@@ -56,7 +55,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 	Win32InputEngineComponent::Win32InputEngineComponent(const ObjectLocator& services) :
 		EngineComponent(services),
 		_keyboardHook(SetWindowsHookExW(WH_KEYBOARD_LL, &WindowsKeyHook, GetModuleByAddress(&WindowsKeyHook), 0)),
-		_devices(FindService<Engine>().GetLog()),
+		_devices(FindService<Engine>()->GetLog()),
 		_inputReader(_devices) {
 	}
 
@@ -82,8 +81,8 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 	void Win32InputEngineComponent::BindResourcesEarly(JobExecutor& /*executor*/) {
 		ET_PROFILE_SCOPE("Engine/Initialization", "Initialize Win32 input", 0xBBBBBB);
 
-		if (Failed(FindService<JobSystem>().Launch(_inputReader))) {
-			return FindService<Engine>().SetShouldShutDown();
+		if (Failed(_inputReader.Boot("Win32 Input Reader Thread"))) {
+			return FindService<Engine>()->SetShouldShutDown();
 		}
 	}
 

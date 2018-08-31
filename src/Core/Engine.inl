@@ -22,44 +22,49 @@ namespace Eldritch2 { namespace Core {
 	namespace Detail {
 
 		template <class Service, class... AdditionalComponents>
-		static ETInlineHint void CopyComponents(EngineComponent** out, Service& service, AdditionalComponents&... additionalComponents) {
-			*out = eastl::addressof(service);
-			CopyComponents(out + 1, additionalComponents...);
+		static ETCpp14Constexpr ETInlineHint ETForceInlineHint void CopyComponents(EngineComponent** out, Service& service, AdditionalComponents&... additionalComponents) {
+			*out = ETAddressOf(service), CopyComponents(out + 1, additionalComponents...);
 		}
 
 		// ---
 
-		static ETInlineHint void CopyComponents(EngineComponent** /*out*/) {}
+		static ETConstexpr ETInlineHint ETForceInlineHint void CopyComponents(EngineComponent** /*out*/) {}
 
 	} // namespace Detail
 
-	ETInlineHint const ObjectLocator& Engine::GetServiceLocator() const {
+	ETInlineHint ETForceInlineHint const ObjectLocator& Engine::GetServiceLocator() const {
 		return _services;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Logging::Log& Engine::GetLog() const {
+	ETInlineHint ETForceInlineHint Logging::Log& Engine::GetLog() const {
 		return _log;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool Engine::ShouldRun() const {
-		return _shouldRun.load(std::memory_order_consume);
+	ETInlineHint ETForceInlineHint bool Engine::ShouldRun(MemoryOrder order) const {
+		return _shouldRun.load(order);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Engine::SetShouldShutDown() const {
-		_shouldRun.store(false, std::memory_order_release);
+	ETInlineHint ETForceInlineHint void Engine::SetShouldShutDown(MemoryOrder order) const {
+		_shouldRun.store(false, order);
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint void Engine::DestroyGarbage(size_t destructionLimit) {
+		_packageProvider.DestroyGarbage(destructionLimit);
 	}
 
 	// ---------------------------------------------------
 
 	template <class... Components>
-	ETInlineHint int Engine::BootOnCaller(Scheduling::JobExecutor& executor, Components&... clientComponents) {
-		ArrayList<EngineComponent*> components(sizeof...(clientComponents), _components.GetAllocator());
+	ETInlineHint ETForceInlineHint ErrorCode Engine::BootOnCaller(Scheduling::JobExecutor& executor, Components&... clientComponents) {
+		ArrayList<EngineComponent*> components(_components.GetAllocator(), sizeof...(clientComponents));
 
 		Detail::CopyComponents(components.Begin(), clientComponents...);
 		Swap(_components, components);

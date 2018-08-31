@@ -29,34 +29,34 @@ namespace {
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint ETInlineHint __m128i _mm_reverse_epi32(__m128i x) {
+	static ETInlineHint ETPureFunctionHint __m128i _mm_reverse_epi32(__m128i x) {
 		return _mm_shuffle_epi32(x, ReverseMask);
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint ETInlineHint __m128i _mm_unstripehi_epi32(__m128i x, __m128i y) {
+	static ETInlineHint ETPureFunctionHint __m128i _mm_unstripehi_epi32(__m128i x, __m128i y) {
 		//	NOTE: OLDER MODEL INTEL PROCESSORS (pre-Sandy Bridge) INCUR A PENALTY TO LATENCY WHEN SHIFTING FROM FP -> INTEGER SIMD UNIT
 		return _mm_shuffle_epi32(_mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(x), _mm_castsi128_ps(y), HighWordsMask)), StripeHiLoMask);
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint ETInlineHint __m128i _mm_unstripelo_epi32(__m128i x, __m128i y) {
+	static ETInlineHint ETPureFunctionHint __m128i _mm_unstripelo_epi32(__m128i x, __m128i y) {
 		//	NOTE: OLDER MODEL INTEL PROCESSORS (pre-Sandy Bridge) INCUR A PENALTY TO LATENCY WHEN SHIFTING FROM FP -> INTEGER SIMD UNIT
 		return _mm_shuffle_epi32(_mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(x), _mm_castsi128_ps(y), LowWordsMask)), StripeHiLoMask);
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint ETInlineHint __m128i _mm_stripehi_epi32(__m128i x, __m128i y) {
+	static ETInlineHint ETPureFunctionHint __m128i _mm_stripehi_epi32(__m128i x, __m128i y) {
 		//	NOTE: OLDER MODEL INTEL PROCESSORS (pre-Sandy Bridge) INCUR A PENALTY TO LATENCY WHEN SHIFTING FROM FP -> INTEGER SIMD UNIT
 		return _mm_shuffle_epi32(_mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(x), _mm_castsi128_ps(y), HighWordsMask)), StripeHiLoMask);
 	}
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint ETInlineHint __m128i _mm_stripelo_epi32(__m128i x, __m128i y) {
+	static ETInlineHint ETPureFunctionHint __m128i _mm_stripelo_epi32(__m128i x, __m128i y) {
 		//	NOTE: OLDER MODEL INTEL PROCESSORS (pre-Sandy Bridge) INCUR A PENALTY TO LATENCY WHEN SHIFTING FROM FP -> INTEGER SIMD UNIT
 		return _mm_shuffle_epi32(_mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(x), _mm_castsi128_ps(y), LowWordsMask)), StripeHiLoMask);
 	}

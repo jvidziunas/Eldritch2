@@ -16,110 +16,62 @@
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Graphics {
-		namespace Vulkan {
-			class	Vulkan;
-		}
-	}
-}
+namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-namespace Eldritch2 {
-namespace Graphics {
-namespace Vulkan {
-namespace AssetViews {
-
-	class MeshAsset : public Assets::Asset, public MeshSource {
-	// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		enum Attribute {
-
-		};
-
-	// ---
-
-	public:
-		class Surface {
+	class MeshAsset : public MeshSource, public Assets::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		public:
-		//!	Constructs this @ref Surface instance.
-			Surface(
-				const Utf8Char* const pipeline,
-				uint32 indexOffset,
-				uint32 faceCount,
-				uint16 indicesPerFace,
-				Bounds bounds
-			);
-		//!	Constructs this @ref Surface instance.
-			Surface(const Surface&) = default;
-
-			~Surface() = default;
-
-		// - DATA MEMBERS ------------------------------------
-
-		public:
-			Utf8Char	pipelineName[MaxPathLength];
-			uint32		indexOffset;
-			uint32		faceCount;
-			uint16		indicesPerFace;
-			Bounds		bounds;
-		};
-
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
 	public:
-	//!	Constructs this @ref MeshAsset instance.
-	/*!	@param[in] filePath Null-terminated, UTF-8-encoded file system path to the resource this @ref MeshAsset describes. */
-		MeshAsset(const Utf8Char* const filePath);
-	//!	Disable copy construction.
+		//!	Disable copy construction.
 		MeshAsset(const MeshAsset&) = delete;
+		//!	Constructs this @ref MeshAsset instance.
+		/*!	@param[in] path String view containing the file system path to the resource the @ref MeshAsset describes. */
+		MeshAsset(StringView path);
 
 		~MeshAsset() override = default;
 
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		Dimensions	GetDimensions() const override;
+		SurfaceDescription GetSurface(uint32 surface) const ETNoexceptHint override;
 
-		void		Stream(const VertexStreamRequest& vertices, const IndexStreamRequest& indices) const override;
+		uint32 GetSurfaceCount() const ETNoexceptHint override;
 
-	// ---------------------------------------------------
+		uint32 GetVerticesSize() const ETNoexceptHint override;
 
-	public:
-		const ArrayList<Attribute>&	GetAttributes() const;
+		uint32 GetIndicesSize() const ETNoexceptHint override;
 
-		const ArrayList<Surface>&	GetSurfaces() const;
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		ErrorCode	BindResources(const Builder& builder) override;
+		void Stream(const VertexStreamRequest& request) const ETNoexceptHint override;
+		void Stream(const IndexStreamRequest& request) const ETNoexceptHint override;
 
-		void		FreeResources() override;
-
-	// ---------------------------------------------------
+		// ---------------------------------------------------
 
 	public:
-		static Utf8Literal	GetExtension();
+		ErrorCode BindResources(const Builder& builder) override;
 
-	// ---------------------------------------------------
+		void FreeResources() override;
 
-	//!	Disable copy assignment.
-		MeshAsset&	operator=(const MeshAsset&) = delete;
+		// ---------------------------------------------------
 
-	// - DATA MEMBERS ------------------------------------
+	public:
+		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		MeshAsset& operator=(const MeshAsset&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<Attribute>	_attributes;
-		ArrayList<Surface>		_surfaces;
+		ArrayList<Attribute>          _attributes;
+		ArrayList<SurfaceDescription> _surfaces;
 	};
 
-}	// namespace AssetViews
-}	// namespace Vulkan
-}	// namespace Graphics
-}	// namespace Eldritch2
+}}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

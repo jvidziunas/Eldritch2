@@ -18,58 +18,50 @@
 namespace Eldritch2 {
 
 template <typename Value>
-ETInlineHint IntrusiveLinkedList<Value>::IntrusiveLinkedList(
-	IntrusiveLinkedList&& list) :
-	_container(eastl::move(list._container)) {
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveLinkedList<Value>::ConstIterator IntrusiveLinkedList<Value>::Find(ConstIterator searchHint, UnaryPredicate condition) const {
+	return eastl::find_if(searchHint, _container.end(), condition);
 }
 
 // ---------------------------------------------------
 
 template <typename Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveLinkedList<Value>::ConstIterator IntrusiveLinkedList<Value>::Find(ConstIterator searchHint, Predicate predicate) const {
-	return eastl::find_if(searchHint, _container.end(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Find(Iterator searchHint, UnaryPredicate condition) {
+	return eastl::find_if(searchHint, _container.end(), condition);
 }
 
 // ---------------------------------------------------
 
 template <typename Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Find(Iterator searchHint, Predicate predicate) {
-	return eastl::find_if(searchHint, _container.end(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveLinkedList<Value>::ConstIterator IntrusiveLinkedList<Value>::Find(UnaryPredicate condition) const {
+	return Find(_container.begin(), condition);
 }
 
 // ---------------------------------------------------
 
 template <typename Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveLinkedList<Value>::ConstIterator IntrusiveLinkedList<Value>::Find(Predicate predicate) const {
-	return Find(_container.begin(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Find(UnaryPredicate condition) {
+	return Find(_container.begin(), condition);
 }
 
 // ---------------------------------------------------
 
 template <typename Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Find(Predicate predicate) {
-	return Find(_container.begin(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint void IntrusiveLinkedList<Value>::EraseIf(UnaryPredicate condition) {
+	EraseAndDisposeIf(condition, [](Reference /*unused*/) {});
 }
 
 // ---------------------------------------------------
 
 template <typename Value>
-template <typename Predicate>
-ETInlineHint void IntrusiveLinkedList<Value>::EraseIf(Predicate predicate) {
-	EraseAndDisposeIf(predicate, [](Reference /*unused*/) {});
-}
-
-// ---------------------------------------------------
-
-template <typename Value>
-template <typename Predicate, typename Disposer>
-ETInlineHint void IntrusiveLinkedList<Value>::EraseAndDisposeIf(Predicate predicate, Disposer disposer) {
+template <typename UnaryPredicate, typename Disposer>
+ETInlineHint void IntrusiveLinkedList<Value>::EraseAndDisposeIf(UnaryPredicate condition, Disposer disposer) {
 	for (Iterator element(_container.begin()), end(_container.end()); element != end;) {
-		if (predicate(*element)) {
+		if (condition(*element)) {
 			ValueType& object(*element);
 
 			element = _container.erase(element);
@@ -169,8 +161,8 @@ ETInlineHint typename IntrusiveLinkedList<Value>::Reference IntrusiveLinkedList<
 // ---------------------------------------------------
 
 template <typename Value>
-ETInlineHint void IntrusiveLinkedList<Value>::Prepend(Reference item) {
-	_container.push_front(item);
+ETInlineHint void IntrusiveLinkedList<Value>::Prepend(Reference value) {
+	_container.push_front(value);
 }
 
 // ---------------------------------------------------
@@ -183,8 +175,8 @@ ETInlineHint void IntrusiveLinkedList<Value>::PopFront() {
 // ---------------------------------------------------
 
 template <typename Value>
-ETInlineHint void IntrusiveLinkedList<Value>::Append(Reference item) {
-	_container.push_back(item);
+ETInlineHint void IntrusiveLinkedList<Value>::Append(Reference value) {
+	_container.push_back(value);
 }
 
 // ---------------------------------------------------
@@ -233,15 +225,15 @@ ETInlineHint void IntrusiveLinkedList<Value>::CloneFrom(const IntrusiveLinkedLis
 // ---------------------------------------------------
 
 template <typename Value>
-ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Insert(Iterator location, Reference item) {
-	return _container.insert(location, item);
+ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Insert(Iterator where, Reference value) {
+	return _container.insert(where, value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value>
-ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Erase(Iterator position) {
-	return _container.erase(position);
+ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::Erase(Iterator where) {
+	return _container.erase(where);
 }
 
 // ---------------------------------------------------
@@ -255,14 +247,12 @@ ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<V
 
 template <typename Value>
 template <typename Disposer>
-ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::EraseAndDispose(Iterator position, Disposer disposer) {
-	ValueType& element(*position);
-
-	position = _container.erase(position);
-
+ETInlineHint typename IntrusiveLinkedList<Value>::Iterator IntrusiveLinkedList<Value>::EraseAndDispose(Iterator where, Disposer disposer) {
+	ValueType& element(*where);
+	where = _container.erase(where);
 	disposer(element);
 
-	return position;
+	return where;
 }
 
 // ---------------------------------------------------
@@ -318,8 +308,8 @@ ETInlineHint IntrusiveLinkedList<Value>::operator bool() const {
 // ---------------------------------------------------
 
 template <typename Value>
-ETInlineHint void Swap(IntrusiveLinkedList<Value>& list0, IntrusiveLinkedList<Value>& list1) {
-	eastl::swap(list0._container, list1._container);
+ETInlineHint void Swap(IntrusiveLinkedList<Value>& lhs, IntrusiveLinkedList<Value>& rhs) {
+	lhs._container.swap(rhs._container);
 }
 
 } // namespace Eldritch2

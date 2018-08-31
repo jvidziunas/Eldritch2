@@ -1,18 +1,23 @@
 namespace Eldritch2.Graphics.FlatBuffers;
 
+enum GpuPrimitive : ubyte {
+	None,
+	Point,
+	Line,
+	Triangle,
+	QuadPatch,
+}
+
 enum GpuFormat : ushort {
-	R32G32B32A32Float,
-	R32G32B32A32Int,
-	R32G32B32A32UInt,
-	R32G32B32A32UNorm,
-	R16G16B16A16Float,
-	R16G16B16A16Int,
-	R16G16B16A16UInt,
-	R16G16B16A16UNorm,
-	R8G8B8A8Int,
-	R8G8B8A8UInt,
-	R8G8B8A8UNorm,
-	R8G8B8A8UNorm_sRGB,
-	R8G8B8A8SNorm,
-	R10G10B10A2UNorm
+	R8G8B8A8_Unorm,
+	R8G8B8A8_Srgb,
+	R8G8B8A8_Snorm,
+	R8G8B8A8_Uint,
+	BC1_Unorm,
+	BC1_Srgb,
+	BC3_Unorm,
+	BC3_Srgb,
+	BC3_YCoCg,
+	BC5_Unorm,
+	BC5_Snorm,
 }

@@ -31,7 +31,7 @@ namespace Eldritch2 { namespace Input {
 		// ---------------------------------------------------
 
 	public:
-		bool TryAcquireDevice(DeviceId id, InputDevice::BindingMap<> bindingByCode, InputHandler& handler);
+		bool TryAcquireDevice(DeviceId id, InputDevice::BindingMap bindingByCode, InputHandler& handler);
 
 		void ReleaseDevice(DeviceId id);
 

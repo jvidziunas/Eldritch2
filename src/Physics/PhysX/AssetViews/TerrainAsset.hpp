@@ -15,11 +15,10 @@
 #include <Physics/PhysX/PhysxPointer.hpp>
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6326)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <PxShape.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews {
@@ -28,12 +27,12 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref TerrainAsset instance.
-		/*!	@param[in] assetPath Null-terminated, UTF-8-encoded character sequence containing the file system path to the asset
-			the @ref TerrainAsset will be describing. */
-		TerrainAsset(const Utf8Char* const assetPath);
 		//!	Disable copy construction.
 		TerrainAsset(const TerrainAsset&) = delete;
+		//!	Constructs this @ref TerrainAsset instance.
+		/*!	@param[in] path UTF-8-encoded string view containing the file system path to the asset
+			the @ref TerrainAsset will be describing. */
+		TerrainAsset(StringView path);
 
 		~TerrainAsset() override = default;
 
@@ -52,7 +51,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		// ---------------------------------------------------
 
 	public:
-		static Utf8Literal GetExtension();
+		static ETPureFunctionHint StringView GetExtension();
 
 		// ---------------------------------------------------
 

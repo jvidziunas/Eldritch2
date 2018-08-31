@@ -33,17 +33,21 @@ public:
 public:
 	//!	Constructs this @ref Stack instance.
 	template <class AllocatorType>
-	Stack(const Stack&, const AllocatorType& allocator = AllocatorType());
+	Stack(const AllocatorType& allocator, const Stack&);
 	//!	Constructs this @ref Stack instance.
 	template <class AllocatorType>
-	Stack(Stack&&, const AllocatorType& allocator);
+	Stack(const AllocatorType& allocator, Stack&&);
 	//!	Constructs this @ref Stack instance.
 	template <class AllocatorType>
-	Stack(const AllocatorType& allocator = AllocatorType());
+	Stack(const AllocatorType& allocator);
 	//!	Constructs this @ref Stack instance.
 	Stack(const ContainerType&);
 	//!	Constructs this @ref Stack instance.
 	Stack(ContainerType&&);
+	//!	Constructs this @ref Stack instance.
+	Stack(const Stack&) = default;
+	//!	Constructs this @ref Stack instance.
+	Stack(Stack&&) = default;
 	//!	Constructs this @ref Stack instance.
 	Stack() = default;
 
@@ -55,6 +59,8 @@ public:
 	SizeType GetSize() const;
 
 	bool IsEmpty() const;
+
+	operator bool() const;
 
 	// ---------------------------------------------------
 
@@ -68,8 +74,8 @@ public:
 	void Push(const ValueType& value);
 	void Push(ValueType&& value);
 
-	template <class... Args>
-	void EmplaceBack(Args&&... args);
+	template <class... Arguments>
+	void EmplaceBack(Arguments&&... arguments);
 
 	void Pop();
 

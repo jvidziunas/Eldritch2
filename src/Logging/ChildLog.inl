@@ -17,19 +17,24 @@
 
 namespace Eldritch2 { namespace Logging {
 
-	ETInlineHint ChildLog::ChildLog(Log& parent) :
-		_parent(eastl::addressof(parent)) {}
+	ETInlineHint ETForceInlineHint ChildLog::ChildLog(Log& parent) ETNoexceptHint : _parent(ETAddressOf(parent)) {}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Log& ChildLog::SetParent(Log& parent) {
-		return *eastl::exchange(_parent, eastl::addressof(parent));
+	ETInlineHint ETForceInlineHint void ChildLog::Write(const Utf8Char* string, size_t lengthInOctets) ETNoexceptHint {
+		_parent->Write(string, lengthInOctets);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Log& ChildLog::GetParent() const {
-		return *_parent;
+	ETInlineHint ETForceInlineHint Log* ChildLog::SetParent(Log& parent) ETNoexceptHint {
+		return eastl::exchange(_parent, ETAddressOf(parent));
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint Log* ChildLog::GetParent() const ETNoexceptHint {
+		return _parent;
 	}
 
 }} // namespace Eldritch2::Logging

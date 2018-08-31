@@ -29,22 +29,19 @@ public:
 public:
 	//! Constructs this @ref EaStlAllocatorMixin instance.
 	template <typename... Arguments>
-	EaStlAllocatorMixin(Arguments&&... arguments) noexcept;
+	EaStlAllocatorMixin(Arguments&&... arguments) ETNoexceptHint;
+	//! Constructs this @ref EaStlAllocatorMixin instance.
+	EaStlAllocatorMixin(const EaStlAllocatorMixin&) = default;
 
 	~EaStlAllocatorMixin() = default;
 
 	// ---------------------------------------------------
 
 public:
-	ETRestrictHint void* allocate(size_t allocationSizeInBytes, size_t alignmentInBytes, size_t offsetInBytes, int flags = 0);
-	ETRestrictHint void* allocate(size_t allocationSizeInBytes, int flags = 0);
+	ETRestrictHint void* allocate(size_t sizeInBytes, size_t alignmentInBytes, size_t offsetInBytes, int flags = 0);
+	ETRestrictHint void* allocate(size_t sizeInBytes, int flags = 0);
 
-	void deallocate(void* pointer, size_t allocationSizeInBytes);
-
-	// ---------------------------------------------------
-
-public:
-	ETInlineHint EaStlAllocatorMixin& operator=(const EaStlAllocatorMixin&) = default;
+	void deallocate(void* pointer, size_t sizeInBytes);
 
 	// ---------------------------------------------------
 
@@ -52,6 +49,11 @@ public:
 	const char* get_name() const;
 
 	void set_name(const char* name);
+
+	// ---------------------------------------------------
+
+public:
+	ETInlineHint EaStlAllocatorMixin& operator=(const EaStlAllocatorMixin&) = default;
 
 	// ---------------------------------------------------
 

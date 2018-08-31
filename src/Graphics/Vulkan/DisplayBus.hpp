@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/GraphicsPipeline.hpp>
+#include <Graphics/Vulkan/CommandList.hpp>
 #include <Graphics/Vulkan/Display.hpp>
 //------------------------------------------------------------------//
 
@@ -24,7 +24,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	public:
 		//! Disable copy construction.
 		DisplayBus(const DisplayBus&) = delete;
-		//! Constructs this @ref DisplayCoordinator instance.
+		//! Constructs this @ref DisplayBus instance.
 		DisplayBus();
 
 		~DisplayBus() = default;
@@ -32,14 +32,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult AcquireImages(Vulkan& vulkan, Gpu& gpu);
+		VkResult PresentSwapchainImages(Gpu& gpu);
+
+		VkResult AcquireSwapchainImages(Gpu& gpu);
 
 		// ---------------------------------------------------
 
 	public:
-		DisplayMap<>& GetDisplays();
+		DisplayList& GetDisplays() ETNoexceptHint;
 
-		Mutex& GetDisplaysMutex();
+		Mutex& GetDisplaysMutex() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -50,15 +52,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
+	private:
 		//! Disable copy assignment.
 		DisplayBus& operator=(const DisplayBus&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		GraphicsPipeline _compositor;
-		mutable Mutex    _displayMutex;
-		DisplayMap<>     _displayByName;
+		ArrayMap<VkFormat, GraphicsPipeline> _compositorByFormat;
+		mutable Mutex                        _displayMutex;
+		DisplayList                          _displays;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

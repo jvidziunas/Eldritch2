@@ -25,28 +25,26 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	namespace {
 
-		static ETInlineHint nk_flags GetSlotFlags(WrenVM* vm, int slot) {
-			return static_cast<nk_flags>(AsIntBits(wrenGetSlotDouble(vm, slot)));
+		ETInlineHint nk_flags GetSlotFlags(WrenVM* vm, int slot) {
+			return nk_flags(AsIntBits(wrenGetSlotDouble(vm, slot)));
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint nk_text_align GetSlotTextAlignment(WrenVM* vm, int slot) {
-			return static_cast<nk_text_align>(AsIntBits(wrenGetSlotDouble(vm, slot)));
+		ETInlineHint nk_text_align GetSlotTextAlignment(WrenVM* vm, int slot) {
+			return nk_text_align(AsIntBits(wrenGetSlotDouble(vm, slot)));
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint nk_color GetSlotColor(WrenVM* vm, int slot) {
+		ETInlineHint nk_color GetSlotColor(WrenVM* vm, int slot) {
 			const RgbColor& color(GetSlotAs<RgbColor>(vm, slot));
-
 			return nk_rgb_f(color.GetRed(), color.GetGreen(), color.GetBlue());
 		}
 
 	} // anonymous namespace
 
-	ET_IMPLEMENT_WREN_CLASS(Interface) {
-		// clang-format off
+	ET_IMPLEMENT_WREN_CLASS(Interface) { // clang-format off
 		api.CreateClass<Interface>(ET_BUILTIN_WREN_MODULE_NAME(Interface), "Interface",
 			{/* Constructors */ },
 			{/*	Static methods */ },
@@ -55,26 +53,26 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 				ForeignMethod("doWindow(_,_)", [](WrenVM* vm) {
 					GetSlotAs<Interface>(vm, 0).DoWindow(wrenGetSlotString(vm, 1), GetSlotFlags(vm, 2), {}, [vm](Interface& /*interface*/) {
 						// wrenSwapSlots(vm, 0, 3);
-						wrenCall(vm, AsContext(vm).GetCallStubForArity<1>());
+						wrenCall(vm, GetContext(vm)->GetCallStubForArity<1>());
 					});
 				}),
 				ForeignMethod("doStaticPopup(_,_)", [](WrenVM* vm) {
 					GetSlotAs<Interface>(vm, 0).DoStaticPopup(wrenGetSlotString(vm, 1), GetSlotFlags(vm, 2), {}, [vm](Interface& /*interface*/) {
 						// wrenSwapSlots(vm, 0, 3);
-						wrenCall(vm, AsContext(vm).GetCallStubForArity<1>());
+						wrenCall(vm, GetContext(vm)->GetCallStubForArity<1>());
 					});
 				}),
 				ForeignMethod("doDynamicPopup(_,_)", [](WrenVM* vm) {
 					GetSlotAs<Interface>(vm, 0).DoDynamicPopup(wrenGetSlotString(vm, 1), GetSlotFlags(vm, 2), {}, [vm](Interface& /*interface*/) {
 						// wrenSwapSlots(vm, 0, 3);
-						wrenCall(vm, AsContext(vm).GetCallStubForArity<1>());
+						wrenCall(vm, GetContext(vm)->GetCallStubForArity<1>());
 					});
 
 				}),
 				ForeignMethod("doTooltip(_,_)", [](WrenVM* vm) {
 					GetSlotAs<Interface>(vm, 0).DoTooltip(wrenGetSlotDouble(vm, 1), [vm](Interface& /*interface*/) {
 						// wrenSwapSlots(vm, 0, 3);
-						wrenCall(vm, AsContext(vm).GetCallStubForArity<1>());
+						wrenCall(vm, GetContext(vm)->GetCallStubForArity<1>());
 					});
 				}),
 			/*	To consider: Strings are immutable in Wren.
@@ -101,8 +99,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 					double value(wrenGetSlotDouble(vm, 3));
 					GetSlotAs<Interface>(vm, 0).DoProperty(wrenGetSlotString(vm, 1), wrenGetSlotDouble(vm, 2), &value, wrenGetSlotDouble(vm, 4), wrenGetSlotDouble(vm, 5), wrenGetSlotDouble(vm, 6));
 					wrenSetSlotDouble(vm, 0, value);
-				}),
-			}); // clang-format on
-	}
+				})}); 
+	} // clang-format on
 
 }}} // namespace Eldritch2::Scripting::Wren

@@ -53,23 +53,23 @@ public:
 	// - ALGORITHMS --------------------------------------
 
 public:
-	template <typename Predicate>
-	ConstIterator FindIf(Predicate predicate, ConstIterator searchHint) const;
-	template <typename Predicate>
-	ConstIterator FindIf(Predicate predicate) const;
-	template <typename Predicate>
-	Iterator FindIf(Predicate predicate, Iterator searchHint);
-	template <typename Predicate>
-	Iterator FindIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	ConstIterator FindIf(UnaryPredicate predicate, ConstIterator where) const;
+	template <typename UnaryPredicate>
+	ConstIterator FindIf(UnaryPredicate predicate) const;
+	template <typename UnaryPredicate>
+	Iterator FindIf(UnaryPredicate predicate, Iterator where);
+	template <typename UnaryPredicate>
+	Iterator FindIf(UnaryPredicate predicate);
 
-	template <typename Predicate, typename Disposer>
-	void EraseAndDisposeIf(Predicate predicate, Disposer disposer);
+	template <typename UnaryPredicate, typename Disposer>
+	void EraseAndDisposeIf(UnaryPredicate condition, Disposer disposer);
 
-	template <typename Predicate>
-	void EraseIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void EraseIf(UnaryPredicate condition);
 
-	template <typename Predicate>
-	void Sort(Predicate predicate);
+	template <typename UnaryPredicate>
+	void Sort(UnaryPredicate sort);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -95,7 +95,7 @@ public:
 	Reference Front();
 
 	//! Adds the passed-in item to the head of this @ref IntrusiveForwardList.
-	void Prepend(Reference item);
+	void Prepend(Reference value);
 
 	//! Removes the head element of this @ref IntrusiveForwardList, reducing its size by one element.
 	template <typename Disposer>
@@ -114,20 +114,20 @@ public:
 
 public:
 	//! Inserts an element, shifting all antecedent elements down one position.
-	Iterator Insert(Iterator location, Reference item);
+	Iterator Insert(Iterator where, Reference item);
 
-	Iterator InsertAfter(Iterator location, Reference item);
+	Iterator InsertAfter(Iterator where, Reference item);
 
 	Iterator Erase(Iterator first, Iterator last);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 
 	Iterator EraseAfter(Iterator beforeBegin, Iterator end);
-	Iterator EraseAfter(Iterator position);
+	Iterator EraseAfter(Iterator where);
 
 	template <typename Disposer>
 	void EraseAndDispose(Iterator first, Iterator last, Disposer disposer);
 	template <typename Disposer>
-	Iterator EraseAndDispose(Iterator position, Disposer disposer);
+	Iterator EraseAndDispose(Iterator where, Disposer disposer);
 
 	template <typename Disposer>
 	void ClearAndDispose(Disposer disposer);

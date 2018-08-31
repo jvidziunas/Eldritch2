@@ -18,21 +18,20 @@
 #include <Common/Hash.hpp>
 #include <Common/Pair.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(4800) EASTL does some int to bool coercion MSVC doesn't like.
-ET_SET_MSVC_WARNING_STATE(disable : 4800)
+ET_PUSH_MSVC_WARNING_STATE(disable : 4800)
 #include <eastl/hash_map.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-template <typename Key, typename Value, class HashPredicate = Hash<Key>, class KeyEqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
+template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
 class HashMap {
 	// - TYPE PUBLISHING ---------------------------------
 
 private:
-	using UnderlyingContainer = eastl::hash_map<Key, Value, HashPredicate, KeyEqualityPredicate, EaStlAllocatorMixin<Allocator>, cacheHashCode>;
+	using UnderlyingContainer = eastl::hash_map<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, cacheHashCode>;
 
 public:
 	using ValueType             = typename UnderlyingContainer::value_type;
@@ -41,52 +40,49 @@ public:
 	using NodeType              = typename UnderlyingContainer::node_type;
 	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
 	using SizeType              = typename UnderlyingContainer::size_type;
-	using HashPredicateType     = HashPredicate;
-	using EqualityPredicateType = KeyEqualityPredicate;
 	using HashCode              = typename UnderlyingContainer::hash_code_t;
 	using Iterator              = typename UnderlyingContainer::iterator;
 	using ConstIterator         = typename UnderlyingContainer::const_iterator;
 	using LocalIterator         = typename UnderlyingContainer::local_iterator;
 	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
+	using EqualityPredicateType = EqualityPredicate;
+	using HashPredicateType     = HashPredicate;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	//! Constructs this @ref HashMap instance.
-	explicit HashMap(
-		SizeType                     bucketCount,
-		const HashPredicateType&     hash              = HashPredicateType(),
-		const EqualityPredicateType& equalityPredicate = EqualityPredicateType(),
-		const AllocatorType&         allocator         = AllocatorType());
+	HashMap(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
 	//! Constructs this @ref HashMap instance.
-	HashMap(const HashPredicateType& hash, const EqualityPredicateType& equalityPredicate, const AllocatorType& allocator = AllocatorType());
+	template <typename InputIterator>
+	HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashMap instance.
-	HashMap(HashMap&&, const AllocatorType& allocator);
+	HashMap(const AllocatorType& allocator, std::initializer_list<ValueType>);
 	//! Constructs this @ref HashMap instance.
-	HashMap(const AllocatorType& allocator = AllocatorType());
+	HashMap(const AllocatorType& allocator, const HashMap&);
 	//! Constructs this @ref HashMap instance.
-	HashMap(const HashMap&);
+	HashMap(const HashMap&) = default;
 	//! Constructs this @ref HashMap instance.
-	HashMap(HashMap&&);
+	HashMap(HashMap&&) = default;
 
 	~HashMap() = default;
 
 	// - ALGORITHMS --------------------------------------
 
 public:
-	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
-	ConstIterator Find(const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate) const;
-	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
-	Iterator      Find(const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate);
+	template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
+	ConstIterator Find(const Key2& key, HashPredicate2 hash, EqualityPredicate2 equal) const;
+	template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
+	Iterator      Find(const Key2& key, HashPredicate2 hash, EqualityPredicate2 equal);
 	ConstIterator Find(const KeyType& key) const;
 	Iterator      Find(const KeyType& key);
 
 	//! Erases all elements for which the result of the predicate returns true.
-	template <typename Predicate>
-	void EraseIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void EraseIf(UnaryPredicate condition);
 
-	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
-	bool ContainsKey(const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate) const;
-	bool ContainsKey(const KeyType& key) const;
+	template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
+	bool Contains(const Key2& key, HashPredicate2 hash, EqualityPredicate2 equal) const;
+	bool Contains(const KeyType& key) const;
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -116,8 +112,8 @@ public:
 	// - CONTAINER DUPLICATION ---------------------------
 
 public:
-	HashMap& operator=(const HashMap&);
-	HashMap& operator=(HashMap&&);
+	HashMap& operator=(const HashMap&) = default;
+	HashMap& operator=(HashMap&&) = default;
 
 	// - CONTAINER MANIPULATION --------------------------
 
@@ -134,7 +130,7 @@ public:
 	Pair<Iterator, bool> Emplace(Arguments&&... arguments);
 
 	Iterator Erase(Iterator first, Iterator last);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 	SizeType Erase(const KeyType& key);
 
 	template <typename Disposer>
@@ -154,9 +150,9 @@ public:
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	const EqualityPredicateType& GetKeyEqualityPredicate() const;
+	const EqualityPredicateType& GetEqualityPredicate() const;
 
-	const HashPredicateType& GetHashFunction() const;
+	const HashPredicateType& GetHash() const;
 
 	const AllocatorType& GetAllocator() const;
 
@@ -167,12 +163,12 @@ private:
 
 	// ---------------------------------------------------
 
-	template <typename Key, typename Value, class HashPredicate, class KeyEqualityPredicate, class Allocator, bool cacheHashCode>
-	friend void Swap(HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>&, HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>&);
+	template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+	friend void Swap(HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&, HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&);
 };
 
-template <typename Key, typename Value, class HashPredicate = Hash<Key>, class KeyEqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator>
-using CachingHashMap = HashMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, true>;
+template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator>
+using CachingHashMap = HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, true>;
 
 } // namespace Eldritch2
 

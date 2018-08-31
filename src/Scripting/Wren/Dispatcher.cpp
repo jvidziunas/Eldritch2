@@ -41,9 +41,8 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	Dispatcher::Dispatcher(
-		World& world) :
-		_world(eastl::addressof(world)),
+	Dispatcher::Dispatcher(World& world) :
+		_world(ETAddressOf(world)),
 		_gameTime(0u),
 		_events(MallocAllocator("Wren Event Queue Allocator")) {
 	}
@@ -63,30 +62,28 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	// ---------------------------------------------------
 
 	void Dispatcher::SetWorldTimeScalar(double value) {
-		_world->SetTimeScalar(static_cast<float32>(value));
+		_world->SetTimeScalar(float32(value));
 	}
 
 	// ---------------------------------------------------
 
 	void Dispatcher::ExecuteScriptEvents(WrenVM* vm, MicrosecondTime deltaMicroseconds) {
-		WrenHandle* const callStub(AsContext(vm).GetCallStubForArity<0>());
+		WrenHandle* const callStub(GetContext(vm)->GetCallStubForArity<0>());
 		const ScriptTime  now(GetNow());
-
-		wrenEnsureSlots(vm, 1);
 
 		/*	Events are sorted according to dispatch time, with events that complete at an earlier time coming before
 		 *	those completing at a later time. */
+		wrenEnsureSlots(vm, 1);
 		while (_events) {
 			Event& mostRecent(_events.Top());
-
-			if (mostRecent.ShouldDispatch(now)) {
-				mostRecent.Call(vm, callStub);
-				mostRecent.FreeResources(vm);
-
-				_events.Pop();
-			} else {
+			if (!mostRecent.ShouldDispatch(now)) {
 				break;
 			}
+
+			mostRecent.Call(vm, callStub);
+			mostRecent.FreeResources(vm);
+
+			_events.Pop();
 		}
 
 		_gameTime += deltaMicroseconds;

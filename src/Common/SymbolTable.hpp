@@ -23,15 +23,12 @@ template <typename Character, class Allocator = MallocAllocator>
 class SymbolTable {
 	// - TYPE PUBLISHING ---------------------------------
 
-private:
-	struct Symbol_ {};
-
 public:
-	using StringType    = AbstractString<Character, ChildAllocator>;
-	using CharacterType = typename StringType::CharacterType;
+	using Symbol        = const Character*;
+	using CharacterType = Character;
 	using AllocatorType = Allocator;
+	using StringType    = AbstractString<CharacterType, ChildAllocator>;
 	using TableType     = CachingHashSet<StringType, Hash<StringType>, EqualTo<StringType>, ChildAllocator>;
-	using Symbol        = const Symbol_*;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -46,9 +43,9 @@ public:
 	// ---------------------------------------------------
 
 public:
-	Symbol Find(const CharacterType* string) const;
+	Symbol Find(AbstractStringView<CharacterType> string) const;
 
-	Symbol Intern(const CharacterType* string);
+	Symbol Intern(AbstractStringView<CharacterType> string);
 
 	// ---------------------------------------------------
 

@@ -12,15 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Mpl/Compiler.hpp>
+#include <Common/Function.hpp>
 //------------------------------------------------------------------//
-#include <eastl/bonus/compressed_pair.h>
-#include <eastl/type_traits.h>
-//------------------------------------------------------------------//
-
-namespace Eldritch2 {
-class Allocator;
-}
 
 namespace Eldritch2 {
 
@@ -28,13 +21,13 @@ class InstanceDeleter {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using DeleterFunction = void (*)(Allocator&, void*);
+	using DeleterFunction = Function<void(void*)>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//! Constructs this @ref InstanceDeleter instance.
-	template <typename T>
+	template <typename Allocator, typename T>
 	InstanceDeleter(Allocator& allocator, T* const object);
 	//! Constructs this @ref InstanceDeleter instance.
 	InstanceDeleter(const InstanceDeleter&) = default;
@@ -46,13 +39,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	Allocator& GetAllocator() const;
-
-	// ---------------------------------------------------
-
-public:
-	template <typename T>
-	void operator()(T* const object) const;
+	void operator()(void* object) const;
 
 	// ---------------------------------------------------
 
@@ -62,8 +49,6 @@ public:
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	Allocator*      _allocator;
-	void*           _object;
 	DeleterFunction _deleter;
 };
 
@@ -73,13 +58,13 @@ class InstanceArrayDeleter {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using DeleterFunction = void (*)(Allocator&, void*, size_t);
+	using DeleterFunction = Function<void(void*, size_t)>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//! Constructs this @ref InstanceArrayDeleter instance.
-	template <typename T>
+	template <typename Allocator, typename T>
 	InstanceArrayDeleter(Allocator& allocator, T* const objects, size_t countInObjects);
 	//! Constructs this @ref InstanceArrayDeleter instance.
 	InstanceArrayDeleter(const InstanceArrayDeleter&) = default;
@@ -91,15 +76,12 @@ public:
 	// ---------------------------------------------------
 
 public:
-	Allocator& GetAllocator() const;
-
 	size_t GetSize() const;
 
 	// ---------------------------------------------------
 
 public:
-	template <typename T>
-	void operator()(T* const objects) const;
+	void operator()(void* objects) const;
 
 	// ---------------------------------------------------
 
@@ -109,9 +91,8 @@ public:
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	Allocator*      _allocator;
-	size_t          _countInObjects;
 	DeleterFunction _deleter;
+	size_t          _countInObjects;
 };
 
 } // namespace Eldritch2

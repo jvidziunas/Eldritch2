@@ -44,7 +44,11 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// ---------------------------------------------------
 
 	protected:
+		void BindResources(Scheduling::JobExecutor& executor) override;
+
 		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
+
+		void FreeResources(Scheduling::JobExecutor& executor) override;
 
 		// ---------------------------------------------------
 
@@ -55,7 +59,6 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	private:
 		mutable Logging::ChildLog _log;
-		bool                      _shouldJoinScene;
 		PhysicsScene*             _scene;
 	};
 

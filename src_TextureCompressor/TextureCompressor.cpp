@@ -26,14 +26,6 @@
 ET_LINK_LIBRARY("crnlib.lib")
 //------------------------------------------------------------------//
 
-#define ET_FAIL_UNLESS2(cond) \
-	{                         \
-		const auto _(cond);   \
-		if (_ != 0) {         \
-			return _;         \
-		}                     \
-	}
-
 namespace Eldritch2 {
 namespace Tools {
 
@@ -50,34 +42,32 @@ namespace Tools {
 	// ---------------------------------------------------
 
 	void TextureCompressor::RegisterOptions(OptionRegistrar& options) {
-		options.Register<uint32>("--threadCount", "-t", _threadCount);
-		options.Register<uint32>("--quality", "-q", _imageQuality);
-		options.Register<uint32>("--mipLevels", "-m", _mipLevels);
-		options.Register<uint32>("--a2cSpp", "-s", _alphaToCoverageSamplesPerPixel);
-		options.Register<bool>("--correctAlphaTestDistribution", "-a", _correctAlphaTestDistribution);
-		options.Register<bool>("--colorData", "-c", _isColorData);
+		options.Register<uint32>(L"--threadCount", L"-t", _threadCount);
+		options.Register<uint32>(L"--quality", L"-q", _imageQuality);
+		options.Register<uint32>(L"--mipLevels", L"-m", _mipLevels);
+		options.Register<uint32>(L"--a2cSpp", L"-s", _alphaToCoverageSamplesPerPixel);
+		options.Register<bool>(L"--correctAlphaTestDistribution", L"-a", _correctAlphaTestDistribution);
+		options.Register<bool>(L"--colorData", L"-c", _isColorData);
 
-		options.RegisterInputFileHandler([this](Range<const Utf8Char*> path) -> int {
+		options.RegisterInputFileHandler([this](PlatformStringView path) -> int {
 			if (path.IsEmpty()) {
 				return -1;
 			}
 
-			_sourcePaths.Insert({ path.Begin(), path.End(), MallocAllocator("Source Texture Path Allocator") });
-
+			_sourcePaths.Emplace(MallocAllocator("Texture Path Allocator"), path);
 			return 0;
 		});
 	}
 
 	// ---------------------------------------------------
 
-	int TextureCompressor::ProcessImage(const Utf8Char* path) {
-		crn_comp_params   compressorParameters;
+	ErrorCode TextureCompressor::ProcessImage(const Path& path) {
 		crn_mipmap_params mipmapParameters;
+		crn_comp_params   compressorParameters;
 
 		compressorParameters.set_flag(cCRNCompFlagPerceptual, _isColorData);
 		compressorParameters.m_num_helper_threads = Max(_threadCount, 1u) - 1u;
-
-		// Compression phase is always considered pass-through, we generate/load mips ourselves as requested by user.
+		// Compression phase is always considered pass-through, we generate/load mipmaps ourselves as requested by user.
 		mipmapParameters.m_mode = cCRNMipModeUseSourceMips;
 
 		for (uint32 level(0u); level <= _mipLevels; ++level) {
@@ -87,22 +77,22 @@ namespace Tools {
 		crn_uint32 combinedSize(0u);
 		const auto data(crn_compress(compressorParameters, mipmapParameters, combinedSize));
 		ET_AT_SCOPE_EXIT(crn_free_block(data));
-		ET_FAIL_UNLESS2(data ? 0 : -1);
+		ET_ABORT_UNLESS(data ? Error::None : Error::OutOfMemory);
 
 		const crn_uint32 segmentedSize(crnd::crnd_get_segmented_file_size(data, combinedSize));
-		ET_FAIL_UNLESS2(crnd::crnd_create_segmented_file(data, combinedSize, nullptr, 0u) ? 0 : -1);
+		ET_ABORT_UNLESS(crnd::crnd_create_segmented_file(data, combinedSize, nullptr, 0u) ? Error::None : Error::Unspecified);
 
-		return 0;
+		return Error::None;
 	}
 
 	// ---------------------------------------------------
 
-	int TextureCompressor::Process() {
-		for (const String<>& path : _sourcePaths) {
-			ET_FAIL_UNLESS2(ProcessImage(path));
+	ErrorCode TextureCompressor::Process() {
+		for (const Path& path : _sourcePaths) {
+			ET_ABORT_UNLESS(ProcessImage(path));
 		}
 
-		return 0;
+		return Error::None;
 	}
 
 }} // namespace Eldritch2::Tools

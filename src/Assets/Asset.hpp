@@ -36,15 +36,15 @@ namespace Eldritch2 { namespace Assets {
 
 		public:
 			template <typename... Arguments>
-			void WriteLog(Logging::MessageType severity, StringView<Utf8Char> format, Arguments&&... arguments) const;
+			void WriteLog(Logging::Severity severity, StringView format, Arguments&&... arguments) const;
 
 			// ---------------------------------------------------
 
 		public:
-			const char* Begin() const;
-			const char* End() const;
+			const char* Begin() const ETNoexceptHint;
+			const char* End() const ETNoexceptHint;
 
-			size_t GetSize() const;
+			size_t GetSize() const ETNoexceptHint;
 
 			// - DATA MEMBERS ------------------------------------
 
@@ -65,7 +65,7 @@ namespace Eldritch2 { namespace Assets {
 	public:
 		//! Constructs this @ref Asset instance.
 		/*!	@param[in] path UTF-8-encoded string view containing the file system path to the resource the @ref Asset describes. */
-		Asset(StringView<Utf8Char> path);
+		Asset(StringView path) ETNoexceptHint;
 		//!	Disable copy construction.
 		Asset(const Asset&) = delete;
 
@@ -77,7 +77,7 @@ namespace Eldritch2 { namespace Assets {
 		//! Gets the file system filePath to the asset.
 		/*! @returns UTF-8-encoded string view containing the file system path to the resource this @ref Asset describes.
 			@remarks Thread-safe. */
-		StringView<Utf8Char> GetPath() const;
+		StringView GetPath() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 

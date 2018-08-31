@@ -17,13 +17,19 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint Gpu::CommandQueue::CommandQueue() {
-		lock.clear(std::memory_order_relaxed);
+	ETInlineHint ETForceInlineHint Gpu::CommandQueue::CommandQueue() :
+		family(~uint32_t(0)),
+		queue(VK_NULL_HANDLE) {}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint uint32 Gpu::GetFrameAfrDeviceMask() const ETNoexceptHint {
+		return 0u;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Gpu::AddGarbage(VkBuffer buffer, VmaAllocation backing) {
+	ETInlineHint ETForceInlineHint void Gpu::AddGarbage(VkBuffer buffer, VmaAllocation backing) {
 		Lock _(_garbageMutex);
 
 		_bufferGarbage.Append(buffer);
@@ -32,7 +38,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Gpu::AddGarbage(VkImage image, VmaAllocation backing) {
+	ETInlineHint ETForceInlineHint void Gpu::AddGarbage(VkImage image, VmaAllocation backing) {
 		Lock _(_garbageMutex);
 
 		_imageGarbage.Append(image);
@@ -41,7 +47,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Gpu::AddGarbage(VmaAllocation garbage) {
+	ETInlineHint ETForceInlineHint void Gpu::AddGarbage(VmaAllocation garbage) {
 		Lock _(_garbageMutex);
 
 		_allocationGarbage.Append(garbage);
@@ -49,7 +55,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Gpu::AddGarbage(VkBuffer buffer) {
+	ETInlineHint ETForceInlineHint void Gpu::AddGarbage(VkBuffer buffer) {
 		Lock _(_garbageMutex);
 
 		_bufferGarbage.Append(buffer);
@@ -57,7 +63,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	ETInlineHint void Gpu::AddGarbage(VkImage image) {
+	ETInlineHint ETForceInlineHint void Gpu::AddGarbage(VkImage image) {
 		Lock _(_garbageMutex);
 
 		_imageGarbage.Append(image);
@@ -65,107 +71,86 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	ETInlineHint const VkAllocationCallbacks* Gpu::GetAllocationCallbacks() const {
+	ETInlineHint ETForceInlineHint const VkAllocationCallbacks* Gpu::GetAllocationCallbacks() const ETNoexceptHint {
 		return _allocator;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint VkPipelineCache Gpu::GetPipelineCache() {
+	ETInlineHint ETForceInlineHint VkPipelineCache Gpu::GetPipelineCache() ETNoexceptHint {
 		return _pipelineCache;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Gpu::operator VkPhysicalDevice() {
+	ETInlineHint ETForceInlineHint Gpu::operator VkPhysicalDevice() ETNoexceptHint {
 		return _physicalDevice;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Gpu::operator VmaAllocator() {
+	ETInlineHint ETForceInlineHint Gpu::operator VmaAllocator() ETNoexceptHint {
 		return _gpuAllocator;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint Gpu::operator VkDevice() {
+	ETInlineHint ETForceInlineHint Gpu::operator VkDevice() ETNoexceptHint {
 		return _device;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint uint32_t Gpu::GetQueueFamilyByConcept(QueueConcept concept) const {
+	ETInlineHint ETForceInlineHint uint32_t Gpu::GetQueueFamilyByConcept(QueueConcept concept) const ETNoexceptHint {
 		return _queues[concept].family;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint bool Gpu::SharesQueues(QueueConcept first, QueueConcept second) const {
+	ETInlineHint ETForceInlineHint bool Gpu::SharesQueues(QueueConcept first, QueueConcept second) const ETNoexceptHint {
 		return _queues[first].family == _queues[second].family;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint VkResult Gpu::SubmitAsync(QueueConcept target, VkFence commandsConsumed, uint32_t submitCount, const VkSubmitInfo* begin) {
+	ETInlineHint ETForceInlineHint VkResult Gpu::SubmitAsync(QueueConcept target, VkFence commandsConsumed, uint32_t submitCount, const VkSubmitInfo* begin) ETNoexceptHint {
 		CommandQueue& queue(_queues[target]);
+		Lock          _(queue.mutex);
 
-		while (queue.lock.test_and_set(std::memory_order_acquire)) {
-			//	Busy wait.
-		}
-
-		VkResult result(vkQueueSubmit(queue.queue, submitCount, begin, commandsConsumed));
-
-		queue.lock.clear(std::memory_order_release);
-
-		return result;
+		return vkQueueSubmit(queue.queue, submitCount, begin, commandsConsumed);
 	}
 
 	// ---------------------------------------------------
 
 	template <uint32_t count>
-	ETInlineHint VkResult Gpu::SubmitAsync(QueueConcept target, VkFence commandsConsumed, const VkSubmitInfo (&submits)[count]) {
+	ETInlineHint ETForceInlineHint VkResult Gpu::SubmitAsync(QueueConcept target, VkFence commandsConsumed, const VkSubmitInfo (&submits)[count]) ETNoexceptHint {
 		return Gpu::SubmitAsync(target, commandsConsumed, count, submits);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint VkResult Gpu::BindAsync(QueueConcept target, VkFence commandsConsumed, uint32_t bindCount, const VkBindSparseInfo* begin) {
+	ETInlineHint ETForceInlineHint VkResult Gpu::BindAsync(QueueConcept target, VkFence commandsConsumed, uint32_t bindCount, const VkBindSparseInfo* begin) ETNoexceptHint {
 		CommandQueue& queue(_queues[target]);
+		Lock          _(queue.mutex);
 
-		while (queue.lock.test_and_set(std::memory_order_acquire)) {
-			//	Busy wait.
-		}
-
-		VkResult result(vkQueueBindSparse(queue.queue, bindCount, begin, commandsConsumed));
-
-		queue.lock.clear(std::memory_order_release);
-
-		return result;
+		return vkQueueBindSparse(queue.queue, bindCount, begin, commandsConsumed);
 	}
 
 	// ---------------------------------------------------
 
 	template <uint32_t count>
-	ETInlineHint VkResult Gpu::BindAsync(QueueConcept target, VkFence commandsConsumed, const VkBindSparseInfo (&binds)[count]) {
+	ETInlineHint ETForceInlineHint VkResult Gpu::BindAsync(QueueConcept target, VkFence commandsConsumed, const VkBindSparseInfo (&binds)[count]) ETNoexceptHint {
 		return Gpu::BindAsync(target, commandsConsumed, count, binds);
 	}
 
 	// ---------------------------------------------------
 
 #if VK_KHR_swapchain
-	ETInlineHint VkResult Gpu::PresentAsync(QueueConcept target, const VkPresentInfoKHR& submit) {
+	ETInlineHint ETForceInlineHint VkResult Gpu::PresentAsync(QueueConcept target, const VkPresentInfoKHR& submit) ETNoexceptHint {
 		CommandQueue& queue(_queues[target]);
+		Lock          _(queue.mutex);
 
-		while (queue.lock.test_and_set(std::memory_order_acquire)) {
-			//	Busy wait.
-		}
-
-		VkResult result(vkQueuePresentKHR(queue.queue, &submit));
-
-		queue.lock.clear(std::memory_order_release);
-
-		return result;
+		return vkQueuePresentKHR(queue.queue, ETAddressOf(submit));
 	}
 #endif // VK_KHR_swapchain
 

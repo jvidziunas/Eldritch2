@@ -101,7 +101,7 @@ namespace {
 
 	// ---------------------------------------------------
 
-	ETPureFunctionHint ETInlineHint DWORD CountSetBits(ULONG_PTR mask) {
+	ETInlineHint ETPureFunctionHint DWORD CountSetBits(ULONG_PTR mask) {
 		enum : DWORD { LSHIFT = CHAR_BIT * sizeof(ULONG_PTR) - 1u };
 
 		ULONG_PTR currentBit(ULONG_PTR(1u) << LSHIFT);

@@ -22,33 +22,33 @@ namespace Eldritch2 { namespace Graphics {
 
 	public:
 		//!	Constructs this @ref ResolutionScale instance.
-		ResolutionScale(const ResolutionScale&) = default;
+		ResolutionScale(const ResolutionScale&) ETNoexceptHint = default;
 		//!	Constructs this @ref ResolutionScale instance.
-		ResolutionScale();
+		ResolutionScale() ETNoexceptHint;
 
 		~ResolutionScale() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		void ForceIdentityScale();
+		void ForceIdentityScale() ETNoexceptHint;
 
-		void UpdateTime(uint32 timeInMicroseconds);
+		void UpdateTime(uint64 timeInMicroseconds) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void ScaleMax(uint32_t& width, uint32_t& height) const;
-		void ScaleMax(float32& width, float32& height) const;
+		void ScaleMax(uint32_t& width, uint32_t& height) const ETNoexceptHint;
+		void ScaleMax(float32& width, float32& height) const ETNoexceptHint;
 
-		void Scale(uint32_t& width, uint32_t& height) const;
-		void Scale(float32& width, float32& height) const;
+		void Scale(uint32_t& width, uint32_t& height) const ETNoexceptHint;
+		void Scale(float32& width, float32& height) const ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		uint32  _targetTimeMicroseconds;
-		uint32  _lastTimeMicroseconds;
+		uint64  _targetTimeMicroseconds;
+		uint64  _lastTimeMicroseconds;
 		float32 _minScale;
 		float32 _maxScale;
 	};

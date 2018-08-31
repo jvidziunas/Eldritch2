@@ -12,11 +12,10 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6340) Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6340)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6340)
 #include <isteamclient.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Networking { namespace Steamworks {

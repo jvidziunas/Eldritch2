@@ -14,11 +14,15 @@
 //==================================================================//
 #include <Graphics/MeshSource.hpp>
 //------------------------------------------------------------------//
+/*	(6011/28182) Possible null pointer dereference
+ *	(6386) Possible buffer overrun */
+ET_PUSH_MSVC_WARNING_STATE(disable : 6011 6386 28182)
 #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 #define NK_BUTTON_TRIGGER_ON_RELEASE
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_FONT_BAKING
 #include <nuklear/nuklear.h>
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics {

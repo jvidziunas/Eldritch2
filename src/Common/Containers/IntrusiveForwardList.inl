@@ -19,59 +19,57 @@ namespace Eldritch2 {
 
 template <class Value>
 template <typename InputIterator>
-ETInlineHint IntrusiveForwardList<Value>::IntrusiveForwardList(
-	InputIterator begin,
-	InputIterator end) :
+ETInlineHint IntrusiveForwardList<Value>::IntrusiveForwardList(InputIterator begin, InputIterator end) :
 	_container(begin, end) {
 }
 
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::FindIf(Predicate predicate, Iterator searchHint) {
-	return FindIf(searchHint, _container.end(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::FindIf(UnaryPredicate predicate, Iterator where) {
+	return FindIf(where, _container.end(), predicate);
 }
 
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::FindIf(Predicate predicate) {
-	return FindIf(_container.begin(), _container.end(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::FindIf(UnaryPredicate condition) {
+	return FindIf(_container.begin(), _container.end(), condition);
 }
 
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::FindIf(Predicate predicate, ConstIterator searchHint) const {
-	return FindIf(searchHint, _container.end(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::FindIf(UnaryPredicate condition, ConstIterator where) const {
+	return FindIf(where, _container.end(), condition);
 }
 
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Predicate>
-ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::FindIf(Predicate predicate) const {
-	return FindIf(_container.begin(), _container.end(), predicate);
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveForwardList<Value>::ConstIterator IntrusiveForwardList<Value>::FindIf(UnaryPredicate condition) const {
+	return FindIf(_container.begin(), _container.end(), condition);
 }
 
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Predicate>
-ETInlineHint void IntrusiveForwardList<Value>::EraseIf(Predicate predicate) {
-	EraseAndDisposeIf(predicate, [](Reference /*unused*/) {});
+template <typename UnaryPredicate>
+ETInlineHint void IntrusiveForwardList<Value>::EraseIf(UnaryPredicate condition) {
+	EraseAndDisposeIf(condition, [](Reference /*unused*/) {});
 }
 
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Predicate, typename Disposer>
-ETInlineHint void IntrusiveForwardList<Value>::EraseAndDisposeIf(Predicate predicate, Disposer disposer) {
+template <typename UnaryPredicate, typename Disposer>
+ETInlineHint void IntrusiveForwardList<Value>::EraseAndDisposeIf(UnaryPredicate condition, Disposer disposer) {
 	for (auto current(Begin()), end(End()); current != end;) {
-		if (predicate(*current)) {
+		if (condition(*current)) {
 			current = EraseAndDispose(current, disposer);
 			continue;
 		}
@@ -83,9 +81,9 @@ ETInlineHint void IntrusiveForwardList<Value>::EraseAndDisposeIf(Predicate predi
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Predicate>
-ETInlineHint void IntrusiveForwardList<Value>::Sort(Predicate predicate) {
-	_container.sort(predicate);
+template <typename UnaryPredicate>
+ETInlineHint void IntrusiveForwardList<Value>::Sort(UnaryPredicate sort) {
+	_container.sort(sort);
 }
 
 // ---------------------------------------------------
@@ -171,7 +169,6 @@ template <class Value>
 template <typename Disposer>
 ETInlineHint void IntrusiveForwardList<Value>::PopFrontAndDispose(Disposer disposer) {
 	auto& front(_container.front());
-
 	_container.pop_front();
 
 	disposer(front);
@@ -187,15 +184,15 @@ ETInlineHint void IntrusiveForwardList<Value>::PopFront() {
 // ---------------------------------------------------
 
 template <class Value>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Insert(Iterator location, Reference item) {
-	return _container.insert(location, item);
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Insert(Iterator where, Reference item) {
+	return _container.insert(where, item);
 }
 
 // ---------------------------------------------------
 
 template <class Value>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::InsertAfter(Iterator location, Reference item) {
-	return _container.insert_after(location, item);
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::InsertAfter(Iterator where, Reference item) {
+	return _container.insert_after(where, item);
 }
 
 // ---------------------------------------------------
@@ -208,8 +205,8 @@ ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList
 // ---------------------------------------------------
 
 template <class Value>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Erase(Iterator position) {
-	return _container.erase(position);
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::Erase(Iterator where) {
+	return _container.erase(where);
 }
 
 // ---------------------------------------------------
@@ -222,17 +219,17 @@ ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList
 // ---------------------------------------------------
 
 template <class Value>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAfter(Iterator position) {
-	return _container.erase_after(position);
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAfter(Iterator where) {
+	return _container.erase_after(where);
 }
 
 // ---------------------------------------------------
 
 template <class Value>
 template <typename Disposer>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAndDispose(Iterator position, Disposer disposer) {
-	auto& element(*position);
-	auto  result(_container.erase(position));
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAndDispose(Iterator where, Disposer disposer) {
+	auto& element(*where);
+	auto  result(_container.erase(where));
 
 	disposer(element);
 
@@ -296,8 +293,8 @@ ETInlineHint IntrusiveForwardList<Value>::operator bool() const {
 // ---------------------------------------------------
 
 template <class Value>
-ETInlineHint void Swap(IntrusiveForwardList<Value>& list0, IntrusiveForwardList<Value>& list1) {
-	eastl::swap(list0._container, list1._container);
+ETInlineHint void Swap(IntrusiveForwardList<Value>& lhs, IntrusiveForwardList<Value>& rhs) {
+	lhs._container.swap(rhs._container);
 }
 
 } // namespace Eldritch2

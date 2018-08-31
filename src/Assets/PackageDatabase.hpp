@@ -21,29 +21,46 @@ namespace Eldritch2 { namespace Assets {
 
 namespace Eldritch2 { namespace Assets {
 
+	class ETPureAbstractHint PackageLoadClient {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref PackageLoadClient instance.
+		PackageLoadClient() = default;
+
+		~PackageLoadClient() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		virtual void CompleteLoad(CountedPointer<const Package> package, ErrorCode finalResult) ETNoexceptHint;
+	};
+
+	// ---
+
 	class PackageDatabase {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		struct PackageEqual {
-			ETPureFunctionHint bool operator()(const Package&, StringView<Utf8Char>) const;
-			ETPureFunctionHint bool operator()(const Package&, const Package&) const;
+			ETPureFunctionHint bool operator()(const Package&, const Package&) const ETNoexceptHint;
+			ETPureFunctionHint bool operator()(const Package&, StringView) const ETNoexceptHint;
 		};
 
 		// ---
 
 	public:
 		struct PackageHash {
-			ETPureFunctionHint size_t operator()(StringView<Utf8Char>, size_t seed = 0u) const;
-			ETPureFunctionHint size_t operator()(const Package&, size_t seed = 0u) const;
+			ETPureFunctionHint size_t operator()(const Package&, size_t seed = 0u) const ETNoexceptHint;
+			ETPureFunctionHint size_t operator()(StringView, size_t seed = 0u) const ETNoexceptHint;
 		};
 
 		// ---
 
 	public:
 		struct LoadRequest {
-			Function<void(CountedPointer<const Package>, ErrorCode)> callback;
-			CountedPointer<Package>                                  package;
+			PackageLoadClient*      client;
+			CountedPointer<Package> package;
 		};
 
 		// ---
@@ -75,11 +92,14 @@ namespace Eldritch2 { namespace Assets {
 	public:
 		//! Signals to the @ref AssetDatabase that resources in the specified package will be needed in the near future.
 		/*! @param[in] path UTF-8-encoded string view containing the path to the package file, without any suffix or extension.
+			@param[in] client Reference to a @ref PackageLoadClient that will be notified of load completion.
 			@remarks Thread-safe.
 			@see @ref Package */
-		ErrorCode Load(StringView<Utf8Char> path, Function<void(CountedPointer<const Package>, ErrorCode)> callback);
+		ErrorCode Load(StringView path, PackageLoadClient& client);
 
 		bool PopRequest(LoadRequest& outRequest);
+
+		void CancelClientRequests(const PackageLoadClient& client);
 
 		// ---------------------------------------------------
 
@@ -93,7 +113,7 @@ namespace Eldritch2 { namespace Assets {
 	private:
 		void PushRequest(LoadRequest request);
 
-		void ClearRequests();
+		void CancelAllRequests();
 
 		// ---------------------------------------------------
 

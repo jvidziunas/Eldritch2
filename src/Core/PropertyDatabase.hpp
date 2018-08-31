@@ -25,9 +25,9 @@ namespace Eldritch2 { namespace Core {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using DynamicSetter = Function<void(StringView<Utf8Char> /*name*/, StringView<Utf8Char> /*value*/)>;
-		using SetterKey     = Pair<StringView<Utf8Char>, StringView<Utf8Char>>;
-		using Setter        = Function<void(StringView<Utf8Char> /*value*/)>;
+		using DynamicSetter = Function<void(StringView /*name*/, StringView /*value*/) ETNoexceptHint>;
+		using Setter        = Function<void(StringView /*value*/) ETNoexceptHint>;
+		using SetterKey     = Pair<StringView, StringView>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -42,7 +42,7 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
-		bool SetValue(StringView<Utf8Char> group, StringView<Utf8Char> name, StringView<Utf8Char> value);
+		bool SetValue(StringView group, StringView name, StringView value) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -52,8 +52,8 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		CachingHashMap<SetterKey, Setter>                   _settersByKey;
-		CachingHashMap<StringView<Utf8Char>, DynamicSetter> _dynamicSettersByGroup;
+		CachingHashMap<SetterKey, Setter>         _settersByKey;
+		CachingHashMap<StringView, DynamicSetter> _dynamicSettersByGroup;
 
 		// - FRIEND CLASS DECLARATION ------------------------
 

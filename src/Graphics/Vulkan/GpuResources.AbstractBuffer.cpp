@@ -16,7 +16,7 @@
 #include <Graphics/Vulkan/Gpu.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	AbstractBuffer::AbstractBuffer() :
 		_backing(nullptr),
@@ -45,7 +45,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
 		VmaAllocation backing;
 		VkBuffer      buffer;
 
-		ET_FAIL_UNLESS(vmaCreateBuffer(gpu, &bufferInfo, &allocationInfo, &buffer, &backing, nullptr));
+		ET_ABORT_UNLESS(vmaCreateBuffer(gpu, ETAddressOf(bufferInfo), ETAddressOf(allocationInfo), ETAddressOf(buffer), ETAddressOf(backing), nullptr));
 		ET_AT_SCOPE_EXIT(vmaDestroyBuffer(gpu, buffer, backing));
 
 		Swap(_buffer, buffer);
@@ -56,14 +56,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
 
 	// ---------------------------------------------------
 
-	void AbstractBuffer::GetAllocationInfo(Gpu& gpu, VmaAllocationInfo& info) {
-		vmaGetAllocationInfo(gpu, _backing, &info);
+	void AbstractBuffer::GetAllocationInfo(Gpu& gpu, VmaAllocationInfo& outInfo) {
+		vmaGetAllocationInfo(gpu, _backing, ETAddressOf(outInfo));
 	}
 
 	// ---------------------------------------------------
 
 	VkResult AbstractBuffer::MapHostPointer(Gpu& gpu, void*& outBase) const {
-		return vmaMapMemory(gpu, _backing, &outBase);
+		return vmaMapMemory(gpu, _backing, ETAddressOf(outBase));
 	}
 
 	// ---------------------------------------------------
@@ -81,4 +81,4 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace Detail {
 		Swap(lhs._backing, rhs._backing);
 	}
 
-}}}} // namespace Eldritch2::Graphics::Vulkan::Detail
+}}} // namespace Eldritch2::Graphics::Vulkan

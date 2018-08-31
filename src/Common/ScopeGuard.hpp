@@ -16,38 +16,38 @@
 //------------------------------------------------------------------//
 
 #define STRING_JOIN(arg1, arg2) STRING_JOIN2(arg1, arg2)
-#define STRING_JOIN2(arg1, arg2) arg1 ## arg2
-#define ET_AT_SCOPE_EXIT(...) auto STRING_JOIN(scopeExit, __LINE__)( ::Eldritch2::AtScopeExit( [&] () -> void { __VA_ARGS__; } ) )
+#define STRING_JOIN2(arg1, arg2) arg1##arg2
+#define ET_AT_SCOPE_EXIT(...) auto STRING_JOIN(scopeExit, __LINE__)(::Eldritch2::AtScopeExit([&]() -> void { __VA_ARGS__; }))
 
 namespace Eldritch2 {
 
-	template <typename Lambda>
-	class ScopeGuard {
+template <typename Lambda>
+class ScopeGuard {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Disable copy construction.
-		ScopeGuard(const ScopeGuard&) = delete;
+	ScopeGuard(const ScopeGuard&) = delete;
 	//!	Constructs this @ref ScopeGuard instance.
-		ScopeGuard(ScopeGuard&&);
+	ScopeGuard(ScopeGuard&&);
 	//!	Constructs this @ref ScopeGuard instance.
 	/*!	@param[in] onScopeExit Code to be executed when this object leaves scope. */
-		ScopeGuard(Lambda&& onScopeExit);
+	ScopeGuard(Lambda onScopeExit);
 
-		~ScopeGuard();
+	~ScopeGuard();
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		Lambda	_onScopeExit;
-	};
+private:
+	Lambda _onScopeExit;
+};
 
 // ---
 
-	template <typename Lambda>
-	ScopeGuard<Lambda> AtScopeExit(Lambda&& lambda);
+template <typename Lambda>
+ScopeGuard<Lambda> AtScopeExit(Lambda lambda);
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

@@ -20,25 +20,29 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Input { namespace Win32 {
+
+	using namespace ::Eldritch2::Scheduling;
+	using namespace ::Eldritch2::Logging;
+
 	namespace {
 
 		ETInlineHint LPCWSTR RegisterWindowClass(LPCWSTR className, WNDPROC windowProc, HINSTANCE instance) {
-			WNDCLASSEXW windowClass;
+			WNDCLASSEXW windowClass {
+				/*cbSize =*/sizeof(WNDCLASSEXW),
+				/*style =*/0,
+				/*lpfnWndProc =*/windowProc,
+				/*cbClsExtra =*/0u,
+				/*cbWndExtra =*/0u,
+				/*hInstance =*/instance,
+				/*hIcon =*/nullptr,
+				/*hCursor =*/nullptr,
+				/*hbrBackground =*/nullptr,
+				/*lpszMenuName =*/nullptr,
+				/*lpszClassName =*/className,
+				/*hIconSm =*/nullptr
+			};
 
-			windowClass.cbSize        = sizeof(windowClass);
-			windowClass.style         = 0;
-			windowClass.lpfnWndProc   = windowProc;
-			windowClass.cbClsExtra    = 0;
-			windowClass.cbWndExtra    = 0;
-			windowClass.hInstance     = instance;
-			windowClass.hIcon         = nullptr;
-			windowClass.hCursor       = nullptr;
-			windowClass.hbrBackground = nullptr;
-			windowClass.lpszMenuName  = nullptr;
-			windowClass.lpszClassName = className;
-			windowClass.hIconSm       = nullptr;
-
-			return reinterpret_cast<LPCWSTR>(RegisterClassExW(&windowClass));
+			return LPCWSTR(RegisterClassExW(&windowClass));
 		}
 
 		// ---------------------------------------------------
@@ -63,27 +67,17 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 				return false;
 			}
 
-			return RegisterRawInputDevices(listeners, _countof(listeners), sizeof(*listeners)) == TRUE;
+			return RegisterRawInputDevices(listeners, ETCountOf(listeners), sizeof(*listeners)) == TRUE;
 		}
 
 	} // anonymous namespace
 
-	using namespace ::Eldritch2::Scheduling;
-	using namespace ::Eldritch2::Logging;
-
-	Win32InputEngineComponent::ReaderThread::ReaderThread(DeviceCoordinator& devices) :
-		_window(nullptr),
-		_devices(eastl::addressof(devices)) {}
+	Win32InputEngineComponent::ReaderThread::ReaderThread(DeviceCoordinator& devices) ETNoexceptHint : _window(nullptr),
+																									   _devices(ETAddressOf(devices)) {}
 
 	// ---------------------------------------------------
 
-	Utf8Literal Win32InputEngineComponent::ReaderThread::GetName() const {
-		return "Win32 Input Sampler";
-	}
-
-	// ---------------------------------------------------
-
-	void Win32InputEngineComponent::ReaderThread::Run() {
+	ErrorCode Win32InputEngineComponent::ReaderThread::EnterOnCaller() {
 		/*	Since we operate in short bursts of work before sleeping, boost thread priority slightly to reduce the amount of downtime before the
 		 *	scheduler will queue us for execution. Windows internally does some priority boosting for us behind the scenes when we receive input,
 		 *	this is designed to supplement that behavior. */
@@ -93,10 +87,9 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 		const HWND window(CreateWindowExW(0, windowClass, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, nullptr, nullptr));
 		ET_AT_SCOPE_EXIT(DestroyWindow(window));
-
 		if (!RegisterListeners(window) || !_devices->Enumerate()) {
 			_window.store(nullptr, std::memory_order_release);
-			return;
+			return Error::Unspecified;
 		}
 
 		//	Signal to the outside world that we have initialized.
@@ -104,9 +97,8 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 		RAWINPUT input;
 		BOOL     hadError;
-
 		//	GetMessage() returns 0 if it recieved a WM_QUIT message. This call intentionally blocks.
-		for (MSG event; ET_LIKELY(hadError = GetMessageW(&event, window, 0u, 0u)) != 0;) {
+		for (MSG event; ET_LIKELY(hadError = GetMessageW(&event, window, 0u, 0u)) != 0; /*no increment*/) {
 			if (ET_UNLIKELY(hadError == -1)) {
 				break;
 			}
@@ -126,12 +118,14 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 			TranslateMessage(&event);
 			DispatchMessageW(&event);
 		}
+
+		return Error::None;
 	}
 
 	// ---------------------------------------------------
 
-	void Win32InputEngineComponent::ReaderThread::SetShouldShutDown() {
-		if (HWND window = _window.exchange(nullptr, std::memory_order_acquire)) {
+	void Win32InputEngineComponent::ReaderThread::SetShouldShutDown() ETNoexceptHint {
+		if (const HWND window = _window.exchange(nullptr, std::memory_order_acquire)) {
 			PostMessageW(window, WM_CLOSE, 0, 0);
 		}
 	}

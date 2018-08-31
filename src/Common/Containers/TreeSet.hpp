@@ -40,7 +40,12 @@ public:
 
 public:
 	//!	Constructs this @ref TreeSet instance.
-	TreeSet(const AllocatorType& allocator = AllocatorType());
+	template <typename InputIterator>
+	TreeSet(const AllocatorType& allocator, const SortPredicate& sort, InputIterator begin, InputIterator end);
+	//!	Constructs this @ref TreeSet instance.
+	TreeSet(const AllocatorType& allocator, const SortPredicate& sort, std::initializer_list<ValueType>);
+	//!	Constructs this @ref TreeSet instance.
+	TreeSet(const AllocatorType& allocator = AllocatorType(), const SortPredicate& sort = SortPredicate());
 	//!	Constructs this @ref TreeSet instance.
 	TreeSet(const TreeSet&) = default;
 	//!	Constructs this @ref TreeSet instance.
@@ -54,8 +59,8 @@ public:
 	ConstIterator Find(const ValueType& value) const;
 	Iterator      Find(const ValueType& value);
 
-	template <typename Predicate>
-	void RemoveIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void RemoveIf(UnaryPredicate condition);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -83,7 +88,7 @@ public:
 	Pair<Iterator, bool> Insert(ValueType&& value);
 
 	Iterator Erase(Iterator begin, Iterator end);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 
 	void Clear();
 

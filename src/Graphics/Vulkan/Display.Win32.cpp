@@ -18,16 +18,16 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	VkResult CreateSurface(Vulkan& vulkan, Window& window, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) {
-		const VkWin32SurfaceCreateInfoKHR surfaceInfo{
+	VkResult CreateSurface(Gpu& gpu, const Window& window, const VkAllocationCallbacks* allocator, VkSurfaceKHR* outSurface) {
+		const VkWin32SurfaceCreateInfoKHR surfaceInfo {
 			VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-			nullptr, // No (additional) extension data.
-			0u,      // No flags.
+			/*pNext =*/nullptr, // No (additional) extension data.
+			/*flags =*/0u,      // No flags.
 			window.GetHinstance(),
 			window.GetHwnd()
 		};
 
-		return vkCreateWin32SurfaceKHR(vulkan, &surfaceInfo, allocator, surface);
+		return vkCreateWin32SurfaceKHR(gpu, ETAddressOf(surfaceInfo), allocator, outSurface);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

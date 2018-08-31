@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Animation/KeyframeClip.hpp>
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 
@@ -21,10 +22,10 @@ namespace Eldritch2 { namespace Animation { namespace AssetViews {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref KeyframeClipAsset instance.
-		KeyframeClipAsset(const Utf8Char* const filePath);
 		//!	Disable copy construction.
 		KeyframeClipAsset(const KeyframeClipAsset&) = delete;
+		//!	Constructs this @ref KeyframeClipAsset instance.
+		KeyframeClipAsset(StringView path);
 
 		~KeyframeClipAsset() override = default;
 
@@ -34,6 +35,11 @@ namespace Eldritch2 { namespace Animation { namespace AssetViews {
 		ErrorCode BindResources(const Builder& builder) override;
 
 		void FreeResources() override;
+
+		// ---------------------------------------------------
+
+	public:
+		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

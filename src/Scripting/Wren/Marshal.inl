@@ -15,11 +15,9 @@
 
 //------------------------------------------------------------------//
 
-struct WrenHandle;
-
-void* wrenSetSlotNewForeign(WrenVM*, int, int, size_t);
-void* wrenGetSlotForeign(WrenVM*, int);
-void  wrenSetSlotHandle(WrenVM*, int, WrenHandle*);
+const char* wrenGetSlotBytes(WrenVM*, int, int*);
+void*       wrenSetSlotNewForeign(WrenVM*, int, int, size_t);
+void*       wrenGetSlotForeign(WrenVM*, int);
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
@@ -31,8 +29,17 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	// ---------------------------------------------------
 
 	template <typename T>
-	ETPureFunctionHint ETInlineHint T& GetSlotAs(WrenVM* vm, int slot) {
+	ETInlineHint ETPureFunctionHint T& GetSlotAs(WrenVM* vm, int slot) ETNoexceptHint {
 		return *static_cast<T*>(wrenGetSlotForeign(vm, slot));
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETPureFunctionHint StringView GetSlotStringView(WrenVM* vm, int slot) ETNoexceptHint {
+		int               length;
+		const char* const data(wrenGetSlotBytes(vm, slot, &length));
+
+		return { data, StringView::SizeType(length) };
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

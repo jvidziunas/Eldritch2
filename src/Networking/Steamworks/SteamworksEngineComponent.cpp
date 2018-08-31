@@ -18,11 +18,10 @@
 #include <Core/Engine.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
-ET_PUSH_COMPILER_WARNING_STATE()
 //	(6340) Valve has a few mismatches in their printf specifiers! We can't fix these, so disable the warning.
-ET_SET_MSVC_WARNING_STATE(disable : 6340)
+ET_PUSH_MSVC_WARNING_STATE(disable : 6340)
 #include <steam_api.h>
-ET_POP_COMPILER_WARNING_STATE()
+ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -39,9 +38,19 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 	using namespace ::Eldritch2::Logging;
 	using namespace ::Eldritch2::Core;
 
-	SteamworksEngineComponent::SteamworksEngineComponent(const ObjectLocator& services, Log& log) :
+	namespace {
+
+		enum : NetworkPort {
+			DefaultWorldPortBegin = 6670u,
+			DefaultWorldPortEnd   = 6689u,
+			DefaultSteamPort      = 6690u
+		};
+
+	} // anonymous namespace
+
+	SteamworksEngineComponent::SteamworksEngineComponent(const ObjectLocator& services) :
 		EngineComponent(services),
-		_log(log),
+		_log(FindService<Engine>()->GetLog()),
 		_steamPort(DefaultSteamPort),
 		_worldPorts(MallocAllocator("Steamworks Port Pool Allocator")),
 		_bannedIds(MallocAllocator("Steamworks Banned ID List Allocator")) {
@@ -64,30 +73,29 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 	void SteamworksEngineComponent::BindConfigurableResources(JobExecutor& /*executor*/) {
 		ET_PROFILE_SCOPE("Engine/Initialization", "Steamworks initialization", 0xBBBBBB);
 		if (_worldPorts.IsEmpty()) {
-			_log.Write(MessageType::VerboseWarning, "No world ports allocated to Steam, using range [{} - {}]." UTF8_NEWLINE, DefaultWorldPortBegin, DefaultWorldPortEnd);
-			//	Add a small set of default ports.
-			_worldPorts.ReleaseRange({ DefaultWorldPortBegin, DefaultWorldPortEnd });
+			_log.Write(Severity::VerboseWarning, "No world ports allocated to Steam, using range [{} - {}]." ET_NEWLINE, DefaultWorldPortBegin, DefaultWorldPortEnd);
+			_worldPorts.Assign(DefaultWorldPortBegin, DefaultWorldPortEnd);
 		}
 
 		//	Attempt to establish a connection with the Steam master servers.
 		if (!SteamAPI_Init()) {
-			_log.Write(MessageType::Error, "Unable to initialize Steam API!" UTF8_NEWLINE);
-			FindService<Engine>().SetShouldShutDown();
+			_log.Write(Severity::Error, "Unable to initialize Steam API!" ET_NEWLINE);
+			FindService<Engine>()->SetShouldShutDown();
 			return;
 		}
 
 		SteamClient()->SetLocalIPBinding(0u, _steamPort);
 		SteamClient()->SetWarningMessageHook([](int severity, const char* message) {
+			enum : int { SteamworksWarning = 0 };
 #if ET_PLATFORM_WINDOWS
 			OutputDebugStringA(message);
 #endif
-
-			if (severity >= 1) {
+			if (severity != SteamworksWarning) {
 				ET_TRIGGER_DEBUGBREAK();
 			}
 		});
 
-		_log.Write(MessageType::Message, "Connected to local Steam client." UTF8_NEWLINE);
+		_log.Write(Severity::Message, "Connected to local Steam client." ET_NEWLINE);
 	}
 
 	// ---------------------------------------------------
@@ -98,7 +106,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 			.DefineProperty("SteamPort", _steamPort);
 
 		properties.BeginSection("Steamworks.BannedSteamIds")
-			.DefineDynamicProperty([this](const Utf8Char* /*name*/, Range<const Utf8Char*> /*value*/) {
+			.DefineDynamicProperty([this](StringView /*name*/, StringView /*value*/) {
 				_bannedIds.Insert(CSteamID());
 			});
 	}

@@ -15,32 +15,21 @@
 #include <Graphics/Vulkan/GraphicsPipelineBuilder.hpp>
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
-#include <vulkan/vulkan_core.h>
-//------------------------------------------------------------------//
-
-namespace Eldritch2 { namespace Graphics { namespace AssetViews {
-	class ImageAsset;
-}}} // namespace Eldritch2::Graphics::AssetViews
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	class GraphicsPipelineAsset : public Assets::Asset {
+	class GraphicsPipelineAsset : public GraphicsPipelineBuilder, public Assets::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref GraphicsPipelineAsset instance.
-		/*!	@param[in] filePath Null-terminated, UTF-8-encoded character sequence containing the
-		   file system path to the asset this @ref GraphicsPipelineAsset is describing. */
-		GraphicsPipelineAsset(const Utf8Char* const filePath);
 		//!	Disable copy construction.
 		GraphicsPipelineAsset(const GraphicsPipelineAsset&) = delete;
+		//!	Constructs this @ref GraphicsPipelineAsset instance.
+		/*!	@param[in] path UTF-8-encoded string view containing the path to the asset
+				the @ref GraphicsPipelineAsset is describing. */
+		GraphicsPipelineAsset(StringView path);
 
 		~GraphicsPipelineAsset() override = default;
-
-		// ---------------------------------------------------
-
-	public:
-		const GraphicsPipelineBuilder& GetBuilder() const;
 
 		// ---------------------------------------------------
 
@@ -51,13 +40,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
+	public:
+		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
 		//!	Disable copy assignment.
 		GraphicsPipelineAsset& operator=(const GraphicsPipelineAsset&) = delete;
-
-		// - DATA MEMBERS ------------------------------------
-
-	private:
-		GraphicsPipelineBuilder _pipelineBuilder;
 	};
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

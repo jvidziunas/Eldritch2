@@ -13,9 +13,13 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Containers/HashSet.hpp>
-#include <Common/Containers/String.hpp>
+#include <Common/Containers/Path.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 {
+class ErrorCode;
+}
 
 namespace Eldritch2 { namespace Tools {
 
@@ -33,11 +37,11 @@ namespace Eldritch2 { namespace Tools {
 		// ---------------------------------------------------
 
 	public:
+		ErrorCode ProcessImage(const Path& path);
+
+		ErrorCode Process();
+
 		void RegisterOptions(OptionRegistrar& options);
-
-		int ProcessImage(const Utf8Char* path);
-
-		int Process();
 
 		// ---------------------------------------------------
 
@@ -47,13 +51,13 @@ namespace Eldritch2 { namespace Tools {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		HashSet<String<>> _sourcePaths;
-		uint32            _threadCount;
-		uint32            _imageQuality;
-		uint32            _mipLevels;
-		uint32            _alphaToCoverageSamplesPerPixel;
-		bool              _correctAlphaTestDistribution;
-		bool              _isColorData;
+		HashSet<Path> _sourcePaths;
+		uint32        _threadCount;
+		uint32        _imageQuality;
+		uint32        _mipLevels;
+		uint32        _alphaToCoverageSamplesPerPixel;
+		bool          _correctAlphaTestDistribution;
+		bool          _isColorData;
 	};
 
 }} // namespace Eldritch2::Tools

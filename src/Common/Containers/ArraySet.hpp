@@ -44,17 +44,18 @@ public:
 
 public:
 	//!	Constructs this @ref ArraySet instance.
+	ArraySet(const AllocatorType& allocator = AllocatorType(), const SorterType& sort = SorterType(), SizeType capacityHint = 0u);
+	//!	Constructs this @ref ArraySet instance.
 	template <typename InputIterator>
-	ArraySet(InputIterator begin, InputIterator end, const SorterType& orderingPredicate = SorterType(), const AllocatorType& allocator = AllocatorType());
+	ArraySet(const AllocatorType& allocator, const SorterType& sort, InputIterator begin, InputIterator end);
 	//!	Constructs this @ref ArraySet instance.
-	ArraySet(SizeType reservedSizeInElements, const SorterType& orderingPredicate = SorterType(), const AllocatorType& allocator = AllocatorType());
+	ArraySet(const AllocatorType& allocator, const SorterType& sort, std::initializer_list<ValueType>);
 	//!	Constructs this @ref ArraySet instance.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	ArraySet(const ArraySet& set, const AllocatorType& allocator = AllocatorType());
+	ArraySet(const AllocatorType& allocator, const ArraySet&);
 	//!	Constructs this @ref ArraySet instance.
-	ArraySet(const AllocatorType& allocator = AllocatorType());
+	ArraySet(const ArraySet&) = default;
 	//!	Constructs this @ref ArraySet instance.
-	ArraySet(ArraySet&&);
+	ArraySet(ArraySet&&) = default;
 
 	~ArraySet() = default;
 
@@ -67,19 +68,19 @@ public:
 	ConstIterator UpperBound(const ValueType& value) const;
 	Iterator      UpperBound(const ValueType& value);
 
-	template <typename AlternateValue, typename BinaryPredicate>
-	ConstIterator Find(const AlternateValue& value, BinaryPredicate comparisonPredicate) const;
-	template <typename AlternateValue, typename BinaryPredicate>
-	Iterator      Find(const AlternateValue& value, BinaryPredicate comparisonPredicate);
+	template <typename Value2, typename SortPredicate2>
+	ConstIterator Find(const Value2& value, SortPredicate2 sort) const;
+	template <typename Value2, typename SortPredicate2>
+	Iterator      Find(const Value2& value, SortPredicate2 sort);
 	ConstIterator Find(const ValueType& value) const;
 	Iterator      Find(const ValueType& value);
 
-	template <typename AlternateValue, typename BinaryPredicate>
-	bool Contains(const AlternateValue& value, BinaryPredicate comparisonPredicate) const;
+	template <typename Value2, typename SortPredicate2>
+	bool Contains(const Value2& value, SortPredicate2 sort) const;
 	bool Contains(const ValueType& value) const;
 
-	template <typename Predicate>
-	void RemoveIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void RemoveIf(UnaryPredicate filter);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -94,12 +95,6 @@ public:
 	ConstIterator End() const;
 	Iterator      End();
 
-	// - CONTAINER DUPLICATION ---------------------------
-
-public:
-	ArraySet& operator=(const ArraySet&) = default;
-	ArraySet& operator=(ArraySet&&) = default;
-
 	// - ELEMENT ACCESS ----------------------------------
 
 	ConstPointer GetData() const;
@@ -111,12 +106,11 @@ public:
 	template <typename... Arguments>
 	Pair<Iterator, bool> Emplace(Arguments&&... arguments);
 
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
 	Pair<Iterator, bool> Insert(const ValueType& value);
 	Pair<Iterator, bool> Insert(ValueType&& value);
 
-	Iterator Erase(Iterator beginPosition, Iterator endPosition);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator begin, Iterator end);
+	Iterator Erase(Iterator where);
 	SizeType Erase(const ValueType& value);
 
 	void Clear();
@@ -148,6 +142,12 @@ public:
 
 public:
 	const AllocatorType& GetAllocator() const;
+
+	// - CONTAINER DUPLICATION ---------------------------
+
+public:
+	ArraySet& operator=(const ArraySet&) = default;
+	ArraySet& operator=(ArraySet&&) = default;
 
 	// - DATA MEMBERS ------------------------------------
 

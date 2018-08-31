@@ -1,0 +1,468 @@
+/*==================================================================*\
+  AbstractStringView.inl
+  ------------------------------------------------------------------
+  Purpose:
+  
+
+  ------------------------------------------------------------------
+  ©2010-2018 Eldritch Entertainment, LLC.
+\*==================================================================*/
+#pragma once
+
+//==================================================================//
+// INCLUDES
+//==================================================================//
+#include <fmt/format.h>
+//------------------------------------------------------------------//
+#include <eastl/internal/char_traits.h>
+//------------------------------------------------------------------//
+
+namespace Eldritch2 {
+template <typename T>
+class Hash;
+
+ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t sizeInBytes, size_t seed);
+} // namespace Eldritch2
+
+namespace Eldritch2 {
+
+template <typename Character>
+ETConstexpr ETInlineHint AbstractStringView<Character>::AbstractStringView(const CharacterType* begin, SizeType length) :
+	_view(begin, length) {}
+
+// ---------------------------------------------------
+
+template <typename Character>
+template <size_t size>
+ETConstexpr ETInlineHint AbstractStringView<Character>::AbstractStringView(const CharacterType (&string)[size]) :
+	_view(string, size) {
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstIterator AbstractStringView<Character>::Begin() const {
+	return _view.begin();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstIterator AbstractStringView<Character>::End() const {
+	return _view.end();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstIterator AbstractStringView<Character>::ConstBegin() const {
+	return _view.cbegin();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstIterator AbstractStringView<Character>::ConstEnd() const {
+	return _view.cend();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstReverseIterator AbstractStringView<Character>::ReverseBegin() const {
+	return _view.rbegin();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstReverseIterator AbstractStringView<Character>::ReverseEnd() const {
+	return _view.rend();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstReverseIterator AbstractStringView<Character>::ConstReverseBegin() const {
+	return _view.crbegin();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::ConstReverseIterator AbstractStringView<Character>::ConstReverseEnd() const {
+	return _view.crend();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename const AbstractStringView<Character>::CharacterType* AbstractStringView<Character>::GetData() const {
+	return _view.data();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::CharacterType AbstractStringView<Character>::Front() const {
+	return _view.front();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::CharacterType AbstractStringView<Character>::Back() const {
+	return _view.back();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::CharacterType AbstractStringView<Character>::operator[](SizeType offset) const {
+	return _view[offset];
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint int AbstractStringView<Character>::Compare(const CharacterType* string) const {
+	return _view.compare(string);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint int AbstractStringView<Character>::Compare(const AbstractStringView<Character>& string) const {
+	return _view.compare(string._view);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::GetLength() const {
+	return _view.length();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::GetSize() const {
+	return _view.size();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool AbstractStringView<Character>::IsEmpty() const {
+	return _view.empty();
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr bool AbstractStringView<Character>::StartsWith(const AbstractStringView<Character>& prefix) const {
+	return prefix.GetLength() <= this->GetLength() ? Substring(0, prefix.GetLength()).Compare(prefix) == 0 : false;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr bool AbstractStringView<Character>::EndsWith(const AbstractStringView<Character>& suffix) const {
+	return suffix.GetLength() <= this->GetLength() ? Substring(this->GetLength() - suffix.GetLength(), suffix.GetLength()).Compare(suffix) == 0 : false;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint void AbstractStringView<Character>::RemovePrefix(const AbstractStringView<Character>& prefix) {
+	if (StartsWith(prefix)) {
+		RemovePrefix(prefix.GetLength());
+	}
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint void AbstractStringView<Character>::RemovePrefix(SizeType length) {
+	_view.remove_prefix(length);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint void AbstractStringView<Character>::RemoveSuffix(const AbstractStringView<Character>& suffix) {
+	if (EndsWith(suffix)) {
+		RemoveSuffix(suffix.GetLength());
+	}
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint void AbstractStringView<Character>::RemoveSuffix(SizeType length) {
+	_view.remove_suffix(length);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint AbstractStringView<Character> AbstractStringView<Character>::Substring(SizeType offset, SizeType length) const {
+	UnderlyingView view(_view.substr(offset, length));
+	return { view.data(), view.length() };
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::Find(const AbstractStringView<Character>& string, SizeType offset) const {
+	return _view.find(string._view, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::Find(CharacterType character, SizeType offset) const {
+	return _view.find(character, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindLast(const AbstractStringView<Character>& string, SizeType offset) const {
+	return _view.rfind(string._view, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindLast(CharacterType character, SizeType offset) const {
+	return _view.rfind(character, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindAny(const AbstractStringView<Character>& set, SizeType offset) const {
+	return _view.find_first_of(set._view, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindAnyLast(const AbstractStringView<Character>& set, SizeType offset) const {
+	return _view.find_last_of(set._view, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindNot(const AbstractStringView<Character>& set, SizeType offset) const {
+	return _view.find_first_not_of(set._view, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindNot(CharacterType value, SizeType offset) const {
+	return _view.find_first_not_of(value, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindNotLast(const AbstractStringView<Character>& set, SizeType offset) const {
+	return _view.find_last_not_of(set._view, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::FindNotLast(CharacterType value, SizeType offset) const {
+	return _view.find_last_not_of(value, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETInlineHint typename AbstractStringView<Character>::SizeType AbstractStringView<Character>::Copy(CharacterType* target, SizeType limit, SizeType offset) const {
+	return _view.copy(target, limit, offset);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint void Swap(AbstractStringView<Character>& lhs, AbstractStringView<Character>& rhs) {
+	eastl::swap(lhs._view, rhs._view);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETCpp14Constexpr ETInlineHint size_t GetHashCode(const AbstractStringView<Character>& string, size_t seed = 0u) ETNoexceptHint {
+	return Eldritch2::HashMemory(string.Begin(), string.GetLength() * sizeof(Character), seed);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator==(const AbstractStringView<Character>& lhs, const AbstractStringView<Character>& rhs) ETNoexceptHint {
+	return lhs.Compare(rhs) == 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator!=(const AbstractStringView<Character>& lhs, const AbstractStringView<Character>& rhs) ETNoexceptHint {
+	return !(lhs == rhs);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator<(const AbstractStringView<Character>& lhs, const AbstractStringView<Character>& rhs) {
+	return lhs.Compare(rhs) < 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator<=(const AbstractStringView<Character>& lhs, const AbstractStringView<Character>& rhs) {
+	return rhs.Compare(lhs) < 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator>(const AbstractStringView<Character>& lhs, const AbstractStringView<Character>& rhs) {
+	return lhs.Compare(rhs) > 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator>=(const AbstractStringView<Character>& lhs, const AbstractStringView<Character>& rhs) {
+	return rhs.Compare(lhs) > 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator==(const AbstractStringView<Character>& lhs, const Character* rhs) {
+	return lhs.Compare(rhs) == 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator!=(const AbstractStringView<Character>& lhs, const Character* rhs) {
+	return !(lhs == rhs);
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator<(const AbstractStringView<Character>& lhs, const Character* rhs) {
+	return lhs.Compare(rhs) < 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator<=(const AbstractStringView<Character>& lhs, const Character* rhs) {
+	return lhs.Compare(rhs) <= 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator>(const AbstractStringView<Character>& lhs, const Character* rhs) {
+	return lhs.Compare(rhs) > 0;
+}
+
+// ----------------------------------------------------
+
+template <typename Character>
+ETConstexpr ETInlineHint bool operator>=(const AbstractStringView<Character>& lhs, const Character* rhs) {
+	return lhs.Compare(rhs) >= 0;
+}
+
+} // namespace Eldritch2
+
+template <typename Character>
+class ::Eldritch2::Hash<::Eldritch2::AbstractStringView<Character>> {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+public:
+	//!	Constructs this @ref Hash instance.
+	Hash(const Hash&) = default;
+	//!	Constructs this @ref Hash instance.
+	Hash() = default;
+
+	~Hash() = default;
+
+	// ---------------------------------------------------
+
+public:
+	ETInlineHint ETPureFunctionHint size_t operator()(::Eldritch2::AbstractStringView<Character> string, size_t seed = 0u) const {
+		return ::Eldritch2::GetHashCode(string, seed);
+	}
+};
+
+template <typename Character>
+struct ::fmt::v5::formatter<::Eldritch2::AbstractStringView<Character>, Character> {
+	template <typename ParseContext>
+	ETConstexpr auto parse(ParseContext& context) -> decltype(eastl::declval<ParseContext>().begin()) {
+		return context.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(::Eldritch2::AbstractStringView<Character> string, FormatContext& context) -> decltype(eastl::declval<FormatContext>().begin()) {
+		fmt::internal::basic_buffer<Character>& buffer(fmt::internal::get_container(context.out()));
+		buffer.reserve(buffer.capacity() + string.GetLength());
+		return ::Eldritch2::Copy(string.Begin(), string.End(), context.begin());
+	}
+};
+
+template <>
+struct ::fmt::v5::formatter<::Eldritch2::AbstractStringView<::Eldritch2::PlatformChar>, ::Eldritch2::Utf8Char, std::enable_if_t<!eastl::is_same_v<::Eldritch2::Utf8Char, ::Eldritch2::PlatformChar>>> {
+	template <typename ParseContext>
+	ETConstexpr auto parse(ParseContext& context) -> decltype(eastl::declval<ParseContext>().begin()) {
+		return context.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(const ::Eldritch2::AbstractStringView<::Eldritch2::PlatformChar>& string, FormatContext& context) -> decltype(eastl::declval<FormatContext>().begin()) {
+		::Eldritch2::Utf8Char staging[32u / sizeof(::Eldritch2::Utf8Char)];
+		auto                  output(context.begin());
+
+		for (auto input(string.ConstBegin()), end(string.ConstEnd()); input < end;) {
+			auto lastDecoded(eastl::begin(staging));
+			eastl::DecodePart(input, end, lastDecoded, eastl::end(staging));
+			output = eastl::copy(eastl::begin(staging), lastDecoded, output);
+		}
+
+		return output;
+	}
+};
+
+template <>
+struct ::fmt::v5::formatter<::Eldritch2::AbstractStringView<::Eldritch2::Utf8Char>, ::Eldritch2::PlatformChar, std::enable_if_t<!eastl::is_same_v<::Eldritch2::Utf8Char, ::Eldritch2::PlatformChar>>> {
+	template <typename ParseContext>
+	ETConstexpr auto parse(ParseContext& context) -> decltype(eastl::declval<ParseContext>().begin()) {
+		return context.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(::Eldritch2::AbstractStringView<::Eldritch2::Utf8Char> string, FormatContext& context) -> decltype(eastl::declval<FormatContext>().begin()) {
+		::Eldritch2::PlatformChar staging[32u / sizeof(::Eldritch2::PlatformChar)];
+		auto                      output(context.begin());
+
+		for (auto input(string.ConstBegin()), end(string.ConstEnd()); input < end;) {
+			auto lastDecoded(eastl::begin(staging));
+			eastl::DecodePart(input, end, lastDecoded, eastl::end(staging));
+			output = eastl::copy(eastl::begin(staging), lastDecoded, output);
+		}
+
+		return output;
+	}
+};

@@ -25,6 +25,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
+	struct View {
+		//!  Set of planes to clip objects against.
+		Vector     frustumPlanes[6];
+		VkViewport affineViewport;
+		uint8      id;
+	};
+
+	// ---
+
 	class CommandList {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -41,58 +50,52 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		operator VkCommandBuffer();
+		operator VkCommandBuffer() ETNoexceptHint;
 
-		VkCommandBuffer Get();
-
-		// ---------------------------------------------------
-
-	public:
-		void ExecutePipeline(const GraphicsPipeline& pipeline, const DescriptorTable& descriptors, const Framebuffer& target);
+		VkCommandBuffer Get() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
+		void ExecutePipeline(const Framebuffer& target, const GraphicsPipeline& pipeline, const DescriptorTable& descriptors, const ArrayList<View>& views);
 
-		void DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance);
-
-		void DrawIndirect(VkBuffer buffer, VkDeviceSize offset, uint32_t drawCount, uint32_t drawStrideInBytes = sizeof(VkDrawIndirectCommand));
-
-		void DrawIndexedIndirect(VkBuffer buffer, VkDeviceSize offset, uint32_t drawCount, uint32_t drawStrideInBytes = sizeof(VkDrawIndexedIndirectCommand));
-
-		//!	Dispatch the currently-bound compute shader pipeline.
-		/*!	The dispatch can be optionally split into two subgroups to avoid GPU cache and dispatch bubbles. */
-		void Dispatch(VkEvent halfComplete, VkEvent fullComplete, uint32_t x, uint32_t y, uint32_t z);
+		void CompositeImage(const Framebuffer& target, const Framebuffer& source);
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult ResetPool(Gpu& gpu, VkCommandPoolResetFlags flags = 0);
+		VkResult BeginRecording(Gpu& gpu, VkCommandPoolResetFlags flags, VkCommandBufferUsageFlags usageFlags) ETNoexceptHint;
 
-		VkResult BeginRecording(VkCommandBufferUsageFlags flags);
-
-		VkResult FinishRecording();
+		VkResult FinishRecording() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, QueueConcept queue, VkCommandPoolCreateFlags flags);
+		VkResult BindResources(Gpu& gpu, QueueConcept concept, VkCommandPoolCreateFlags flags);
 
 		void FreeResources(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+	private:
+		//!	Dispatch the currently-bound compute shader pipeline.
+		/*!	The dispatch can be optionally split into two subgroups to avoid GPU cache and dispatch bubbles. */
+		void Dispatch(VkEvent halfComplete, VkEvent complete, uint32_t x, uint32_t y, uint32_t z) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
 		CommandList& operator=(const CommandList&) = delete;
 
-		friend void Swap(CommandList&, CommandList&);
-
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		VkCommandPool   _pool;
-		VkCommandBuffer _commandBuffer;
+		VkCommandBuffer _commands;
+
+		// ---------------------------------------------------
+
+		friend void Swap(CommandList&, CommandList&) ETNoexceptHint;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

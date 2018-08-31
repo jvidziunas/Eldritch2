@@ -40,9 +40,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			//!	Disable copy construction.
 			Usage(const Usage&) = delete;
 			//!	Constructs this @ref Usage instance.
-			Usage(Usage&&);
+			Usage(Usage&&) ETNoexceptHint;
 			//!	Constructs this @ref Usage instance.
-			Usage();
+			Usage() ETNoexceptHint;
 
 			~Usage();
 
@@ -65,7 +65,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 			// ---------------------------------------------------
 
-			friend void Swap(Usage&, Usage&);
+			friend void Swap(Usage&, Usage&) ETNoexceptHint;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -115,29 +115,44 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		public:
 			//!	Constructs this @ref AttachmentDescription instance.
-			AttachmentDescription(const AttachmentDescription&) = default;
+			AttachmentDescription(const GraphicsPipelineBuilder::AttachmentDescription&) ETNoexceptHint;
 			//!	Constructs this @ref AttachmentDescription instance.
-			AttachmentDescription();
+			AttachmentDescription(const AttachmentDescription&) ETNoexceptHint = default;
+			//!	Constructs this @ref AttachmentDescription instance.
+			AttachmentDescription() ETNoexceptHint;
 
 			~AttachmentDescription() = default;
 
 			// ---------------------------------------------------
 
 		public:
-			VkExtent3D GetDimensions(VkExtent2D base, uint32 layers) const;
+			VkImageViewCreateInfo GetImageViewCreateInfo(VkImage image, uint32 mip, void* extensions = nullptr) const ETNoexceptHint;
+
+			VkImageCreateInfo GetImageCreateInfo(VkExtent2D base, uint32 layers, void* extensions = nullptr) const ETNoexceptHint;
+
+			// ---------------------------------------------------
+
+		private:
+			VkImageViewType GetViewType() const ETNoexceptHint;
+
+			VkImageType GetType() const ETNoexceptHint;
+
+			VkExtent3D GetResolution(VkExtent2D baseResolution) const ETNoexceptHint;
+
+			uint32 GetLayers(uint32 baseLayers) const ETNoexceptHint;
 
 			// - DATA MEMBERS ------------------------------------
 
-		public:
-			VkFormat           format;
-			VkImageCreateFlags flags;
-			VkImageUsageFlags  usages;
-			VkSampleCountFlags msaaFlags;
-			uint32             arraySize;
-			bool               dynamicResolution;
+		private:
+			VkFormat           _format;
+			VkImageCreateFlags _flags;
+			VkImageUsageFlags  _usages;
+			VkSampleCountFlags _sampleRates;
+			uint32             _arraySize;
+			bool               _staticResolution;
 			union {
-				VkExtent3D dimensions;
-				float32    scale[2];
+				VkExtent3D        _resolution;
+				GraphicsPassScale _scale;
 			};
 		};
 
@@ -157,9 +172,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		public:
 			//!	Constructs this @ref PassDescription instance.
-			PassDescription(GeometryType source = GeometryType::StaticMeshes);
+			PassDescription(GeometryType source = GeometryType::StaticMeshes) ETNoexceptHint;
 			//!	Constructs this @ref PassDescription instance.
-			PassDescription(const PassDescription&) = default;
+			PassDescription(const PassDescription&) ETNoexceptHint = default;
 
 			~PassDescription();
 
@@ -198,15 +213,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const PassDescription* GetPasses() const;
+		const PassDescription* GetPasses() const ETNoexceptHint;
 
-		uint32 GetPassCount() const;
+		uint32 GetPassCount() const ETNoexceptHint;
 
-		const AttachmentDescription* GetFramebufferAttachments() const;
+		const AttachmentDescription* GetFramebufferAttachments() const ETNoexceptHint;
 
-		uint32 GetFramebufferAttachmentCount() const;
+		uint32 GetFramebufferAttachmentCount() const ETNoexceptHint;
 
-		VkDescriptorSetLayout GetDescriptorLayout() const;
+		VkDescriptorSetLayout GetDescriptorLayout() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -224,7 +239,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	private:
 		VkDescriptorSetLayout            _descriptorLayout;
-		ArrayList<AttachmentDescription> _framebufferAttachments;
+		ArrayList<AttachmentDescription> _attachments;
 		ArrayList<PassDescription>       _passes;
 
 		// ---------------------------------------------------
@@ -238,6 +253,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		using ExternalImageMap = ArrayMap<uint32 /*attachmentIndex*/, VkImage /*image*/>;
+
+		// ---
+
 		class Attachment {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -245,16 +264,22 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			//!	Disable copy construction.
 			Attachment(const Attachment&) = delete;
 			//! Constructs this @ref Attachment instance.
-			Attachment(Attachment&&);
+			Attachment(Attachment&&) ETNoexceptHint;
 			//! Constructs this @ref Attachment instance.
-			Attachment();
+			Attachment() ETNoexceptHint;
 
 			~Attachment();
 
 			// ---------------------------------------------------
 
 		public:
-			VkResult BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, uint32 attachmentIndex, VkExtent2D baseDimensions, uint32 arrayLayers);
+			bool OwnsImage() const ETNoexceptHint;
+
+			// ---------------------------------------------------
+
+		public:
+			VkResult BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, uint32 attachmentIndex, VkExtent2D baseDimensions, uint32 layers);
+			VkResult BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, uint32 attachmentIndex, VkImage image);
 
 			void FreeResources(Gpu& gpu);
 
@@ -266,7 +291,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 			// ---------------------------------------------------
 
-			friend void Swap(Attachment&, Attachment&);
+			friend void Swap(Attachment&, Attachment&) ETNoexceptHint;
 		};
 
 		// ---
@@ -279,16 +304,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			//!	Disable copy construction.
 			Pass(const Pass&) = delete;
 			//!	Constructs this @ref Pass instance.
-			Pass(Pass&&);
+			Pass(Pass&&) ETNoexceptHint;
 			//!	Constructs this @ref Pass instance.
-			Pass();
+			Pass() ETNoexceptHint;
 
 			~Pass();
 
 			// ---------------------------------------------------
 
 		public:
-			VkRect2D GetRenderArea() const;
+			VkRect2D GetRenderArea() const ETNoexceptHint;
 
 			// ---------------------------------------------------
 
@@ -308,7 +333,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 			// ---------------------------------------------------
 
-			friend void Swap(Pass&, Pass&);
+			friend void Swap(Pass&, Pass&) ETNoexceptHint;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -326,11 +351,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const Pass* GetPasses() const;
+		const Pass* GetPasses() const ETNoexceptHint;
 
-		uint32 GetPassCount() const;
+		uint32 GetPassCount() const ETNoexceptHint;
 
-		VkQueryPool GetTimingPool() const;
+		VkQueryPool GetTimingPool() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -340,7 +365,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, VkExtent2D baseDimensions, uint32 arrayLayers = 1u);
+		VkResult BindResources(Gpu& gpu, const GraphicsPipeline& pipeline, VkExtent2D dimensions, uint32 layers, ExternalImageMap externalImages = ExternalImageMap {});
 
 		void FreeResources(Gpu& gpu);
 
@@ -359,7 +384,52 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		friend void Swap(Framebuffer&, Framebuffer&);
+		friend void Swap(Framebuffer&, Framebuffer&) ETNoexceptHint;
+	};
+
+	// ---
+
+	class Viewport : public Framebuffer {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		Viewport(const Viewport&) = delete;
+		//!	Construct this @ref Viewport instance.
+		Viewport(Viewport&&) ETNoexceptHint;
+		//!	Construct this @ref Viewport instance.
+		Viewport();
+
+		~Viewport() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult Resize(Gpu& gpu, VkExtent2D dimensions, uint32 layers, ExternalImageMap externalImages = ExternalImageMap {});
+
+		// ---------------------------------------------------
+
+	public:
+		bool TryAcquire(const GraphicsPipeline& generator) ETNoexceptHint;
+
+		void Release() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	private:
+		Atomic<const GraphicsPipeline*> _generator;
+
+		// ---------------------------------------------------
+
+		friend void Swap(Viewport&, Viewport&) ETNoexceptHint;
+
+		friend struct ViewportDisposer;
+	};
+
+	// ---
+
+	struct ViewportDisposer {
+		ETPureFunctionHint void operator()(Viewport* viewport) const ETNoexceptHint;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

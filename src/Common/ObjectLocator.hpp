@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Containers/HashMap.hpp>
-#include <Common/Type.hpp>
+#include <Common/CppType.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -25,6 +25,8 @@ public:
 	//!	Constructs this @ref ObjectLocator instance.
 	ObjectLocator(const ObjectLocator&) = default;
 	//!	Constructs this @ref ObjectLocator instance.
+	ObjectLocator(ObjectLocator&&) = default;
+	//!	Constructs this @ref ObjectLocator instance.
 	ObjectLocator();
 
 	~ObjectLocator() = default;
@@ -32,24 +34,24 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ObjectLocator& PublishService(Type type, void* service);
+	ObjectLocator& PublishService(CppType type, void* service);
 	template <typename Service>
 	ObjectLocator& PublishService(Service& service);
 
-	void* Find(Type type) const;
+	void* Find(CppType type) const ETNoexceptHint;
 	template <typename Service>
-	Service& Find() const;
+	Service* Find() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	ObjectLocator& operator=(const ObjectLocator&);
-	ObjectLocator& operator=(ObjectLocator&&);
+	ObjectLocator& operator=(const ObjectLocator&) = default;
+	ObjectLocator& operator=(ObjectLocator&&) = default;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	HashMap<Type, void*> _servicesByType;
+	HashMap<CppType, void*> _servicesByType;
 };
 
 } // namespace Eldritch2

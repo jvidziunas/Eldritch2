@@ -34,11 +34,11 @@ namespace ispc { /* namespace */
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 extern "C" {
 #endif // __cplusplus
-    extern void BulkHermite(float * values, const uint32_t * channels, const float * startTimes, const float * reciprocalDurations, const uint16_t * startValues, const uint16_t * endValues, const uint16_t * startTangents, const uint16_t * endTangents, uint32_t trackCount, float time);
-    extern void BulkHermiteWithDerivative(float * values, float * derivatives, const uint32_t * channels, const float * startTimes, const float * reciprocalDurations, const uint16_t * startValues, const uint16_t * endValues, const uint16_t * startTangents, const uint16_t * endTangents, uint32_t trackCount, float time);
-    extern void CopyPalette(float * values, const float * sourceValues, uint32_t valueCount);
-    extern void LinearBlend(float * finalValues, const float * sourceValues, float sourceFactor, const float * targetValues, float targetFactor, uint32_t valueCount);
-    extern void TransposeTransforms(float transforms[][4], const float * sourceValues, uint32_t transformCount);
+    extern void BulkHermite(uint32_t trackCount, float time, float * values, const uint16_t * channels, const float * startTimes, const float * reciprocalDurations, const uint16_t * startValues, const uint16_t * endValues, const uint16_t * startTangents, const uint16_t * endTangents);
+    extern void BulkHermiteWithDerivative(uint32_t trackCount, float time, float * values, float * derivatives, const uint16_t * channels, const float * startTimes, const float * reciprocalDurations, const uint16_t * startValues, const uint16_t * endValues, const uint16_t * startTangents, const uint16_t * endTangents);
+    extern void CopyPalette(uint32_t valueCount, float * values, const float * sourceValues);
+    extern void LinearBlend(uint32_t valueCount, float * finalValues, const float * sourceValues, float sourceFactor, const float * targetValues, float targetFactor);
+    extern void TransposeTransforms(uint32_t transformCount, float transforms[][4], const float * sourceValues);
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 } /* end extern C */
 #endif // __cplusplus

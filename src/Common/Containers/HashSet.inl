@@ -20,58 +20,66 @@ namespace Eldritch2 {
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
 ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet(
-	const HashPredicate&     hashPredicate,
-	const EqualityPredicate& equalityPredicate,
-	const AllocatorType&     allocator) :
-	_container(hashPredicate, equalityPredicate, allocator) {
+	const AllocatorType&     allocator,
+	SizeType                 bucketCount,
+	const HashPredicate&     hash,
+	const EqualityPredicate& equal) :
+	_container(bucketCount, hash, equal, allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-template <class /*SFINAE*/>
+template <typename InputIterator>
 ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet(
-	const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& set,
-	const AllocatorType&                                                              allocator) :
-	_container(set._container, allocator) {
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet(
-	const AllocatorType& allocator) :
-	_container(allocator) {
+	const AllocatorType&     allocator,
+	SizeType                 bucketCount,
+	const HashPredicate&     hash,
+	const EqualityPredicate& equal,
+	InputIterator            begin,
+	InputIterator            end) :
+	_container(begin, end, bucketCount, hash, equal, allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
 ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet(
-	HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&& set) :
-	_container(eastl::move(set._container)) {
+	const AllocatorType&             allocator,
+	SizeType                         bucketCount,
+	const HashPredicate&             hash,
+	const EqualityPredicate&         equal,
+	std::initializer_list<ValueType> set) :
+	_container(set, bucketCount, hash, equal, allocator) {
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
+ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashSet(const AllocatorType& allocator, const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& set) :
+	_container(set.Begin(), set.End(), 0u, set.GetHash(), set.GetEqualityPredicate(), allocator) {
+}
+
+// ---------------------------------------------------
+
+template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
 ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Find(
-	const AlternateValue&      value,
-	AlternateHashPredicate     alternateHashPredicate,
-	AlternateEqualityPredicate alternateEqualityPredicate) const {
-	return _container.find_as(value, eastl::forward<AlternateHashPredicate>(alternateHashPredicate), eastl::forward<AlternateEqualityPredicate>(alternateEqualityPredicate));
+	const Value2&      value,
+	HashPredicate2     hash,
+	EqualityPredicate2 equal) const {
+	return _container.find_as<Value2, HashPredicate2, EqualityPredicate2>(value, eastl::move(hash), eastl::move(equal));
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-template <typename AlternateValue, typename AlternateHashPredicate, typename AlternateEqualityPredicate>
+template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
 ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Find(
-	const AlternateValue&      value,
-	AlternateHashPredicate     alternateHashPredicate,
-	AlternateEqualityPredicate alternateEqualityPredicate) {
-	return _container.find_as(value, eastl::forward<AlternateHashPredicate>(alternateHashPredicate), eastl::forward<AlternateEqualityPredicate>(alternateEqualityPredicate));
+	const Value2&      value,
+	HashPredicate2     hash,
+	EqualityPredicate2 equal) {
+	return _container.find_as<Value2, HashPredicate2, EqualityPredicate2>(value, eastl::move(hash), eastl::move(equal));
 }
 
 // ---------------------------------------------------
@@ -91,6 +99,14 @@ ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
+ETInlineHint bool HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Contains(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) const {
+	return _container.find_as<Value2, HashPredicate2, EqualityPredicate2>(value, eastl::move(hash), eastl::move(equal)) != _container.end();
+}
+
+// ---------------------------------------------------
+
+template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
 ETInlineHint bool HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Contains(const ValueType& value) const {
 	return _container.find(value) != _container.end();
 }
@@ -98,14 +114,13 @@ ETInlineHint bool HashSet<Value, HashPredicate, EqualityPredicate, Allocator, ca
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-template <typename Predicate>
-ETInlineHint void HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EraseIf(Predicate predicate) {
+template <typename UnaryPredicate>
+ETInlineHint void HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EraseIf(UnaryPredicate predicate) {
 	for (auto element(_container.begin()), end(_container.end()); element != end;) {
 		if (predicate(*element)) {
 			element = _container.erase(element);
 			continue;
 		}
-
 		++element;
 	}
 }
@@ -155,27 +170,15 @@ ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-template <class /*SFINAE*/>
-ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::operator=(
-	const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& set) {
-	_container = set._container;
-	return *this;
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::operator=(
-	HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&& set) {
-	_container = eastl::move(set._container);
-	return *this;
+ETInlineHint Pair<typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Insert(const ValueType& value) {
+	return _container.insert(value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
 ETInlineHint Pair<typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Insert(ValueType&& value) {
-	return _container.insert(eastl::forward<ValueType>(value));
+	return _container.insert(eastl::move(value));
 }
 
 // ---------------------------------------------------
@@ -189,14 +192,6 @@ ETInlineHint Pair<typename HashSet<Value, HashPredicate, EqualityPredicate, Allo
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-template <class /*SFINAE*/>
-ETInlineHint Pair<typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Insert(const ValueType& value) {
-	return _container.insert(value);
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
 ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase(Iterator begin, Iterator end) {
 	return _container.erase(begin, end);
 }
@@ -204,8 +199,8 @@ ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase(Iterator position) {
-	return _container.erase(position);
+ETInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase(Iterator where) {
+	return _container.erase(where);
 }
 
 // ---------------------------------------------------
@@ -260,7 +255,7 @@ ETInlineHint typename const HashSet<Value, HashPredicate, EqualityPredicate, All
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint typename const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashPredicateType& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetHashPredicate() const {
+ETInlineHint typename const HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashPredicateType& HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetHash() const {
 	return _container.hash_function();
 }
 
@@ -274,8 +269,8 @@ ETInlineHint typename const HashSet<Value, HashPredicate, EqualityPredicate, All
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint void Swap(HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& set0, HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& set1) {
-	eastl::swap(set0._container, set1._container);
+ETInlineHint void Swap(HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& lhs, HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& rhs) {
+	lhs._container.swap(rhs._container);
 }
 
 } // namespace Eldritch2

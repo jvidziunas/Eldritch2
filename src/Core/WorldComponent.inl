@@ -17,13 +17,13 @@
 
 namespace Eldritch2 { namespace Core {
 
-	ETInlineHint WorldComponent::WorldComponent(const ObjectLocator& services) :
-		_services(eastl::addressof(services)) {}
+	ETInlineHint ETForceInlineHint WorldComponent::WorldComponent(const ObjectLocator& services) :
+		_services(ETAddressOf(services)) {}
 
 	// ---------------------------------------------------
 
 	template <typename ServiceType>
-	ETInlineHint ServiceType& WorldComponent::FindService() const {
+	ETInlineHint ETForceInlineHint ServiceType* WorldComponent::FindService() const {
 		return _services->Find<ServiceType>();
 	}
 

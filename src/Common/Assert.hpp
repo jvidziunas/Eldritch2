@@ -14,6 +14,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Common/Containers/String.hpp>
 #include <Common/Mpl/IntTypes.hpp>
 //------------------------------------------------------------------//
 
@@ -30,30 +31,32 @@ enum AssertionFailure : uint8 {
 
 // ---
 
-using AssertionHandler = AssertionFailure (*)(const char*, const char*, uint32, const char*);
+using AssertionHandler = AssertionFailure (*)(StringView /*condition*/, StringView /*file*/, uint32 /*line*/, StringView /*message*/);
 
 // ---------------------------------------------------
 
-void InstallHandler(AssertionHandler newHandler);
+template <typename... Arguments>
+AssertionFailure ReportFailure(StringView condition, StringView file, uint32 line, StringView format, Arguments&&... arguments);
+AssertionFailure ReportFailure(StringView condition, StringView file, uint32 line, StringView message);
 
 // ---------------------------------------------------
 
-template <size_t formatSize, typename... Arguments>
-AssertionFailure ReportFailure(const char* condition, const char* file, uint32 line, const char (&format)[formatSize], Arguments&&... arguments);
-AssertionFailure ReportFailure(const char* condition, const char* file, uint32 line, const char* message);
+AssertionHandler InstallHandler(AssertionHandler newHandler);
 
 #if ET_DEBUG_BUILD || ET_FORCE_ASSERTIONS
-#	define ET_ASSERT(cond, message, ...)                                                                               \
-		if (!(cond) && !Eldritch2::ReportFailure(#cond, __FILE__, static_cast<Eldritch2::uint32>(__LINE__), message)) { \
-			ET_TRIGGER_DEBUGBREAK();                                                                                    \
+#	define ET_ASSERT(cond, message, ...)                                                                                   \
+		if (!(cond) && !::Eldritch2::ReportFailure(#cond, __FILE__, ::Eldritch2::uint32(__LINE__), message, __VA_ARGS__)) { \
+			ET_TRIGGER_DEBUGBREAK();                                                                                        \
 		}
 #else
-#	define ET_ASSERT(cond, message, ...) static_cast<void>(sizeof((cond)))
+#	define ET_ASSERT(cond, message, ...)  \
+		static_cast<void>(sizeof((cond))); \
+		__assume(!(cond));
 #endif
 
-#define ET_VERIFY(cond, message, ...)                                                                               \
-	if (!(cond) && !Eldritch2::ReportFailure(#cond, __FILE__, static_cast<Eldritch2::uint32>(__LINE__), message)) { \
-		ETIsDebugBuild() ? ET_TRIGGER_DEBUGBREAK() : std::terminate();                                              \
+#define ET_VERIFY(cond, message, ...)                                                                                   \
+	if (!(cond) && !::Eldritch2::ReportFailure(#cond, __FILE__, ::Eldritch2::uint32(__LINE__), message, __VA_ARGS__)) { \
+		ETIsDebugBuild() ? ET_TRIGGER_DEBUGBREAK() : std::terminate();                                                  \
 	}
 
 } // namespace Eldritch2

@@ -1,15 +1,15 @@
 #include "../Eldritch2Math.isph"
 
-export void BulkHermite(uniform float values[],
-							const uniform uint32 channels[],
-							const uniform float startTimes[],
-							const uniform float reciprocalDurations[],
-							const uniform half startValues[],
-							const uniform half endValues[],
-							const uniform half startTangents[],
-							const uniform half endTangents[],
-							uniform size_t trackCount,
-							uniform float time) {
+export void BulkHermite(uniform size_t trackCount,
+						uniform float time,
+						uniform float values[],
+						const uniform uint16 channels[],
+						const uniform float startTimes[],
+						const uniform float reciprocalDurations[],
+						const uniform half startValues[],
+						const uniform half endValues[],
+						const uniform half startTangents[],
+						const uniform half endTangents[]) {
 	foreach (track = 0 ... trackCount) {
 		float value = HermiteSpline(half_to_float_fast(startValues[track]),
 									half_to_float_fast(startTangents[track]),
@@ -23,17 +23,17 @@ export void BulkHermite(uniform float values[],
 	}
 }
 
-export void BulkHermiteWithDerivative(uniform float values[],
-						uniform float derivatives[],
-						const uniform uint32 channels[],
-						const uniform float startTimes[],
-						const uniform float reciprocalDurations[],
-						const uniform half startValues[],
-						const uniform half endValues[],
-						const uniform half startTangents[],
-						const uniform half endTangents[],
-						uniform size_t trackCount,
-						uniform float time) {
+export void BulkHermiteWithDerivative(uniform size_t trackCount,
+										uniform float time,
+										uniform float values[],
+										uniform float derivatives[],
+										const uniform uint16 channels[],
+										const uniform float startTimes[],
+										const uniform float reciprocalDurations[],
+										const uniform half startValues[],
+										const uniform half endValues[],
+										const uniform half startTangents[],
+										const uniform half endTangents[]) {
 	foreach (track = 0 ... trackCount) {
 		float value = HermiteSpline(half_to_float_fast(startValues[track]),
 									half_to_float_fast(startTangents[track]),
@@ -51,25 +51,25 @@ export void BulkHermiteWithDerivative(uniform float values[],
 	}
 }
 
-export void LinearBlend(uniform float finalValues[],
+export void LinearBlend(uniform size_t valueCount,
+						uniform float finalValues[],
 						const uniform float sourceValues[],
 						uniform float sourceFactor,
 						const uniform float targetValues[],
-						uniform float targetFactor,
-						uniform size_t valueCount) {
+						uniform float targetFactor) {
 	foreach (value = 0 ... valueCount) {
 		finalValues[value] = sourceValues[value] * sourceFactor +
 							 targetValues[value] * targetFactor;
 	}
 }
 
-export void CopyPalette(uniform float values[], const uniform float sourceValues[], uniform size_t valueCount) {
+export void CopyPalette(uniform size_t valueCount, uniform float values[], const uniform float sourceValues[]) {
 	foreach (value = 0 ... valueCount) {
 		values[value] = sourceValues[value];
 	}
 }
 
-export void TransposeTransforms(uniform float transforms[][4], const uniform float sourceValues[], uniform size_t transformCount) {
+export void TransposeTransforms(uniform size_t transformCount, uniform float transforms[][4], const uniform float sourceValues[]) {
 	foreach (transform = 0 ... transformCount) {
 		float x = sourceValues[transform];
 		float y = sourceValues[transform + 1];

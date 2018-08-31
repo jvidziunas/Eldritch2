@@ -1,5 +1,5 @@
 /*==================================================================*\
-  DialogueAsset.hpp
+  DialogueSetAsset.hpp
   ------------------------------------------------------------------
   Purpose:
   
@@ -12,30 +12,22 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/Wren/DialogueSet.hpp>
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Scripting { namespace Wren {
-	class DialogueSet;
-}}} // namespace Eldritch2::Scripting::Wren
-
 namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetViews {
 
-	class DialogueSetAsset : public Assets::Asset {
+	class DialogueSetAsset : public Wren::DialogueSet, public Assets::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref DialogueAsset instance.
-		DialogueSetAsset(const Utf8Char* const filePath);
 		//!	Disable copy construction.
 		DialogueSetAsset(const DialogueSetAsset&) = delete;
+		//!	Constructs this @ref DialogueAsset instance.
+		DialogueSetAsset(StringView path);
 
 		~DialogueSetAsset() override = default;
-
-		// ---------------------------------------------------
-
-	public:
-		static ETPureFunctionHint Utf8Literal GetExtension();
 
 		// ---------------------------------------------------
 
@@ -43,6 +35,11 @@ namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetView
 		ErrorCode BindResources(const Builder& builder) override;
 
 		void FreeResources() override;
+
+		// ---------------------------------------------------
+
+	public:
+		static ETPureFunctionHint StringView GetExtension();
 
 		// ---------------------------------------------------
 

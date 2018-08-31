@@ -33,9 +33,9 @@ namespace Eldritch2 { namespace Core {
 
 	public:
 		//!	Sets the active variable section used for coarse grouping.
-		/*!	@param[in] sectionName Name of the configuration block variables will be added to.
+		/*!	@param[in] name Name of the configuration block variables will be added to.
 			@returns (*this) for method chaining. */
-		PropertyRegistrar& BeginSection(StringView<Utf8Char> sectionName);
+		PropertyRegistrar& BeginSection(StringView name) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -45,9 +45,9 @@ namespace Eldritch2 { namespace Core {
 			@param[in] setter Handler function that will optionally parse the input string into the correct final representation, changing
 				client variables as appropriate.
 			@returns (*this) for method chaining. */
-		PropertyRegistrar& DefineProperty(StringView<Utf8Char> name, PropertyDatabase::Setter setter);
+		PropertyRegistrar& DefineProperty(StringView name, PropertyDatabase::Setter setter);
 		template <typename PodValue>
-		PropertyRegistrar& DefineProperty(StringView<Utf8Char> name, PodValue& property);
+		PropertyRegistrar& DefineProperty(StringView name, PodValue& property);
 
 		PropertyRegistrar& DefineDynamicProperty(PropertyDatabase::DynamicSetter setter);
 
@@ -59,8 +59,8 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		PropertyDatabase*    _database;
-		StringView<Utf8Char> _section;
+		PropertyDatabase* _database;
+		StringView        _section;
 	};
 
 }} // namespace Eldritch2::Core

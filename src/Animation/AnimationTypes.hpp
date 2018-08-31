@@ -17,75 +17,75 @@
 
 namespace Eldritch2 { namespace Animation {
 
-	using BoneIndex = int16;
+	using BoneIndex = uint16;
 	using KeyTime   = float16;
 
 	// ---
 
 	class KnotCache {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using ChannelIndex   = BoneIndex;
+		using Time           = float32;
+		using Key            = uint16;
+		using Container      = typename SoArrayList<Time /*start*/, Time /*reciprocalDuration*/, Key /*startValue*/, Key /*endValue*/, Key /*startTangent*/, Key /*endTangent*/, ChannelIndex /*channel*/>;
+		using ConstPointer   = typename Container::ConstPointer;
+		using Pointer        = typename Container::Pointer;
+		using ConstReference = typename Container::ConstReference;
+		using Reference      = typename Container::Reference;
+		using SizeType       = typename Container::SizeType;
+
+		enum : size_t {
+			StartTimes = 0,
+			ReciprocalDurations,
+			StartValues,
+			EndValues,
+			StartTangents,
+			EndTangents,
+			TargetChannels
+		};
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Disable copy construction.
-		KnotCache(const KnotCache&) = delete;
 		//!	Constructs this @ref KnotCache instance.
-		KnotCache();
+		KnotCache(SizeType capacityHint = 0u);
+		//!	Constructs this @ref KnotCache instance.
+		KnotCache(const KnotCache&) = default;
+		//!	Constructs this @ref KnotCache instance.
+		KnotCache(KnotCache&&) = default;
 
 		~KnotCache() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		template <uint32 knotCount>
-		void PushKnots(uint32 index, const float32 (&startTimes)[knotCount], const float32 (&endTimes)[knotCount], const uint16 (&startValues)[knotCount], const uint16 (&endValues)[knotCount], const uint16 (&startTangents)[knotCount], const uint16 (&endTangents)[knotCount]);
-		void PushKnots(uint32 index, uint32 channelCount, const float32* startTimes, const float32* endTimes, const uint16* startValues, const uint16* endValues, const uint16* startTangents, const uint16* endTangents);
+		ConstReference operator[](SizeType offset) const ETNoexceptHint;
+		Reference      operator[](SizeType offset) ETNoexceptHint;
 
-		void PushKnot(uint32 index, float32 startTime, float32 endTime, uint16 startValue, uint16 endValue, uint16 startTangent, uint16 endTangent);
+		ConstPointer Get(SizeType offset) const ETNoexceptHint;
+		Pointer      Get(SizeType offset) ETNoexceptHint;
 
-		// ---------------------------------------------------
-
-	public:
-		const uint32* GetTargetChannels() const;
-
-		const float32* GetStartTimes() const;
-
-		const float32* GetReciprocalDurations() const;
-
-		const uint16* GetStartValues() const;
-
-		const uint16* GetEndValues() const;
-
-		const uint16* GetStartTangents() const;
-
-		const uint16* GetEndTangents() const;
-
-		uint32 GetSize() const;
+		SizeType GetSize() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		uint32 AllocateKnots(uint32 knotCount, const uint32* channelIndices);
-		template <uint32 knotCount>
-		uint32 AllocateKnots(const uint32 (&channelIndices)[knotCount]);
+		SizeType Append(SizeType count, const ChannelIndex* channels);
 
-		// ---------------------------------------------------
+		void Reserve(SizeType capacityHint);
 
-	private:
-		void Resize(uint32 knots);
+		void Clear() ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<char> _memory;
-		uint32          _capacity;
-		uint32          _count;
-		uint32*         _channelIndices;
-		float32*        _startTimes;
-		float32*        _reciprocalDurations;
-		uint16*         _startValues;
-		uint16*         _endValues;
-		uint16*         _startTangents;
-		uint16*         _endTangents;
+		Container _knots;
+
+		// ---------------------------------------------------
+
+		friend void Swap(KnotCache&, KnotCache&);
 	};
 
 	// ---
@@ -104,7 +104,12 @@ namespace Eldritch2 { namespace Animation {
 		// ---------------------------------------------------
 
 	public:
-		virtual void Evaluate(float32 values[], const float32 palette[], BoneIndex maximumBone) const abstract;
+		virtual void Evaluate(BoneIndex maximumBone, float32 values[], const float32 palette[]) const abstract;
+
+		// ---------------------------------------------------
+
+	public:
+		Blend& operator=(const Blend&) = default;
 	};
 
 	// ---
@@ -123,17 +128,14 @@ namespace Eldritch2 { namespace Animation {
 		// ---------------------------------------------------
 
 	public:
-		void Evaluate(float32 values[], const float32 palette[], BoneIndex maximumBone) const override;
+		void Evaluate(BoneIndex maximumBone, float32 values[], const float32 palette[]) const override;
 
 		// ---------------------------------------------------
 
 	public:
-		virtual void FetchKnots(KnotCache& knots, uint64 time, BoneIndex maximumBone) abstract;
+		virtual void FetchKnots(KnotCache& knots, BoneIndex maximumBone, uint64 time) abstract;
 
-		// ---------------------------------------------------
-
-	public:
-		void Attach(KnotCache& knots, uint32 knotCount);
+		virtual void Attach(KnotCache& knots) abstract;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -143,8 +145,8 @@ namespace Eldritch2 { namespace Animation {
 
 	// ---
 
-	void EvaluatePose(Transformation poseToLocals[], Transformation poseToVelocity[], float32 scratch[], const Blend& blend, const KnotCache& knots, BoneIndex maximumBone, float32 time);
-	void EvaluatePose(Transformation poseToLocals[], float32 scratch[], const Blend& blend, const KnotCache& knots, BoneIndex maximumBone, float32 time);
+	void EvaluatePose(BoneIndex maximumBone, float32 time, Transformation poseToLocals[], Transformation poseToVelocity[], float32 scratch[], const KnotCache& knots, const Blend& blend);
+	void EvaluatePose(BoneIndex maximumBone, float32 time, Transformation poseToLocals[], float32 scratch[], const KnotCache& knots, const Blend& blend);
 
 }} // namespace Eldritch2::Animation
 

@@ -18,30 +18,27 @@
 namespace Eldritch2 {
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint QueryBuilder<SymbolTable, Allocator>::QueryBuilder(
-	const AllocatorType&   allocator,
-	const SymbolTableType& symbols) :
+ETInlineHint QueryBuilder<SymbolTable, Allocator>::QueryBuilder(const AllocatorType& allocator, const SymbolTableType& symbols) :
 	_facts(allocator),
-	_symbols(eastl::addressof(symbols)) {
+	_symbols(ETAddressOf(symbols)) {
 }
 
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint const typename QueryBuilder<SymbolTable, Allocator>::FactSetType& QueryBuilder<SymbolTable, Allocator>::GetFacts() const {
+ETInlineHint ETForceInlineHint const typename QueryBuilder<SymbolTable, Allocator>::FactMapType& QueryBuilder<SymbolTable, Allocator>::GetFacts() const ETNoexceptHint {
 	return _facts;
 }
 
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::InsertFact(const CharacterType* nameString, SymbolType value) {
-	if (const auto name = _symbols->Find(nameString)) {
-		typename typename FactSetType::MappedType fact;
-
+ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::Insert(FactNameType name, SymbolType value) {
+	if (const auto id = _symbols->Find(name)) {
+		FactType fact;
 		fact.asSymbol = value;
 
-		_facts.Emplace(name, fact);
+		_facts.Emplace(id, fact);
 	}
 
 	return *this;
@@ -50,13 +47,12 @@ ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, All
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::InsertFact(const CharacterType* nameString, float64 value) {
-	if (const auto name = _symbols->Find(nameString)) {
-		typename typename FactSetType::MappedType fact;
-
+ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::Insert(FactNameType name, float64 value) {
+	if (const auto id = _symbols->Find(name)) {
+		FactType fact;
 		fact.asFloat = value;
 
-		_facts.Emplace(name, fact);
+		_facts.Emplace(id, fact);
 	}
 
 	return *this;
@@ -65,13 +61,12 @@ ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, All
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::InsertFact(const CharacterType* nameString, uint64 value) {
-	if (const auto name = _symbols->Find(nameString)) {
-		typename FactSetType::MappedType fact;
-
+ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::Insert(FactNameType name, uint64 value) {
+	if (const auto id = _symbols->Find(name)) {
+		FactType fact;
 		fact.asUInt = value;
 
-		_facts.Emplace(name, fact);
+		_facts.Emplace(id, fact);
 	}
 
 	return *this;
@@ -80,13 +75,12 @@ ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, All
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::InsertFact(const CharacterType* nameString, int64 value) {
-	if (const auto name = _symbols->Find(nameString)) {
-		typename FactSetType::MappedType fact;
-
+ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::Insert(FactNameType name, int64 value) {
+	if (const auto id = _symbols->Find(name)) {
+		FactType fact;
 		fact.asInt = value;
 
-		_facts.Emplace(name, fact);
+		_facts.Emplace(id, fact);
 	}
 
 	return *this;
@@ -95,13 +89,12 @@ ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, All
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::InsertFact(const CharacterType* nameString, bool value) {
-	if (const auto name = _symbols->Find(nameString)) {
-		typename FactSetType::MappedType fact;
-
+ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::Insert(FactNameType name, bool value) {
+	if (const auto id = _symbols->Find(name)) {
+		FactType fact;
 		fact.asBool = value;
 
-		_facts.Emplace(name, fact);
+		_facts.Emplace(id, fact);
 	}
 
 	return *this;
@@ -110,13 +103,12 @@ ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, All
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::InsertFact(const CharacterType* nameString) {
-	if (const auto name = _symbols->Find(nameString)) {
-		typename FactSetType::MappedType fact;
-
+ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, Allocator>::Insert(FactNameType name) {
+	if (const auto id = _symbols->Find(name)) {
+		FactType fact;
 		fact.asSymbol = nullptr;
 
-		_facts.Emplace(name, fact);
+		_facts.Emplace(id, fact);
 	}
 
 	return *this;
@@ -125,48 +117,44 @@ ETInlineHint QueryBuilder<SymbolTable, Allocator>& QueryBuilder<SymbolTable, All
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint RuleBuilder<SymbolTable, Allocator>::RuleBuilder(
-	const AllocatorType& allocator,
-	SymbolTableType&     symbols) :
+ETInlineHint ETForceInlineHint RuleBuilder<SymbolTable, Allocator>::RuleBuilder(const AllocatorType& allocator, SymbolTableType& symbols) :
 	_criteria(allocator),
-	_symbols(eastl::addressof(symbols)) {
+	_symbols(ETAddressOf(symbols)) {
 }
 
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint typename const RuleBuilder<SymbolTable, Allocator>::CriteriaSetType& RuleBuilder<SymbolTable, Allocator>::GetCriteria() const {
+ETInlineHint ETForceInlineHint typename const RuleBuilder<SymbolTable, Allocator>::CriteriaSetType& RuleBuilder<SymbolTable, Allocator>::GetCriteria() const ETNoexceptHint {
 	return _criteria;
 }
 
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint typename RuleBuilder<SymbolTable, Allocator>::CriteriaSetType& RuleBuilder<SymbolTable, Allocator>::GetCriteria() {
+ETInlineHint ETForceInlineHint typename RuleBuilder<SymbolTable, Allocator>::CriteriaSetType& RuleBuilder<SymbolTable, Allocator>::GetCriteria() ETNoexceptHint {
 	return _criteria;
 }
 
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint RuleBuilder<SymbolTable, Allocator>& RuleBuilder<SymbolTable, Allocator>::InsertCriterion(const CharacterType* name, typename CriteriaSetType::MappedType evaluator) {
+ETInlineHint ETForceInlineHint RuleBuilder<SymbolTable, Allocator>& RuleBuilder<SymbolTable, Allocator>::Insert(FactNameType name, typename CriteriaSetType::MappedType evaluator) {
 	_criteria.Emplace(_symbols->Intern(name), eastl::move(evaluator));
-
 	return *this;
 }
 
 // ---------------------------------------------------
 
 template <typename SymbolTable, class Allocator>
-ETInlineHint RuleBuilder<SymbolTable, Allocator>& RuleBuilder<SymbolTable, Allocator>::InsertCriterion(const CharacterType* name) {
-	return InsertCriterion(name, [](const QueryFact<SymbolType>& /*unused*/) { return true; });
+ETInlineHint ETForceInlineHint RuleBuilder<SymbolTable, Allocator>& RuleBuilder<SymbolTable, Allocator>::Insert(FactNameType name) {
+	return Insert(name, [](const QueryFact<SymbolType>& /*unused*/) { return true; });
 }
 
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint RuleSet<Response, Allocator>::RuleSet(
-	const AllocatorType& allocator) :
+ETInlineHint ETForceInlineHint RuleSet<Response, Allocator>::RuleSet(const AllocatorType& allocator) :
 	_allocator(allocator),
 	_symbols(ChildAllocator(_allocator, "Rule Database Symbol Allocator")),
 	_rules(ChildAllocator(_allocator, "Rule Database Rule Allocator")) {
@@ -175,28 +163,28 @@ ETInlineHint RuleSet<Response, Allocator>::RuleSet(
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint typename RuleSet<Response, Allocator>::RuleIterator RuleSet<Response, Allocator>::Begin() const {
+ETInlineHint ETForceInlineHint typename RuleSet<Response, Allocator>::RuleIterator RuleSet<Response, Allocator>::Begin() const ETNoexceptHint {
 	return _rules.ConstBegin();
 }
 
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint typename RuleSet<Response, Allocator>::RuleIterator RuleSet<Response, Allocator>::End() const {
+ETInlineHint ETForceInlineHint typename RuleSet<Response, Allocator>::RuleIterator RuleSet<Response, Allocator>::End() const ETNoexceptHint {
 	return _rules.ConstEnd();
 }
 
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint typename const RuleSet<Response, Allocator>::SymbolTableType& RuleSet<Response, Allocator>::GetSymbols() const {
+ETInlineHint ETForceInlineHint typename const RuleSet<Response, Allocator>::SymbolTableType& RuleSet<Response, Allocator>::GetSymbols() const ETNoexceptHint {
 	return _symbols;
 }
 
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint typename RuleSet<Response, Allocator>::SymbolTableType& RuleSet<Response, Allocator>::GetSymbols() {
+ETInlineHint ETForceInlineHint typename RuleSet<Response, Allocator>::SymbolTableType& RuleSet<Response, Allocator>::GetSymbols() ETNoexceptHint {
 	return _symbols;
 }
 
@@ -204,8 +192,8 @@ ETInlineHint typename RuleSet<Response, Allocator>::SymbolTableType& RuleSet<Res
 
 template <typename Response, class Allocator>
 template <class TemporaryAllocator>
-ETInlineHint typename RuleSet<Response, Allocator>::MatchList<TemporaryAllocator> RuleSet<Response, Allocator>::MatchAll(const TemporaryAllocator& allocator, const QueryBuilderType& query) const {
-	MatchList<TemporaryAllocator> matches(allocator);
+ETInlineHint ArrayList<typename RuleSet<Response, Allocator>::RuleIterator, TemporaryAllocator> RuleSet<Response, Allocator>::MatchAll(const TemporaryAllocator& allocator, const QueryBuilderType& query) const {
+	ArrayList<RuleIterator, TemporaryAllocator> matches(allocator);
 	//	We can optimize matching slightly by starting at 1-- this will cause rules that match 0 patterns to fail immediately.
 	size_t threshold(1u);
 
@@ -231,30 +219,29 @@ ETInlineHint typename RuleSet<Response, Allocator>::MatchList<TemporaryAllocator
 
 template <typename Response, class Allocator>
 template <class TemporaryAllocator>
-ETInlineHint typename RuleSet<Response, Allocator>::RuleIterator RuleSet<Response, Allocator>::Match(const TemporaryAllocator& allocator, const QueryBuilderType& query) const {
-	const MatchList<TemporaryAllocator> matches(MatchAll(allocator, query));
-
+ETInlineHint ETForceInlineHint typename RuleSet<Response, Allocator>::RuleIterator RuleSet<Response, Allocator>::Match(const TemporaryAllocator& allocator, const QueryBuilderType& query) const {
+	const ArrayList<RuleIterator, TemporaryAllocator> matches(MatchAll(allocator, query));
 	return matches ? matches.Front() : End();
 }
 
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint void RuleSet<Response, Allocator>::Insert(const RuleBuilderType& ruleBuilder, const Response& response) {
+ETInlineHint ETForceInlineHint void RuleSet<Response, Allocator>::Insert(const RuleBuilderType& ruleBuilder, const Response& response) {
 	_rules.EmplaceBack(ruleBuilder.GetCriteria(), response);
 }
 
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint void RuleSet<Response, Allocator>::Insert(RuleBuilderType&& ruleBuilder, Response&& response) {
+ETInlineHint ETForceInlineHint void RuleSet<Response, Allocator>::Insert(RuleBuilderType&& ruleBuilder, Response&& response) {
 	_rules.EmplaceBack(eastl::move(ruleBuilder.GetCriteria()), eastl::move(response));
 }
 
 // ---------------------------------------------------
 
 template <typename Response, class Allocator>
-ETInlineHint void RuleSet<Response, Allocator>::Clear() {
+ETInlineHint ETForceInlineHint void RuleSet<Response, Allocator>::Clear() {
 	_rules.Clear();
 	_symbols.Clear();
 }

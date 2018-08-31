@@ -23,7 +23,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	T& SetReturn(WrenVM* vm, Arguments&&... arguments);
 
 	template <typename T>
-	ETPureFunctionHint T& GetSlotAs(WrenVM* vm, int slot);
+	ETPureFunctionHint T& GetSlotAs(WrenVM* vm, int slot) ETNoexceptHint;
+
+	ETPureFunctionHint StringView GetSlotStringView(WrenVM* vm, int slot) ETNoexceptHint;
 
 }}} // namespace Eldritch2::Scripting::Wren
 

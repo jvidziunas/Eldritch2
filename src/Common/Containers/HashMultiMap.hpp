@@ -25,56 +25,58 @@
 
 namespace Eldritch2 {
 
-template <typename Key, typename Value, class HashPredicate = Hash<Key>, class KeyEqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
+template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
 class HashMultiMap {
 	// - TYPE PUBLISHING ---------------------------------
 
 private:
-	using UnderlyingContainer = eastl::hash_multimap<Key, Value, HashPredicate, KeyEqualityPredicate, EaStlAllocatorMixin<Allocator>, cacheHashCode>;
+	using UnderlyingContainer = eastl::hash_multimap<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, cacheHashCode>;
 
 public:
-	using ValueType                = typename UnderlyingContainer::value_type;
-	using KeyType                  = typename UnderlyingContainer::key_type;
-	using MappedType               = typename UnderlyingContainer::mapped_type;
-	using AllocatorType            = typename UnderlyingContainer::allocator_type::PublicType;
-	using SizeType                 = typename UnderlyingContainer::size_type;
-	using Iterator                 = typename UnderlyingContainer::iterator;
-	using ConstIterator            = typename UnderlyingContainer::const_iterator;
-	using LocalIterator            = typename UnderlyingContainer::local_iterator;
-	using ConstLocalIterator       = typename UnderlyingContainer::const_local_iterator;
-	using HashPredicateType        = HashPredicate;
-	using KeyEqualityPredicateType = KeyEqualityPredicate;
+	using ValueType             = typename UnderlyingContainer::value_type;
+	using KeyType               = typename UnderlyingContainer::key_type;
+	using MappedType            = typename UnderlyingContainer::mapped_type;
+	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
+	using SizeType              = typename UnderlyingContainer::size_type;
+	using Iterator              = typename UnderlyingContainer::iterator;
+	using ConstIterator         = typename UnderlyingContainer::const_iterator;
+	using LocalIterator         = typename UnderlyingContainer::local_iterator;
+	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
+	using EqualityPredicateType = EqualityPredicate;
+	using HashPredicateType     = HashPredicate;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//! Constructs this @ref HashMultiMap instance.
-	HashMultiMap(const HashPredicateType& hashPredicate, const KeyEqualityPredicateType& keyEqualityPredicate, const AllocatorType& allocatorType = AllocatorType());
+	HashMultiMap(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
 	//! Constructs this @ref HashMultiMap instance.
-	explicit HashMultiMap(SizeType sizeHint, const AllocatorType& allocatorType = AllocatorType());
+	template <typename InputIterator>
+	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashMultiMap instance.
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	HashMultiMap(const HashMultiMap&, const AllocatorType& allocatorType = AllocatorType());
+	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, std::initializer_list<ValueType>);
 	//! Constructs this @ref HashMultiMap instance.
-	explicit HashMultiMap(const AllocatorType& allocatorType = AllocatorType());
+	HashMultiMap(const AllocatorType& allocator, const HashMultiMap&);
 	//! Constructs this @ref HashMultiMap instance.
-	HashMultiMap(HashMultiMap&&);
+	HashMultiMap(const HashMultiMap&) = default;
+	//! Constructs this @ref HashMultiMap instance.
+	HashMultiMap(HashMultiMap&&) = default;
 
 	~HashMultiMap() = default;
 
 	// - ALGORITHMS --------------------------------------
 
 public:
-	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
-	Range<ConstIterator> EqualRange(const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate) const;
-	template <typename AlternateKey, typename AlternateHashPredicate, typename AlternateKeyEqualityPredicate>
-	Range<Iterator>      EqualRange(const AlternateKey& key, const AlternateHashPredicate& hashPredicate, const AlternateKeyEqualityPredicate& keyEqualityPredicate);
+	template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
+	Range<ConstIterator> EqualRange(const Key2& key, const HashPredicate2& hash, const EqualityPredicate2& equal) const;
+	template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
+	Range<Iterator>      EqualRange(const Key2& key, const HashPredicate2& hash, const EqualityPredicate2& equal);
 	Range<ConstIterator> EqualRange(const KeyType& key) const;
 	Range<Iterator>      EqualRange(const KeyType& key);
 
 	//! Erases all elements for which the result of the predicate returns true.
-	template <typename Predicate>
-	void EraseIf(Predicate predicate);
+	template <typename UnaryPredicate>
+	void EraseIf(UnaryPredicate filter);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -107,17 +109,9 @@ public:
 	//!	Retrieves an @ref Iterator to one past the end of all elements stored in this @ref HashMultiMap.
 	Iterator End();
 
-	// - CONTAINER DUPLICATION ---------------------------
-
-public:
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
-	HashMultiMap& operator=(const HashMultiMap&);
-	HashMultiMap& operator=(HashMultiMap&&);
-
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	template <class = eastl::enable_if<eastl::is_copy_constructible<ValueType>::value>::type>
 	Pair<Iterator, bool> Insert(const ValueType& value);
 	Pair<Iterator, bool> Insert(ValueType&& value);
 
@@ -125,7 +119,7 @@ public:
 	Pair<Iterator, bool> Emplace(Arguments&&... arguments);
 
 	Iterator Erase(Iterator begin, Iterator end);
-	Iterator Erase(Iterator position);
+	Iterator Erase(Iterator where);
 	SizeType Erase(const KeyType& key);
 
 	template <typename Disposer>
@@ -136,18 +130,26 @@ public:
 	// - CONTENT QUERY -----------------------------------
 
 public:
-	SizeType GetSize() const;
+	SizeType GetSize() const ETNoexceptHint;
 
-	bool IsEmpty() const;
+	bool IsEmpty() const ETNoexceptHint;
 
-	explicit operator bool() const;
+	explicit operator bool() const ETNoexceptHint;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	const HashPredicateType& GetHashPredicate() const;
+	const EqualityPredicateType& GetEqualityPredicate() const ETNoexceptHint;
 
-	const AllocatorType& GetAllocator() const;
+	const HashPredicateType& GetHash() const ETNoexceptHint;
+
+	const AllocatorType& GetAllocator() const ETNoexceptHint;
+
+	// - CONTAINER DUPLICATION ---------------------------
+
+public:
+	HashMultiMap& operator=(const HashMultiMap&) = default;
+	HashMultiMap& operator=(HashMultiMap&&) = default;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -156,12 +158,12 @@ private:
 
 	// ---------------------------------------------------
 
-	template <typename Key, typename Value, class HashPredicate = Hash<Key>, class KeyEqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
-	friend void Swap(HashMultiMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>&, HashMultiMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, cacheHashCode>&);
+	template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
+	friend void Swap(HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&, HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&);
 };
 
-template <typename Key, typename Value, class HashPredicate = Hash<Key>, class KeyEqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator>
-using CachingHashMultiMap = HashMultiMap<Key, Value, HashPredicate, KeyEqualityPredicate, Allocator, true>;
+template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator>
+using CachingHashMultiMap = HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, true>;
 
 } // namespace Eldritch2
 
