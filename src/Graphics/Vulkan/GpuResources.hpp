@@ -12,6 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Graphics/GpuFormats.hpp>
+//------------------------------------------------------------------//
 #include <vk_mem_alloc.h>
 //------------------------------------------------------------------//
 
@@ -371,9 +373,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	public:
 		enum : uint32_t {
-			PageCoordinateBits = 18u,
-			MaxImageDimension  = 1u << PageCoordinateBits,
-			PageMipBits        = 10u
+			PageCoordinateBits  = 18u,
+			MaxImageDimension   = 1u << PageCoordinateBits,
+			PageSubresourceBits = 10u
 		};
 
 		// ---
@@ -383,7 +385,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			uint64_t x : PageCoordinateBits;
 			uint64_t y : PageCoordinateBits;
 			uint64_t z : PageCoordinateBits;
-			uint64_t mip : PageMipBits;
+			uint64_t subresource : PageSubresourceBits;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -454,7 +456,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers);
+		VkResult BindResources(Gpu& gpu, GpuFormat format, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers);
 
 		// ---------------------------------------------------
 
@@ -567,7 +569,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips);
+		VkResult BindResources(Gpu& gpu, GpuFormat format, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers);
 
 		void FreeResources(Gpu& gpu);
 

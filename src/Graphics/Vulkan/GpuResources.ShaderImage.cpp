@@ -24,7 +24,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult ShaderImage::BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers) {
+	VkResult ShaderImage::BindResources(Gpu& gpu, GpuFormat format, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers) {
 		enum : VkMemoryPropertyFlags { InferFromUsage = 0u };
 
 		return AbstractImage::BindResources(
@@ -34,7 +34,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*pNext =*/nullptr,
 				/*flags =*/0u, // VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT?
 				GetImageType(extent),
-				format,
+				TextureFormats[size_t(format)].vkFormat,
 				extent,
 				mips,
 				arrayLayers,

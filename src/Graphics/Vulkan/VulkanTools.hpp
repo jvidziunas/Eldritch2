@@ -19,12 +19,10 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	struct FormatDescriptor {
-		VkFormat           format;
+	extern const struct FormatDescriptor {
+		VkFormat           vkFormat;
 		VkComponentMapping swizzle;
-	};
-
-	ETPureFunctionHint const FormatDescriptor& DescribeFormat(GpuFormat format) ETNoexceptHint;
+	} TextureFormats[size_t(GpuFormat::MAX) + 1];
 
 	// ---------------------------------------------------
 

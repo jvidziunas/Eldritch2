@@ -24,10 +24,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult SparseShaderImage::BindResources(Gpu& gpu, VkFormat format, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips) {
+	VkResult SparseShaderImage::BindResources(Gpu& gpu, GpuFormat format, VkExtent3D tileExtent, VkExtent3D extent, uint32_t mips, uint32_t arrayLayers) {
 		enum : VkMemoryPropertyFlags { InferFromUsage = 0u };
 
-		TileManager tileManager(format, tileExtent, extent);
+		TileManager tileManager(TextureFormats[size_t(format)].vkFormat, tileExtent, extent);
 		ET_ABORT_UNLESS(AbstractImage::BindResources(
 			gpu,
 			VkImageCreateInfo {
@@ -35,10 +35,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*pNext =*/nullptr,
 				VK_IMAGE_CREATE_SPARSE_BINDING_BIT | VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT,
 				GetImageType(extent),
-				format,
+				TextureFormats[size_t(format)].vkFormat,
 				extent,
 				mips,
-				/*arrayLayers =*/1u,
+				arrayLayers,
 				VK_SAMPLE_COUNT_1_BIT,
 				VK_IMAGE_TILING_OPTIMAL,
 				VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,

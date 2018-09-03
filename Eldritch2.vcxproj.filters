@@ -781,7 +781,7 @@
       <Filter>Source Files\Assets</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\VulkanTools.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
