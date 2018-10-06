@@ -32,20 +32,19 @@ namespace Eldritch2 { namespace Graphics {
 		_lightConcepts {
 			{ MallocAllocator("Scene Light Concept Allocator") },
 			{ MallocAllocator("Scene Light Concept Allocator") }
-		} {
-	}
+		} {}
 
 	// ---------------------------------------------------
 
 	void GraphicsScene::UpdateAccelerators(JobExecutor& executor) {
 		ET_PROFILE_SCOPE("Graphics", "Build Acceleration Structures", 0xFFFFFF);
 		executor.AwaitWork(
-			[this](JobExecutor& executor) {
+			[this](JobExecutor& executor) ETNoexceptHint {
 				executor.ForEach<1u>(Begin(_portalViewConcepts), End(_portalViewConcepts), [this](JobExecutor& executor, PortalViewConcept& concept) {
 					ET_PROFILE_SCOPE("Graphics/AccelerationStructures", "Update Portal View Hierarchy", 0xFFAAFF);
 				});
 			},
-			[this](JobExecutor& executor) {
+			[this](JobExecutor& executor) ETNoexceptHint {
 				executor.ForEach<1u>(Begin(_geometryConcepts), End(_geometryConcepts), [this](JobExecutor& executor, GeometryConcept& concept) {
 					ET_PROFILE_SCOPE("Graphics/AccelerationStructures", "Update Geometry Hierarchy", 0xFFAAFF);
 					if (!concept.ShouldRebuildHierarchy()) {
@@ -54,7 +53,7 @@ namespace Eldritch2 { namespace Graphics {
 					Rebuild(executor, concept, LeafExtractor<uint64>(_geometryCellExtent));
 				});
 			},
-			[this](JobExecutor& executor) {
+			[this](JobExecutor& executor) ETNoexceptHint {
 				executor.ForEach<1u>(Begin(_lightConcepts), End(_lightConcepts), [this](JobExecutor& executor, LightConcept& concept) {
 					ET_PROFILE_SCOPE("Graphics/AccelerationStructures", "Update Light Hierarchy", 0xFFAAFF);
 					if (!concept.ShouldRebuildHierarchy()) {

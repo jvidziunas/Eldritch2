@@ -8,7 +8,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -17,85 +16,80 @@
 #include <steam_api.h>
 //------------------------------------------------------------------//
 
-#if defined( ZeroMemory )
+#if defined(ZeroMemory)
 #	undef ZeroMemory
 #endif
 
-namespace Eldritch2 {
-	namespace Networking {
-		namespace Steamworks {
-			namespace {
+namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
-				enum : HSteamUser { InvalidUser = 0u };
+	namespace {
 
-			}	// anonymous namespace
+		enum : HSteamUser { InvalidUser = 0u };
 
-			Player::Player() : _localUser(InvalidUser) {
-				ZeroMemory(_name);
-			}
+	} // anonymous namespace
 
-		// ---------------------------------------------------
+	Player::Player() ETNoexceptHint : _user(InvalidUser) {
+		ZeroMemory(_name);
+	}
 
-			Player::~Player() {
-				ET_ASSERT(_localUser == InvalidUser, "Leaking Steamworks user!");
-			}
+	// ---------------------------------------------------
 
-		// ---------------------------------------------------
+	Player::~Player() {
+		ET_ASSERT(_user == InvalidUser, "Leaking Steamworks user {}!", _user);
+	}
 
-			const Utf8Char* Player::GetName() const {
-				return _name;
-			}
+	// ---------------------------------------------------
 
-		// ---------------------------------------------------
+	StringView Player::GetName() const ETNoexceptHint {
+		return _name;
+	}
 
-			void Player::NotifyPersonaNameChange(const Utf8Char* const name) {
-				CopyString(_name, name);
-			}
+	// ---------------------------------------------------
 
-		// ---------------------------------------------------
+	void Player::SetName(StringView name) ETNoexceptHint {
+		name.Copy(_name, ETCountOf(_name));
+	}
 
-			bool Player::IsAttachedToLocalUser() const {
-				return _localUser != InvalidUser;
-			}
+	// ---------------------------------------------------
 
-		// ---------------------------------------------------
+	bool Player::IsLocal() const ETNoexceptHint {
+		return _user != InvalidUser;
+	}
 
-			bool Player::BindToLocalUser(HSteamPipe pipe) {
-				const HSteamUser user(SteamClient()->ConnectToGlobalUser(pipe));
-				if (user == InvalidUser) {
-					return false;
-				}
+	// ---------------------------------------------------
 
-				DisconnectFromUser(pipe);
+	ErrorCode Player::BindResources(HSteamPipe pipe, EAccountType accountType) {
+		using ::Eldritch2::Swap;
 
-				_localUser = user;
+		HSteamUser user(SteamClient()->CreateLocalUser(ETAddressOf(pipe), accountType));
+		ET_ABORT_UNLESS(user != InvalidUser ? Error::None : Error::Unspecified);
+		ET_AT_SCOPE_EXIT(if (user != InvalidUser) SteamClient()->ReleaseUser(user, pipe));
 
-				return true;
-			}
+		Swap(_user, user);
 
-		// ---------------------------------------------------
+		return Error::None;
+	}
 
-			bool Player::BindToAnonymousUser(HSteamPipe pipe) {
-				const HSteamUser user(SteamClient()->CreateLocalUser(&pipe, k_EAccountTypeConsoleUser));
-				if (user == InvalidUser) {
-					return false;
-				}
+	// ---------------------------------------------------
 
-				DisconnectFromUser(pipe);
+	ErrorCode Player::BindResources(HSteamPipe pipe) {
+		using ::Eldritch2::Swap;
 
-				_localUser = user;
+		HSteamUser user(SteamClient()->ConnectToGlobalUser(pipe));
+		ET_ABORT_UNLESS(user != InvalidUser ? Error::None : Error::Unspecified);
+		ET_AT_SCOPE_EXIT(if (user != InvalidUser) SteamClient()->ReleaseUser(user, pipe));
 
-				return true;
-			}
+		Swap(_user, user);
 
-		// ---------------------------------------------------
+		return Error::None;
+	}
 
-			void Player::DisconnectFromUser(HSteamPipe pipe) {
-				if (HSteamUser user = eastl::exchange(_localUser, InvalidUser)) {
-					SteamClient()->ReleaseUser(user, pipe);
-				}
-			}
+	// ---------------------------------------------------
 
-		}	// namespace Steamworks
-	}	// namespace Networking
-}	// namespace Eldritch2
+	void Player::FreeResources(HSteamPipe pipe) {
+		if (const HSteamUser user = eastl::exchange(_user, InvalidUser)) {
+			SteamClient()->ReleaseUser(user, pipe);
+		}
+	}
+
+}}} // namespace Eldritch2::Networking::Steamworks

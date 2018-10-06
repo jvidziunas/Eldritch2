@@ -51,30 +51,26 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	using namespace ::Eldritch2::Scripting::Wren::AssetViews;
 	using namespace ::Eldritch2::Assets;
 
-	ET_IMPLEMENT_WREN_CLASS(DialogueSet) { // clang-format off
-		api.CreateClass<DialogueSet>(ET_BUILTIN_WREN_MODULE_NAME(Core), "DialogueSet",
-			{/* Constructors */
-				ConstructorMethod("new(_)", [](WrenVM* vm) {
-					const DialogueSetAsset* const	asset(Cast<DialogueSetAsset>(GetSlotAs<AssetReference>(vm, 1)));
-
+	ET_IMPLEMENT_WREN_CLASS(DialogueSet) {
+		api.DefineClass<DialogueSet>(ET_BUILTIN_WREN_MODULE_NAME(Core), "DialogueSet", // clang-format off
+			{/*	Static methods */
+				ForeignMethod("new(_)", [](WrenVM* vm) {
+					const DialogueSetAsset* const asset(Cast<DialogueSetAsset>(GetSlotAs<AssetReference>(vm, 1)));
 					ET_ABORT_WREN_UNLESS(asset, "Asset must be a DialogueSetAsset.");
 
-					SetReturn<DialogueSet>(vm);
-				})},
-			{/*	Static methods */ },
-			{/*	Properties */ },
+					SetReturn<DialogueSet>(vm, /*classSlot =*/0);
+				}), },
 			{/*	Methods */
 				ForeignMethod("match(_)", [](WrenVM* vm) {
-					DialogueSet&        self(GetSlotAs<DialogueSet>(vm, 0));
-					WrenHandle* const	wrenFacts(wrenGetSlotHandle(vm, 1));
+					DialogueSet&      self(GetSlotAs<DialogueSet>(vm, 0));
+					WrenHandle* const wrenFacts(wrenGetSlotHandle(vm, 1));
+					ET_AT_SCOPE_EXIT(wrenReleaseHandle(vm, wrenFacts));
+
 					// const ObjMap* const facts(AS_MAP(wrenFacts->value));
 
-					DialogueSet::QueryBuilderType    query(MallocAllocator(), self.GetSymbols());
-
+					DialogueSet::QueryBuilderType query(MallocAllocator(), self.GetSymbols());
 					self.Match(MallocAllocator(), query);
-
-					wrenReleaseHandle(vm, wrenFacts);
-				})});
-	} // clang-format on
+				}), }); // clang-format on
+	}
 
 }}} // namespace Eldritch2::Scripting::Wren

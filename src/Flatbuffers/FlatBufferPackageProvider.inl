@@ -24,19 +24,13 @@ namespace Eldritch2 { namespace FlatBuffers {
 	// ---------------------------------------------------
 
 	ETConstexpr ETInlineHint ETForceInlineHint Assets::AssetDatabase& FlatBufferPackageProvider::GetAssetDatabase() ETNoexceptHint {
-		return _assetDatabase;
+		return _packageDatabase.GetAssetDatabase();
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint ETForceInlineHint bool FlatBufferPackageProvider::ShouldRun(MemoryOrder order) const ETNoexceptHint {
 		return _runBehavior.load(order) == Continue;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint void FlatBufferPackageProvider::DestroyGarbage(size_t destructionLimit) {
-		_packageDatabase.DestroyGarbage(_assetDatabase, destructionLimit);
 	}
 
 }} // namespace Eldritch2::FlatBuffers

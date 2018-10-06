@@ -44,7 +44,6 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	PhysxEngineComponent::PhysxEngineComponent(const ObjectLocator& services) :
 		EngineComponent(services),
-		_log(FindService<Engine>()->GetLog()),
 		_allocator("PhysX Root Allocator") {}
 
 	// ---------------------------------------------------
@@ -58,6 +57,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	void PhysxEngineComponent::BindResourcesEarly(JobExecutor& /*executor*/) {
 		ET_PROFILE_SCOPE("Engine/Initialization/PhysX", "PhysX SDK creation", 0x76b900);
 
+		_log.BindResources(FindService<Engine>()->GetLog());
 		if (!PxCreateFoundation(PX_FOUNDATION_VERSION, _allocator, _log)) {
 			_log.Write(Severity::Error, "Error creating PhysX foundation object!" ET_NEWLINE);
 			FindService<Engine>()->SetShouldShutDown();

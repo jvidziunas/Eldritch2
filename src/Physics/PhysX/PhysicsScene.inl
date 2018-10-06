@@ -24,13 +24,13 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	// ---------------------------------------------------
 
 	ETInlineHint ETForceInlineHint physx::PxMaterial& PhysicsScene::GetCharacterMaterial() const {
-		return *_characterMaterial;
+		return *_knownMaterials[Character];
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint ETForceInlineHint physx::PxMaterial& PhysicsScene::GetTriggerMaterial() const {
-		return *_triggerMaterial;
+		return *_knownMaterials[Trigger];
 	}
 
 	// ---------------------------------------------------

@@ -23,19 +23,48 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	using namespace ::Eldritch2::Assets;
 	using namespace ::flatbuffers;
 
+	namespace {
+
+		ETConstexpr SkinnedVertex MeshVertices[] = {
+			{ { 0.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 0.0f } },
+			{ { 0.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 0.0f } },
+			{ { 1.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 0.0f } }
+		};
+
+		// ---
+
+		ETConstexpr uint16 MeshIndices[] = { 0u, 1u, 2u };
+
+		// ---
+
+		ETConstexpr Box MeshBounds({ 0.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f });
+
+	} // anonymous namespace
+
 	MeshAsset::MeshAsset(StringView path) :
 		Asset(path),
-		_attributes(MallocAllocator("Mesh Asset Attribute Collection Allocator")),
 		_surfaces(MallocAllocator("Mesh Asset Element Collection Allocator")) {
 	}
 
 	// ---------------------------------------------------
 
-	void MeshAsset::Stream(const VertexStreamRequest& /*request*/) const ETNoexceptHint {}
+	MeshDescription MeshAsset::GetDescription() const ETNoexceptHint {
+		return MeshDescription { uint32(_surfaces.GetSize()), sizeof(MeshVertices), sizeof(MeshIndices) };
+	}
 
 	// ---------------------------------------------------
 
-	void MeshAsset::Stream(const IndexStreamRequest& /*request*/) const ETNoexceptHint {}
+	void MeshAsset::Stream(MeshElementRequest<StridingIterator<SkinnedVertex>> request) const ETNoexceptHint {
+		while (request.first != request.last) {
+			CopyMemoryNonTemporal(ETAddressOf(*request.out++), ETAddressOf(MeshVertices[request.first++]), sizeof(MeshVertices[0]));
+		}
+	}
+
+	// ---------------------------------------------------
+
+	void MeshAsset::Stream(MeshElementRequest<MeshIndex*> request) const ETNoexceptHint {
+		CopyMemoryNonTemporal(request.out, MeshIndices + request.first, (request.last - request.first) * sizeof(*MeshIndices));
+	}
 
 	// ---------------------------------------------------
 
@@ -47,10 +76,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			return Error::Unspecified;
 		}
 
-		ArrayList<Attribute>          attributes(_attributes.GetAllocator());
-		ArrayList<SurfaceDescription> surfaces(_surfaces.GetAllocator());
+		ArrayList<MeshSurface> surfaces(_surfaces.GetAllocator(), { MeshSurface(GpuPrimitive::Triangle, 0u, ETCountOf(MeshIndices), MeshBounds, "lol") });
 
-		Swap(_attributes, attributes);
 		Swap(_surfaces, surfaces);
 
 		return Error::None;
@@ -59,7 +86,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	// ---------------------------------------------------
 
 	void MeshAsset::FreeResources() {
-		_attributes.Clear(ReleaseMemorySemantics());
 		_surfaces.Clear(ReleaseMemorySemantics());
 	}
 

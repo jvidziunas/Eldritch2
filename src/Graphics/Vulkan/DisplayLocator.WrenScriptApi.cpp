@@ -17,16 +17,8 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	using namespace ::Eldritch2::Scripting::Wren;
-	using namespace ::Eldritch2::Scripting;
-
-	ET_IMPLEMENT_WREN_CLASS(DisplayLocator) { // clang-format off
-		api.CreateClass<DisplayLocator>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "DisplayLocator",
-			{ /* Constructors */ },
-			{ /* Static methods */ },
-			{ /* Properties */ },
-			{ /* Methods */ }
-		);
-	} // clang-format on
+	ET_IMPLEMENT_WREN_CLASS(DisplayLocator) {
+		api.DefineClass<DisplayLocator>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "DisplayLocator", { /* Static methods */ }, { /* Methods */ });
+	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

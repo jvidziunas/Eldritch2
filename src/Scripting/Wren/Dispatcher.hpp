@@ -15,121 +15,123 @@
 
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Core {
-	class World;
-}} // namespace Eldritch2::Core
+namespace Eldritch2 { namespace Scripting { namespace Wren {
+	class Context;
+}}} // namespace Eldritch2::Scripting::Wren
 
 struct WrenHandle;
-struct WrenVM;
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
+
+	class ScriptEvent {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using Time = uint64;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref ScriptEvent instance.
+		ETConstexpr ScriptEvent(Time when, WrenHandle* receiver) ETNoexceptHint;
+		//!	Disable copy construction.
+		ETConstexpr ScriptEvent(const ScriptEvent&) ETNoexceptHint = delete;
+		//!	Constructs this @ref ScriptEvent instance.
+		ScriptEvent(ScriptEvent&&) ETNoexceptHint;
+		//!	Constructs this @ref Event instance.
+		ScriptEvent() ETNoexceptHint = default;
+
+		~ScriptEvent();
+
+		// ---------------------------------------------------
+
+	public:
+		bool ShouldDispatch(Time now) const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		ScriptEvent& operator=(const ScriptEvent&) ETNoexceptHint = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	public:
+		Time        when;
+		WrenHandle* receiver;
+	};
+
+	// ---
 
 	class Dispatcher {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using ScriptTime = uint32;
-
-		// ---
-
-		struct Event {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref Event instance.
-			Event(ScriptTime dispatchTime, WrenHandle* receiver);
-			//!	Disable copy construction.
-			Event(const Event&) = default;
-			//!	Constructs this @ref Event instance.
-			Event() = default;
-
-			~Event();
-
-			// ---------------------------------------------------
-
-		public:
-			bool ShouldDispatch(ScriptTime now) const;
-
-			// ---------------------------------------------------
-
-		public:
-			bool Call(WrenVM* wren, WrenHandle* arity0Stub);
-
-			void FreeResources(WrenVM* wren);
-
-			// ---------------------------------------------------
-
-		public:
-			Event& operator=(const Event&) = default;
-
-			// - DATA MEMBERS ------------------------------------
-
-		public:
-			ScriptTime  when;
-			WrenHandle* receiver;
-		};
-
-		// ---
-
-	public:
-		template <typename Allocator = MallocAllocator>
-		using EventQueue = PriorityQueue<Event, ArrayList<Event, Allocator>>;
+		using EventQueue = PriorityQueue<ScriptEvent, ArrayList<ScriptEvent, MallocAllocator>>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Dispatcher instance.
-		Dispatcher(Core::World& world);
 		//!	Disable copy construction.
 		Dispatcher(const Dispatcher&) = delete;
+		//!	Constructs this @ref Dispatcher instance.
+		Dispatcher();
 
 		~Dispatcher();
 
 		// ---------------------------------------------------
 
 	public:
-		ScriptTime GetNow() const;
+		ETConstexpr ScriptEvent::Time GetNow() const ETNoexceptHint;
 
-		MicrosecondTime SetGameTime(MicrosecondTime microseconds);
-
-		double GetWorldTimeScalar() const;
-
-		void SetWorldTimeScalar(double value);
+		ETConstexpr MicrosecondTime SetGameTime(MicrosecondTime) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void CallAtGameTime(ScriptTime time, WrenHandle* receiver);
+		void CallAtGameTime(ScriptEvent::Time when, WrenHandle* receiver);
 
-		void ExecuteScriptEvents(WrenVM* wren, MicrosecondTime deltaMicroseconds);
-
-		// ---------------------------------------------------
-
-	public:
-		void ShutDownWorld(bool andEngine) const;
+		void CallOnDelay(ScriptEvent::Time delay, WrenHandle* receiver);
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(WrenVM* wren);
+		ETConstexpr double GetTimeScalar() const ETNoexceptHint;
 
-		void FreeResources(WrenVM* wren);
+		ETConstexpr double SetTimeScalar(double) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		void ExecuteScriptEvents(Context& context, MicrosecondTime tickDelta);
+
+		// ---------------------------------------------------
+
+	public:
+		ETConstexpr bool ShouldShutDownWorld() const ETNoexceptHint;
+
+		ETConstexpr void ShutDownWorld() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		ErrorCode BindResources(Context& context, double timeScalar, MicrosecondTime now = 0u);
+
+		void FreeResources(Context& context);
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Core::World* _world;
-		/*!	Current 'age of the universe', in microseconds. Note that as a virtual value this can advance at a
-			different rate relative to (or not at all, depending on pause state) a player's wall clock. */
-		uint64       _gameTime;
-		EventQueue<> _events;
+		bool            _requestedShutdown;
+		double          _timeScalar;
+		MicrosecondTime _gameTime;
+		EventQueue      _events;
 	};
 
 	// ---
 
-	ETPureFunctionHint Dispatcher::ScriptTime AsScriptTime(MicrosecondTime when);
+	ETConstexpr ETPureFunctionHint ScriptEvent::Time AsScriptTime(MicrosecondTime when) ETNoexceptHint;
 
-	ETPureFunctionHint MicrosecondTime AsMicroseconds(Dispatcher::ScriptTime when);
+	ETConstexpr ETPureFunctionHint MicrosecondTime AsMicroseconds(ScriptEvent::Time when) ETNoexceptHint;
 
 }}} // namespace Eldritch2::Scripting::Wren
 

@@ -308,6 +308,7 @@
 using ETPostfixOperatorHint = int;
 
 namespace Eldritch2 {
+
 namespace Detail {
 
 	template <typename Type>
@@ -325,12 +326,17 @@ namespace Detail {
 #endif // ET_COMPILER_SUPPORTS_CPP11
 	};
 
-}
-} // namespace Eldritch2::Detail
+} // namespace Detail
+
+template <typename... Ts>
+ETConstexpr void DiscardReturns(Ts&&...) ETNoexceptHint {}
+
+} // namespace Eldritch2
 
 #define ETAlignOf(type) static_cast<size_t>(::Eldritch2::Detail::AlignmentOf<type>::Value)
 #define ETAddressOf(value) __builtin_addressof(value)
 #define ETCountOf(value) _countof(value)
+#define ETOffsetOf(structure, field) __builtin_offsetof(structure, field)
 
 /*	Since the override specifiers and enum class language extensions are safely wrapped away in here, turn off the warnings.
  *	(4505) Some template classes will have unreferenced inline members. The optimizer/linker will strip these out, so we don't need to worry.

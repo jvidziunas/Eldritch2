@@ -17,6 +17,11 @@
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
 
+#define ET_TERMINATE_WORLD_UNLESS(cond)                  \
+	if (!(cond)) {                                       \
+		FindService<Core::World>()->SetShouldShutDown(); \
+	}
+
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	using namespace ::Eldritch2::Scheduling;
@@ -24,18 +29,14 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	using namespace ::Eldritch2::Core;
 	using namespace ::physx;
 
-	PhysxWorldComponent::PhysxWorldComponent(const ObjectLocator& services) :
-		WorldComponent(services),
-		CpuDispatcher(4u),
-		_log(FindService<World>()->GetLog()),
-		_scene(nullptr) {
-	}
+	PhysxWorldComponent::PhysxWorldComponent(const ObjectLocator& services) ETNoexceptHint : WorldComponent(services), CpuDispatcher(4u), _scene(nullptr) {}
 
 	// ---------------------------------------------------
 
 	void PhysxWorldComponent::OnFixedRateTickEarly(JobExecutor& executor, MicrosecondTime duration) {
 		ET_PROFILE_SCOPE("World/EarlyTick/PhysX", "Join simulation", 0x32AACD);
 		executor.AwaitCondition(_scene->IsSimulationComplete());
+
 		if (Failed(_scene->FinishSimulation())) {
 			_log.Write(Severity::Error, "PhysX hardware error simulating scene {}, terminating." ET_NEWLINE, fmt::ptr(_scene));
 			FindService<World>()->SetShouldShutDown();
@@ -44,22 +45,26 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	// ---------------------------------------------------
 
-	void PhysxWorldComponent::OnFixedRateTickLate(JobExecutor& executor, MicrosecondTime duration) {
+	void PhysxWorldComponent::OnFixedRateTickLate(JobExecutor& /*executor*/, MicrosecondTime duration) {
 		ET_PROFILE_SCOPE("World/LateTick/PhysX", "Start simulation", 0x32AACD);
-		if (Failed(_scene->StartSimulation(AsSeconds(duration)))) {
-			FindService<World>()->SetShouldShutDown();
-		}
+
+		_scene->Simulate(duration);
 	}
 
 	// ---------------------------------------------------
 
-	void PhysxWorldComponent::BindResources(JobExecutor& /*executor*/) {}
+	void PhysxWorldComponent::BindResources(JobExecutor& /*executor*/) {
+		_log.BindResources(FindService<World>()->GetLog());
+
+		ET_TERMINATE_WORLD_UNLESS(_scene && Succeeded(_scene->BindResources(*this)));
+	}
 
 	// ---------------------------------------------------
 
 	void PhysxWorldComponent::FreeResources(JobExecutor& executor) {
-		if (_scene) {
-			executor.AwaitCondition(_scene->IsSimulationComplete());
+		if (PhysicsScene* const scene = eastl::exchange(_scene, nullptr)) {
+			executor.AwaitCondition(scene->IsSimulationComplete());
+			scene->FreeResources();
 		}
 
 		executor.AwaitFence(GetTasksCompletedFence());

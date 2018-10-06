@@ -95,6 +95,7 @@
 #include <Common/Semaphore.hpp>
 #include <Common/Sort.hpp>
 #include <Common/Stopwatch.hpp>
+#include <Common/StridingIterator.hpp>
 #include <Common/SymbolTable.hpp>
 #include <Common/Thread.hpp>
 #include <Common/Tuple.hpp>

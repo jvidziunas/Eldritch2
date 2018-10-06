@@ -14,6 +14,7 @@
 #include <Graphics/Vulkan/VulkanEngineComponent.hpp>
 #include <Graphics/Vulkan/VulkanWorldComponent.hpp>
 #include <Graphics/Vulkan/VulkanTools.hpp>
+#include <Scheduling/JobExecutor.hpp>
 #include <Core/PropertyRegistrar.hpp>
 #include <Core/Engine.hpp>
 //------------------------------------------------------------------//
@@ -58,16 +59,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	void VulkanEngineComponent::PublishConfiguration(PropertyRegistrar& properties) {
 		ET_PROFILE_SCOPE("Engine/Initialization/Properties/Vulkan", "Property registration", 0xBBBBBB);
 		properties.BeginSection("Vulkan")
-			.DefineProperty("PreferredGpu", [this](StringView value) {
-				_preferredGpu = value;
+			.DefineProperty("PreferredGpu", [this](StringView gpuName) {
+				_preferredGpu = gpuName;
 			});
 		properties.BeginSection("Vulkan.InstanceLayers")
-			.DefineDynamicProperty([this](StringView name, StringView /*value*/) {
-				_instanceLayers.Emplace(MallocAllocator("Vulkan Instance Layer Name Allocator"), name);
+			.DefineDynamicProperty([this](StringView layer, StringView /*value*/) {
+				_instanceLayers.Emplace(MallocAllocator("Vulkan Instance Layer Name Allocator"), layer);
 			});
 		properties.BeginSection("Vulkan.DeviceLayers")
-			.DefineDynamicProperty([this](StringView name, StringView /*value*/) {
-				_deviceLayers.Emplace(MallocAllocator("Vulkan Device Layer Name Allocator"), name);
+			.DefineDynamicProperty([this](StringView layer, StringView /*value*/) {
+				_deviceLayers.Emplace(MallocAllocator("Vulkan Device Layer Name Allocator"), layer);
 			});
 	}
 
@@ -81,14 +82,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	void VulkanEngineComponent::TickEarly(JobExecutor& executor) {
 		ET_PROFILE_SCOPE("Engine/ServiceTick/Vulkan", "Begin frame", 0xBBBBBB);
-		auto& gpu(_vulkan.GetPrimaryDevice());
 
 		executor.AwaitWork(
-			[&](JobExecutor& executor) {
-				executor.AwaitCondition(gpu.GetTransfersConsumed(gpu));
-				gpu.SubmitFrameIo(gpu);
+			[this](JobExecutor& executor) {
+				auto& gpu(_vulkan.GetDevice());
+				auto& frame(gpu.GetFrames()[0]);
+
+				executor.AwaitCondition(frame.GetTransfersConsumed(gpu));
+				frame.SubmitIo(gpu);
 			},
-			[&](JobExecutor& /*executor*/) {
+			[this](JobExecutor& /*executor*/) {
+				auto& gpu(_vulkan.GetDevice());
 				gpu.PresentSwapchainImages(gpu);
 				// ET_PROFILE_FRAME_BEGIN_GPU(nullptr);
 				gpu.AcquireSwapchainImages(gpu);

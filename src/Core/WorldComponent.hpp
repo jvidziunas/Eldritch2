@@ -32,7 +32,7 @@ namespace Eldritch2 { namespace Core {
 
 	public:
 		//!	Constructs this @ref WorldComponent instance.
-		WorldComponent(const ObjectLocator& services);
+		WorldComponent(const ObjectLocator& services) ETNoexceptHint;
 		//!	Disable copy construction.
 		WorldComponent(const WorldComponent&) = delete;
 

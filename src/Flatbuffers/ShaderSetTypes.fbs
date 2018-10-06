@@ -96,14 +96,14 @@ enum StencilOperation : ubyte {
 	DecrementWithWrap
 }
 
-struct StencilBehavior {
+struct StencilDescriptor {
 	StencilAndDepthFailBehavior		: StencilOperation		= KeepExisting;
 	StencilPassDepthFailBehavior	: StencilOperation		= KeepExisting;
 	StencilAndDepthPassBehavior		: StencilOperation		= KeepExisting;
 	StencilComparisonFunction		: ComparisonFunction	= AlwaysPass;
 }
 
-table RasterizationState {
+table RasterizerDescriptor {
 	FillMode						: PolygonFillMode		= Solid;
 	CullMode						: FaceCullMode			= BackFace;
 	DepthBias						: int					= 0;
@@ -112,15 +112,15 @@ table RasterizationState {
 	Flags							: RasterizationFlags	= DepthClipEnable;
 }
 
-table DepthStencilState {
+table DepthStencilDescriptor {
 	Flags							: DepthStencilFlags;
 	DepthComparisonFunction			: ComparisonFunction	= PassIfLess;
 	
-	FrontFaceBehavior				: StencilBehavior;
-	BackFaceBehavior				: StencilBehavior;
+	FrontFaceBehavior				: StencilDescriptor;
+	BackFaceBehavior				: StencilDescriptor;
 }
 
-table OutputState {
+table OutputDescriptor {
 	SourceColorBlendFactor			: ColorBlendFactor		= One;
 	DestinationColorBlendFactor		: ColorBlendFactor		= Zero;
 	ColorBlendOperator				: BlendOperator			= Add;
@@ -131,10 +131,10 @@ table OutputState {
 	WriteMask						: ChannelWriteMask		= 255;
 }
 
-table UnorderedAccessViewState {
+table UnorderedAccessViewDescriptor {
 }
 
-enum ShaderFlags : ubyte (bit_flags) {
+enum StageFlags : ubyte (bit_flags) {
 	VertexShader,
 	HullShader,
 	DomainShader,
@@ -142,11 +142,11 @@ enum ShaderFlags : ubyte (bit_flags) {
 	FragmentShader
 }
 
-table UsageDescriptor {
+table ShaderDescriptor {
 	Name					: string (required, key);
-	Shaders					: ShaderFlags;
-	RasterizationBehavior	: RasterizationState (required);
-	DepthStencilBehavior	: DepthStencilState (required);
-	Outputs					: [OutputState];
-	UnorderedAccessViews	: [UnorderedAccessViewState];
+	Stages					: StageFlags;
+	Rasterizer	            : RasterizerDescriptor (required);
+	DepthStencil	        : DepthStencilDescriptor (required);
+	Outputs					: [OutputDescriptor];
+	UnorderedAccessViews	: [UnorderedAccessViewDescriptor];
 }

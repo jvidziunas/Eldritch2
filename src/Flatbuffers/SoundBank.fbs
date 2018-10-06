@@ -3,14 +3,14 @@ file_extension	".e2soundbank";
 
 namespace Eldritch2.Sound.FlatBuffers;
 
-table Cue {
+table CueDescriptor {
 	Name	: string (required, key);
 	Offset	: ulong;
 	Length	: ulong;
 }
 
-table SoundBank {
-	Cues	: [Cue];
+table SoundBankDescriptor {
+	Cues	: [CueDescriptor];
 }
 
-root_type SoundBank;
+root_type SoundBankDescriptor;

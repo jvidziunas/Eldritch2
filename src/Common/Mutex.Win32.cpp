@@ -16,46 +16,45 @@
 
 namespace Eldritch2 {
 
-Mutex::Mutex(const Mutex&) :
-	Mutex() {}
+Mutex::Mutex(const Mutex&) ETNoexceptHint : Mutex() {}
 
 // ---------------------------------------------------
 
-Mutex::Mutex() {
-	InitializeSRWLock(&_lock);
+Mutex::Mutex() ETNoexceptHint {
+	InitializeSRWLock(ETAddressOf(_lock));
 }
 
 // ---------------------------------------------------
 
-Mutex::~Mutex() {}
+Mutex::~Mutex() ETNoexceptHint {}
 
 // ---------------------------------------------------
 
-bool Mutex::TryEnterAsReader() const {
-	return TryAcquireSRWLockShared(&_lock) != 0;
+bool Mutex::TryEnterAsReader() const ETNoexceptHint {
+	return TryAcquireSRWLockShared(ETAddressOf(_lock)) != 0;
 }
 
 // ---------------------------------------------------
 
-void Mutex::LeaveAsReader() const {
-	ReleaseSRWLockShared(&_lock);
+void Mutex::LeaveAsReader() const ETNoexceptHint {
+	ReleaseSRWLockShared(ETAddressOf(_lock));
 }
 
 // ---------------------------------------------------
 
-bool Mutex::TryEnter() {
-	return TryAcquireSRWLockExclusive(&_lock) != 0;
+bool Mutex::TryEnter() ETNoexceptHint {
+	return TryAcquireSRWLockExclusive(ETAddressOf(_lock)) != 0;
 }
 
 // ---------------------------------------------------
 
-void Mutex::Leave() {
-	ReleaseSRWLockExclusive(&_lock);
+void Mutex::Leave() ETNoexceptHint {
+	ReleaseSRWLockExclusive(ETAddressOf(_lock));
 }
 
 // ---------------------------------------------------
 
-Mutex& Mutex::operator=(const Mutex&) {
+Mutex& Mutex::operator=(const Mutex&) ETNoexceptHint {
 	//	No-op.
 	return *this;
 }

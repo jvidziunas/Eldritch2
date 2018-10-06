@@ -17,8 +17,7 @@
 
 namespace Eldritch2 { namespace Core {
 
-	ETInlineHint ETForceInlineHint WorldComponent::WorldComponent(const ObjectLocator& services) :
-		_services(ETAddressOf(services)) {}
+	ETInlineHint ETForceInlineHint WorldComponent::WorldComponent(const ObjectLocator& services) ETNoexceptHint : _services(ETAddressOf(services)) {}
 
 	// ---------------------------------------------------
 

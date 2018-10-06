@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/GraphicsPipeline.hpp>
+#include <Graphics/Vulkan/GpuResourceApi.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
@@ -22,11 +22,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class Display {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using ViewportList = Viewport[4];
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -42,14 +37,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const ViewportList& GetViewports() const ETNoexceptHint;
-
-		Viewport* TryAcquireViewport(const GraphicsPipeline& generator) ETNoexceptHint;
+		ETConstexpr auto GetViewports() const ETNoexceptHint -> const Viewport (&)[4];
+		ETConstexpr auto GetViewports() ETNoexceptHint -> Viewport (&)[4];
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult CreateSwapchain(Gpu& gpu, VkSwapchainKHR& outSwapchain) ETNoexceptHint;
+		VkResult BindSwapchain(Gpu& gpu, VkSwapchainKHR& outSwapchain, VkSwapchainKHR old) ETNoexceptHint;
+
+		void FreeSwapchain(Gpu& gpu, VkSwapchainKHR swapchain) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -70,7 +66,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		VkSurfaceKHR       _surface;
 		VkSurfaceFormatKHR _format;
 		VkPresentModeKHR   _presentMode;
-		ViewportList       _viewports;
+		Viewport           _viewports[4];
 
 		// ---------------------------------------------------
 
@@ -79,7 +75,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---
 
-	using ImageList   = SoArrayList<VkImageView /*view*/, Framebuffer /*backbuffer*/, CommandList /*commands*/>;
+	using ImageList   = SoArrayList<VkImageView /*view*/, Framebuffer /*backbuffer*/, CommandList /*commands*/, VkSemaphore /*ready*/>;
 	using DisplayList = SoArrayList<Display /*display*/, VkResult /*presentResult*/, VkSwapchainKHR /*swapchain*/, VkSemaphore /*ready*/, uint32 /*index*/, ImageList /*images*/>;
 
 }}} // namespace Eldritch2::Graphics::Vulkan

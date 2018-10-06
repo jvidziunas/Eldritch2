@@ -14,8 +14,7 @@
 //==================================================================//
 #include <Graphics/Vulkan/BatchCoordinator.hpp>
 #include <Graphics/Vulkan/GraphicsPipeline.hpp>
-#include <Graphics/Vulkan/DescriptorTable.hpp>
-#include <Graphics/Vulkan/GpuResources.hpp>
+#include <Graphics/Vulkan/GpuResourceApi.hpp>
 #include <Graphics/GraphicsScene.hpp>
 //------------------------------------------------------------------//
 
@@ -25,13 +24,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using ViewportReference = UniquePointer<const Viewport, ViewportDisposer>;
+		using DisplayLink = UniquePointer<Viewport, ViewportDisposer>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref PlayerView instance.
-		PlayerView(ViewportReference target, Transformation worldToView, Angle verticalFov);
+		PlayerView(DisplayLink target, Transformation worldToView, Angle verticalFov);
 		//! Disable copy construction.
 		PlayerView(const PlayerView&) = delete;
 
@@ -45,13 +44,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		Transformation ETSimdCall GetWorldToView() const ETNoexceptHint;
+		ETConstexpr Transformation ETSimdCall GetWorldToView() const ETNoexceptHint;
 
-		void ETSimdCall SetWorldToView(Transformation worldToView) ETNoexceptHint;
+		ETConstexpr void ETSimdCall SetWorldToView(Transformation worldToView) ETNoexceptHint;
 
-		Angle GetVerticalFov() const ETNoexceptHint;
+		ETConstexpr Angle GetVerticalFov() const ETNoexceptHint;
 
-		void SetVerticalFov(Angle angle) ETNoexceptHint;
+		ETConstexpr void SetVerticalFov(Angle angle) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -61,9 +60,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ViewportReference _target;
-		Transformation    _worldToView;
-		Angle             _verticalFov;
+		DisplayLink    _target;
+		Transformation _worldToView;
+		Angle          _verticalFov;
 	};
 
 	// ---
@@ -72,32 +71,28 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Disable copy construction.
-		VulkanGraphicsScene(const VulkanGraphicsScene&) = delete;
 		//! Constructs this @ref VulkanGraphicsScene instance.
 		VulkanGraphicsScene();
+		//! Disable copy construction.
+		VulkanGraphicsScene(const VulkanGraphicsScene&) = delete;
 
 		~VulkanGraphicsScene() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		const ArrayList<PlayerView*> GetRootViews() const ETNoexceptHint;
+		Range<const PlayerView* const*> GetRootViews() const ETNoexceptHint;
 
-		const BatchCoordinator& GetOpaqueBatches() const ETNoexceptHint;
+		ETConstexpr const GraphicsPipeline& GetShadowPipeline() const ETNoexceptHint;
 
-		const DescriptorTable& GetShaderResources() const ETNoexceptHint;
+		ETConstexpr const GraphicsPipeline& GetLitPipeline() const ETNoexceptHint;
 
-		const GraphicsPipeline& GetOpaqueLitPipeline() const ETNoexceptHint;
-
-		const GraphicsPipeline& GetShadowPipeline() const ETNoexceptHint;
-
-		const Framebuffer& GetShadowAtlas() const ETNoexceptHint;
+		ETConstexpr const Framebuffer& GetShadowAtlas() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkExtent2D shadowResolution, VkDeviceSize transformArenaSize);
+		VkResult BindResources(Gpu& gpu, const GraphicsPipelineBuilder& litPipelineBuilder, const GraphicsPipelineBuilder& shadowPipelineBuilder, VkExtent2D shadowResolution, VkDeviceSize transformArenaSize);
 
 		void FreeResources(Gpu& gpu);
 
@@ -109,13 +104,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<PlayerView*> _rootViews;
-		UniformBuffer          _transforms;
-		BatchCoordinator       _opaqueBatches;
-		GraphicsPipeline       _shadowPipeline;
-		Framebuffer            _shadowAtlas;
-		GraphicsPipeline       _opaqueLitPipeline;
-		DescriptorTable        _shaderResources;
+		const GraphicsPipelineBuilder* _shadowPipelineBuilder;
+		const GraphicsPipelineBuilder* _litPipelineBuilder;
+		ArrayList<PlayerView*>         _rootViews;
+		UniformBuffer                  _uniforms;
+		GraphicsPipeline               _shadowPipeline;
+		Framebuffer                    _shadowAtlas;
+		GraphicsPipeline               _litPipeline;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

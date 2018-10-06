@@ -12,12 +12,17 @@ struct Float3 {
 }
 
 struct Quaternion {
-	X	: float;
-	Y	: float;
-	Z	: float;
+	I	: float;
+	J	: float;
+	K	: float;
 	W	: float;
 }
 
 struct CompressedUnitQuaternion {
 	Bits	: uint;
+}
+
+struct Transformation {
+	Translation : Float3;
+	Orientation : CompressedUnitQuaternion;
 }

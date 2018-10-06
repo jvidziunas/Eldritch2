@@ -52,6 +52,8 @@ public:
 public:
 	void Clear();
 
+	ETConstexpr const AllocatorType& GetAllocator() const ETNoexceptHint;
+
 	// - DATA MEMBERS ------------------------------------
 
 private:

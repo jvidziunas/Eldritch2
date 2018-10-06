@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/Context.hpp>
-#include <Scripting/Wren/Game.hpp>
 #include <Core/WorldComponent.hpp>
 //------------------------------------------------------------------//
 
@@ -21,14 +20,14 @@ namespace Eldritch2 {
 namespace Scripting {
 namespace Wren {
 	class Dispatcher;
+	class Game;
 }} // namespace Scripting::Wren
 
 namespace Assets {
+	class AsynchronousImport;
 	class ContentLocator;
 } // namespace Assets
 } // namespace Eldritch2
-
-struct WrenVM;
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
@@ -72,12 +71,11 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		//!	Wren virtual machine that will execute script code for the world.
-		WrenVM*                 _vm;
-		Context                 _wren;
-		Game                    _game;
-		Assets::ContentLocator* _contentLocator;
-		Dispatcher*             _dispatcher;
+		Context                     _wren;
+		Assets::ContentLocator*     _contentLocator;
+		Assets::AsynchronousImport* _requiredPackages;
+		Dispatcher*                 _dispatcher;
+		Game*                       _game;
 	};
 
 }}} // namespace Eldritch2::Scripting::Wren

@@ -54,9 +54,6 @@
     <ClCompile Include="src\Animation\AnimationTree.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
-    <ClCompile Include="src\Animation\AnimationTypes.cpp">
-      <Filter>Source Files\Code</Filter>
-    </ClCompile>
     <ClCompile Include="src\Animation\Armature.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
@@ -592,6 +589,9 @@
       <Filter>Source Files\Code</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\ObjectLocator.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\AnimationApi.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
   </ItemGroup>

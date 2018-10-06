@@ -22,25 +22,25 @@ namespace Eldritch2 { namespace Graphics {
 
 	public:
 		//!	Constructs this @ref RgbColor instance.
-		RgbColor(float32 red, float32 green, float32 blue);
+		ETConstexpr RgbColor(const RgbColor&) ETNoexceptHint = default;
 		//!	Constructs this @ref RgbColor instance.
-		RgbColor(const RgbColor&) = default;
+		RgbColor(float32 red, float32 green, float32 blue);
 
 		~RgbColor() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		float16 GetRed() const;
+		float16 GetRed() const ETNoexceptHint;
 
-		float16 GetGreen() const;
+		float16 GetGreen() const ETNoexceptHint;
 
-		float16 GetBlue() const;
+		float16 GetBlue() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		float32 GetRec709Luminance() const;
+		float32 GetRec709Luminance() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -57,7 +57,7 @@ namespace Eldritch2 { namespace Graphics {
 
 	ETPureFunctionHint RgbColor GetRgbFromCieXyz(float32 x, float32 y, float32 z);
 
-	ETPureFunctionHint RgbColor GetRgbFromEv(uint8 red, uint8 green, uint8 blue, float16 exposureStops = float16(1.0f));
+	ETPureFunctionHint RgbColor GetRgbFromEv(uint8 red, uint8 green, uint8 blue, float32 exposureStops = 1.0f);
 
 	ETPureFunctionHint RgbColor GetRgbFromKelvin(float32 degrees);
 

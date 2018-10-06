@@ -18,11 +18,10 @@
 namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
 	ETInlineHint ETPureFunctionHint X3DAUDIO_VECTOR ETSimdCall AsX3dAudioVector(Vector value) {
-		float32 coefficients[4];
+		ET16ByteAligned float32 coefficients[4];
 
-		value.ExtractCoefficients(coefficients);
-
-		return { coefficients[0], coefficients[1], coefficients[2] };
+		StreamCoefficients(coefficients, value);
+		return { coefficients[Vector::X], coefficients[Vector::Y], coefficients[Vector::Z] };
 	}
 
 	// ---------------------------------------------------

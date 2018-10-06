@@ -21,6 +21,7 @@ ET_PUSH_MSVC_WARNING_STATE(disable : 6011 6386 28182)
 #define NK_BUTTON_TRIGGER_ON_RELEASE
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_COMMAND_USERDATA
 #include <nuklear/nuklear.h>
 ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
@@ -31,7 +32,7 @@ namespace Eldritch2 { namespace Graphics {
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
-	class Interface : public Graphics::MeshSource {
+	class Interface {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -58,12 +59,12 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 		bool DoButton(const Graphics::ImageSource& image, const Utf8Char* const text, nk_text_align alignment);
 
-		bool DoCheckbox(const Utf8Char* const text, unsigned int* flags, unsigned int value);
-		bool DoCheckbox(const Utf8Char* const text, bool* active);
+		bool DoCheckbox(const Utf8Char* text, unsigned int* flags, unsigned int value);
+		bool DoCheckbox(const Utf8Char* text, bool* active);
 
-		bool DoRadioButton(const Utf8Char* const text, int* isActive);
+		bool DoRadioButton(const Utf8Char* text, int* isActive);
 
-		bool DoRadioLabel(const Utf8Char* const text, nk_text_align alignment, int* value);
+		bool DoRadioLabel(const Utf8Char* text, nk_text_align alignment, int* value);
 
 		bool DoSlider(double min, double* val, double max, double step);
 
@@ -74,42 +75,44 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	public:
-		void DoText(const Utf8Char* const text, nk_flags alignment, nk_color textColor);
+		void DoText(nk_flags alignment, struct nk_color color, const Utf8Char* text);
 
 		void DoImage(const Graphics::ImageSource& image);
 
-		void DoProperty(const Utf8Char* const text, double min, double* val, double max, double step, double incrementPerPixel);
+		void DoProperty(double min, double* val, double max, double step, double incrementPerPixel, const Utf8Char* text);
 
 		// ---------------------------------------------------
 
 	public:
 		template <typename UnaryConsumer>
-		void DoStaticPopup(const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
+		void DoStaticPopup(const Utf8Char* name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
 
 		template <typename UnaryConsumer>
-		void DoDynamicPopup(const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
+		void DoDynamicPopup(const Utf8Char* name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
 
 		template <typename UnaryConsumer>
-		void DoWindow(const Utf8Char* const name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
+		void DoWindow(const Utf8Char* name, nk_flags flags, struct nk_rect bounds, UnaryConsumer implementation);
 
 		template <typename UnaryConsumer>
 		void DoTooltip(float width, UnaryConsumer implementation);
 
 		// ---------------------------------------------------
 
-	public:
-		void Stream(const VertexStreamRequest& vertices, const IndexStreamRequest& indices) const override;
+		ETConstexpr operator const nk_context*() const ETNoexceptHint;
+		ETConstexpr operator nk_context*() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void Clear();
+		ErrorCode BindResources();
+
+		void FreeResources();
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable nk_buffer  _commandPool;
-		mutable nk_context _context;
+		nk_buffer  _commandPool;
+		nk_context _context;
 	};
 
 }}} // namespace Eldritch2::Scripting::Wren

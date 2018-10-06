@@ -18,7 +18,8 @@
 namespace Eldritch2 { namespace Logging {
 
 	enum Severity {
-		VerboseWarning = 0,
+		Debug,
+		VerboseWarning,
 		Warning,
 		Error,
 		Message

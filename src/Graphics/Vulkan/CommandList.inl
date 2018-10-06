@@ -17,13 +17,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint ETForceInlineHint VkCommandBuffer CommandList::Get() ETNoexceptHint {
-		return _commands;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint CommandList::operator VkCommandBuffer() ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint auto CommandList::Get() const ETNoexceptHint -> const VkCommandBuffer (&)[1] {
 		return _commands;
 	}
 

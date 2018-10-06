@@ -72,11 +72,13 @@ namespace {
 		sizeHelper.QuadPart = byteSize;
 
 		const HANDLE mapping(CreateFileMappingW(file, /*lpFileMappingAttributes =*/nullptr, ProtectModeFromAccess(access), sizeHelper.HighPart, sizeHelper.LowPart, /*lpName =*/nullptr));
-		ET_ABORT_UNLESS(mapping != nullptr ? Error::None : Error::Unspecified);
+		ET_ABORT_UNLESS(mapping ? Error::None : Error::Unspecified);
 		ET_AT_SCOPE_EXIT(CloseHandle(mapping));
 
 		ULARGE_INTEGER offsetHelper;
 		offsetHelper.QuadPart = byteOffset;
+		// Static analyzer has problems seeing the null check for `mapping`.
+		ET_SUPPRESS_MSVC_WARNINGS(6387)
 		const auto view(static_cast<char*>(MapViewOfFile(mapping, MapModeFromAccess(access), offsetHelper.HighPart, offsetHelper.LowPart, byteSize)));
 		ET_ABORT_UNLESS(view ? Error::None : Error::Unspecified);
 

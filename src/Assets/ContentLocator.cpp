@@ -18,13 +18,34 @@
 namespace Eldritch2 { namespace Assets {
 
 	AsynchronousImport::AsynchronousImport() :
-		_pendingLoads(0u),
+		_pendingLoadCount(0u),
 		_loadedPackages(MallocAllocator("Asynchronous Import Loaded Package List Allocator")) {}
 
 	// ---------------------------------------------------
 
-	bool AsynchronousImport::IsComplete(MemoryOrder order) const {
-		return _pendingLoads.load(order) == 0u;
+	AsynchronousImport::~AsynchronousImport() {
+#if ETIsDebugBuild()
+		const auto pendingLoads(_pendingLoadCount.load(std::memory_order_consume));
+		ET_ASSERT(pendingLoads == 0, "Asynchronous import {} has {} pending load requests!", fmt::ptr(this), pendingLoads);
+#endif
+	}
+
+	// ---------------------------------------------------
+
+	bool AsynchronousImport::IsComplete(MemoryOrder order) const ETNoexceptHint {
+		return _pendingLoadCount.load(order) == 0u;
+	}
+
+	// ---------------------------------------------------
+
+	ErrorCode AsynchronousImport::InitiateLoad(PackageDatabase& packages, StringView path) {
+		_pendingLoadCount.fetch_add(1u, std::memory_order_acquire);
+		const ErrorCode result(packages.Load(path, *this));
+		if (Failed(result)) {
+			_pendingLoadCount.fetch_sub(1u, std::memory_order_release);
+		}
+
+		return result;
 	}
 
 	// ---------------------------------------------------
@@ -34,55 +55,23 @@ namespace Eldritch2 { namespace Assets {
 			_loadedPackages.Append(eastl::move(package));
 		}
 
-		_pendingLoads.fetch_sub(1u, std::memory_order_release);
+		_pendingLoadCount.fetch_sub(1u, std::memory_order_release);
 	}
 
 	// ---------------------------------------------------
 
-	ContentLocator::ContentLocator(const AssetDatabase& assets, PackageDatabase& packages) ETNoexceptHint : _assets(ETAddressOf(assets)),
-																											_packages(ETAddressOf(packages)),
-																											_loadedPackages(MallocAllocator("Content Locator Imports List Allocator")) {
-	}
-
-	// ---------------------------------------------------
-
-	void ContentLocator::RequirementsComplete(MemoryOrder order) const {
-		return _pendingLoads.load(order) == 0u;
-	}
-
-	// ---------------------------------------------------
-
-	ErrorCode ContentLocator::RequirePackageAsynchronous(StringView path, PackageLoadClient& client) {
-		return _packages->Load(path, client);
-	}
-
-	// ---------------------------------------------------
-
-	ErrorCode ContentLocator::BindResources() {
-		static ETConstexpr StringView loadSet[] = { "boot" };
-
-		for (StringView package : loadSet) {
-			_pendingLoads.fetch_add(1u, std::memory_order_acquire);
-			ET_ABORT_UNLESS(RequirePackageAsynchronous(package, *this));
-		}
+	ErrorCode ContentLocator::BindResources(const AssetDatabase& assets, PackageDatabase& packages) {
+		_assets   = ETAddressOf(assets);
+		_packages = ETAddressOf(packages);
 
 		return Error::None;
 	}
 
 	// ---------------------------------------------------
 
-	void ContentLocator::CompleteLoad(CountedPointer<const Package> package, ErrorCode finalResult) ETNoexceptHint {
-		if (Succeeded(finalResult)) {
-			_loadedPackages.Append(eastl::move(package));
-		}
-
-		_pendingLoads.fetch_sub(1u, std::memory_order_release);
-	}
-
-	// ---------------------------------------------------
-
 	void ContentLocator::FreeResources() {
-		_loadedPackages.Clear();
+		_packages = nullptr;
+		_assets   = nullptr;
 	}
 
 }} // namespace Eldritch2::Assets

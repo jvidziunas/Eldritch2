@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/AnimationTypes.hpp>
+#include <Animation/AnimationApi.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Animation {
@@ -21,10 +21,10 @@ namespace Eldritch2 { namespace Animation {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		struct FootstepState {
-			uint64  endTime;
+		struct FootState {
 			Vector  centerOfMassPosition;
 			float16 centerOfMassVelocity[3];
+			uint64  stepEndTime;
 		};
 
 		// ---
@@ -47,7 +47,7 @@ namespace Eldritch2 { namespace Animation {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		FootstepState _footStates[FootCount];
+		FootState _feet[FootCount];
 	};
 
 }} // namespace Eldritch2::Animation

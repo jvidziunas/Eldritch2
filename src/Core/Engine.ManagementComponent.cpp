@@ -64,7 +64,7 @@ namespace Eldritch2 { namespace Core {
 	// ---------------------------------------------------
 
 	void Engine::ManagementComponent::TickEarly(JobExecutor& /*executor*/) {
-		_owner->DestroyGarbage(_packageSweepLimitPerFrame);
+		FindService<PackageDatabase>()->DestroyGarbage(_packageSweepLimitPerFrame);
 	}
 
 	// ---------------------------------------------------
@@ -83,7 +83,9 @@ namespace Eldritch2 { namespace Core {
 		properties.BeginSection("Engine")
 			.DefineProperty("PackageSweepLimitPerFrame", _packageSweepLimitPerFrame)
 			.DefineProperty("LogThreshold", [&](StringView threshold) {
-				if (threshold == "VerboseWarning") {
+				if (threshold == "Debug") {
+					log.SetWriteThreshold(Severity::Debug);
+				} else if (threshold == "VerboseWarning") {
 					log.SetWriteThreshold(Severity::VerboseWarning);
 				} else if (threshold == "Warning") {
 					log.SetWriteThreshold(Severity::Warning);

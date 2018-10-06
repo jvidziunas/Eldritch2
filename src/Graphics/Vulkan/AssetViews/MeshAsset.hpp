@@ -18,7 +18,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	class MeshAsset : public MeshSource, public Assets::Asset {
+	class MeshAsset : public MeshSource<SkinnedVertex>, public Assets::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -33,19 +33,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		// ---------------------------------------------------
 
 	public:
-		SurfaceDescription GetSurface(uint32 surface) const ETNoexceptHint override;
+		MeshSurface GetSurface(uint32 surface) const ETNoexceptHint override;
 
-		uint32 GetSurfaceCount() const ETNoexceptHint override;
-
-		uint32 GetVerticesSize() const ETNoexceptHint override;
-
-		uint32 GetIndicesSize() const ETNoexceptHint override;
+		MeshDescription GetDescription() const ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		void Stream(const VertexStreamRequest& request) const ETNoexceptHint override;
-		void Stream(const IndexStreamRequest& request) const ETNoexceptHint override;
+		void Stream(MeshElementRequest<StridingIterator<SkinnedVertex>> request) const ETNoexceptHint override;
+
+		void Stream(MeshElementRequest<MeshIndex*> request) const ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
@@ -67,8 +64,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<Attribute>          _attributes;
-		ArrayList<SurfaceDescription> _surfaces;
+		ArrayList<MeshSurface> _surfaces;
 	};
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

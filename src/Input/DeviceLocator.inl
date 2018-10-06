@@ -23,24 +23,26 @@ namespace Eldritch2 { namespace Input {
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool DeviceLocator::TryAcquireDevice(DeviceId id, InputDevice::BindingMap bindingByCode, InputHandler& handler) {
+	ETInlineHint ETForceInlineHint bool DeviceLocator::TryAcquireDevice(DeviceId id, InputClient& handler, InputDevice::BindingMap bindingByCode) {
 		ReadLock _(*_mutex);
-		if (_devices->GetSize() <= id) {
+		if (id >= _devices->GetSize()) {
 			return false;
 		}
 
-		return (*_devices)[id].TryAcquire(eastl::move(bindingByCode), handler);
+		return (*_devices)[id].TryAcquire(handler, eastl::move(bindingByCode));
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void DeviceLocator::ReleaseDevice(DeviceId id) {
+	ETInlineHint ETForceInlineHint bool DeviceLocator::TryAcquireDevice(InputClient& handler, InputDevice::BindingMap bindingByCode) {
 		ReadLock _(*_mutex);
-		if (_devices->GetSize() <= id) {
-			return;
+		for (InputDevice& device : *_devices) {
+			if (device.TryAcquire(handler, eastl::move(bindingByCode))) {
+				return true;
+			}
 		}
 
-		(*_devices)[id].Release();
+		return false;
 	}
 
 	// ---------------------------------------------------

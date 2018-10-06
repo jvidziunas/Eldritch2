@@ -16,40 +16,46 @@
 //------------------------------------------------------------------//
 
 void* wrenGetUserData(WrenVM*);
+void  wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
+void  wrenSetSlotDouble(WrenVM* vm, int slot, double value);
+void  wrenSetSlotBool(WrenVM* vm, int slot, bool value);
+void  wrenReleaseHandle(WrenVM* vm, WrenHandle* handle);
+void  wrenEnsureSlots(WrenVM* vm, int numSlots);
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	template <typename... Arguments>
-	ETInlineHint ETForceInlineHint void Context::WriteLog(Logging::Severity type, StringView format, Arguments&&... arguments) const {
-		_log.Write(type, format, eastl::forward<Arguments>(arguments)...);
+	ETInlineHint ETForceInlineHint bool Context::Call(WrenHandle* receiver, Arguments... arguments) {
+		static_assert(sizeof...(Arguments) < ETCountOf(_callStubByArity), "Arity too high for Context implementation!");
+
+		wrenEnsureSlots(_vm, sizeof...(Arguments) + 1u);
+		wrenSetSlotHandle(_vm, 0, receiver);
+		wrenCall(_vm, _callStubByArity[sizeof...(Arguments)]);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void Context::WriteLog(const Utf8Char* const string, size_t lengthInOctets) const ETNoexceptHint {
-		_log.Write(string, lengthInOctets);
+	ETInlineHint ETForceInlineHint void Context::Free(WrenHandle* handle) ETNoexceptHint {
+		if (handle == nullptr) {
+			return;
+		}
+
+		wrenReleaseHandle(_vm, handle);
 	}
 
 	// ---------------------------------------------------
 
-	template <typename Type>
-	ETInlineHint ETForceInlineHint WrenHandle* Context::FindForeignClass() const ETNoexceptHint {
-		const auto candidate(_classesByType.Find(typeid(Type)));
-		return candidate != _classesByType.End() ? candidate->second : nullptr;
-	}
-
-	// ---------------------------------------------------
-
-	template <size_t arity>
-	ETInlineHint ETForceInlineHint WrenHandle* Context::GetCallStubForArity() const ETNoexceptHint {
-		static_assert(arity < ETCountOf(_callStubByArity), "Arity too high for Context implementation!");
-		return _callStubByArity[arity];
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETPureFunctionHint ETForceInlineHint Context* GetContext(WrenVM* vm) ETNoexceptHint {
+	ETInlineHint ETForceInlineHint ETPureFunctionHint Context* GetContext(WrenVM* vm) ETNoexceptHint {
 		return static_cast<Context*>(wrenGetUserData(vm));
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren
+
+template <typename Class>
+ETInlineHint ETPureFunctionHint void wrenSetSlotCppTypeHandle(WrenVM* vm, int slot) ETNoexceptHint {
+	const auto& classesByType(GetContext(vm)->_classByCppType);
+	const auto  candidate(classesByType.Find(typeid(Class)));
+	ET_ASSERT(candidate != classesByType.End(), "Attempting to use unregistered C++ type with Wren VM!");
+
+	wrenSetSlotHandle(vm, slot, candidate->second);
+}

@@ -33,8 +33,24 @@ ETInlineHint ETForceInlineHint SoArrayListAlloc<Allocator, Types...>::SoArrayLis
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstReverseIterator<Type> SoArrayListAlloc<Allocator, Types...>::ConstReverseBegin() const ETNoexceptHint {
+	return LocalConstReverseIterator<Type>(this->ConstEnd<Type>());
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::ConstReverseIterator SoArrayListAlloc<Allocator, Types...>::ConstReverseBegin() const ETNoexceptHint {
 	return _container.crend();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstReverseIterator<Type> SoArrayListAlloc<Allocator, Types...>::ConstReverseEnd() const ETNoexceptHint {
+	return LocalConstReverseIterator<Type>(this->ConstBegin<Type>());
 }
 
 // ---------------------------------------------------
@@ -47,8 +63,24 @@ ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::C
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstReverseIterator<Type> SoArrayListAlloc<Allocator, Types...>::ReverseBegin() const ETNoexceptHint {
+	return LocalConstReverseIterator<Type>(this->End<Type>());
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::ConstReverseIterator SoArrayListAlloc<Allocator, Types...>::ReverseBegin() const ETNoexceptHint {
 	return _container.rbegin();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalReverseIterator<Type> SoArrayListAlloc<Allocator, Types...>::ReverseBegin() ETNoexceptHint {
+	return LocalReverseIterator<Type>(this->End<Type>());
 }
 
 // ---------------------------------------------------
@@ -61,8 +93,24 @@ ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::R
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstReverseIterator<Type> SoArrayListAlloc<Allocator, Types...>::ReverseEnd() const ETNoexceptHint {
+	return LocalConstReverseIterator<Type>(this->Begin<Type>());
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::ConstReverseIterator SoArrayListAlloc<Allocator, Types...>::ReverseEnd() const ETNoexceptHint {
 	return _container.rend();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalReverseIterator<Type> SoArrayListAlloc<Allocator, Types...>::ReverseEnd() ETNoexceptHint {
+	return LocalReverseIterator<Type>(this->Begin<Type>());
 }
 
 // ---------------------------------------------------
@@ -75,8 +123,24 @@ ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::R
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstIterator<Type> SoArrayListAlloc<Allocator, Types...>::ConstBegin() const ETNoexceptHint {
+	return _container.get<Type>();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::ConstIterator SoArrayListAlloc<Allocator, Types...>::ConstBegin() const ETNoexceptHint {
 	return _container.cbegin();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstIterator<Type> SoArrayListAlloc<Allocator, Types...>::ConstEnd() const ETNoexceptHint {
+	return _container.get<Type>() + _container.size();
 }
 
 // ---------------------------------------------------
@@ -89,8 +153,24 @@ ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::C
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstIterator<Type> SoArrayListAlloc<Allocator, Types...>::Begin() const ETNoexceptHint {
+	return _container.get<Type>();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::ConstIterator SoArrayListAlloc<Allocator, Types...>::Begin() const ETNoexceptHint {
 	return _container.begin();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalIterator<Type> SoArrayListAlloc<Allocator, Types...>::Begin() ETNoexceptHint {
+	return _container.get<Type>();
 }
 
 // ---------------------------------------------------
@@ -103,8 +183,24 @@ ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::I
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalConstIterator<Type> SoArrayListAlloc<Allocator, Types...>::End() const ETNoexceptHint {
+	return _container.get<Type>() + _container.size();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::ConstIterator SoArrayListAlloc<Allocator, Types...>::End() const ETNoexceptHint {
 	return _container.end();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::LocalIterator<Type> SoArrayListAlloc<Allocator, Types...>::End() ETNoexceptHint {
+	return _container.get<Type>() + _container.size();
 }
 
 // ---------------------------------------------------
@@ -159,6 +255,14 @@ ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::R
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint const Type* SoArrayListAlloc<Allocator, Types...>::GetData() const ETNoexceptHint {
+	return _container.get<Type>();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::ConstPointer SoArrayListAlloc<Allocator, Types...>::GetData() const ETNoexceptHint {
 	return _container.data();
 }
@@ -166,24 +270,16 @@ ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::C
 // ---------------------------------------------------
 
 template <class Allocator, typename... Types>
+template <typename Type>
+ETInlineHint ETForceInlineHint Type* SoArrayListAlloc<Allocator, Types...>::GetData() ETNoexceptHint {
+	return _container.get<Type>();
+}
+
+// ---------------------------------------------------
+
+template <class Allocator, typename... Types>
 ETInlineHint ETForceInlineHint typename SoArrayListAlloc<Allocator, Types...>::Pointer SoArrayListAlloc<Allocator, Types...>::GetData() ETNoexceptHint {
 	return _container.data();
-}
-
-// ---------------------------------------------------
-
-template <class Allocator, typename... Types>
-template <typename Type>
-ETInlineHint ETForceInlineHint const Type* SoArrayListAlloc<Allocator, Types...>::Get() const ETNoexceptHint {
-	return _container.get<Type>();
-}
-
-// ---------------------------------------------------
-
-template <class Allocator, typename... Types>
-template <typename Type>
-ETInlineHint ETForceInlineHint Type* SoArrayListAlloc<Allocator, Types...>::Get() ETNoexceptHint {
-	return _container.get<Type>();
 }
 
 // ---------------------------------------------------

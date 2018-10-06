@@ -15,12 +15,7 @@
 #include <Scripting/Wren/Marshal.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Scripting { namespace Wren {
-	class Context;
-}}} // namespace Eldritch2::Scripting::Wren
-
-void wrenSetSlotBytes(WrenVM* vm, int slot, const char* text, size_t length);
-void wrenAbortFiber(WrenVM* vm, int slot);
+struct WrenHandle;
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
@@ -28,9 +23,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum : size_t { MaxSignatureLength = 64u };
-
-		using Body = void (*)(WrenVM*);
+		using Body = void (*)(WrenVM*) ETNoexceptHint;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -40,101 +33,99 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		//!	Constructs this @ref ForeignMethod instance.
 		ForeignMethod(const ForeignMethod&) ETNoexceptHint = default;
 		//!	Constructs this @ref ForeignMethod instance.
-		ETCpp14Constexpr ForeignMethod(decltype(nullptr)) ETNoexceptHint;
+		ETCpp14Constexpr ForeignMethod() ETNoexceptHint;
 
 		~ForeignMethod() = default;
 
 		// - DATA MEMBERS ------------------------------------
 
 	public:
-		char signature[MaxSignatureLength];
+		char signature[64];
 		Body body;
 	};
 
 	// ---
 
-	class StaticMethod : public ForeignMethod {
+	class Property {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref StaticMethod instance.
-		StaticMethod(StringView signature, Body body) ETNoexceptHint;
-		//!	Constructs this @ref StaticMethod instance.
-		StaticMethod(const StaticMethod&) ETNoexceptHint = default;
-		//!	Constructs this @ref StaticMethod instance.
-		ETCpp14Constexpr StaticMethod(decltype(nullptr)) ETNoexceptHint;
+		//!	Constructs this @ref Property instance.
+		Property(StringView name, ForeignMethod::Body getter, ForeignMethod::Body setter) ETNoexceptHint;
+		//!	Constructs this @ref Property instance.
+		Property(const Property&) ETNoexceptHint = default;
 
-		~StaticMethod() = default;
-	};
-
-	// ---
-
-	class ConstructorMethod : public ForeignMethod {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+		// - DATA MEMBERS ------------------------------------
 
 	public:
-		//!	Constructs this @ref ConstructorMethod instance.
-		ConstructorMethod(StringView signature, Body body) ETNoexceptHint;
-		//!	Constructs this @ref ConstructorMethod instance.
-		ConstructorMethod(const ConstructorMethod&) ETNoexceptHint = default;
-		//!	Constructs this @ref ConstructorMethod instance.
-		ETCpp14Constexpr ConstructorMethod(decltype(nullptr)) ETNoexceptHint;
-
-		~ConstructorMethod() = default;
+		ForeignMethod getter;
+		ForeignMethod setter;
 	};
 
 	// ---
 
 	class ApiBuilder {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using ClassMap = CachingHashMap<CppType, WrenHandle*>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref ApiBuilder instance.
-		ApiBuilder(WrenVM* vm, Context& wren) ETNoexceptHint;
+		ApiBuilder(WrenVM* vm) ETNoexceptHint;
 		//!	Disable copy construction.
 		ApiBuilder(const ApiBuilder&) = delete;
 
-		~ApiBuilder() = default;
+		~ApiBuilder();
 
 		// ---------------------------------------------------
 
 	public:
 		template <class Class>
-		void CreateClass(
-			StringView                                                module,
-			StringView                                                name,
-			std::initializer_list<ConstructorMethod>                  constructors,
-			std::initializer_list<StaticMethod>                       staticMethods,
-			std::initializer_list<Pair<ForeignMethod, ForeignMethod>> properties,
-			std::initializer_list<ForeignMethod>                      methods);
+		void DefineClass(StringView wrenModule, StringView wrenName, std::initializer_list<ForeignMethod> staticMethods, std::initializer_list<ForeignMethod> methods);
 
 		template <class Class, typename... Arguments>
-		Class* CreateVariable(StringView module, StringView name, Arguments&&... arguments);
-		void   CreateVariable(StringView module, StringView name, double value);
+		Class* DefineVariable(StringView wrenModule, StringView wrenName, Arguments&&... arguments);
+		double DefineVariable(StringView wrenModule, StringView wrenName, double value);
+
+		// ---------------------------------------------------
+
+	public:
+		ClassMap ReleaseClasses();
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		ApiBuilder& operator=(const ApiBuilder&) = delete;
+
+		// ---------------------------------------------------
+
+	private:
+		void* DefineVariable(CppType type, size_t byteSize, StringView wrenModule, StringView wrenName);
+
+		void DefineClass(CppType type, StringView wrenModule, StringView wrenName, std::initializer_list<ForeignMethod> staticMethods, std::initializer_list<ForeignMethod> methods, void (*finalizer)(void*) ETNoexceptHint);
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		WrenVM*  _vm;
-		Context* _context;
+		ClassMap _classByCppType;
 	};
-
-	// ---------------------------------------------------
-
-	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineProperty(StringView name, ForeignMethod::Body getterBody, ForeignMethod::Body setterBody) ETNoexceptHint;
-
-	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineGetter(StringView name, ForeignMethod::Body body) ETNoexceptHint;
-
-	ETPureFunctionHint Pair<ForeignMethod, ForeignMethod> DefineSetter(StringView name, ForeignMethod::Body body) ETNoexceptHint;
 
 }}} // namespace Eldritch2::Scripting::Wren
 
 #define ET_BUILTIN_WREN_MODULE_NAME(name) "builtin/" #name
 
-#define ET_ABORT_WREN(message)                                     \
-	{                                                              \
+//	Forward declarations for Wren built-in function used in the macros below.
+void wrenSetSlotBytes(WrenVM* vm, int slot, const char* text, size_t length);
+void wrenAbortFiber(WrenVM* vm, int slot);
+
+#define ET_ABORT_WREN(message)                                      \
+	{                                                               \
 		::wrenSetSlotBytes(vm, 0, message, ETCountOf(message) - 1); \
-		return ::wrenAbortFiber(vm, 0);                            \
+		return ::wrenAbortFiber(vm, 0);                             \
 	}
 #define ET_ABORT_WREN_FMT(message, ...)                                 \
 	{                                                                   \

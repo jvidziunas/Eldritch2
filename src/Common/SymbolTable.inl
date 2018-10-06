@@ -18,7 +18,7 @@
 namespace Eldritch2 {
 
 template <typename Character, class Allocator>
-ETInlineHint SymbolTable<Character, Allocator>::SymbolTable(const AllocatorType& allocator) :
+ETInlineHint ETForceInlineHint SymbolTable<Character, Allocator>::SymbolTable(const AllocatorType& allocator) :
 	_allocator(allocator),
 	_symbols(ChildAllocator(_allocator, "Symbol Table Bucket Allocator")) {
 }
@@ -26,7 +26,7 @@ ETInlineHint SymbolTable<Character, Allocator>::SymbolTable(const AllocatorType&
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Find(AbstractStringView<CharacterType> string) const {
+ETInlineHint ETForceInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Find(AbstractStringView<CharacterType> string) const {
 	auto candidate(_symbols.Find(string, _symbols.GetHash(), _symbols.GetEqualityPredicate()));
 	return candidate != _symbols.End() ? Symbol(*candidate) : nullptr;
 }
@@ -34,7 +34,7 @@ ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Char
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Intern(AbstractStringView<CharacterType> string) {
+ETInlineHint ETForceInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Character, Allocator>::Intern(AbstractStringView<CharacterType> string) {
 	auto candidate(_symbols.Find(string, _symbols.GetHash(), _symbols.GetEqualityPredicate()));
 	if (candidate == _symbols.End()) {
 		candidate = _symbols.Emplace(ChildAllocator(_allocator, "Symbol String Allocator"), string).first;
@@ -46,8 +46,15 @@ ETInlineHint typename SymbolTable<Character, Allocator>::Symbol SymbolTable<Char
 // ---------------------------------------------------
 
 template <typename Character, class Allocator>
-ETInlineHint void SymbolTable<Character, Allocator>::Clear() {
+ETInlineHint ETForceInlineHint void SymbolTable<Character, Allocator>::Clear() {
 	_symbols.Clear();
+}
+
+// ---------------------------------------------------
+
+template <typename Character, class Allocator>
+ETConstexpr ETInlineHint ETForceInlineHint typename const SymbolTable<Character, Allocator>::AllocatorType& SymbolTable<Character, Allocator>::GetAllocator() const ETNoexceptHint {
+	return _allocator;
 }
 
 } // namespace Eldritch2

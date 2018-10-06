@@ -20,8 +20,7 @@
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Core {
+namespace Eldritch2 { namespace Core {
 
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Scripting;
@@ -37,7 +36,7 @@ namespace Core {
 
 		// ---
 
-		ETInlineHint ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime microseconds) {
+		ETInlineHint ETForceInlineHint ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime microseconds) ETNoexceptHint {
 			return AsFloat(microseconds) / /*microseconds per millisecond*/ 1000.0f;
 		}
 
@@ -46,7 +45,6 @@ namespace Core {
 	World::World(const ObjectLocator& services) :
 		_allocator("World Root Allocator"),
 		_services(services),
-		_log(services.Find<Engine>()->GetLog()),
 		_shouldShutDown(false),
 		_pauseCounter(0u),
 		_timeAccumulator(/*default fixed tick framerate*/ 60u, 1.0f),
@@ -60,9 +58,9 @@ namespace Core {
 		//	Avoid spiral of death by capping the number of fixed-rate ticks that can be run per main loop invocation.
 		enum : uint32 { MaxFixedTicksPerInvocation = 3 };
 
-		Stopwatch timer;
 		/*	Execute a variable-rate tick exactly once per main loop iteration. Variable-rate ticks handle real-time
 		 *	update tasks like rendering to the screen, mixing sound or polling the network. */
+		Stopwatch timer;
 		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [this](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
 			component->OnVariableRateTick(executor, _timeAccumulator.GetTickDurationInMicroseconds(), _timeAccumulator.GetResidualBlendFactor());
 		});

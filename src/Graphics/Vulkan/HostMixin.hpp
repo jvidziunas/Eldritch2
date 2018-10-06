@@ -35,9 +35,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const VkAllocationCallbacks* GetCallbacks() const ETNoexceptHint;
+		ETConstexpr const VkAllocationCallbacks* GetCallbacks() const ETNoexceptHint;
 
-		operator const VkAllocationCallbacks*() const ETNoexceptHint;
+		ETConstexpr operator const VkAllocationCallbacks*() const ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 

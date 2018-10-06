@@ -13,62 +13,54 @@
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysXPointer.hpp>
-#include <Animation/AnimationTypes.hpp>
+#include <Animation/AnimationApi.hpp>
 //------------------------------------------------------------------//
-#include <PxArticulation.h>
+#include <PxAggregate.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Animation {
-	class Armature;
-}
-
-namespace Physics { namespace PhysX { namespace AssetViews {
+namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews {
 	class PhysicsAsset;
-}}} // namespace Physics::PhysX::AssetViews
-} // namespace Eldritch2
+}}}} // namespace Eldritch2::Physics::PhysX::AssetViews
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
-	class Physics {
+	class PhysicsClip : public Animation::Clip {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class AnimationClip : public Animation::Clip {
-			// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			enum : uint32 { TracksPerBone = 8u };
-
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref AnimationClip instance.
-			AnimationClip(PhysxPointer<physx::PxArticulation> articulation, const Animation::Armature& target);
-			//!	Constructs this @ref AnimationClip instance.
-			AnimationClip(const AnimationClip&) = default;
-
-			~AnimationClip() = default;
-
-			// ---------------------------------------------------
-
-		public:
-			void FetchKnots(Animation::KnotCache& knots, Animation::BoneIndex maximumBone, uint64 time) override;
-
-			void Attach(Animation::KnotCache& knots) override;
-
-			// - DATA MEMBERS ------------------------------------
-
-		public:
-			PhysxPointer<physx::PxArticulation> _articulation;
-			const Animation::Armature*          _target;
-		};
+		enum : uint32 { TracksPerBone = 8u };
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
+		//!	Constructs this @ref PhysicsClip instance.
+		PhysicsClip(const physx::PxAggregate& aggregate);
+		//!	Constructs this @ref PhysicsClip instance.
+		PhysicsClip(const PhysicsClip&) = default;
+
+		~PhysicsClip() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		void FetchKnots(Animation::KnotCache& knots, Animation::BoneIndex maximumBone, uint64 time) override;
+
+		void Attach(Animation::KnotCache& knots) override;
+
+		// - DATA MEMBERS ------------------------------------
+
+	public:
+		const physx::PxAggregate* _aggregate;
+	};
+
+	// ---
+
+	class Physics {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
 		//! Constructs this @ref Physics instance.
-		Physics(AnimationClip& clip);
+		Physics(const AssetViews::PhysicsAsset& asset, PhysicsClip& clip) ETNoexceptHint;
 		//! Disable copy construction.
 		Physics(const Physics&) = delete;
 
@@ -82,7 +74,8 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		AnimationClip* _clip;
+		const AssetViews::PhysicsAsset* _asset;
+		PhysicsClip*                    _clip;
 	};
 
 }}} // namespace Eldritch2::Physics::PhysX

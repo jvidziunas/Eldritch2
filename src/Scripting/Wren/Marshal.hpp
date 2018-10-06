@@ -20,6 +20,8 @@ struct WrenVM;
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	template <typename T, typename... Arguments>
+	T& SetReturn(WrenVM* vm, int classSlot, Arguments&&... arguments);
+	template <typename T, typename... Arguments>
 	T& SetReturn(WrenVM* vm, Arguments&&... arguments);
 
 	template <typename T>

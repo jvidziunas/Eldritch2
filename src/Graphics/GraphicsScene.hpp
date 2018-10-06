@@ -26,20 +26,12 @@ namespace Animation {
 }
 
 namespace Graphics {
+	template <typename Vertex>
 	class MeshSource;
 }
 } // namespace Eldritch2
 
 namespace Eldritch2 { namespace Graphics {
-
-	enum GeometryType {
-		StaticMeshes,
-		Meshes,
-
-		GeometryTypes
-	};
-
-	// ---
 
 	enum LightType {
 		StaticLights,
@@ -58,12 +50,13 @@ namespace Eldritch2 { namespace Graphics {
 
 	// ---
 
+	template <typename Vertex>
 	class MeshInstance {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref MeshInstance instance.
-		MeshInstance(const Animation::Armature& armature, const MeshSource& source);
+		MeshInstance(const Animation::Armature& armature, const MeshSource<Vertex>& mesh) ETNoexceptHint;
 		//!	Constructs this @ref MeshInstance instance.
 		MeshInstance(const MeshInstance&) = default;
 
@@ -73,7 +66,7 @@ namespace Eldritch2 { namespace Graphics {
 
 	public:
 		const Animation::Armature* armature;
-		const MeshSource*          source;
+		const MeshSource<Vertex>*  mesh;
 	};
 
 	// ---
@@ -83,7 +76,7 @@ namespace Eldritch2 { namespace Graphics {
 
 	public:
 		//!	Constructs this @ref Light instance.
-		Light(Transformation localToWorld, RgbColor color, float16 radius);
+		Light(Transformation localToWorld, RgbColor color, float16 radius) ETNoexceptHint;
 		//!	Constructs this @ref Light instance.
 		Light(const Light&) = default;
 
@@ -100,7 +93,9 @@ namespace Eldritch2 { namespace Graphics {
 	// ---
 
 	class PortalView {
-		Vector viewPlane;
+	public:
+		const MeshSource<StaticVertex>* mask;
+		Plane                           portalPlane;
 	};
 
 	// ---
@@ -109,7 +104,7 @@ namespace Eldritch2 { namespace Graphics {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		template <typename Code>
+		template <typename MortonCode>
 		class LeafExtractor {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -117,15 +112,15 @@ namespace Eldritch2 { namespace Graphics {
 			//!	Constructs this @ref LeafExtractor instance.
 			LeafExtractor(const LeafExtractor&) ETNoexceptHint = default;
 			//!	Constructs this @ref LeafExtractor instance.
-			LeafExtractor(Vector cellLength);
+			LeafExtractor(Vector cellLength) ETNoexceptHint;
 
 			~LeafExtractor() = default;
 
 			// ---------------------------------------------------
 
 		public:
-			Code operator()(const MeshInstance& geometry) const ETNoexceptHint;
-			Code operator()(const Light& light) const ETNoexceptHint;
+			MortonCode operator()(const Animation::Armature&) const ETNoexceptHint;
+			MortonCode operator()(const Light& light) const ETNoexceptHint;
 
 			// - DATA MEMBERS ------------------------------------
 
@@ -136,15 +131,16 @@ namespace Eldritch2 { namespace Graphics {
 		// ---
 
 	public:
+		template <typename Vertex>
+		using GeometryConcept   = RenderConcept<MeshInstance<Vertex>, MallocAllocator>;
 		using PortalViewConcept = ViewConcept<PortalView, MallocAllocator>;
-		using GeometryConcept   = RenderConcept<MeshInstance, MallocAllocator>;
 		using LightConcept      = RenderConcept<Light, MallocAllocator>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref GraphicsScene instance.
-		GraphicsScene(Vector geometryCellExtent, Vector lightCellExtent);
+		GraphicsScene(Vector geometryCellExtent, Vector lightCellExtent) ETNoexceptHint;
 		//!	Disable copy construction.
 		GraphicsScene(const GraphicsScene&) = delete;
 

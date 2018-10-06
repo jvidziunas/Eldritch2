@@ -35,18 +35,17 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		SubimageDescription GetDescription(uint32 subimageId) const override;
+		ImageDescription GetDescription() const override;
 
-		uint32 GetSliceCount() const override;
+		// ---------------------------------------------------
 
-		uint32 GetMipCount() const override;
-
+	public:
 		void StreamTexels(const StreamRequest& request) const override;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(const char* begin, const char* end);
+		ErrorCode BindResources(Range<const char*> bytes);
 
 		void FreeResources();
 
@@ -59,10 +58,7 @@ namespace Eldritch2 { namespace Graphics {
 
 	private:
 		crnd::crnd_unpack_context _context;
-		uint32                    _width;
-		uint32                    _height;
-		uint32                    _mips;
-		uint32                    _slices;
+		ImageDescription          _description;
 	};
 
 }} // namespace Eldritch2::Graphics

@@ -17,7 +17,7 @@
 
 namespace Eldritch2 { namespace Logging {
 
-	ETInlineHint ETForceInlineHint ChildLog::ChildLog(Log& parent) ETNoexceptHint : _parent(ETAddressOf(parent)) {}
+	ETInlineHint ETForceInlineHint ChildLog::ChildLog() ETNoexceptHint : _parent(nullptr) {}
 
 	// ---------------------------------------------------
 
@@ -27,14 +27,23 @@ namespace Eldritch2 { namespace Logging {
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint Log* ChildLog::SetParent(Log& parent) ETNoexceptHint {
-		return eastl::exchange(_parent, ETAddressOf(parent));
+	ETInlineHint ETForceInlineHint ErrorCode ChildLog::BindResources(Log& parent) {
+		_parent = ETAddressOf(parent);
+		return Error::None;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint Log* ChildLog::GetParent() const ETNoexceptHint {
-		return _parent;
+	ETInlineHint ETForceInlineHint void ChildLog::FreeResources() {
+		_parent = nullptr;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint void Swap(ChildLog& lhs, ChildLog& rhs) {
+		using ::Eldritch2::Swap;
+
+		Swap(lhs._parent, rhs._parent);
 	}
 
 }} // namespace Eldritch2::Logging

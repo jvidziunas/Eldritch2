@@ -35,156 +35,238 @@ public:
 
 public:
 	//!	Constructs this @ref Vector instance.
-	ETConstexpr Vector(float32 x, float32 y, float32 z, float32 w);
+	ETConstexpr Vector(float32 x, float32 y, float32 z, float32 w) ETNoexceptHint;
 	//!	Constructs this @ref Vector instance.
-	ETConstexpr Vector(const float32* values);
+	ETConstexpr Vector(const Vector&) ETNoexceptHint = default;
 	//!	Constructs this @ref Vector instance.
-	ETConstexpr Vector(const Vector&) = default;
+	Vector(const float32* values) ETNoexceptHint;
 	//!	Constructs this @ref Vector instance.
-	ETConstexpr Vector(const __m128&);
+	ETConstexpr Vector(__m128) ETNoexceptHint;
 	//!	Constructs this @ref Vector instance.
-	Vector() = default;
+	Vector() ETNoexceptHint = default;
 
 	~Vector() = default;
 
 	// ---------------------------------------------------
 
 public:
+	Vector& ETSimdCall operator+=(Vector) ETNoexceptHint;
+	Vector& ETSimdCall operator-=(Vector) ETNoexceptHint;
+	Vector& ETSimdCall operator*=(Vector) ETNoexceptHint;
+	Vector& ETSimdCall operator*=(float32) ETNoexceptHint;
+	Vector& ETSimdCall operator/=(Vector) ETNoexceptHint;
+	Vector& ETSimdCall operator/=(float32) ETNoexceptHint;
+	Vector& ETSimdCall operator^=(Vector) ETNoexceptHint;
+
+	ETConstexpr Vector& ETSimdCall operator=(const Vector&) ETNoexceptHint = default;
+
+	// ---------------------------------------------------
+
+public:
 	template <Component component0, Component component1, Component component2, Component component3>
-	Vector& Swizzle();
+	ETPureFunctionHint Vector ETSimdCall Swizzle() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	Vector& ETSimdCall operator+=(Vector operand);
-	Vector& ETSimdCall operator-=(Vector operand);
-	Vector& ETSimdCall operator*=(Vector operand);
-	Vector& ETSimdCall operator*=(float32 scalar);
-	Vector& ETSimdCall operator/=(Vector operand);
-	Vector& ETSimdCall operator/=(float32 scalar);
+	Vector& Normalize() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	friend ETPureFunctionHint Vector ETSimdCall AbsoluteValue(Vector vector);
-
-	friend ETPureFunctionHint Vector ETSimdCall Floor(Vector vector);
-
-	friend ETPureFunctionHint Vector ETSimdCall Ceil(Vector vector);
-
-	// ---------------------------------------------------
-
-public:
-	friend ETPureFunctionHint Vector ETSimdCall LinearInterpolate(Vector vector0, Vector vector1, float32 alpha);
-
-	friend ETPureFunctionHint Vector ETSimdCall CrossProduct(Vector vector0, Vector vector1);
-
-	friend ETPureFunctionHint float32 ETSimdCall DotProduct(Vector vector0, Vector vector1);
-
-	friend ETPureFunctionHint float32 ETSimdCall SquaredLength(Vector vector);
-
-	friend ETPureFunctionHint float32 ETSimdCall Length(Vector vector);
-
-	// ---------------------------------------------------
-
-public:
-	Vector& Normalize();
-
-	// ---------------------------------------------------
-
-public:
-	void ExtractCoefficients(float32 (&output)[4]) const;
-
-	// ---------------------------------------------------
-
-public:
-	operator const __m128&() const;
-	operator __m128&();
-
-	// ---------------------------------------------------
-
-public:
-	static constexpr Vector ETSimdCall MakeIdentity();
+	ETConstexpr ETSimdCall operator const __m128&() const ETNoexceptHint;
+	ETConstexpr ETSimdCall operator __m128&() ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
 public:
 	__m128 coefficients;
+
+	// ---------------------------------------------------
+
+public:
+	static ETConstexpr Vector ETSimdCall MakeIdentity() ETNoexceptHint;
+
+	static ETConstexpr Vector ETSimdCall MakeForward() ETNoexceptHint;
+
+	static ETConstexpr Vector ETSimdCall MakeUp() ETNoexceptHint;
+
+	static ETConstexpr Vector ETSimdCall MakeRight() ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+public:
+	friend ETPureFunctionHint Vector ETSimdCall Min(Vector, Vector) ETNoexceptHint;
+
+	friend ETPureFunctionHint Vector ETSimdCall Max(Vector, Vector) ETNoexceptHint;
+
+	friend ETPureFunctionHint Vector ETSimdCall Clamp(Vector value, Vector minima, Vector maxima) ETNoexceptHint;
+
+	friend ETPureFunctionHint Vector ETSimdCall AbsoluteValue(Vector vector) ETNoexceptHint;
+
+	friend ETPureFunctionHint Vector ETSimdCall Floor(Vector vector) ETNoexceptHint;
+
+	friend ETPureFunctionHint Vector ETSimdCall Ceil(Vector vector) ETNoexceptHint;
+
+	friend ETPureFunctionHint Vector ETSimdCall Interpolate(Vector lhs, Vector rhs, float32 alpha) ETNoexceptHint;
+
+	friend ETPureFunctionHint float32 ETSimdCall DotProduct(Vector lhs, Vector rhs) ETNoexceptHint;
+
+	friend ETPureFunctionHint float32 ETSimdCall SquaredLength(Vector vector) ETNoexceptHint;
+
+	friend ETPureFunctionHint float32 ETSimdCall Length(Vector vector) ETNoexceptHint;
+
+	friend ETPureFunctionHint void ETSimdCall StreamCoefficients(float32 (&output)[4], Vector) ETNoexceptHint;
+
+	template <typename Code>
+	friend ETPureFunctionHint Code ETSimdCall GetMortonCode(Vector) ETNoexceptHint;
 };
 
-// ---------------------------------------------------
-
 class Quaternion {
+	// - TYPE PUBLISHING ---------------------------------
+
+public:
+	enum Component {
+		I = 3,
+		J = 2,
+		K = 1,
+		W = 0
+	};
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref Quaternion instance.
-	ETConstexpr Quaternion(float32 i, float32 j, float32 k, float32 w);
+	ETConstexpr Quaternion(float32 i, float32 j, float32 k, float32 w) ETNoexceptHint;
 	//!	Constructs this @ref Quaternion instance.
-	ETConstexpr Quaternion(const float32* values);
+	ETConstexpr Quaternion(const Quaternion&) ETNoexceptHint = default;
 	//!	Constructs this @ref Quaternion instance.
-	ETConstexpr Quaternion(const Quaternion&) = default;
+	Quaternion(const float32* values) ETNoexceptHint;
 	//!	Constructs this @ref Quaternion instance.
-	ETConstexpr Quaternion(const __m128&);
+	Quaternion(uint32 packedBits) ETNoexceptHint;
 	//!	Constructs this @ref Quaternion instance.
-	Quaternion() = default;
+	ETConstexpr Quaternion(__m128) ETNoexceptHint;
+	//!	Constructs this @ref Quaternion instance.
+	Quaternion() ETNoexceptHint = default;
 
 	~Quaternion() = default;
 
 	// ---------------------------------------------------
 
 public:
-	Quaternion& Normalize();
+	Quaternion& ETSimdCall operator*=(Quaternion) ETNoexceptHint;
+
+	ETConstexpr Quaternion& ETSimdCall operator=(const Quaternion&) ETNoexceptHint = default;
 
 	// ---------------------------------------------------
 
 public:
-	Quaternion& ETSimdCall operator*=(Quaternion);
+	ETPureFunctionHint Vector ETSimdCall Rotate(Vector point) const ETNoexceptHint;
 
-	Quaternion ETSimdCall operator~() const;
+	Vector ETSimdCall GetForward() const ETNoexceptHint;
 
-	// ---------------------------------------------------
+	Vector ETSimdCall GetRight() const ETNoexceptHint;
 
-public:
-	ETPureFunctionHint Quaternion ETSimdCall GetReverse() const;
+	Vector ETSimdCall GetUp() const ETNoexceptHint;
 
-	// ---------------------------------------------------
+	Quaternion& Normalize() ETNoexceptHint;
 
-public:
-	ETPureFunctionHint Vector ETSimdCall Rotate(Vector point) const;
-
-	Vector ETSimdCall GetForward() const;
-
-	Vector ETSimdCall GetRight() const;
-
-	Vector ETSimdCall GetUp() const;
+	uint32 PackBits() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	void ExtractCoefficients(float32 (&coefficients)[4]) const;
+	ETConstexpr ETSimdCall operator const __m128&() const ETNoexceptHint;
+	ETConstexpr ETSimdCall operator __m128&() ETNoexceptHint;
+
+	// - DATA MEMBERS ------------------------------------
+
+public:
+	__m128 coefficients;
 
 	// ---------------------------------------------------
 
 public:
-	friend ETPureFunctionHint Quaternion ETSimdCall AsBasis(Vector forward, Vector up);
-
-	friend ETPureFunctionHint Quaternion ETSimdCall LinearInterpolateNonConstantVelocity(Quaternion quaternion0, Quaternion quaternion1, float32 alpha);
-
-	friend ETPureFunctionHint Quaternion ETSimdCall LinearInterpolate(Quaternion quaternion0, Quaternion quaternion1, float32 alpha);
-
-	friend ETPureFunctionHint float32 ETSimdCall DotProduct(Quaternion quaternion0, Quaternion quaternion1);
+	static ETConstexpr Quaternion ETSimdCall MakeIdentity() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	operator const __m128&() const;
-	operator __m128&();
+	friend ETPureFunctionHint Quaternion ETSimdCall AsBasis(Vector forward, Vector up) ETNoexceptHint;
+
+	friend ETPureFunctionHint Quaternion ETSimdCall InterpolateNonuniformVelocity(Quaternion lhs, Quaternion rhs, float32 alpha) ETNoexceptHint;
+
+	friend ETPureFunctionHint Quaternion ETSimdCall Interpolate(Quaternion lhs, Quaternion rhs, float32 alpha) ETNoexceptHint;
+
+	friend ETPureFunctionHint float32 ETSimdCall DotProduct(Quaternion lhs, Quaternion rhs) ETNoexceptHint;
+
+	friend ETPureFunctionHint void ETSimdCall StreamCoefficients(float32 (&coefficients)[4], Quaternion) ETNoexceptHint;
+};
+
+// ---
+
+class Transformation {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+public:
+	//!	Constructs this @ref Transformation instance.
+	ETConstexpr Transformation(Vector translation, Quaternion rotation) ETNoexceptHint;
+	//!	Constructs this @ref Transformation instance.
+	ETConstexpr Transformation(const Transformation&) ETNoexceptHint = default;
+	//!	Constructs this @ref Transformation instance.
+	ETConstexpr Transformation(Quaternion rotation) ETNoexceptHint;
+	//!	Constructs this @ref Transformation instance.
+	ETConstexpr Transformation(Vector translation) ETNoexceptHint;
+	//!	Constructs this @ref Transformation instance.
+	Transformation() ETNoexceptHint = default;
+
+	~Transformation() = default;
 
 	// ---------------------------------------------------
 
 public:
-	static constexpr Quaternion ETSimdCall MakeIdentity();
+	Transformation& ETSimdCall operator*=(Transformation) ETNoexceptHint;
+
+	ETConstexpr Transformation& ETSimdCall operator=(const Transformation&) ETNoexceptHint = default;
+
+	// - DATA MEMBERS ------------------------------------
+
+public:
+	Vector     translation;
+	Quaternion rotation;
+
+	// ---------------------------------------------------
+
+public:
+	static ETConstexpr Transformation ETSimdCall MakeIdentity() ETNoexceptHint;
+};
+
+// ---
+
+class Plane {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+public:
+	//! Constructs this @ref Plane instance.
+	ETConstexpr Plane(float32 x, float32 y, float32 z, float32 w) ETNoexceptHint;
+	//! Constructs this @ref Plane instance.
+	ETConstexpr Plane(const Plane&) ETNoexceptHint = default;
+	//! Constructs this @ref Plane instance.
+	Plane(const float32* values) ETNoexceptHint;
+	//! Constructs this @ref Plane instance.
+	ETConstexpr Plane(__m128) ETNoexceptHint;
+	//! Constructs this @ref Plane instance.
+	Plane() ETNoexceptHint = default;
+
+	// ---------------------------------------------------
+
+public:
+	ETConstexpr Plane& ETSimdCall operator=(const Plane&) ETNoexceptHint = default;
+
+	// ---------------------------------------------------
+
+public:
+	Transformation ETSimdCall Reflect(Transformation) const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -192,67 +274,36 @@ public:
 	__m128 coefficients;
 };
 
-// ---------------------------------------------------
+// ---
 
-class Bounds {
+class Box {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref Bounds instance.
-	Bounds(Vector minima, Vector maxima);
+	ETConstexpr Box(Vector minima, Vector maxima) ETNoexceptHint;
 	//!	Constructs this @ref Bounds instance.
-	Bounds(const Bounds&) = default;
+	ETConstexpr Box(const Box&) ETNoexceptHint = default;
 
-	~Bounds() = default;
+	~Box() = default;
+
+	// ---------------------------------------------------
+
+public:
+	ETPureFunctionHint Box& ETSimdCall operator*=(Transformation) ETNoexceptHint;
+
+	ETConstexpr Box& ETSimdCall operator=(const Box&) ETNoexceptHint = default;
+
+	// ---------------------------------------------------
+
+public:
+	ETPureFunctionHint bool ETSimdCall Covers(Vector point) const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
 public:
 	Vector minima;
 	Vector maxima;
-};
-
-// ---------------------------------------------------
-
-class Transformation {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-public:
-	//!	Constructs this @ref Transformation instance.
-	constexpr Transformation(Vector translation, Quaternion rotation);
-	//!	Constructs this @ref Transformation instance.
-	constexpr Transformation(const Transformation&) = default;
-	//!	Constructs this @ref Transformation instance.
-	constexpr Transformation(Quaternion rotation);
-	//!	Constructs this @ref Transformation instance.
-	constexpr Transformation(Vector translation);
-	//!	Constructs this @ref Transformation instance.
-	Transformation() = default;
-
-	~Transformation() = default;
-
-	// ---------------------------------------------------
-
-public:
-	Transformation ETSimdCall GetInverse() const;
-
-	// ---------------------------------------------------
-
-public:
-	Transformation& ETSimdCall operator*=(Transformation operand);
-
-	Transformation ETSimdCall operator~() const;
-
-	// ---------------------------------------------------
-
-public:
-	static constexpr Transformation ETSimdCall MakeIdentity();
-
-	// - DATA MEMBERS ------------------------------------
-
-public:
-	Vector     translation;
-	Quaternion rotation;
 };
 
 } // namespace Eldritch2

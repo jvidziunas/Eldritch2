@@ -17,19 +17,13 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint ETForceInlineHint Viewport* Display::TryAcquireViewport(const GraphicsPipeline& generator) ETNoexceptHint {
-		for (Viewport& viewport : _viewports) {
-			if (viewport.TryAcquire(generator)) {
-				return ETAddressOf(viewport);
-			}
-		}
-
-		return nullptr;
+	ETConstexpr ETInlineHint ETForceInlineHint auto Display::GetViewports() const ETNoexceptHint -> const Viewport (&)[4] {
+		return _viewports;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint const Display::ViewportList& Display::GetViewports() const ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint auto Display::GetViewports() ETNoexceptHint -> Viewport (&)[4] {
 		return _viewports;
 	}
 

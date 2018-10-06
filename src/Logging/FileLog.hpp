@@ -50,6 +50,16 @@ namespace Eldritch2 { namespace Logging {
 
 	private:
 		FileAppender _appender;
+
+		// ---------------------------------------------------
+
+		friend void Swap(FileLog&, FileLog&);
 	};
 
 }} // namespace Eldritch2::Logging
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Logging/FileLog.inl>
+//------------------------------------------------------------------//

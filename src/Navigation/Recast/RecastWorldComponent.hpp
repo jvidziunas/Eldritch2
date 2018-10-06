@@ -26,7 +26,7 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	public:
 		//!	Constructs this @ref RecastWorldComponent instance.
-		RecastWorldComponent(const ObjectLocator& services);
+		RecastWorldComponent(const ObjectLocator& services) ETNoexceptHint;
 		//!	Disable copy construction.
 		RecastWorldComponent(const RecastWorldComponent&) = delete;
 
@@ -40,7 +40,11 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		// ---------------------------------------------------
 
 	public:
+		void BindResources(Scheduling::JobExecutor& executor) override;
+
 		void DefineScriptApi(Scripting::Wren::ApiBuilder& api) override;
+
+		void FreeResources(Scheduling::JobExecutor& executor) override;
 
 		// - DATA MEMBERS ------------------------------------
 

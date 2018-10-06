@@ -21,41 +21,35 @@ ET_POP_MSVC_WARNING_STATE()
 namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	class Player {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		enum : size_t { NameMaxLength = 128u };
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		Player(const Player&) = delete;
 		//!	Constructs this @ref Player instance.
-		Player();
+		Player() ETNoexceptHint;
 
 		~Player();
 
 		// ---------------------------------------------------
 
 	public:
-		const Utf8Char* GetName() const;
+		StringView GetName() const ETNoexceptHint;
 
-		void NotifyPersonaNameChange(const Utf8Char* const name);
-
-		// ---------------------------------------------------
-
-	public:
-		bool IsAttachedToLocalUser() const;
+		void SetName(StringView name) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		bool BindToLocalUser(HSteamPipe pipe);
+		bool IsLocal() const ETNoexceptHint;
 
-		bool BindToAnonymousUser(HSteamPipe pipe);
+		// ---------------------------------------------------
 
-		void DisconnectFromUser(HSteamPipe pipe);
+	public:
+		ErrorCode BindResources(HSteamPipe pipe, EAccountType type);
+		ErrorCode BindResources(HSteamPipe pipe);
+
+		void FreeResources(HSteamPipe pipe);
 
 		// ---------------------------------------------------
 
@@ -65,8 +59,8 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Utf8Char   _name[NameMaxLength];
-		HSteamUser _localUser;
+		Utf8Char   _name[128];
+		HSteamUser _user;
 	};
 
 }}} // namespace Eldritch2::Networking::Steamworks

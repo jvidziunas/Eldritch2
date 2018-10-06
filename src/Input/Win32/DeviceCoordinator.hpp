@@ -12,8 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Input/InputDevice.hpp>
 #include <Logging/ChildLog.hpp>
+#include <Input/InputApi.hpp>
 //------------------------------------------------------------------//
 
 using RAWINPUT = struct tagRAWINPUT;
@@ -25,7 +25,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref DeviceSet instance.
+		//!	Constructs this @ref DeviceCoordinator instance.
 		DeviceCoordinator(Logging::Log& log);
 		//!	Disable copy construction.
 		DeviceCoordinator(const DeviceCoordinator&) = delete;

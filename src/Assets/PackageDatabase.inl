@@ -41,6 +41,12 @@ namespace Eldritch2 { namespace Assets {
 
 	// ---------------------------------------------------
 
+	ETConstexpr ETInlineHint ETForceInlineHint AssetDatabase& PackageDatabase::GetAssetDatabase() ETNoexceptHint {
+		return _assets;
+	}
+
+	// ---------------------------------------------------
+
 	ETInlineHint ETForceInlineHint void PackageDatabase::PushRequest(LoadRequest request) {
 		Lock _(_requestsMutex);
 		_requests.Push(eastl::move(request));

@@ -17,7 +17,7 @@
 namespace Eldritch2 {
 
 Lock::Lock(Mutex& mutex) :
-	_mutex(&mutex) {
+	_mutex(ETAddressOf(mutex)) {
 	while (mutex.TryEnter() == false) {
 		// Busy wait.
 	}
@@ -31,14 +31,14 @@ Lock::~Lock() {
 
 // ---------------------------------------------------
 
-bool Lock::IsAttachedTo(const Mutex& mutex) const {
-	return &mutex == _mutex;
+bool Lock::IsAttachedTo(const Mutex& mutex) const ETNoexceptHint {
+	return ETAddressOf(mutex) == _mutex;
 }
 
 // ---------------------------------------------------
 
 ReadLock::ReadLock(const Mutex& mutex) :
-	_mutex(&mutex) {
+	_mutex(ETAddressOf(mutex)) {
 	while (mutex.TryEnterAsReader() == false) {
 		// Busy wait.
 	}
@@ -52,8 +52,8 @@ ReadLock::~ReadLock() {
 
 // ---------------------------------------------------
 
-bool ReadLock::IsAttachedTo(const Mutex& mutex) const {
-	return &mutex == _mutex;
+bool ReadLock::IsAttachedTo(const Mutex& mutex) const ETNoexceptHint {
+	return ETAddressOf(mutex) == _mutex;
 }
 
 } // namespace Eldritch2

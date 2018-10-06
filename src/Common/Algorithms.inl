@@ -205,14 +205,14 @@ ETInlineHint ETForceInlineHint typename Container::Iterator Begin(Container& con
 // ---------------------------------------------------
 
 template <typename Value, size_t length>
-ETInlineHint ETCpp14Constexpr ETForceInlineHint const Value* Begin(const Value (&array)[length]) ETNoexceptHint {
+ETCpp14Constexpr ETInlineHint ETForceInlineHint const Value* Begin(const Value (&array)[length]) ETNoexceptHint {
 	return eastl::begin(array);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, size_t length>
-ETInlineHint ETCpp14Constexpr ETForceInlineHint Value* Begin(Value (&array)[length]) ETNoexceptHint {
+ETCpp14Constexpr ETInlineHint ETForceInlineHint Value* Begin(Value (&array)[length]) ETNoexceptHint {
 	return eastl::begin(array);
 }
 
@@ -233,14 +233,14 @@ ETInlineHint ETForceInlineHint typename Container::Iterator End(Container& conta
 // ---------------------------------------------------
 
 template <typename Value, size_t length>
-ETInlineHint ETCpp14Constexpr ETForceInlineHint const Value* End(const Value (&array)[length]) ETNoexceptHint {
+ETCpp14Constexpr ETInlineHint ETForceInlineHint const Value* End(const Value (&array)[length]) ETNoexceptHint {
 	return eastl::end(array);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, size_t length>
-ETInlineHint ETCpp14Constexpr ETForceInlineHint Value* End(Value (&array)[length]) ETNoexceptHint {
+ETCpp14Constexpr ETInlineHint ETForceInlineHint Value* End(Value (&array)[length]) ETNoexceptHint {
 	return eastl::end(array);
 }
 

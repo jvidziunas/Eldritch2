@@ -12,6 +12,8 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/AssetViews/SpirVShaderSetAsset.hpp>
+#include <Graphics/Vulkan/VulkanTools.hpp>
+#include <Flatbuffers/FlatBufferTools.hpp>
 #include <Assets/AssetDatabase.hpp>
 //------------------------------------------------------------------//
 #include <FlatBuffers/SpirVShaderSet_generated.h>
@@ -27,8 +29,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 	namespace {
 
-		ETInlineHint ETPureFunctionHint VkStencilOp ParseStencilOp(StencilOperation operation) {
+		template <typename BitField>
+		ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint bool IsFlagEnabled(BitField field, BitField flags) ETNoexceptHint {
+			using FlagBits = typename eastl::underlying_type<BitField>::type;
+
+			// ---
+
+			return FlagBits(field) & FlagBits(flags) == FlagBits(flags);
+		}
+
+		// ---------------------------------------------------
+
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkStencilOp ParseStencilOp(StencilOperation operation) ETNoexceptHint {
 			switch (operation) {
+			default:
 			case StencilOperation::KeepExisting: return VK_STENCIL_OP_KEEP;
 			case StencilOperation::SetZero: return VK_STENCIL_OP_ZERO;
 			case StencilOperation::ReplaceExisting: return VK_STENCIL_OP_REPLACE;
@@ -36,16 +50,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case StencilOperation::DecrementWithSaturate: return VK_STENCIL_OP_DECREMENT_AND_CLAMP;
 			case StencilOperation::InvertExisting: return VK_STENCIL_OP_INVERT;
 			case StencilOperation::IncrementWithWrap: return VK_STENCIL_OP_INCREMENT_AND_WRAP;
-			case StencilOperation::DecrementWithWrap:
-				return VK_STENCIL_OP_DECREMENT_AND_WRAP;
-				ET_NO_DEFAULT_CASE;
+			case StencilOperation::DecrementWithWrap: return VK_STENCIL_OP_DECREMENT_AND_WRAP;
 			}; // switch(operation)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkCompareOp ParseComparisonOp(ComparisonFunction function) {
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkCompareOp ParseComparisonOp(ComparisonFunction function) ETNoexceptHint {
 			switch (function) {
+			default:
 			case ComparisonFunction::NeverPass: return VK_COMPARE_OP_NEVER;
 			case ComparisonFunction::PassIfLess: return VK_COMPARE_OP_LESS;
 			case ComparisonFunction::PassIfEqual: return VK_COMPARE_OP_EQUAL;
@@ -53,30 +66,28 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case ComparisonFunction::PassIfGreater: return VK_COMPARE_OP_GREATER;
 			case ComparisonFunction::PassIfNotEqual: return VK_COMPARE_OP_NOT_EQUAL;
 			case ComparisonFunction::PassIfGreaterOrEqual: return VK_COMPARE_OP_GREATER_OR_EQUAL;
-			case ComparisonFunction::AlwaysPass:
-				return VK_COMPARE_OP_ALWAYS;
-				ET_NO_DEFAULT_CASE;
+			case ComparisonFunction::AlwaysPass: return VK_COMPARE_OP_ALWAYS;
 			}; // switch(function)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkBlendOp ParseBlendOp(BlendOperator operation) {
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkBlendOp ParseBlendOp(BlendOperator operation) ETNoexceptHint {
 			switch (operation) {
+			default:
 			case BlendOperator::Add: return VK_BLEND_OP_ADD;
 			case BlendOperator::Subtract: return VK_BLEND_OP_SUBTRACT;
 			case BlendOperator::ReverseSubtract: return VK_BLEND_OP_REVERSE_SUBTRACT;
 			case BlendOperator::Minimum: return VK_BLEND_OP_MIN;
-			case BlendOperator::Maximum:
-				return VK_BLEND_OP_MAX;
-				ET_NO_DEFAULT_CASE;
+			case BlendOperator::Maximum: return VK_BLEND_OP_MAX;
 			}; // switch(operation)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(ColorBlendFactor factor) {
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(ColorBlendFactor factor) ETNoexceptHint {
 			switch (factor) {
+			default:
 			case ColorBlendFactor::Zero: return VK_BLEND_FACTOR_ZERO;
 			case ColorBlendFactor::One: return VK_BLEND_FACTOR_ONE;
 			case ColorBlendFactor::SourceColor: return VK_BLEND_FACTOR_SRC_COLOR;
@@ -95,16 +106,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case ColorBlendFactor::DualSourceColor: return VK_BLEND_FACTOR_SRC1_COLOR;
 			case ColorBlendFactor::OneMinusDualSourceColor: return VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR;
 			case ColorBlendFactor::DualSourceAlpha: return VK_BLEND_FACTOR_SRC1_ALPHA;
-			case ColorBlendFactor::OneMinusDualSourceAlpha:
-				return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
-				ET_NO_DEFAULT_CASE;
+			case ColorBlendFactor::OneMinusDualSourceAlpha: return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
 			}; // switch(factor)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(AlphaBlendFactor factor) {
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(AlphaBlendFactor factor) ETNoexceptHint {
 			switch (factor) {
+			default:
 			case AlphaBlendFactor::Zero: return VK_BLEND_FACTOR_ZERO;
 			case AlphaBlendFactor::One: return VK_BLEND_FACTOR_ONE;
 			case AlphaBlendFactor::SourceAlpha: return VK_BLEND_FACTOR_SRC_ALPHA;
@@ -115,200 +125,156 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 			case AlphaBlendFactor::BlendFactorAlpha: return VK_BLEND_FACTOR_CONSTANT_ALPHA;
 			case AlphaBlendFactor::OneMinusBlendFactorAlpha: return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA;
 			case AlphaBlendFactor::DualSourceAlpha: return VK_BLEND_FACTOR_SRC1_ALPHA;
-			case AlphaBlendFactor::OneMinusDualSourceAlpha:
-				return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
-				ET_NO_DEFAULT_CASE;
+			case AlphaBlendFactor::OneMinusDualSourceAlpha: return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
 			}; // switch(factor)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkColorComponentFlags ParseWriteMask(ChannelWriteMask mask) {
-			using FlagBits = eastl::underlying_type<ChannelWriteMask>::type;
-
-			// ---
-
-			VkColorComponentFlags flags(0u);
-
-			if (FlagBits(mask) & FlagBits(ChannelWriteMask::Red)) {
-				flags |= VK_COLOR_COMPONENT_R_BIT;
-			}
-
-			if (FlagBits(mask) & FlagBits(ChannelWriteMask::Green)) {
-				flags |= VK_COLOR_COMPONENT_G_BIT;
-			}
-
-			if (FlagBits(mask) & FlagBits(ChannelWriteMask::Blue)) {
-				flags |= VK_COLOR_COMPONENT_B_BIT;
-			}
-
-			if (FlagBits(mask) & FlagBits(ChannelWriteMask::Alpha)) {
-				flags |= VK_COLOR_COMPONENT_A_BIT;
-			}
-
-			return flags;
+		ETInlineHint ETForceInlineHint ETPureFunctionHint VkColorComponentFlags ParseWriteMask(ChannelWriteMask channels) ETNoexceptHint {
+			return IsFlagEnabled(channels, ChannelWriteMask::Red) ? VK_COLOR_COMPONENT_R_BIT : 0u // clang-format off
+				| IsFlagEnabled(channels, ChannelWriteMask::Green) ? VK_COLOR_COMPONENT_G_BIT : 0u
+				| IsFlagEnabled(channels, ChannelWriteMask::Blue) ? VK_COLOR_COMPONENT_B_BIT : 0u
+				| IsFlagEnabled(channels, ChannelWriteMask::Alpha) ? VK_COLOR_COMPONENT_A_BIT : 0u; // clang-format on
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkPipelineColorBlendAttachmentState ParseColorBlendState(const OutputState* state) {
+		ETInlineHint ETForceInlineHint ETPureFunctionHint VkPipelineColorBlendAttachmentState ParseColorBlendState(const OutputState* asset) ETNoexceptHint {
 			return VkPipelineColorBlendAttachmentState {
 				/*blendEnable =*/VK_TRUE,
-				ParseBlendFactor(state->SourceColorBlendFactor()),
-				ParseBlendFactor(state->DestinationColorBlendFactor()),
-				ParseBlendOp(state->ColorBlendOperator()),
-				ParseBlendFactor(state->SourceAlphaBlendFactor()),
-				ParseBlendFactor(state->DestinationAlphaBlendFactor()),
-				ParseBlendOp(state->AlphaBlendOperator()),
-				ParseWriteMask(state->WriteMask())
+				ParseBlendFactor(asset->SourceColorBlendFactor()),
+				ParseBlendFactor(asset->DestinationColorBlendFactor()),
+				ParseBlendOp(asset->ColorBlendOperator()),
+				ParseBlendFactor(asset->SourceAlphaBlendFactor()),
+				ParseBlendFactor(asset->DestinationAlphaBlendFactor()),
+				ParseBlendOp(asset->AlphaBlendOperator()),
+				ParseWriteMask(asset->WriteMask())
 			};
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkStencilOpState ParseStencilOpState(uint8 readMask, uint8 writeMask, uint8 stencilReference, const StencilBehavior* state) {
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkStencilOpState ParseStencilOpState(uint8 readMask, uint8 writeMask, uint8 reference, const StencilBehavior* asset) ETNoexceptHint {
 			return VkStencilOpState {
-				ParseStencilOp(state->StencilAndDepthFailBehavior()),
-				ParseStencilOp(state->StencilAndDepthPassBehavior()),
-				ParseStencilOp(state->StencilPassDepthFailBehavior()),
-				ParseComparisonOp(state->StencilComparisonFunction()),
+				ParseStencilOp(asset->StencilAndDepthFailBehavior()),
+				ParseStencilOp(asset->StencilAndDepthPassBehavior()),
+				ParseStencilOp(asset->StencilPassDepthFailBehavior()),
+				ParseComparisonOp(asset->StencilComparisonFunction()),
 				readMask,
 				writeMask,
-				stencilReference
+				reference
 			};
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkPolygonMode ParsePolygonMode(PolygonFillMode fill) {
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkPolygonMode ParsePolygonMode(PolygonFillMode fill) ETNoexceptHint {
 			switch (fill) {
+			default:
+			case PolygonFillMode::Solid: return VK_POLYGON_MODE_FILL;
 			case PolygonFillMode::Wireframe: return VK_POLYGON_MODE_LINE;
-			case PolygonFillMode::Solid:
-				return VK_POLYGON_MODE_FILL;
-				ET_NO_DEFAULT_CASE;
 			}; // switch(mode)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkCullModeFlags ParseCullMode(FaceCullMode cull) {
+		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkCullModeFlags ParseCullMode(FaceCullMode cull) ETNoexceptHint {
 			switch (cull) {
+			default:
+			case FaceCullMode::None: return VK_CULL_MODE_NONE;
 			case FaceCullMode::FrontFace: return VK_CULL_MODE_FRONT_BIT;
 			case FaceCullMode::BackFace: return VK_CULL_MODE_BACK_BIT;
-			case FaceCullMode::None:
-				return VK_CULL_MODE_NONE;
-				ET_NO_DEFAULT_CASE;
 			}; // switch(mode)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkPipelineDepthStencilStateCreateInfo ParseDepthStencilState(const DepthStencilState* state) {
+		ETInlineHint ETForceInlineHint ETPureFunctionHint VkResult ParseDepthStencilState(SpirVShader& shader, const DepthStencilState* asset) ETNoexceptHint {
 			using FlagBits = eastl::underlying_type<DepthStencilFlags>::type;
 
 			// ---
 
-			return VkPipelineDepthStencilStateCreateInfo {
-				VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-				/*pNext =*/nullptr,
-				/*flags =*/0,
-				VkBool32(FlagBits(state->Flags()) & FlagBits(DepthStencilFlags::DepthTestEnable) ? VK_TRUE : VK_FALSE),
-				VkBool32(FlagBits(state->Flags()) & FlagBits(DepthStencilFlags::DepthWriteEnable) ? VK_TRUE : VK_FALSE),
-				ParseComparisonOp(state->DepthComparisonFunction()),
-				/*depthBoundsTestEnable =*/VK_FALSE,
-				VkBool32(FlagBits(state->Flags()) & FlagBits(DepthStencilFlags::StencilTestEnable) ? VK_TRUE : VK_FALSE),
-				ParseStencilOpState(0xFF, 0xFF, 0xFF, state->FrontFaceBehavior()),
-				ParseStencilOpState(0xFF, 0xFF, 0xFF, state->BackFaceBehavior()),
-				/*minDepthBounds =*/0.0f,
-				/*maxDepthBounds =*/1.0f
-			};
+			shader.depthStencil.flags                = 0u;
+			shader.depthStencil.shouldTest           = IsFlagEnabled(asset->Flags(), DepthStencilFlags::DepthTestEnable) ? VK_TRUE : VK_FALSE;
+			shader.depthStencil.shouldWrite          = IsFlagEnabled(asset->Flags(), DepthStencilFlags::DepthWriteEnable) ? VK_TRUE : VK_FALSE;
+			shader.depthStencil.depthOperator        = ParseComparisonOp(asset->DepthComparisonFunction());
+			shader.depthStencil.shouldClipBounds     = VK_FALSE;
+			shader.depthStencil.shouldTestStencil    = FlagBits(asset->Flags()) & FlagBits(DepthStencilFlags::StencilTestEnable) ? VK_TRUE : VK_FALSE;
+			shader.depthStencil.frontStencilOperator = ParseStencilOpState(0xFF, 0xFF, 0xFF, asset->FrontFaceBehavior());
+			shader.depthStencil.backStencilOperator  = ParseStencilOpState(0xFF, 0xFF, 0xFF, asset->BackFaceBehavior());
+			shader.depthStencil.minDepthBounds       = 0.0f;
+			shader.depthStencil.maxDepthBounds       = 1.0f;
+
+			return VK_SUCCESS;
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETPureFunctionHint VkPipelineRasterizationStateCreateInfo ParseRasterizationState(const RasterizationState* state) {
-			return VkPipelineRasterizationStateCreateInfo {
-				VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-				/*pNext =*/nullptr,
-				/*flags =*/0,
-				/*depthClampEnable =*/VK_FALSE,
-				/*rasterizerDiscardEnable =*/VK_FALSE,
-				ParsePolygonMode(state->FillMode()),
-				ParseCullMode(state->CullMode()),
-				VK_FRONT_FACE_CLOCKWISE,
-				VkBool32(state->DepthBias() != 0 ? VK_TRUE : VK_FALSE),
-				static_cast<const float&>(state->DepthBias()),
-				state->DepthBiasClamp(),
-				state->SlopeScaledDepthBias(),
-				/*lineWidth =*/1.0f
-			};
+		ETInlineHint ETForceInlineHint ETPureFunctionHint VkResult ParseRasterizationState(SpirVShader& shader, const RasterizationState* asset) ETNoexceptHint {
+			shader.rasterizer.flags               = 0,
+			shader.rasterizer.shouldClampDepth    = VK_FALSE;
+			shader.rasterizer.shouldDiscardOutput = VK_FALSE;
+			shader.rasterizer.fill                = ParsePolygonMode(asset->FillMode());
+			shader.rasterizer.cullMode            = ParseCullMode(asset->CullMode());
+			shader.rasterizer.frontFace           = VK_FRONT_FACE_CLOCKWISE;
+			shader.rasterizer.depthBias           = AsFloatBits(asset->DepthBias());
+			shader.rasterizer.depthBiasClamp      = asset->DepthBiasClamp();
+			shader.rasterizer.slopeDepthBias      = asset->SlopeScaledDepthBias();
+
+			return VK_SUCCESS;
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint void ParseBytecode(ArrayList<uint32>& bytecode, const flatbuffers::Vector<uint32>* spirv) {
-			bytecode.Assign(spirv->data(), spirv->data() + spirv->size());
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint void ParseUsage(ArrayList<SpirVShaderSetAsset::Usage>& usages, const UsageDescriptor* usage) {
-			// Typedef here because compiler has a hard time dealing with array literals.
-			using BlendList = VkPipelineColorBlendAttachmentState[SpirVShaderSetAsset::Usage::MaxColorAttachments];
-
-			static ETConstexpr VkPipelineColorBlendAttachmentState BlendDisabled { /*blendEnable =*/VK_FALSE };
-
-			const uint32 blendCount(usage->Outputs()->size());
-			usages.EmplaceBack(
-				BlendList {
-					blendCount > 0u ? ParseColorBlendState(usage->Outputs()->Get(0)) : BlendDisabled,
-					blendCount > 1u ? ParseColorBlendState(usage->Outputs()->Get(1)) : BlendDisabled,
-					blendCount > 2u ? ParseColorBlendState(usage->Outputs()->Get(2)) : BlendDisabled,
-					blendCount > 3u ? ParseColorBlendState(usage->Outputs()->Get(3)) : BlendDisabled },
-				VK_SHADER_STAGE_ALL_GRAPHICS,
-				VkPipelineMultisampleStateCreateInfo {},
-				ParseRasterizationState(usage->RasterizationBehavior()),
-				ParseDepthStencilState(usage->DepthStencilBehavior()));
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint void ParseUsages(ArrayList<SpirVShaderSetAsset::Usage>& usages, CachingHashMap<String, uint32>& indexByName, const flatbuffers::Vector<Offset<UsageDescriptor>>* assets) {
-			for (uint32 index(0u); index < assets->size(); ++index) {
-				const UsageDescriptor* usage(assets->Get(index));
-
-				indexByName.Emplace(String(MallocAllocator("Usage Name Allocator"), StringView(usage->Name()->c_str(), usage->Name()->size())), index);
-				ParseUsage(usages, usage);
+		ETInlineHint ETForceInlineHint VkResult ParseOutputStates(SpirVShader& shader, const FlatbufferVector<Offset<OutputState>>* assets) ETNoexceptHint {
+			if (assets->size() > ETCountOf(shader.blending.attachments)) {
+				return VK_ERROR_FEATURE_NOT_PRESENT;
 			}
+
+			Transform(assets->begin(), assets->end(), shader.blending.attachments, [](const OutputState* asset) { return ParseColorBlendState(asset); });
+			return VK_SUCCESS;
+		}
+
+		// ---------------------------------------------------
+
+		ETInlineHint ETForceInlineHint void ParseBytecode(ArrayList<uint32>& bytecode, const FlatbufferVector<uint32>* asset) {
+			bytecode.Assign(asset->data(), asset->data() + asset->size());
+		}
+
+		// ---------------------------------------------------
+
+		ETInlineHint ETForceInlineHint VkResult ParseShader(SpirVShader& shader, Range<const uint32*> bytecode, const Shader* asset) ETNoexceptHint {
+			ET_ABORT_UNLESS(ParseRasterizationState(shader, asset->RasterizationBehavior()));
+			ET_ABORT_UNLESS(ParseOutputStates(shader, asset->Outputs()));
+			ET_ABORT_UNLESS(ParseDepthStencilState(shader, asset->DepthStencilBehavior()));
+
+			return VK_SUCCESS;
+		}
+
+		// ---------------------------------------------------
+
+		ETInlineHint ETForceInlineHint VkResult ParseShaders(SpirVShaderSetAsset::ContainerType& shaders, Range<const uint32*> bytecode, const FlatbufferVector<Offset<Shader>>* asset) {
+			for (uint32 shader(0u); shader < asset->size(); ++shader) {
+				SpirVShader asdf;
+				ET_ABORT_UNLESS(ParseShader(asdf, bytecode, asset->Get(shader)));
+				shaders.Insert(eastl::move(asdf));
+			}
+
+			return VK_SUCCESS;
 		}
 
 	} // anonymous namespace
 
-	SpirVShaderSetAsset::Usage::Usage(
-		const VkPipelineColorBlendAttachmentState (&blends)[MaxColorAttachments],
-		VkShaderStageFlagBits                         enabledShaders,
-		const VkPipelineMultisampleStateCreateInfo&   multisampleInfo,
-		const VkPipelineRasterizationStateCreateInfo& rasterizationInfo,
-		const VkPipelineDepthStencilStateCreateInfo&  depthStencilInfo) :
-		enabledShaders(enabledShaders),
-		multisampleInfo(multisampleInfo),
-		rasterizationInfo(rasterizationInfo),
-		depthStencilInfo(depthStencilInfo) {
-		CopyArrayNonTemporal(this->blends, blends);
-	}
-
-	// ---------------------------------------------------
-
 	SpirVShaderSetAsset::SpirVShaderSetAsset(StringView path) :
+		Vulkan::SpirVShaderSet(MallocAllocator("SPIR-V Shader Set Allocator")),
 		Asset(path),
-		_bytecode(MallocAllocator("SPIR-V Shader Package Bytecode Allocator")),
-		_usages(MallocAllocator("SPIR-V Shader Package Usage List Allocator")),
-		_indexByName(MallocAllocator("SPIR-V Shader Package Usage Name Table Allocator")) {}
+		_bytecode(MallocAllocator("SPIR-V Shader Package Bytecode Allocator")) {}
 
 	// ---------------------------------------------------
 
 	ErrorCode SpirVShaderSetAsset::BindResources(const Builder& asset) {
-		//	Ensure we're working with data that can plausibly represent a shader package.
+		//	Ensure we're working with data that can plausibly represent a shader set.
 		Verifier verifier(reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize());
 		if (!VerifySpirVShaderSetBuffer(verifier)) {
 			asset.WriteLog(Severity::Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath());
@@ -318,13 +284,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		ArrayList<uint32> bytecode(_bytecode.GetAllocator());
 		ParseBytecode(bytecode, GetSpirVShaderSet(asset.Begin())->Bytecode());
 
-		ArrayList<Usage>               usages(_usages.GetAllocator());
-		CachingHashMap<String, uint32> indexByName(_indexByName.GetAllocator());
-		ParseUsages(usages, indexByName, GetSpirVShaderSet(asset.Begin())->Usages());
+		const auto    shaderAsset(GetSpirVShaderSet(asset.Begin()));
+		ContainerType shaders(GetAllocator(), shaderAsset->Shaders()->size());
+		if (Failed(ParseShaders(shaders, { bytecode.GetData(), bytecode.GetData() + bytecode.GetSize() }, shaderAsset->Shaders()))) {
+			return Error::InvalidParameter;
+		}
 
+		Swap(*this, shaders);
 		Swap(_bytecode, bytecode);
-		Swap(_usages, usages);
-		Swap(_indexByName, indexByName);
 
 		return Error::None;
 	}
@@ -332,8 +299,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	// ---------------------------------------------------
 
 	void SpirVShaderSetAsset::FreeResources() {
-		_indexByName.Clear();
-		_usages.Clear();
+		Clear();
 		_bytecode.Clear();
 	}
 

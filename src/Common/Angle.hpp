@@ -17,54 +17,52 @@
 
 namespace Eldritch2 {
 
-	class Angle {
-	// - CONSTRUCTOR/DESTRUCTOR -------------------------- 
+class Angle {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
-	//!	Constructs this @ref RadianAngle instance.
-		explicit Angle( float32 angle );
-	//!	Constructs this @ref RadianAngle instance.
-		Angle( const Angle& ) = default;
-	//!	Constructs this @ref RadianAngle instance.
-		Angle() = default;
+public:
+	//!	Constructs this @ref Angle instance.
+	explicit ETConstexpr Angle(float32 radians) ETNoexceptHint;
+	//!	Constructs this @ref Angle instance.
+	ETConstexpr Angle(const Angle&) ETNoexceptHint = default;
+	//!	Constructs this @ref Angle instance.
+	Angle() ETNoexceptHint = default;
 
-		~Angle() = default;
-
-	// ---------------------------------------------------
-
-	public:
-		operator	float32() const;
+	~Angle() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		friend ETPureFunctionHint Angle	operator*( Angle left, float32 scalar );
+public:
+	ETConstexpr operator float32() const ETNoexceptHint;
 
-		friend ETPureFunctionHint Angle	operator/( Angle left, float32 scalar );
-
-		Angle&							operator*=( float32 scalar );
-
-		Angle&							operator/=( float32 scalar );
-
-	// ---------------------------------------------------
-
-	public:
-		Angle&	operator=( float32 angle );
-		Angle&	operator=( const Angle& ) = default;
+	ETConstexpr Angle& operator*=(float32) ETNoexceptHint;
+	ETConstexpr Angle& operator/=(float32) ETNoexceptHint;
+	ETConstexpr Angle& operator+=(Angle) ETNoexceptHint;
+	ETConstexpr Angle& operator-=(Angle) ETNoexceptHint;
+	ETConstexpr Angle& operator=(float32) ETNoexceptHint;
+	ETConstexpr Angle& operator=(const Angle&) ETNoexceptHint = default;
 
 	// ---------------------------------------------------
 
-	private:
-		float32	_angle;
-	};
+private:
+	float32 _radians;
+
+	// ---------------------------------------------------
+
+	friend ETConstexpr ETPureFunctionHint Angle operator*(Angle, float32)ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint Angle operator/(Angle, float32) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint Angle operator+(Angle, Angle) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint Angle operator-(Angle, Angle) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint Angle operator-(Angle) ETNoexceptHint;
+};
 
 // ---
 
-	ETPureFunctionHint Angle	AngleFromDegrees( float32 angle );
+ETConstexpr ETPureFunctionHint Angle AngleFromDegrees(float32 angle) ETNoexceptHint;
 
-	ETPureFunctionHint float32	DegreesFromAngle( Angle angle );
+ETConstexpr ETPureFunctionHint float32 DegreesFromAngle(Angle angle) ETNoexceptHint;
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

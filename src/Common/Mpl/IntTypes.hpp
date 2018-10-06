@@ -16,6 +16,7 @@
 #include <Common/Mpl/Compiler.hpp>
 //------------------------------------------------------------------//
 #include <EABase/eabase.h>
+#include <limits.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -34,5 +35,8 @@ using uintmax = uintmax_t;
 using ptrdiff = ptrdiff_t;
 using intptr  = intptr_t;
 using uintptr = uintptr_t;
+using byte    = unsigned char;
+
+ETConstexpr size_t BitsPerByte(CHAR_BIT);
 
 } // namespace Eldritch2

@@ -20,28 +20,37 @@ struct WrenVM;
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
-	class Action {
+	class Tactic {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Action instance.
-		Action(WrenHandle* action);
+		//!	Constructs this @ref Tactic instance.
+		Tactic(WrenHandle* action) ETNoexceptHint;
 		//!	Disable copy construction.
-		Action(const Action&) = delete;
-		//!	Constructs this @ref Action instance.
-		Action(Action&&);
+		Tactic(const Tactic&) = delete;
+		//!	Constructs this @ref Tactic instance.
+		Tactic(Tactic&&) ETNoexceptHint;
 
-		~Action();
+		~Tactic();
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		Tactic& operator=(const Tactic&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	protected:
 		WrenHandle* _action;
+
+		// ---------------------------------------------------
+
+		friend void Swap(Tactic&, Tactic&);
 	};
 
 	// ---
 
-	class Planner : public GoapPlanner<Action, float32> {
+	class Planner : public GoapPlanner<Tactic, float32> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:

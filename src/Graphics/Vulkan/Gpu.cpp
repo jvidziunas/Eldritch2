@@ -111,9 +111,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	// ---------------------------------------------------
 
 	Gpu::~Gpu() {
-		ET_ASSERT(_device == nullptr, "Leaking Vulkan device!");
-		ET_ASSERT(_pipelineCache == nullptr, "Leaking Vulkan pipeline cache!");
-		ET_ASSERT(_gpuAllocator == nullptr, "Leaking Vulkan GPU allocator!");
+		ET_ASSERT(_device == nullptr, "Leaking Vulkan device {}!", fmt::ptr(_device));
+		ET_ASSERT(_pipelineCache == nullptr, "Leaking Vulkan pipeline cache {}!", fmt::ptr(_pipelineCache));
+		ET_ASSERT(_gpuAllocator == nullptr, "Leaking Vulkan GPU allocator {}!", fmt::ptr(_gpuAllocator));
 	}
 
 	// ---------------------------------------------------

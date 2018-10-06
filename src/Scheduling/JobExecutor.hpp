@@ -44,7 +44,7 @@ namespace Eldritch2 { namespace Scheduling {
 
 		public:
 			//!	Constructs this @ref JobClosure instance.
-			JobClosure(JobFence& completedFence, Function<void(JobExecutor& /*executor*/)> work);
+			JobClosure(JobFence& completedFence, Function<void(JobExecutor& /*executor*/) ETNoexceptHint> work);
 			//!	Constructs this @ref JobClosure instance.
 			JobClosure(const JobClosure&) = default;
 			//!	Constructs this @ref JobClosure instance.
@@ -61,8 +61,8 @@ namespace Eldritch2 { namespace Scheduling {
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			JobFence*                    completedFence;
-			Function<void(JobExecutor&)> work;
+			JobFence*                                   completedFence;
+			Function<void(JobExecutor&) ETNoexceptHint> work;
 		};
 
 		// ---
@@ -93,16 +93,16 @@ namespace Eldritch2 { namespace Scheduling {
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			Detail::PlatformFiber           fiber;
-			Function<bool() ETNoexceptHint> shouldResume;
 #if ET_ENABLE_JOB_DEBUGGING
+			//!	Counter value used to distinguish unique wait invocations for a particular line.
+			uint64 serialNumber;
 			//!	Source file containing the wait instruction. Used for debugging deadlock/stalled task dependencies.
 			const char* file;
 			//!	Line number in the file indicating where the wait occurred. Used for debugging deadlock/stalled task dependencies.
 			int line;
-			//!	Counter value used to distinguish unique wait invocations for a particular line.
-			uint64 serialNumber;
 #endif
+			Detail::PlatformFiber           fiber;
+			Function<bool() ETNoexceptHint> shouldResume;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -118,14 +118,14 @@ namespace Eldritch2 { namespace Scheduling {
 		// ---------------------------------------------------
 
 	public:
+		void AwaitCondition_(const char* file, int line, Function<bool() ETNoexceptHint> condition);
 		template <typename... WorkItems>
-		void Await_(const char* file, int line, Function<void(JobExecutor&) ETNoexceptHint> workItem, WorkItems&&... workItems);
-		void Await_(const char* file, int line, Function<bool() ETNoexceptHint> condition);
-		void Await_(const char* file, int line, JobFence& fence);
+		void AwaitWork_(const char* file, int line, WorkItems... workItems);
+		void AwaitFence_(const char* file, int line, JobFence& fence);
 
-#define AwaitCondition(...) Await_(__FILE__, __LINE__, [&]() -> bool { return __VA_ARGS__; })
-#define AwaitFence(fence) Await_(__FILE__, __LINE__, fence)
-#define AwaitWork(...) Await_(__FILE__, __LINE__, __VA_ARGS__)
+#define AwaitCondition(...) AwaitCondition_(__FILE__, __LINE__, [&]() -> bool { return __VA_ARGS__; })
+#define AwaitFence(fence) AwaitFence_(__FILE__, __LINE__, fence)
+#define AwaitWork(...) AwaitWork_(__FILE__, __LINE__, __VA_ARGS__)
 
 		// ---------------------------------------------------
 
@@ -135,7 +135,7 @@ namespace Eldritch2 { namespace Scheduling {
 				completion time of all work items submitted in this call to @ref StartAsync(). @endparblock
 			@param[in] workItems Variadic collection of unary functors to be executed asynchronously. */
 		template <typename... WorkItems>
-		void StartAsync(JobFence& completed, Function<void(JobExecutor&) ETNoexceptHint> workItem, WorkItems&&... workItems);
+		void StartAsync(JobFence& completed, WorkItems... workItems);
 
 		template <size_t splitSize, typename InputIterator, typename OutputIterator, typename AlternateInputIterator, typename TrinaryPredicate>
 		void Transform(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, OutputIterator out, TrinaryPredicate transformer);

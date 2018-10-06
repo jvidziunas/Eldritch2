@@ -17,6 +17,7 @@
 #include <Common/Memory/MallocAllocator.hpp>
 //------------------------------------------------------------------//
 #include <eastl/bonus/tuple_vector.h>
+#include <eastl/iterator.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -30,16 +31,24 @@ private:
 
 public:
 	using AllocatorType        = typename EaStlAllocatorMixin<Allocator>::PublicType;
-	using ConstIterator        = typename UnderlyingContainer::const_iterator;
-	using Iterator             = typename UnderlyingContainer::iterator;
 	using ConstReverseIterator = typename UnderlyingContainer::const_reverse_iterator;
 	using ReverseIterator      = typename UnderlyingContainer::reverse_iterator;
+	using ConstIterator        = typename UnderlyingContainer::const_iterator;
+	using Iterator             = typename UnderlyingContainer::iterator;
 	using SizeType             = typename UnderlyingContainer::size_type;
 	using ConstPointer         = typename UnderlyingContainer::const_ptr_tuple;
 	using Pointer              = typename UnderlyingContainer::ptr_tuple;
 	using ConstReference       = typename UnderlyingContainer::const_reference_tuple;
 	using Reference            = typename UnderlyingContainer::reference_tuple;
 	using ValueType            = typename UnderlyingContainer::value_tuple;
+	template <typename Type>
+	using LocalConstIterator = const Type*;
+	template <typename Type>
+	using LocalIterator = Type*;
+	template <typename Type>
+	using LocalConstReverseIterator = eastl::reverse_iterator<const Type*>;
+	template <typename Type>
+	using LocalReverseIterator = eastl::reverse_iterator<Type*>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -58,24 +67,49 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ConstReverseIterator ConstReverseBegin() const ETNoexceptHint;
-	ConstReverseIterator ConstReverseEnd() const ETNoexceptHint;
+	template <typename Type>
+	LocalConstReverseIterator<Type> ConstReverseBegin() const ETNoexceptHint;
+	ConstReverseIterator            ConstReverseBegin() const ETNoexceptHint;
 
-	ConstReverseIterator ReverseBegin() const ETNoexceptHint;
-	ReverseIterator      ReverseBegin() ETNoexceptHint;
+	template <typename Type>
+	LocalConstReverseIterator<Type> ConstReverseEnd() const ETNoexceptHint;
+	ConstReverseIterator            ConstReverseEnd() const ETNoexceptHint;
 
-	ConstReverseIterator ReverseEnd() const ETNoexceptHint;
-	ReverseIterator      ReverseEnd() ETNoexceptHint;
+	template <typename Type>
+	LocalConstReverseIterator<Type> ReverseBegin() const ETNoexceptHint;
+	ConstReverseIterator            ReverseBegin() const ETNoexceptHint;
+	template <typename Type>
+	LocalReverseIterator<Type> ReverseBegin() ETNoexceptHint;
+	ReverseIterator            ReverseBegin() ETNoexceptHint;
 
-	ConstIterator ConstBegin() const ETNoexceptHint;
+	template <typename Type>
+	LocalConstReverseIterator<Type> ReverseEnd() const ETNoexceptHint;
+	ConstReverseIterator            ReverseEnd() const ETNoexceptHint;
+	template <typename Type>
+	LocalReverseIterator<Type> ReverseEnd() ETNoexceptHint;
+	ReverseIterator            ReverseEnd() ETNoexceptHint;
 
-	ConstIterator ConstEnd() const ETNoexceptHint;
+	template <typename Type>
+	LocalConstIterator<Type> ConstBegin() const ETNoexceptHint;
+	ConstIterator            ConstBegin() const ETNoexceptHint;
 
-	ConstIterator Begin() const ETNoexceptHint;
-	Iterator      Begin() ETNoexceptHint;
+	template <typename Type>
+	LocalConstIterator<Type> ConstEnd() const ETNoexceptHint;
+	ConstIterator            ConstEnd() const ETNoexceptHint;
 
-	ConstIterator End() const ETNoexceptHint;
-	Iterator      End() ETNoexceptHint;
+	template <typename Type>
+	LocalConstIterator<Type> Begin() const ETNoexceptHint;
+	ConstIterator            Begin() const ETNoexceptHint;
+	template <typename Type>
+	LocalIterator<Type> Begin() ETNoexceptHint;
+	Iterator            Begin() ETNoexceptHint;
+
+	template <typename Type>
+	LocalConstIterator<Type> End() const ETNoexceptHint;
+	ConstIterator            End() const ETNoexceptHint;
+	template <typename Type>
+	LocalIterator<Type> End() ETNoexceptHint;
+	Iterator            End() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -89,13 +123,12 @@ public:
 	ConstReference Back() const ETNoexceptHint;
 	Reference      Back() ETNoexceptHint;
 
+	template <typename Type>
+	const Type*  GetData() const ETNoexceptHint;
 	ConstPointer GetData() const ETNoexceptHint;
-	Pointer      GetData() ETNoexceptHint;
-
 	template <typename Type>
-	const Type* Get() const ETNoexceptHint;
-	template <typename Type>
-	Type* Get() ETNoexceptHint;
+	Type*   GetData() ETNoexceptHint;
+	Pointer GetData() ETNoexceptHint;
 
 	// ---------------------------------------------------
 

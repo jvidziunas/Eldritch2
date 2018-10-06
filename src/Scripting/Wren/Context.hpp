@@ -16,11 +16,10 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scripting { namespace Wren { namespace AssetViews {
-	class ScriptAsset;
-}}} // namespace Scripting::Wren::AssetViews
+namespace Scripting { namespace Wren {
+	class ApiBuilder;
+}} // namespace Scripting::Wren
 namespace Assets {
-	class AssetReference;
 	class AssetDatabase;
 } // namespace Assets
 } // namespace Eldritch2
@@ -34,61 +33,55 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using ClassMap = CachingHashMap<CppType, WrenHandle*, Hash<CppType>, EqualTo<CppType>, MallocAllocator>;
+		using ClassMap = CachingHashMap<CppType, WrenHandle*>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Context instance.
-		Context(const Assets::AssetDatabase& assets, Logging::Log& log);
 		//!	Disable copy construction.
 		Context(const Context&) = delete;
+		//!	Constructs this @ref Context instance.
+		Context();
 
 		~Context();
 
 		// ---------------------------------------------------
 
 	public:
-		template <size_t arity>
-		WrenHandle* GetCallStubForArity() const ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	public:
 		template <typename... Arguments>
-		void WriteLog(Logging::Severity type, StringView format, Arguments&&... arguments) const;
-		void WriteLog(const Utf8Char* const string, size_t lengthInOctets) const ETNoexceptHint;
+		bool Call(WrenHandle* receiver, Arguments... arguments);
+
+		bool Interpret(const char* source);
 
 		// ---------------------------------------------------
 
 	public:
-		template <typename CppType>
-		WrenHandle* FindForeignClass() const ETNoexceptHint;
+		WrenHandle* BindCallStub(const char* signature) ETNoexceptHint;
 
-		WrenHandle* CreateForeignClass(WrenVM* vm, StringView module, StringView name, CppType type);
-
-		void*  CreateVariable(WrenVM* vm, StringView module, StringView name, WrenHandle* wrenClass, size_t size) ETNoexceptHint;
-		double CreateVariable(WrenVM* vm, StringView module, StringView name, double value) ETNoexceptHint;
+		void Free(WrenHandle* handle) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		const AssetViews::ScriptAsset* FindScriptModule(StringView path) const ETNoexceptHint;
+		ErrorCode BindResources(const Assets::AssetDatabase& assets, Logging::Log& log, Function<void(ApiBuilder&)> apiBuilder);
 
-		// ---------------------------------------------------
-
-	public:
-		void BindResources(WrenVM* vm);
-
-		void FreeResources(WrenVM* vm);
+		void FreeResources();
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable Logging::ChildLog    _log;
+		Logging::ChildLog            _log;
 		const Assets::AssetDatabase* _assets;
-		ClassMap                     _classesByType;
-		WrenHandle*                  _callStubByArity[16];
+		WrenVM*                      _vm;
+		ClassMap                     _classByCppType;
+		WrenHandle*                  _callStubByArity[8];
+
+		// ---------------------------------------------------
+
+		template <typename Class>
+		friend void ::wrenSetSlotCppTypeHandle(WrenVM* vm, int slot) ETNoexceptHint;
+
+		friend void Swap(Context&, Context&);
 	};
 
 	// ---------------------------------------------------

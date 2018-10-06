@@ -196,6 +196,8 @@ ETPureFunctionHint bool StringsEqualCaseInsensitive(const char (&lhs)[length], c
 
 // ---------------------------------------------------
 
+ETConstexpr ETPureFunctionHint size_t GetHashCode(const void* pointer, size_t seed = 0u) ETNoexceptHint;
+
 ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t sizeInBytes, size_t seed) ETNoexceptHint;
 
 // ---------------------------------------------------
@@ -326,7 +328,7 @@ ETPureFunctionHint T* FindArrayDifference(T* ETRestrictPtrHint lhs, T* ETRestric
 template <typename T, size_t length>
 ETPureFunctionHint const T* FindArrayDifference(const T (&lhs)[length], const T (&rhs)[length]) ETNoexceptHint;
 /*!	Attempts to locate a pointer to the first 'different' element in lhs as compared to rhs.
-*	If the arrays are identical, a null pointer is returned instead. */
+ *	If the arrays are identical, a null pointer is returned instead. */
 template <typename T, size_t length>
 ETPureFunctionHint T* FindArrayDifference(T (&lhs)[length], T (&rhs)[length]) ETNoexceptHint;
 

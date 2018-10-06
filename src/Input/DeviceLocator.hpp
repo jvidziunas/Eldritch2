@@ -1,5 +1,5 @@
 /*==================================================================*\
-  InputBus.hpp
+  DeviceLocator.hpp
   ------------------------------------------------------------------
   Purpose:
 
@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Input/InputDevice.hpp>
+#include <Input/InputApi.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Input {
@@ -21,9 +21,9 @@ namespace Eldritch2 { namespace Input {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref InputBus instance.
+		//!	Constructs this @ref DeviceLocator instance.
 		DeviceLocator(const Mutex& mutex, ArrayList<InputDevice>& devices);
-		//!	Constructs this @ref InputBus instance.
+		//!	Constructs this @ref DeviceLocator instance.
 		DeviceLocator(const DeviceLocator&) = default;
 
 		~DeviceLocator() = default;
@@ -31,9 +31,8 @@ namespace Eldritch2 { namespace Input {
 		// ---------------------------------------------------
 
 	public:
-		bool TryAcquireDevice(DeviceId id, InputDevice::BindingMap bindingByCode, InputHandler& handler);
-
-		void ReleaseDevice(DeviceId id);
+		bool TryAcquireDevice(DeviceId id, InputClient& handler, InputDevice::BindingMap bindingByCode);
+		bool TryAcquireDevice(InputClient& handler, InputDevice::BindingMap bindingByCode);
 
 		// ---------------------------------------------------
 

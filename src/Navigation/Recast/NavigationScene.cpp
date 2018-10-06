@@ -8,52 +8,33 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Navigation/Recast/NavigationScene.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Navigation {
-		namespace Recast {
+namespace Eldritch2 { namespace Navigation { namespace Recast {
 
-			NavigationScene::NavigationScene(
-				int maxAgents,
-				float32 maxAgentRadius,
-				const dtNavMeshParams& meshParameters
-			) {
-				dtNavMesh::init(&meshParameters);
-				dtCrowd::init(maxAgents, maxAgentRadius, this);
-			}
+	NavigationScene::NavigationScene() ETNoexceptHint {}
 
-		// ---------------------------------------------------
+	// ---------------------------------------------------
 
-			void NavigationScene::Simulate(float32 timeDeltaMicroseconds) {
-				dtCrowd::update(timeDeltaMicroseconds, nullptr);
-			}
+	void NavigationScene::Simulate(MicrosecondTime duration) {
+		dtCrowd::update(AsSeconds(duration), /*debug =*/nullptr);
+	}
 
-		// ---------------------------------------------------
+	// ---------------------------------------------------
 
-			ETPureFunctionHint dtNavMeshParams ETSimdCall BuildMeshParameters(Vector origin, float32 tileWidth, float32 tileHeight, uint32 maxTiles, uint32 maxPolygons) {
-				dtNavMeshParams	meshParams;
-				float32			coefficients[4];
+	ErrorCode NavigationScene::BindResources(const dtNavMeshParams& meshParameters, int maxAgents, float32 agentRadius) {
+		ET_ABORT_UNLESS(dtNavMesh::init(ETAddressOf(meshParameters)) == DT_SUCCESS ? Error::None : Error::Unspecified);
+		ET_ABORT_UNLESS(dtCrowd::init(maxAgents, agentRadius, this) ? Error::None : Error::Unspecified);
 
-				origin.ExtractCoefficients(coefficients);
+		return Error::None;
+	}
 
-				meshParams.orig[0] = coefficients[0];
-				meshParams.orig[1] = coefficients[1];
-				meshParams.orig[2] = coefficients[2];
+	// ---------------------------------------------------
 
-				meshParams.tileWidth = tileWidth;
-				meshParams.tileHeight = tileHeight;
-				meshParams.maxTiles = maxTiles;
-				meshParams.maxPolys = maxPolygons;
+	void NavigationScene::FreeResources() {}
 
-				return meshParams;
-			}
-
-		}	// namespace Recast
-	}	// namespace Navigation
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Navigation::Recast

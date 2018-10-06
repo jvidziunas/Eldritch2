@@ -46,13 +46,13 @@ namespace Eldritch2 { namespace Core {
 		// - STATE INSPECTION --------------------------------
 
 	public:
-		const ComponentList<>& GetComponents() const;
+		Range<const UniquePointer<WorldComponent>*> GetComponents() const ETNoexceptHint;
 
-		Logging::Log& GetLog() const;
+		ETConstexpr Logging::Log& GetLog() const ETNoexceptHint;
 
-		float32 GetTimeScalar() const;
+		float32 GetTimeScalar() const ETNoexceptHint;
 
-		void SetTimeScalar(float32 scalar);
+		void SetTimeScalar(float32 scalar) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -62,19 +62,19 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
-		bool ShouldShutDown(MemoryOrder order = std::memory_order_consume) const;
+		bool ShouldShutDown(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
 		//!	Notifies the world that it should cease updating as soon as possible.
 		/*!	@param[in] andEngine boolean option indicating whether or not a shutdown request should be
 				placed for the owning @ref Engine as well.
 			@remarks Idempotent, thread-safe. */
-		void SetShouldShutDown(bool andEngine = false) const;
+		void SetShouldShutDown(bool andEngine = false) const ETNoexceptHint;
 
-		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const;
+		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
-		bool IsRunning(MemoryOrder order = std::memory_order_consume) const;
+		bool IsRunning(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
-		void SetShouldPause(MemoryOrder order = std::memory_order_relaxed);
+		void SetShouldPause(MemoryOrder order = std::memory_order_relaxed) ETNoexceptHint;
 
 		// ---------------------------------------------------
 

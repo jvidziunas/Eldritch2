@@ -5,7 +5,7 @@ file_extension	".spirv.e2shaderset";
 namespace Eldritch2.Graphics.Vulkan.FlatBuffers;
 
 table SpirVShaderSet {
-	Usages		: [Eldritch2.Graphics.FlatBuffers.UsageDescriptor] (required);
+	Shaders		: [Eldritch2.Graphics.FlatBuffers.Shader] (required);
 	Bytecode	: [uint] (required);
 }
 

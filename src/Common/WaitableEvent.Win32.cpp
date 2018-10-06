@@ -18,8 +18,8 @@
 
 namespace Eldritch2 {
 
-WaitableEvent::WaitableEvent(State initialState) :
-	_event(CreateEventW(nullptr, FALSE, (initialState == Signaled ? TRUE : FALSE), nullptr)) {}
+WaitableEvent::WaitableEvent(SignalState initialState) :
+	_event(CreateEventW(/*lpEventAttributes =*/nullptr, /*bManualReset =*/FALSE, (initialState == SignalState::Signaled ? TRUE : FALSE), /*lpName =*/nullptr)) {}
 
 // ---------------------------------------------------
 
@@ -29,19 +29,19 @@ WaitableEvent::~WaitableEvent() {
 
 // ---------------------------------------------------
 
-void WaitableEvent::AwaitSignal() const {
-	WaitForSingleObject(_event, INFINITE);
+void WaitableEvent::AwaitSignal() const ETNoexceptHint {
+	WaitForSingleObject(_event, /*dwMilliseconds =*/INFINITE);
 }
 
 // ---------------------------------------------------
 
-bool WaitableEvent::IsSignaled() const {
-	return WaitForSingleObject(_event, 0u) == WAIT_OBJECT_0;
+bool WaitableEvent::IsSignaled() const ETNoexceptHint {
+	return WaitForSingleObject(_event, /*dwMilliseconds =*/0u) == WAIT_OBJECT_0;
 }
 
 // ---------------------------------------------------
 
-void WaitableEvent::Signal() {
+void WaitableEvent::Signal() ETNoexceptHint {
 	SetEvent(_event);
 }
 

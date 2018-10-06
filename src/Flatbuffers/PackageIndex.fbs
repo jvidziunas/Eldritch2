@@ -9,8 +9,8 @@ table AssetDescriptor {
 	Length	: ulong;
 }
 
-table PackageIndex {
+table PackageDescriptor {
 	Assets	: [AssetDescriptor] (required);
 }
 
-root_type PackageIndex;
+root_type PackageDescriptor;

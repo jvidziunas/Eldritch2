@@ -19,27 +19,37 @@
 namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	class NavigationScene : public dtNavMesh, public dtCrowd {
+		// - TYPE PUBLISHING ---------------------------------
+
 	public:
 		enum : int { InvalidAgentId = -1 };
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref NavigationScene instance.
-		NavigationScene(int maxAgents, float32 maxAgentRadius, const dtNavMeshParams& meshParameters);
 		//!	Disable copy construction.
 		NavigationScene(const NavigationScene&) = delete;
+		//!	Constructs this @ref NavigationScene instance.
+		NavigationScene() ETNoexceptHint;
 
 		~NavigationScene() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		void Simulate(float32 timeDeltaMicroseconds);
+		void Simulate(MicrosecondTime duration);
+
+		// ---------------------------------------------------
+
+	public:
+		ErrorCode BindResources(const dtNavMeshParams& meshParameters, int maxAgents, float32 agentRadius);
+
+		void FreeResources();
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		NavigationScene& operator=(const NavigationScene&) = delete;
 	};
-
-	// ---------------------------------------------------
-
-	ETPureFunctionHint dtNavMeshParams ETSimdCall BuildMeshParameters(Vector origin, float32 tileWidth, float32 tileHeight, uint32 maxTiles, uint32 maxPolygons);
 
 }}} // namespace Eldritch2::Navigation::Recast

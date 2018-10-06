@@ -20,14 +20,23 @@ namespace Eldritch2 {
 
 class InvokeDestructor {
 public:
+	//!	Constructs this @ref InvokeDestructor instance.
+	InvokeDestructor(const InvokeDestructor&) ETNoexceptHint = default;
+	//!	Constructs this @ref InvokeDestructor instance.
+	InvokeDestructor() ETNoexceptHint = default;
+
+	~InvokeDestructor() = default;
+
+	// ---------------------------------------------------
+
+public:
 	template <typename ObjectType>
 	ETInlineHint ETForceInlineHint void operator()(ObjectType* object) const {
-		object->~ObjectType();
+		eastl::destruct(object);
 	}
-
 	template <typename ObjectType>
 	ETInlineHint ETForceInlineHint void operator()(ObjectType& object) const {
-		object.~ObjectType();
+		eastl::destruct(ETAddressOf(object));
 	}
 };
 
@@ -35,11 +44,20 @@ public:
 
 class InvokeTrivialConstructor {
 public:
+	//!	Constructs this @ref InvokeTrivialConstructor instance.
+	InvokeTrivialConstructor(const InvokeTrivialConstructor&) ETNoexceptHint = default;
+	//!	Constructs this @ref InvokeTrivialConstructor instance.
+	InvokeTrivialConstructor() ETNoexceptHint = default;
+
+	~InvokeTrivialConstructor() = default;
+
+	// ---------------------------------------------------
+
+public:
 	template <typename ObjectType>
 	ETInlineHint ETForceInlineHint void operator()(ObjectType& object) const {
 		new (ETAddressOf(object)) ObjectType();
 	}
-
 	template <typename ObjectType>
 	ETInlineHint ETForceInlineHint void operator()(ObjectType* object) const {
 		new (object) ObjectType();

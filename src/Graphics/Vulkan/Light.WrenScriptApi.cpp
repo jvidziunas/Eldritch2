@@ -16,55 +16,47 @@
 //------------------------------------------------------------------//
 
 double wrenGetSlotDouble(WrenVM* vm, int slot);
-void   wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	using namespace ::Eldritch2::Scripting::Wren;
-	using namespace ::Eldritch2::Scripting;
 
 	namespace {
 
-		struct Light : public Graphics::Light {
-			Light(Transformation localToWorld, RgbColor color, float16 radius) :
-				Graphics::Light(localToWorld, color, radius) {}
+		class Light : public Graphics::Light {
+		public:
+			//!	Constructs this @ref Light instance.
+			ETInlineHint ETForceInlineHint Light(Transformation localToWorld, RgbColor color, float16 radius) ETNoexceptHint : Graphics::Light(localToWorld, color, radius) {}
+			//! Disable copy assignment.
+			Light(const Light&) = delete;
+
+			~Light() = default;
+
+			//!	Disable copy construction.
+			Light& operator=(const Light&) = delete;
 		};
 
 	} // anonymous namespace
 
-	ET_IMPLEMENT_WREN_CLASS(Light) { // clang-format off
-		api.CreateClass<Light>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "Light",
-			{ /* Constructors */
-				ConstructorMethod("new(_,_,_)", [](WrenVM* vm) {
-					SetReturn<Light>(vm, GetSlotAs<Transformation>(vm, 2), GetSlotAs<RgbColor>(vm, 3), float16(wrenGetSlotDouble(vm, 4)));
-				})},
-			{ /* Static methods */ },
-			{ /* Properties */
-				DefineProperty("color",
-					//	Getter
-					[](WrenVM* vm) {
-						Light& self(GetSlotAs<Light>(vm, 0));
-
-						wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<RgbColor>());
-						SetReturn<RgbColor>(vm, self.color);
-					},
-					//	Setter
-					[](WrenVM* vm) {
-						GetSlotAs<Light>(vm, 0).color = GetSlotAs<RgbColor>(vm, 1);
-					}),
-				DefineProperty("localToWorld",
-					//	Getter
-					[](WrenVM* vm) {
-						Light& self(GetSlotAs<Light>(vm, 0));
-
-						wrenSetSlotHandle(vm, 0, GetContext(vm)->FindForeignClass<Transformation>());
-						SetReturn<Transformation>(vm, self.localToWorld);
-					},
-					//	Setter
-					[](WrenVM* vm) {
-						GetSlotAs<Light>(vm, 0).localToWorld = GetSlotAs<Transformation>(vm, 1);
-					})},
-			{ /* Methods */ });
-	} // clang-format on
+	ET_IMPLEMENT_WREN_CLASS(Light) {
+		api.DefineClass<Light>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "Light", // clang-format off
+			{ /* Static methods */
+				ForeignMethod("new(_,_,_)", [](WrenVM* vm) ETNoexceptHint {
+					SetReturn<Light>(vm, /*classSlot =*/0, GetSlotAs<Transformation>(vm, 2), GetSlotAs<RgbColor>(vm, 3), float16(wrenGetSlotDouble(vm, 4)));
+				}), },
+			{ /* Methods */
+				ForeignMethod("color", [](WrenVM* vm) ETNoexceptHint {
+					SetReturn<RgbColor>(vm, GetSlotAs<Light>(vm, 0).color);
+				}),
+				ForeignMethod("color=(_)", [](WrenVM* vm) ETNoexceptHint {
+					GetSlotAs<Light>(vm, 0).color = GetSlotAs<RgbColor>(vm, 1);
+				}),
+				ForeignMethod("localToWorld", [](WrenVM* vm) ETNoexceptHint {
+					SetReturn<Transformation>(vm, GetSlotAs<Light>(vm, 0).localToWorld);
+				}),
+				ForeignMethod("localToWorld=(_)", [](WrenVM* vm) ETNoexceptHint {
+					GetSlotAs<Light>(vm, 0).localToWorld = GetSlotAs<Transformation>(vm, 1);
+				}), }); // clang-format on
+	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

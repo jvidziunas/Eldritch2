@@ -22,16 +22,12 @@ namespace Eldritch2 { namespace Input {
 	using namespace ::Eldritch2::Scripting::Wren;
 
 	ET_IMPLEMENT_WREN_CLASS(DeviceLocator) {
-		// clang-format off
-		api.CreateClass<DeviceLocator>(ET_BUILTIN_WREN_MODULE_NAME(Input), "DeviceLocator",
-			{ /* Constructors */ },
+		api.DefineClass<DeviceLocator>(ET_BUILTIN_WREN_MODULE_NAME(Input), "DeviceLocator", // clang-format off
 			{ /* Static methods */ },
-			{ /* Properties */
-				DefineGetter("deviceCount", [](WrenVM* vm) {
+			{ /* Methods */
+				ForeignMethod("deviceCount", [](WrenVM* vm) ETNoexceptHint {
 					wrenSetSlotDouble(vm, 0, AsFloat64(GetSlotAs<DeviceLocator>(vm, 0).GetDeviceCount()));
-				}) },
-			{ /* Methods */ });
-		// clang-format on
+				}) }); // clang-format on
 	}
 
 }} // namespace Eldritch2::Input

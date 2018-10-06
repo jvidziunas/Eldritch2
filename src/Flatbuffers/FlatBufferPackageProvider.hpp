@@ -13,7 +13,6 @@
 // INCLUDES
 //==================================================================//
 #include <Assets/PackageDatabase.hpp>
-#include <Assets/AssetDatabase.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace FlatBuffers {
@@ -44,10 +43,6 @@ namespace Eldritch2 { namespace FlatBuffers {
 		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
 		// ---------------------------------------------------
-	public:
-		void DestroyGarbage(size_t destructionLimit);
-
-		// ---------------------------------------------------
 
 	public:
 		ErrorCode BindResources();
@@ -63,7 +58,6 @@ namespace Eldritch2 { namespace FlatBuffers {
 
 	private:
 		Assets::PackageDatabase _packageDatabase;
-		Assets::AssetDatabase   _assetDatabase;
 		Atomic<RunBehavior>     _runBehavior;
 	};
 

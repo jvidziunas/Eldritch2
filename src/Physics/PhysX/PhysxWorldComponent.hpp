@@ -28,7 +28,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	public:
 		//!	Constructs this @ref PhysXWorldComponent instance.
-		PhysxWorldComponent(const ObjectLocator& services);
+		PhysxWorldComponent(const ObjectLocator& services) ETNoexceptHint;
 		//!	Disable copy construction.
 		PhysxWorldComponent(const PhysxWorldComponent&) = delete;
 

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/AnimationTypes.hpp>
+#include <Animation/AnimationApi.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Animation { namespace AssetViews {

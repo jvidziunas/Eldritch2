@@ -13,20 +13,15 @@
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysxPointer.hpp>
-#include <Animation/AnimationTypes.hpp>
+#include <Animation/AnimationApi.hpp>
 #include <Assets/Asset.hpp>
 //------------------------------------------------------------------//
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
 ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
-#include <cloth/PxCloth.h>
+#include <cloth/PxClothTypes.h>
 #include <PxShape.h>
 ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
-
-namespace physx {
-class PxArticulation;
-class PxAggregate;
-} // namespace physx
 
 namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews {
 
@@ -40,22 +35,27 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		public:
 			//!	Constructs this @ref RigidShape instance.
 			/*!	@param[in] shape PhysX shape describing the geometry, positioning and material data for the rigid body.
-			@param[in] linkIndex Index of the actor the shape should be attached to within an aggregate. */
-			RigidShape(PhysxPointer<physx::PxShape> shape, Animation::BoneIndex linkIndex);
-			//!	Disable copy construction.
-			RigidShape(const RigidShape&) = delete;
+				@param[in] linkIndex Index of the actor the shape should be attached to within an aggregate. */
+			RigidShape(PhysxPointer<physx::PxShape> shape, Animation::BoneIndex bone);
 			//!	Constructs this @ref RigidShape instance.
 			RigidShape(RigidShape&&) ETNoexceptHint = default;
+			//!	Disable copy construction.
+			RigidShape(const RigidShape&) = delete;
 			//!	Constructs this @ref RigidShape instance.
 			RigidShape() ETNoexceptHint = default;
 
 			~RigidShape() = default;
 
+			// ---------------------------------------------------
+
+			//!	Disable copy construction.
+			RigidShape& operator=(const RigidShape&) = delete;
+
 			// - DATA MEMBERS ------------------------------------
 
 		public:
 			PhysxPointer<physx::PxShape> shape;
-			Animation::BoneIndex         linkIndex;
+			Animation::BoneIndex         bone;
 		};
 
 		// ---
@@ -65,14 +65,28 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Disable copy construction.
-			ClothShape(const ClothShape&) = delete;
+			//!	Constructs this @ref ClothShape instance.
+			ClothShape(PhysxPointer<PxClothFabric> fabric, ArrayList<PxClothParticle> particles, Animation::BoneIndex bone);
 			//!	Constructs this @ref ClothShape instance.
 			ClothShape(ClothShape&&) ETNoexceptHint = default;
+			//!	Disable copy construction.
+			ClothShape(const ClothShape&) = delete;
 			//!	Constructs this @ref ClothShape instance.
 			ClothShape() ETNoexceptHint = default;
 
 			~ClothShape() = default;
+
+			// ---------------------------------------------------
+
+			//!	Disable copy construction.
+			ClothShape& operator=(const ClothShape&) = delete;
+
+			// ---------------------------------------------------
+
+		public:
+			PhysxPointer<PxClothFabric> fabric;
+			ArrayList<PxClothParticle>  particles;
+			Animation::BoneIndex        bone;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -89,9 +103,9 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		// ---------------------------------------------------
 
 	public:
-		const ArrayList<RigidShape>& GetRigidShapes() const;
+		Range<const RigidShape*> GetRigidShapes() const ETNoexceptHint;
 
-		const ArrayList<ClothShape>& GetClothShapes() const;
+		Range<const ClothShape*> GetClothShapes() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 

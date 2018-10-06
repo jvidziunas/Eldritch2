@@ -12,12 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Assets/AssetDatabase.hpp>
 #include <Assets/Package.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 { namespace Assets {
-	class AssetDatabase;
-}} // namespace Eldritch2::Assets
 
 namespace Eldritch2 { namespace Assets {
 
@@ -25,6 +22,8 @@ namespace Eldritch2 { namespace Assets {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
+		//!	Disable copy construction.
+		PackageLoadClient(const PackageLoadClient&) = delete;
 		//!	Constructs this @ref PackageLoadClient instance.
 		PackageLoadClient() = default;
 
@@ -82,10 +81,15 @@ namespace Eldritch2 { namespace Assets {
 		// ---------------------------------------------------
 
 	public:
+		ETConstexpr AssetDatabase& GetAssetDatabase() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
 		//!	Performs an incremental garbage collection pass on the set of unreferenced asset packages.
 		/*!	@remarks @parblock Note that this function is *not* safe to be called simulaneously on multiple threads, however other methods that operate on the package set
 				may be safely called while this function is being executed. @endparblock */
-		void DestroyGarbage(AssetDatabase& assetDatabase, size_t destructionLimit);
+		void DestroyGarbage(size_t destructionLimit);
 
 		// - PACKAGE MANAGEMENT ------------------------------
 
@@ -123,11 +127,12 @@ namespace Eldritch2 { namespace Assets {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable Mutex      _requestsMutex;
-		Stack<LoadRequest> _requests;
 		mutable Mutex      _packagesMutex;
 		LoadableSet        _packages;
 		GcCursor           _gcCursor;
+		AssetDatabase      _assets;
+		mutable Mutex      _requestsMutex;
+		Stack<LoadRequest> _requests;
 	};
 
 }} // namespace Eldritch2::Assets

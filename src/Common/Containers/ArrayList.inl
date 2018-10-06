@@ -225,8 +225,8 @@ ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Append(ValueTyp
 
 template <typename Value, typename Allocator>
 template <typename... Arguments>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::EmplaceBack(Arguments&&... arguments) {
-	_container.emplace_back(eastl::forward<Arguments>(arguments)...);
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Reference ArrayList<Value, Allocator>::EmplaceBack(Arguments&&... arguments) {
+	return _container.emplace_back(eastl::forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------

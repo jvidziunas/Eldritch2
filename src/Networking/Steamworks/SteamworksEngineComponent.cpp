@@ -50,7 +50,6 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	SteamworksEngineComponent::SteamworksEngineComponent(const ObjectLocator& services) :
 		EngineComponent(services),
-		_log(FindService<Engine>()->GetLog()),
 		_steamPort(DefaultSteamPort),
 		_worldPorts(MallocAllocator("Steamworks Port Pool Allocator")),
 		_bannedIds(MallocAllocator("Steamworks Banned ID List Allocator")) {
@@ -72,6 +71,8 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	void SteamworksEngineComponent::BindConfigurableResources(JobExecutor& /*executor*/) {
 		ET_PROFILE_SCOPE("Engine/Initialization", "Steamworks initialization", 0xBBBBBB);
+		_log.BindResources(FindService<World>()->GetLog());
+
 		if (_worldPorts.IsEmpty()) {
 			_log.Write(Severity::VerboseWarning, "No world ports allocated to Steam, using range [{} - {}]." ET_NEWLINE, DefaultWorldPortBegin, DefaultWorldPortEnd);
 			_worldPorts.Assign(DefaultWorldPortBegin, DefaultWorldPortEnd);
@@ -84,7 +85,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 			return;
 		}
 
-		SteamClient()->SetLocalIPBinding(0u, _steamPort);
+		SteamClient()->SetLocalIPBinding(/*unIp =*/0u, _steamPort);
 		SteamClient()->SetWarningMessageHook([](int severity, const char* message) {
 			enum : int { SteamworksWarning = 0 };
 #if ET_PLATFORM_WINDOWS
@@ -117,7 +118,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		ET_PROFILE_SCOPE("Engine/ServiceTick", "Steamworks callback dispatch", 0xAAAAAA);
 		/*	Run callbacks only for the engine-tier Steam pipe. World components will individually maintain separate
 		 *	communication channels with the Steam client and are responsible for dispatching their own callbacks. */
-		Steam_RunCallbacks(SteamAPI_GetHSteamPipe(), false);
+		Steam_RunCallbacks(SteamAPI_GetHSteamPipe(), /*bGameServerCallbacks =*/false);
 		SteamAPI_ReleaseCurrentThreadMemory();
 	}
 

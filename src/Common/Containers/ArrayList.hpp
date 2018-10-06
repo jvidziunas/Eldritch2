@@ -183,7 +183,7 @@ public:
 	void Append(ValueType&& value);
 
 	template <typename... Arguments>
-	void EmplaceBack(Arguments&&... arguments);
+	Reference EmplaceBack(Arguments&&... arguments);
 
 	void Pop();
 

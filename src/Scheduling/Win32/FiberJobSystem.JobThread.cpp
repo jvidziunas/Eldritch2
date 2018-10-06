@@ -106,7 +106,7 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 				const JobClosure job(eastl::move(_jobs.Back()));
 				_jobs.Pop();
 				job.work(*this);
-				job.completedFence->fetch_sub(1, std::memory_order_release);
+				job.completed->fetch_sub(1, std::memory_order_release);
 
 				continue;
 			}
@@ -118,7 +118,7 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 				const auto job(FindIf(_suspendedJobs.ReverseBegin(), _suspendedJobs.ReverseEnd(), [](const SuspendedJob& job) { return job.shouldResume(); }));
 				if (job != _suspendedJobs.ReverseEnd()) {
 					const Detail::PlatformFiber fiber(job->fiber);
-					_suspendedJobs.Erase(job, UnorderedSemantics());
+					_suspendedJobs.EraseUnordered(job);
 
 					SwitchFibers(fiber);
 				}

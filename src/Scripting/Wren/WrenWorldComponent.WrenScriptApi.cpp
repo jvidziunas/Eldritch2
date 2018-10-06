@@ -22,11 +22,12 @@
 
 namespace Eldritch2 {
 namespace Scripting { namespace Wren {
+	ET_DECLARE_WREN_CLASS(ActionSetClient);
 	ET_DECLARE_WREN_CLASS(DialogueSet);
 	ET_DECLARE_WREN_CLASS(Dispatcher);
 	ET_DECLARE_WREN_CLASS(GameObject);
-	ET_DECLARE_WREN_CLASS(ActionSet);
 	ET_DECLARE_WREN_CLASS(Planner);
+	ET_DECLARE_WREN_CLASS(Game);
 
 	ET_DECLARE_WREN_CLASS(Transformation);
 	ET_DECLARE_WREN_CLASS(Quaternion);
@@ -51,16 +52,19 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		ET_REGISTER_WREN_CLASS(Vector, api);
 
 		ET_REGISTER_WREN_CLASS(AsynchronousImport, api);
+		ET_REGISTER_WREN_CLASS(ActionSetClient, api);
 		ET_REGISTER_WREN_CLASS(AssetReference, api);
 		ET_REGISTER_WREN_CLASS(ContentLocator, api);
 		ET_REGISTER_WREN_CLASS(DialogueSet, api);
 		ET_REGISTER_WREN_CLASS(Dispatcher, api);
 		ET_REGISTER_WREN_CLASS(GameObject, api);
-		ET_REGISTER_WREN_CLASS(ActionSet, api);
 		ET_REGISTER_WREN_CLASS(Planner, api);
+		ET_REGISTER_WREN_CLASS(Game, api);
 
-		_contentLocator = api.CreateVariable<ContentLocator>(ET_BUILTIN_WREN_MODULE_NAME(Core), "AllContent", FindService<AssetDatabase>());
-		_dispatcher     = api.CreateVariable<Dispatcher>(ET_BUILTIN_WREN_MODULE_NAME(Core), "Dispatcher", FindService<World>());
+		_contentLocator   = api.DefineVariable<ContentLocator>(ET_BUILTIN_WREN_MODULE_NAME(Core), "ContentLocator");
+		_requiredPackages = api.DefineVariable<AsynchronousImport>(ET_BUILTIN_WREN_MODULE_NAME(Core), "RequiredPackages");
+		_dispatcher       = api.DefineVariable<Dispatcher>(ET_BUILTIN_WREN_MODULE_NAME(Core), "Dispatcher");
+		_game             = api.DefineVariable<Game>(ET_BUILTIN_WREN_MODULE_NAME(Core), "Game");
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

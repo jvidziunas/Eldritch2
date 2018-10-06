@@ -21,17 +21,24 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref DisplayLocator instance.
-		DisplayLocator(DisplayList& displays, Mutex& mutex);
 		//!	Disable copy construction.
 		DisplayLocator(const DisplayLocator&) = delete;
+		//!	Constructs this @ref DisplayLocator instance.
+		DisplayLocator() ETNoexceptHint;
 
 		~DisplayLocator() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		UniquePointer<Viewport, ViewportDisposer> TryAcquireViewport(const GraphicsPipeline& pipeline);
+		UniquePointer<Viewport, ViewportDisposer> TryAcquireViewport(const GraphicsPipelineBuilder& pipeline);
+
+		// ---------------------------------------------------
+
+	public:
+		ErrorCode BindResources(DisplayList& displays, Mutex& mutex);
+
+		void FreeResources();
 
 		// - DATA MEMBERS ------------------------------------
 

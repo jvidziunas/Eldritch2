@@ -11,9 +11,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/PhysX/AssetViews/ArmatureAsset.hpp>
-#include <Physics/PhysX/PhysicsScene.hpp>
+#include <Physics/PhysX/AssetViews/PhysicsAsset.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
+#include <Assets/ContentLocator.hpp>
 #include <Physics/PhysX/Physics.hpp>
 #include <Animation/Armature.hpp>
 //------------------------------------------------------------------//
@@ -24,26 +24,24 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	using namespace ::Eldritch2::Physics::PhysX::AssetViews;
 	using namespace ::Eldritch2::Scripting::Wren;
-	using namespace ::Eldritch2::Scripting;
 	using namespace ::Eldritch2::Animation;
 	using namespace ::Eldritch2::Assets;
 	using namespace ::physx;
 
 	ET_IMPLEMENT_WREN_CLASS(Physics) {
-		api.CreateClass<Physics>(ET_BUILTIN_WREN_MODULE_NAME(Physics), "Physics", // clang-format off
-			{/* Constructors */
-				ConstructorMethod("new(_,_)", [](WrenVM* vm) {
-					PhysxPointer<PxArticulation> articulation(PxGetPhysics().createArticulation());
-					Armature&		             armature(GetSlotAs<Armature>(vm, 2));
+		api.DefineClass<Physics>(ET_BUILTIN_WREN_MODULE_NAME(Physics), "Physics", // clang-format off
+			{/*	Static methods */
+				ForeignMethod("new(_,_)", [](WrenVM* vm) ETNoexceptHint {
+					const PhysicsAsset*       asset(Cast<PhysicsAsset>(GetSlotAs<AssetReference>(vm, 2)));
+					PhysxPointer<PxAggregate> aggregate(PxGetPhysics().createAggregate(1u, /*enableSelfCollision =*/false));
+					ET_ABORT_WREN_UNLESS(aggregate, "Error creating PhysX aggregate.");
 
-					ET_ABORT_WREN_UNLESS(articulation, "Error creating PhysX articulation.");
+					for (const PhysicsAsset::RigidShape& shape : asset->GetRigidShapes()) {
 
-					GetSlotAs<PhysicsScene>(vm, 1).GetScene().addArticulation(*articulation);
-					SetReturn<Physics>(vm, armature.InsertClip<Physics::AnimationClip>(eastl::move(articulation), armature));
-				})
-			},
-			{/*	Static methods */ },
-			{/*	Properties */ },
+					}
+
+					SetReturn<Physics>(vm, /*classSlot =*/0, *asset, GetSlotAs<Armature>(vm, 1).InsertClip<PhysicsClip>(eastl::move(aggregate)));
+				}), },
 			{/*	Methods */ }); // clang-format on
 	}
 

@@ -13,6 +13,7 @@
 //==================================================================//
 #include <Scripting/Wren/AssetViews/ScriptAsset.hpp>
 #include <Scripting/Wren/WrenInternal.hpp>
+#include <Scripting/Wren/ApiBuilder.hpp>
 #include <Scripting/Wren/Context.hpp>
 #include <Assets/AssetDatabase.hpp>
 //------------------------------------------------------------------//
@@ -25,103 +26,32 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	using namespace ::Eldritch2::Logging;
 	using namespace ::Eldritch2::Assets;
 
-	namespace {
-
-		ETInlineHint ObjModule* CreateModule(WrenVM* vm, ObjString* name) {
-			ObjModule* const module(wrenNewModule(vm, name));
-
-			wrenPushRoot(vm, reinterpret_cast<Obj*>(module));
-			wrenMapSet(vm, vm->modules, OBJ_VAL(name), OBJ_VAL(module));
-			wrenPopRoot(vm);
-
-			return module;
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ObjModule* GetModule(WrenVM* vm, StringView moduleName) {
-			ObjString* const name(AS_STRING(wrenNewStringLength(vm, moduleName.GetData(), moduleName.GetLength())));
-
-			wrenPushRoot(vm, reinterpret_cast<Obj*>(name));
-			const Value candidate(wrenMapGet(vm->modules, OBJ_VAL(name)));
-			ObjModule*  module(candidate != UNDEFINED_VAL ? AS_MODULE(candidate) : CreateModule(vm, name));
-			wrenPopRoot(vm);
-
-			return module;
-		}
-
-	} // anonymous namespace
-
-	Context::Context(const AssetDatabase& assets, Log& log) :
-		_log(log),
-		_assets(&assets),
-		_classesByType(MallocAllocator("Wren Class By Type Allocator")),
-		_callStubByArity { nullptr } {
-	}
+	Context::Context() :
+		_assets(nullptr),
+		_classByCppType(MallocAllocator("Wren Class By Type Allocator")),
+		_callStubByArity { nullptr } {}
 
 	// ---------------------------------------------------
 
 	Context::~Context() {
 #if ET_DEBUG_BUILD
 		for (WrenHandle* stub : _callStubByArity) {
-			ET_ASSERT(stub == nullptr, "Leaking Wren call handle!");
+			ET_ASSERT(stub == nullptr, "Leaking Wren call stub {}!", fmt::ptr(stub));
 		}
 #endif
 	}
 
 	// ---------------------------------------------------
 
-	WrenHandle* Context::CreateForeignClass(WrenVM* vm, StringView module, StringView name, CppType type) {
-		ObjString* const wrenName(AS_STRING(wrenNewStringLength(vm, name.GetData(), name.GetLength())));
-
-		wrenPushRoot(vm, reinterpret_cast<Obj*>(wrenName));
-		const Value wrenClass(OBJ_VAL(wrenNewClass(vm, vm->objectClass, -1, wrenName)));
-		const int   result(wrenDefineVariable(vm, GetModule(vm, module), name.GetData(), name.GetLength(), wrenClass));
-
-		ET_ASSERT(result != -1, "Duplicate Wren class registration!");
-		ET_ASSERT(result != -2, "Error registering Wren class with module!");
-
-		WrenHandle* klass(wrenMakeHandle(vm, OBJ_VAL(wrenClass)));
-		//	Pop Wren class name.
-		wrenPopRoot(vm);
-
-		_classesByType.Emplace(type, klass);
-
-		return klass;
+	bool Context::Interpret(const char* source) {
+		return wrenInterpret(_vm, source) == WREN_RESULT_SUCCESS;
 	}
 
 	// ---------------------------------------------------
 
-	void* Context::CreateVariable(WrenVM* vm, StringView module, StringView name, WrenHandle* wrenClass, size_t size) ETNoexceptHint {
-		ObjForeign* const variable(wrenNewForeign(vm, AS_CLASS(wrenClass->value), size));
-		const int         result(wrenDefineVariable(vm, GetModule(vm, module), name.GetData(), name.GetLength(), OBJ_VAL(variable)));
+	ErrorCode Context::BindResources(const AssetDatabase& assets, Log& parentLog, Function<void(ApiBuilder&)> apiBuilder) {
+		using ::Eldritch2::Swap;
 
-		ET_ASSERT(result != -1, "Duplicate Wren variable registration!");
-		ET_ASSERT(result != -2, "Error registering Wren variable with module!");
-
-		return variable->data;
-	}
-
-	// ---------------------------------------------------
-
-	double Context::CreateVariable(WrenVM* vm, StringView module, StringView name, double value) ETNoexceptHint {
-		const int result(wrenDefineVariable(vm, GetModule(vm, module), name.GetData(), name.GetLength(), NUM_VAL(value)));
-
-		ET_ASSERT(result != -1, "Duplicate Wren variable registration!");
-		ET_ASSERT(result != -2, "Error registering Wren variable with module!");
-
-		return value;
-	}
-
-	// ---------------------------------------------------
-
-	const ScriptAsset* Context::FindScriptModule(StringView path) const ETNoexceptHint {
-		return static_cast<const ScriptAsset*>(_assets->Find(path));
-	}
-
-	// ---------------------------------------------------
-
-	void Context::BindResources(WrenVM* vm) {
 		static ETConstexpr const char* CallSignatures[ETCountOf(_callStubByArity)] = {
 			"call()",
 			"call(_)",
@@ -130,31 +60,117 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 			"call(_,_,_,_)",
 			"call(_,_,_,_,_)",
 			"call(_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_,_,_,_,_,_,_)",
-			"call(_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)"
+			"call(_,_,_,_,_,_,_)"
 		};
 
-		Transform(CallSignatures, _callStubByArity, [vm](const char* const signature) {
+		WrenConfiguration configuration;
+		wrenInitConfiguration(ETAddressOf(configuration));
+		configuration.userData            = this;
+		configuration.bindForeignClassFn  = nullptr;
+		configuration.bindForeignMethodFn = nullptr;
+		configuration.initialHeapSize     = 4u * 1024u * 1024u /* 2MB*/;
+		configuration.minHeapSize         = 2u * 1024u * 1024u /* 2MB*/;
+		configuration.reallocateFn        = [](void* previousAllocation, size_t byteSize) ETNoexceptHint {
+            return _aligned_realloc(previousAllocation, byteSize, /*alignment =*/16u);
+		};
+
+		configuration.loadModuleFn = [](WrenVM* vm, const char* module) ETNoexceptHint -> char* {
+			String path;
+			path.Append(module, FindTerminator(module)).Append(ScriptAsset::GetExtension());
+
+			const ScriptAsset* asset(static_cast<const ScriptAsset*>(GetContext(vm)->_assets->Find(path)));
+			if (!asset) {
+				return nullptr;
+			}
+
+			//	The initial script source is null-terminated, though we need to make sure to allocate room for the terminator here.
+			char* const script(static_cast<char*>(_aligned_malloc(asset->GetLength() + 1u, 16u)));
+			if (script) {
+				CopyAndTerminate(asset->Begin(), asset->End(), script, '\0');
+			}
+
+			return script;
+		};
+
+		configuration.writeFn = [](WrenVM* vm, const char* text) ETNoexceptHint {
+			GetContext(vm)->_log.Write(text, StringLength(text));
+		};
+
+		configuration.errorFn = [](WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message) ETNoexceptHint {
+			switch (type) {
+			case WREN_ERROR_COMPILE: GetContext(vm)->_log.Write(Severity::Error, "{} ({}:{})" ET_NEWLINE, message, module, line); break;
+			case WREN_ERROR_RUNTIME: GetContext(vm)->_log.Write(Severity::Error, "Wren runtime error: {}" ET_NEWLINE, message); break;
+			case WREN_ERROR_STACK_TRACE: GetContext(vm)->_log.Write(Severity::Error, "\tin {} ({}:{})" ET_NEWLINE, message, module, line); break;
+			} // switch (type)
+		};
+
+		ChildLog log;
+		ET_ABORT_UNLESS(log.BindResources(parentLog));
+
+		WrenVM* vm(wrenNewVM(ETAddressOf(configuration)));
+		ET_ABORT_UNLESS(vm ? Error::None : Error::Unspecified);
+		ET_AT_SCOPE_EXIT(if (vm) wrenFreeVM(vm));
+
+		ApiBuilder api(vm);
+		apiBuilder(api);
+
+		ClassMap classByCppType(api.ReleaseClasses());
+		ET_AT_SCOPE_EXIT(for (ClassMap::ValueType& wrenClass
+							  : classByCppType) {
+			wrenReleaseHandle(vm, wrenClass.second);
+		});
+
+		WrenHandle* callStubByArity[ETCountOf(CallSignatures)] = { nullptr };
+		ET_AT_SCOPE_EXIT(for (WrenHandle* stub
+							  : callStubByArity) {
+			if (stub) {
+				wrenReleaseHandle(vm, stub);
+			}
+		});
+		Transform(Begin(CallSignatures), End(CallSignatures), callStubByArity, [vm](const char* const signature) {
 			return wrenMakeCallHandle(vm, signature);
 		});
+
+		Swap(_log, log);
+		_assets = ETAddressOf(assets);
+		Swap(_vm, vm);
+		Swap(_classByCppType, classByCppType);
+		Swap(_callStubByArity, callStubByArity);
+
+		return Error::None;
 	}
 
 	// ---------------------------------------------------
 
-	void Context::FreeResources(WrenVM* vm) {
-		_classesByType.ClearAndDispose([vm](const Pair<CppType, WrenHandle*>& entry) {
-			wrenReleaseHandle(vm, entry.second);
+	void Context::FreeResources() {
+		for (WrenHandle*& stub : _callStubByArity) {
+			wrenReleaseHandle(_vm, eastl::exchange(stub, nullptr));
+		}
+
+		_classByCppType.ClearAndDispose([this](const Pair<CppType, WrenHandle*>& entry) {
+			wrenReleaseHandle(_vm, entry.second);
 		});
 
-		for (WrenHandle*& stub : _callStubByArity) {
-			wrenReleaseHandle(vm, eastl::exchange(stub, nullptr));
+		wrenFreeVM(eastl::exchange(_vm, nullptr));
+	}
+
+	// ---------------------------------------------------
+
+	void Swap(Context& lhs, Context& rhs) {
+		using ::Eldritch2::Swap;
+
+		Swap(lhs._log, rhs._log);
+		Swap(lhs._assets, rhs._assets);
+		Swap(lhs._vm, rhs._vm);
+		Swap(lhs._classByCppType, rhs._classByCppType);
+		Swap(lhs._callStubByArity, rhs._callStubByArity);
+
+		if (lhs._vm) {
+			wrenSetUserData(lhs._vm, ETAddressOf(lhs));
+		}
+
+		if (rhs._vm) {
+			wrenSetUserData(rhs._vm, ETAddressOf(rhs));
 		}
 	}
 

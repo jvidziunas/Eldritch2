@@ -113,8 +113,6 @@ namespace Eldritch2 { namespace Core {
 
 		void TickWorlds(Scheduling::JobExecutor& executor);
 
-		void DestroyGarbage(size_t collectionLimit);
-
 		// ---------------------------------------------------
 
 	private:

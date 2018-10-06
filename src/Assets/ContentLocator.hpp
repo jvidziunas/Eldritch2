@@ -67,7 +67,7 @@ namespace Eldritch2 { namespace Assets {
 		//!	Constructs this @ref AsynchronousImport instance.
 		AsynchronousImport();
 
-		~AsynchronousImport() = default;
+		~AsynchronousImport();
 
 		// ---------------------------------------------------
 
@@ -76,7 +76,9 @@ namespace Eldritch2 { namespace Assets {
 
 		// ---------------------------------------------------
 
-	private:
+	public:
+		ErrorCode InitiateLoad(PackageDatabase& packages, StringView path);
+
 		void CompleteLoad(CountedPointer<const Package> package, ErrorCode finalResult) ETNoexceptHint override;
 
 		// ---------------------------------------------------
@@ -87,33 +89,27 @@ namespace Eldritch2 { namespace Assets {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Atomic<size_t> _pendingLoads;
+		Atomic<size_t> _pendingLoadCount;
 		Mutex          _loadedPackagesMutex;
 		PackageList    _loadedPackages;
+
+		// ---------------------------------------------------
+
+		friend void Swap(AsynchronousImport&, AsynchronousImport&) = delete;
 	};
 
 	// ---
 
-	class ContentLocator : public PackageLoadClient {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using PackageList = ArrayList<CountedPointer<const Package>, MallocAllocator>;
-
+	class ContentLocator {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref ContentLocator instance.
-		ContentLocator(const AssetDatabase& assets, PackageDatabase& packages) ETNoexceptHint;
 		//!	Disable copy construction.
 		ContentLocator(const ContentLocator&) = delete;
+		//!	Constructs this @ref ContentLocator instance.
+		ContentLocator() ETNoexceptHint;
 
 		~ContentLocator() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		void RequirementsComplete(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -123,19 +119,9 @@ namespace Eldritch2 { namespace Assets {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode RequirePackageAsynchronous(StringView path, PackageLoadClient& client);
-
-		// ---------------------------------------------------
-
-	public:
-		ErrorCode BindResources();
+		ErrorCode BindResources(const AssetDatabase& assets, PackageDatabase& packages);
 
 		void FreeResources();
-
-		// ---------------------------------------------------
-
-	private:
-		void CompleteLoad(CountedPointer<const Package> package, ErrorCode finalResult) ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
@@ -147,8 +133,6 @@ namespace Eldritch2 { namespace Assets {
 	private:
 		const AssetDatabase* _assets;
 		PackageDatabase*     _packages;
-		Atomic<size_t>       _pendingLoads;
-		PackageList          _loadedPackages;
 	};
 
 }} // namespace Eldritch2::Assets

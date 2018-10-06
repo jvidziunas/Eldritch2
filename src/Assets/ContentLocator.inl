@@ -39,6 +39,10 @@ namespace Eldritch2 { namespace Assets {
 
 	// ---------------------------------------------------
 
+	ETInlineHint ETForceInlineHint ContentLocator::ContentLocator() ETNoexceptHint : _assets(nullptr), _packages(nullptr) {}
+
+	// ---------------------------------------------------
+
 	ETInlineHint ETForceInlineHint const Asset* ContentLocator::FindAsset(StringView path) const ETNoexceptHint {
 		return _assets->Find(path);
 	}

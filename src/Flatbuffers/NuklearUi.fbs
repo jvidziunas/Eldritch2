@@ -11,82 +11,70 @@ struct Color {
 }
 
 table ImageReference {
-	Path			: string (required);
+	Path            : string (required);
 }
 
-table TextElement {
-	TextLiteral		: string;
-	BindingPath		: string;
+table TextDescriptor {
+	TextLiteral     : string;
+	BindingPath     : string;
 }
 
-table ImageElement {
-	Image			: ImageReference (required);
+table ImageDescriptor {
+	Image           : ImageReference (required);
 }
 
-table TextButton {
-	TextLiteral		: string (required);
-	BindingPath		: string (required);
-	ClickEventName	: string;
+table ButtonDescriptor {
+	Background      : ImageReference;
+	Text            : string;
+	BindingPath     : string;
+	ClickEventName  : string;
 }
 
-table ColorButton {
-	ColorLiteral	: Color;
-	BindingPath		: string;
-	ClickEventName	: string;
-}
-
-table ImageButton {
-	Image			: ImageReference (required);
-	ClickEventName	: string;
-}
-
-table Checkbox {
+table CheckboxDescriptor {
 	BindingPath		: string (required);
 }
 
-table RadioElement {
+table RadioElementDescriptor {
 	BindingPath		: string (required);
 }
 
-table RadioSelector {
+table RadioSelectorDescriptor {
 	BindingPath		: string;
-	Elements		: [RadioElement] (required);
+	Elements		: [RadioElementDescriptor] (required);
 }
 
-table FloatSlider {
+table FloatSliderDescriptor {
 	StepValue		: float;
 	MinimumValue	: float;
 	MaximumValue	: float;
 	BindingPath		: string (required);
 }
 
-table IntSlider {
+table IntSliderDescriptor {
 	StepValue		: int;
 	MinimumValue	: int;
 	MaximumValue	: int;
 	BindingPath		: string (required);
 }
 
-table LdrColorPicker {
+table LdrColorPickerDescriptor {
 	BindingPath		: string (required);
 }
 
-table TextEditor {
+table TextEditorDescriptor {
 	BindingPath		: string (required);
 }
 
-union Widget {
-	TextElement,
-	ImageElement,
-	TextButton,
-	ColorButton,
-	ImageButton,
-	Checkbox,
-	RadioSelector,
-	FloatSlider,
-	IntSlider,
-	LdrColorPicker,
-	TextEditor
+union WidgetDescriptor {
+	TextDescriptor,
+	ImageDescriptor,
+	ButtonDescriptor,
+	CheckboxDescriptor,
+	RadioSelectorDescriptor,
+	FloatSliderDescriptor,
+	IntSliderDescriptor,
+	LdrColorPickerDescriptor,
+	TextEditorDescriptor
 }
 
 enum WindowBehaviors : uint (bit_flags) {
@@ -106,7 +94,7 @@ enum PopupType : uint {
 	Dynamic
 }
 
-table NuklearUi {
+table NuklearUiDescriptor {
 }
 
-root_type NuklearUi;
+root_type NuklearUiDescriptor;

@@ -24,16 +24,9 @@ namespace Eldritch2 { namespace Logging {
 		//!	Constructs this @ref ChildLog instance.
 		ChildLog(const ChildLog&) = delete;
 		//!	Constructs this @ref ChildLog instance.
-		ChildLog(Log& parent) ETNoexceptHint;
+		ChildLog() ETNoexceptHint;
 
 		~ChildLog() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		Log* SetParent(Log& parent) ETNoexceptHint;
-
-		Log* GetParent() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -44,12 +37,23 @@ namespace Eldritch2 { namespace Logging {
 		// ---------------------------------------------------
 
 	public:
+		ErrorCode BindResources(Log& parent);
+
+		void FreeResources();
+
+		// ---------------------------------------------------
+
+	public:
 		ChildLog& operator=(const ChildLog&) ETNoexceptHint = default;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		Log* _parent;
+
+		// ---------------------------------------------------
+
+		friend void Swap(ChildLog&, ChildLog&) ETNoexceptHint;
 	};
 
 }} // namespace Eldritch2::Logging

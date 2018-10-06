@@ -17,15 +17,24 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint ETForceInlineHint VkDescriptorSet DescriptorTable::GetDescriptorSet() const {
-		return _descriptors;
+	ETConstexpr ETInlineHint ETForceInlineHint auto DescriptorTable::GetDescriptorSetLayouts() const ETNoexceptHint -> const VkDescriptorSetLayout (&)[1] {
+		return _setLayouts;
 	}
 
 	// ---------------------------------------------------
 
-	template <uint32_t count>
-	ETInlineHint ETForceInlineHint void DescriptorTable::PushDescriptors(Gpu& gpu, uint32_t slot, const VkDescriptorImageInfo (&images)[count]) {
-		return this->PushDescriptors(gpu, slot, count, images);
+	ETConstexpr ETInlineHint ETForceInlineHint auto DescriptorTable::GetDescriptorSets() const ETNoexceptHint -> const VkDescriptorSet (&)[1] {
+		return _sets;
+	}
+
+	// ---------------------------------------------------
+
+	template <typename InputIterator>
+	ETInlineHint ETForceInlineHint void DescriptorTable::PushShaderResources(uint32_t& outSlot, InputIterator begin, InputIterator end) {
+		outSlot = _resources.GetSize();
+		while (begin != end) {
+			_resources.EmplaceBack(*begin++, VK_NULL_HANDLE);
+		}
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

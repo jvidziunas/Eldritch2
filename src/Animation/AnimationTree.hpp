@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/AnimationTypes.hpp>
+#include <Animation/AnimationApi.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -38,7 +38,7 @@ namespace Animation {
 		// ---------------------------------------------------
 
 	public:
-		const KnotCache& GetKnots() const;
+		ETConstexpr const KnotCache& GetKnots() const ETNoexceptHint;
 
 		const Blend* GetRoot() const;
 

@@ -20,18 +20,18 @@ namespace Eldritch2 { namespace Scheduling {
 
 	namespace {
 
-		static const DWORD activeFiberFlsIndex(FlsAlloc(nullptr));
+		static const DWORD ActiveFiberFlsIndex(FlsAlloc(nullptr));
 
 	} // anonymous namespace
 
-	void JobExecutor::Await_(const char* file, int line, Function<bool()> shouldResume) {
+	void JobExecutor::AwaitCondition_(const char* file, int line, Function<bool() ETNoexceptHint> shouldResume) {
 		if (shouldResume()) {
 			return;
 		}
 
 		if (_pooledFibers) {
 			_transitionTarget = _pooledFibers.Front();
-			_pooledFibers.Erase(_pooledFibers.Begin(), UnorderedSemantics());
+			_pooledFibers.EraseUnordered(_pooledFibers.Begin());
 		}
 
 		_transitionSource = SuspendedJob(file, line, GetCurrentFiber(), eastl::move(shouldResume));
@@ -43,13 +43,10 @@ namespace Eldritch2 { namespace Scheduling {
 	void JobExecutor::SwitchFibers(Detail::PlatformFiber targetFiber) {
 		_transitionTarget = targetFiber;
 		_transitionSource = SuspendedJob {
-			"",
-			-1,
-			GetCurrentFiber(),
-			[]() {
-				//	Fibers suspended via this method are considered always resumable.
-				return true;
-			}
+			/*file =*/"",
+			/*line =*/-1,
+			/*fiber =*/GetCurrentFiber(),
+			/*shouldResume =*/[]() { return true; } // Fibers suspended via this method are considered always resumable.
 		};
 
 		SwitchToFiber(_switchFiber);
@@ -90,13 +87,13 @@ namespace Eldritch2 { namespace Scheduling {
 	// ---------------------------------------------------
 
 	void JobExecutor::SetActive() {
-		FlsSetValue(activeFiberFlsIndex, this);
+		FlsSetValue(ActiveFiberFlsIndex, this);
 	}
 
 	// ---------------------------------------------------
 
 	JobExecutor* GetExecutor() ETNoexceptHint {
-		return static_cast<JobExecutor*>(FlsGetValue(activeFiberFlsIndex));
+		return static_cast<JobExecutor*>(FlsGetValue(ActiveFiberFlsIndex));
 	}
 
 }} // namespace Eldritch2::Scheduling

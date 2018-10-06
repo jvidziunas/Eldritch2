@@ -56,9 +56,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		// ---------------------------------------------------
 
 	private:
-		bool IsConnectedToSteam() const;
+		bool IsConnectedToSteam() const ETNoexceptHint;
 
-		bool ConnectToSteam();
+		ErrorCode ConnectToSteam(uint16 gamePort, uint16 queryPort);
 
 		void DisconnectFromSteam();
 

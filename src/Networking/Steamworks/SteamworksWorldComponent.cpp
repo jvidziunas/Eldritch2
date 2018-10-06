@@ -40,7 +40,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	namespace {
 
-		ETPureFunctionHint const Utf8Char* AsCString(EP2PSessionError error) {
+		ETPureFunctionHint ETForceInlineHint const Utf8Char* AsCString(EP2PSessionError error) ETNoexceptHint {
 			switch (error) {
 			case k_EP2PSessionErrorNotRunningApp: return "User not running the same application";
 			case k_EP2PSessionErrorNoRightsToApp: return "User does not have rights to use application";
@@ -52,13 +52,13 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 		// ---------------------------------------------------
 
-		ETInlineHint ISteamGameServer* GetSteamGameServer(HSteamUser user, HSteamPipe pipe) {
+		ETInlineHint ETForceInlineHint ISteamGameServer* GetSteamGameServer(HSteamUser user, HSteamPipe pipe) ETNoexceptHint {
 			return SteamClient()->GetISteamGameServer(user, pipe, STEAMGAMESERVER_INTERFACE_VERSION);
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ISteamNetworking* GetSteamNetworking(HSteamUser user, HSteamPipe pipe) {
+		ETInlineHint ETForceInlineHint ISteamNetworking* GetSteamNetworking(HSteamUser user, HSteamPipe pipe) ETNoexceptHint {
 			return SteamClient()->GetISteamNetworking(user, pipe, STEAMNETWORKING_INTERFACE_VERSION);
 		}
 
@@ -66,7 +66,6 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	SteamworksWorldComponent::SteamworksWorldComponent(const ObjectLocator& services) :
 		WorldComponent(services),
-		_log(FindService<World>()->GetLog()),
 		_connectedToSteam(false),
 		_gamePort(0u),
 		_queryPort(0u) {
@@ -81,7 +80,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 	// ---------------------------------------------------
 
 	void SteamworksWorldComponent::BindResources(JobExecutor& /*executor*/) {
-		ConnectToSteam();
+		_log.BindResources(FindService<World>()->GetLog());
+
+		ConnectToSteam(_gamePort, _queryPort);
 	}
 
 	// ---------------------------------------------------
@@ -111,9 +112,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		}
 
 		const auto networking(GetSteamNetworking(_serverUser, _pipe));
-		for (uint32 packetSize; networking->IsP2PPacketAvailable(&packetSize);) {
+		for (uint32 packetSize; networking->IsP2PPacketAvailable(ETAddressOf(packetSize));) {
 			CSteamID remoteId;
-			networking->ReadP2PPacket(nullptr, 0, &packetSize, &remoteId);
+			networking->ReadP2PPacket(nullptr, 0, ETAddressOf(packetSize), ETAddressOf(remoteId));
 		}
 	}
 
@@ -123,27 +124,26 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	// ---------------------------------------------------
 
-	bool SteamworksWorldComponent::IsConnectedToSteam() const {
+	bool SteamworksWorldComponent::IsConnectedToSteam() const ETNoexceptHint {
 		return _connectedToSteam;
 	}
 
 	// ---------------------------------------------------
 
-	bool SteamworksWorldComponent::ConnectToSteam() {
+	ErrorCode SteamworksWorldComponent::ConnectToSteam(uint16 gamePort, uint16 queryPort) {
 		enum : uint32 { AnyInboundIp = 0u };
 
 		if (IsConnectedToSteam()) {
-			return true;
+			return Error::None;
 		}
 
-		if (_gamePort == 0u || _queryPort == 0u) {
+		if (gamePort == 0u || queryPort == 0u) {
 			_log.Write(Severity::Error, "Unable to create world Steamworks presence: No ports assigned!" ET_NEWLINE);
-			return false;
+			return Error::InvalidObjectState;
 		}
 
 		HSteamPipe pipe(SteamClient()->CreateSteamPipe());
 		HSteamUser serverUser(SteamClient()->CreateLocalUser(ETAddressOf(pipe), EAccountType::k_EAccountTypeAnonGameServer));
-
 		/*	Game server callbacks *MUST* be registered here because of Valve's awful OpenGL-style hidden global state. Internally, Steam has a
 		 *	notion of an active thread-local callback list that's updated when a thread calls CreateSteamPipe(). Naive implementations that rely
 		 *	on the automatic registration in the constructor causes undefined behavior at program shutdown, since they will have been added to a list
@@ -158,9 +158,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		_clientKickRequestRecieved.Register(this, ETAddressOf(SteamworksWorldComponent::OnClientKickRequestReceived));
 
 		const auto gameServer(GetSteamGameServer(serverUser, pipe));
-		if (!gameServer->InitGameServer(AnyInboundIp, _gamePort, _queryPort, 0u, SteamUtils()->GetAppID(), "0.0.0.0")) {
+		if (!gameServer->InitGameServer(AnyInboundIp, gamePort, queryPort, /*unFlags =*/0u, SteamUtils()->GetAppID(), "0.0.0.0")) {
 			_log.Write(Severity::Error, "Unable to bind Steam game server!" ET_NEWLINE);
-			return false;
+			return Error::Unspecified;
 		}
 
 		gameServer->LogOnAnonymous();
@@ -169,7 +169,7 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		_serverUser       = serverUser;
 		_connectedToSteam = true;
 
-		return true;
+		return Error::None;
 	}
 
 	// ---------------------------------------------------

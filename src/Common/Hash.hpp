@@ -23,16 +23,16 @@ class Hash {
 
 public:
 	//!	Constructs this @ref Hash instance.
-	Hash(const Hash&) = default;
+	ETConstexpr Hash(const Hash&) ETNoexceptHint = default;
 	//!	Constructs this @ref Hash instance.
-	Hash() = default;
+	ETConstexpr Hash() ETNoexceptHint = default;
 
 	~Hash() = default;
 
 	// ---------------------------------------------------
 
 public:
-	ETPureFunctionHint size_t operator()(const T& object, size_t seed = 0u) const;
+	size_t operator()(const T& object, size_t seed = 0u) const;
 };
 
 } // namespace Eldritch2

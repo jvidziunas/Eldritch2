@@ -22,9 +22,9 @@ namespace Eldritch2 { namespace Core {
 
 	public:
 		//!	Constructs this @ref TimeAccumulator instance.
-		TimeAccumulator(uint32 targetFrameRateInHz, float32 timeScale);
+		TimeAccumulator(uint32 targetFrameRateInHz, float32 timeScale) ETNoexceptHint;
 		//!	Constructs this @ref TimeAccumulator instance.
-		TimeAccumulator(const TimeAccumulator&) = default;
+		TimeAccumulator(const TimeAccumulator&) ETNoexceptHint = default;
 
 		~TimeAccumulator() = default;
 
@@ -45,19 +45,19 @@ namespace Eldritch2 { namespace Core {
 		// ---------------------------------------------------
 
 	public:
-		uint32  GetTickDurationInMicroseconds() const;
-		float32 GetTickDurationInSeconds() const;
+		uint32  GetTickDurationInMicroseconds() const ETNoexceptHint;
+		float32 GetTickDurationInSeconds() const ETNoexceptHint;
 
-		uint32  GetTickDurationInWallMicroseconds() const;
-		float32 GetTickDurationInWallSeconds() const;
+		uint32  GetTickDurationInWallMicroseconds() const ETNoexceptHint;
+		float32 GetTickDurationInWallSeconds() const ETNoexceptHint;
 
-		void SetFixedTickFramerate(uint32 value);
+		void SetFixedTickFramerate(uint32 value) ETNoexceptHint;
 
-		float32 GetReciprocalTimeScalar() const;
+		float32 GetReciprocalTimeScalar() const ETNoexceptHint;
 
-		float32 GetTimeScalar() const;
+		float32 GetTimeScalar() const ETNoexceptHint;
 
-		void SetTimeScalar(float32 value);
+		void SetTimeScalar(float32 value) ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 

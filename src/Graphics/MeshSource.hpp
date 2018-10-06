@@ -12,83 +12,45 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/GpuFormats.hpp>
+#include <Graphics/GpuAbi.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics {
 
+	template <typename OutputIterator>
+	struct MeshElementRequest {
+		OutputIterator out;
+		uint32         first;
+		uint32         last;
+	};
+
+	// ---
+
+	template <typename Vertex>
 	class ETPureAbstractHint MeshSource {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		struct SurfaceDescription {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref SurfaceDescription instance.
-			SurfaceDescription(StringView pipeline, GpuPrimitive type, uint32 firstIndex, uint32 primitiveCount, Bounds bounds) ETNoexceptHint;
-			//!	Constructs this @ref SurfaceDescription instance.
-			SurfaceDescription(const SurfaceDescription&) ETNoexceptHint = default;
-
-			~SurfaceDescription() = default;
-
-			// - DATA MEMBERS ------------------------------------
-
-		public:
-			Utf8Char     pipelineName[64u];
-			GpuPrimitive type;
-			uint32       firstIndex;
-			uint32       primitiveCount;
-			Bounds       bounds;
-		};
-
-		// ---
-
-	public:
-		struct Description {
-			uint32 surfaceCount;
-			uint32 verticesSize;
-			uint32 indicesSize;
-		};
-
-		// ---
-
-	public:
-		struct StreamRequest {
-			uint32 firstElement;
-			uint32 byteStride;
-			void*  target;
-		};
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref MeshSource instance.
-		MeshSource(const MeshSource&) = default;
+		ETConstexpr MeshSource(const MeshSource&) ETNoexceptHint = default;
 		//!	Constructs this @ref MeshSource instance.
-		MeshSource() = default;
+		ETConstexpr MeshSource() ETNoexceptHint = default;
 
 		~MeshSource() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		virtual SurfaceDescription GetSurface(uint32 surface) const ETNoexceptHint abstract;
+		virtual MeshDescription GetDescription() const ETNoexceptHint abstract;
 
-		virtual Description GetDescription() const ETNoexceptHint abstract;
+		virtual MeshSurface GetSurface(uint32 surface) const ETNoexceptHint abstract;
 
 		// ---------------------------------------------------
 
 	public:
-		virtual void StreamVertices(const StreamRequest& request) const ETNoexceptHint abstract;
+		virtual void Stream(MeshElementRequest<StridingIterator<Vertex>> request) const ETNoexceptHint abstract;
 
-		virtual void StreamIndices(const StreamRequest& request) const ETNoexceptHint abstract;
+		virtual void Stream(MeshElementRequest<MeshIndex*> request) const ETNoexceptHint abstract;
 	};
 
 }} // namespace Eldritch2::Graphics
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Graphics/MeshSource.inl>
-//------------------------------------------------------------------//

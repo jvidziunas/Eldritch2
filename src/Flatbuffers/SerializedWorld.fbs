@@ -3,13 +3,13 @@ file_extension	".e2world";
 
 namespace Eldritch2.Core.FlatBuffers;
 
-table Property {
+table PropertyDescriptor {
 	Name	: string (required);
 	Value	: string (required);
 }
 
-table World {
-	Properties : [Property];
+table WorldDescriptor {
+	Properties : [PropertyDescriptor];
 }
 
-root_type World;
+root_type WorldDescriptor;

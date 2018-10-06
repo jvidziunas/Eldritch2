@@ -7,8 +7,7 @@ file_extension	".e2graphicspipeline";
 namespace Eldritch2.Graphics.FlatBuffers;
 
 enum AttachmentFlags : uint (bit_flags) {
-	ClearOnBegin,
-	StoreOnFinish
+	Persistent
 }
 
 enum SourceConcept : ubyte {
@@ -19,7 +18,6 @@ enum SourceConcept : ubyte {
 struct Dynamic {
 	Width  : float = 1.0;
 	Height : float = 1.0;
-	Depth  : float = 1.0;
 }
 
 struct Static {
@@ -28,29 +26,36 @@ struct Static {
 	Depth  : uint = 1;
 }
 
+struct AttachmentReference {
+	GlobalIndex : uint;
+	Mip         : uint = 0;
+	FirstSlice  : uint = 0;
+	Slices      : uint = 0xFFFFFFFF;
+}
+
 union PassDimensions {
 	Dynamic,
 	Static
 }
 
 table DrawStage {
-	Dimensions       : PassDimensions  (required);
-	ShaderUsageName  : string          (required);
-	SourceConcepts   : [SourceConcept] (required);
-	InputAttachments : [uint]          (required);
-	ColorAttachments : [uint]          (required);
-	DepthAttachment  : uint = 0x;
+	Dimensions       : PassDimensions        (required);
+	ShaderUsageName  : string                (required);
+	SourceConcepts   : [SourceConcept]       (required);
+	InputAttachments : [AttachmentReference] (required);
+	ColorAttachments : [AttachmentReference] (required);
+	DepthAttachment  : AttachmentReference;
 }
 
 table CopyStage {
-	Source : uint;
-	Target : uint;
+	Source : AttachmentReference (required);
+	Target : AttachmentReference (required);
 }
 
 table ComputeStage {
-	Dimensions  : PassDimensions (required);
-	ShaderName  : string         (required);
-	Attachments : [uint]         (required);
+	Dimensions  : PassDimensions        (required);
+	ShaderName  : string                (required);
+	Attachments : [AttachmentReference] (required);
 }
 
 union PipelineStage {
@@ -59,16 +64,16 @@ union PipelineStage {
 	ComputeStage
 }
 
-table Attachment {
+table AttachmentDescriptor {
 	Name   : string (required, key);
 	Format : GpuFormat;
 	Flags  : AttachmentFlags;
 }
 
-table GraphicsPipeline {
-	Attachments  : [Attachment]    (required);
-	SharedImages : [uint]          (required);
-	Stages       : [PipelineStage] (required);
+table GraphicsPipelineDescriptor {
+	Attachments  : [AttachmentDescriptor] (required);
+	SharedImages : [uint]                 (required);
+	Stages       : [PipelineStage]        (required);
 }
 
-root_type GraphicsPipeline;
+root_type GraphicsPipelineDescriptor;

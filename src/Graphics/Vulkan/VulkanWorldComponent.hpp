@@ -23,52 +23,58 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	class Frame {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Disable copy construction.
-		Frame(const Frame&) = delete;
-		//!	Constructs this @ref Frame instance.
-		Frame();
-
-		~Frame() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		bool IsConsumed(Gpu& gpu) const ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	public:
-		VkResult RecordCommands(Gpu& gpu, const VulkanGraphicsScene& scene);
-
-		VkResult SubmitCommands(Gpu& gpu);
-
-		// ---------------------------------------------------
-
-	public:
-		VkResult BindResources(Gpu& gpu);
-
-		void FreeResources(Gpu& gpu);
-
-		// - DATA MEMBERS ------------------------------------
-
-	public:
-		VkFence                  _drawsConsumed;
-		SoArrayList<VkSemaphore> _waits;
-		ArrayList<VkSemaphore>   _signals;
-		CommandList              _drawCommands;
-
-		// ---------------------------------------------------
-
-		friend void Swap(Frame&, Frame&);
-	};
-
-	// ---
-
 	class VulkanWorldComponent : public Core::WorldComponent {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		class Frame {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Disable copy construction.
+			Frame(const Frame&) = delete;
+			//!	Constructs this @ref Frame instance.
+			Frame();
+
+			~Frame() = default;
+
+			// ---------------------------------------------------
+
+		public:
+			bool IsConsumed(Gpu& gpu) const ETNoexceptHint;
+
+			// ---------------------------------------------------
+
+		public:
+			VkResult RecordCommands(Gpu& gpu, const VulkanGraphicsScene& scene);
+
+			VkResult SubmitCommands(Gpu& gpu) const;
+
+			// ---------------------------------------------------
+
+		public:
+			VkResult BindResources(Gpu& gpu);
+
+			void FreeResources(Gpu& gpu);
+
+			// ---------------------------------------------------
+
+			//!	Disable copy assignment.
+			Frame& operator=(const Frame&) = delete;
+
+			// - DATA MEMBERS ------------------------------------
+
+		public:
+			VkFence                                        _drawsConsumed;
+			SoArrayList<VkSemaphore, VkPipelineStageFlags> _waits;
+			ArrayList<VkSemaphore>                         _signals;
+			CommandList                                    _drawCommands;
+
+			// ---------------------------------------------------
+
+			friend void Swap(Frame&, Frame&);
+		};
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -104,8 +110,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VulkanGraphicsScene* _scene;
 		DisplayLocator*      _displays;
+		VulkanGraphicsScene* _scene;
 		Frame                _frames[2];
 	};
 

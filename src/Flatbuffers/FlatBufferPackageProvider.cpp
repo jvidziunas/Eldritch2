@@ -36,7 +36,7 @@ namespace Eldritch2 { namespace FlatBuffers {
 
 		// ---------------------------------------------------
 
-		ErrorCode DeserializeAssets(Package& package, AssetDatabase& assetDatabase, Log& log) {
+		ETInlineHint ETForceInlineHint ErrorCode DeserializeAssets(Package& package, AssetDatabase& assetDatabase, Log& log) {
 			MappedFile diskIndex, diskBlob;
 			Stopwatch  loadTimer;
 			{
@@ -78,7 +78,6 @@ namespace Eldritch2 { namespace FlatBuffers {
 	} // anonymous namespace
 
 	FlatBufferPackageProvider::FlatBufferPackageProvider() :
-		_assetDatabase(),
 		_packageDatabase(),
 		_runBehavior(Continue) {}
 
@@ -140,7 +139,7 @@ namespace Eldritch2 { namespace FlatBuffers {
 			PackageDatabase::LoadRequest request;
 
 			if (_packageDatabase.PopRequest(request)) {
-				request.callback(eastl::move(request.package), DeserializeAssets(*request.package, _assetDatabase, log));
+				request.client->CompleteLoad(eastl::move(request.package), DeserializeAssets(*request.package, _packageDatabase.GetAssetDatabase(), log));
 			}
 		}
 

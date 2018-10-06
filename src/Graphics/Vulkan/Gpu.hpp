@@ -14,7 +14,6 @@
 //==================================================================//
 #include <Graphics/Vulkan/HostMixin.hpp>
 //------------------------------------------------------------------//
-#include <vulkan/vulkan_core.h>
 #include <vk_mem_alloc.h>
 //------------------------------------------------------------------//
 
@@ -28,6 +27,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		Transfer,
 
 		QueueConcepts
+	};
+
+	// ---
+
+	enum PoolConcept : uint32 {
+		ShaderResources,
+		FramebufferAttachments,
+		StagingBuffers,
+
+		PoolConcepts
 	};
 
 	// ---
@@ -48,7 +57,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			//!	Disable copy construction.
 			CommandQueue(const CommandQueue&) = delete;
 			//!	Constructs this @ref CommandQueue instance.
-			CommandQueue();
+			CommandQueue() ETNoexceptHint;
 
 			~CommandQueue() = default;
 
@@ -89,12 +98,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		template <uint32_t count>
 		VkResult SubmitAsync(QueueConcept target, VkFence commandsConsumed, const VkSubmitInfo (&submits)[count]) ETNoexceptHint;
 
-		VkResult BindAsync(QueueConcept target, VkFence commandsConsumed, uint32_t bindCount, const VkBindSparseInfo* begin) ETNoexceptHint;
+		VkResult BindAsync(VkFence commandsConsumed, uint32_t bindCount, const VkBindSparseInfo* begin) ETNoexceptHint;
 		template <uint32_t count>
-		VkResult BindAsync(QueueConcept target, VkFence commandsConsumed, const VkBindSparseInfo (&binds)[count]) ETNoexceptHint;
+		VkResult BindAsync(VkFence commandsConsumed, const VkBindSparseInfo (&binds)[count]) ETNoexceptHint;
 
 #if VK_KHR_swapchain
-		VkResult PresentAsync(QueueConcept target, const VkPresentInfoKHR& submit) ETNoexceptHint;
+		VkResult PresentAsync(const VkPresentInfoKHR& submit) ETNoexceptHint;
 #endif // VK_KHR_swapchain
 
 		// ---------------------------------------------------
@@ -105,6 +114,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
+		template <typename HostType>
+		VkResult Map(HostType*& outBase, VmaAllocation allocation) ETNoexceptHint;
+
+		void Unmap(VmaAllocation allocation) ETNoexceptHint;
+
 		VkResult AllocateMemory(const VmaAllocationCreateInfo& allocationInfo) ETNoexceptHint;
 
 		void AddGarbage(VkBuffer buffer, VmaAllocation backing);
@@ -118,24 +132,24 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		const VkAllocationCallbacks* GetAllocationCallbacks() const ETNoexceptHint;
+		ETConstexpr const VkAllocationCallbacks* GetAllocationCallbacks() const ETNoexceptHint;
 
-		VkPipelineCache GetPipelineCache() ETNoexceptHint;
+		ETConstexpr VkPipelineCache GetPipelineCache() ETNoexceptHint;
 
-		operator VkPhysicalDevice() ETNoexceptHint;
+		ETConstexpr operator VkPhysicalDevice() ETNoexceptHint;
 
-		operator VmaAllocator() ETNoexceptHint;
+		ETConstexpr operator VmaAllocator() ETNoexceptHint;
 
-		operator VkInstance() ETNoexceptHint;
+		ETConstexpr operator VkInstance() ETNoexceptHint;
 
-		operator VkDevice() ETNoexceptHint;
+		ETConstexpr operator VkDevice() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		uint32_t GetQueueFamilyByConcept(QueueConcept concept) const ETNoexceptHint;
+		ETConstexpr uint32_t GetQueueFamilyByConcept(QueueConcept concept) const ETNoexceptHint;
 
-		bool SharesQueues(QueueConcept first, QueueConcept second) const ETNoexceptHint;
+		ETConstexpr bool RequiresSemaphore(QueueConcept first, QueueConcept second) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 

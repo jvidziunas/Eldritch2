@@ -33,18 +33,18 @@ union FactValue {
 	StringValue
 }
 
-table Criterion {
+table RuleCriterion {
 	FactName : string    (required);
 	Value    : FactValue (required);
 }
 
-table Rule {
-	Name     : string      (required);
-	Criteria : [Criterion] (required);
+table RuleDescriptor {
+	Name     : string          (required);
+	Criteria : [RuleCriterion] (required);
 }
 
-table DialogueSet {
-	Rules : [Rule] (required);
+table DialogueSetDescriptor {
+	Rules : [RuleDescriptor] (required);
 }
 
-root_type DialogueSet;
+root_type DialogueSetDescriptor;

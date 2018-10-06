@@ -22,31 +22,40 @@ using HANDLE = void*;
 
 namespace Eldritch2 {
 
+enum class SignalState {
+	Unsignaled, //!< An outside source must manually invoke @ref Signal() on this @ref WaitableEvent instance before threads waiting on it will wake up.
+	Signaled    //!< The first thread to block on this @ref WaitableEvent will immediately wake.
+};
+
+// ---
+
 class WaitableEvent {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	enum State {
-		Unsignaled, //!< An outside source must manually invoke @ref Signal() on this @ref WaitableEvent instance before threads waiting on it will wake up.
-		Signaled    //!< The first thread to block on this @ref WaitableEvent will immediately wake.
-	};
-
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref WaitableEvent instance.
-	WaitableEvent(State initialState);
+	WaitableEvent(SignalState initialState);
+	//!	Disable copy construction.
+	WaitableEvent(const WaitableEvent&) = delete;
 
 	~WaitableEvent();
 
 	// ---------------------------------------------------
 
 public:
-	void AwaitSignal() const;
+	void AwaitSignal() const ETNoexceptHint;
 
-	bool IsSignaled() const;
+	bool IsSignaled() const ETNoexceptHint;
 
-	void Signal();
+	void Signal() ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+	//!	Disable copy assignment.
+	WaitableEvent& operator=(const WaitableEvent&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 

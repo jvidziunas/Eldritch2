@@ -24,11 +24,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	UniquePointer<Viewport, ViewportDisposer> DisplayLocator::TryAcquireViewport(const GraphicsPipeline& pipeline) {
+	UniquePointer<Viewport, ViewportDisposer> DisplayLocator::TryAcquireViewport(const GraphicsPipelineBuilder& pipeline) {
 		Lock _(*_displayMutex);
-		for (auto display(_displays->Get<Display>()), end(display + _displays->GetSize()); display != end; ++display) {
-			if (const auto viewport = display->TryAcquireViewport(pipeline)) {
-				return viewport;
+		for (Display& display : Range<Display*>(_displays->Begin<Display>(), _displays->End<Display>())) {
+			for (Viewport& viewport : display.GetViewports()) {
+				if (viewport.TryAcquire(pipeline)) {
+					return ETAddressOf(viewport);
+				}
 			}
 		}
 

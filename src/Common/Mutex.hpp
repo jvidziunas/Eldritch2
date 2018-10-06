@@ -27,9 +27,9 @@ ETCacheLineAligned class Mutex {
 
 public:
 	//!	Constructs this @ref Mutex instance.
-	explicit Mutex(const Mutex&);
+	explicit Mutex(const Mutex&) ETNoexceptHint;
 	//!	Constructs this @ref Mutex instance.
-	Mutex();
+	Mutex() ETNoexceptHint;
 
 	~Mutex();
 
@@ -40,12 +40,12 @@ public:
 	/*!	@returns _True_ if read access was acquired, or _false_ if another thread currently has modification rights.
 		@remarks Unlike @ref EnterAsReader(), the function will return immediately in the event another thread has write access.
 		@see @ref EnterAsReader(), @ref LeaveAsReader(), @ref ScopedReadLock */
-	bool TryEnterAsReader() const;
+	bool TryEnterAsReader() const ETNoexceptHint;
 
 	//!	Releases shared inspection rights for a shared resource.
 	/*!	@pre Read rights should previously have been obtained for the caller via a call to one of @ref EnterAsReader() or @ref TryEnterAsReader().
 		@see @ref EnterAsReader(), @ref TryEnterAsReader() @ref ScopedReadLock */
-	void LeaveAsReader() const;
+	void LeaveAsReader() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -54,17 +54,17 @@ public:
 	/*!	@returns _True_ if exclusive write access was acquired, or _false_ if another thread currently has modification rights.
 		@remarks Unlike @ref Enter(), the function will return immediately in the event another thread has write access.
 		@see @ref Enter(), @ref Leave(), @ref ScopedLock */
-	bool TryEnter();
+	bool TryEnter() ETNoexceptHint;
 
 	//!	Releases exclusive modification rights to access a shared resource.
 	/*!	@pre Modification rights should previously have been obtained for the caller via a call to one of @ref Enter() or @ref TryEnter().
 		@see @ref Enter(), @ref TryEnter(), @ref ScopedLock */
-	void Leave();
+	void Leave() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	Mutex& operator=(const Mutex&);
+	Mutex& operator=(const Mutex&) ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -90,7 +90,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	bool IsAttachedTo(const Mutex& mutex) const;
+	bool IsAttachedTo(const Mutex& mutex) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -119,7 +119,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	bool IsAttachedTo(const Mutex& mutex) const;
+	bool IsAttachedTo(const Mutex& mutex) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 

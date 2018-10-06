@@ -34,25 +34,20 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	using namespace ::Eldritch2::Assets;
 	using namespace ::physx;
 
-	ET_IMPLEMENT_WREN_CLASS(TerrainPhysics) { // clang-format off
-		api.CreateClass<TerrainPhysics>(ET_BUILTIN_WREN_MODULE_NAME(Physics), "TerrainPhysics",
-			{ /* Constructors */
-				ConstructorMethod("new(_,_)", [](WrenVM* vm) {
+	ET_IMPLEMENT_WREN_CLASS(TerrainPhysics) {
+		api.DefineClass<TerrainPhysics>(ET_BUILTIN_WREN_MODULE_NAME(Physics), "TerrainPhysics", // clang-format off
+			{ /* Static methods */
+				ForeignMethod("new(_,_)", [](WrenVM* vm) ETNoexceptHint {
 					const TerrainAsset* const asset(Cast<TerrainAsset>(GetSlotAs<AssetReference>(vm, 2)));
-					PhysicsScene&             scene(GetSlotAs<PhysicsScene>(vm, 1));
-
 					ET_ABORT_WREN_UNLESS(asset, "Asset must be a TerrainAsset.")
 
 					PhysxPointer<PxRigidStatic> actor(PxGetPhysics().createRigidStatic(PxTransform(PxIdentity)));
 					ET_ABORT_WREN_UNLESS(actor, "Error creating PhysX actor.");
 
 					actor->attachShape(asset->GetShape());
-
 					SetReturn<TerrainPhysics>(vm, eastl::move(actor));
 				}) },
-			{ /* Static methods */},
-			{ /* Properties */},
-			{ /* Methods */});
-	} // clang-format on
+			{ /* Methods */}); // clang-format on
+	}
 
 }}} // namespace Eldritch2::Physics::PhysX

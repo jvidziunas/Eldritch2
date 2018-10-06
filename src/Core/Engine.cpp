@@ -88,7 +88,7 @@ namespace Eldritch2 { namespace Core {
 			});
 
 			//	Remove all null entries from the worlds collection.
-			_worlds.EraseIf([](UniquePointer<World>& world) { return world == nullptr; });
+			_worlds.EraseIf([](const UniquePointer<World>& world) { return world == nullptr; });
 
 			if (_worlds.IsEmpty()) {
 				_log.Write(Severity::Message, "No running worlds, shutting down engine." ET_NEWLINE);

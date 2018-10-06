@@ -17,6 +17,12 @@
 
 namespace Eldritch2 {
 
+ETConstexpr ETPureFunctionHint size_t GetHashCode(const void* pointer, size_t seed) ETNoexceptHint {
+	return uintptr(pointer) + 31u * seed;
+}
+
+// ---------------------------------------------------
+
 ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t sizeInBytes, size_t seed) ETNoexceptHint {
 	struct SizeHelper {
 		static ETCpp14Constexpr ETInlineHint ETPureFunctionHint uint64 Mix(uint64& value) ETNoexceptHint {
@@ -64,7 +70,7 @@ ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t
 
 		static ETCpp14Constexpr ETPureFunctionHint uint32 Hash(const void* buffer, size_t lengthInBytes, uint32 seed) ETNoexceptHint {
 			/*	Converts the 64-bit hash code to Fermat residue, which retains information from both the higher and
-				*	lower parts of the code. */
+			 *	lower parts of the code. */
 			const uint64 hash(Hash(buffer, lengthInBytes, uint64(seed)));
 			return uint32(hash - (hash >> 32));
 		}

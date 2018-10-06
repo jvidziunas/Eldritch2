@@ -16,6 +16,7 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class GpuImage;
 	class Gpu;
 }}} // namespace Eldritch2::Graphics::Vulkan
 
@@ -37,19 +38,22 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkDescriptorSet GetDescriptorSet() const;
+		ETConstexpr auto GetDescriptorSetLayouts() const ETNoexceptHint -> const VkDescriptorSetLayout (&)[1];
+
+		ETConstexpr auto GetDescriptorSets() const ETNoexceptHint -> const VkDescriptorSet (&)[1];
 
 		// ---------------------------------------------------
 
 	public:
-		void PushDescriptors(Gpu& gpu, uint32_t slot, uint32_t count, const VkDescriptorImageInfo* images);
-		template <uint32_t count>
-		void PushDescriptors(Gpu& gpu, uint32_t slot, const VkDescriptorImageInfo (&images)[count]);
+		template <typename InputIterator>
+		void PushShaderResources(uint32_t& outSlot, InputIterator begin, InputIterator end);
+
+		void PushToGpu(Gpu& gpu);
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkDescriptorSetLayout layout, uint32_t poolCount, const VkDescriptorPoolSize* pools);
+		VkResult BindResources(Gpu& gpu, std::initializer_list<VkDescriptorPoolSize> pools, std::initializer_list<VkDescriptorSetLayoutBinding> bindings);
 
 		void FreeResources(Gpu& gpu);
 
@@ -62,8 +66,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VkDescriptorPool _pool;
-		VkDescriptorSet  _descriptors;
+		uint32                                    _lastCurrent;
+		SoArrayList<const GpuImage*, VkImageView> _resources;
+		VkDescriptorPool                          _pool;
+		VkDescriptorSetLayout                     _setLayouts[1];
+		VkDescriptorSet                           _sets[1];
 
 		// ---------------------------------------------------
 

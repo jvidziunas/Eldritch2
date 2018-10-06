@@ -12,6 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Graphics/Vulkan/GraphicsPipeline.hpp>
 #include <Graphics/Vulkan/CommandList.hpp>
 #include <Graphics/Vulkan/Display.hpp>
 //------------------------------------------------------------------//
@@ -39,9 +40,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		DisplayList& GetDisplays() ETNoexceptHint;
+		ETConstexpr DisplayList& GetDisplays() ETNoexceptHint;
 
-		Mutex& GetDisplaysMutex() ETNoexceptHint;
+		ETConstexpr Mutex& GetDisplaysMutex() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -59,9 +60,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayMap<VkFormat, GraphicsPipeline> _compositorByFormat;
-		mutable Mutex                        _displayMutex;
-		DisplayList                          _displays;
+		HashMap<VkFormat, GraphicsPipeline> _compositorByFormat;
+		mutable Mutex                       _displayMutex;
+		DisplayList                         _displays;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

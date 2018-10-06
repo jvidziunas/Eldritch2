@@ -107,7 +107,7 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult Display::CreateSwapchain(Gpu& gpu, VkSwapchainKHR& outSwapchain) ETNoexceptHint {
+	VkResult Display::BindSwapchain(Gpu& gpu, VkSwapchainKHR& outSwapchain, VkSwapchainKHR old) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		VkSurfaceCapabilitiesKHR capabilities;
@@ -132,16 +132,21 @@ namespace Vulkan {
 			VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
 			_presentMode,
 			/*clipped =*/VK_TRUE,
-			outSwapchain
+			old
 		};
+		ET_AT_SCOPE_EXIT(vkDestroySwapchainKHR(gpu, old, gpu.GetAllocationCallbacks()));
 		ET_ABORT_UNLESS(vkCreateSwapchainKHR(gpu, ETAddressOf(swapchainInfo), gpu.GetAllocationCallbacks(), ETAddressOf(swapchain)));
-		ET_AT_SCOPE_EXIT(vkDestroySwapchainKHR(gpu, swapchain, gpu.GetAllocationCallbacks()));
 
-		Swap(outSwapchain, swapchain);
-
+		outSwapchain = swapchain;
 		_window.EnsureVisible();
 
 		return VK_SUCCESS;
+	}
+
+	// ---------------------------------------------------
+
+	void Display::FreeSwapchain(Gpu& gpu, VkSwapchainKHR swapchain) ETNoexceptHint {
+		vkDestroySwapchainKHR(gpu, swapchain, gpu.GetAllocationCallbacks());
 	}
 
 	// ---------------------------------------------------

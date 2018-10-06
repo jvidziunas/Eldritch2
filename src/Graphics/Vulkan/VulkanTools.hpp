@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/GpuFormats.hpp>
+#include <Graphics/GpuAbi.hpp>
 //------------------------------------------------------------------//
 #include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
@@ -20,76 +20,27 @@
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	extern const struct FormatDescriptor {
-		VkFormat           vkFormat;
-		VkComponentMapping swizzle;
+		VkFormat           deviceFormat;
+		VkComponentMapping shaderSwizzle;
 	} TextureFormats[size_t(GpuFormat::MAX) + 1];
 
-	// ---------------------------------------------------
+	ETCpp14Constexpr ETPureFunctionHint VkSampleCountFlagBits GetSampleCountFlags(uint32 samples) ETNoexceptHint;
 
-	ETCpp14Constexpr ETPureFunctionHint VkSubmitInfo AsSubmitInfo(uint32_t waitCount, const VkSemaphore* waits, const VkPipelineStageFlags* waitStages, uint32_t commandCount, const VkCommandBuffer* commands, uint32_t signalCount, const VkSemaphore* signals);
-	template <uint32_t count, uint32_t commandCount, uint32_t signalCount>
-	ETCpp14Constexpr ETPureFunctionHint VkSubmitInfo AsSubmitInfo(const VkSemaphore (&waits)[count], const VkPipelineStageFlags (&stages)[count], const VkCommandBuffer (&commands)[commandCount], const VkSemaphore (&signals)[signalCount]);
-	template <uint32_t commandCount, uint32_t signalCount>
-	ETCpp14Constexpr ETPureFunctionHint VkSubmitInfo AsSubmitInfo(const VkCommandBuffer (&commands)[commandCount], const VkSemaphore (&signals)[signalCount]);
-	template <uint32_t count, uint32_t commandCount>
-	ETCpp14Constexpr ETPureFunctionHint VkSubmitInfo AsSubmitInfo(const VkSemaphore (&waits)[count], const VkPipelineStageFlags (&stages)[count], const VkCommandBuffer (&commands)[commandCount]);
-	template <uint32_t count, uint32_t signalCount>
-	ETCpp14Constexpr ETPureFunctionHint VkSubmitInfo AsSubmitInfo(const VkSemaphore (&waits)[count], const VkPipelineStageFlags (&stages)[count], const VkSemaphore (&signals)[signalCount]);
-	template <uint32_t count>
-	ETCpp14Constexpr ETPureFunctionHint VkSubmitInfo AsSubmitInfo(const VkCommandBuffer (&commands)[count]);
+	ETCpp14Constexpr ETPureFunctionHint VkImageAspectFlags GetAspectsByUsage(VkImageUsageFlags usages) ETNoexceptHint;
+
+	ETCpp14Constexpr ETPureFunctionHint VkImageViewType GetViewType(VkImageCreateFlags flags, VkImageType type, uint32 layers) ETNoexceptHint;
+
+	ETConstexpr ETPureFunctionHint VkImageType GetImageType(VkExtent3D extent) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	ETCpp14Constexpr ETPureFunctionHint VkBindSparseInfo AsBindSparseInfo(
-		uint32_t                                 waitCount,
-		const VkSemaphore*                       waits,
-		uint32_t                                 bufferBindCount,
-		const VkSparseBufferMemoryBindInfo*      bufferBinds,
-		uint32_t                                 opaqueImageBindCount,
-		const VkSparseImageOpaqueMemoryBindInfo* opaqueImageBinds,
-		uint32_t                                 imageBindCount,
-		const VkSparseImageMemoryBindInfo*       imageBinds,
-		uint32_t                                 signalCount,
-		const VkSemaphore*                       signals);
-	template <uint32_t count, uint32_t signalCount>
-	ETCpp14Constexpr ETPureFunctionHint VkBindSparseInfo AsBindSparseInfo(
-		const VkSemaphore (&waits)[count],
-		uint32_t                                 bufferBindCount,
-		const VkSparseBufferMemoryBindInfo*      bufferBinds,
-		uint32_t                                 opaqueImageBindCount,
-		const VkSparseImageOpaqueMemoryBindInfo* opaqueImageBinds,
-		uint32_t                                 imageBindCount,
-		const VkSparseImageMemoryBindInfo*       imageBinds,
-		const VkSemaphore (&signals)[signalCount]);
-	template <uint32_t signalCount>
-	ETCpp14Constexpr ETPureFunctionHint VkBindSparseInfo AsBindSparseInfo(
-		uint32_t                                 bufferBindCount,
-		const VkSparseBufferMemoryBindInfo*      bufferBinds,
-		uint32_t                                 opaqueImageBindCount,
-		const VkSparseImageOpaqueMemoryBindInfo* opaqueImageBinds,
-		uint32_t                                 imageBindCount,
-		const VkSparseImageMemoryBindInfo*       imageBinds,
-		const VkSemaphore (&signals)[signalCount]);
+	ETConstexpr ETPureFunctionHint bool Succeeded(VkResult result) ETNoexceptHint;
+
+	ETConstexpr ETPureFunctionHint bool Failed(VkResult result) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	ETCpp14Constexpr ETPureFunctionHint VkSampleCountFlags GetSampleCountFlags(uint32_t sampleCount);
-
-	ETCpp14Constexpr ETPureFunctionHint VkImageAspectFlags GetAspectsByUsage(VkImageUsageFlags usages);
-
-	ETConstexpr ETPureFunctionHint VkImageType GetImageType(VkExtent3D extent);
-
-	ETConstexpr ETPureFunctionHint bool IsDepthStencilFormat(VkFormat format);
-
-	// ---------------------------------------------------
-
-	ETConstexpr ETPureFunctionHint bool Succeeded(VkResult result);
-
-	ETConstexpr ETPureFunctionHint bool Failed(VkResult result);
-
-	// ---------------------------------------------------
-
-	ETPureFunctionHint VkViewport GetViewport(VkRect2D renderArea, bool invertDepth = true);
+	ETPureFunctionHint VkViewport GetViewport(VkRect2D renderArea, bool invertDepth = true) ETNoexceptHint;
 
 }}} // namespace Eldritch2::Graphics::Vulkan
 

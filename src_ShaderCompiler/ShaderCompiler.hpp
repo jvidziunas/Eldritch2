@@ -12,8 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/PlatformString.hpp>
-#include <Common/ComPointer.hpp>
+#include <Common/Containers/Path.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
 
@@ -62,13 +61,13 @@ namespace Eldritch2 { namespace Tools {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		PlatformString<> _pipelinePath;
-		PlatformString<> _hlslPath;
-		PlatformString<> _spirvOutPath;
-		PlatformString<> _dxbcOutPath;
-		ShaderModel      _shaderModel;
-		bool             _emitSpirV;
-		bool             _emitDxbc;
+		Path        _pipelinePath;
+		Path        _hlslPath;
+		Path        _spirvOutPath;
+		Path        _dxbcOutPath;
+		ShaderModel _shaderModel;
+		bool        _emitSpirV;
+		bool        _emitDxbc;
 	};
 
 }} // namespace Eldritch2::Tools

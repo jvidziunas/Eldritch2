@@ -22,7 +22,6 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Logging;
 
 	namespace {
@@ -55,9 +54,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint VkResult CreateLogCallback(VkInstance instance, Vulkan& vulkan, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback) {
-			const auto Callback([](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*source*/, uint64_t /*object*/, size_t /*location*/, int32_t /*code*/, const char* /*layer*/, const char* message, void* vulkan) -> VkBool32 {
-				static_cast<Vulkan*>(vulkan)->WriteLog(AsSeverity(flags), "{}" ET_NEWLINE, message);
+		ETInlineHint ETForceInlineHint VkResult CreateLogCallback(VkInstance instance, Log& log, const VkAllocationCallbacks* allocator, VkDebugReportCallbackEXT* callback) {
+			const auto Callback([](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*source*/, uint64_t /*object*/, size_t /*location*/, int32_t /*code*/, const char* /*layer*/, const char* message, void* log) -> VkBool32 {
+				static_cast<Log*>(log)->Write(AsSeverity(flags), "{}" ET_NEWLINE, message);
 				if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
 					ET_TRIGGER_DEBUGBREAK();
 				}
@@ -70,7 +69,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*pNext =*/nullptr,
 				VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
 				Callback,
-				/*pUserData =*/ETAddressOf(vulkan)
+				/*pUserData =*/ETAddressOf(log)
 			};
 
 			return CreateDebugReportCallbackEXT(instance, createInfo, allocator, callback);
@@ -78,7 +77,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	} // anonymous namespace
 
-	VkResult Vulkan::Device::BindResources(VkInstance vulkan, VkPhysicalDevice device, VkDeviceSize heapBlockSize, VkDeviceSize transferBufferSize) {
+	VkResult Device::BindResources(VkInstance vulkan, VkPhysicalDevice device, VkDeviceSize heapBlockSize, VkDeviceSize transferBufferSize) {
 		ET_ABORT_UNLESS(Gpu::BindResources(vulkan, device, heapBlockSize, 2u));
 		ET_ABORT_UNLESS(ResourceBus::BindResources(*this, transferBufferSize, /*vertexCacheSize =*/256u * 1024u * 1024u, /*indexCacheSize =*/64u * 1024u * 1024u));
 		ET_ABORT_UNLESS(DisplayBus::BindResources(*this));
@@ -88,7 +87,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Vulkan::Device::FreeResources() {
+	void Device::FreeResources() {
 		DisplayBus::FreeResources(*this);
 		ResourceBus::FreeResources(*this);
 		Gpu::FreeResources();
@@ -163,7 +162,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		ET_AT_SCOPE_EXIT(vkDestroyInstance(vulkan, _allocator));
 
 		VkDebugReportCallbackEXT debugCallback;
-		if (Failed(CreateLogCallback(vulkan, *this, _allocator, ETAddressOf(debugCallback)))) {
+		if (Failed(CreateLogCallback(vulkan, _log, _allocator, ETAddressOf(debugCallback)))) {
 			_log.Write(Severity::Warning, "Unable to create Vulkan log callback, debug output will be unavailable." ET_NEWLINE);
 		}
 		ET_AT_SCOPE_EXIT(DestroyDebugReportCallbackEXT(vulkan, debugCallback, _allocator));

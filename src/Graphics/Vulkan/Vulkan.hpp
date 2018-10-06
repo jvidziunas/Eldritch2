@@ -23,38 +23,37 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	class Vulkan {
+	class Device : public Gpu, public ResourceBus, public DisplayBus {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class Device : public Gpu, public ResourceBus, public DisplayBus {
-			// - TYPE PUBLISHING ---------------------------------
-
-		public:
-			enum : VkDeviceSize {
-				HeapBlockSize      = 256u * 1024u * 1024u, /*256MB*/
-				TransferBufferSize = 128u * 1024u * 1024u, /*128MB*/
-			};
-
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Disable copy construction.
-			Device(const Device&) = delete;
-			//!	Constructs this @ref Device instance.
-			Device() = default;
-
-			~Device() = default;
-
-			// ---------------------------------------------------
-
-		public:
-			VkResult BindResources(VkInstance vulkan, VkPhysicalDevice device, VkDeviceSize heapBlockSize = HeapBlockSize, VkDeviceSize transferBufferSize = TransferBufferSize);
-
-			void FreeResources();
+		enum : VkDeviceSize {
+			HeapBlockSize      = 256u * 1024u * 1024u, /*256MB*/
+			TransferBufferSize = 128u * 1024u * 1024u, /*128MB*/
 		};
 
-		// ---
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		Device(const Device&) = delete;
+		//!	Constructs this @ref Device instance.
+		Device() = default;
+
+		~Device() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(VkInstance vulkan, VkPhysicalDevice device, VkDeviceSize heapBlockSize = HeapBlockSize, VkDeviceSize transferBufferSize = TransferBufferSize);
+
+		void FreeResources();
+	};
+
+	// ---
+
+	class Vulkan {
+		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		using HostAllocator = HostMixin<UsageMixin<MallocAllocator>>;
@@ -72,15 +71,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		template <typename... Arguments>
-		void WriteLog(Logging::Severity type, StringView format, Arguments&&... arguments) const;
+		ETConstexpr Device& GetDevice() ETNoexceptHint;
 
-		// ---------------------------------------------------
-
-	public:
-		Device& GetPrimaryDevice() ETNoexceptHint;
-
-		operator VkInstance() ETNoexceptHint;
+		ETConstexpr operator VkInstance() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

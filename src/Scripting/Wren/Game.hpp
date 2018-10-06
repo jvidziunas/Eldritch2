@@ -12,12 +12,58 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <wren.h>
+#include <Networking/WorldEventClient.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
+	class Dispatcher;
+	class Context;
+}}} // namespace Eldritch2::Scripting::Wren
 
-	class Game {
+struct WrenHandle;
+struct WrenVM;
+
+namespace Eldritch2 { namespace Scripting { namespace Wren {
+
+	class GameObject {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		GameObject(const GameObject&) = delete;
+		//!	Constructs this @ref GameObject instance.
+		GameObject();
+
+		~GameObject();
+
+		// ---------------------------------------------------
+
+	public:
+		WrenHandle* FindComponent(WrenVM* vm, WrenHandle* wrenClass) const ETNoexceptHint;
+
+		bool HasComponent(WrenVM* vm, WrenHandle* wrenClass) const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		void InsertComponent(Context& vm, WrenHandle* wrenClass);
+
+		void FreeComponents(Context& vm);
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		GameObject& operator=(const GameObject&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		ArrayList<WrenHandle*> _components;
+	};
+
+	// ---
+
+	class Game : public Networking::WorldEventClient {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -31,16 +77,16 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	public:
-		WrenInterpretResult HandlePlayerJoin(WrenVM* vm, const Utf8Char* const name);
+		void HandlePlayerJoin(Dispatcher& dispatcher, StringView name);
 
-		WrenInterpretResult HandlePlayerLeave(WrenVM* vm, const Utf8Char* const name);
+		void HandlePlayerLeave(Dispatcher& dispatcher, StringView name);
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(WrenVM* vm);
+		ErrorCode BindResources(Context& vm, Dispatcher& dispatcher);
 
-		void FreeResources(WrenVM* vm);
+		void FreeResources(Context& vm);
 
 		// ---------------------------------------------------
 
@@ -50,13 +96,14 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		WrenHandle* _game;
-
-		WrenHandle* _whenPlayerJoinsStub;
-		WrenHandle* _whenPlayerLeavesStub;
-
+		WrenHandle*            _whenPlayerJoinsStub;
+		WrenHandle*            _whenPlayerLeavesStub;
 		SymbolTable<Utf8Char>  _tags;
 		ArrayList<WrenHandle*> _gameObjects;
+
+		// ---------------------------------------------------
+
+		friend void Swap(Game&, Game&) = delete;
 	};
 
 }}} // namespace Eldritch2::Scripting::Wren

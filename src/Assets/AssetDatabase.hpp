@@ -16,7 +16,6 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Assets {
-	class AssetDatabase;
 	class Package;
 	class Asset;
 }} // namespace Eldritch2::Assets

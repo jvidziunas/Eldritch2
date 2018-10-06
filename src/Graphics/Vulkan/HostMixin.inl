@@ -29,7 +29,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint ETPureFunctionHint AllocationHeader& GetHeader(void* allocation) {
+		ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint AllocationHeader& GetHeader(void* allocation) {
 			return static_cast<AllocationHeader*>(allocation)[-1];
 		}
 
@@ -82,7 +82,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	template <class EldritchAllocator>
 	template <typename... Arguments, class /*SFINAE*/>
-	ETInlineHint HostMixin<EldritchAllocator>::HostMixin(Arguments&&... arguments) :
+	ETInlineHint ETForceInlineHint HostMixin<EldritchAllocator>::HostMixin(Arguments&&... arguments) :
 		EldritchAllocator(eastl::forward<Arguments>(arguments)...) {
 		_callbacks.pUserData             = static_cast<EldritchAllocator*>(this);
 		_callbacks.pfnAllocation         = ETAddressOf(Graphics::Vulkan::Allocate<EldritchAllocator>);
@@ -95,14 +95,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	// ---------------------------------------------------
 
 	template <class EldritchAllocator>
-	ETInlineHint ETForceInlineHint const VkAllocationCallbacks* HostMixin<EldritchAllocator>::GetCallbacks() const ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint const VkAllocationCallbacks* HostMixin<EldritchAllocator>::GetCallbacks() const ETNoexceptHint {
 		return ETAddressOf(_callbacks);
 	}
 
 	// ---------------------------------------------------
 
 	template <class EldritchAllocator>
-	ETInlineHint ETForceInlineHint HostMixin<EldritchAllocator>::operator const VkAllocationCallbacks*() const ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint HostMixin<EldritchAllocator>::operator const VkAllocationCallbacks*() const ETNoexceptHint {
 		return ETAddressOf(_callbacks);
 	}
 

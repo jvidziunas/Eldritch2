@@ -15,10 +15,8 @@
 #include <Animation/BipedalWalkClip.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Animation {
+namespace Eldritch2 { namespace Animation {
 
-		BipedalWalkClip::BipedalWalkClip() {}
+	BipedalWalkClip::BipedalWalkClip() {}
 
-	}	// namespace Animation
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Animation

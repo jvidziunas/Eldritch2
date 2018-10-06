@@ -12,9 +12,9 @@ table BlendDescriptor {
 	
 }
 
-table AnimationTree {
+table AnimationTreeDescriptor {
 	Clips	: [ClipDescriptor] (required);
 	Blends	: [BlendDescriptor] (required);
 }
 
-root_type AnimationTree;
+root_type AnimationTreeDescriptor;

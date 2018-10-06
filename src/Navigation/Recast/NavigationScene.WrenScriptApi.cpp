@@ -8,7 +8,6 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
-
 //==================================================================//
 // INCLUDES
 //==================================================================//
@@ -16,22 +15,10 @@
 #include <Scripting/Wren/ApiBuilder.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Navigation {
-		namespace Recast {
+namespace Eldritch2 { namespace Navigation { namespace Recast {
 
-			using namespace ::Eldritch2::Scripting::Wren;
-			using namespace ::Eldritch2::Scripting;
+	ET_IMPLEMENT_WREN_CLASS(NavigationScene) {
+		api.DefineClass<NavigationScene>(ET_BUILTIN_WREN_MODULE_NAME(Navigation), "NavigationSceneClass", { /* Static methods */ }, { /* Methods */ });
+	}
 
-			ET_IMPLEMENT_WREN_CLASS(NavigationScene) {
-				api.CreateClass<NavigationScene>(ET_BUILTIN_WREN_MODULE_NAME(Navigation), "NavigationSceneClass",
-												 {/* Constructors */ },
-												 {/*	Static methods */ },
-												 {/*	Properties */ },
-												 {/*	Methods */ }
-				);
-			}
-
-		}	// namespace Recast
-	}	// namespace Navigation
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Navigation::Recast

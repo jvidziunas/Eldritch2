@@ -81,9 +81,9 @@ public:
 
 public:
 	//!	Constructs this @ref IdentifierPool instance.
-	IdentifierPool(const AllocatorType& allocator, ValueType begin, ValueType end);
-	//!	Constructs this @ref IdentifierPool instance.
 	IdentifierPool(const AllocatorType& allocator, std::initializer_list<RangeType> ranges);
+	//!	Constructs this @ref IdentifierPool instance.
+	IdentifierPool(const AllocatorType& allocator, ValueType begin, ValueType end);
 	//!	Constructs this @ref IdentifierPool instance.
 	IdentifierPool(const AllocatorType& allocator);
 	//!	Constructs this @ref IdentifierPool instance.

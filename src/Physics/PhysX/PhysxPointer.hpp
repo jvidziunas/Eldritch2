@@ -20,6 +20,7 @@ class PxBase;
 }
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
+
 	namespace Detail {
 
 		class Deleter {
@@ -27,9 +28,9 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 		public:
 			//!	Constructs this @ref Deleter instance.
-			Deleter(const Deleter&) = default;
+			Deleter(const Deleter&) ETNoexceptHint = default;
 			//!	Constructs this @ref Deleter instance.
-			Deleter() = default;
+			Deleter() ETNoexceptHint = default;
 
 			~Deleter() = default;
 

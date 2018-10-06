@@ -4,9 +4,9 @@ file_extension	".dxbc.e2shaderset";
 
 namespace Eldritch2.Graphics.Direct3D.FlatBuffers;
 
-table DxbcShaderSet {
-	Usages		: [Eldritch2.Graphics.FlatBuffers.UsageDescriptor] (required);
+table DxbcShaderSetDescriptor {
+	Shaders		: [Eldritch2.Graphics.FlatBuffers.ShaderDescriptor] (required);
 	Bytecode	: [ubyte] (required);
 }
 
-root_type DxbcShaderSet;
+root_type DxbcShaderSetDescriptor;

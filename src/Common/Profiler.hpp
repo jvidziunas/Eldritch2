@@ -22,7 +22,3 @@
 #define ET_PROFILE_THREAD_END() MicroProfileOnThreadExit()
 #define ET_PROFILE_FRAME_BEGIN_CPU()
 #define ET_PROFILE_FRAME_BEGIN_GPU(context) MicroProfileFlip(context)
-
-namespace Eldritch2 {
-
-} // namespace Eldritch2

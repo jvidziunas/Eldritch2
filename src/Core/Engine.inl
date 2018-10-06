@@ -56,12 +56,6 @@ namespace Eldritch2 { namespace Core {
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void Engine::DestroyGarbage(size_t destructionLimit) {
-		_packageProvider.DestroyGarbage(destructionLimit);
-	}
-
-	// ---------------------------------------------------
-
 	template <class... Components>
 	ETInlineHint ETForceInlineHint ErrorCode Engine::BootOnCaller(Scheduling::JobExecutor& executor, Components&... clientComponents) {
 		ArrayList<EngineComponent*> components(_components.GetAllocator(), sizeof...(clientComponents));

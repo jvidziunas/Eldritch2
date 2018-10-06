@@ -29,7 +29,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	public:
 		//!	Constructs this @ref CpuDispatcher instance.
-		CpuDispatcher(physx::PxU32 taskCount);
+		CpuDispatcher(physx::PxU32 taskCount) ETNoexceptHint;
 		//!	Disable copy construction.
 		CpuDispatcher(const CpuDispatcher&) = delete;
 

@@ -22,11 +22,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	namespace {
 
 		ETInlineHint ETForceInlineHint GraphicsPipelineBuilder& BuildCompositorPipeline(GraphicsPipelineBuilder& pipeline, VkFormat backbufferFormat) {
-			pipeline.BeginPass(VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPassScale { /*width =*/1.0f, /*height =*/1.0f }, VK_SAMPLE_COUNT_1_BIT, "FramebufferComposite");
-			pipeline.AppendColorOutput(/*attachment =*/pipeline.DefineAttachment(backbufferFormat));
-			pipeline.Finish(/*andOptimize =*/false); // Skip optimization, it's assumed we know what we're doing/this is a 'trusted' source
+			pipeline.BeginPass(PassType::Compute, { /*width =*/1.0f, /*height =*/1.0f }, /*samplesPerPixel =*/1u, "FramebufferComposite");
+			pipeline.AppendColorOutput(/*attachment =*/pipeline.DefineAttachment(backbufferFormat, /*mips =*/1u, /*isPersistent =*/false));
 
-			return pipeline;
+			return pipeline.Optimize();
 		}
 
 	} // anonymous namespace
@@ -42,8 +41,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		Lock _(_displayMutex);
 
 		for (DisplayList::Reference current : _displays) {
-			if (eastl::get<VkResult&>(current) == VK_SUBOPTIMAL_KHR) {
-				ET_ABORT_UNLESS(eastl::get<Display&>(current).CreateSwapchain(gpu, eastl::get<VkSwapchainKHR&>(current)));
+			if (eastl::get<VkResult&>(current) != VK_SUCCESS) {
+				ET_ABORT_UNLESS(eastl::get<Display&>(current).BindSwapchain(gpu, eastl::get<VkSwapchainKHR&>(current), /*old =*/eastl::get<VkSwapchainKHR&>(current)));
+
+				for (Viewport& viewport : eastl::get<Display&>(current).GetViewports()) {
+					ET_ABORT_UNLESS(viewport.Resize(gpu, VkExtent2D {}, /*layers =*/1u));
+				}
 			}
 
 			const VkAcquireNextImageInfoKHR acquireInfo {
@@ -66,15 +69,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	VkResult DisplayBus::PresentSwapchainImages(Gpu& gpu) {
 		ReadLock _(_displayMutex);
-		return gpu.PresentAsync(QueueConcept::Presentation, { // clang-format off
+		return gpu.PresentAsync({ // clang-format off
 			VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 			/*pNext=*/nullptr,
 			/*waitSemaphoreCount =*/uint32(_displays.GetSize()),
-			/*pWaitSemaphores =*/_displays.Get<VkSemaphore>(),
+			/*pWaitSemaphores =*/_displays.GetData<VkSemaphore>(),
 			/*swapchainCount =*/uint32(_displays.GetSize()),
-			/*pSwapchains =*/_displays.Get<VkSwapchainKHR>(),
-			/*pImageIndices =*/_displays.Get<uint32>(),
-			/*pResults =*/_displays.Get<VkResult>() }); // clang-format on
+			/*pSwapchains =*/_displays.GetData<VkSwapchainKHR>(),
+			/*pImageIndices =*/_displays.GetData<uint32>(),
+			/*pResults =*/_displays.GetData<VkResult>() }); // clang-format on
 	}
 
 	// ---------------------------------------------------
@@ -82,12 +85,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	VkResult DisplayBus::BindResources(Gpu& gpu) {
 		static ETConstexpr VkFormat formats[] = { VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM };
 
-		ArrayMap<VkFormat, GraphicsPipeline> compositorByFormat(_compositorByFormat.GetAllocator());
-		ET_AT_SCOPE_EXIT(for (auto& compositor
+		HashMap<VkFormat, GraphicsPipeline> compositorByFormat(_compositorByFormat.GetAllocator());
+		ET_AT_SCOPE_EXIT(for (Pair<const VkFormat, GraphicsPipeline>& compositor
 							  : compositorByFormat) compositor.second.FreeResources(gpu));
 		for (VkFormat format : formats) {
 			GraphicsPipelineBuilder compositorBuilder;
-			ET_ABORT_UNLESS(compositorByFormat[format].BindResources(gpu, BuildCompositorPipeline(compositorBuilder, format)));
+			ET_ABORT_UNLESS(compositorByFormat[format].BindResources(gpu, BuildCompositorPipeline(compositorBuilder, format), /*commandPoolCount =*/2u));
 		}
 
 		Swap(_compositorByFormat, compositorByFormat);
@@ -106,7 +109,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			}
 
 			vkDestroySemaphore(gpu, eastl::get<VkSemaphore&>(display), gpu.GetAllocationCallbacks());
-			vkDestroySwapchainKHR(gpu, eastl::get<VkSwapchainKHR&>(display), gpu.GetAllocationCallbacks());
+			eastl::get<Display&>(display).FreeSwapchain(gpu, eastl::get<VkSwapchainKHR&>(display));
 			eastl::get<Display&>(display).FreeResources(gpu);
 		}
 

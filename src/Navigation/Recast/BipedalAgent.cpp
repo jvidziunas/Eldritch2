@@ -40,7 +40,6 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 	// ---------------------------------------------------
 
 	bool ETSimdCall BipedalAgent::TryBeginNavigation(NavigationScene& scene, Vector targetPosition) {
-		//	Scalars for adjusting planning characteristics.
 		static ETConstexpr float32 AgentRadius                     = 1.0f;
 		static ETConstexpr float32 AgentHeight                     = 2.0f;
 		static ETConstexpr float32 MaxAcceleration                 = 3.5f;
@@ -64,9 +63,9 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 			this
 		};
 
-		float32 coefficients[4];
+		ET16ByteAligned float32 coefficients[4];
+		StreamCoefficients(coefficients, targetPosition);
 
-		targetPosition.ExtractCoefficients(coefficients);
 		const int id(scene.addAgent(coefficients, ETAddressOf(configuration)));
 		if (id == NavigationScene::InvalidAgentId) {
 			return false;

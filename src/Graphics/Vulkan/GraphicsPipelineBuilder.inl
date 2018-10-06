@@ -17,80 +17,69 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(GraphicsPassScale desired) const ETNoexceptHint {
-		return !IsUsed() || (staticResolution == 0 && OrderBuffers(ETAddressOf(scale), ETAddressOf(desired), sizeof(desired)) == 0);
+	ETConstexpr ETInlineHint ETForceInlineHint VkAttachmentStoreOp PipelineAttachmentDescription::GetStoreOp(uint32 thisPass) const ETNoexceptHint {
+		return thisPass < lastRead ? VK_ATTACHMENT_STORE_OP_STORE : VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::SupportsResolution(VkExtent3D desired) const ETNoexceptHint {
-		return !IsUsed() || (staticResolution != 0 && OrderBuffers(ETAddressOf(resolution), ETAddressOf(desired), sizeof(desired)) == 0);
+	ETConstexpr ETInlineHint ETForceInlineHint VkAttachmentLoadOp PipelineAttachmentDescription::GetLoadOp(uint32 thisPass) const ETNoexceptHint {
+		return thisPass > firstWrite ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::ShouldPreserve(uint32 pass) const ETNoexceptHint {
-		return isPersistent || (firstWrite < pass && pass < lastRead);
+	ETConstexpr ETInlineHint ETForceInlineHint bool PipelineAttachmentDescription::IsUsed() const ETNoexceptHint {
+		return usages != 0u;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsWritten() const ETNoexceptHint {
-		return firstWrite <= lastWrite;
+	ETInlineHint ETForceInlineHint Range<const PipelineAttachmentDescription*> GraphicsPipelineBuilder::GetAttachments() const ETNoexceptHint {
+		return { _attachments.Begin(), _attachments.End() };
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsRead() const ETNoexceptHint {
-		return firstRead <= lastRead;
+	ETInlineHint ETForceInlineHint Range<const PipelineBufferDescription*> GraphicsPipelineBuilder::GetBuffers() const ETNoexceptHint {
+		return { _buffers.Begin(), _buffers.End() };
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool GraphicsPipelineBuilder::AttachmentDescription::IsUsed() const ETNoexceptHint {
-		return IsWritten() | IsRead();
+	ETInlineHint ETForceInlineHint Range<const PipelinePassDescription*> GraphicsPipelineBuilder::GetPasses() const ETNoexceptHint {
+		return { _passes.Begin(), _passes.End() };
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint const GraphicsPipelineBuilder::PassDescription& GraphicsPipelineBuilder::operator[](uint32 pass) const ETNoexceptHint {
-		return _passes[pass];
+	ETInlineHint ETForceInlineHint uint32 GraphicsPipelineBuilder::DefineAttachment(VkFormat format, uint32 mips, bool isPersistent) {
+		return _attachments.EmplaceBack(format, mips, isPersistent), uint32(_attachments.GetSize() - 1u);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint uint32 GraphicsPipelineBuilder::GetPassCount() const ETNoexceptHint {
-		return uint32(_passes.GetSize());
+	template <typename Pass, typename... AdditionalPasses>
+	ETInlineHint ETForceInlineHint GraphicsPipelineBuilder& GraphicsPipelineBuilder::Optimize(Pass pass, AdditionalPasses... passes) {
+		return pass(_attachments, _buffers, _passes), Optimize(eastl::move(passes)...);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint const GraphicsPipelineBuilder::AttachmentDescription& GraphicsPipelineBuilder::GetAttachment(uint32 attachment) const ETNoexceptHint {
-		return _attachments[attachment];
+	ETInlineHint ETForceInlineHint GraphicsPipelineBuilder& GraphicsPipelineBuilder::Optimize() {
+		/* This space intentionally blank.*/
+		return *this;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint uint32 GraphicsPipelineBuilder::GetAttachmentCount() const ETNoexceptHint {
-		return uint32(_attachments.GetSize());
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint uint32 GraphicsPipelineBuilder::DefineAttachment(VkFormat format) {
-		_attachments.EmplaceBack(format);
-		return uint32(_attachments.GetSize() - 1u);
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator==(const GraphicsPipelineBuilder::AttachmentReference& lhs, const GraphicsPipelineBuilder::AttachmentReference& rhs) {
+	ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator==(const PipelineAttachmentReference& lhs, const PipelineAttachmentReference& rhs) {
 		return lhs.globalIndex == rhs.globalIndex;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator!=(const GraphicsPipelineBuilder::AttachmentReference& lhs, const GraphicsPipelineBuilder::AttachmentReference& rhs) {
+	ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator!=(const PipelineAttachmentReference& lhs, const PipelineAttachmentReference& rhs) {
 		return !(lhs == rhs);
 	}
 

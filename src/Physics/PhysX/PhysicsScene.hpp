@@ -15,12 +15,11 @@
 #include <Physics/PhysX/PhysXPointer.hpp>
 //------------------------------------------------------------------//
 /*	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does.
- *		We can't fix this, but we can at least disable the warning. */
+ *	We can't fix this, but we can at least disable the warning. */
 ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <characterkinematic/PxControllerManager.h>
 #include <PxContactModifyCallback.h>
 #include <PxQueryReport.h>
-#include <PxFiltering.h>
 #include <PxMaterial.h>
 #include <PxScene.h>
 ET_POP_MSVC_WARNING_STATE()
@@ -28,18 +27,23 @@ ET_POP_MSVC_WARNING_STATE()
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
+	enum KnownMaterial {
+		Trigger,
+		Character,
+
+		KnownMaterials
+	};
+
+	// ---
+
 	class PhysicsScene : public physx::PxContactModifyCallback {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref PhysicsScene instance.
-		PhysicsScene(
-			PhysxPointer<physx::PxScene>             scene,
-			PhysxPointer<physx::PxControllerManager> controllerManager,
-			PhysxPointer<physx::PxMaterial>          characterMaterial,
-			PhysxPointer<physx::PxMaterial>          triggerMaterial);
 		//! Disable copy construction.
 		PhysicsScene(const PhysicsScene&) = delete;
+		//! Constructs this @ref PhysicsScene instance.
+		PhysicsScene() ETNoexceptHint;
 
 		~PhysicsScene() = default;
 
@@ -61,41 +65,30 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode StartSimulation(physx::PxReal duration);
+		void Simulate(MicrosecondTime duration);
 
 		ErrorCode FinishSimulation();
+
+		// ---------------------------------------------------
+
+	public:
+		ErrorCode BindResources(physx::PxCpuDispatcher& dispatcher);
+
+		void FreeResources();
 
 		// - PXCONTACTMODIFYCALLBACK METHODS -----------------
 
 	private:
 		void onContactModify(physx::PxContactModifyPair* const pairs, physx::PxU32 count) override;
 
-		// ---------------------------------------------------
-
-	public:
-		static physx::PxFilterFlags FilterShader(
-			physx::PxFilterObjectAttributes lhsAttributes,
-			physx::PxFilterData             lhsFilter,
-			physx::PxFilterObjectAttributes rhsAttributes,
-			physx::PxFilterData             rhsFilter,
-			physx::PxPairFlags&             flags,
-			const void*                     constants,
-			physx::PxU32                    constantsSize);
-
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		PhysxPointer<physx::PxScene>             _scene;
 		PhysxPointer<physx::PxControllerManager> _controllerManager;
-		PhysxPointer<physx::PxMaterial>          _characterMaterial;
-		PhysxPointer<physx::PxMaterial>          _triggerMaterial;
-		ET16ByteAligned char                     _scratchMemory[16384u /* 16KB*/];
+		PhysxPointer<physx::PxMaterial>          _knownMaterials[KnownMaterials];
+		ET16ByteAligned char                     _scratchMemory[16384];
 	};
-
-	// ---
-
-	PhysxPointer<physx::PxMaterial> MakeCharacterMaterial();
-	PhysxPointer<physx::PxMaterial> MakeTriggerMaterial();
 
 	// ---
 

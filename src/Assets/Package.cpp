@@ -26,13 +26,13 @@ namespace Eldritch2 { namespace Assets {
 	// ---------------------------------------------------
 
 	Package::~Package() {
-		ET_ASSERT(!IsLoaded(), "Package contains assets! Call FreeAssets() before the package is destroyed!");
+		ET_ASSERT(!IsLoaded(), "Package {} contains assets! Call FreeAssets() before the package is destroyed!", GetPath());
 	}
 
 	// ---------------------------------------------------
 
 	void Package::BindAssets(AssetList assets) {
-		ET_ASSERT(!IsLoaded(), "Package contains assets! Call FreeAssets() before binding a new asset list!");
+		ET_ASSERT(!IsLoaded(), "Package {} contains assets! Call FreeAssets() before binding a new asset list!", GetPath());
 
 		assets.ShrinkToFit();
 		Swap(_assets, assets);

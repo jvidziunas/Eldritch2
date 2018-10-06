@@ -31,11 +31,16 @@ namespace Eldritch2 { namespace Animation {
 		// ---------------------------------------------------
 
 	public:
-		Transformation ETSimdCall GetLocalToWorld() const;
+		Transformation ETSimdCall GetLocalToWorld() const ETNoexceptHint;
 
-		Transformation ETSimdCall GetWorldToLocal() const;
+		Transformation ETSimdCall GetWorldToLocal() const ETNoexceptHint;
 
-		void ETSimdCall SetLocalToWorld(Transformation localToWorld);
+		void ETSimdCall SetLocalToWorld(Transformation localToWorld) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+		//!	Disable copy construction.
+		Armature& operator=(const Armature&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 

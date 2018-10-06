@@ -202,7 +202,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation\AnimationTree.cpp" />
-    <ClCompile Include="src\Animation\AnimationTypes.cpp" />
+    <ClCompile Include="src\Animation\AnimationApi.cpp" />
     <ClCompile Include="src\Animation\Armature.cpp" />
     <ClCompile Include="src\Animation\AssetViews\AnimationTreeAsset.cpp" />
     <ClCompile Include="src\Animation\AssetViews\KeyframeClipAsset.cpp" />

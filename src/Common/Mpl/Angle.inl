@@ -17,84 +17,85 @@
 
 //------------------------------------------------------------------//
 
-//	Fake anonymous/static functions; these will be cleaned up at the end of this file.
-#if !defined(RAD2DEG)
-#	define RAD2DEG(x) ((x)*180.0f / 3.14159265358972f)
-#	define RAD2DEGCLEANUP
-#endif
-
-#if !defined(DEG2RAD)
-#	define DEG2RAD(x) ((x)*3.14159265358972f / 180.0f)
-#	define DEG2RADCLEANUP
-#endif
-
 namespace Eldritch2 {
 
-ETInlineHint Angle::Angle(float32 angle) :
-	_angle(angle) {}
+ETConstexpr ETInlineHint ETForceInlineHint Angle::Angle(float32 radians) ETNoexceptHint : _radians(radians) {}
 
 // ---------------------------------------------------
 
-ETInlineHint Angle::operator float32() const {
-	return _angle;
+ETConstexpr ETInlineHint ETForceInlineHint Angle::operator float32() const ETNoexceptHint {
+	return _radians;
 }
 
 // ---------------------------------------------------
 
-ETInlineHint Angle& Angle::operator*=(float32 scalar) {
-	_angle *= scalar;
-
-	return *this;
+ETConstexpr ETInlineHint ETForceInlineHint Angle& Angle::operator*=(float32 rhs) ETNoexceptHint {
+	return (_radians *= rhs, *this);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint Angle& Angle::operator/=(float32 scalar) {
-	_angle /= scalar;
-
-	return *this;
+ETConstexpr ETInlineHint ETForceInlineHint Angle& Angle::operator/=(float32 rhs) ETNoexceptHint {
+	return (_radians /= rhs, *this);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint Angle operator*(Angle measure, float32 scalar) {
-	return measure *= scalar;
+ETConstexpr ETInlineHint ETForceInlineHint Angle& Angle::operator+=(Angle rhs) ETNoexceptHint {
+	return (_radians += rhs, *this);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint Angle operator/(Angle measure, float32 scalar) {
-	return measure /= scalar;
+ETConstexpr ETInlineHint ETForceInlineHint Angle& Angle::operator-=(Angle rhs) ETNoexceptHint {
+	return (_radians -= rhs, *this);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint Angle& Angle::operator=(float32 angle) {
-	_angle = angle;
-
-	return *this;
+ETConstexpr ETInlineHint ETForceInlineHint Angle& Angle::operator=(float32 radians) ETNoexceptHint {
+	return (_radians = radians, *this);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint Angle AngleFromDegrees(float32 angle) {
-	return Angle(DEG2RAD(angle));
+ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint Angle operator*(Angle lhs, float32 rhs)ETNoexceptHint {
+	return lhs *= rhs;
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint float32 DegreesFromAngle(Angle angle) {
-	return RAD2DEG(static_cast<float32>(angle));
+ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint Angle operator/(Angle lhs, float32 rhs) ETNoexceptHint {
+	return lhs /= rhs;
+}
+
+// ---------------------------------------------------
+
+ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint Angle operator+(Angle lhs, Angle rhs) ETNoexceptHint {
+	return lhs += rhs;
+}
+// ---------------------------------------------------
+
+ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint Angle operator-(Angle lhs, Angle rhs) ETNoexceptHint {
+	return lhs -= rhs;
+}
+
+// ---------------------------------------------------
+
+ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint Angle operator-(Angle angle) ETNoexceptHint {
+	return Angle(-float32(angle));
+}
+
+// ---------------------------------------------------
+
+ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint Angle AngleFromDegrees(float32 degrees) ETNoexceptHint {
+	return Angle(degrees * (3.14159265358972f / 180.0f));
+}
+
+// ---------------------------------------------------
+
+ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint float32 DegreesFromAngle(Angle angle) ETNoexceptHint {
+	return float32(angle) * (180.0f / 3.14159265358972f);
 }
 
 } // namespace Eldritch2
-
-#if defined(RAD2DEGCLEANUP)
-#	undef RAD2DEG
-#	undef RAD2DEGCLEANUP
-#endif
-
-#if defined(DEG2RADCLEANUP)
-#	undef DEG2RAD
-#	undef DEG2RADCLEANUP
-#endif
