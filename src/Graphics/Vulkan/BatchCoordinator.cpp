@@ -46,7 +46,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		public:
 			//! Constructs this @ref GraphicsPipelineState instance.
-			ETInlineHint ETForceInlineHint GraphicsPipelineState(const SpirVShader& shader, const PipelinePassDescription& pass) :
+			ETInlineHint ETForceInlineHint GraphicsPipelineState(const SpirVShader& shader, const PipelinePassDescription& pass) ETNoexceptHint :
 				rasterizationState {
 					VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 					/*pNext =*/nullptr,
@@ -102,7 +102,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 					/*pNext =*/nullptr,
 				} {}
 			//! Constructs this @ref GraphicsPipelineState instance.
-			ETInlineHint ETForceInlineHint GraphicsPipelineState(const GraphicsPipelineState& info) :
+			ETInlineHint ETForceInlineHint GraphicsPipelineState(const GraphicsPipelineState& info) ETNoexceptHint :
 				rasterizationState(info.rasterizationState),
 				multisampleState(info.multisampleState),
 				depthStencilState(info.depthStencilState),
@@ -131,62 +131,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		template <typename Container, typename Value>
 		ETInlineHint ETForceInlineHint const Value* FindElement(const Container& list, const Value& value) ETNoexceptHint {
 			return LowerBound(list.Begin<Value>(), list.End<Value>(), value, LessThan<Value>());
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ETForceInlineHint ArrayMap<size_t, VkPipeline> BuildPipelines(Gpu& gpu, VkPipelineLayout layout, const GraphicsPipelineBuilder& pipeline, const SpirVShaderSet& shaders) {
-			SoArrayList<VkPipeline, GraphicsPipelineState, VkGraphicsPipelineCreateInfo> pipelines(MallocAllocator("Pipeline List Allocator"), Min(pipeline.GetPasses().GetSize(), shaders.GetSize()));
-
-			for (const PipelinePassDescription& pass : pipeline.GetPasses()) {
-				pipelines.EmplaceBack(VK_NULL_HANDLE, shader, VkGraphicsPipelineCreateInfo { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-																							 /*pNext =*/nullptr,
-																							 /*flags =*/pipelines.IsEmpty() ? VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT : VK_PIPELINE_CREATE_DERIVATIVE_BIT,
-																							 /*stageCount =*/0u,
-																							 /*pStages =*/nullptr,
-																							 /*pVertexInputState =*/nullptr,
-																							 /*pInputAssemblyState =*/nullptr,
-																							 /*pTessellationState =*/nullptr,
-																							 /*pViewportState =*/nullptr,
-																							 /*pRasterizationState =*/nullptr,
-																							 /*pMultisampleState =*/nullptr,
-																							 /*pDepthStencilState =*/nullptr,
-																							 /*pColorBlendState =*/nullptr,
-																							 /*pDynamicState =*/nullptr, layout,
-																							 /*renderPass =*/VK_NULL_HANDLE,
-																							 /*subpass =*/0u,
-																							 /*basePipelineHandle =*/VK_NULL_HANDLE,
-																							 /*basePipelineIndex =*/pipelines.IsEmpty() ? uint32(-1) : 0u });
-			}
-
-			vkCreateGraphicsPipelines(gpu, gpu.GetPipelineCache(), pipelines.GetSize(), pipelines.Begin<VkGraphicsPipelineCreateInfo>(), gpu.GetAllocationCallbacks(), pipelines.Begin<VkPipeline>());
-			return {};
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ETForceInlineHint ArrayMap<size_t, VkPipeline> BuildComputePipelines(Gpu& gpu, VkPipelineLayout layout, const GraphicsPipelineBuilder& pipeline, const SpirVShaderSet& shaders) {
-			SoArrayList<VkPipeline, VkComputePipelineCreateInfo> pipelines(MallocAllocator("Pipeline List Allocator"), Min(pipeline.GetPasses().GetSize(), shaders.GetSize()));
-
-			for (const PipelinePassDescription& pass : pipeline.GetPasses()) {
-				pipelines.Append(VK_NULL_HANDLE, VkComputePipelineCreateInfo { VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
-																			   /*pNext =*/nullptr,
-																			   /*flags =*/pipelines.IsEmpty() ? VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT : VK_PIPELINE_CREATE_DERIVATIVE_BIT,
-																			   /*stage =*/VkPipelineShaderStageCreateInfo {
-																				   VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-																				   /*pNext =*/nullptr,
-																				   /*flags =*/0u,
-																				   /*stage =*/VK_SHADER_STAGE_COMPUTE_BIT,
-																				   /*module =*/VK_NULL_HANDLE,
-																				   /*pName =*/"",
-																				   /*pSpecializationInfo =*/nullptr,
-																			   },
-																			   layout,
-																			   /*basePipelineHandle =*/VK_NULL_HANDLE,
-																			   /*basePipelineIndex =*/pipelines.IsEmpty() ? uint32(-1) : 0u });
-			}
-
-			vkCreateComputePipelines(gpu, gpu.GetPipelineCache(), pipelines.GetSize(), pipelines.Begin<VkComputePipelineCreateInfo>(), gpu.GetAllocationCallbacks(), pipelines.Begin<VkPipeline>());
 		}
 
 	} // anonymous namespace
@@ -237,41 +181,44 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	VkResult BatchCoordinator::BindShaderSet(Gpu& gpu, const SpirVShaderSet& shaders, const void* batchConstants, uint32 constantsByteSize) {
 		ET_ASSERT(constantsByteSize == 0u || batchConstants, "batchConstants must be non-null if constantsByteSize != 0 (constantsByteSize = {})", constantsByteSize);
+		const auto pipelines( BuildPipelines( gpu, /*layout =*/VK_NULL_HANDLE, shaders ) );
 
-		CommandPool& pool(FindPool(pipeline));
+		for (const ArrayMap<size_t, VkPipeline>::ValueType& pipeline : pipelines) {
+			CommandPool& pool( FindPool( pipeline.second ) );
 
-		VkCommandBuffer                   commands;
-		const VkCommandBufferAllocateInfo commandsInfo {
-			VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-			/*pNext =*/nullptr,
-			pool.pool,
-			VK_COMMAND_BUFFER_LEVEL_SECONDARY,
-			/*commandBufferCount =*/1u
-		};
-		ET_ABORT_UNLESS(vkAllocateCommandBuffers(gpu, ETAddressOf(commandsInfo), ETAddressOf(commands)));
-		ET_AT_SCOPE_EXIT(if (commands) vkFreeCommandBuffers(gpu, pool.pool, /*commandBufferCount =*/1u, ETAddressOf(commands)));
+			VkCommandBuffer                   commands;
+			const VkCommandBufferAllocateInfo commandsInfo{
+				VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+				/*pNext =*/nullptr,
+				pool.pool,
+				VK_COMMAND_BUFFER_LEVEL_SECONDARY,
+				/*commandBufferCount =*/1u
+			};
+			ET_ABORT_UNLESS( vkAllocateCommandBuffers( gpu, ETAddressOf( commandsInfo ), ETAddressOf( commands ) ) );
+			ET_AT_SCOPE_EXIT( if (commands) vkFreeCommandBuffers( gpu, pool.pool, /*commandBufferCount =*/1u, ETAddressOf( commands ) ) );
 
-		const VkCommandBufferInheritanceInfo inheritanceInfo {
-			VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
-			/*pNext =*/nullptr,
-			/*renderPass =*/VK_NULL_HANDLE,
-			/*subpass =*/0u,
-			/*framebuffer =*/VK_NULL_HANDLE,
-			/*occlusionQueryEnable =*/VK_FALSE,
-			/*queryFlags =*/0u,
-			/*pipelineStatistics =*/0u
-		};
-		const VkCommandBufferBeginInfo beginInfo {
-			VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-			/*pNext =*/nullptr,
-			/*flags =*/VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT,
-			ETAddressOf(inheritanceInfo)
-		};
-		ET_ABORT_UNLESS(vkBeginCommandBuffer(commands, ETAddressOf(beginInfo)));
-		vkCmdBindPipeline(commands, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-		vkCmdPushConstants(commands, _layout, VK_SHADER_STAGE_ALL, /*offset =*/0u, constantsByteSize, batchConstants);
-		vkCmdDrawIndexedIndirect(commands, _drawParameters, /*offset =*/0u, /*drawCount =*/1u, /*stride =*/sizeof(VkDrawIndexedIndirectCommand));
-		ET_ABORT_UNLESS(vkEndCommandBuffer(commands));
+			const VkCommandBufferInheritanceInfo inheritanceInfo{
+				VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
+				/*pNext =*/nullptr,
+				/*renderPass =*/VK_NULL_HANDLE,
+				/*subpass =*/0u,
+				/*framebuffer =*/VK_NULL_HANDLE,
+				/*occlusionQueryEnable =*/VK_FALSE,
+				/*queryFlags =*/0u,
+				/*pipelineStatistics =*/0u
+			};
+			const VkCommandBufferBeginInfo beginInfo{
+				VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+				/*pNext =*/nullptr,
+				/*flags =*/VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT,
+				ETAddressOf( inheritanceInfo )
+			};
+			ET_ABORT_UNLESS( vkBeginCommandBuffer( commands, ETAddressOf( beginInfo ) ) );
+			vkCmdBindPipeline( commands, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.second );
+			vkCmdPushConstants( commands, _layout, VK_SHADER_STAGE_ALL, /*offset =*/0u, constantsByteSize, batchConstants );
+			vkCmdDrawIndexedIndirect( commands, _drawParameters, /*offset =*/0u, /*drawCount =*/1u, /*stride =*/sizeof( VkDrawIndexedIndirectCommand ) );
+			ET_ABORT_UNLESS( vkEndCommandBuffer( commands ) );
+		}
 
 		return VK_SUCCESS;
 	}
@@ -292,8 +239,24 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			ET_ABORT_UNLESS(commandPools.EmplaceBack().BindResources(gpu));
 		}
 
+		SoArrayList<VkRenderPass, String> renderPasses( _renderPasses.GetAllocator(), pipeline.GetPasses().GetSize() );
+		ET_AT_SCOPE_EXIT( for (VkRenderPass pass : Range<VkRenderPass*>( renderPasses.Begin<VkRenderPass>(), renderPasses.End<VkRenderPass>() )) {
+			vkDestroyRenderPass( gpu, pass, gpu.GetAllocationCallbacks() );
+		} );
+
+		for (const PipelinePassDescription& pipelinePass : pipeline.GetPasses()) {
+			VkRenderPass pass;
+			const VkRenderPassCreateInfo passInfo{
+				VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+				/*pNext =*/nullptr,
+			};
+			ET_ABORT_UNLESS( vkCreateRenderPass( gpu, ETAddressOf( passInfo ), gpu.GetAllocationCallbacks(), ETAddressOf(pass)) );
+			renderPasses.Append(pass, String(MallocAllocator("Render Pass Name Allocator"), StringView( pipelinePass.shader )));
+		}
+
 		Swap(_drawParameters, drawParameters);
 		Swap(_commandPools, commandPools);
+		Swap( _renderPasses, renderPasses );
 
 		return VK_SUCCESS;
 	}
@@ -307,6 +270,63 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		_drawParameters.FreeResources(gpu);
 		_commandPools.Clear();
+	}
+
+	// ---------------------------------------------------
+
+	BatchCoordinator::PipelineList BatchCoordinator::BuildComputePipelines( Gpu& gpu, VkPipelineLayout layout, const SpirVShaderSet& shaders ) const {
+		SoArrayList<VkPipeline, VkComputePipelineCreateInfo> pipelines( MallocAllocator( "Pipeline List Allocator" ), Min( shaders.GetSize(), _renderPasses.GetSize() ) );
+
+		for (SoArrayList<VkRenderPass, String>::ConstReference pass : _renderPasses) {
+			pipelines.Append( VK_NULL_HANDLE, VkComputePipelineCreateInfo{ VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+							  /*pNext =*/nullptr,
+							  /*flags =*/pipelines.IsEmpty() ? VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT : VK_PIPELINE_CREATE_DERIVATIVE_BIT,
+							  /*stage =*/VkPipelineShaderStageCreateInfo {
+								  VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+								  /*pNext =*/nullptr,
+								  /*flags =*/0u,
+								  /*stage =*/VK_SHADER_STAGE_COMPUTE_BIT,
+								  /*module =*/VK_NULL_HANDLE,
+								  /*pName =*/"",
+								  /*pSpecializationInfo =*/nullptr,
+							  },
+							  layout,
+							  /*basePipelineHandle =*/VK_NULL_HANDLE,
+							  /*basePipelineIndex =*/pipelines.IsEmpty() ? uint32( -1 ) : 0u } );
+		}
+
+		vkCreateComputePipelines( gpu, gpu.GetPipelineCache(), pipelines.GetSize(), pipelines.Begin<VkComputePipelineCreateInfo>(), gpu.GetAllocationCallbacks(), pipelines.Begin<VkPipeline>() );
+	}
+
+	// ---------------------------------------------------
+
+	BatchCoordinator::PipelineList BatchCoordinator::BuildPipelines( Gpu& gpu, VkPipelineLayout layout, const SpirVShaderSet& shaders ) const {
+		SoArrayList<VkPipeline, GraphicsPipelineState, VkGraphicsPipelineCreateInfo> pipelines( MallocAllocator( "Pipeline List Allocator" ), Min( shaders.GetSize(), _renderPasses.GetSize() ) );
+
+		for (SoArrayList<VkRenderPass, String>::ConstReference pass : _renderPasses) {
+			const auto shader( shaders.Find( StringView( eastl::get<const String&>( pass ), Hash<StringView>(), EqualTo<StringView>() )));
+			pipelines.EmplaceBack( VK_NULL_HANDLE, shader, VkGraphicsPipelineCreateInfo{ VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+								   /*pNext =*/nullptr,
+								   /*flags =*/pipelines.IsEmpty() ? VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT : VK_PIPELINE_CREATE_DERIVATIVE_BIT,
+								   /*stageCount =*/0u,
+								   /*pStages =*/nullptr,
+								   /*pVertexInputState =*/nullptr,
+								   /*pInputAssemblyState =*/nullptr,
+								   /*pTessellationState =*/nullptr,
+								   /*pViewportState =*/nullptr,
+								   /*pRasterizationState =*/nullptr,
+								   /*pMultisampleState =*/nullptr,
+								   /*pDepthStencilState =*/nullptr,
+								   /*pColorBlendState =*/nullptr,
+								   /*pDynamicState =*/nullptr, layout,
+								   /*renderPass =*/VK_NULL_HANDLE,
+								   /*subpass =*/0u,
+								   /*basePipelineHandle =*/VK_NULL_HANDLE,
+								   /*basePipelineIndex =*/pipelines.IsEmpty() ? uint32( -1 ) : 0u } );
+		}
+
+		vkCreateGraphicsPipelines( gpu, gpu.GetPipelineCache(), pipelines.GetSize(), pipelines.Begin<VkGraphicsPipelineCreateInfo>(), gpu.GetAllocationCallbacks(), pipelines.Begin<VkPipeline>() );
+		return {};
 	}
 
 	// ---------------------------------------------------

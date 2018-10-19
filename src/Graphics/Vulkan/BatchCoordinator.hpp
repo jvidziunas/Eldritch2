@@ -53,6 +53,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			VkCommandPool pool;
 		};
 
+		// ---
+
+	public:
+		using PipelineList = ArrayMap<size_t, VkPipeline>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -86,6 +91,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
+	private:
+		PipelineList BuildComputePipelines( Gpu& gpu, VkPipelineLayout layout, const SpirVShaderSet& shaders ) const;
+
+		PipelineList BuildPipelines( Gpu& gpu, VkPipelineLayout layout, const SpirVShaderSet& shaders ) const;
+
+		// ---------------------------------------------------
+
 		//!	Disable copy assignment.
 		BatchCoordinator& operator=(const BatchCoordinator&) = delete;
 
@@ -97,11 +109,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VkPipelineLayout                         _layout;
-		UniformBuffer                            _drawParameters;
-		ArrayList<VkRenderPass>                  _renderPasses;
-		ArrayList<CommandPool>                   _commandPools;
-		SoArrayList<VkPipeline, VkCommandBuffer> _commandsByPipeline;
+		VkPipelineLayout                             _layout;
+		UniformBuffer                                _drawParameters;
+		SoArrayList<VkRenderPass, String>		     _renderPasses;
+		ArrayList<CommandPool>                       _commandPools;
+		SoArrayList<VkPipeline, VkCommandBuffer>     _commandsByPipeline;
+		HashMap<const SpirVShaderSet*, PipelineList> _pipelinesByShaderSet;
 
 		// ---------------------------------------------------
 
