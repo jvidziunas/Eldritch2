@@ -12,9 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <isteamnetworking.h>
 //------------------------------------------------------------------//
 
-class CSteamID;
-
 size_t GetHashCode(const CSteamID& id, size_t seed = 0u);
+
+ETConstexpr ETPureFunctionHint Eldritch2::StringSpan AsString(EP2PSessionError error) ETNoexceptHint;

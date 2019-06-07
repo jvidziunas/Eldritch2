@@ -12,13 +12,13 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/AbstractStringView.hpp>
+#include <Common/Containers/AbstractStringSpan.hpp>
 #include <Common/Atomic.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-class ErrorCode;
-}
+enum class Result : int;
+} // namespace Eldritch2
 
 namespace Eldritch2 {
 
@@ -26,7 +26,7 @@ class ETPureAbstractHint Thread {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	enum ExecutionState : uint32 {
+	enum class ExecutionState : uint32 {
 		Uninitialized,
 		Running,
 		Terminated
@@ -36,7 +36,7 @@ public:
 
 	/*!	Implementation aid for @ref Thread implementations that involve processes that do not have built-in signaling mechanisms.
 		Classes are encouraged to use an @ref Atomic member of this enum for self-documentation. */
-	enum RunBehavior : uint32 {
+	enum class RunBehavior : bool {
 		Terminate, //!< The @ref Thread should cease execution at the earliest possible opportunity.
 		Continue   //!< The @ref Thread should continue execution.
 	};
@@ -64,24 +64,24 @@ public:
 	/*!	@remark The turnaround time for a full termination is very much unbounded. Where possible, try to call @ref Thread::SetShouldShutDown() ahead of time
 			and then call this function at the last possible moment.
 		@see @ref Thread::IsRunning() */
-	void AwaitCompletion();
+	void AwaitCompletion() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode BootOnCaller(AbstractStringView<Utf8Char> name);
+	Result BootOnCaller(AbstractStringSpan<Utf8Char> name) ETNoexceptHint;
 
-	ErrorCode Boot(AbstractStringView<Utf8Char> name);
-
-	// ---------------------------------------------------
-
-private:
-	virtual ErrorCode EnterOnCaller() abstract;
+	Result Boot(AbstractStringSpan<Utf8Char> name) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 private:
-	static ETNoInlineHint void NameThread(AbstractStringView<Utf8Char> name) ETNoexceptHint;
+	virtual Result EnterOnCaller() ETNoexceptHint abstract;
+
+	// ---------------------------------------------------
+
+private:
+	static ETNoInlineHint void NameThread(AbstractStringSpan<Utf8Char> name) ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -89,8 +89,6 @@ private:
 	/*! Marker used by the underlying operating system thread to indicate whether or not it has forked/joined. */
 	Atomic<ExecutionState> _state;
 };
-
-Thread* GetCurrentThread() ETNoexceptHint;
 
 } // namespace Eldritch2
 

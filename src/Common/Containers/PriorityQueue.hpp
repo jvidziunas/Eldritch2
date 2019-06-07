@@ -25,9 +25,12 @@ class PriorityQueue {
 public:
 	using ContainerType  = Container;
 	using ComparatorType = Comparator;
+	using ValueType      = typename ContainerType::ValueType;
+	using ConstPointer   = typename ContainerType::ConstPointer;
+	using Pointer        = typename ContainerType::Pointer;
 	using ConstReference = typename ContainerType::ConstReference;
 	using Reference      = typename ContainerType::Reference;
-	using ValueType      = typename Container::ValueType;
+	using AllocatorType  = typename ContainerType::AllocatorType;
 	using SizeType       = typename ContainerType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -84,7 +87,7 @@ public:
 	template <class... Arguments>
 	void Emplace(Arguments&&... arguments);
 
-	void Pop(ValueType& value);
+	void Pop(ValueType& outValue);
 	void Pop();
 
 	// ---------------------------------------------------

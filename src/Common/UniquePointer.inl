@@ -18,8 +18,8 @@
 namespace Eldritch2 {
 
 template <typename T, typename Deleter>
-template <typename AlternateObject, typename AlternateDeleter>
-ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>::UniquePointer(UniquePointer<AlternateObject, AlternateDeleter>&& other) ETNoexceptHint : UnderlyingContainer(eastl::move(other)) {}
+template <typename T2, typename Deleter2>
+ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>::UniquePointer(UniquePointer<T2, Deleter2>&& other) ETNoexceptHint : UnderlyingContainer(Move(other)) {}
 
 // ---------------------------------------------------
 
@@ -29,7 +29,7 @@ ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>::UniquePointer(Pointer 
 // ---------------------------------------------------
 
 template <typename T, typename Deleter>
-ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>::UniquePointer(UniquePointer<T, Deleter>&& source) ETNoexceptHint : UnderlyingContainer(eastl::forward<UnderlyingContainer>(source)) {}
+ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>::UniquePointer(UniquePointer<T, Deleter>&& source) ETNoexceptHint : UnderlyingContainer(Forward<UnderlyingContainer>(source)) {}
 
 // ---------------------------------------------------
 
@@ -44,9 +44,9 @@ ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>::UniquePointer() ETNoex
 // ---------------------------------------------------
 
 template <typename T, typename Deleter>
-template <typename AlternateObject, typename AlternateDeleter>
-ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>& UniquePointer<T, Deleter>::operator=(UniquePointer<AlternateObject, AlternateDeleter>&& other) {
-	UnderlyingContainer::operator=(eastl::move(other));
+template <typename T2, typename Deleter2>
+ETInlineHint ETForceInlineHint UniquePointer<T, Deleter>& UniquePointer<T, Deleter>::operator=(UniquePointer<T2, Deleter2>&& other) {
+	UnderlyingContainer::operator=(Move(other));
 	return *this;
 }
 
@@ -88,8 +88,8 @@ ETInlineHint ETForceInlineHint typename UniquePointer<T, Deleter>::DeleterType& 
 // ---------------------------------------------------
 
 template <typename T, typename Deleter>
-ETInlineHint ETForceInlineHint void Swap(UniquePointer<T, Deleter>& lhs, UniquePointer<T, Deleter>& rhs) {
-	eastl::swap(static_cast<eastl::unique_ptr<T, Deleter>&>(lhs), static_cast<eastl::unique_ptr<T, Deleter>&>(rhs));
+ETInlineHint ETForceInlineHint void Swap(UniquePointer<T, Deleter>& lhs, UniquePointer<T, Deleter>& rhs) ETNoexceptHint {
+	lhs.swap(rhs);
 }
 
 // ---------------------------------------------------
@@ -110,7 +110,7 @@ ETInlineHint ETForceInlineHint UniquePointer<T[], Deleter>::UniquePointer(std::n
 // ---------------------------------------------------
 
 template <typename T, typename Deleter>
-ETInlineHint ETForceInlineHint UniquePointer<T[], Deleter>::UniquePointer(UniquePointer<T[], Deleter>&& source) ETNoexceptHint : UnderlyingContainer(eastl::forward<UnderlyingContainer>(source)) {}
+ETInlineHint ETForceInlineHint UniquePointer<T[], Deleter>::UniquePointer(UniquePointer<T[], Deleter>&& source) ETNoexceptHint : UnderlyingContainer(Forward<UnderlyingContainer>(source)) {}
 
 // ---------------------------------------------------
 
@@ -136,9 +136,9 @@ ETInlineHint ETForceInlineHint size_t UniquePointer<T[], Deleter>::GetSize() con
 // ---------------------------------------------------
 
 template <typename T, typename Deleter>
-template <typename AlternateDeleter>
-ETInlineHint ETForceInlineHint UniquePointer<T[], Deleter>& UniquePointer<T[], Deleter>::operator=(UniquePointer<T[], AlternateDeleter>&& other) {
-	UnderlyingContainer::operator=(eastl::move(other));
+template <typename Deleter2>
+ETInlineHint ETForceInlineHint UniquePointer<T[], Deleter>& UniquePointer<T[], Deleter>::operator=(UniquePointer<T[], Deleter2>&& other) {
+	UnderlyingContainer::operator=(Move(other));
 	return *this;
 }
 
@@ -152,7 +152,7 @@ ETInlineHint ETForceInlineHint UniquePointer<T[], Deleter>::operator bool() cons
 // ---------------------------------------------------
 
 template <typename T, typename Deleter>
-ETInlineHint ETForceInlineHint void UniquePointer<T[], Deleter>::Reset(Pointer value, size_t sizeInElements) ETNoexceptHint {
+ETInlineHint ETForceInlineHint void UniquePointer<T[], Deleter>::Reset(Pointer value, SizeType sizeInElements) ETNoexceptHint {
 	UnderlyingContainer::reset(value);
 	UnderlyingContainer::get_deleter().SetSize(sizeInElements);
 }
@@ -195,8 +195,8 @@ ETInlineHint ETForceInlineHint typename UniquePointer<T[], Deleter>::DeleterType
 // ---------------------------------------------------
 
 template <typename T, typename Deleter>
-ETInlineHint ETForceInlineHint void Swap(UniquePointer<T[], Deleter>& lhs, UniquePointer<T[], Deleter>& rhs) {
-	eastl::swap(static_cast<eastl::unique_ptr<T[], Deleter>&>(lhs), static_cast<eastl::unique_ptr<T[], Deleter>&>(rhs));
+ETInlineHint ETForceInlineHint void Swap(UniquePointer<T[], Deleter>& lhs, UniquePointer<T[], Deleter>& rhs) ETNoexceptHint {
+	lhs.swap(rhs);
 }
 
 // ---------------------------------------------------
@@ -267,7 +267,7 @@ ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator>=(const UniquePo
 template <typename Object, typename... Args>
 ETInlineHint ETForceInlineHint UniquePointer<Object, InstanceDeleter> MakeUnique(Allocator& allocator, Args&&... args) {
 	Object* const object(static_cast<Object*>(allocator.Allocate(sizeof(Object))));
-	return { new (object) Object(eastl::forward<Args>(args)...), InstanceDeleter(allocator, object) };
+	return { new (object) Object(Forward<Args>(args)...), InstanceDeleter(allocator, object) };
 }
 
 // ---------------------------------------------------
@@ -275,7 +275,7 @@ ETInlineHint ETForceInlineHint UniquePointer<Object, InstanceDeleter> MakeUnique
 template <typename Object, typename... Args>
 ETInlineHint ETForceInlineHint UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, size_t sizeInElements, Args&... args) {
 	const auto objects(static_cast<Object*>(allocator.Allocate(sizeInElements * sizeof(Object))));
-	eastl::for_each(objects, objects + sizeInElements, [&](Object& object) {
+	ForEach(objects, objects + sizeInElements, [&](Object& object) {
 		new (ETAddressOf(object)) Object(args...);
 	});
 
@@ -285,11 +285,11 @@ ETInlineHint ETForceInlineHint UniquePointer<Object[], InstanceArrayDeleter> Mak
 // ---------------------------------------------------
 
 template <typename Object, typename Iterator>
-ETInlineHint ETForceInlineHint UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, Iterator first, Iterator last) {
-	const auto size(eastl::distance(first, last));
+ETInlineHint ETForceInlineHint UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, Iterator begin, Iterator end) {
+	const auto size(eastl::distance(begin, end));
 	const auto objects(static_cast<Object*>(allocator.Allocate(size * sizeof(Object))));
 
-	eastl::uninitialized_move(first, last, objects);
+	eastl::uninitialized_move(begin, end, objects);
 	return { objects, InstanceArrayDeleter(allocator, objects, size_t(size)) };
 }
 

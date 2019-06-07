@@ -16,13 +16,13 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class GraphicsPipeline;
-	class Gpu;
-}}} // namespace Eldritch2::Graphics::Vulkan
-
-namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class SpirVShader {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		enum class Opcode : uint32 {};
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -36,15 +36,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	public:
-		Utf8Char             name[64];
-		Range<const uint32*> bytecodeByStage[5];
-
 		struct {
 			VkPipelineMultisampleStateCreateFlags flags;
 			VkBool32                              shouldSubsampleShading;
 			float                                 minSampleShading;
 			VkBool32                              shouldSendAlphaToCoverage;
-			VkBool32                              shouldForceAlphaToOne;
 		} multisample;
 		struct {
 			VkPipelineRasterizationStateCreateFlags flags;
@@ -53,9 +49,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 #endif
 			VkBool32        shouldClampDepth;
 			VkBool32        shouldDiscardOutput;
-			VkPolygonMode   fill;
 			VkCullModeFlags cullMode;
-			VkFrontFace     frontFace;
 			float           depthBias;
 			float           slopeDepthBias;
 			float           depthBiasClamp;
@@ -64,13 +58,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			VkPipelineDepthStencilStateCreateFlags flags;
 			VkBool32                               shouldTest;
 			VkBool32                               shouldWrite;
-			VkBool32                               shouldClipBounds;
-			VkBool32                               shouldTestStencil;
 			VkCompareOp                            depthOperator;
 			VkStencilOpState                       frontStencilOperator;
 			VkStencilOpState                       backStencilOperator;
-			float                                  minDepthBounds;
-			float                                  maxDepthBounds;
 		} depthStencil;
 		struct {
 			VkPipelineColorBlendStateCreateFlags flags;
@@ -79,18 +69,52 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			float                                constants[4];
 			VkPipelineColorBlendAttachmentState  attachments[4];
 		} blending;
-
-		// ---------------------------------------------------
-
-		friend ETCpp14Constexpr size_t GetHashCode(const SpirVShader&, size_t seed = 0u) ETNoexceptHint;
-
-		friend ETPureFunctionHint bool operator==(const SpirVShader&, const SpirVShader&) ETNoexceptHint;
-		friend ETPureFunctionHint bool operator==(const SpirVShader&, const StringView&) ETNoexceptHint;
+		Span<const Opcode*> bytecodeByStage[5];
 	};
 
 	// ---
 
-	using SpirVShaderSet = HashSet<SpirVShader>;
+	class SpirVShaderSet {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using BytecodeList = ArrayList<SpirVShader::Opcode>;
+		using SubshaderMap = CachingHashMap<String, SpirVShader>;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref SpirVShaderSet instance.
+		SpirVShaderSet(const SpirVShaderSet&) = default;
+		//!	Constructs this @ref SpirVShaderSet instance.
+		SpirVShaderSet(SpirVShaderSet&&) ETNoexceptHint;
+		//!	Constructs this @ref SpirVShaderSet instance.
+		SpirVShaderSet() ETNoexceptHint;
+
+		~SpirVShaderSet() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		BytecodeList::ConstSliceType GetBytecode() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		Result BindResources(BytecodeList bytecode, SubshaderMap shaders) ETNoexceptHint;
+
+		void FreeResources() ETNoexceptHint;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		BytecodeList _combinedBytecode;
+		SubshaderMap _subshaderByPass;
+
+		// ---------------------------------------------------
+
+		friend void Swap(SpirVShaderSet&, SpirVShaderSet&) ETNoexceptHint;
+	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan
 

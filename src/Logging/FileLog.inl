@@ -18,7 +18,7 @@
 namespace Eldritch2 { namespace Logging {
 
 	ETInlineHint ETForceInlineHint void Swap(FileLog& lhs, FileLog& rhs) {
-		Swap(lhs._appender, rhs._appender);
+		Swap(lhs._sink, rhs._sink);
 	}
 
 }} // namespace Eldritch2::Logging

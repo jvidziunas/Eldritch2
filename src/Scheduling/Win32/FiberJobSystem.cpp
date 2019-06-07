@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scheduling/Win32/FiberJobSystem.hpp>
@@ -20,9 +26,7 @@
 
 namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
-	FiberJobSystem::FiberJobSystem() :
-		_workers(MallocAllocator("Job System Worker Thread List Allocator")) {
-	}
+	FiberJobSystem::FiberJobSystem() ETNoexceptHint : _workers(MallocAllocator("Job System Worker Thread List Allocator")) {}
 
 	// ---------------------------------------------------
 
@@ -34,7 +38,7 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 	// ---------------------------------------------------
 
-	void FiberJobSystem::SetShouldShutDown(ErrorCode /*result*/) ETNoexceptHint {
+	void FiberJobSystem::SetShouldShutDown(Result /*result*/) ETNoexceptHint {
 		for (JobThread& thread : _workers) {
 			thread.SetShouldShutDown();
 		}
@@ -42,8 +46,8 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 	// ---------------------------------------------------
 
-	void FiberJobSystem::BackOff(BackoffContext& context) ETNoexceptHint {
-		const BackoffContext backoff(context++);
+	void FiberJobSystem::BackOff(BackoffCounter& counter) ETNoexceptHint {
+		const BackoffCounter backoff(counter++);
 
 		if (backoff < 10u) {
 			_mm_pause();

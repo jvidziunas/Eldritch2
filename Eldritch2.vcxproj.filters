@@ -37,12 +37,6 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{c4240366-799b-49e9-aeef-7024b306df9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Graphics\Direct3D">
-      <UniqueIdentifier>{00f7cf0b-64b8-4119-95fe-da7e6e99afcc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Scripting">
-      <UniqueIdentifier>{4561e1ed-4ad2-4991-894d-bdacd366d321}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Animation">
       <UniqueIdentifier>{22a8a921-290a-4549-8c34-5cd2055a299b}</UniqueIdentifier>
     </Filter>
@@ -66,9 +60,6 @@
     </Filter>
     <Filter Include="Header Files\Graphics">
       <UniqueIdentifier>{328e5b69-7123-49f1-987b-afaa5134357b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Graphics\Direct3D">
-      <UniqueIdentifier>{c242046a-5770-4e49-9e58-6fd28ef36ac3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Scripting">
       <UniqueIdentifier>{5e66b86e-bd39-4ea9-b45f-e0136e907b81}</UniqueIdentifier>
@@ -112,12 +103,6 @@
     <Filter Include="FlatBuffer Schema Defintions">
       <UniqueIdentifier>{abc7007a-dce7-4dec-82fc-e5f832c26bdf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Assets">
-      <UniqueIdentifier>{aba325c3-d964-4820-919f-1aaf7107df25}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Assets">
-      <UniqueIdentifier>{89172c13-ecd3-4cb9-80b5-7ecdb6ad0d19}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Audio">
       <UniqueIdentifier>{fe22664c-1e32-4461-8c65-0cc35d6b0e45}</UniqueIdentifier>
     </Filter>
@@ -151,14 +136,8 @@
     <Filter Include="Header Files\Scripting\Wren">
       <UniqueIdentifier>{bade746d-880f-48a2-9742-0017dd0072d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Scripting\Wren">
-      <UniqueIdentifier>{20676d7c-1bcc-407c-9ee0-599293a62da2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Scripting\Wren\AssetViews">
       <UniqueIdentifier>{779b2221-334d-442b-a3c2-1fd179d194fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Scripting\Wren\AssetViews">
-      <UniqueIdentifier>{789d1c47-fd0d-4980-a47c-2f0a3dce847a}</UniqueIdentifier>
     </Filter>
     <Filter Include="IPSC Kernels">
       <UniqueIdentifier>{163e5f1c-3be9-4708-946a-a433d4022b81}</UniqueIdentifier>
@@ -190,20 +169,29 @@
     <Filter Include="Header Files\Navigation">
       <UniqueIdentifier>{fdf9de70-87be-4712-9da6-831c92086fbf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Navigation">
-      <UniqueIdentifier>{062d4f12-3e6f-4348-b906-02006c36f01e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Navigation\Recast">
       <UniqueIdentifier>{307e4e7a-5c87-4a81-8539-9cfdb0e34809}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Navigation\Recast">
-      <UniqueIdentifier>{189dbc09-6527-4890-b618-75e534f82fb6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\FlatBuffers">
       <UniqueIdentifier>{cd4e78da-2e93-4640-8fc5-be8733f828cf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\FlatBuffers">
       <UniqueIdentifier>{1e570e57-9c1f-46fc-b894-5d8712035f89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Navigation">
+      <UniqueIdentifier>{062d4f12-3e6f-4348-b906-02006c36f01e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Navigation\Recast">
+      <UniqueIdentifier>{189dbc09-6527-4890-b618-75e534f82fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting">
+      <UniqueIdentifier>{4561e1ed-4ad2-4991-894d-bdacd366d321}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting\Wren">
+      <UniqueIdentifier>{20676d7c-1bcc-407c-9ee0-599293a62da2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting\Wren\AssetViews">
+      <UniqueIdentifier>{789d1c47-fd0d-4980-a47c-2f0a3dce847a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -212,9 +200,6 @@
     </ClCompile>
     <ClCompile Include="src\Common\memory\InstanceNew.cpp">
       <Filter>Source Files\Common\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Direct3D\FormatHelpers.cpp">
-      <Filter>Source Files\Graphics\Direct3D</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\memory\Allocator.cpp">
       <Filter>Source Files\Common\Memory</Filter>
@@ -237,32 +222,14 @@
     <ClCompile Include="src\Scripting\Wren\WrenVm.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scheduling\JobFiber.Win32.cpp">
-      <Filter>Source Files\Scheduling</Filter>
-    </ClCompile>
     <ClCompile Include="src\Networking\Steamworks\Player.cpp">
       <Filter>Source Files\Networking\Steamworks</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\Gpu.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\Assets\Package.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Animation\Armature.cpp">
-      <Filter>Source Files\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Assets\AssetDatabase.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureAsset.cpp">
-      <Filter>Source Files\Physics\PhysX\AssetViews</Filter>
-    </ClCompile>
     <ClCompile Include="src\Physics\PhysX\AssetViews\TerrainAsset.cpp">
       <Filter>Source Files\Physics\PhysX\AssetViews</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\CrunchImageSource.cpp">
-      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Scripting\Wren\ApiBuilder.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
@@ -276,16 +243,10 @@
     <ClCompile Include="src\Core\PropertyDatabase.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\PropertyRegistrar.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\EngineComponent.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\WorldComponent.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Engine.ManagementComponent.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\Containers\AbstractString.cpp">
@@ -306,9 +267,6 @@
     <ClCompile Include="src\Scripting\Wren\Game.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio\XAudio2\Xaudio2WorldComponent.cpp">
-      <Filter>Source Files\Audio\XAudio2</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input\Win32\Win32InputEngineComponent.cpp">
       <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
@@ -318,17 +276,8 @@
     <ClCompile Include="src\Networking\Steamworks\SteamworksEngineComponent.cpp">
       <Filter>Source Files\Networking\Steamworks</Filter>
     </ClCompile>
-    <ClCompile Include="src\Networking\Steamworks\SteamworksWorldComponent.cpp">
-      <Filter>Source Files\Networking\Steamworks</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scripting\Wren\WrenEngineComponent.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scripting\Wren\WrenWorldComponent.cpp">
-      <Filter>Source Files\Scripting\Wren</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\VulkanWorldComponent.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\VulkanEngineComponent.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
@@ -336,19 +285,10 @@
     <ClCompile Include="src\Scheduling\JobExecutor.cpp">
       <Filter>Source Files\Scheduling</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\Mpl\Matrices.cpp">
-      <Filter>Source Files\Common\Mpl</Filter>
-    </ClCompile>
     <ClCompile Include="src\Navigation\Recast\RecastImplementation.cpp">
       <Filter>Source Files\Navigation\Recast</Filter>
     </ClCompile>
     <ClCompile Include="src\Navigation\Recast\RecastEngineComponent.cpp">
-      <Filter>Source Files\Navigation\Recast</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Navigation\Recast\RecastWorldComponent.cpp">
-      <Filter>Source Files\Navigation\Recast</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Navigation\Recast\RecastWorldComponent.WrenScriptApi.cpp">
       <Filter>Source Files\Navigation\Recast</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Camera.cpp">
@@ -381,9 +321,6 @@
     <ClCompile Include="src\Graphics\Vulkan\Vulkan.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\VulkanWorldComponent.WrenScriptApi.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Audio\Listener.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
@@ -403,12 +340,6 @@
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\PhysX\PhysxEngineComponent.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\PhysX\PhysxWorldComponent.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\PhysX\PhysxWorldComponent.WrenScriptApi.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\PhysX\PhysxErrorMixin.cpp">
@@ -435,12 +366,6 @@
     <ClCompile Include="src\Navigation\Recast\BipedalAgent.WrenScriptApi.cpp">
       <Filter>Source Files\Navigation\Recast</Filter>
     </ClCompile>
-    <ClCompile Include="src\Physics\PhysX\CharacterPhysics.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\PhysX\CharacterPhysics.WrenScriptApi.cpp">
-      <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
     <ClCompile Include="src\Physics\PhysX\Physics.WrenScriptApi.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
@@ -449,9 +374,6 @@
     </ClCompile>
     <ClCompile Include="src\Physics\PhysX\TerrainPhysics.WrenScriptApi.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scripting\Wren\WrenWorldComponent.WrenScriptApi.cpp">
-      <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\PhysX\PhysicsScene.WrenScriptApi.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
@@ -471,9 +393,6 @@
     <ClCompile Include="src\Scripting\Wren\Quaternion.WrenScriptApi.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio\XAudio2\OpusStreamingCallback.cpp">
-      <Filter>Source Files\Audio\XAudio2</Filter>
-    </ClCompile>
     <ClCompile Include="src\Audio\XAudio2\Xaudio2Listener.WrenScriptApi.cpp">
       <Filter>Source Files\Audio\XAudio2</Filter>
     </ClCompile>
@@ -483,23 +402,11 @@
     <ClCompile Include="src\Audio\XAudio2\XAudio2EngineComponent.cpp">
       <Filter>Source Files\Audio\XAudio2</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio\XAudio2\XAudio2WorldComponent.WrenScriptApi.cpp">
-      <Filter>Source Files\Audio\XAudio2</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\VmaImplementation.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\DescriptorTable.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Logging\FileLog.cpp">
       <Filter>Source Files\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Assets\PackageDatabase.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\AssetViews\ImageAsset.cpp">
-      <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\AssetViews\MeshAsset.cpp">
       <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
@@ -516,9 +423,6 @@
     <ClCompile Include="src\Scripting\Wren\Planner.WrenScriptApi.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scripting\Wren\Context.cpp">
-      <Filter>Source Files\Scripting\Wren</Filter>
-    </ClCompile>
     <ClCompile Include="src\Physics\PhysX\PhysxEngineComponent.AssetApi.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
@@ -533,9 +437,6 @@
     </ClCompile>
     <ClCompile Include="src\Scripting\Wren\DialogueSet.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Common\SymbolTable.cpp">
-      <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Audio\XAudio2\XAudio2AudioScene.cpp">
       <Filter>Source Files\Audio\XAudio2</Filter>
@@ -564,9 +465,6 @@
     <ClCompile Include="src\Common\FileWriter.Win32.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\MappedFile.Win32.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Common\Mutex.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -584,18 +482,6 @@
     </ClCompile>
     <ClCompile Include="src\Common\Window.Win32.cpp">
       <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\XInput\XInputWorldComponent.WrenScriptApi.cpp">
-      <Filter>Source Files\Input\XInput</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\XInput\XInputWorldComponent.cpp">
-      <Filter>Source Files\Input\XInput</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\Win32\Win32InputWorldComponent.cpp">
-      <Filter>Source Files\Input\Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\Win32\Win32InputWorldComponent.WrenScriptApi.cpp">
-      <Filter>Source Files\Input\Win32</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\Win32Tools.cpp">
       <Filter>Source Files\Common</Filter>
@@ -617,12 +503,6 @@
     </ClCompile>
     <ClCompile Include="src\Common\Precompiled.cpp">
       <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\VulkanGraphicsScene.PlayerView.WrenScriptApi.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\BatchCoordinator.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\GraphicsPipeline.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
@@ -660,20 +540,11 @@
     <ClCompile Include="src\Graphics\Vulkan\Display.Win32.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\AssetViews\SpirVShaderSetAsset.cpp">
       <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\ObjectLocator.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\DisplayLocator.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\DeviceLocator.WrenScriptApi.cpp">
-      <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\DisplayLocator.WrenScriptApi.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
@@ -687,9 +558,6 @@
     <ClCompile Include="src\Common\Containers\Path.Win32.cpp">
       <Filter>Source Files\Common\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flatbuffers\FlatBufferPackageProvider.cpp">
-      <Filter>Source Files\FlatBuffers</Filter>
-    </ClCompile>
     <ClCompile Include="src\Common\Thread.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -698,15 +566,6 @@
     </ClCompile>
     <ClCompile Include="src\Common\CppType.cpp">
       <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Assets\ContentLocator.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Assets\ContentLocator.WrenScriptApi.cpp">
-      <Filter>Source Files\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\VulkanTools.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Scripting\Wren\ActionSetClient.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
@@ -732,9 +591,6 @@
     <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.UploadBuffer.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.VertexBuffer.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.VertexCache.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
@@ -750,9 +606,6 @@
     <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.GpuBuffer.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.Viewport.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input\InputApi.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
@@ -760,9 +613,6 @@
       <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.HostSparseTileCache.cpp">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphics\Vulkan\SpirVShaderSet.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Animation\AnimationApi.cpp">
@@ -783,6 +633,147 @@
     <ClCompile Include="src\Networking\WorldEventClient.cpp">
       <Filter>Source Files\Networking</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\ScriptExecutor.cpp">
+      <Filter>Source Files\Scripting\Wren</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\OpusStreamDecoder.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\Xaudio2Selector.cpp">
+      <Filter>Source Files\Audio\XAudio2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\InputApi.DeviceLocator.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\InputApi.DeviceLocator.WrenScriptApi.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Fiber.Win32.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Fiber.Linux.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\StringLocalization.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.DescriptorTable.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Profiler.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\VulkanEngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\VulkanEngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Win32\Win32InputEngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Input\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Win32\Win32InputEngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Input\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\XInput\XInputEngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\XInput\XInputEngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Input\XInput</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\RecastEngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Navigation\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Navigation\Recast\RecastEngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Navigation\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Networking\Steamworks\SteamworksEngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Networking\Steamworks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\PhysxEngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\PhysxEngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\WrenEngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Scripting\Wren</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\WrenEngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Scripting\Wren</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\XAudio2EngineComponent.WorldComponent.cpp">
+      <Filter>Source Files\Audio\XAudio2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\XAudio2\XAudio2EngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Audio\XAudio2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ContentLocator.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ContentLocator.WrenScriptApi.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Package.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\PropertyApiBuilder.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Animation\AnimationTree.cpp">
+      <Filter>Source Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\ObjectInjector.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Networking\Steamworks\SteamworksEngineComponent.WrenScriptApi.cpp">
+      <Filter>Source Files\Networking\Steamworks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\FileView.Win32.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ContentDatabase.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatbuffers\FlatBufferContentDatabase.cpp">
+      <Filter>Source Files\FlatBuffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scripting\Wren\AssetViews\SerializedWorldAsset.cpp">
+      <Filter>Source Files\Scripting\Wren\AssetViews</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\GpuResourceApi.AttributeBuffer.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\PipelineBatcher.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\VulkanGraphicsScene.RootView.WrenScriptApi.cpp">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\PipelineBuilder.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Mpl\Matrix.cpp">
+      <Filter>Source Files\Common\Mpl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\BasisImageSource.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureDefinitionAsset.cpp">
+      <Filter>Source Files\Physics\PhysX\AssetViews</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\SpanInputStream.cpp">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\AssetViews\BasisImageAsset.cpp">
+      <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\SymbolSet.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\Vulkan\SpirVShaderSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Common\Algorithms.hpp">
@@ -791,17 +782,8 @@
     <ClInclude Include="src\Common\Assert.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\ErrorCode.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\IdentifierPool.hpp">
       <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Common\Containers\Range.hpp">
-      <Filter>Header Files\Common\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Direct3D\FormatHelpers.hpp">
-      <Filter>Header Files\Graphics\Direct3D</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Containers\IntrusiveForwardList.hpp">
       <Filter>Header Files\Common\Containers</Filter>
@@ -872,9 +854,6 @@
     <ClInclude Include="src\logging\ChildLog.hpp">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio\XAudio2\ForwardDeclarations.hpp">
-      <Filter>Header Files\Audio\XAudio2</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\World.hpp">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -902,26 +881,11 @@
     <ClInclude Include="src\Scripting\Wren\Marshal.hpp">
       <Filter>Header Files\Scripting\Wren</Filter>
     </ClInclude>
-    <ClInclude Include="src\Assets\Package.hpp">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scripting\Wren\WrenInternal.hpp">
       <Filter>Header Files\Scripting\Wren</Filter>
     </ClInclude>
-    <ClInclude Include="src\Animation\Armature.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Containers\RangeAdapters.hpp">
       <Filter>Header Files\Common\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Assets\AssetDatabase.hpp">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Assets\Asset.hpp">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Physics\PhysX\AssetViews\ArmatureAsset.hpp">
-      <Filter>Header Files\Physics\PhysX\AssetViews</Filter>
     </ClInclude>
     <ClInclude Include="src\Physics\PhysX\AssetViews\TerrainAsset.hpp">
       <Filter>Header Files\Physics\PhysX\AssetViews</Filter>
@@ -931,9 +895,6 @@
     </ClInclude>
     <ClInclude Include="src\Common\Mpl\Platform.hpp">
       <Filter>Header Files\Common\Mpl</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\CrunchImageSource.hpp">
-      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\Scripting\Wren\ApiBuilder.hpp">
       <Filter>Header Files\Scripting\Wren</Filter>
@@ -948,9 +909,6 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\PropertyDatabase.hpp">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\PropertyRegistrar.hpp">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\IniParser.hpp">
@@ -1010,26 +968,14 @@
     <ClInclude Include="src\Audio\XAudio2\Xaudio2EngineComponent.hpp">
       <Filter>Header Files\Audio\XAudio2</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio\XAudio2\Xaudio2WorldComponent.hpp">
-      <Filter>Header Files\Audio\XAudio2</Filter>
-    </ClInclude>
     <ClInclude Include="src\Input\Win32\Win32InputEngineComponent.hpp">
       <Filter>Header Files\Input\Win32</Filter>
     </ClInclude>
     <ClInclude Include="src\Networking\Steamworks\SteamworksEngineComponent.hpp">
       <Filter>Header Files\Networking\Steamworks</Filter>
     </ClInclude>
-    <ClInclude Include="src\Networking\Steamworks\SteamworksWorldComponent.hpp">
-      <Filter>Header Files\Networking\Steamworks</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scripting\Wren\WrenEngineComponent.hpp">
       <Filter>Header Files\Scripting\Wren</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scripting\Wren\WrenWorldComponent.hpp">
-      <Filter>Header Files\Scripting\Wren</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\VulkanWorldComponent.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\VulkanEngineComponent.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
@@ -1043,12 +989,6 @@
     <ClInclude Include="src\Common\Memory.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\Mpl\Matrices.hpp">
-      <Filter>Header Files\Common\Mpl</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Common\Mpl\Vectors.hpp">
-      <Filter>Header Files\Common\Mpl</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Mpl\EnableIf.hpp">
       <Filter>Header Files\Common\Mpl</Filter>
     </ClInclude>
@@ -1056,9 +996,6 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="src\Navigation\Recast\NavigationScene.hpp">
-      <Filter>Header Files\Navigation\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Navigation\Recast\RecastWorldComponent.hpp">
       <Filter>Header Files\Navigation\Recast</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Camera.hpp">
@@ -1091,9 +1028,6 @@
     <ClInclude Include="src\Graphics\Vulkan\VulkanTools.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\SymbolTable.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Audio\Listener.hpp">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
@@ -1102,9 +1036,6 @@
     </ClInclude>
     <ClInclude Include="src\Graphics\RenderConcept.hpp">
       <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Common\Tuple.hpp">
-      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Sort.hpp">
       <Filter>Header Files\Common</Filter>
@@ -1121,9 +1052,6 @@
     <ClInclude Include="src\Physics\PhysX\PhysxEngineComponent.hpp">
       <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics\PhysX\PhysxWorldComponent.hpp">
-      <Filter>Header Files\Physics\PhysX</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physics\PhysX\PhysxPointer.hpp">
       <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
@@ -1132,9 +1060,6 @@
     </ClInclude>
     <ClInclude Include="src\Navigation\Recast\BipedalAgent.hpp">
       <Filter>Header Files\Navigation\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Physics\PhysX\CharacterPhysics.hpp">
-      <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
     <ClInclude Include="src\Physics\PhysX\TerrainPhysics.hpp">
       <Filter>Header Files\Physics\PhysX</Filter>
@@ -1145,14 +1070,8 @@
     <ClInclude Include="src\Physics\PhysX\PhysxMarshals.hpp">
       <Filter>Header Files\Physics\PhysX</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio\XAudio2\OpusStreamingCallback.hpp">
-      <Filter>Header Files\Audio\XAudio2</Filter>
-    </ClInclude>
     <ClInclude Include="src\Audio\XAudio2\XAudio2AudioScene.hpp">
       <Filter>Header Files\Audio\XAudio2</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\DescriptorTable.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\ScopeGuard.hpp">
       <Filter>Header Files\Common</Filter>
@@ -1160,22 +1079,13 @@
     <ClInclude Include="src\Logging\FileLog.hpp">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Assets\PackageDatabase.hpp">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Memory\MallocAllocator.hpp">
       <Filter>Header Files\Common\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\AssetViews\ImageAsset.hpp">
-      <Filter>Header Files\Graphics\Vulkan\AssetViews</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\AssetViews\MeshAsset.hpp">
       <Filter>Header Files\Graphics\Vulkan\AssetViews</Filter>
     </ClInclude>
     <ClInclude Include="src\Scripting\Wren\Planner.hpp">
-      <Filter>Header Files\Scripting\Wren</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scripting\Wren\Context.hpp">
       <Filter>Header Files\Scripting\Wren</Filter>
     </ClInclude>
     <ClInclude Include="src\Audio\XAudio2\XAudioMarshals.hpp">
@@ -1205,9 +1115,6 @@
     <ClInclude Include="src\Common\FileWriter.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\MappedFile.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Mutex.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
@@ -1229,14 +1136,8 @@
     <ClInclude Include="src\Graphics\Vulkan\HostMixin.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="src\Input\XInput\XInputWorldComponent.hpp">
-      <Filter>Header Files\Input\XInput</Filter>
-    </ClInclude>
     <ClInclude Include="src\Input\XInput\XInputEngineComponent.hpp">
       <Filter>Header Files\Input\XInput</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input\Win32\Win32InputWorldComponent.hpp">
-      <Filter>Header Files\Input\Win32</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Win32Tools.hpp">
       <Filter>Header Files\Common</Filter>
@@ -1267,9 +1168,6 @@
     </ClInclude>
     <ClInclude Include="src\Common\Mpl\IntTypes.hpp">
       <Filter>Header Files\Common\Mpl</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\BatchCoordinator.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Atomic.hpp">
       <Filter>Header Files\Common</Filter>
@@ -1307,23 +1205,11 @@
     <ClInclude Include="src\Graphics\Vulkan\Display.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.hpp">
-      <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\AssetViews\SpirVShaderSetAsset.hpp">
       <Filter>Header Files\Graphics\Vulkan\AssetViews</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\Profiler.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Common\ObjectLocator.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\DisplayLocator.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input\DeviceLocator.hpp">
-      <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\DisplayBus.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
@@ -1334,38 +1220,20 @@
     <ClInclude Include="src\Common\Containers\Path.hpp">
       <Filter>Header Files\Common\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\Containers\AbstractStringView.hpp">
-      <Filter>Header Files\Common\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Flatbuffers\FlatBufferTools.hpp">
-      <Filter>Header Files\FlatBuffers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Flatbuffers\FlatBufferPackageProvider.hpp">
       <Filter>Header Files\FlatBuffers</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\Thread.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\Containers\SoArrayList.hpp">
-      <Filter>Header Files\Common\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\CppType.hpp">
       <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Assets\ContentLocator.hpp">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\GraphicsPipelineOptimizations.hpp">
-      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\Scripting\Wren\ActionSetClient.hpp">
       <Filter>Header Files\Scripting\Wren</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\Vulkan\GpuResourceApi.hpp">
       <Filter>Header Files\Graphics\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics\GraphicsPipelineApi.hpp">
-      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\Input\InputApi.hpp">
       <Filter>Header Files\Input</Filter>
@@ -1394,6 +1262,111 @@
     <ClInclude Include="src\Networking\WorldEventClient.hpp">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scripting\Wren\ScriptExecutor.hpp">
+      <Filter>Header Files\Scripting\Wren</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\OpusStreamDecoder.hpp">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\XAudio2\Xaudio2Selector.hpp">
+      <Filter>Header Files\Audio\XAudio2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\XAudio2\StreamingVoice.hpp">
+      <Filter>Header Files\Audio\XAudio2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio\PcmCache.hpp">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Fiber.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\StringLocalization.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Profiler.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Asset.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ContentLocator.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Package.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Mpl\Tuple.hpp">
+      <Filter>Header Files\Common\Mpl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Mpl\CompileOptions.hpp">
+      <Filter>Header Files\Common\Mpl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\PropertyApiBuilder.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\ObjectInjector.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\FileView.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ContentDatabase.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatbuffers\FlatBufferContentDatabase.hpp">
+      <Filter>Header Files\FlatBuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scripting\Wren\AssetViews\SerializedWorldAsset.hpp">
+      <Filter>Header Files\Scripting\Wren\AssetViews</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Result.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Memory\ArenaAllocator.hpp">
+      <Filter>Header Files\Common\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Vulkan\PipelineBatcher.hpp">
+      <Filter>Header Files\Graphics\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\PipelineBuilder.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\PipelineOptimizations.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Mpl\Vector.hpp">
+      <Filter>Header Files\Common\Mpl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Mpl\Matrix.hpp">
+      <Filter>Header Files\Common\Mpl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\Span.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\AbstractStringSpan.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\BasisImageSource.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\PhysX\AssetViews\ArmatureDefinitionAsset.hpp">
+      <Filter>Header Files\Physics\PhysX\AssetViews</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\PhysX\SpanInputStream.hpp">
+      <Filter>Header Files\Physics\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics\Vulkan\AssetViews\BasisImageAsset.hpp">
+      <Filter>Header Files\Graphics\Vulkan\AssetViews</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\BvhQuery.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\SymbolSet.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\SoaList.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Eldritch2.ico">
@@ -1404,16 +1377,10 @@
     <None Include="src\Common\Algorithms.inl">
       <Filter>Source Files\Common</Filter>
     </None>
-    <None Include="src\Common\ErrorCode.inl">
-      <Filter>Source Files\Common</Filter>
-    </None>
     <None Include="src\Common\IdentifierPool.inl">
       <Filter>Source Files\Common</Filter>
     </None>
     <None Include="src\Common\Containers\IntrusiveForwardList.inl">
-      <Filter>Source Files\Common\Containers</Filter>
-    </None>
-    <None Include="src\Common\Containers\Range.inl">
       <Filter>Source Files\Common\Containers</Filter>
     </None>
     <None Include="src\Common\Memory\ArenaAllocator.inl">
@@ -1485,18 +1452,6 @@
     <None Include="src\Scripting\Wren\Marshal.inl">
       <Filter>Source Files\Scripting\Wren</Filter>
     </None>
-    <None Include="src\Assets\Package.inl">
-      <Filter>Source Files\Assets</Filter>
-    </None>
-    <None Include="src\Animation\Armature.inl">
-      <Filter>Source Files\Animation</Filter>
-    </None>
-    <None Include="src\Assets\AssetDatabase.inl">
-      <Filter>Source Files\Assets</Filter>
-    </None>
-    <None Include="src\Assets\Asset.inl">
-      <Filter>Source Files\Assets</Filter>
-    </None>
     <None Include="src\Scripting\Wren\ApiBuilder.inl">
       <Filter>Source Files\Scripting\Wren</Filter>
     </None>
@@ -1504,9 +1459,6 @@
       <Filter>Source Files\Physics\PhysX</Filter>
     </None>
     <None Include="src\Core\IniParser.inl">
-      <Filter>Source Files\Core</Filter>
-    </None>
-    <None Include="src\Core\PropertyRegistrar.inl">
       <Filter>Source Files\Core</Filter>
     </None>
     <None Include="src\Core\EngineComponent.inl">
@@ -1551,12 +1503,6 @@
     <None Include="src\Common\Math.inl">
       <Filter>Source Files\Common</Filter>
     </None>
-    <None Include="src\Common\Mpl\Matrices.inl">
-      <Filter>Source Files\Common\Mpl</Filter>
-    </None>
-    <None Include="src\Common\Mpl\Vectors.inl">
-      <Filter>Source Files\Common\Mpl</Filter>
-    </None>
     <None Include="src\Common\Containers\PriorityQueue.inl">
       <Filter>Source Files\Common\Containers</Filter>
     </None>
@@ -1573,9 +1519,6 @@
       <Filter>Source Files\Graphics</Filter>
     </None>
     <None Include="src\Common\Assert.inl">
-      <Filter>Source Files\Common</Filter>
-    </None>
-    <None Include="src\Common\SymbolTable.inl">
       <Filter>Source Files\Common</Filter>
     </None>
     <None Include="src\Graphics\Vulkan\VulkanTools.inl">
@@ -1602,23 +1545,14 @@
     <None Include="src\Audio\Listener.inl">
       <Filter>Source Files\Audio</Filter>
     </None>
-    <None Include="src\Graphics\Vulkan\DescriptorTable.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
     <None Include="src\Common\Memory\UsageMixin.inl">
       <Filter>Source Files\Common\Memory</Filter>
     </None>
     <None Include="src\Common\ComPointer.inl">
       <Filter>Source Files\Common</Filter>
     </None>
-    <None Include="src\Graphics\Vulkan\AssetViews\ImageAsset.inl">
-      <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
-    </None>
     <None Include="src\Graphics\Vulkan\AssetViews\MeshAsset.inl">
       <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
-    </None>
-    <None Include="src\Scripting\Wren\Context.inl">
-      <Filter>Source Files\Scripting\Wren</Filter>
     </None>
     <None Include="src\Audio\XAudio2\XAudioMarshals.inl">
       <Filter>Source Files\Audio\XAudio2</Filter>
@@ -1637,9 +1571,6 @@
     </None>
     <None Include="src\Graphics\Vulkan\CommandList.inl">
       <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
-    <None Include="src\Common\MappedFile.inl">
-      <Filter>Source Files\Common</Filter>
     </None>
     <None Include="src\Common\Filesystem.inl">
       <Filter>Source Files\Common</Filter>
@@ -1665,22 +1596,13 @@
     <None Include="src\Scripting\Wren\Interface.inl">
       <Filter>Source Files\Scripting\Wren</Filter>
     </None>
-    <None Include="src\Assets\PackageDatabase.inl">
-      <Filter>Source Files\Assets</Filter>
-    </None>
     <None Include="src\Scripting\Wren\Dispatcher.inl">
       <Filter>Source Files\Scripting\Wren</Filter>
     </None>
     <None Include="src\Input\Win32\DeviceCoordinator.inl">
       <Filter>Source Files\Input\Win32</Filter>
     </None>
-    <None Include="src\Graphics\Vulkan\Display.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
     <None Include=".clang-format" />
-    <None Include="src\Graphics\Vulkan\GraphicsPipelineBuilder.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
     <None Include="src\Eldritch2Math.isph">
       <Filter>IPSC Kernels</Filter>
     </None>
@@ -1689,12 +1611,6 @@
     </None>
     <None Include="src\Graphics\ImageSource.inl">
       <Filter>Source Files\Graphics</Filter>
-    </None>
-    <None Include="src\Common\ObjectLocator.inl">
-      <Filter>Source Files\Common</Filter>
-    </None>
-    <None Include="src\Input\DeviceLocator.inl">
-      <Filter>Source Files\Input</Filter>
     </None>
     <None Include="src\Graphics\Vulkan\DisplayBus.inl">
       <Filter>Source Files\Graphics\Vulkan</Filter>
@@ -1708,9 +1624,6 @@
     <None Include="src\Common\Containers\Path.inl">
       <Filter>Source Files\Common\Containers</Filter>
     </None>
-    <None Include="src\Common\Containers\AbstractStringView.inl">
-      <Filter>Source Files\Common</Filter>
-    </None>
     <None Include="src\Common\Memory\MallocAllocator.inl">
       <Filter>Source Files\Common\Memory</Filter>
     </None>
@@ -1720,14 +1633,8 @@
     <None Include="src\Flatbuffers\FlatBufferTools.inl">
       <Filter>Source Files\FlatBuffers</Filter>
     </None>
-    <None Include="src\Flatbuffers\FlatBufferPackageProvider.inl">
-      <Filter>Source Files\FlatBuffers</Filter>
-    </None>
     <None Include="src\Common\Thread.inl">
       <Filter>Source Files\Common</Filter>
-    </None>
-    <None Include="src\Common\Containers\SoArrayList.inl">
-      <Filter>Source Files\Common\Containers</Filter>
     </None>
     <None Include="src\Common\CppType.inl">
       <Filter>Source Files\Common</Filter>
@@ -1735,25 +1642,13 @@
     <None Include="src\Common\Platform.inl">
       <Filter>Source Files\Common</Filter>
     </None>
-    <None Include="src\Assets\ContentLocator.inl">
-      <Filter>Source Files\Assets</Filter>
-    </None>
-    <None Include="src\Graphics\GraphicsPipelineOptimizations.inl">
-      <Filter>Source Files\Graphics</Filter>
-    </None>
     <None Include="src\Graphics\Vulkan\GpuResourceApi.inl">
       <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
-    <None Include="src\Graphics\GraphicsPipelineApi.inl">
-      <Filter>Source Files\Graphics</Filter>
     </None>
     <None Include="src\Input\InputApi.inl">
       <Filter>Source Files\Input</Filter>
     </None>
     <None Include="src\Graphics\Vulkan\VmaMutex.inl">
-      <Filter>Source Files\Graphics\Vulkan</Filter>
-    </None>
-    <None Include="src\Graphics\Vulkan\BatchCoordinator.inl">
       <Filter>Source Files\Graphics\Vulkan</Filter>
     </None>
     <None Include="src\Graphics\GpuAbi.inl">
@@ -1765,11 +1660,105 @@
     <None Include="src\Logging\FileLog.inl">
       <Filter>Source Files\Logging</Filter>
     </None>
+    <None Include="src\Scripting\Wren\WrenInternal.inl">
+      <Filter>Source Files\Scripting\Wren</Filter>
+    </None>
+    <None Include="src\Scripting\Wren\ScriptExecutor.inl">
+      <Filter>Source Files\Scripting\Wren</Filter>
+    </None>
+    <None Include="src\Audio\XAudio2\StreamingVoice.inl">
+      <Filter>Source Files\Audio\XAudio2</Filter>
+    </None>
+    <None Include="src\Audio\PcmCache.inl">
+      <Filter>Source Files\Audio</Filter>
+    </None>
     <None Include="src\Animation\AnimationApi.inl">
       <Filter>Source Files\Animation</Filter>
     </None>
-    <None Include="src\Scripting\Wren\WrenInternal.inl">
-      <Filter>Source Files\Scripting\Wren</Filter>
+    <None Include="src\Animation\AssetViews\KeyframeClipAsset.inl">
+      <Filter>Source Files\Animation\AssetViews</Filter>
+    </None>
+    <None Include="cpp.hint" />
+    <None Include="src\Common\Function.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Core\ContentLocator.inl">
+      <Filter>Source Files\Core</Filter>
+    </None>
+    <None Include="src\Core\Package.inl">
+      <Filter>Source Files\Core</Filter>
+    </None>
+    <None Include="src\Core\Asset.inl">
+      <Filter>Source Files\Core</Filter>
+    </None>
+    <None Include="src\Common\Stopwatch.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Common\Mpl\Tuple.inl">
+      <Filter>Source Files\Common\Mpl</Filter>
+    </None>
+    <None Include="src\Core\PropertyApiBuilder.inl">
+      <Filter>Source Files\Core</Filter>
+    </None>
+    <None Include="src\Common\ObjectInjector.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Networking\Steamworks\SteamTools.inl">
+      <Filter>Source Files\Networking\Steamworks</Filter>
+    </None>
+    <None Include="src\Common\FileView.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Core\ContentDatabase.inl">
+      <Filter>Source Files\Core</Filter>
+    </None>
+    <None Include="src\Flatbuffers\FlatBufferContentDatabase.inl">
+      <Filter>Source Files\FlatBuffers</Filter>
+    </None>
+    <None Include="src\Common\Result.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Common\Memory\Win32HeapAllocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Common\Memory\Allocator.inl">
+      <Filter>Source Files\Common\Memory</Filter>
+    </None>
+    <None Include="src\Graphics\Vulkan\PipelineBatcher.inl">
+      <Filter>Source Files\Graphics\Vulkan</Filter>
+    </None>
+    <None Include="src\Graphics\PipelineBuilder.inl">
+      <Filter>Source Files\Graphics</Filter>
+    </None>
+    <None Include="src\Graphics\PipelineOptimizations.inl">
+      <Filter>Source Files\Graphics</Filter>
+    </None>
+    <None Include="src\Common\Mpl\Vector.inl">
+      <Filter>Source Files\Common\Mpl</Filter>
+    </None>
+    <None Include="src\Common\Mpl\Matrix.inl">
+      <Filter>Source Files\Common\Mpl</Filter>
+    </None>
+    <None Include="src\Graphics\Camera.inl">
+      <Filter>Source Files\Graphics</Filter>
+    </None>
+    <None Include="src\Common\Containers\Span.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Containers\AbstractStringSpan.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Physics\PhysX\SpanInputStream.inl">
+      <Filter>Source Files\Physics\PhysX</Filter>
+    </None>
+    <None Include="src\Common\Containers\Cache.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\SymbolSet.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Common\Containers\SoaList.inl">
+      <Filter>Source Files\Common\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1830,6 +1819,9 @@
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
     <FlatbufferSchemaItem Include="src\Flatbuffers\Animation.fbs">
+      <Filter>FlatBuffer Schema Defintions</Filter>
+    </FlatbufferSchemaItem>
+    <FlatbufferSchemaItem Include="src\Flatbuffers\Localization.fbs">
       <Filter>FlatBuffer Schema Defintions</Filter>
     </FlatbufferSchemaItem>
   </ItemGroup>

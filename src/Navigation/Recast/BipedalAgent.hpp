@@ -23,7 +23,7 @@ namespace Recast {
 } // namespace Navigation::Recast
 namespace Animation {
 	class Armature;
-}
+} // namespace Animation
 } // namespace Eldritch2
 
 namespace Eldritch2 { namespace Navigation { namespace Recast {
@@ -33,11 +33,11 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	public:
 		//!	Constructs this @ref BipedalAgent instance.
-		BipedalAgent(Animation::Armature& armature);
+		BipedalAgent(Animation::Armature& armature) ETNoexceptHint;
 		//!	Disable copy construction.
 		BipedalAgent(const BipedalAgent&) = delete;
 		//!	Constructs this @ref BipedalAgent instance.
-		BipedalAgent(BipedalAgent&&);
+		BipedalAgent(BipedalAgent&&) ETNoexceptHint;
 
 		~BipedalAgent();
 

@@ -17,7 +17,8 @@
 
 namespace Eldritch2 {
 
-enum class KnownDirectory : uint32 {
+enum class KnownDirectory : unsigned int {
+	Relative,
 	UserDocuments,
 	AppDataLocal,
 	AppDataShared,
@@ -31,17 +32,27 @@ enum class KnownDirectory : uint32 {
 
 template <class Allocator = MallocAllocator>
 class AbstractPath : public AbstractString<PlatformChar, Allocator> {
+	// - TYPE PUBLISHING ---------------------------------
+
+public:
+	using Iterator             = typename AbstractString<PlatformChar, Allocator>::Iterator;
+	using ConstIterator        = typename AbstractString<PlatformChar, Allocator>::ConstIterator;
+	using ReverseIterator      = typename AbstractString<PlatformChar, Allocator>::ReverseIterator;
+	using ConstReverseIterator = typename AbstractString<PlatformChar, Allocator>::ConstReverseIterator;
+	using SizeType             = typename AbstractString<PlatformChar, Allocator>::SizeType;
+	using CharacterType        = typename AbstractString<PlatformChar, Allocator>::CharacterType;
+	using ValueType            = typename AbstractString<PlatformChar, Allocator>::ValueType;
+	using AllocatorType        = typename AbstractString<PlatformChar, Allocator>::AllocatorType;
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref AbstractPath instance.
 	template <typename... Arguments>
-	AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringView<CharacterType> format, Arguments&&... arguments);
+	AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringSpan<CharacterType> format, Arguments&&... arguments);
 	//!	Constructs this @ref AbstractPath instance.
 	template <typename Character>
-	AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringView<Character> path);
-	//!	Constructs this @ref AbstractPath instance.
-	AbstractPath(const AllocatorType& allocator, AbstractStringView<CharacterType> path);
+	AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringSpan<Character> path);
 	//!	Constructs this @ref AbstractPath instance.
 	AbstractPath(const AllocatorType& allocator, SizeType reservedLength);
 	//!	Constructs this @ref AbstractPath instance.
@@ -57,20 +68,20 @@ public:
 
 public:
 	template <typename... Arguments>
-	AbstractPath& Assign(KnownDirectory root, AbstractStringView<CharacterType> format, Arguments&&... arguments);
+	AbstractPath& Assign(KnownDirectory root, AbstractStringSpan<CharacterType> format, Arguments&&... arguments);
 	template <typename Character>
-	AbstractPath& Assign(KnownDirectory root, AbstractStringView<Character> path);
+	AbstractPath& Assign(KnownDirectory root, AbstractStringSpan<Character> path);
 	using AbstractString<PlatformChar, Allocator>::Assign;
 
 	// ---------------------------------------------------
 
 	template <class Allocator>
-	friend void Swap(AbstractPath<Allocator>&, AbstractPath<Allocator>&);
+	friend void Swap(AbstractPath<Allocator>&, AbstractPath<Allocator>&) ETNoexceptHint;
 };
 
 // ---
 
-AbstractStringView<PlatformChar> GetPath(KnownDirectory directory);
+AbstractStringSpan<PlatformChar> GetPath(KnownDirectory directory);
 
 using Path = AbstractPath<MallocAllocator>;
 

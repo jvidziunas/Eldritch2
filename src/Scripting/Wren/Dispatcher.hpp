@@ -16,24 +16,21 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
-	class Context;
+	class ScriptExecutor;
 }}} // namespace Eldritch2::Scripting::Wren
 
 struct WrenHandle;
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
+	enum class GameTime : uint64 {};
+
 	class ScriptEvent {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using Time = uint64;
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref ScriptEvent instance.
-		ETConstexpr ScriptEvent(Time when, WrenHandle* receiver) ETNoexceptHint;
+		ETConstexpr ScriptEvent(GameTime when, WrenHandle* receiver) ETNoexceptHint;
 		//!	Disable copy construction.
 		ETConstexpr ScriptEvent(const ScriptEvent&) ETNoexceptHint = delete;
 		//!	Constructs this @ref ScriptEvent instance.
@@ -46,17 +43,19 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	public:
-		bool ShouldDispatch(Time now) const ETNoexceptHint;
+		bool ShouldDispatch(GameTime now) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
+		//!	Disable copy assignment.
 		ScriptEvent& operator=(const ScriptEvent&) ETNoexceptHint = delete;
+		ScriptEvent& operator                                     =(ScriptEvent&&) ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	public:
-		Time        when;
+		GameTime    when;
 		WrenHandle* receiver;
 	};
 
@@ -74,35 +73,35 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		//!	Disable copy construction.
 		Dispatcher(const Dispatcher&) = delete;
 		//!	Constructs this @ref Dispatcher instance.
-		Dispatcher();
+		Dispatcher() ETNoexceptHint;
 
 		~Dispatcher();
 
 		// ---------------------------------------------------
 
 	public:
-		ETConstexpr ScriptEvent::Time GetNow() const ETNoexceptHint;
+		ETConstexpr GameTime GetNow() const ETNoexceptHint;
 
-		ETConstexpr MicrosecondTime SetGameTime(MicrosecondTime) ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	public:
-		void CallAtGameTime(ScriptEvent::Time when, WrenHandle* receiver);
-
-		void CallOnDelay(ScriptEvent::Time delay, WrenHandle* receiver);
+		ETCpp14Constexpr MicrosecondTime SetGameTime(MicrosecondTime) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
+		void CallAtGameTime(GameTime when, WrenHandle* receiver);
+
+		void CallOnDelay(GameTime delay, WrenHandle* receiver);
+
+		// ---------------------------------------------------
+
+	public:
+		ETCpp14Constexpr double SetTimeScalar(double) ETNoexceptHint;
+
 		ETConstexpr double GetTimeScalar() const ETNoexceptHint;
 
-		ETConstexpr double SetTimeScalar(double) ETNoexceptHint;
-
 		// ---------------------------------------------------
 
 	public:
-		void ExecuteScriptEvents(Context& context, MicrosecondTime tickDelta);
+		void ExecuteScriptEvents(ScriptExecutor& context, MicrosecondTime tickDelta);
 
 		// ---------------------------------------------------
 
@@ -114,24 +113,24 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(Context& context, double timeScalar, MicrosecondTime now = 0u);
+		Result BindResources(ScriptExecutor& context, MicrosecondTime now);
 
-		void FreeResources(Context& context);
+		void FreeResources(ScriptExecutor& context) ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		bool            _requestedShutdown;
-		double          _timeScalar;
+		double          _targetTimeScalar;
 		MicrosecondTime _gameTime;
 		EventQueue      _events;
 	};
 
 	// ---
 
-	ETConstexpr ETPureFunctionHint ScriptEvent::Time AsScriptTime(MicrosecondTime when) ETNoexceptHint;
+	ETConstexpr ETPureFunctionHint MicrosecondTime AsMicrosecondTime(GameTime when) ETNoexceptHint;
 
-	ETConstexpr ETPureFunctionHint MicrosecondTime AsMicroseconds(ScriptEvent::Time when) ETNoexceptHint;
+	ETConstexpr ETPureFunctionHint GameTime AsGameTime(MicrosecondTime when) ETNoexceptHint;
 
 }}} // namespace Eldritch2::Scripting::Wren
 

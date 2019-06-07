@@ -12,19 +12,18 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/HashSet.hpp>
-#include <Common/Containers/String.hpp>
+#include <Common/Containers/SoaList.hpp>
+#include <Common/Containers/Path.hpp>
+#include <Common/FileReader.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-class ErrorCode;
-}
-
-namespace Eldritch2 {
-namespace Tools {
+namespace Eldritch2 { namespace Tools {
 
 	class GeometryCompiler : public CrtpTool<GeometryCompiler> {
+	public:
+		using MeshList = SoaList<Path, FileReader>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -40,18 +39,17 @@ namespace Tools {
 	public:
 		void RegisterOptions(OptionRegistrar& visitor);
 
-		ErrorCode ProcessMesh(StringView<PlatformChar> path);
+		Result ProcessMesh(Logging::Log& log, MeshList::Reference sourceMesh);
 
-		ErrorCode Process();
+		Result Process(Logging::Log& log);
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		HashSet<PlatformString<>> _sourcePaths;
-		String<>                  _password;
-		bool                      _skipTextureCoordinates;
-		bool                      _skipOrientation;
+		MeshList _meshes;
+		String   _password;
+		bool     _skipTextureCoordinates;
+		bool     _skipOrientation;
 	};
 
-}
-} // namespace Eldritch2::Tools
+}} // namespace Eldritch2::Tools

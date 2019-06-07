@@ -12,41 +12,90 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Audio/XAudio2/Xaudio2Selector.hpp>
 #include <Core/EngineComponent.hpp>
-#include <Logging/ChildLog.hpp>
+#include <Core/WorldComponent.hpp>
+#include <Audio/PcmCache.hpp>
 //------------------------------------------------------------------//
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-#	include <C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include/XAudio2.h>
-#else
-#	include <XAudio2.h>
-#endif
-//------------------------------------------------------------------//
+
+namespace Eldritch2 { namespace Audio { namespace XAudio2 {
+	class XAudio2AudioScene;
+}}} // namespace Eldritch2::Audio::XAudio2
 
 namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
 	class XAudio2EngineComponent : public Core::EngineComponent, public IXAudio2EngineCallback {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		class WorldComponent : public Core::WorldComponent {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//! Constructs this @ref XAudio2WorldComponent instance.
+			WorldComponent(const ObjectInjector& services) ETNoexceptHint;
+			//!	Disable copy construction.
+			WorldComponent(const WorldComponent&) = delete;
+
+			~WorldComponent() = default;
+
+			// ---------------------------------------------------
+
+		public:
+			void OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction) ETNoexceptHint override;
+
+			void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime delta) ETNoexceptHint override;
+
+			// ---------------------------------------------------
+
+		public:
+			void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+			void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+			// ---------------------------------------------------
+
+		public:
+			void PublishApi(Scripting::Wren::ApiBuilder&) override;
+
+			using Core::WorldComponent::PublishApi;
+
+			// - DATA MEMBERS ------------------------------------
+
+		private:
+			XAudio2AudioScene* _scene;
+		};
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref XAudio2EngineComponent instance.
-		XAudio2EngineComponent(const ObjectLocator& services);
+		XAudio2EngineComponent(const ObjectInjector& services) ETNoexceptHint;
 		//!	Disable copy construction.
 		XAudio2EngineComponent(const XAudio2EngineComponent&) = delete;
 
 		~XAudio2EngineComponent();
 
+		// ---------------------------------------------------
+
+	public:
+		uint32 GetFrameOperationSet(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
+
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
-		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
+		void BindResourcesEarly(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
-		void BindResourcesEarly(Scheduling::JobExecutor& executor) override;
+		void BindConfigurableResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
-		void BindConfigurableResources(Scheduling::JobExecutor& executor) override;
+		void TickEarly(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
-		void TickEarly(Scheduling::JobExecutor& executor) override;
+		// ---------------------------------------------------
 
-		void PublishConfiguration(Core::PropertyRegistrar& properties) override;
+	public:
+		void PublishApi(Core::PropertyApiBuilder& api) override;
+
+		using EngineComponent::PublishApi;
 
 		// ---------------------------------------------------
 
@@ -60,14 +109,15 @@ namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable Logging::ChildLog           _log;
-		mutable UsageMixin<MallocAllocator> _allocator;
-		HMODULE                             _xaudioLibrary;
-		uint32                              _speakerCount;
-		uint32                              _affinityMask;
-		String                              _deviceName;
-		uint32                              _glitchCount;
-		ComPointer<IXAudio2>                _xaudio;
+		HMODULE                 _xaudioLibrary;
+		String                  _deviceName;
+		uint32                  _affinityMask;
+		uint32                  _channelCount;
+		uint32                  _sampleRateHz;
+		Atomic<uint32>          _operationSet;
+		Atomic<uint32>          _glitchCount;
+		ComPointer<IXAudio2>    _xaudio;
+		IXAudio2MasteringVoice* _output;
 	};
 
 }}} // namespace Eldritch2::Audio::XAudio2

@@ -13,7 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysxPointer.hpp>
-#include <Assets/Asset.hpp>
+#include <Core/Asset.hpp>
 //------------------------------------------------------------------//
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
 ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
@@ -23,7 +23,7 @@ ET_POP_MSVC_WARNING_STATE()
 
 namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews {
 
-	class TerrainAsset : public Assets::Asset {
+	class TerrainAsset : public Core::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -32,26 +32,26 @@ namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews
 		//!	Constructs this @ref TerrainAsset instance.
 		/*!	@param[in] path UTF-8-encoded string view containing the file system path to the asset
 			the @ref TerrainAsset will be describing. */
-		TerrainAsset(StringView path);
+		TerrainAsset(StringSpan path) ETNoexceptHint;
 
 		~TerrainAsset() override = default;
 
 		// ---------------------------------------------------
 
 	public:
-		physx::PxShape& GetShape() const;
+		physx::PxShape& GetShape() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(const Builder& builder) override;
+		Result BindResources(Logging::Log& log, const Core::AssetBuilder& builder) override;
 
-		void FreeResources() override;
+		void FreeResources() ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		static ETPureFunctionHint StringView GetExtension();
+		static ETPureFunctionHint StringSpan GetExtension() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

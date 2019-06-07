@@ -18,14 +18,8 @@
 namespace Eldritch2 { namespace Detail {
 
 	template <class Value, class ElementPolicy>
-	IntrusiveConcurrentQueue<Value, ElementPolicy>::IntrusiveConcurrentQueue(IntrusiveConcurrentQueue<Value, ElementPolicy>&& queue) :
-		ElementPolicy(eastl::move(queue)) {}
-
-	// ---------------------------------------------------
-
-	template <class Value, class ElementPolicy>
-	typename IntrusiveConcurrentQueue<Value, ElementPolicy>::ValueType* IntrusiveConcurrentQueue<Value, ElementPolicy>::Pop() {
-		auto result(static_cast<ValueType*>(ElementPolicy::Pop()));
+	ETInlineHint ETForceInlineHint typename IntrusiveConcurrentQueue<Value, ElementPolicy>::Pointer IntrusiveConcurrentQueue<Value, ElementPolicy>::Pop() ETNoexceptHint {
+		const Pointer result(Pointer(ElementPolicy::Pop()));
 #if ET_DEBUG_BUILD
 		if (result) {
 			result->mpNext = result;
@@ -37,9 +31,9 @@ namespace Eldritch2 { namespace Detail {
 	// ---------------------------------------------------
 
 	template <class Value, class ElementPolicy>
-	template <typename Disposer>
-	bool IntrusiveConcurrentQueue<Value, ElementPolicy>::PopAndDispose(Disposer disposer) {
-		if (const auto element = this->Pop()) {
+	template <typename UnaryPredicate>
+	ETInlineHint ETForceInlineHint bool IntrusiveConcurrentQueue<Value, ElementPolicy>::PopAndDispose(UnaryPredicate disposer) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>()) {
+		if (const Pointer element = Pointer(ElementPolicy::Pop())) {
 			disposer(*element);
 			return true;
 		}
@@ -50,25 +44,24 @@ namespace Eldritch2 { namespace Detail {
 	// ---------------------------------------------------
 
 	template <class Value, class ElementPolicy>
-	void IntrusiveConcurrentQueue<Value, ElementPolicy>::Push(ValueType& object) {
-		ElementPolicy::Push(object);
+	ETInlineHint ETForceInlineHint void IntrusiveConcurrentQueue<Value, ElementPolicy>::Push(Reference value) ETNoexceptHint {
+		ElementPolicy::Push(value);
 	}
 
 	// ---------------------------------------------------
 
 	template <class Value, class ElementPolicy>
-	template <typename Disposer>
-	void IntrusiveConcurrentQueue<Value, ElementPolicy>::ClearAndDispose(Disposer disposer) {
-		while (const auto element = this->Pop()) {
-			disposer(*element);
+	template <typename UnaryPredicate>
+	ETInlineHint ETForceInlineHint void IntrusiveConcurrentQueue<Value, ElementPolicy>::ClearAndDispose(UnaryPredicate disposer) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>()) {
+		while (IntrusiveConcurrentQueue<Value, ElementPolicy>::PopAndDispose(disposer)) {
 		}
 	}
 
 	// ---------------------------------------------------
 
 	template <class Value, class ElementPolicy>
-	void IntrusiveConcurrentQueue<Value, ElementPolicy>::Clear() {
-		this->ClearAndDispose([](Value& /*unused*/) {});
+	ETInlineHint ETForceInlineHint void IntrusiveConcurrentQueue<Value, ElementPolicy>::Clear() ETNoexceptHint {
+		IntrusiveConcurrentQueue<Value, ElementPolicy>::ClearAndDispose([](Reference) ETNoexceptHint {});
 	}
 
 }} // namespace Eldritch2::Detail

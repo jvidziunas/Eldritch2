@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Navigation/Recast/BipedalAgent.hpp>
@@ -25,11 +31,11 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		api.DefineClass<BipedalAgent>(ET_BUILTIN_WREN_MODULE_NAME(Navigation), "BipedalAgent", // clang-format off
 			{ /* Static methods */
 				ForeignMethod("new(_)", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<BipedalAgent>(vm, /*classSlot =*/0, GetSlotAs<Armature>(vm, 1));
+					wrenSetReturn<BipedalAgent>(vm, /*classSlot =*/0, wrenGetSlotAs<Armature>(vm, 1));
 				}) },
 			{ /* Methods */
 				ForeignMethod("navigateTo(_,_)", [](WrenVM* vm) ETNoexceptHint {
-					ET_ABORT_WREN_UNLESS(GetSlotAs<BipedalAgent>(vm, 0).TryBeginNavigation(GetSlotAs<NavigationScene>(vm, 1), GetSlotAs<Vector>(vm, 2)), "Error adding navigation agent to scene.");
+					ET_ABORT_WREN_UNLESS(vm, wrenGetSlotAs<BipedalAgent>(vm, 0).TryBeginNavigation(wrenGetSlotAs<NavigationScene>(vm, 1), wrenGetSlotAs<Vector>(vm, 2)), "Error adding navigation agent to scene.");
 				}), }); // clang-format on
 	}
 

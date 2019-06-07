@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #define NK_IMPLEMENTATION
@@ -23,9 +29,15 @@
 #include <Scripting/Wren/Interface.hpp>
 //------------------------------------------------------------------//
 
+//==================================================================//
+// THIRD-PARTY SOURCE
+//==================================================================//
+
+//------------------------------------------------------------------//
+
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
-	Interface::Interface() {}
+	Interface::Interface() ETNoexceptHint {}
 
 	// ---------------------------------------------------
 
@@ -35,14 +47,16 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	ErrorCode Interface::BindResources() {
+	Result Interface::BindResources() {
 		nk_buffer_init_fixed(ETAddressOf(_commandPool), /*m =*/nullptr, /*size =*/0);
 		nk_init_custom(ETAddressOf(_context), /*cmds =*/nullptr, ETAddressOf(_commandPool), /*font =*/nullptr);
+
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void Interface::FreeResources() {
+	void Interface::FreeResources() ETNoexceptHint {
 		nk_clear(ETAddressOf(_context));
 	}
 

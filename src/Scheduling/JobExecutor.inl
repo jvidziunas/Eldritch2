@@ -17,170 +17,167 @@
 
 namespace Eldritch2 { namespace Scheduling {
 
-	ETInlineHint ETForceInlineHint JobExecutor::JobClosure::JobClosure(JobFence& completedFence, Function<void(JobExecutor&) ETNoexceptHint> work) :
-		completedFence(ETAddressOf(completedFence)),
-		work(eastl::move(work)) {}
+	ETInlineHint ETForceInlineHint JobExecutor::JobClosure::JobClosure(JobFence& completedFence, FixedFunction<JobClosureSizeBytes, void(JobExecutor& /*executor*/)> work) ETNoexceptHint : completedFence(ETAddressOf(completedFence)),
+																																															work(Move(work)) {}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint JobExecutor::SuspendedJob::SuspendedJob(const char* file, int line, Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume) :
+	ETInlineHint ETForceInlineHint JobExecutor::SuspendedJob::SuspendedJob(const char* file, int line, PlatformFiber fiber, FixedFunction<WaitClosureSizeBytes, bool()> shouldResume) ETNoexceptHint :
 #if ET_ENABLE_JOB_DEBUGGING
-		serialNumber([]() -> uint64 { static ETThreadLocal uint64 serial(0u); return serial++; }()),
+		serialNumber([]() ETNoexceptHint -> uint64 { static ETThreadLocal uint64 serial(0u); return serial++; }()),
 		file(file),
 		line(line),
 #endif
 		fiber(fiber),
-		shouldResume(eastl::move(shouldResume)) {
+		shouldResume(Move(shouldResume)) {
 		ETUnreferencedParameter(file);
 		ETUnreferencedParameter(line);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint JobExecutor::SuspendedJob::SuspendedJob(Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume) :
+	ETInlineHint ETForceInlineHint JobExecutor::SuspendedJob::SuspendedJob(PlatformFiber fiber, FixedFunction<WaitClosureSizeBytes, bool()> shouldResume) ETNoexceptHint :
+#if ET_ENABLE_JOB_DEBUGGING
+		file(""),
+		line(-1),
+#endif
 		fiber(fiber),
-		shouldResume(eastl::move(shouldResume)) {}
+		shouldResume(Move(shouldResume)) {
+	}
 
 	// ---------------------------------------------------
 
 	template <typename... WorkItems>
 	ETInlineHint ETForceInlineHint void JobExecutor::StartAsync(JobFence& completed, WorkItems... workItems) {
 		completed.fetch_add(static_cast<int>(sizeof...(workItems)), std::memory_order_relaxed);
-		DiscardReturns((_jobs.EmplaceBack(completed, eastl::move(workItems)), 0)...);
+		DiscardArguments((_jobs.EmplaceBack(completed, Move(workItems)), 0)...);
 	}
 
 	// ---------------------------------------------------
 
-	template <size_t splitSize, typename InputIterator, typename OutputIterator, typename AlternateInputIterator, typename TrinaryPredicate>
-	ETInlineHint void JobExecutor::Transform(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, OutputIterator out, TrinaryPredicate transformer) {
+	template <size_t SplitSize, typename InputIterator, typename InputIterator2, typename QuaternaryPredicate>
+	ETInlineHint void JobExecutor::ForEachSplit(InputIterator begin, InputIterator end, InputIterator2 begin2, QuaternaryPredicate predicate) {
 		struct Split {
-			InputIterator          begin;
-			InputIterator          end;
-			AlternateInputIterator alternateBegin;
-			OutputIterator         out;
-			TrinaryPredicate       transformer;
+			InputIterator       begin;
+			InputIterator       end;
+			InputIterator2      begin2;
+			QuaternaryPredicate predicate;
 		};
 
-		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
+		const auto splitCount(eastl::distance(begin, end) / SplitSize);
+		const auto splits(ETStackAlloc(Split, Maximum(splitCount, 1u)));
 		JobFence   completed(0);
 		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
-		for (Split* split(splits); end - begin < splitSize; begin += splitSize, alternateBegin += splitSize, out += splitSize, ++split) {
-			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, alternateBegin, out, transformer }](JobExecutor& executor) {
-				executor.Transform<splitSize, InputIterator, OutputIterator, AlternateInputIterator, TrinaryPredicate>(
-					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->alternateBegin), eastl::move(current->out), eastl::move(current->transformer));
-				current->~Split();
+		for (size_t split(0u); split < splitCount; split++) {
+			new (splits + split) Split{
+				eastl::next(begin, split * SplitSize),
+				eastl::next(begin, split * SplitSize + SplitSize),
+				eastl::next(begin2, split * SplitSize),
+				predicate
+			};
+			this->StartAsync(completed, [current = splits + split](JobExecutor& executor) ETNoexceptHint {
+				executor.ForEachSplit<SplitSize, InputIterator, InputIterator2, QuaternaryPredicate>(Move(current->begin), Move(current->end), Move(current->begin2), Move(current->predicate));
 			});
 		}
-
-		//	Finish off the remaining [0-splitSize) transform operations.
-		while (begin != end) {
-			*out++ = transformer(*this, *begin++, *alternateBegin++);
-		}
-
-		AwaitFence(splitsCompleted);
-	}
-
-	// ---------------------------------------------------
-
-	template <size_t splitSize, typename InputIterator, typename OutputIterator, typename BinaryPredicate>
-	ETInlineHint void JobExecutor::Transform(InputIterator begin, InputIterator end, OutputIterator out, BinaryPredicate transformer) {
-		struct Split {
-			InputIterator   begin;
-			InputIterator   end;
-			OutputIterator  out;
-			BinaryPredicate transformer;
-		};
-
-		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
-		JobFence   completed(0);
-		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
-		for (Split* split(splits); end - begin < splitSize; begin += splitSize, out += splitSize, ++split) {
-			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, out, transformer }](JobExecutor& executor) {
-				executor.Transform<splitSize, InputIterator, OutputIterator, BinaryPredicate>(
-					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->out), eastl::move(current->transformer));
-				current->~Split();
-			});
-		}
-
-		//	Finish off the remaining [0-splitSize) transform operations.
-		while (begin != end) {
-			*out++ = transformer(*this, *begin++);
-		}
-
-		AwaitFence(completed);
-	}
-
-	// ---------------------------------------------------
-
-	template <size_t splitSize, typename InputIterator, typename AlternateInputIterator, typename QuaternaryPredicate>
-	ETInlineHint void JobExecutor::ForEachSplit(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, QuaternaryPredicate predicate) {
-		struct Split {
-			InputIterator          begin;
-			InputIterator          end;
-			AlternateInputIterator alternateBegin;
-			QuaternaryPredicate    predicate;
-		};
-
-		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
-		JobFence   completed(0);
-		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
-		for (Split* split(splits); end - begin < splitSize; begin += splitSize, alternateBegin += splitSize, ++split) {
-			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, alternateBegin, predicate }](JobExecutor& executor) {
-				executor.ForEachSplit<splitSize, InputIterator, AlternateInputIterator, QuaternaryPredicate>(
-					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->alternateBegin), eastl::move(current->predicate));
-				current->~Split();
-			});
-		}
-		//	Finish off the remaining [0-splitSize) transform operations.
-		predicate(*this, begin, end, alternateBegin);
+		//	Finish off the remaining [0 - SplitSize) transform operations.
+		predicate(*this, eastl::next(begin, splitCount * SplitSize), end, eastl::next(begin2, splitCount * SplitSize));
 
 		this->AwaitFence(completed);
 	}
 
 	// ---------------------------------------------------
 
-	template <size_t splitSize, typename InputIterator, typename TernaryPredicate>
-	ETInlineHint void JobExecutor::ForEachSplit(InputIterator begin, InputIterator end, TernaryPredicate predicate) {
+	template <size_t SplitSize, typename InputIterator, typename TrinaryPredicate>
+	ETInlineHint void JobExecutor::ForEachSplit(InputIterator begin, InputIterator end, TrinaryPredicate predicate) {
 		struct Split {
 			InputIterator    begin;
 			InputIterator    end;
-			TernaryPredicate predicate;
+			TrinaryPredicate predicate;
 		};
 
-		const auto splits(ETStackAlloc(Split, size_t(end - begin) / splitSize));
+		const auto splitCount(eastl::distance(begin, end) / SplitSize);
+		const auto splits(ETStackAlloc(Split, Maximum(splitCount, 1u)));
 		JobFence   completed(0);
-		//	Start [0 - (end - begin) / splitSize) subtasks to exploit data-level parallelism.
-		for (Split* split(splits); end - begin < splitSize; begin += splitSize, ++split) {
-			StartAsync(completed, [current = new (split) Split { begin, begin + splitSize, predicate }](JobExecutor& executor) {
-				executor.ForEachSplit<splitSize, InputIterator, TernaryPredicate>(
-					eastl::move(current->begin), eastl::move(current->end), eastl::move(current->predicate));
-				current->~Split();
+		//	Start [0 - splitCount) subtasks to exploit data-level parallelism.
+		for (size_t split(0u); split < splitCount; split++) {
+			new (splits + split) Split{
+				eastl::next(begin, split * SplitSize),
+				eastl::next(begin, split * SplitSize + SplitSize),
+				predicate
+			};
+			this->StartAsync(completed, [current = splits + split](JobExecutor& executor) ETNoexceptHint {
+				executor.ForEachSplit<SplitSize, InputIterator, TrinaryPredicate>(Move(current->begin), Move(current->end), Move(current->predicate));
 			});
 		}
-		//	Finish off the remaining [0-splitSize) transform operations.
-		predicate(*this, begin, end);
+		//	Finish off the remaining [0 - SplitSize) transform operations.
+		predicate(*this, eastl::next(begin, splitCount * SplitSize), end);
 
 		this->AwaitFence(completed);
 	}
 
 	// ---------------------------------------------------
 
-	template <size_t splitSize, typename InputIterator, typename AlternateInputIterator, typename TrinaryPredicate>
-	ETInlineHint ETForceInlineHint void JobExecutor::ForEach(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, TrinaryPredicate predicate) {
-		this->ForEachSplit<splitSize>(begin, end, alternateBegin, [predicate = eastl::move(predicate)](JobExecutor& executor, InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin) {
+	template <size_t SplitSize, typename InputIterator, typename InputIterator2, typename TrinaryPredicate>
+	ETInlineHint ETForceInlineHint void JobExecutor::ForEach(InputIterator begin, InputIterator end, InputIterator2 begin2, TrinaryPredicate predicate) {
+		this->ForEachSplit<SplitSize, InputIterator, InputIterator2>(Move(begin), Move(end), Move(begin2), [predicate = Move(predicate)](JobExecutor& executor, InputIterator begin, InputIterator end, InputIterator2 begin2) ETNoexceptHint {
 			while (begin != end) {
-				predicate(executor, *begin++, *alternateBegin++);
+				predicate(executor, *begin++, *begin2++);
 			}
 		});
 	}
 
 	// ---------------------------------------------------
 
-	template <size_t splitSize, typename InputIterator, typename BinaryPredicate>
+	template <size_t SplitSize, typename InputIterator, typename BinaryPredicate>
 	ETInlineHint ETForceInlineHint void JobExecutor::ForEach(InputIterator begin, InputIterator end, BinaryPredicate predicate) {
-		this->ForEachSplit<splitSize>(begin, end, [predicate = eastl::move(predicate)](JobExecutor& executor, InputIterator begin, InputIterator end) {
+		this->ForEachSplit<SplitSize, InputIterator>(Move(begin), Move(end), [predicate = Move(predicate)](JobExecutor& executor, InputIterator begin, InputIterator end) ETNoexceptHint {
 			while (begin != end) {
 				predicate(executor, *begin++);
+			}
+		});
+	}
+
+	// ---------------------------------------------------
+
+	template <typename BinaryPredicate, typename... Types>
+	ETInlineHint ETForceInlineHint void JobExecutor::ForEach(Tuple<Types...>&& tuple, BinaryPredicate predicate) {
+		this->ForEach(tuple, IndexSequenceFor<Types...>(), predicate);
+	}
+
+	// ---------------------------------------------------
+
+	template <typename BinaryPredicate, typename... Types>
+	ETInlineHint ETForceInlineHint void JobExecutor::ForEach(Tuple<Types...>& tuple, BinaryPredicate predicate) {
+		this->ForEach(tuple, IndexSequenceFor<Types...>(), predicate);
+	}
+
+	// ---------------------------------------------------
+
+	template <typename BinaryPredicate, typename Tuple, size_t... Indices>
+	ETInlineHint ETForceInlineHint void JobExecutor::ForEach(Tuple&& tuple, IndexSequence<Indices...>, BinaryPredicate predicate) {
+		JobFence completed(0);
+
+		StartAsync(completed, [&](JobExecutor& executor) ETNoexceptHint { predicate(executor, Get<Indices>(tuple)); }...);
+		AwaitFence(completed);
+	}
+
+	// ---------------------------------------------------
+
+	template <typename BinaryPredicate, typename Tuple, size_t... Indices>
+	ETInlineHint ETForceInlineHint void JobExecutor::ForEach(Tuple& tuple, IndexSequence<Indices...>, BinaryPredicate predicate) {
+		JobFence completed(0);
+
+		StartAsync(completed, [&](JobExecutor& executor) ETNoexceptHint { predicate(executor, Get<Indices>(tuple)); }...);
+		AwaitFence(completed);
+	}
+
+	// ---------------------------------------------------
+
+	template <size_t SplitSize, typename InputIterator, typename OutputIterator, typename BinaryPredicate>
+	ETInlineHint void JobExecutor::Transform(InputIterator begin, InputIterator end, OutputIterator out, BinaryPredicate transformer) {
+		this->ForEachSplit<SplitSize, InputIterator, OutputIterator>(Move(begin), Move(end), Move(out), [transformer = Move(transformer)](JobExecutor& executor, InputIterator begin, InputIterator end, OutputIterator out) ETNoexceptHint {
+			while (begin != end) {
+				*out++ = Move(transformer(executor, *begin++));
 			}
 		});
 	}
@@ -191,7 +188,7 @@ namespace Eldritch2 { namespace Scheduling {
 	ETInlineHint ETForceInlineHint void JobExecutor::AwaitWork_(const char* file, int line, WorkItems... workItems) {
 		JobFence completed(0);
 
-		this->StartAsync<WorkItems...>(completed, eastl::move(workItems)...);
+		this->StartAsync<WorkItems...>(completed, Move(workItems)...);
 		this->AwaitFence_(file, line, completed);
 	}
 
@@ -200,9 +197,21 @@ namespace Eldritch2 { namespace Scheduling {
 	ETInlineHint ETForceInlineHint void JobExecutor::AwaitFence_(const char* file, int line, JobFence& fence) {
 		return AwaitCondition_(file, line, [&fence]() -> bool {
 			const int value(fence.load(std::memory_order_consume));
-			ET_ASSERT(value >= 0, "Reference count mismatch for job fence!");
+			ETAssert(value >= 0, "Reference count mismatch for job fence!");
 			return value == 0;
 		});
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint void JobExecutor::SetActive() ETNoexceptHint {
+		SetFiberUserData(this);
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint JobExecutor* GetExecutor() ETNoexceptHint {
+		return static_cast<JobExecutor*>(GetFiberUserData());
 	}
 
 }} // namespace Eldritch2::Scheduling

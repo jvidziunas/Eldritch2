@@ -19,35 +19,30 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	enum QueueConcept : uint32 {
+	enum QueueClass : uint32 {
 		Drawing,
 		BulkComputation,
 		Presentation,
 		SparseBinding,
 		Transfer,
 
-		QueueConcepts
+		QueueClasses
 	};
 
 	// ---
 
-	enum PoolConcept : uint32 {
+	enum PoolClass : uint32 {
 		ShaderResources,
 		FramebufferAttachments,
 		StagingBuffers,
 
-		PoolConcepts
+		PoolClasses
 	};
 
 	// ---
 
 	class Gpu {
 		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using AllocatorType = HostMixin<UsageMixin<MallocAllocator>>;
-
-		// ---
 
 	public:
 		class CommandQueue {
@@ -64,22 +59,54 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			// ---------------------------------------------------
 
 		public:
+			ETConstexpr bool IsIndependent(const CommandQueue&) const ETNoexceptHint;
+
+			ETConstexpr uint32 GetFamily() const ETNoexceptHint;
+
+			// ---------------------------------------------------
+
+		public:
+			VkResult Submit(VkFence consumed, uint32_t submitCount, const VkSubmitInfo submits[]) ETNoexceptHint;
+
+			VkResult Bind(VkFence consumed, uint32_t bindCount, const VkBindSparseInfo binds[]) ETNoexceptHint;
+
+#if VK_KHR_swapchain
+			VkResult Present(const VkPresentInfoKHR& present) ETNoexceptHint;
+#endif // VK_KHR_swapchain
+
+			// ---------------------------------------------------
+
+		public:
 			void BindResources(VkDevice device, uint32_t family);
 
 			// - DATA MEMBERS ------------------------------------
 
-		public:
-			Mutex    mutex;
-			uint32_t family;
-			VkQueue  queue;
+		private:
+			ETCacheLineAligned Mutex _mutex;
+			VkQueue                  _queue;
+			uint32_t                 _family;
+		};
+
+		// ---
+
+	public:
+		template <typename... Args>
+		struct ETPureAbstractHint Finalizer : public IntrusiveForwardListBaseHook {
+			virtual void operator()(Args... args) ETNoexceptHint abstract;
 		};
 
 		// ---
 
 	public:
 		union QueueIndices {
-			uint8_t byConcept[QueueConcepts];
+			uint8_t byConcept[QueueClasses];
 		};
+
+		// ---
+
+	public:
+		template <typename Allocator>
+		using AllocatorType = HostMixin<UsageMixin<Allocator>>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -87,29 +114,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		Gpu(const Gpu&) = delete;
 		//!	Constructs this @ref Gpu instance.
-		Gpu();
+		Gpu() ETNoexceptHint;
 
 		~Gpu();
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult SubmitAsync(QueueConcept target, VkFence commandsConsumed, uint32_t submitCount, const VkSubmitInfo* begin) ETNoexceptHint;
-		template <uint32_t count>
-		VkResult SubmitAsync(QueueConcept target, VkFence commandsConsumed, const VkSubmitInfo (&submits)[count]) ETNoexceptHint;
+		ETConstexpr const CommandQueue& GetQueue(QueueClass queue) const ETNoexceptHint;
+		ETConstexpr CommandQueue& GetQueue(QueueClass queue) ETNoexceptHint;
 
-		VkResult BindAsync(VkFence commandsConsumed, uint32_t bindCount, const VkBindSparseInfo* begin) ETNoexceptHint;
-		template <uint32_t count>
-		VkResult BindAsync(VkFence commandsConsumed, const VkBindSparseInfo (&binds)[count]) ETNoexceptHint;
-
-#if VK_KHR_swapchain
-		VkResult PresentAsync(const VkPresentInfoKHR& submit) ETNoexceptHint;
-#endif // VK_KHR_swapchain
-
-		// ---------------------------------------------------
-
-	public:
-		uint32 GetFrameAfrDeviceMask() const ETNoexceptHint;
+		uint32 GetFrameDeviceMask() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -119,26 +134,35 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		void Unmap(VmaAllocation allocation) ETNoexceptHint;
 
-		VkResult AllocateMemory(const VmaAllocationCreateInfo& allocationInfo) ETNoexceptHint;
+		// ---------------------------------------------------
 
-		void AddGarbage(VkBuffer buffer, VmaAllocation backing);
-		void AddGarbage(VkImage image, VmaAllocation backing);
-		void AddGarbage(VmaAllocation allocation);
-		void AddGarbage(VkBuffer buffer);
-		void AddGarbage(VkImage image);
+	public:
+		VkResult AllocateMemory(VmaAllocation& allocation, const VmaAllocationCreateInfo& createInfo, VkBuffer buffer);
+		VkResult AllocateMemory(VmaAllocation& allocation, const VmaAllocationCreateInfo& createInfo, VkImage image);
 
-		void DestroyGarbage();
+		void DeallocateMemory(VmaAllocation allocation);
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult GetTemporarySemaphore(VkSemaphore& outSemaphore);
+
+		// ---------------------------------------------------
+
+	public:
+		template <typename BinaryPredicate>
+		void Finalize(PoolClass pool, BinaryPredicate finalizer) ETNoexceptHint;
+		template <typename UnaryPredicate>
+		void Finalize(UnaryPredicate finalizer) ETNoexceptHint;
+
+		void DestroyGarbage() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
 		ETConstexpr const VkAllocationCallbacks* GetAllocationCallbacks() const ETNoexceptHint;
 
-		ETConstexpr VkPipelineCache GetPipelineCache() ETNoexceptHint;
-
 		ETConstexpr operator VkPhysicalDevice() ETNoexceptHint;
-
-		ETConstexpr operator VmaAllocator() ETNoexceptHint;
 
 		ETConstexpr operator VkInstance() ETNoexceptHint;
 
@@ -147,16 +171,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		ETConstexpr uint32_t GetQueueFamilyByConcept(QueueConcept concept) const ETNoexceptHint;
-
-		ETConstexpr bool RequiresSemaphore(QueueConcept first, QueueConcept second) const ETNoexceptHint;
+		ETConstexpr uint32_t GetQueueFamilyByClass(QueueClass concept) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
 		VkResult BindResources(VkInstance vulkan, VkPhysicalDevice physicalDevice, VkDeviceSize heapBlockSize, uint32 frameUseCount);
 
-		void FreeResources();
+		void FreeResources() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -166,19 +188,18 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable AllocatorType    _allocator;
-		VkInstance               _vulkan;
-		VkPhysicalDevice         _physicalDevice;
-		VkDevice                 _device;
-		VkPipelineCache          _pipelineCache;
-		QueueIndices             _indices;
-		CommandQueue             _queues[QueueConcepts];
-		mutable Mutex            _gpuAllocatorMutex;
-		VmaAllocator             _gpuAllocator;
-		mutable Mutex            _garbageMutex;
-		ArrayList<VkImage>       _imageGarbage;
-		ArrayList<VkBuffer>      _bufferGarbage;
-		ArrayList<VmaAllocation> _allocationGarbage;
+		mutable AllocatorType<MallocAllocator>            _allocator;
+		VkInstance                                        _vulkan;
+		VkPhysicalDevice                                  _physicalDevice;
+		VkDevice                                          _device;
+		QueueIndices                                      _indices;
+		CommandQueue                                      _queues[QueueClasses];
+		ETCacheLineAligned mutable Mutex                  _gpuAllocatorMutex;
+		VmaAllocator                                      _gpuAllocator;
+		ArenaChildAllocator                               _finalizerArena;
+		ArenaChildAllocator::Checkpoint                   _frameStartCheckpoint;
+		IntrusiveMpscQueue<Finalizer<Gpu&>>               _finalizers;
+		IntrusiveMpscQueue<Finalizer<Gpu&, VmaAllocator>> _allocationFinalizers;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

@@ -22,24 +22,24 @@ class NullAllocator : public Allocator {
 
 protected:
 	//!	Constructs this @ref NullAllocator instance.
-	NullAllocator(const NullAllocator&) = delete;
+	NullAllocator(const NullAllocator&) ETNoexceptHint = default;
 	//!	Constructs this @ref NullAllocator instance.
-	NullAllocator();
+	NullAllocator() ETNoexceptHint;
 
 	~NullAllocator() = default;
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
 public:
-	ETRestrictHint void* Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal) override sealed;
-	ETRestrictHint void* Allocate(SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal) override sealed;
+	ETRestrictHint void* Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override sealed;
+	ETRestrictHint void* Allocate(SizeType byteSize, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override sealed;
 
-	void Deallocate(void* const address, SizeType sizeInBytes) override sealed;
+	void Deallocate(void* const address, SizeType byteSize) ETNoexceptHint override sealed;
 
 	// ---------------------------------------------------
 
 public:
-	static NullAllocator& GetInstance();
+	static NullAllocator& GetInstance() ETNoexceptHint;
 };
 
 } // namespace Eldritch2

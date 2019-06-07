@@ -31,14 +31,16 @@ protected:
 	using UnderlyingContainer = eastl::vector_set<Value, SortPredicate, EaStlAllocatorMixin<Allocator>>;
 
 public:
-	using ValueType     = typename UnderlyingContainer::value_type;
-	using ConstPointer  = typename UnderlyingContainer::const_pointer;
-	using Pointer       = typename UnderlyingContainer::pointer;
-	using AllocatorType = typename UnderlyingContainer::allocator_type::PublicType;
-	using ConstIterator = typename UnderlyingContainer::const_iterator;
-	using Iterator      = typename UnderlyingContainer::iterator;
-	using SizeType      = typename UnderlyingContainer::size_type;
-	using SorterType    = SortPredicate;
+	using ValueType      = typename UnderlyingContainer::value_type;
+	using ConstPointer   = typename UnderlyingContainer::const_pointer;
+	using Pointer        = typename UnderlyingContainer::pointer;
+	using ConstReference = typename UnderlyingContainer::const_reference;
+	using Reference      = typename UnderlyingContainer::reference;
+	using AllocatorType  = typename UnderlyingContainer::allocator_type::PublicType;
+	using ConstIterator  = typename UnderlyingContainer::const_iterator;
+	using Iterator       = typename UnderlyingContainer::iterator;
+	using SizeType       = typename UnderlyingContainer::size_type;
+	using SorterType     = SortPredicate;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -49,7 +51,7 @@ public:
 	template <typename InputIterator>
 	ArraySet(const AllocatorType& allocator, const SorterType& sort, InputIterator begin, InputIterator end);
 	//!	Constructs this @ref ArraySet instance.
-	ArraySet(const AllocatorType& allocator, const SorterType& sort, std::initializer_list<ValueType>);
+	ArraySet(const AllocatorType& allocator, const SorterType& sort, InitializerList<ValueType>);
 	//!	Constructs this @ref ArraySet instance.
 	ArraySet(const AllocatorType& allocator, const ArraySet&);
 	//!	Constructs this @ref ArraySet instance.
@@ -112,6 +114,9 @@ public:
 	Iterator Erase(Iterator begin, Iterator end);
 	Iterator Erase(Iterator where);
 	SizeType Erase(const ValueType& value);
+
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
 	void Clear();
 

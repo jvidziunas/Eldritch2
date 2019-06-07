@@ -17,7 +17,7 @@
 
 namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews {
 
-	ETInlineHint physx::PxShape& TerrainAsset::GetShape() const {
+	ETInlineHint ETForceInlineHint physx::PxShape& TerrainAsset::GetShape() const ETNoexceptHint {
 		return *_shape;
 	}
 

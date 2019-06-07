@@ -5,23 +5,30 @@ file_extension	".e2mesh";
 
 namespace Eldritch2.Graphics.FlatBuffers;
 
-table MeshElementDescriptor {
+table MeshMaterialDescriptor {
 	ShaderPipeline		: string   (required);
-	PipelineResources	: [string] (required);
-	IndexCount			: ushort;
-	MaximumUsedBone		: ushort;
+	Resources			: [string] (required);
 }
 
-table MeshAttributeDescriptor {
-	Name				: string (required);
-	Format				: GpuFormat;
+struct MeshElementDescriptor {
+	MaterialIndex		: ushort;
+	IndexCount			: ushort;
+	MaximumBoneIndex	: ushort;
+}
+
+table MeshLodDescriptor {
+	Elements			: [ushort] (required);
+}
+
+table MeshStreamDescriptor {
+	Data				: [ubyte] (required);
 }
 
 table MeshDescriptor {
-	Attributes			: [MeshAttributeDescriptor];
+	Materials			: [MeshMaterialDescriptor] (required);
 	Elements			: [MeshElementDescriptor] (required);
-	ShadowCasterElement	: MeshElementDescriptor;
-	OccluderElement		: MeshElementDescriptor;
+	Lods				: [MeshLodDescriptor] (required);
+	Streams				: [MeshStreamDescriptor] (required);
 }
 
 root_type MeshDescriptor;

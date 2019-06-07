@@ -12,84 +12,149 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <vulkan/vulkan_core.h>
+#include <Graphics/Vulkan/Gpu.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics {
 	namespace Vulkan {
-		enum QueueConcept : uint32_t;
 		class GraphicsPipeline;
 		class Framebuffer;
-		class Gpu;
 	} // namespace Vulkan
 
-	template <typename Vertex>
-	class MeshSource;
-	struct StaticVertex;
+	class RenderView;
 }} // namespace Eldritch2::Graphics
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	struct View {
-		const MeshSource<StaticVertex>* maskGeometry;
-		VkViewport                      affineViewport;
-	};
-
-	// ---
-
-	class CommandList {
+	class AbstractCommandList {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
-		CommandList(const CommandList&) = delete;
-		//!	Constructs this @ref CommandList instance.
-		CommandList(CommandList&&) ETNoexceptHint;
-		//!	Constructs this @ref CommandList instance.
-		CommandList() ETNoexceptHint;
+		AbstractCommandList(const AbstractCommandList&) = delete;
+		//!	Constructs this @ref AbstractCommandList instance.
+		AbstractCommandList(AbstractCommandList&&) ETNoexceptHint;
+		//!	Constructs this @ref AbstractCommandList instance.
+		ETConstexpr AbstractCommandList() ETNoexceptHint;
 
-		~CommandList();
-
-		// ---------------------------------------------------
-
-	public:
-		ETConstexpr auto Get() const ETNoexceptHint -> const VkCommandBuffer (&)[1];
+		~AbstractCommandList();
 
 		// ---------------------------------------------------
 
 	public:
-		void ExecutePipeline(const Framebuffer& target, const GraphicsPipeline& pipeline, const ArrayList<View>& views);
+		VkResult BindResources(Gpu& gpu, QueueClass queue);
 
-		void CompositeImage(const Framebuffer& target, const Framebuffer& source);
-
-		// ---------------------------------------------------
-
-	public:
-		VkResult BeginRecording(Gpu& gpu, VkCommandPoolResetFlags flags, VkCommandBufferUsageFlags usageFlags) ETNoexceptHint;
-
-		VkResult FinishRecording() ETNoexceptHint;
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
-	public:
-		VkResult BindResources(Gpu& gpu, QueueConcept concept, VkCommandPoolCreateFlags poolFlags);
-
-		void FreeResources(Gpu& gpu);
+	protected:
+		VkResult Submit(Gpu& gpu, VkFence consumed, uint32 submitCount, const VkSubmitInfo submits[]) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
-		CommandList& operator=(const CommandList&) = delete;
+		AbstractCommandList& operator=(const AbstractCommandList&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	protected:
+		VkCommandPool   _pool;
+		VkCommandBuffer _commands;
+	};
+
+	// ---
+
+	class GraphicsCommandList : public AbstractCommandList {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref GraphicsCommandList instance.
+		GraphicsCommandList(GraphicsCommandList&&) ETNoexceptHint = default;
+		//!	Disable copy construction.
+		GraphicsCommandList(const GraphicsCommandList&) = delete;
+		//!	Constructs this @ref GraphicsCommandList instance.
+		GraphicsCommandList() ETNoexceptHint = default;
+
+		~GraphicsCommandList() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		void ExecutePipeline(Framebuffer& target, const GraphicsPipeline& pipeline, Span<const RenderView*> views) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult Submit(Gpu& gpu, VkFence consumed, uint32 waitCount, const VkSemaphore waits[], const VkPipelineStageFlags stages[]) ETNoexceptHint;
+		VkResult Submit(Gpu& gpu, VkFence consumed = VK_NULL_HANDLE) ETNoexceptHint;
+	};
+
+	// ---
+
+	class TransferCommandList : public AbstractCommandList {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		enum : size_t {
+			BindInfos,
+			BindLists
+		};
+
+		// ---
+
+	public:
+		using MemoryBindList      = ArrayList<VkSparseMemoryBind>;
+		using ImageMemoryBindList = ArrayList<VkSparseImageMemoryBind>;
+		using BufferBindList      = SoaList<VkSparseBufferMemoryBindInfo, MemoryBindList>;
+		using ImageBindList       = SoaList<VkSparseImageMemoryBindInfo, ImageMemoryBindList>;
+		using ImageOpaqueBindList = SoaList<VkSparseImageOpaqueMemoryBindInfo, MemoryBindList>;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		TransferCommandList(const TransferCommandList&) = delete;
+		//!	Constructs this @ref TransferCommandList instance.
+		TransferCommandList(TransferCommandList&&) ETNoexceptHint = default;
+		//!	Constructs this @ref TransferCommandList instance.
+		TransferCommandList() ETNoexceptHint;
+
+		~TransferCommandList() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		void QueuePush(VkImage target, VkBuffer source, VkOffset3D offset, VkExtent3D extent, VkImageSubresourceLayers layers);
+		void QueuePush(VkBuffer target, VkBuffer source, VkDeviceSize offset, VkDeviceSize extent);
+
+		void QueuePull(VkBuffer target, VkImage source, VkOffset3D offset, VkExtent3D extent, VkImageSubresourceLayers layers);
+		void QueuePull(VkBuffer target, VkBuffer source, VkDeviceSize offset, VkDeviceSize extent);
+
+		void QueueBind(VkImage target, const VkSparseImageMemoryBind& bind);
+		void QueueBind(VkBuffer target, const VkSparseMemoryBind& bind);
+		void QueueBind(VkImage target, const VkSparseMemoryBind& bind);
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult Submit(Gpu& gpu, VkFence consumed, uint32 waitCount, const VkSemaphore waits[], const VkPipelineStageFlags stages[]) ETNoexceptHint;
+		VkResult Submit(Gpu& gpu, VkFence consumed = VK_NULL_HANDLE) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	private:
+		static ETConstexpr VkSparseBufferMemoryBindInfo CreateBindInfo(VkBuffer buffer) ETNoexceptHint;
+		static ETConstexpr VkSparseImageMemoryBindInfo CreateBindInfo(VkImage image) ETNoexceptHint;
+
+		static ETConstexpr VkSparseImageOpaqueMemoryBindInfo CreateOpaqueBindInfo(VkImage image) ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VkCommandPool   _pool;
-		VkCommandBuffer _commands[1];
-
-		// ---------------------------------------------------
-
-		friend void Swap(CommandList&, CommandList&) ETNoexceptHint;
+		BufferBindList      _bufferBinds;
+		ImageBindList       _imageBinds;
+		ImageOpaqueBindList _imageOpaqueBinds;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

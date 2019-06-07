@@ -37,7 +37,7 @@ public:
 
 public:
 	//!	Constructs this @ref WaitableEvent instance.
-	WaitableEvent(SignalState initialState);
+	WaitableEvent(SignalState initialState) ETNoexceptHint;
 	//!	Disable copy construction.
 	WaitableEvent(const WaitableEvent&) = delete;
 

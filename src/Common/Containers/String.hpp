@@ -19,7 +19,7 @@ namespace Eldritch2 {
 
 using PlatformString     = AbstractString<PlatformChar, MallocAllocator>;
 using String             = AbstractString<Utf8Char, MallocAllocator>;
-using PlatformStringView = AbstractStringView<PlatformString::CharacterType>;
-using StringView         = AbstractStringView<String::CharacterType>;
+using PlatformStringSpan = AbstractStringSpan<PlatformString::CharacterType>;
+using StringSpan         = AbstractStringSpan<String::CharacterType>;
 
 } // namespace Eldritch2

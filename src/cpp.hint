@@ -1,0 +1,3 @@
+#define ETInlineHint
+#define ETForceInlineHint
+#define ETNoexceptHint noexcept

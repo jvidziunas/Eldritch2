@@ -19,33 +19,26 @@ namespace Eldritch2 {
 
 template <class BackingAllocator>
 template <class /*SFINAE*/>
-ETInlineHint UsageMixin<BackingAllocator>::UsageMixin(const UsageMixin<BackingAllocator>& other) :
-	BackingAllocator(other),
-	_usage(0u),
-	_peakUsage(0u) {}
+ETInlineHint UsageMixin<BackingAllocator>::UsageMixin(const UsageMixin<BackingAllocator>& other) ETNoexceptHint : BackingAllocator(other), _usage(0u), _peakUsage(0u) {}
 
 // ---------------------------------------------------
 
 template <class BackingAllocator>
 template <typename... Arguments>
-ETInlineHint UsageMixin<BackingAllocator>::UsageMixin(Arguments&&... args) :
-	BackingAllocator(eastl::forward<Arguments>(args)...),
-	_usage(0u),
-	_peakUsage(0u) {}
+ETInlineHint UsageMixin<BackingAllocator>::UsageMixin(Arguments&&... args) ETNoexceptHint : BackingAllocator(Forward<Arguments>(args)...), _usage(0u), _peakUsage(0u) {}
 
 // ---------------------------------------------------
 
 template <class BackingAllocator>
-ETInlineHint ETRestrictHint void* UsageMixin<BackingAllocator>::Allocate(typename BackingAllocator::SizeType sizeInBytes, typename BackingAllocator::SizeType alignmentInBytes, typename BackingAllocator::SizeType offsetInBytes, AllocationDuration duration) {
-	void* const result(BackingAllocator::Allocate(sizeInBytes, alignmentInBytes, offsetInBytes, duration));
-
+ETInlineHint ETRestrictHint void* UsageMixin<BackingAllocator>::Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration duration) ETNoexceptHint {
+	void* const result(BackingAllocator::Allocate(byteSize, byteAlignment, byteOffset, duration));
 	if (!result) {
 		return nullptr;
 	}
 
 	//	Atomic maximum operation.
 	SizeType   peakSize;
-	const auto effectiveSize(_usage.fetch_add(sizeInBytes, std::memory_order_relaxed));
+	const auto effectiveSize(_usage.fetch_add(byteSize, std::memory_order_relaxed));
 
 	do {
 		peakSize = _peakUsage.load(std::memory_order_relaxed);
@@ -57,9 +50,8 @@ ETInlineHint ETRestrictHint void* UsageMixin<BackingAllocator>::Allocate(typenam
 // ---------------------------------------------------
 
 template <class BackingAllocator>
-ETInlineHint ETRestrictHint void* UsageMixin<BackingAllocator>::Allocate(typename BackingAllocator::SizeType sizeInBytes, AllocationDuration duration) {
+ETInlineHint ETRestrictHint void* UsageMixin<BackingAllocator>::Allocate(typename BackingAllocator::SizeType sizeInBytes, AllocationDuration duration) ETNoexceptHint {
 	void* const result(BackingAllocator::Allocate(sizeInBytes, duration));
-
 	if (!result) {
 		return nullptr;
 	}
@@ -78,7 +70,7 @@ ETInlineHint ETRestrictHint void* UsageMixin<BackingAllocator>::Allocate(typenam
 // ---------------------------------------------------
 
 template <class BackingAllocator>
-ETInlineHint void UsageMixin<BackingAllocator>::Deallocate(void* const address, typename BackingAllocator::SizeType sizeInBytes) {
+ETInlineHint void UsageMixin<BackingAllocator>::Deallocate(void* const address, typename BackingAllocator::SizeType sizeInBytes) ETNoexceptHint {
 	_usage.fetch_sub(sizeInBytes, std::memory_order_release);
 	BackingAllocator::Deallocate(address, sizeInBytes);
 }
@@ -86,16 +78,16 @@ ETInlineHint void UsageMixin<BackingAllocator>::Deallocate(void* const address, 
 // ---------------------------------------------------
 
 template <class BackingAllocator>
-ETInlineHint typename BackingAllocator::SizeType UsageMixin<BackingAllocator>::GetPeakUsageInBytes() const {
+ETInlineHint typename BackingAllocator::SizeType UsageMixin<BackingAllocator>::GetPeakUsageInBytes() const ETNoexceptHint {
 	return _peakUsage.load(std::memory_order_consume);
 }
 
 // ---------------------------------------------------
 
-template <class BackingAllocator>
-ETInlineHint void UsageMixin<BackingAllocator>::Swap(UsageMixin<BackingAllocator>& allocator) {
-	//	Forward to the backing allocator.
-	BackingAllocator::Swap(allocator);
+template <typename BackingAllocator2>
+ETInlineHint void Swap(UsageMixin<BackingAllocator2>& lhs, UsageMixin<BackingAllocator2>& rhs) ETNoexceptHint {
+	Swap(static_cast<BackingAllocator2&>(lhs), static_cast<BackingAllocator2&>(rhs));
+
 	//	Exchange the current and peak allocated amounts on the allocators.
 	_usage.store(_usage.exchange(_usage.load(std::memory_order_relaxed), std::memory_order_consume), std::memory_order_release);
 	_peakUsage.store(_peakUsage.exchange(_peakUsage.load(std::memory_order_relaxed), std::memory_order_consume), std::memory_order_release);

@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/ApiBuilder.hpp>
@@ -31,7 +37,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 						wrenGetListElement(vm, /*listSlot =*/1, i, 2);
 					}
 
-					SetReturn<Planner>(vm, /*classSlot =*/0);
+					wrenSetReturn<Planner>(vm, /*classSlot =*/0);
 				}) },
 			{ /* Methods */ }); // clang-format on
 	}

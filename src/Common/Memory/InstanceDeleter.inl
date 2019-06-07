@@ -19,62 +19,51 @@
 namespace Eldritch2 {
 
 template <typename Allocator, typename T>
-ETInlineHint InstanceDeleter::InstanceDeleter(Allocator& allocator, T* const /*object*/) :
-	_deleter([&allocator](void* object) {
+ETInlineHint ETForceInlineHint InstanceDeleter::InstanceDeleter(Allocator& allocator, T* const /*object*/) :
+	_deleter([&](void* object) ETNoexceptHint {
 		if (!object) {
 			return;
 		}
 		eastl::destruct(static_cast<T*>(object));
 		allocator.Deallocate(object, sizeof(T));
-	}) {
-}
-
-// ---------------------------------------------------
-
-ETInlineHint InstanceDeleter::InstanceDeleter() :
-	_deleter([](void* object) {
-		ET_ASSERT(object == nullptr, "Leaking memory! Object {} assigned to a unique pointer without a matching deleter.", object);
 	}) {}
 
 // ---------------------------------------------------
 
-ETInlineHint void InstanceDeleter::operator()(void* object) const {
+ETInlineHint ETForceInlineHint InstanceDeleter::InstanceDeleter() :
+	_deleter([](void* object) ETNoexceptHint {
+		ETAssert(object == nullptr, "Leaking memory! Object {} assigned to a unique pointer without a matching deleter.", fmt::ptr(object));
+	}) {}
+
+// ---------------------------------------------------
+
+ETInlineHint ETForceInlineHint void InstanceDeleter::operator()(void* object) const ETNoexceptHint {
 	_deleter(object);
 }
 
 // ---------------------------------------------------
 
 template <typename Allocator, typename T>
-ETInlineHint InstanceArrayDeleter::InstanceArrayDeleter(Allocator& allocator, T* const /*objects*/, size_t countInObjects) :
-	_countInObjects(countInObjects),
-	_deleter([&allocator](void* array, size_t countInObjects) {
+ETInlineHint ETForceInlineHint InstanceArrayDeleter::InstanceArrayDeleter(Allocator& allocator, T* const /*objects*/, size_t countInObjects) :
+	_deleter([&allocator, countInObjects](void* array) ETNoexceptHint {
 		if (!array) {
 			return;
 		}
 		eastl::destruct(static_cast<T*>(array), static_cast<T*>(array) + countInObjects);
-		allocator.Deallocate(array, sizeof(T) * countInObjects);
-	}) {
-}
+		allocator.Deallocate(array, countInObjects * sizeof(T));
+	}) {}
 
 // ---------------------------------------------------
 
-ETInlineHint InstanceArrayDeleter::InstanceArrayDeleter() :
-	_countInObjects(0u),
-	_deleter([](void* array, size_t) {
-		ET_ASSERT(array == nullptr, "Leaking memory! Array {} assigned to a unique pointer without a matching deleter.", array);
-	}) {
-}
+ETInlineHint ETForceInlineHint InstanceArrayDeleter::InstanceArrayDeleter() :
+	_deleter([](void* array) ETNoexceptHint {
+		ETAssert(array == nullptr, "Leaking memory! Array {} assigned to a unique pointer without a matching deleter.", fmt::ptr(array));
+	}) {}
 
 // ---------------------------------------------------
 
-ETInlineHint size_t InstanceArrayDeleter::GetSize() const {
-	return _countInObjects;
-}
-
-// ---------------------------------------------------
-
-ETInlineHint void InstanceArrayDeleter::operator()(void* objects) const {
-	_deleter(objects, GetSize());
+ETInlineHint ETForceInlineHint void InstanceArrayDeleter::operator()(void* objects) const ETNoexceptHint {
+	_deleter(objects);
 }
 
 } // namespace Eldritch2

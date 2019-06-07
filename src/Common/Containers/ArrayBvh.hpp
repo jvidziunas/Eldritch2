@@ -12,105 +12,98 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/SoArrayList.hpp>
-#include <Common/Memory/ChildAllocator.hpp>
-#include <Common/Containers/ArrayList.hpp>
+#include <Common/Containers/SoaList.hpp>
+#include <Common/Mpl/Vector.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-template <typename Value, class Allocator = MallocAllocator>
+template <typename Value, typename SortPredicate, class Allocator = MallocAllocator>
 class ArrayBvh {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using LeafIndex  = uint32;
-	using SplitIndex = uint32;
-	using SortKey    = uintptr;
-
-	// ---
-
-public:
-	struct Split {
-		LeafIndex minima[3];
-		LeafIndex maxima[3];
-
-		SplitIndex leftChild;
-		SplitIndex rightChild;
-	};
-
-	// ---
-
 	enum : size_t {
-		TargetKey,
-		SourceKey,
+		Values,
+		Keys,
+		Splits,
 	};
 
 	// ---
 
-private:
-	using LeafContainer  = SoArrayListAlloc<ChildAllocator, SortKey /*targetKey*/, SortKey /*sourceKey*/, Value>;
-	using SplitContainer = ArrayList<Split, ChildAllocator>;
-
 public:
-	using SplitConstIterator = typename SplitContainer::ConstIterator;
-	using SplitIterator      = typename SplitContainer::Iterator;
-	using LeafConstIterator  = typename LeafContainer::ConstIterator;
-	using LeafIterator       = typename LeafContainer::Iterator;
-	using SizeType           = typename LeafContainer::SizeType;
-	using AllocatorType      = Allocator;
-	using ValueType          = Value;
+	template <typename Index>
+	struct Split {
+		Index minima[3];
+		Index maxima[3];
+		Index leftChild;
+		Index rightChild;
+		Box   bounds;
+	};
+
+	// ---
+	
+public:
+	using LeafList           = SoaListAlloc<Allocator, Value /*values*/, typename SortPredicate::KeyType /*keys*/, Split<uint32> /*splits*/>;
+	using SortType           = SortPredicate;
+	using AllocatorType      = typename LeafList::AllocatorType;
+	using ValueType          = typename LeafList::template ValueType<Values>;
+	using KeyType            = typename LeafList::template ValueType<Keys>;
+	using SplitType          = typename LeafList::template ValueType<Splits>;
+	using SplitConstIterator = typename LeafList::template LocalConstIterator<SplitType>;
+	using SplitIterator      = typename LeafList::template LocalConstIterator<SplitType>;
+	using ConstIterator      = typename LeafList::template LocalConstIterator<ValueType>;
+	using Iterator           = typename LeafList::template LocalConstIterator<ValueType>;
+	using ConstSliceType     = Span<ConstIterator>;
+	using SliceType          = Span<Iterator>;
+	using SizeType           = typename LeafList::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref ArrayBvh instance.
-	ArrayBvh(const AllocatorType& allocator);
+	ArrayBvh(const AllocatorType& allocator, const SortType& sort = SortType()) ETNoexceptHint;
 	//!	Constructs this @ref ArrayBvh instance.
 	ArrayBvh(const ArrayBvh&) = default;
+	//!	Constructs this @ref ArrayBvh instance.
+	ArrayBvh(ArrayBvh&&) ETNoexceptHint = default;
 
 	~ArrayBvh() = default;
 
 	// ---------------------------------------------------
 
 public:
-	SplitConstIterator ConstBegin() const ETNoexceptHint;
-
-	SplitConstIterator ConstEnd() const ETNoexceptHint;
-
-	SplitConstIterator Begin() const ETNoexceptHint;
-
-	SplitConstIterator End() const ETNoexceptHint;
+	const SplitType& operator[](SizeType index) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	LeafConstIterator Find(const ValueType& value) const ETNoexceptHint;
-	LeafIterator      Find(const ValueType& value) ETNoexceptHint;
+	template <typename... ExtraArgs>
+	void Sort(ExtraArgs&... args);
 
 	// ---------------------------------------------------
 
 public:
 	void Insert(const ValueType& value);
 
-	LeafIterator Erase(const ValueType& value);
+	SizeType Erase(const ValueType& value);
 
 	// ---------------------------------------------------
 
 public:
-	void Clear();
+	void Clear() ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	Allocator      _allocator;
-	LeafContainer  _leaves;
-	SplitContainer _splits;
+	LeafList _leaves;
+	SortType _sort;
+	SizeType _splits;
 
 	// ---------------------------------------------------
 
 	template <typename Value, class Allocator>
-	friend void Swap(ArrayBvh<Value, Allocator>&, ArrayBvh<Value, Allocator>&);
+	friend void Swap(ArrayBvh<Value, Allocator>&, ArrayBvh<Value, Allocator>&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

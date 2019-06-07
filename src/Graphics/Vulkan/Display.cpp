@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/VulkanTools.hpp>
@@ -30,9 +36,9 @@ namespace Vulkan {
 
 	namespace {
 
-		ETInlineHint ETForceInlineHint VkResult GetSurfacePresentationSupport(Gpu& gpu, VkSurfaceKHR surface) ETNoexceptHint {
+		ETInlineHint ETForceInlineHint VkResult IsSurfacePresentable(Gpu& gpu, VkSurfaceKHR surface) ETNoexceptHint {
 			VkBool32 canPresent;
-			ET_ABORT_UNLESS(vkGetPhysicalDeviceSurfaceSupportKHR(gpu, gpu.GetQueueFamilyByConcept(Presentation), surface, ETAddressOf(canPresent)));
+			ET_ABORT_UNLESS(vkGetPhysicalDeviceSurfaceSupportKHR(gpu, gpu.GetQueueFamilyByClass(Presentation), surface, ETAddressOf(canPresent)));
 
 			return canPresent == VK_TRUE ? VK_SUCCESS : VK_ERROR_FEATURE_NOT_PRESENT;
 		}
@@ -61,23 +67,23 @@ namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint VkResult FindBestSurfaceFormat(VkSurfaceFormatKHR& outFormat, VkPhysicalDevice device, VkSurfaceKHR surface, VkColorSpaceKHR colorSpace, uint32 formatCount, const VkFormat* allowedFormats) ETNoexceptHint {
+		ETInlineHint ETForceInlineHint VkResult FindBestSurfaceFormat(VkSurfaceFormatKHR& outFormat, VkPhysicalDevice device, VkSurfaceKHR surface, VkColorSpaceKHR colorSpace, uint32 formatCount, const VkFormat allowedFormats[]) ETNoexceptHint {
 			uint32_t count(0u);
 
 			ET_ABORT_UNLESS(vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, ETAddressOf(count), nullptr));
-			const auto formats(ETStackAlloc(VkSurfaceFormatKHR, count));
-			const auto end(formats + count);
-			ET_ABORT_UNLESS(vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, ETAddressOf(count), formats));
+			const auto deviceFormats(ETStackAlloc(VkSurfaceFormatKHR, count));
+			const auto end(deviceFormats + count);
+			ET_ABORT_UNLESS(vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, ETAddressOf(count), deviceFormats));
 
 			/*	Vulkan returns a 1-element array with format VK_FORMAT_UNDEFINED to indicate that the presentation layer does not impose any restriction on image format.
 			 *	Thus, we default to the most-preferred format as specified by the caller. */
-			if (count == 1u && formats[0].format == VK_FORMAT_UNDEFINED) {
-				outFormat = VkSurfaceFormatKHR { allowedFormats[0], colorSpace };
+			if (count == 1u && deviceFormats[0].format == VK_FORMAT_UNDEFINED) {
+				outFormat = VkSurfaceFormatKHR{ allowedFormats[0], colorSpace };
 				return VK_SUCCESS;
 			}
 
 			for (uint32 i(0u); i < formatCount; ++i) {
-				const auto candidate(Find(formats, end, VkSurfaceFormatKHR { allowedFormats[i], colorSpace }));
+				const auto candidate(Find(deviceFormats, end, VkSurfaceFormatKHR{ allowedFormats[i], colorSpace }));
 				if (candidate == end) {
 					continue;
 				}
@@ -89,32 +95,56 @@ namespace Vulkan {
 			return VK_ERROR_FEATURE_NOT_PRESENT;
 		}
 
+		ETConstexpr VkRect2D EmptyRect{ { 0, 0 }, { 0u, 0 } };
+
 	} // anonymous namespace
 
-	Display::Display() :
-		_window(),
-		_surface(nullptr),
-		_format { VK_FORMAT_UNDEFINED, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR },
-		_presentMode(VK_PRESENT_MODE_FIFO_KHR),
-		_viewports {} {
-	}
+	Display::Display() ETNoexceptHint : displayRects{ EmptyRect, EmptyRect, EmptyRect, EmptyRect },
+										_window(),
+										_surface(nullptr),
+										_format{ VK_FORMAT_UNDEFINED, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR },
+										_presentMode(VK_PRESENT_MODE_FIFO_KHR),
+										_swapchain(nullptr) {}
 
 	// ---------------------------------------------------
 
 	Display::~Display() {
-		ET_ASSERT(_surface == nullptr, "Leaking Vulkan surface!");
+		ETAssert(_surface == nullptr, "Leaking Vulkan surface {}!", fmt::ptr(_surface));
+		ETAssert(_swapchain == nullptr, "Leaking Vulkan swapchain {}!", fmt::ptr(_swapchain));
 	}
 
 	// ---------------------------------------------------
 
-	VkResult Display::BindSwapchain(Gpu& gpu, VkSwapchainKHR& outSwapchain, VkSwapchainKHR old) ETNoexceptHint {
+	VkResult Display::AcquireImage(Gpu& gpu, VkSwapchainKHR& outSwapchain, VkSemaphore& outWaitSemaphore, uint32& outIndex, uint32 deviceMask) {
+		uint32                          index;
+		const VkAcquireNextImageInfoKHR acquireNextImageInfo{
+			VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR,
+			/*pNext =*/nullptr,
+			_swapchain,
+			/*timeout =*/0u,
+			/*semaphore =*/nullptr,
+			/*fence =*/nullptr,
+			deviceMask
+		};
+		ET_ABORT_UNLESS(vkAcquireNextImage2KHR(gpu, ETAddressOf(acquireNextImageInfo), ETAddressOf(index)));
+
+		outSwapchain     = _swapchain;
+		outWaitSemaphore = nullptr;
+		outIndex         = index;
+
+		return VK_SUCCESS;
+	}
+
+	// ---------------------------------------------------
+
+	VkResult Display::BindSwapchain(Gpu& gpu) {
 		using ::Eldritch2::Swap;
 
 		VkSurfaceCapabilitiesKHR capabilities;
 		ET_ABORT_UNLESS(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gpu, _surface, ETAddressOf(capabilities)));
 
 		VkSwapchainKHR                 swapchain;
-		const VkSwapchainCreateInfoKHR swapchainInfo {
+		const VkSwapchainCreateInfoKHR swapchainInfo{
 			VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 			/*pNext =*/nullptr, // No extension data.
 			/*flags =*/0u,
@@ -132,12 +162,12 @@ namespace Vulkan {
 			VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
 			_presentMode,
 			/*clipped =*/VK_TRUE,
-			old
+			_swapchain
 		};
-		ET_AT_SCOPE_EXIT(vkDestroySwapchainKHR(gpu, old, gpu.GetAllocationCallbacks()));
 		ET_ABORT_UNLESS(vkCreateSwapchainKHR(gpu, ETAddressOf(swapchainInfo), gpu.GetAllocationCallbacks(), ETAddressOf(swapchain)));
+		ET_AT_SCOPE_EXIT(vkDestroySwapchainKHR(gpu, swapchain, gpu.GetAllocationCallbacks()));
 
-		outSwapchain = swapchain;
+		Swap(_swapchain, swapchain);
 		_window.EnsureVisible();
 
 		return VK_SUCCESS;
@@ -145,13 +175,7 @@ namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Display::FreeSwapchain(Gpu& gpu, VkSwapchainKHR swapchain) ETNoexceptHint {
-		vkDestroySwapchainKHR(gpu, swapchain, gpu.GetAllocationCallbacks());
-	}
-
-	// ---------------------------------------------------
-
-	VkResult Display::BindResources(Gpu& gpu, bool preferVerticalSync, uint32 formatCount, const VkFormat* allowedFormats) {
+	VkResult Display::BindResources(Gpu& gpu, bool preferVerticalSync, uint32 formatCount, const VkFormat preferredFormats[]) {
 		using ::Eldritch2::Swap;
 
 		Window window;
@@ -161,10 +185,10 @@ namespace Vulkan {
 		VkSurfaceKHR surface;
 		ET_ABORT_UNLESS(CreateSurface(gpu, window, gpu.GetAllocationCallbacks(), ETAddressOf(surface)));
 		ET_AT_SCOPE_EXIT(vkDestroySurfaceKHR(gpu, surface, gpu.GetAllocationCallbacks()));
-		ET_ABORT_UNLESS(GetSurfacePresentationSupport(gpu, surface));
+		ET_ABORT_UNLESS(IsSurfacePresentable(gpu, surface));
 
 		VkSurfaceFormatKHR format;
-		ET_ABORT_UNLESS(FindBestSurfaceFormat(format, gpu, surface, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, formatCount, allowedFormats));
+		ET_ABORT_UNLESS(FindBestSurfaceFormat(format, gpu, surface, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, formatCount, preferredFormats));
 
 		VkPresentModeKHR presentMode;
 		if (preferVerticalSync) {
@@ -173,9 +197,15 @@ namespace Vulkan {
 			ET_ABORT_UNLESS(FindBestPresentMode(presentMode, gpu, surface, { VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_FIFO_KHR }));
 		}
 
+		// Swapchains are created/updated independently, though we need to clear out the existing swapchain if it exists.
+		VkSwapchainKHR swapchain(nullptr);
+		ET_AT_SCOPE_EXIT(vkDestroySwapchainKHR(gpu, swapchain, gpu.GetAllocationCallbacks()));
+
 		Swap(_window, window);
 		Swap(_surface, surface);
 		Swap(_format, format);
+		Swap(_presentMode, presentMode);
+		Swap(_swapchain, swapchain);
 
 		return VK_SUCCESS;
 	}
@@ -183,13 +213,13 @@ namespace Vulkan {
 	// ---------------------------------------------------
 
 	void Display::FreeResources(Gpu& gpu) {
-		for (Viewport& viewport : _viewports) {
-			viewport.FreeResources(gpu);
-		}
+		_images.ClearAndDispose([&](VkImageView view, VkSemaphore semaphore) ETNoexceptHint {
+			vkDestroySemaphore(gpu, semaphore, gpu.GetAllocationCallbacks());
+			vkDestroyImageView(gpu, view, gpu.GetAllocationCallbacks());
+		});
 
-		_presentMode = VK_PRESENT_MODE_FIFO_KHR;
-		_format      = VkSurfaceFormatKHR { VK_FORMAT_UNDEFINED, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-		vkDestroySurfaceKHR(gpu, eastl::exchange(_surface, nullptr), nullptr);
+		vkDestroySwapchainKHR(gpu, Exchange(_swapchain, nullptr), gpu.GetAllocationCallbacks());
+		vkDestroySurfaceKHR(gpu, Exchange(_surface, nullptr), gpu.GetAllocationCallbacks());
 		_window.FreeResources();
 	}
 

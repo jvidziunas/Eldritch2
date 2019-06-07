@@ -9,12 +9,14 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Mpl/CharTypes.hpp>
-#include <Common/Platform.hpp>
-#include <Common/Memory.hpp>
-//------------------------------------------------------------------//
 #include <Windows.h>
 #include <Process.h>
 #include <malloc.h>
@@ -30,197 +32,172 @@ ET_LINK_LIBRARY("Psapi.lib")
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+
 namespace {
 
-	enum : uint64 { TicksPerMicrosecond = 1000000u };
-
-	// ---------------------------------------------------
-
 	struct ProcessMemoryCountersEx : public PROCESS_MEMORY_COUNTERS_EX {
-	public:
 		//!	Constructs this @ref ProcessMemoryCountersEx instance.
-		ETInlineHint ProcessMemoryCountersEx() {
+		ETForceInlineHint ProcessMemoryCountersEx() ETNoexceptHint {
 			GetProcessMemoryInfo(GetCurrentProcess(), PPROCESS_MEMORY_COUNTERS(this), DWORD(sizeof(*this)));
 		}
-
-		~ProcessMemoryCountersEx() = default;
 	};
 
-	// ---------------------------------------------------
-
-	struct SystemInfo : public SYSTEM_INFO {
-	public:
-		//!	Constructs this @ref SystemInfo instance.
-		ETInlineHint SystemInfo() {
-			GetSystemInfo(this);
-		}
-
-		~SystemInfo() = default;
-	};
-
-	// ---------------------------------------------------
+	// ---
 
 	struct MemoryStatusEx : public MEMORYSTATUSEX {
-	public:
 		//!	Constructs this @ref MemoryStatusEx instance.
-		ETInlineHint MemoryStatusEx() {
+		ETForceInlineHint MemoryStatusEx() ETNoexceptHint {
 			dwLength = DWORD(sizeof(*this));
-
 			GlobalMemoryStatusEx(this);
 		}
-
-		~MemoryStatusEx() = default;
 	};
 
+	// ---
+
+	struct CurrentSystemInfo : public SYSTEM_INFO {
+		//!	Constructs this @ref SystemInfo instance.
+		ETForceInlineHint CurrentSystemInfo() ETNoexceptHint {
+			GetSystemInfo(this);
+		}
+	};
+
+	// ---
+
+	static const struct CurrentSystemInfo SystemInfo;
+
 	// ---------------------------------------------------
 
-	ETPureFunctionHint uint64 GetCpuTicksPerMicrosecond() {
-		LARGE_INTEGER counter;
-
-		QueryPerformanceFrequency(&counter);
-
-		//	QueryPerformanceFrequency() returns the number of ticks in a second; we want a value in microseconds.
-		return uint64(counter.QuadPart) / TicksPerMicrosecond;
-	}
-
-	// ---------------------------------------------------
-
-	ETPureFunctionHint bool VerifyWindowsLibrariesNewerThanVersion(DWORD majorVersion, DWORD minorVersion) {
-		OSVERSIONINFOEX versionInfo;
-		ULONGLONG       conditionMask;
-
+	ETForceInlineHint ETPureFunctionHint bool VerifyWindowsLibrariesNewerThanVersion(DWORD majorVersion, DWORD minorVersion) ETNoexceptHint {
+		OSVERSIONINFOEXW versionInfo;
 		versionInfo.dwOSVersionInfoSize = DWORD(sizeof(versionInfo));
 		versionInfo.dwMajorVersion      = majorVersion;
 		versionInfo.dwMinorVersion      = minorVersion;
 
-		conditionMask = VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL);
+		ULONGLONG conditionMask(0u);
+		conditionMask = VerSetConditionMask(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
 		conditionMask = VerSetConditionMask(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
-
-		return VerifyVersionInfoW(&versionInfo, VER_MAJORVERSION | VER_MINORVERSION, conditionMask) != FALSE;
+		return VerifyVersionInfoW(ETAddressOf(versionInfo), VER_MAJORVERSION | VER_MINORVERSION, conditionMask) != FALSE;
 	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETPureFunctionHint DWORD CountSetBits(ULONG_PTR mask) {
-		enum : DWORD { LSHIFT = CHAR_BIT * sizeof(ULONG_PTR) - 1u };
-
-		ULONG_PTR currentBit(ULONG_PTR(1u) << LSHIFT);
-		DWORD     count(0u);
-
-		for (DWORD i(0); i <= LSHIFT; ++i) {
-			count += ((mask & currentBit) ? 1u : 0u);
-			currentBit >>= 1u;
-		}
-
-		return count;
-	}
-
-	// ---------------------------------------------------
-
-	static const auto CpuTicksPerMicrosecond(GetCpuTicksPerMicrosecond());
 
 } // anonymous namespace
 
-size_t GetCurrentWorkingSetInBytes() {
+size_t GetCurrentWorkingSetInBytes() ETNoexceptHint {
 	return ProcessMemoryCountersEx().WorkingSetSize;
 }
 
 // ---------------------------------------------------
 
-size_t GetPeakWorkingSetInBytes() {
+size_t GetPeakWorkingSetInBytes() ETNoexceptHint {
 	return ProcessMemoryCountersEx().PeakWorkingSetSize;
 }
 
 // ---------------------------------------------------
 
-size_t GetMaximumWorkingSetInBytes() {
+size_t GetMaximumWorkingSetInBytes() ETNoexceptHint {
 	return size_t(MemoryStatusEx().ullTotalVirtual);
 }
 
 // ---------------------------------------------------
 
-size_t GetVirtualMemoryAllocationGranularityInBytes() {
-	return size_t(SystemInfo().dwAllocationGranularity);
+size_t GetVirtualMemoryAllocationByteGranularity() ETNoexceptHint {
+	return size_t(SystemInfo.dwAllocationGranularity);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint CoreInfo GetCoreInfo() {
-	CoreInfo info {};
+ETPureFunctionHint CoreInfo GetCoreInfo() ETNoexceptHint {
+	CoreInfo cores{};
 	DWORD    length(0);
 
-	if (GetLogicalProcessorInformationEx(RelationAll, nullptr, &length) == FALSE && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+	if (GetLogicalProcessorInformationEx(RelationAll, /*Buffer =*/nullptr, ETAddressOf(length)) == FALSE && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
 		char* buffer(ETStackAlloc(char, length));
 
-		if (GetLogicalProcessorInformationEx(RelationAll, PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX(buffer), &length)) {
+		if (GetLogicalProcessorInformationEx(RelationAll, PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX(buffer), ETAddressOf(length))) {
 			const char* const end(buffer + length);
 
 			while (buffer < end) {
-				const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX& processor(*PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX(buffer));
-				if (processor.Relationship == RelationProcessorCore) {
-					info.physicalCores++;
-
-					for (size_t g(0); g < processor.Processor.GroupCount; ++g) {
-						info.logicalCores += CountSetBits(processor.Processor.GroupMask[g].Mask);
-					}
+				const auto& processorInfo(*PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX(buffer));
+				if (processorInfo.Relationship == RelationProcessorCore) {
+					const auto& processor(processorInfo.Processor);
+					cores.physicalCores++;
+					cores.logicalCores = Reduce(processor.GroupMask, processor.GroupMask + processor.GroupCount, cores.logicalCores, [](const GROUP_AFFINITY& group, uint32 cores) ETNoexceptHint {
+						return cores + CountSetBits(group.Mask);
+					});
 				}
 
-				buffer += processor.Size;
+				buffer += processorInfo.Size;
 			}
 		}
 	}
 
-	return info;
+	return cores;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint size_t GetL0CacheLineSizeInBytes() {
+ETPureFunctionHint size_t GetL0CacheLineSizeInBytes() ETNoexceptHint {
 	return 64u;
 }
 
 // ---------------------------------------------------
 
-CpuTimestamp ReadCpuTimestamp() {
+CpuTimestamp ReadCpuTimestamp() ETNoexceptHint {
 	LARGE_INTEGER counter;
-
-	QueryPerformanceCounter(&counter);
-
-	return CpuTimestamp(counter.QuadPart) / CpuTicksPerMicrosecond;
+	QueryPerformanceCounter(ETAddressOf(counter));
+	return CpuTimestamp(counter.QuadPart);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint bool IsWindows10OrNewer() {
+ETPureFunctionHint bool IsWindows10OrNewer() ETNoexceptHint {
 	return false;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint bool IsWindows8OrNewer() {
+ETPureFunctionHint bool IsWindows8OrNewer() ETNoexceptHint {
 	//	Windows 8 is version 6.2 internally.
-	return VerifyWindowsLibrariesNewerThanVersion(6u, 2u);
+	return VerifyWindowsLibrariesNewerThanVersion(/*majorVersion=*/6u, /*minorVersion =*/2u);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint bool IsWindows7OrNewer() {
+ETPureFunctionHint bool IsWindows7OrNewer() ETNoexceptHint {
 	//	Windows 7 is version 6.1 internally.
-	return VerifyWindowsLibrariesNewerThanVersion(6u, 1u);
+	return VerifyWindowsLibrariesNewerThanVersion(/*majorVersion=*/6u, /*minorVersion =*/1u);
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint bool IsPosix() {
+ETPureFunctionHint bool IsPosix() ETNoexceptHint {
 	//	Windows is not POSIX.
 	return false;
 }
 
 // ---------------------------------------------------
 
-ETPureFunctionHint bool IsMacOsX() {
+ETPureFunctionHint bool IsMacOsX() ETNoexceptHint {
 	//	Windows is not OSX.
 	return false;
+}
+
+// ---------------------------------------------------
+
+ETPureFunctionHint MicrosecondTime AsMicroseconds(CpuTimestamp timestamp) ETNoexceptHint {
+	// Memoize ticks per microsecond.
+	static const uint64 CpuTicksPerMicrosecond(([]() ETNoexceptHint -> uint64 {
+		LARGE_INTEGER counter;
+		QueryPerformanceFrequency(ETAddressOf(counter));
+		return uint64(counter.QuadPart / /*microseconds/second =*/1000000u);
+	})());
+
+	return MicrosecondTime(uint64(timestamp) / CpuTicksPerMicrosecond);
+}
+
+// ---------------------------------------------------
+
+ETPureFunctionHint float32 AsMilliseconds(CpuTimestamp timestamp) ETNoexceptHint {
+	return float32(AsMicroseconds(timestamp)) / 1000.0f;
 }
 
 } // namespace Eldritch2

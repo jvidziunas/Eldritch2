@@ -1,4 +1,8 @@
-namespace Eldritch2.FlatBuffers;
+namespace flatbuffers;
+
+struct TransientObjectMarker {
+	Dummy : ubyte;
+}
 
 struct Float2 {
 	X	: float;
@@ -18,11 +22,11 @@ struct Quaternion {
 	W	: float;
 }
 
-struct CompressedUnitQuaternion {
-	Bits	: uint;
+struct UnitQuaternion {
+	Bits : uint;
 }
 
 struct Transformation {
 	Translation : Float3;
-	Orientation : CompressedUnitQuaternion;
+	Orientation : UnitQuaternion;
 }

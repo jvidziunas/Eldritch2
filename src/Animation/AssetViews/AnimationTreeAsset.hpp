@@ -12,17 +12,23 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Assets/Asset.hpp>
+#include <Core/Asset.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Animation { namespace AssetViews {
 
-	class AnimationTreeAsset : public Assets::Asset {
+	class AnimationTreeAsset : public Core::Asset {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
 		struct Blend {};
 		struct Clip {};
+
+		// ---
+
+	public:
+		using ClipList  = ArrayList<Clip>;
+		using BlendList = ArrayList<Blend>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -30,27 +36,27 @@ namespace Eldritch2 { namespace Animation { namespace AssetViews {
 		//!	Disable copy construction.
 		AnimationTreeAsset(const AnimationTreeAsset&) = delete;
 		//!	Constructs this @ref AnimationTreeAsset instance.
-		AnimationTreeAsset(StringView path);
+		AnimationTreeAsset(StringSpan path) ETNoexceptHint;
 
 		~AnimationTreeAsset() override = default;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(const Builder& builder) override;
+		Result BindResources(Logging::Log& log, const Core::AssetBuilder& builder) override;
 
-		void FreeResources() override;
+		void FreeResources() ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+		static ETPureFunctionHint StringSpan GetExtension() ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	public:
-		ArrayList<Clip>  _clips;
-		ArrayList<Blend> _blends;
+		ClipList  _clips;
+		BlendList _blends;
 	};
 
 }}} // namespace Eldritch2::Animation::AssetViews

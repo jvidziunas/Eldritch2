@@ -13,16 +13,60 @@
 // INCLUDES
 //==================================================================//
 #include <Core/EngineComponent.hpp>
+#include <Core/WorldComponent.hpp>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 { namespace Navigation { namespace Recast {
+	class NavigationScene;
+}}} // namespace Eldritch2::Navigation::Recast
 
 namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	class RecastEngineComponent : public Core::EngineComponent {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		class WorldComponent : public Core::WorldComponent {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref WorldComponent instance.
+			WorldComponent(const ObjectInjector& services) ETNoexceptHint;
+			//!	Disable copy construction.
+			WorldComponent(const WorldComponent&) = delete;
+
+			~WorldComponent() = default;
+
+			// ---------------------------------------------------
+
+		public:
+			void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime duration) ETNoexceptHint override;
+
+			// ---------------------------------------------------
+
+		public:
+			void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+			void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+			
+			// ---------------------------------------------------
+
+		public:
+			void PublishApi(Scripting::Wren::ApiBuilder&) override;
+
+			using Core::WorldComponent::PublishApi;
+
+			// - DATA MEMBERS ------------------------------------
+
+		private:
+			NavigationScene* _scene;
+		};
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref RecastEngineComponent instance.
-		RecastEngineComponent(const ObjectLocator& services);
+		RecastEngineComponent(const ObjectInjector& services) ETNoexceptHint;
 		//!	Disable copy construction.
 		RecastEngineComponent(const RecastEngineComponent&) = delete;
 
@@ -31,14 +75,11 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		// ---------------------------------------------------
 
 	public:
-		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
+		void PublishApi(Core::PropertyApiBuilder& api) override;
 
-		// ---------------------------------------------------
+		void PublishApi(Core::AssetApiBuilder& api) override;
 
-	public:
-		void PublishConfiguration(Core::PropertyRegistrar& properties) override;
-
-		void PublishAssetTypes(Assets::AssetApiBuilder& factories) override;
+		using Core::EngineComponent::PublishApi;
 	};
 
 }}} // namespace Eldritch2::Navigation::Recast

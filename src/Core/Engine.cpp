@@ -9,76 +9,43 @@
 \*==================================================================*/
 
 //==================================================================//
-// INCLUDES
+// PRECOMPILED HEADER
 //==================================================================//
-#include <Core/PropertyRegistrar.hpp>
-#include <Scheduling/JobExecutor.hpp>
-#include <Core/IniParser.hpp>
-#include <Core/Engine.hpp>
+#include <Common/Precompiled.hpp>
 //------------------------------------------------------------------//
 
-#if defined(CreateDirectory)
-#	undef CreateDirectory
-#endif
+//==================================================================//
+// INCLUDES
+//==================================================================//
+#include <Core/PropertyApiBuilder.hpp>
+#include <Scheduling/JobExecutor.hpp>
+#include <Core/IniParser.hpp>
+#include <Core/Profiler.hpp>
+#include <Core/Engine.hpp>
+//------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Core {
 
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Scripting;
 	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
-
-	namespace {
-
-		enum : size_t {
-			HighParallelismSplit = 2u,
-			LowParallelismSplit  = 4u
-		};
-
-		// ---
-
-		ETInlineHint ETForceInlineHint ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime delta) {
-			return AsFloat(delta) / /*microseconds per millisecond*/ 1000.0f;
-		}
-
-	} // anonymous namespace
-
-	Engine::Engine() :
-		_allocator("Game Engine Allocator"),
-		_services(),
-		_packageProvider(),
-		_log(),
-		_shouldRun(true),
-		_worlds(MallocAllocator("Game Engine World List Allocator")),
-		_components(MallocAllocator("Game Engine Component List Allocator")) {
-		//	Create the bootstrap set of services.
-		_services.PublishService<PackageDatabase>(_packageProvider.GetPackageDatabase());
-		_services.PublishService<AssetDatabase>(_packageProvider.GetAssetDatabase());
-		_services.PublishService<Engine>(*this);
-	}
 
 	// ---------------------------------------------------
 
-	ErrorCode Engine::CreateWorld(JobExecutor& executor) {
-		UniquePointer<World> world(MakeUnique<World>(_allocator, GetServiceLocator()));
-		ET_ABORT_UNLESS(world->BindResources(executor, _components.Begin(), _components.End()));
-		{
-			Lock _(_worldsMutex);
-			_worlds.Append(eastl::move(world));
-		} // End of lock scope.
-
-		return Error::None;
-	}
+	AbstractEngine::AbstractEngine() ETNoexceptHint : _allocator("Engine Allocator"), _shouldRun(true), _worlds(WorldList::AllocatorType("Engine World List Allocator")) {}
 
 	// ---------------------------------------------------
 
-	void Engine::TickWorlds(JobExecutor& executor) {
+	void AbstractEngine::TickWorlds(JobExecutor& executor) ETNoexceptHint {
+		enum : size_t { HighParallelismSplit = 1u };
+
 		ET_PROFILE_SCOPE("Engine/WorldManagement", "Tick worlds", 0xF32334);
 		{
 			ET_PROFILE_SCOPE("Engine/WorldManagement", "Garbage collect worlds", 0x3422F3);
-			Lock _(_worldsMutex);
 
-			executor.ForEach<HighParallelismSplit>(_worlds.Begin(), _worlds.End(), [this](JobExecutor& executor, UniquePointer<World>& world) {
+			ET_LOCK_SCOPE(_worldsMutex);
+			// Remove any worlds that have marked themselves for deletion.
+			executor.ForEach<HighParallelismSplit>(_worlds.Begin(), _worlds.End(), [this](JobExecutor& executor, UniquePointer<AbstractWorld>& world) ETNoexceptHint {
 				if (world->ShouldShutDown()) {
 					/*	Note that there will (temporarily) be a null pointer in the world collection until these entries are removed at the end
 					 *	of the sweep phase-- see below. */
@@ -87,123 +54,77 @@ namespace Eldritch2 { namespace Core {
 				}
 			});
 
-			//	Remove all null entries from the worlds collection.
-			_worlds.EraseIf([](const UniquePointer<World>& world) { return world == nullptr; });
+			//	Remove all deleted worlds from the list.
+			_worlds.EraseIf([](const UniquePointer<AbstractWorld>& world) ETNoexceptHint { return world == nullptr; });
 
 			if (_worlds.IsEmpty()) {
 				_log.Write(Severity::Message, "No running worlds, shutting down engine." ET_NEWLINE);
-				return SetShouldShutDown();
+				SetShouldShutDown();
 			}
-		} // End of profile/lock scope.
-		executor.ForEach<HighParallelismSplit>(_worlds.Begin(), _worlds.End(), [this](JobExecutor& executor, UniquePointer<World>& world) {
+			// End of lock scope.
+		}
+
+		// Tick all remaining worlds.
+		executor.ForEach<HighParallelismSplit>(_worlds.Begin(), _worlds.End(), [this](JobExecutor& executor, UniquePointer<AbstractWorld>& world) ETNoexceptHint {
+			ET_PROFILE_SCOPE("Engine/WorldManagement", "Tick single world", 0xF32334);
+
 			world->Tick(executor);
 		});
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode Engine::ApplyConfiguration(PlatformStringView filePath) {
-		const Path path(MallocAllocator(), KnownDirectory::UserDocuments, filePath);
-		MappedFile iniFile;
-		if (Failed(iniFile.Open(MappedFile::Read, path))) {
-			_log.Write(Severity::Warning, "Error opening {}, skipping configuration." ET_NEWLINE, path);
-			return Error::None;
+	void AbstractEngine::ApplyProperties(JobExecutor& executor, PlatformStringSpan filePath) ETNoexceptHint {
+		const Path path(Path::AllocatorType(), KnownDirectory::UserDocuments, filePath);
+		FileView   values;
+
+		if (Succeeded(values.Open(FileView::Read, path))) {
+			_log.Write(Severity::Message, "Applying user configuration from file {}." ET_NEWLINE, path);
+
+			values.Prefetch(0u, FileView::EndOfFile);
+			//	Give the disk time to page in the configuration data by registering client properties.
+			PropertyApiBuilder propertyApi(BuildApi(PropertyApiBuilder()));
+			ParseIni(values.StringSlice<Utf8Char>(0u, values.GetByteSize()), [this, &properties = propertyApi.GetProperties()](StringSpan group, StringSpan name, StringSpan value) ETNoexceptHint {
+				if (!properties.SetValue(group, name, value)) {
+					_log.Write(Severity::Warning, "Unknown configuration key '[{}] {} (= {})'." ET_NEWLINE, group, name, value);
+				}
+			});
 		}
 
-		iniFile.Prefetch(0u, MappedFile::LengthOfFile);
-		//	Give the disk time to page in the configuration data by registering client properties.
-		PropertyDatabase properties;
-		{
-			PropertyRegistrar registrar(properties);
-			for (EngineComponent* component : _components) {
-				component->PublishConfiguration(registrar);
-			}
-		}
-
-		auto SetPropertyValue([&](StringView group, StringView name, StringView value) -> bool {
-			return properties.SetValue(group, name, value);
-		});
-
-		auto LogUnknownProperty([&](StringView group, StringView name, StringView /*value*/) {
-			_log.Write(Severity::Warning, "Unknown configuration key '[{}] {}'." ET_NEWLINE, group, name);
-		});
-
-		ParseIni({ iniFile.Get<const Utf8Char>(0u), iniFile.GetSizeInBytes() }, SetPropertyValue, LogUnknownProperty);
-
-		return Error::None;
+		BindConfigurableResources(executor);
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode Engine::BootOnCaller(JobExecutor& executor) {
-		EnsureDirectoryExists(KnownDirectory::Logs, L"");
-		ET_ABORT_UNLESS(_packageProvider.BindResources());
-		ET_AT_SCOPE_EXIT(_packageProvider.FreeResources());
-		Move(KnownDirectory::Logs, L"EngineLog.old.txt", L"EngineLog.txt");
-		ET_ABORT_UNLESS(_log.BindResources(L"EngineLog.txt"));
-		ET_AT_SCOPE_EXIT(
-			_log.Write(Severity::Message, "\t======================================================" ET_NEWLINE);
-			_log.Write(Severity::Message, "\t| TERMINATING APPLICATION                            |" ET_NEWLINE);
-			_log.Write(Severity::Message, "\t======================================================" ET_NEWLINE);
-			_log.FreeResources());
-
-		_log.Write(Severity::Message, "\t======================================================" ET_NEWLINE);
-		_log.Write(Severity::Message, "\t| INITIALIZING APPLICATION                           |" ET_NEWLINE);
-		_log.Write(Severity::Message, "\t======================================================" ET_NEWLINE);
-		Stopwatch timer;
-		BindComponents(executor);
-		CreateBootWorld(executor);
-		_log.Write(Severity::Message, "Engine initialization complete in {:.2f}ms." ET_NEWLINE, AsMilliseconds(timer.GetDuration()));
-		_log.Write(Severity::Message, "\t======================================================" ET_NEWLINE);
-
-		while (ShouldRun()) {
-			ET_PROFILE_FRAME_BEGIN_CPU();
-			RunFrame(executor);
-		}
-
-		return Error::None;
-	}
-
-	// ---------------------------------------------------
-
-	void Engine::BindComponents(JobExecutor& executor) {
+	Result AbstractEngine::BindResources(JobExecutor& executor) ETNoexceptHint {
 		ET_PROFILE_SCOPE("Engine/Initialization", "Initialization", 0xAAAAAA);
 
-		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, EngineComponent* component) {
-			component->BindResourcesEarly(executor);
-		});
-		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, EngineComponent* component) {
-			component->BindResources(executor);
-		});
+		Stopwatch bindTimer;
+		// Back up the previous log, if present.
+		Move(KnownDirectory::Logs, SL("EngineLog.old.txt"), SL("EngineLog.txt"));
+		ET_ABORT_UNLESS(_log.BindResources(SL("EngineLog.txt"), "\t======================================================" ET_NEWLINE // clang-format off
+																"\t| INITIALIZING APPLICATION                           |" ET_NEWLINE
+																"\t======================================================" ET_NEWLINE)); // clang-format on
+		_services = BuildApi(ObjectInjector(*this, _localization, static_cast<Log&>(_log)));
+		BindComponents(executor);
+		CreateWorld(executor);
+
+		_log.Write(
+			Severity::Message,
+			"Engine initialization complete in {:.2f}ms." ET_NEWLINE
+			"\t======================================================" ET_NEWLINE,
+			bindTimer.GetDurationMilliseconds());
+
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void Engine::CreateBootWorld(JobExecutor& executor) {
-		const ErrorCode result(CreateWorld(executor));
-
-		if (Failed(result)) {
-			_log.Write(Severity::Error, "Failed to create boot world: {}!" ET_NEWLINE, result);
-		}
-	}
-
-	// ---------------------------------------------------
-
-	void Engine::RunFrame(JobExecutor& executor) {
-		ET_PROFILE_SCOPE("Engine/Frame", "Frame", 0xAAAAAA);
-		{
-			//	Engine component tick is run in sequence before world tick; we want all shared state to be updated *before* world tick happens.
-			ET_PROFILE_SCOPE("Engine/Frame", "Engine Tick", 0xEEEEEE);
-			executor.ForEach<LowParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, EngineComponent* component) {
-				component->TickEarly(executor);
-			});
-		} // End of profile scope.
-		{
-			ET_PROFILE_SCOPE("Engine/Frame", "World Tick", 0xFFFFFF);
-			executor.ForEach<LowParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, EngineComponent* component) {
-				component->Tick(executor);
-			});
-		} // End of profile scope.
+	void AbstractEngine::FreeResources(JobExecutor& executor) ETNoexceptHint {
+		FreeComponents(executor);
+		_log.FreeResources("\t======================================================" ET_NEWLINE // clang-format off
+						   "\t| TERMINATING APPLICATION                            |" ET_NEWLINE
+						   "\t======================================================" ET_NEWLINE); // clang-format on
 	}
 
 }} // namespace Eldritch2::Core

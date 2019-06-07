@@ -15,7 +15,14 @@
 #include <Scripting/Wren/Marshal.hpp>
 //------------------------------------------------------------------//
 
+#if !defined(ETWrenCall)
+#	define ETWrenCall ETCDecl
+#endif
+
+#define ET_BUILTIN_WREN_MODULE_NAME(name) "builtin/" #name
+
 struct WrenHandle;
+struct WrenVM;
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
@@ -23,17 +30,17 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using Body = void (*)(WrenVM*) ETNoexceptHint;
+		using Body = void(ETWrenCall*)(WrenVM*) ETNoexceptHint;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref ForeignMethod instance.
-		ForeignMethod(StringView signature, Body body) ETNoexceptHint;
+		ETConstexpr ForeignMethod(const ForeignMethod&) ETNoexceptHint = default;
 		//!	Constructs this @ref ForeignMethod instance.
-		ForeignMethod(const ForeignMethod&) ETNoexceptHint = default;
+		ForeignMethod(StringSpan signature, Body body) ETNoexceptHint;
 		//!	Constructs this @ref ForeignMethod instance.
-		ETCpp14Constexpr ForeignMethod() ETNoexceptHint;
+		ETConstexpr ForeignMethod() ETNoexceptHint;
 
 		~ForeignMethod() = default;
 
@@ -51,9 +58,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	public:
 		//!	Constructs this @ref Property instance.
-		Property(StringView name, ForeignMethod::Body getter, ForeignMethod::Body setter) ETNoexceptHint;
+		Property(StringSpan name, ForeignMethod::Body getter, ForeignMethod::Body setter) ETNoexceptHint;
 		//!	Constructs this @ref Property instance.
-		Property(const Property&) ETNoexceptHint = default;
+		ETConstexpr Property(const Property&) ETNoexceptHint = default;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -73,10 +80,12 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref ApiBuilder instance.
-		ApiBuilder(WrenVM* vm) ETNoexceptHint;
 		//!	Disable copy construction.
 		ApiBuilder(const ApiBuilder&) = delete;
+		//!	Constructs this @ref ApiBuilder instance.
+		ApiBuilder(ApiBuilder&&) ETNoexceptHint;
+		//!	Constructs this @ref ApiBuilder instance.
+		ApiBuilder(WrenVM* vm) ETNoexceptHint;
 
 		~ApiBuilder();
 
@@ -84,16 +93,18 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	public:
 		template <class Class>
-		void DefineClass(StringView wrenModule, StringView wrenName, std::initializer_list<ForeignMethod> staticMethods, std::initializer_list<ForeignMethod> methods);
+		void DefineClass(StringSpan name, StringSpan moduleName, InitializerList<ForeignMethod> staticMethods, InitializerList<ForeignMethod> methods);
 
 		template <class Class, typename... Arguments>
-		Class* DefineVariable(StringView wrenModule, StringView wrenName, Arguments&&... arguments);
-		double DefineVariable(StringView wrenModule, StringView wrenName, double value);
+		Class* DefineVariable(StringSpan name, StringSpan moduleName, Arguments&&... arguments);
+		double DefineVariable(StringSpan name, StringSpan moduleName, double value);
 
 		// ---------------------------------------------------
 
 	public:
-		ClassMap ReleaseClasses();
+		ETConstexpr ClassMap& GetClasses() ETNoexceptHint;
+
+		ETConstexpr WrenVM*& GetVm() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -103,9 +114,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	private:
-		void* DefineVariable(CppType type, size_t byteSize, StringView wrenModule, StringView wrenName);
+		void* DefineVariable(CppType type, size_t byteSize, StringSpan name, StringSpan moduleName);
 
-		void DefineClass(CppType type, StringView wrenModule, StringView wrenName, std::initializer_list<ForeignMethod> staticMethods, std::initializer_list<ForeignMethod> methods, void (*finalizer)(void*) ETNoexceptHint);
+		void DefineClass(CppType type, StringSpan name, StringSpan moduleName, InitializerList<ForeignMethod> staticMethods, InitializerList<ForeignMethod> methods, void(ETWrenCall* finalizer)(void*) ETNoexceptHint);
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -116,45 +127,25 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 }}} // namespace Eldritch2::Scripting::Wren
 
-#define ET_BUILTIN_WREN_MODULE_NAME(name) "builtin/" #name
-
-//	Forward declarations for Wren built-in function used in the macros below.
+//	Forward declarations for Wren built-in functions used in macros.
 void wrenSetSlotBytes(WrenVM* vm, int slot, const char* text, size_t length);
 void wrenAbortFiber(WrenVM* vm, int slot);
 
-#define ET_ABORT_WREN(message)                                      \
-	{                                                               \
-		::wrenSetSlotBytes(vm, 0, message, ETCountOf(message) - 1); \
-		return ::wrenAbortFiber(vm, 0);                             \
-	}
-#define ET_ABORT_WREN_FMT(message, ...)                                 \
+// clang-format off
+#define ET_ABORT_WREN(vm, message, ...)                                 \
 	{                                                                   \
 		::fmt::memory_buffer text;                                      \
-		::fmt::format_to(text, fmt::string_view(message), __VA_ARGS__); \
-		wrenSetSlotBytes(vm, 0, text.data(), text.size());              \
-		return wrenAbortFiber(vm, 0);                                   \
+		::fmt::format_to(text, ::fmt::string_view(message), __VA_ARGS__); \
+		::wrenSetSlotBytes(vm, 0, text.data(), text.size());              \
+		return ::wrenAbortFiber(vm, 0);                                   \
 	}
-#define ET_ABORT_WREN_IF(condition, message)                       \
-	if ((condition)) {                                             \
-		::wrenSetSlotBytes(vm, 0, message, StringLength(message)); \
-		return ::wrenAbortFiber(vm, 0);                            \
-	}
-#define ET_ABORT_WREN_IF_FMT(condition, message, ...) \
-	if ((condition)) {                                \
-		ET_ABORT_WREN_FMT(message, __VA_ARGS__);      \
-	}
-#define ET_ABORT_WREN_UNLESS(condition, message) \
-	if (!(condition)) {                          \
-		ET_ABORT_WREN(message);                  \
-	}
-#define ET_ABORT_WREN_UNLESS_FMT(condition, message, ...) \
-	if (!(condition)) {                                   \
-		ET_ABORT_WREN_FMT(message, __VA_ARGS__);          \
-	}
+#define ET_ABORT_WREN_IF(condition, vm, message, ...) if ((condition)) ET_ABORT_WREN(vm, message, __VA_ARGS__)
+#define ET_ABORT_WREN_UNLESS(condition, vm, message, ...) if (!(condition)) ET_ABORT_WREN(vm, message, __VA_ARGS__)
 
-#define ET_DECLARE_WREN_CLASS(className) void className##WrenDefinition(::Eldritch2::Scripting::Wren::ApiBuilder& api)
-#define ET_IMPLEMENT_WREN_CLASS(className) void className##WrenDefinition(::Eldritch2::Scripting::Wren::ApiBuilder& api)
-#define ET_REGISTER_WREN_CLASS(className, builder) className##WrenDefinition(builder)
+#define ET_DECLARE_WREN_CLASS(name) void ET_CPP_JOIN(name, WrenDefinition)(::Eldritch2::Scripting::Wren::ApiBuilder&, ::Eldritch2::StringSpan)
+#define ET_IMPLEMENT_WREN_CLASS(name, api, moduleName) void ET_CPP_JOIN(name, WrenDefinition)(::Eldritch2::Scripting::Wren::ApiBuilder& api, ::Eldritch2::StringSpan moduleName)
+#define ET_REGISTER_WREN_CLASS(name, api, moduleName) ET_CPP_JOIN(name, WrenDefinition)(api, moduleName)
+// clang-format on
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

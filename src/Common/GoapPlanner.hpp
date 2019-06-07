@@ -16,7 +16,7 @@
 #include <Common/Memory/ChildAllocator.hpp>
 #include <Common/Containers/ArrayMap.hpp>
 #include <Common/Mpl/FloatTypes.hpp>
-#include <Common/SymbolTable.hpp>
+#include <Common/SymbolSet.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -26,17 +26,17 @@ class GoapAgent {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using ActionType      = Pair<Action, Weight>;
-	using ListType        = ArrayList<ActionType, Allocator>;
-	using ActionQueueType = PriorityQueue<ActionType, ListType>;
-	using VertexType      = typename ActionQueueType::ValueType;
-	using AllocatorType   = typename ListType::AllocatorType;
+	using ActionList     = ArrayList<Pair<Action, Weight>, Allocator>;
+	using ActionQueue    = PriorityQueue<typename ActionList::ValueType, ActionList>;
+	using ActionType     = typename ActionList::ValueType;
+	using PlanVertexType = typename ActionQueue::ValueType;
+	using AllocatorType  = typename ActionList::AllocatorType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref GoapAgent instance.
-	GoapAgent(const AllocatorType& allocator);
+	GoapAgent(const AllocatorType& allocator) ETNoexceptHint;
 	//!	Disable copy construction.
 	GoapAgent(const GoapAgent&) = delete;
 
@@ -50,8 +50,8 @@ public:
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	ActionQueueType _actions;
-	Weight          _distanceEstimate;
+	ActionQueue _actions;
+	Weight      _distanceEstimate;
 };
 
 // ---
@@ -61,14 +61,15 @@ class GoapPlanner {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using AllocatorType = typename Allocator;
+	using SymbolSetType = SymbolSet<Utf8Char, Allocator>;
+	using AllocatorType = typename SymbolSetType::AllocatorType;
 	using AgentType     = typename GoapAgent<Action, Weight>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref GoapPlanner instance.
-	GoapPlanner(const AllocatorType& allocator);
+	GoapPlanner(const AllocatorType& allocator) ETNoexceptHint;
 	//!	Disable copy construction.
 	GoapPlanner(const GoapPlanner&) = delete;
 
@@ -77,8 +78,7 @@ public:
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	AllocatorType                         _allocator;
-	SymbolTable<Utf8Char, ChildAllocator> _stateTags;
+	SymbolSetType _tags;
 };
 
 } // namespace Eldritch2

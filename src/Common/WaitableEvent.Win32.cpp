@@ -9,17 +9,20 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/WaitableEvent.hpp>
-//------------------------------------------------------------------//
 #include <Windows.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-WaitableEvent::WaitableEvent(SignalState initialState) :
-	_event(CreateEventW(/*lpEventAttributes =*/nullptr, /*bManualReset =*/FALSE, (initialState == SignalState::Signaled ? TRUE : FALSE), /*lpName =*/nullptr)) {}
+WaitableEvent::WaitableEvent(SignalState initialState) ETNoexceptHint : _event(CreateEventW(/*lpEventAttributes =*/nullptr, /*bManualReset =*/FALSE, (initialState == SignalState::Signaled ? TRUE : FALSE), /*lpName =*/nullptr)) {}
 
 // ---------------------------------------------------
 

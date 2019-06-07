@@ -17,85 +17,95 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace Scheduling {
-	class JobExecutor;
-}
-
 namespace Animation {
 	class Armature;
-}
+} // namespace Animation
 
 namespace Graphics {
-	template <typename Vertex>
 	class MeshSource;
-}
+} // namespace Graphics
 } // namespace Eldritch2
 
 namespace Eldritch2 { namespace Graphics {
 
+	enum MeshType {
+		WorldMesh,
+		DynamicMesh,
+
+		MeshTypes
+	};
+
+	// ---
+
 	enum LightType {
-		StaticLights,
-		DynamicLights,
+		WorldLight,
+		DynamicLight,
 
 		LightTypes
 	};
 
 	// ---
 
-	enum PortalViewType {
-		PortalViews,
-
-		PortalViewTypes
-	};
-
-	// ---
-
-	template <typename Vertex>
-	class MeshInstance {
+	class RenderMesh {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref MeshInstance instance.
-		MeshInstance(const Animation::Armature& armature, const MeshSource<Vertex>& mesh) ETNoexceptHint;
-		//!	Constructs this @ref MeshInstance instance.
-		MeshInstance(const MeshInstance&) = default;
+		//!	Constructs this @ref RenderMesh instance.
+		RenderMesh(const Animation::Armature& armature, const MeshSource& mesh) ETNoexceptHint;
+		//!	Constructs this @ref RenderMesh instance.
+		RenderMesh(const RenderMesh&) = default;
 
-		~MeshInstance() = default;
+		~RenderMesh() = default;
 
 		// - DATA MEMBERS ------------------------------------
 
 	public:
 		const Animation::Armature* armature;
-		const MeshSource<Vertex>*  mesh;
+		const MeshSource*          mesh;
 	};
 
 	// ---
 
-	class Light {
+	class RenderLight {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Light instance.
-		Light(Transformation localToWorld, RgbColor color, float16 radius) ETNoexceptHint;
-		//!	Constructs this @ref Light instance.
-		Light(const Light&) = default;
+		//!	Constructs this @ref RenderLight instance.
+		RenderLight(Transformation localToWorld, RgbColor color, float32 radius) ETNoexceptHint;
+		//!	Constructs this @ref RenderLight instance.
+		RenderLight(const RenderLight&) = default;
 
-		~Light() = default;
+		~RenderLight() = default;
 
 		// - DATA MEMBERS ------------------------------------
 
 	public:
 		Transformation localToWorld;
 		RgbColor       color;
-		float16        radius;
+		float32        radius;
 	};
 
 	// ---
 
-	class PortalView {
+	class RenderView {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 	public:
-		const MeshSource<StaticVertex>* mask;
-		Plane                           portalPlane;
+		//!	Constructs this @ref RenderView instance.
+		RenderView(Transformation view, bool isMirror) ETNoexceptHint;
+		//!	Constructs this @ref RenderView instance.
+		RenderView(const RenderView&) ETNoexceptHint = default;
+
+		~RenderView() = default;
+
+		// - DATA MEMBERS ------------------------------------
+
+	public:
+		Transformation viewTransform;
+		bool           isMirror;
+		struct {
+			float32 x, y, width, height;
+		} viewport;
 	};
 
 	// ---
@@ -104,43 +114,14 @@ namespace Eldritch2 { namespace Graphics {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		template <typename MortonCode>
-		class LeafExtractor {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref LeafExtractor instance.
-			LeafExtractor(const LeafExtractor&) ETNoexceptHint = default;
-			//!	Constructs this @ref LeafExtractor instance.
-			LeafExtractor(Vector cellLength) ETNoexceptHint;
-
-			~LeafExtractor() = default;
-
-			// ---------------------------------------------------
-
-		public:
-			MortonCode operator()(const Animation::Armature&) const ETNoexceptHint;
-			MortonCode operator()(const Light& light) const ETNoexceptHint;
-
-			// - DATA MEMBERS ------------------------------------
-
-		private:
-			Vector _reciprocalLength;
-		};
-
-		// ---
-
-	public:
-		template <typename Vertex>
-		using GeometryConcept   = RenderConcept<MeshInstance<Vertex>, MallocAllocator>;
-		using PortalViewConcept = ViewConcept<PortalView, MallocAllocator>;
-		using LightConcept      = RenderConcept<Light, MallocAllocator>;
+		using LightConcept = RenderConcept<RenderLight>;
+		using MeshConcept  = RenderConcept<RenderMesh>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref GraphicsScene instance.
-		GraphicsScene(Vector geometryCellExtent, Vector lightCellExtent) ETNoexceptHint;
+		GraphicsScene(Vector meshCellExtent, Vector lightCellExtent) ETNoexceptHint;
 		//!	Disable copy construction.
 		GraphicsScene(const GraphicsScene&) = delete;
 
@@ -149,14 +130,10 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		const PortalViewConcept& GetConcept(PortalViewType concept) const ETNoexceptHint;
-		const GeometryConcept&   GetConcept(GeometryType concept) const ETNoexceptHint;
-		const LightConcept&      GetConcept(LightType concept) const ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	public:
-		void UpdateAccelerators(Scheduling::JobExecutor& executor);
+		ETConstexpr const LightConcept& GetInstances(LightType concept) const ETNoexceptHint;
+		ETConstexpr const MeshConcept& GetInstances(MeshType concept) const ETNoexceptHint;
+		ETConstexpr LightConcept& GetInstances(LightType concept) ETNoexceptHint;
+		ETConstexpr MeshConcept& GetInstances(MeshType concept) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -166,11 +143,8 @@ namespace Eldritch2 { namespace Graphics {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Vector            _geometryCellExtent;
-		Vector            _lightCellExtent;
-		PortalViewConcept _portalViewConcepts[PortalViewTypes];
-		GeometryConcept   _geometryConcepts[GeometryTypes];
-		LightConcept      _lightConcepts[LightTypes];
+		MeshConcept  _meshConcepts[MeshTypes];
+		LightConcept _lightConcepts[LightTypes];
 	};
 
 }} // namespace Eldritch2::Graphics

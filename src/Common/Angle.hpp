@@ -33,7 +33,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ETConstexpr operator float32() const ETNoexceptHint;
+	ETConstexpr explicit operator float32() const ETNoexceptHint;
 
 	ETConstexpr Angle& operator*=(float32) ETNoexceptHint;
 	ETConstexpr Angle& operator/=(float32) ETNoexceptHint;
@@ -42,7 +42,7 @@ public:
 	ETConstexpr Angle& operator=(float32) ETNoexceptHint;
 	ETConstexpr Angle& operator=(const Angle&) ETNoexceptHint = default;
 
-	// ---------------------------------------------------
+	// - DATA MEMBERS ------------------------------------
 
 private:
 	float32 _radians;
@@ -58,9 +58,9 @@ private:
 
 // ---
 
-ETConstexpr ETPureFunctionHint Angle AngleFromDegrees(float32 angle) ETNoexceptHint;
+ETConstexpr ETPureFunctionHint Angle AsDegreeAngle(float32 angle) ETNoexceptHint;
 
-ETConstexpr ETPureFunctionHint float32 DegreesFromAngle(Angle angle) ETNoexceptHint;
+ETConstexpr ETPureFunctionHint float32 AsDegrees(Angle angle) ETNoexceptHint;
 
 } // namespace Eldritch2
 

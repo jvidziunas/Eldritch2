@@ -66,8 +66,8 @@ ETInlineHint void IntrusiveForwardList<Value>::EraseIf(UnaryPredicate condition)
 // ---------------------------------------------------
 
 template <class Value>
-template <typename UnaryPredicate, typename Disposer>
-ETInlineHint void IntrusiveForwardList<Value>::EraseAndDisposeIf(UnaryPredicate condition, Disposer disposer) {
+template <typename UnaryPredicate, typename UnaryPredicate2>
+ETInlineHint void IntrusiveForwardList<Value>::EraseAndDisposeIf(UnaryPredicate condition, UnaryPredicate2 disposer) {
 	for (auto current(Begin()), end(End()); current != end;) {
 		if (condition(*current)) {
 			current = EraseAndDispose(current, disposer);
@@ -166,8 +166,8 @@ ETInlineHint void IntrusiveForwardList<Value>::Prepend(Reference item) {
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Disposer>
-ETInlineHint void IntrusiveForwardList<Value>::PopFrontAndDispose(Disposer disposer) {
+template <typename UnaryPredicate>
+ETInlineHint void IntrusiveForwardList<Value>::PopFrontAndDispose(UnaryPredicate disposer) {
 	auto& front(_container.front());
 	_container.pop_front();
 
@@ -226,8 +226,8 @@ ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Disposer>
-ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAndDispose(Iterator where, Disposer disposer) {
+template <typename UnaryPredicate>
+ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList<Value>::EraseAndDispose(Iterator where, UnaryPredicate disposer) {
 	auto& element(*where);
 	auto  result(_container.erase(where));
 
@@ -239,8 +239,8 @@ ETInlineHint typename IntrusiveForwardList<Value>::Iterator IntrusiveForwardList
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Disposer>
-ETInlineHint void IntrusiveForwardList<Value>::EraseAndDispose(Iterator begin, Iterator end, Disposer disposer) {
+template <typename UnaryPredicate>
+ETInlineHint void IntrusiveForwardList<Value>::EraseAndDispose(Iterator begin, Iterator end, UnaryPredicate disposer) {
 	if (begin != end) {
 		while (begin.next() != end.node()) {
 			EraseAfterAndDispose(first, disposer);
@@ -262,8 +262,8 @@ ETInlineHint void IntrusiveForwardList<Value>::Clear() {
 // ---------------------------------------------------
 
 template <class Value>
-template <typename Disposer>
-ETInlineHint void IntrusiveForwardList<Value>::ClearAndDispose(Disposer disposer) {
+template <typename UnaryPredicate>
+ETInlineHint void IntrusiveForwardList<Value>::ClearAndDispose(UnaryPredicate disposer) {
 	while (!_container.empty()) {
 		PopFrontAndDispose(disposer);
 	}

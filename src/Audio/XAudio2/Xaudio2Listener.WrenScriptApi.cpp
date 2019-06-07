@@ -9,30 +9,47 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Audio/XAudio2/XAudio2AudioScene.hpp>
-#include <Audio/XAudio2/Xaudio2Listener.hpp>
+#include <Audio/XAudio2/XAudio2Listener.hpp>
+#include <Scripting/Wren/ScriptExecutor.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
-#include <Scripting/Wren/Context.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
 	using namespace ::Eldritch2::Scripting::Wren;
 
-	ET_IMPLEMENT_WREN_CLASS(XAudio2Listener) {
-		api.DefineClass<XAudio2Listener>(ET_BUILTIN_WREN_MODULE_NAME(Audio), "AudioListener", // clang-format off
+	// ---------------------------------------------------
+
+	ET_IMPLEMENT_WREN_CLASS(XAudio2Listener, api, moduleName) {
+		api.DefineClass<XAudio2Listener>("AudioListener", moduleName, // clang-format off
 			{ /* Static methods */
 				ForeignMethod("new(_,_)", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<XAudio2Listener>(vm, /*classSlot=*/0, GetSlotAs<Transformation>(vm, 2));
+					wrenSetReturn<XAudio2Listener>(vm, /*classSlot=*/0, wrenGetSlotAs<Transformation>(vm, 2), /*linearVelocity =*/Vector::MakeIdentity());
 				}), },
 			{ /* Methods */
 				ForeignMethod("localToWorld", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<Transformation>(vm, GetSlotAs<XAudio2Listener>(vm, 0).GetLocalToWorld());
+					wrenSetReturn<Transformation>(vm, wrenGetReceiver<XAudio2Listener>(vm).GetLocalToWorld());
 				}),
 				ForeignMethod("worldToLocal", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<Transformation>(vm, GetSlotAs<XAudio2Listener>(vm, 0).GetWorldToLocal());
+					wrenSetReturn<Transformation>(vm, ~wrenGetReceiver<XAudio2Listener>(vm).GetLocalToWorld());
+				}),
+				ForeignMethod("linearVelocity", [] (WrenVM* vm) ETNoexceptHint {
+					wrenSetReturn<Vector>(vm, wrenGetReceiver<XAudio2Listener>(vm).GetLinearVelocity());
+				}),
+				ForeignMethod("moveTo(_,_)", [] (WrenVM* vm) ETNoexceptHint {
+					wrenGetReceiver<XAudio2Listener>(vm).MoveTo(wrenGetSlotAs<Transformation>(vm, 1), wrenGetSlotAs<Vector>(vm, 2));
+				}),
+				ForeignMethod("moveTo(_)", [] (WrenVM* vm) ETNoexceptHint {
+					wrenGetReceiver<XAudio2Listener>(vm).MoveTo(wrenGetSlotAs<Transformation>(vm, 1), wrenGetReceiver<XAudio2Listener>(vm).GetLinearVelocity());
 				}), }); // clang-format on
 	}
 

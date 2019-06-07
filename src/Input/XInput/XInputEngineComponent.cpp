@@ -9,10 +9,16 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Input/XInput/XInputEngineComponent.hpp>
-#include <Input/XInput/XInputWorldComponent.hpp>
+#include <Core/Profiler.hpp>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -30,21 +36,17 @@ namespace Eldritch2 { namespace Input { namespace XInput {
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Core;
 
-	XInputEngineComponent::XInputEngineComponent(const ObjectLocator& services) :
-		EngineComponent(services) {}
+	// ---------------------------------------------------
+
+	XInputEngineComponent::XInputEngineComponent(const ObjectInjector& services) ETNoexceptHint : EngineComponent(services) {}
 
 	// ---------------------------------------------------
 
-	UniquePointer<WorldComponent> XInputEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
-		return MakeUnique<XInputWorldComponent>(allocator, services);
-	}
-
-	// ---------------------------------------------------
-
-	void XInputEngineComponent::TickEarly(JobExecutor& /*executor*/) {
+	void XInputEngineComponent::TickEarly(JobExecutor& /*executor*/) ETNoexceptHint {
 		ET_PROFILE_SCOPE("Engine/ServiceTick", "Sample XInput pad state", 0xFFFFFF);
+
 		for (DWORD pad(0u); pad < ETCountOf(_gamepads); ++pad) {
-			XInputGetState(pad, &_gamepads[pad]);
+			XInputGetState(pad, ETAddressOf(_gamepads[pad]));
 		}
 	}
 

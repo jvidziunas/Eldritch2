@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -16,8 +22,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	IndexBuffer::IndexBuffer(IndexBuffer&& buffer) :
-		IndexBuffer() {
+	IndexBuffer::IndexBuffer(IndexBuffer&& buffer) ETNoexceptHint : IndexBuffer() {
 		Swap(*this, buffer);
 	}
 
@@ -28,7 +33,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		return GpuBuffer::BindResources(
 			gpu,
-			VkBufferCreateInfo {
+			VkBufferCreateInfo{
 				VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 				/*pNext =*/nullptr,
 				/*flags =*/0u,
@@ -38,7 +43,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*queueFamilyIndexCount =*/0u,    // Exclusive sharing.
 				/*pQueueFamilyIndices =*/nullptr, // Exclusive sharing.
 			},
-			VmaAllocationCreateInfo {
+			VmaAllocationCreateInfo{
 				/*flags =*/0u,
 				VMA_MEMORY_USAGE_GPU_ONLY,
 				/*requiredFlags =*/InferFromUsage,
@@ -50,7 +55,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(IndexBuffer& lhs, IndexBuffer& rhs) {
+	void Swap(IndexBuffer& lhs, IndexBuffer& rhs) ETNoexceptHint {
 		Swap(static_cast<GpuBuffer&>(lhs), rhs);
 	}
 

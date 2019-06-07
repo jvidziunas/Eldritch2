@@ -18,7 +18,7 @@
 namespace Eldritch2 { namespace Scripting {
 
 	struct StoryboardEvent {
-		uint32 time;
+		uint64 time;
 	};
 
 	// ---
@@ -28,7 +28,7 @@ namespace Eldritch2 { namespace Scripting {
 
 	public:
 		//!	Constructs this @ref Storyboard instance.
-		Storyboard();
+		Storyboard() ETNoexceptHint;
 
 		~Storyboard() = default;
 

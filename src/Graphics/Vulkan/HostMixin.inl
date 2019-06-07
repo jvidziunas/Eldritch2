@@ -15,94 +15,57 @@
 
 //------------------------------------------------------------------//
 
-#ifdef CopyMemory
-#	undef CopyMemory
-#endif
-
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	namespace {
-
-		struct ET16ByteAligned AllocationHeader {
-			size_t allocationSize;
-		};
-
-		// ---------------------------------------------------
-
-		ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint AllocationHeader& GetHeader(void* allocation) {
-			return static_cast<AllocationHeader*>(allocation)[-1];
-		}
-
-		// ---------------------------------------------------
-
-		template <typename EldritchAllocator>
-		ETRestrictHint void* Allocate(void* allocator, size_t sizeInBytes, size_t alignmentInBytes, VkSystemAllocationScope /*scope*/) {
-			if (ET_UNLIKELY(ETAlignOf(AllocationHeader) < alignmentInBytes)) {
-				return nullptr;
-			}
-
-			sizeInBytes += sizeof(AllocationHeader);
-			AllocationHeader* result(static_cast<AllocationHeader*>(static_cast<EldritchAllocator*>(allocator)->Allocate(sizeInBytes, ETAlignOf(AllocationHeader), 0u, AllocationDuration::Normal)));
-			if (!result) {
-				return nullptr;
-			}
-
-			*result++ = AllocationHeader { sizeInBytes };
-
-			return result;
-		}
-
-		// ---------------------------------------------------
-
-		template <typename EldritchAllocator>
-		ETRestrictHint void* Reallocate(void* allocator, void* originalMemory, size_t sizeInBytes, size_t alignmentInBytes, VkSystemAllocationScope scope) {
-			void* const result(Allocate<EldritchAllocator>(allocator, sizeInBytes, alignmentInBytes, scope));
-			if (result && originalMemory) {
-				CopyMemory(result, originalMemory, GetHeader(originalMemory).allocationSize);
-			}
-
-			Free<EldritchAllocator>(allocator, originalMemory);
-
-			return result;
-		}
-
-		// ---------------------------------------------------
-
-		template <typename EldritchAllocator>
-		void Free(void* allocator, void* memory) {
-			if (!memory) {
-				return;
-			}
-
-			AllocationHeader& header(GetHeader(memory));
-			static_cast<EldritchAllocator*>(allocator)->Deallocate(ETAddressOf(header), header.allocationSize);
-		}
-
-	} // anonymous namespace
-
 	template <class EldritchAllocator>
-	template <typename... Arguments, class /*SFINAE*/>
-	ETInlineHint ETForceInlineHint HostMixin<EldritchAllocator>::HostMixin(Arguments&&... arguments) :
-		EldritchAllocator(eastl::forward<Arguments>(arguments)...) {
+	template <typename... Arguments>
+	ETInlineHint HostMixin<EldritchAllocator>::HostMixin(Arguments&&... arguments) ETNoexceptHintIf(IsNoThrowConstructible<EldritchAllocator, Arguments...>()) :
+		EldritchAllocator(Forward<Arguments>(arguments)...) {
+		using Header = typename EldritchAllocator::AllocationHeader<16u>;
+		static ETConstexpr auto Noop([](void* /*allocator*/, size_t /*byteSize*/, VkInternalAllocationType /*type*/, VkSystemAllocationScope /*scope*/) ETNoexceptHint -> void {});
+		static ETConstexpr auto Free([](void* allocator, void* allocation) ETNoexceptHint -> void {
+			if (Header* const header = Header::Get(allocation)) {
+				static_cast<EldritchAllocator*>(allocator)->Deallocate(allocation, sizeof(Header) + header->userByteSize);
+			}
+		});
+
+		static ETConstexpr auto Reallocate([](void* allocator, void* old, size_t byteSize, size_t byteAlignment, VkSystemAllocationScope /*scope*/) ETNoexceptHint -> void* {
+			ETAssert(byteAlignment <= Header::DataAlignment, "alignment {} is too strict to be honored by host allocator", byteAlignment);
+
+			const auto result(new(*static_cast<EldritchAllocator*>(allocator), byteSize) Header(byteSize));
+			if (const Header* const oldHeader = Header::Get(old)) {
+				Copy(oldHeader->userBytes, oldHeader->userBytes + oldHeader->userByteSize, result->userBytes);
+				Free(allocator, old);
+			}
+
+			return result->userBytes;
+		});
+
+		static ETConstexpr auto Allocate([](void* allocator, size_t byteSize, size_t byteAlignment, VkSystemAllocationScope scope) -> void* {
+			return Reallocate(allocator, /*allocation =*/nullptr, byteSize, byteAlignment, scope);
+		});
+
+		// ---
+
 		_callbacks.pUserData             = static_cast<EldritchAllocator*>(this);
-		_callbacks.pfnAllocation         = ETAddressOf(Graphics::Vulkan::Allocate<EldritchAllocator>);
-		_callbacks.pfnReallocation       = ETAddressOf(Graphics::Vulkan::Reallocate<EldritchAllocator>);
-		_callbacks.pfnFree               = ETAddressOf(Graphics::Vulkan::Free<EldritchAllocator>);
-		_callbacks.pfnInternalAllocation = [](void* /*allocator*/, size_t /*sizeInBytes*/, VkInternalAllocationType /*type*/, VkSystemAllocationScope /*scope*/) {};
-		_callbacks.pfnInternalFree       = [](void* /*allocator*/, size_t /*sizeInBytes*/, VkInternalAllocationType /*type*/, VkSystemAllocationScope /*scope*/) {};
+		_callbacks.pfnAllocation         = Allocate;
+		_callbacks.pfnReallocation       = Reallocate;
+		_callbacks.pfnFree               = Free;
+		_callbacks.pfnInternalAllocation = Noop;
+		_callbacks.pfnInternalFree       = Noop;
 	}
 
 	// ---------------------------------------------------
 
 	template <class EldritchAllocator>
-	ETConstexpr ETInlineHint ETForceInlineHint const VkAllocationCallbacks* HostMixin<EldritchAllocator>::GetCallbacks() const ETNoexceptHint {
+	ETConstexpr ETForceInlineHint const VkAllocationCallbacks* HostMixin<EldritchAllocator>::GetCallbacks() const ETNoexceptHint {
 		return ETAddressOf(_callbacks);
 	}
 
 	// ---------------------------------------------------
 
 	template <class EldritchAllocator>
-	ETConstexpr ETInlineHint ETForceInlineHint HostMixin<EldritchAllocator>::operator const VkAllocationCallbacks*() const ETNoexceptHint {
+	ETConstexpr ETForceInlineHint HostMixin<EldritchAllocator>::operator const VkAllocationCallbacks*() const ETNoexceptHint {
 		return ETAddressOf(_callbacks);
 	}
 

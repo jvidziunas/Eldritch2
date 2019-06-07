@@ -24,35 +24,40 @@ namespace Eldritch2 { namespace Core {
 		//!	Constructs this @ref TimeAccumulator instance.
 		TimeAccumulator(uint32 targetFrameRateInHz, float32 timeScale) ETNoexceptHint;
 		//!	Constructs this @ref TimeAccumulator instance.
-		TimeAccumulator(const TimeAccumulator&) ETNoexceptHint = default;
+		ETConstexpr TimeAccumulator(const TimeAccumulator&) ETNoexceptHint = default;
 
 		~TimeAccumulator() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		float32 GetResidualBlendFactor() const;
+		ETConstexpr MicrosecondTime GetResidualTime() const ETNoexceptHint;
 
-		uint64 GetResidualTime() const;
+		ETConstexpr float32 GetResidualBlendFactor() const ETNoexceptHint;
 
-		bool ShouldTick() const;
+		bool ShouldSimulate() const ETNoexceptHint;
 
-		void DeductTime(uint64 amount);
-		void DeductTime();
+		void DeductTime(MicrosecondTime amount) ETNoexceptHint;
+		void DeductTime() ETNoexceptHint;
 
-		void AddWallTime(uint64 amount);
+		void AddWallTime(MicrosecondTime amount) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		uint32  GetTickDurationInMicroseconds() const ETNoexceptHint;
-		float32 GetTickDurationInSeconds() const ETNoexceptHint;
+		ETConstexpr MicrosecondTime GetTickDurationInMicroseconds() const ETNoexceptHint;
 
-		uint32  GetTickDurationInWallMicroseconds() const ETNoexceptHint;
-		float32 GetTickDurationInWallSeconds() const ETNoexceptHint;
+		ETConstexpr float32 GetTickDurationInSeconds() const ETNoexceptHint;
 
-		void SetFixedTickFramerate(uint32 value) ETNoexceptHint;
+		ETConstexpr MicrosecondTime GetTickDurationInWallMicroseconds() const ETNoexceptHint;
 
+		ETConstexpr float32 GetTickDurationInWallSeconds() const ETNoexceptHint;
+
+		ETConstexpr void SetFixedTickFramerate(uint32 value) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
 		float32 GetReciprocalTimeScalar() const ETNoexceptHint;
 
 		float32 GetTimeScalar() const ETNoexceptHint;
@@ -63,10 +68,10 @@ namespace Eldritch2 { namespace Core {
 
 	private:
 		//!	Amount of virtual time to advance the game clock by during a fixed-rate tick, in microseconds.
-		uint32 _stepInMicroseconds;
+		MicrosecondTime _stepInMicroseconds;
 		/*!	Additional time carried over (in the range [0, ULONG_MAX]) after all fixed-length ticks have completed
 			for the current frame. */
-		uint64 _residual;
+		MicrosecondTime _residual;
 		/*!	Reciprocal scaling value (in the range [0, +INF)). The amount of elapsed wall time is scaled by this value
 			before being added to the residual. */
 		float32 _reciprocalScale;

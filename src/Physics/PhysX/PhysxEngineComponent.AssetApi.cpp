@@ -9,25 +9,32 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Physics/PhysX/AssetViews/ArmatureAsset.hpp>
+#include <Physics/PhysX/AssetViews/ArmatureDefinitionAsset.hpp>
 #include <Physics/PhysX/AssetViews/TerrainAsset.hpp>
 #include <Physics/PhysX/AssetViews/PhysicsAsset.hpp>
 #include <Physics/PhysX/PhysxEngineComponent.hpp>
-#include <Assets/AssetDatabase.hpp>
+#include <Core/ContentDatabase.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	using namespace ::Eldritch2::Physics::PhysX::AssetViews;
-	using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Core;
 
-	void PhysxEngineComponent::PublishAssetTypes(AssetApiBuilder& api) {
-		ET_PROFILE_SCOPE("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
-		api.DefineType(ArmatureAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ArmatureAsset>());
-		api.DefineType(TerrainAsset::GetExtension(), AssetApiBuilder::DefaultFactory<TerrainAsset>());
-		api.DefineType(PhysicsAsset::GetExtension(), AssetApiBuilder::DefaultFactory<PhysicsAsset>());
+	// ---------------------------------------------------
+
+	void PhysxEngineComponent::PublishApi(AssetApiBuilder& api) {
+		api.DefineType(ArmatureDefinitionAsset::GetExtension(), api.MakeFactory<ArmatureDefinitionAsset>());
+		api.DefineType(TerrainAsset::GetExtension(), api.MakeFactory<TerrainAsset>());
+		api.DefineType(PhysicsAsset::GetExtension(), api.MakeFactory<PhysicsAsset>());
 	}
 
 }}} // namespace Eldritch2::Physics::PhysX

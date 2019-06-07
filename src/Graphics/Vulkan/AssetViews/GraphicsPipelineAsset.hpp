@@ -12,13 +12,13 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/GraphicsPipelineBuilder.hpp>
-#include <Assets/Asset.hpp>
+#include <Graphics/PipelineBuilder.hpp>
+#include <Core/Asset.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	class GraphicsPipelineAsset : public GraphicsPipelineBuilder, public Assets::Asset {
+	class GraphicsPipelineAsset : public PipelineBuilder, public Core::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -27,21 +27,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		//!	Constructs this @ref GraphicsPipelineAsset instance.
 		/*!	@param[in] path UTF-8-encoded string view containing the path to the asset
 				the @ref GraphicsPipelineAsset is describing. */
-		GraphicsPipelineAsset(StringView path);
+		GraphicsPipelineAsset(StringSpan path) ETNoexceptHint;
 
 		~GraphicsPipelineAsset() override = default;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(const Builder& asset) override;
+		Result BindResources(Logging::Log& log, const Core::AssetBuilder& asset) override;
 
-		void FreeResources() override;
+		void FreeResources() ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+		static ETPureFunctionHint StringSpan GetExtension() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

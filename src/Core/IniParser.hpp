@@ -17,8 +17,8 @@
 
 namespace Eldritch2 { namespace Core {
 
-	template <typename TrinaryConsumer, typename AltTrinaryConsumer>
-	void ParseIni(StringView source, TrinaryConsumer keyHandler, AltTrinaryConsumer unknownKeyHandler);
+	template <typename TrinaryConsumer>
+	void ParseIni(StringSpan source, TrinaryConsumer keyHandler) ETNoexceptHint;
 
 }} // namespace Eldritch2::Core
 

@@ -37,11 +37,14 @@
     <Filter Include="FlatBuffer Schema Definitions">
       <UniqueIdentifier>{ae6f235f-5491-41e2-bd61-085fe2acea5e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Platform">
-      <UniqueIdentifier>{40b5d972-dd58-41d2-8245-42c8e395b9f6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Common\Containers">
       <UniqueIdentifier>{908d88c6-0f5c-4e10-a2e0-db8f0e76e0d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Logging">
+      <UniqueIdentifier>{18f949a9-bdac-49bd-8605-37bb4474df35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{0dcf5d33-2f20-423e-b204-0e0f8d5db7be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +96,9 @@
     <ClCompile Include="src\Common\Eastl.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tools\ConsoleLog.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Common\Mpl\Alignof.hpp">
@@ -131,9 +137,6 @@
     <ClInclude Include="src\Tools\CrtpTool.hpp">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\ErrorCode.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Memory\MallocAllocator.hpp">
       <Filter>Header Files\Common\Memory</Filter>
     </ClInclude>
@@ -149,7 +152,16 @@
     <ClInclude Include="src\Common\FileWriter.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\MappedFile.hpp">
+    <ClInclude Include="src\Tools\ConsoleLog.hpp">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logging\Log.hpp">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\FileView.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Result.hpp">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -160,17 +172,18 @@
     <None Include="src\Tools\CrtpTool.inl">
       <Filter>Source Files\Tools</Filter>
     </None>
-    <None Include="src\Common\ErrorCode.inl">
-      <Filter>Source Files\Common</Filter>
-    </None>
     <None Include="src\Common\Memory\MallocAllocator.inl">
       <Filter>Source Files\Common\Memory</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PackageIndex.fbc">
+    <None Include="src\Logging\Log.inl">
+      <Filter>Source Files\Logging</Filter>
+    </None>
+    <None Include="src\Flatbuffers\PackageIndex.fbs">
       <Filter>FlatBuffer Schema Definitions</Filter>
-    </FlatbufferSchemaItem>
+    </None>
+    <None Include="src\Common\Result.inl">
+      <Filter>Source Files\Common</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Eldritch2Types.natvis" />

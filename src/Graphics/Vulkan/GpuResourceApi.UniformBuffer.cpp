@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -16,7 +22,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	UniformBuffer::UniformBuffer(UniformBuffer&& buffer) :
+	UniformBuffer::UniformBuffer(UniformBuffer&& buffer) ETNoexceptHint :
 		UniformBuffer() {
 		Swap(*this, buffer);
 	}
@@ -50,8 +56,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(UniformBuffer& lhs, UniformBuffer& rhs) {
-		Swap(static_cast<GpuBuffer&>(lhs), rhs);
+	void Swap(UniformBuffer& lhs, UniformBuffer& rhs) ETNoexceptHint {
+		Swap(static_cast<GpuBuffer&>(lhs), static_cast<GpuBuffer&>(rhs));
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

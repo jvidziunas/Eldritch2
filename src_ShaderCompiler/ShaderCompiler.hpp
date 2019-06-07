@@ -18,15 +18,15 @@
 
 namespace Eldritch2 { namespace Tools {
 
-	enum ShaderModel : uint32 {
-		ShaderModel5_0,
-		ShaderModel6_0,
-		ShaderModel6_1,
+	enum class ShaderModel : uint32 {
+		_5_0,
+		_6_0,
+		_6_1,
 	};
 
 	// ---
 
-	enum ShaderStage : uint32 {
+	enum class ShaderStage : uint32 {
 		Vertex,
 		Hull,
 		TessellationControl = Hull,
@@ -36,6 +36,8 @@ namespace Eldritch2 { namespace Tools {
 		Pixel,
 		Fragment = Pixel,
 		Compute,
+
+		MAX_STAGE
 	};
 
 	// ---
@@ -47,7 +49,7 @@ namespace Eldritch2 { namespace Tools {
 		//!	Disable copy construction.
 		ShaderCompiler(const ShaderCompiler&) = delete;
 		//!	Constructs this @ref ShaderCompiler instance.
-		ShaderCompiler();
+		ShaderCompiler() ETNoexceptHint;
 
 		~ShaderCompiler() = default;
 
@@ -56,7 +58,7 @@ namespace Eldritch2 { namespace Tools {
 	public:
 		void RegisterOptions(OptionRegistrar& options);
 
-		int Process();
+		Result Process(Logging::Log& log);
 
 		// - DATA MEMBERS ------------------------------------
 

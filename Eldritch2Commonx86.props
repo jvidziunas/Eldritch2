@@ -9,13 +9,15 @@
     <IntermediateDir>$(SolutionDir)obj\$(ProjectName)\x86\$(Configuration)\</IntermediateDir>
     <ExternLibDir>$(ExternSrcDir)lib\x86\$(Configuration)\</ExternLibDir>
     <BinaryDir>$(SolutionDir)bin\x86\$(Configuration)\</BinaryDir>
+    <EastlDir>$(ExternSrcDir)eastl\</EastlDir>
+    <EastlPackagesDir>$(EastlDir)test\packages\</EastlPackagesDir>
   </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(MainSrcDir);$(ExternSrcDir);$(ProjectSrcDir);$(SolutionDir);$(ExternSrcDir)eastl\include\;$(ExternSrcDir)eastl\test\packages\EABase\include\Common\;$(ExternSrcDir)cppformat\include\;$(BOOST_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MainSrcDir);$(ExternSrcDir);$(ProjectSrcDir);$(SolutionDir);$(EastlPackagesDir)EABase\include\Common\;$(EastlDir)include\;$(ExternSrcDir)cppformat\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -36,6 +38,12 @@
     </BuildMacro>
     <BuildMacro Include="BinaryDir">
       <Value>$(BinaryDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="EastlDir">
+      <Value>$(EastlDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="EastlPackagesDir">
+      <Value>$(EastlPackagesDir)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

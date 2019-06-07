@@ -9,108 +9,69 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/AssetViews/TerrainAsset.hpp>
+#include <Physics/PhysX/SpanInputStream.hpp>
+#include <Logging/Log.hpp>
 //------------------------------------------------------------------//
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
 ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <geometry/PxHeightFieldDesc.h>
 #include <geometry/PxHeightField.h>
-#include <foundation/PxIO.h>
 #include <PxRigidActor.h>
 #include <PxMaterial.h>
 #include <PxPhysics.h>
 ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Logging;
-using namespace ::Eldritch2::Assets;
-using namespace ::physx;
-
 namespace Eldritch2 { namespace Physics { namespace PhysX { namespace AssetViews {
 
-	namespace {
-
-		static constexpr PxReal HeightScale = 256.0f;
-		static constexpr PxReal ColumnScale = 4.0f;
-		static constexpr PxReal RowScale    = 4.0f;
-
-		class InputStream : public PxInputStream {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref InputStream instance.
-			ETInlineHint InputStream(const char* begin, const char* end) :
-				_source(begin, end) {}
-			//!	Constructs this @ref InputStream instance.
-			InputStream(const InputStream&) = default;
-
-			~InputStream() override = default;
-
-			// ---------------------------------------------------
-
-		public:
-			ETInlineHint uint32_t read(void* dest, uint32_t count) override {
-				if (_source.GetSize() < static_cast<size_t>(count)) {
-					//	Truncation is safe here, since the branch threshold can be represented with a uint32_t.
-					count = static_cast<uint32_t>(_source.GetSize());
-				}
-
-				CopyMemory(dest, _source.Begin(), count);
-
-				_source.SetBegin(_source.Begin() + count);
-
-				return count;
-			}
-
-			// - DATA MEMBERS ------------------------------------
-
-		private:
-			Range<const char*> _source;
-		};
-
-	} // anonymous namespace
-
-	TerrainAsset::TerrainAsset(StringView path) :
-		Asset(path) {}
+	using namespace ::Eldritch2::Logging;
+	using namespace ::Eldritch2::Core;
+	using namespace ::physx;
 
 	// ---------------------------------------------------
 
-	ErrorCode TerrainAsset::BindResources(const Builder& asset) {
-		PhysxPointer<PxMaterial> material(PxGetPhysics().createMaterial(1.0f, 1.0f, 0.1f));
-		if (!material) {
-			asset.WriteLog(Severity::Error, "Unable to create PhysX material for asset '{}'!" ET_NEWLINE, GetPath());
-			return Error::Unspecified;
-		}
+	TerrainAsset::TerrainAsset(StringSpan path) ETNoexceptHint : Asset(path) {}
 
-		InputStream                 input(asset.Begin(), asset.End());
+	// ---------------------------------------------------
+
+	Result TerrainAsset::BindResources(Log& log, const AssetBuilder& asset) {
+		static ETConstexpr PxReal HeightScale(256.0f);
+		static ETConstexpr PxReal ColumnScale(4.0f);
+		static ETConstexpr PxReal RowScale(4.0f);
+
+		SpanInputStream          input(asset.bytes);
 		PhysxPointer<PxHeightField> heightfield(PxGetPhysics().createHeightField(input));
-		if (!heightfield) {
-			asset.WriteLog(Severity::Error, "Unable to create PhysX heightfield for asset '{}'!" ET_NEWLINE, GetPath());
-			return Error::Unspecified;
-		}
+		ET_ABORT_UNLESS(heightfield ? Result::Success : Result::Unspecified, log, "Unable to create PhysX heightfield for asset '{}'!" ET_NEWLINE, GetPath());
+
+		PhysxPointer<PxMaterial> material(PxGetPhysics().createMaterial(1.0f, 1.0f, 0.1f));
+		ET_ABORT_UNLESS(material ? Result::Success : Result::Unspecified, log, "Unable to create PhysX material for asset '{}'!" ET_NEWLINE, GetPath());
 
 		PhysxPointer<PxShape> shape(PxGetPhysics().createShape(PxHeightFieldGeometry(heightfield.Get(), PxMeshGeometryFlags(0), HeightScale, RowScale, ColumnScale), *material));
-		if (!shape) {
-			asset.WriteLog(Severity::Error, "Unable to create PhysX shape for asset '{}'!" ET_NEWLINE, GetPath());
-			return Error::Unspecified;
-		}
+		ET_ABORT_UNLESS(shape ? Result::Success : Result::Unspecified, log, "Unable to create PhysX shape for asset '{}'!" ET_NEWLINE, GetPath());
 
 		Swap(_shape, shape);
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void TerrainAsset::FreeResources() {
+	void TerrainAsset::FreeResources() ETNoexceptHint {
 		_shape.Reset();
 	}
 
 	// ---------------------------------------------------
 
-	ETPureFunctionHint StringView TerrainAsset::GetExtension() {
+	ETPureFunctionHint StringSpan TerrainAsset::GetExtension() ETNoexceptHint {
 		return ".e2terrain";
 	}
 

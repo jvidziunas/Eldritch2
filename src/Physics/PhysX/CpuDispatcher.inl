@@ -17,7 +17,7 @@
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
-	ETInlineHint ETForceInlineHint Scheduling::JobFence& CpuDispatcher::GetTasksCompletedFence() ETNoexceptHint {
+	ETConstexpr ETForceInlineHint Scheduling::JobFence& CpuDispatcher::GetTasksCompletedFence() ETNoexceptHint {
 		return _tasksCompleted;
 	}
 

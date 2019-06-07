@@ -15,36 +15,36 @@ enum SourceConcept : ubyte {
 	Meshes
 }
 
-struct Dynamic {
+struct DynamicDimensions {
 	Width  : float = 1.0;
 	Height : float = 1.0;
 }
 
-struct Static {
+struct StaticDimensions {
 	Width  : uint;
 	Height : uint;
 	Depth  : uint = 1;
+}
+
+union PassDimensions {
+	DynamicDimensions,
+	StaticDimensions
 }
 
 struct AttachmentReference {
 	GlobalIndex : uint;
 	Mip         : uint = 0;
 	FirstSlice  : uint = 0;
-	Slices      : uint = 0xFFFFFFFF;
-}
-
-union PassDimensions {
-	Dynamic,
-	Static
+	LastSlice   : uint = 0xFFFFFFFF;
 }
 
 table DrawStage {
 	Dimensions       : PassDimensions        (required);
 	ShaderUsageName  : string                (required);
 	SourceConcepts   : [SourceConcept]       (required);
+	DepthAttachment  : AttachmentReference;
 	InputAttachments : [AttachmentReference] (required);
 	ColorAttachments : [AttachmentReference] (required);
-	DepthAttachment  : AttachmentReference;
 }
 
 table CopyStage {
@@ -65,9 +65,10 @@ union PipelineStage {
 }
 
 table AttachmentDescriptor {
-	Name   : string (required, key);
-	Format : GpuFormat;
-	Flags  : AttachmentFlags;
+	Name        : string (required, key);
+	Format      : GpuFormat;
+	Flags       : AttachmentFlags;
+	SmallestMip : ushort;
 }
 
 table GraphicsPipelineDescriptor {

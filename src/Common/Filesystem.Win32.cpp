@@ -9,12 +9,14 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/Path.hpp>
-#include <Common/FileSystem.hpp>
-#include <Common/ErrorCode.hpp>
-#include <Common/Memory.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
 #include <Windows.h>
@@ -22,59 +24,56 @@
 
 namespace Eldritch2 {
 
-ErrorCode Copy(KnownDirectory destinationRoot, AbstractStringView<PlatformChar> destinationPath, KnownDirectory sourceRoot, AbstractStringView<PlatformChar> sourcePath, CopyMode mode) {
+Result Copy(KnownDirectory destinationRoot, AbstractStringSpan<PlatformChar> destinationPath, KnownDirectory sourceRoot, AbstractStringSpan<PlatformChar> sourcePath, FileCopyMode mode) {
 	const Path sourceAbsolutePath(MallocAllocator(), destinationRoot, destinationPath), destinationAbsolutePath(MallocAllocator(), sourceRoot, sourcePath);
 
-	::CopyFileW(sourceAbsolutePath, destinationAbsolutePath, mode == CopyMode::SkipIfExists ? TRUE : FALSE);
-	return Error::None;
+	::CopyFileW(sourceAbsolutePath, destinationAbsolutePath, mode == FileCopyMode::SkipIfExists ? TRUE : FALSE);
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode Move(KnownDirectory destinationRoot, AbstractStringView<PlatformChar> destinationPath, KnownDirectory sourceRoot, AbstractStringView<PlatformChar> sourcePath) {
+Result Move(KnownDirectory destinationRoot, AbstractStringSpan<PlatformChar> destinationPath, KnownDirectory sourceRoot, AbstractStringSpan<PlatformChar> sourcePath) {
 	const Path sourceAbsolutePath(MallocAllocator(), destinationRoot, destinationPath), destinationAbsolutePath(MallocAllocator(), sourceRoot, sourcePath);
 
 	::MoveFileExW(sourceAbsolutePath, destinationAbsolutePath, MOVEFILE_REPLACE_EXISTING);
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode Delete(KnownDirectory root, AbstractStringView<PlatformChar> path) {
+Result Delete(KnownDirectory root, AbstractStringSpan<PlatformChar> path) {
 	const Path absolutePath(MallocAllocator(), root, path);
 
 	::DeleteFileW(absolutePath);
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode EnsureDirectoryExists(KnownDirectory root, AbstractStringView<PlatformChar> path) {
+Result EnsureDirectoryExists(KnownDirectory root, AbstractStringSpan<PlatformChar> path) {
 	const Path absolutePath(MallocAllocator(), root, path);
 
-	::CreateDirectoryW(absolutePath, nullptr);
-	return Error::None;
+	::CreateDirectoryW(absolutePath, /*lpSecurityAttributes =*/nullptr);
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode ForEachFile(AbstractStringView<PlatformChar> specifier, Function<void(AbstractStringView<PlatformChar> /*path*/) ETNoexceptHint> handler) {
-	::WIN32_FIND_DATAW result;
-	PlatformChar*      terminated(ETStackAlloc(PlatformChar, specifier.GetLength() + 1u));
+Result ForEachFile(AbstractStringSpan<PlatformChar> specifier, Function<void(AbstractStringSpan<PlatformChar> /*path*/)> handler) {
+	PlatformChar* terminatedSpec(ETStackAlloc(PlatformChar, specifier.GetLength() + 1u));
+	CopyAndTerminate(specifier.Begin(), specifier.End(), terminatedSpec, SL('\0'));
 
-	CopyAndTerminate(specifier.Begin(), specifier.End(), terminated, L'\0');
+	WIN32_FIND_DATAW result;
+	const auto       find(FindFirstFileExW(terminatedSpec, FindExInfoBasic, ETAddressOf(result), FindExSearchNameMatch, nullptr, FIND_FIRST_EX_CASE_SENSITIVE | FIND_FIRST_EX_LARGE_FETCH));
+	ET_ABORT_UNLESS(find != INVALID_HANDLE_VALUE ? Result::Success : Result::Unspecified);
+	ET_AT_SCOPE_EXIT(FindClose(find));
 
-	const auto find(::FindFirstFileExW(terminated, FindExInfoBasic, &result, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_CASE_SENSITIVE | FIND_FIRST_EX_LARGE_FETCH));
-	if (ET_UNLIKELY(INVALID_HANDLE_VALUE == find)) {
-		return Error::Unspecified;
-	}
-
-	ET_AT_SCOPE_EXIT(::FindClose(find));
 	do {
-		handler({ result.cFileName, StringLength(result.cFileName) });
-	} while (::FindNextFileW(find, &result) != 0);
+		handler(PlatformStringSpan(result.cFileName, PlatformStringSpan::SizeType(StringLength(result.cFileName))));
+	} while (FindNextFileW(find, ETAddressOf(result)) != 0);
 
-	return ::GetLastError() == ERROR_NO_MORE_FILES ? Error::None : Error::Unspecified;
+	return GetLastError() == ERROR_NO_MORE_FILES ? Result::Success : Result::Unspecified;
 }
 
 } // namespace Eldritch2

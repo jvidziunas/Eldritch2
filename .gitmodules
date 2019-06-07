@@ -40,3 +40,6 @@
 [submodule "extern/DirectXShaderCompiler"]
 	path = extern/DirectXShaderCompiler
 	url = https://github.com/Microsoft/DirectXShaderCompiler.git
+[submodule "extern/ozz"]
+	path = extern/ozz
+	url = https://github.com/guillaumeblanc/ozz-animation.git

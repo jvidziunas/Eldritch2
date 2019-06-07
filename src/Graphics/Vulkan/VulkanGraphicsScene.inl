@@ -17,52 +17,56 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETInlineHint ETForceInlineHint PlayerView::PlayerView(DisplayLink target, Transformation worldToView, Angle verticalFov) :
-		_target(eastl::move(target)),
-		_worldToView(worldToView),
-		_verticalFov(verticalFov) {
-	}
+	ETInlineHint ETForceInlineHint RootView::RootView(ViewportId target, Transformation worldToView, Angle verticalFov) ETNoexceptHint : _target(target),
+																																		 _worldToView(worldToView),
+																																		 _verticalFov(verticalFov) {}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint Transformation PlayerView::GetWorldToView() const ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint Transformation RootView::GetWorldToView() const ETNoexceptHint {
 		return _worldToView;
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint void PlayerView::SetWorldToView(Transformation worldToView) ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint void RootView::SetWorldToView(Transformation worldToView) ETNoexceptHint {
 		_worldToView = worldToView;
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint Angle PlayerView::GetVerticalFov() const ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint Angle RootView::GetVerticalFov() const ETNoexceptHint {
 		return _verticalFov;
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint void PlayerView::SetVerticalFov(Angle angle) ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint void RootView::SetVerticalFov(Angle angle) ETNoexceptHint {
 		_verticalFov = angle;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint const Framebuffer& PlayerView::GetTarget() const ETNoexceptHint {
-		return *_target;
+	ETConstexpr ETInlineHint ETForceInlineHint const PipelineBuilder& VulkanGraphicsScene::GetShadowPipelineBuilder() const ETNoexceptHint {
+		return _shadowMapPipelineBuilder;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint Range<const PlayerView* const*> VulkanGraphicsScene::GetRootViews() const ETNoexceptHint {
-		return { _rootViews.Begin(), _rootViews.End() };
+	ETConstexpr ETInlineHint ETForceInlineHint const PipelineBuilder& VulkanGraphicsScene::GetLitPipelineBuilder() const ETNoexceptHint {
+		return _litPipelineBuilder;
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint const GraphicsPipeline& VulkanGraphicsScene::GetShadowPipeline() const ETNoexceptHint {
-		return _shadowPipeline;
+	ETConstexpr ETInlineHint ETForceInlineHint const GraphicsPipeline& VulkanGraphicsScene::GetShadowMapPipeline() const ETNoexceptHint {
+		return _shadowMapPipeline;
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETInlineHint ETForceInlineHint GraphicsPipeline& VulkanGraphicsScene::GetShadowMapPipeline() ETNoexceptHint {
+		return _shadowMapPipeline;
 	}
 
 	// ---------------------------------------------------
@@ -73,8 +77,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
+	ETConstexpr ETInlineHint ETForceInlineHint GraphicsPipeline& VulkanGraphicsScene::GetLitPipeline() ETNoexceptHint {
+		return _litPipeline;
+	}
+
+	// ---------------------------------------------------
+
 	ETConstexpr ETInlineHint ETForceInlineHint const Framebuffer& VulkanGraphicsScene::GetShadowAtlas() const ETNoexceptHint {
-		return _shadowAtlas;
+		return _shadowMapAtlas;
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETInlineHint ETForceInlineHint Framebuffer& VulkanGraphicsScene::GetShadowAtlas() ETNoexceptHint {
+		return _shadowMapAtlas;
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

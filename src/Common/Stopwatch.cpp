@@ -9,50 +9,52 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Stopwatch.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-Stopwatch::Stopwatch(CpuTimestamp start) :
-	_start(start) {}
+Stopwatch::Stopwatch(CpuTimestamp start) ETNoexceptHint : _start(start) {}
 
 // ---------------------------------------------------
 
-Stopwatch::Stopwatch(const Stopwatch& stopwatch) :
-	Stopwatch(stopwatch.GetStartTimestamp()) {}
+Stopwatch::Stopwatch(const Stopwatch& stopwatch) ETNoexceptHint : Stopwatch(stopwatch.GetStartTimestamp()) {}
 
 // ---------------------------------------------------
 
-Stopwatch::Stopwatch() :
-	Stopwatch(ReadCpuTimestamp()) {}
+Stopwatch::Stopwatch() ETNoexceptHint : Stopwatch(ReadCpuTimestamp()) {}
 
 // ---------------------------------------------------
 
-CpuTimestamp Stopwatch::GetDurationAndZero() {
+CpuTimestamp Stopwatch::GetDurationAndZero() ETNoexceptHint {
 	const auto start(ReadCpuTimestamp());
-	return start - _start.exchange(start, std::memory_order_relaxed);
+	return CpuTimestamp(uint64(start) - uint64(_start.exchange(start, std::memory_order_relaxed)));
 }
 
 // ---------------------------------------------------
 
-CpuTimestamp Stopwatch::GetDuration() const {
-	return ReadCpuTimestamp() - GetStartTimestamp();
+CpuTimestamp Stopwatch::GetDuration() const ETNoexceptHint {
+	return CpuTimestamp(uint64(ReadCpuTimestamp()) - uint64(GetStartTimestamp()));
 }
 
 // ---------------------------------------------------
 
-CpuTimestamp Stopwatch::GetStartTimestamp() const {
+CpuTimestamp Stopwatch::GetStartTimestamp() const ETNoexceptHint {
 	return _start.load(std::memory_order_relaxed);
 }
 
 // ---------------------------------------------------
 
-Stopwatch& Stopwatch::operator=(const Stopwatch& stopwatch) {
+Stopwatch& Stopwatch::operator=(const Stopwatch& stopwatch) ETNoexceptHint {
 	_start.store(stopwatch.GetStartTimestamp(), std::memory_order_relaxed);
-
 	return *this;
 }
 

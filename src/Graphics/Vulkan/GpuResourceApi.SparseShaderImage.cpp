@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -18,25 +24,29 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	SparseShaderImage::SparseShaderImage(SparseShaderImage&& image) :
-		SparseShaderImage() {
+	SparseShaderImage::SparseShaderImage(SparseShaderImage&& image) ETNoexceptHint : SparseShaderImage() {
 		Swap(*this, image);
 	}
 
 	// ---------------------------------------------------
 
-	VkResult SparseShaderImage::BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32 mips, uint32 layers) {
+	VkResult SparseShaderImage::BindResources(Gpu& gpu, const ImageDescriptor& description) {
 		enum : VkMemoryPropertyFlags { InferFromUsage = 0u };
 		static ETConstexpr VkSampleCountFlagBits SampleFlags(VK_SAMPLE_COUNT_1_BIT);
 		static ETConstexpr VkImageUsageFlags UsageFlags(VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 		static ETConstexpr VkImageTiling ImageTiling(VK_IMAGE_TILING_OPTIMAL);
-		const VkImageType                imageType(GetImageType(extent));
-		uint32_t                         propertyCount(0u);
+
+		// ---
+
+		const VkExtent3D  extent{ description.size.width, description.size.height, description.size.depth };
+		const VkImageType imageType(GetImageType(extent));
+		const VkFormat    format(AsVkFormat(description.format));
+		uint32_t          propertyCount(0u);
 
 		vkGetPhysicalDeviceSparseImageFormatProperties(gpu, format, imageType, SampleFlags, UsageFlags, ImageTiling, ETAddressOf(propertyCount), /*pProperties =*/nullptr);
 		const auto properties(ETStackAlloc(VkSparseImageFormatProperties, propertyCount));
 		vkGetPhysicalDeviceSparseImageFormatProperties(gpu, format, imageType, SampleFlags, UsageFlags, ImageTiling, ETAddressOf(propertyCount), properties);
-		const auto imageProperties(Find(properties, properties + propertyCount, [](const VkSparseImageFormatProperties& format) {
+		const auto imageProperties(FindIf(properties, properties + propertyCount, [](const VkSparseImageFormatProperties& format) ETNoexceptHint -> bool {
 			return (format.aspectMask & VK_IMAGE_ASPECT_COLOR_BIT) != 0u;
 		}));
 
@@ -44,15 +54,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		ET_ABORT_UNLESS(tileManager.BindResources(gpu, extent, imageProperties->imageGranularity));
 		ET_ABORT_UNLESS(GpuImage::BindResources(
 			gpu,
-			VkImageCreateInfo {
+			VkImageCreateInfo{
 				VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 				/*pNext =*/nullptr,
 				VK_IMAGE_CREATE_SPARSE_BINDING_BIT | VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT,
 				imageType,
 				format,
 				extent,
-				mips,
-				layers,
+				description.smallestMip,
+				description.slices,
 				SampleFlags,
 				ImageTiling,
 				UsageFlags,
@@ -60,7 +70,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*queueFamilyIndexCount =*/0u,    // Exclusive sharing.
 				/*pQueueFamilyIndices =*/nullptr, // Exclusive sharing.
 				VK_IMAGE_LAYOUT_UNDEFINED },
-			VmaAllocationCreateInfo {
+			VmaAllocationCreateInfo{
 				/*flags =*/0u,
 				VMA_MEMORY_USAGE_GPU_ONLY,
 				/*requiredFlags =*/InferFromUsage,
@@ -82,10 +92,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(SparseShaderImage& lhs, SparseShaderImage& rhs) {
+	void Swap(SparseShaderImage& lhs, SparseShaderImage& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
-		Swap(static_cast<GpuImage&>(lhs), rhs);
+		Swap(static_cast<GpuImage&>(lhs), static_cast<GpuImage&>(rhs));
 		Swap(lhs._tileManager, rhs._tileManager);
 	}
 

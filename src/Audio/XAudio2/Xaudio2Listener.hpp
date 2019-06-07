@@ -12,65 +12,67 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Audio/XAudio2/Xaudio2Selector.hpp>
 #include <Audio/Listener.hpp>
 //------------------------------------------------------------------//
-#if ET_PLATFORM_WINDOWS
-#	include <windows.h>
-#endif
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-#	include <C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include/X3DAudio.h>
-#else
-#	include <X3DAudio.h>
-#endif
-//------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Audio { namespace XAudio2 {
-	class XAudio2Listener;
-}} // namespace Audio::XAudio2
-class Transformation;
-} // namespace Eldritch2
-
-struct IXAudio2MasteringVoice;
-struct IXAudio2SourceVoice;
-struct IXAudio2Voice;
+namespace Eldritch2 { namespace Audio { namespace XAudio2 {
+	class OpusStreamDecoder;
+	template <typename Sample, typename Decoder>
+	class StreamingVoice;
+}}} // namespace Eldritch2::Audio::XAudio2
 
 namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
-	class XAudio2Voice : public Voice {
+	class XAudio2DiegeticVoice : public DiegeticVoice {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using OpusVoice = StreamingVoice<int16, OpusStreamDecoder>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref XAudio2Voice instance.
-		XAudio2Voice(float32 loudnessDb, IXAudio2SourceVoice* sourceVoice, IXAudio2Voice* effectVoice);
+		//!	Constructs this @ref XAudio2DiegeticVoice instance.
+		XAudio2DiegeticVoice(Transformation localToWorld, MicrosecondTime startTime, float32 loudnessDb);
 		//!	Disable copy construction.
-		XAudio2Voice(const XAudio2Voice&) = delete;
+		XAudio2DiegeticVoice(const XAudio2DiegeticVoice&) = delete;
 		//!	Constructs this @ref XAudio2Voice instance.
-		XAudio2Voice(XAudio2Voice&&);
+		XAudio2DiegeticVoice(XAudio2DiegeticVoice&&);
 
-		~XAudio2Voice();
+		~XAudio2DiegeticVoice();
 
 		// ---------------------------------------------------
 
 	public:
-		void UpdateDsp(const XAudio2Listener& listener, const X3DAUDIO_HANDLE& settings, float32 timeScalar, UINT32 operationSet) const;
+		HRESULT MakeActive(IXAudio2* xaudio, IXAudio2SubmixVoice* diegeticMix, OpusVoice& source);
+
+		void MakeVirtual();
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		XAudio2DiegeticVoice& operator=(const XAudio2DiegeticVoice&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		X3DAUDIO_EMITTER     _emitter;
-		IXAudio2SourceVoice* _sourceVoice;
-		IXAudio2Voice*       _effectVoice;
+		OpusVoice*           _source;
+		IXAudio2SubmixVoice* _effect;
+
+		// ---------------------------------------------------
+
+		friend void Swap(XAudio2DiegeticVoice&, XAudio2DiegeticVoice&);
 	};
 
 	// ---
 
-	class XAudio2Listener : public Listener<XAudio2Voice> {
+	class XAudio2Listener : public Listener<XAudio2DiegeticVoice> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref XAudio2Listener instance.
-		XAudio2Listener(Transformation localToWorld);
+		XAudio2Listener(Transformation localToWorld, Vector linearVelocity) ETNoexceptHint;
 		//!	Disable copy construction.
 		XAudio2Listener(const XAudio2Listener&) = delete;
 
@@ -79,26 +81,21 @@ namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 		// ---------------------------------------------------
 
 	public:
-		Transformation ETSimdCall GetLocalToWorld() const;
-		Transformation ETSimdCall GetWorldToLocal() const;
-
-		void ETSimdCall SetLocalToWorld(Transformation value);
+		void Mix(UINT32 operationSet, float32 timeScalar) const;
 
 		// ---------------------------------------------------
 
 	public:
-		void UpdateVoices(const X3DAUDIO_HANDLE& settings, float32 timeScalar, UINT32 operationSet);
+		HRESULT BindResources(IXAudio2* xaudio, uint32 masteringHz, DWORD channelMask);
+
+		void FreeResources();
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		X3DAUDIO_LISTENER       _listener;
-		IXAudio2MasteringVoice* _inWorldMaster;
-		IXAudio2MasteringVoice* _musicMaster;
-
-		// ---------------------------------------------------
-
-		friend class XAudio2Voice;
+		X3DAUDIO_HANDLE      _settings;
+		IXAudio2SubmixVoice* _diegeticMix;
+		IXAudio2SubmixVoice* _nonDiegeticMix;
 	};
 
 }}} // namespace Eldritch2::Audio::XAudio2

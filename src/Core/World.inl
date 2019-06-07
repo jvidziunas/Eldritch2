@@ -11,74 +11,116 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <Scheduling/JobExecutor.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Core {
 
-	ETInlineHint ETForceInlineHint Range<const UniquePointer<WorldComponent>*> World::GetComponents() const ETNoexceptHint {
-		return { _components.Begin(), _components.End() };
+	ETInlineHint ETForceInlineHint void AbstractWorld::SetShouldShutDown(MemoryOrder order) const ETNoexceptHint {
+		_shouldShutDown.store(true, order);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint Logging::Log& World::GetLog() const ETNoexceptHint {
-		return _log;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint float32 World::GetTimeScalar() const ETNoexceptHint {
-		return _timeAccumulator.GetTimeScalar();
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint void World::SetTimeScalar(float32 scalar) ETNoexceptHint {
-		_timeAccumulator.SetTimeScalar(scalar);
-	}
-
-	// ---------------------------------------------------
-
-	template <typename Iterator>
-	ETInlineHint ETForceInlineHint ErrorCode World::BindResources(Scheduling::JobExecutor& executor, Iterator firstComponent, Iterator lastComponent) {
-		ComponentList<> components(_components.GetAllocator());
-		components.Reserve(eastl::distance(firstComponent, lastComponent));
-
-		for (; firstComponent != lastComponent; ++firstComponent) {
-			UniquePointer<WorldComponent> result((*firstComponent)->CreateWorldComponent(_allocator, _services));
-			if (result) {
-				components.Append(eastl::move(result));
-			}
-		}
-
-		components.ShrinkToFit();
-		Swap(_components, components);
-		return BindResources(executor);
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint bool World::ShouldShutDown(MemoryOrder order) const ETNoexceptHint {
+	ETInlineHint ETForceInlineHint bool AbstractWorld::ShouldShutDown(MemoryOrder order) const ETNoexceptHint {
 		return _shouldShutDown.load(order);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool World::ShouldRun(MemoryOrder order) const ETNoexceptHint {
-		return _pauseCounter.load(order) == 0u;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint bool World::IsRunning(MemoryOrder order) const ETNoexceptHint {
+	ETInlineHint ETForceInlineHint bool AbstractWorld::ShouldExecute(MemoryOrder order) const ETNoexceptHint {
 		return _shouldShutDown.load(order) == false;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void World::SetShouldPause(MemoryOrder order) ETNoexceptHint {
+	ETInlineHint ETForceInlineHint bool AbstractWorld::ShouldSimulate(MemoryOrder order) const ETNoexceptHint {
+		return _pauseCounter.load(order) != 0u;
+	}
+
+	// ---------------------------------------------------
+
+	ETInlineHint ETForceInlineHint void AbstractWorld::SetShouldPause(MemoryOrder order) ETNoexceptHint {
 		_pauseCounter.fetch_add(1u, order);
+	}
+
+	// ---------------------------------------------------
+
+	template <typename ApiBuilder>
+	ETInlineHint ETForceInlineHint ApiBuilder AbstractWorld::BuildApi(ApiBuilder api) const {
+		this->PublishComponents(api);
+		return Move(api);
+	}
+
+	// ---------------------------------------------------
+
+	// Pack expansion is a little unusual to allow for in-place construction of world components/relax move-constructible constraint on component types.
+	template <typename... Components>
+	ETInlineHint ETForceInlineHint World<Components...>::World(const ObjectInjector& services) ETNoexceptHint : AbstractWorld(services), _components(Tie((ExpandPack<Components>(), _services)...)) {}
+
+	// ---------------------------------------------------
+
+	template <typename... Components>
+	ETInlineHint ETForceInlineHint void World<Components...>::PublishComponents(Scripting::Wren::ApiBuilder& api) const {
+		ForEach(_components, [&](auto& component) {
+			component.PublishApi(api);
+		});
+	}
+
+	// ---------------------------------------------------
+
+	template <typename... Components>
+	ETInlineHint ETForceInlineHint void World<Components...>::PublishComponents(ObjectInjector& api) const {
+		ForEach(_components, [&](auto& component) {
+			component.PublishApi(api);
+		});
+	}
+
+	// ---------------------------------------------------
+
+	template <typename... Components>
+	ETInlineHint ETForceInlineHint void World<Components...>::BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint {
+		PublishComponents(_services);
+
+		executor.ForEach(_components, [](Scheduling::JobExecutor& executor, auto& component) ETNoexceptHint {
+			component.BindResourcesEarly(executor);
+		});
+		executor.ForEach(_components, [](Scheduling::JobExecutor& executor, auto& component) ETNoexceptHint {
+			component.BindResources(executor);
+		});
+	}
+
+	// ---------------------------------------------------
+
+	template <typename... Components>
+	ETInlineHint ETForceInlineHint void World<Components...>::FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint {
+		executor.ForEach(_components, [](Scheduling::JobExecutor& executor, auto& component) ETNoexceptHint {
+			component.FreeResources(executor);
+		});
+	}
+
+	// ---------------------------------------------------
+
+	template <typename... Components>
+	ETInlineHint ETForceInlineHint void World<Components...>::VariableTick(Scheduling::JobExecutor& executor, MicrosecondTime duration, float32 blendFraction) ETNoexceptHint {
+		executor.ForEach(_components, [=](Scheduling::JobExecutor& executor, auto& component) ETNoexceptHint {
+			component.OnVariableRateTick(executor, duration, blendFraction);
+		});
+	}
+
+	// ---------------------------------------------------
+
+	template <typename... Components>
+	ETInlineHint ETForceInlineHint void World<Components...>::FixedTick(Scheduling::JobExecutor& executor, MicrosecondTime duration) ETNoexceptHint {
+		executor.ForEach(_components, [=](Scheduling::JobExecutor& executor, auto& component) ETNoexceptHint {
+			component.OnFixedRateTickEarly(executor, duration);
+		});
+		executor.ForEach(_components, [=](Scheduling::JobExecutor& executor, auto& component) ETNoexceptHint {
+			component.OnFixedRateTick(executor, duration);
+		});
+		executor.ForEach(_components, [=](Scheduling::JobExecutor& executor, auto& component) ETNoexceptHint {
+			component.OnFixedRateTickLate(executor, duration);
+		});
 	}
 
 }} // namespace Eldritch2::Core

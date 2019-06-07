@@ -17,9 +17,9 @@
 
 namespace Eldritch2 { namespace Graphics {
 
-	extern const struct WellKnownConstantDescription {
+	extern const struct BuiltinConstantDescription {
 		uint32 byteSize;
 		uint32 minAlignment;
-	} WellKnownConstants[1];
+	} BuiltinConstants[1];
 
 }} // namespace Eldritch2::Graphics

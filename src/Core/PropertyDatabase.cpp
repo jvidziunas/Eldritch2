@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Core/PropertyDatabase.hpp>
@@ -16,14 +22,12 @@
 
 namespace Eldritch2 { namespace Core {
 
-	PropertyDatabase::PropertyDatabase() :
-		_settersByKey(MallocAllocator("Property Database Setter Directory Allocator")),
-		_dynamicSettersByGroup(MallocAllocator("Property Database Dynamic Setter Directory Allocator")) {
-	}
+	PropertyDatabase::PropertyDatabase() ETNoexceptHint : _settersByKey(MallocAllocator("Property Database Setter Directory Allocator")),
+														  _dynamicSettersByGroup(MallocAllocator("Property Database Dynamic Setter Directory Allocator")) {}
 
 	// ---------------------------------------------------
 
-	bool PropertyDatabase::SetValue(StringView group, StringView name, StringView value) ETNoexceptHint {
+	bool PropertyDatabase::SetValue(StringSpan group, StringSpan name, StringSpan value) ETNoexceptHint {
 		{
 			//	Try to find a setter for the specific key/section pair we're working with.
 			const auto candidate(_settersByKey.Find({ group, name }));

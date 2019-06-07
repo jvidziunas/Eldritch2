@@ -17,30 +17,39 @@
 
 namespace Eldritch2 { namespace Graphics {
 
-	template <typename Instance, class Allocator>
-	ETInlineHint ETForceInlineHint RenderConcept<Instance, Allocator>::RenderConcept(const AllocatorType& allocator) :
-		HierarchyType(allocator),
-		_shouldRebuildHierarchy(false) {}
+	template <typename Instance, typename Key>
+	ETInlineHint ETForceInlineHint RenderSortPredicate<Instance, Key>::RenderSortPredicate(Vector cellSize) ETNoexceptHint : _inverseCellSize(~cellSize) {}
 
 	// ---------------------------------------------------
 
-	template <typename Instance, class Allocator>
-	ETInlineHint ETForceInlineHint void RenderConcept<Instance, Allocator>::Insert(const ValueType& value) {
-		Lock _(_hierarchyMutex);
+	template <typename Instance, typename Key>
+	ETInlineHint ETForceInlineHint void RenderSortPredicate<Instance, Key>::SortValues(Scheduling::JobExecutor& executor, Iterator begin, Iterator end, KeyType outKeys[]) ETNoexceptHint {
+		executor.ForEachSplit<16u>(begin, end, outKeys, [](Scheduling::JobExecutor& /*executor*/, Iterator begin, Iterator end, KeyType outKeys[]) ETNoexceptHint {
 
-		_hierarchy.Insert(value);
-		_shouldRebuildHierarchy.store(true, std::memory_order_release);
+		});
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Instance, typename Key>
+	template <typename Split>
+	ETInlineHint ETForceInlineHint uint32 RenderSortPredicate<Instance, Key>::FindSplits(Scheduling::JobExecutor& executor, ConstIterator begin, ConstIterator end, Split splits[]) ETNoexceptHint {
+		struct {
+			Atomic<uint32> position;
+		} sharedData;
+
+		sharedData.position.store(0u, std::memory_order_relaxed);
+		executor.ForEachSplit<64u>(begin, end, [&](Scheduling::JobExecutor& /*executor*/, ConstIterator begin, ConstIterator end) ETNoexceptHint {
+			splits[sharedData.position.fetch_add(1u)];
+		});
+
+		return sharedData.position.load(std::memory_order_consume);
 	}
 
 	// ---------------------------------------------------
 
 	template <typename Instance, class Allocator>
-	ETInlineHint ETForceInlineHint void RenderConcept<Instance, Allocator>::Erase(const ValueType& value) {
-		Lock _(_hierarchyMutex);
-
-		_hierarchy.Erase(_hierarchy.Find(value));
-		_shouldRebuildHierarchy.store(true, std::memory_order_release);
-	}
+	ETInlineHint ETForceInlineHint RenderConcept<Instance, Allocator>::RenderConcept(const AllocatorType& allocator, const SortType& sort) ETNoexceptHint : BvhType(allocator, sort), _shouldRebuildHierarchy(false) {}
 
 	// ---------------------------------------------------
 
@@ -51,29 +60,16 @@ namespace Eldritch2 { namespace Graphics {
 
 	// ---------------------------------------------------
 
-	template <typename Value, class Allocator>
-	ETInlineHint ETForceInlineHint ViewConcept<Value, Allocator>::ViewConcept(const AllocatorType& allocator) :
-		_views(allocator) {}
+	template <typename ViewType, typename Instance, class Allocator>
+	ETInlineHint ETNoInlineHint void BuildShadowViewList(ArrayList<ViewType>& views, const RenderConcept<Instance, Allocator>& source) {
 
-	// ---------------------------------------------------
-
-	template <typename Value, class Allocator>
-	ETInlineHint ETForceInlineHint typename ViewConcept<Value, Allocator>::ConstIterator ViewConcept<Value, Allocator>::Begin() const ETNoexceptHint {
-		return _views.Begin();
 	}
 
 	// ---------------------------------------------------
 
-	template <typename Value, class Allocator>
-	ETInlineHint ETForceInlineHint typename ViewConcept<Value, Allocator>::ConstIterator ViewConcept<Value, Allocator>::End() const ETNoexceptHint {
-		return _views.End();
-	}
+	template <typename ViewType, typename Instance, class Allocator>
+	ETInlineHint ETNoInlineHint void BuildViewList(ArrayList<ViewType>& views, const RenderConcept<Instance, Allocator>& source) {
 
-	// ---------------------------------------------------
-
-	template <typename Instance, class Allocator, typename Extractor>
-	ETInlineHint ETForceInlineHint void Rebuild(Scheduling::JobExecutor& /*executor*/, RenderConcept<Instance, Allocator>& /*concept*/, Extractor /*extractor*/) {
-		// executor.Transform(concept.Begin(), concept.End(), nullptr, extractor);
 	}
 
 }} // namespace Eldritch2::Graphics

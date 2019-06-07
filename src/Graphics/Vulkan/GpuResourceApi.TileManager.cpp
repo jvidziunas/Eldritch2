@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -16,24 +22,24 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	TileManager::TileManager() :
-		_residentTiles(MallocAllocator("Tile Manager GPU Resident Tile Set Allocator")),
-		_tileExtent { 0u, 0u, 0u } {
-	}
+	TileManager::TileManager() ETNoexceptHint : _residentTiles(ResidentSet::AllocatorType("Tile Manager Resident Tile Set Allocator")), _tileExtent{ 0u, 0u, 0u } {}
 
 	// ---------------------------------------------------
 
-	TileManager::TileManager(TileManager&& tileManager) :
-		TileManager() {
+	TileManager::TileManager(TileManager&& tileManager) ETNoexceptHint : TileManager() {
 		Swap(*this, tileManager);
 	}
 
 	// ---------------------------------------------------
 
-	VkResult TileManager::BindResources(Gpu& /*gpu*/, VkExtent3D /*imageExtent*/, VkExtent3D tileExtent) {
+	VkResult TileManager::BindResources(Gpu& /*gpu*/, VkExtent3D imageExtent, VkExtent3D tileExtent) {
+		ETAssert(imageExtent.width < MaxImageDimension, "tiled image width {} must be < {}", imageExtent.width, uint32(MaxImageDimension));
+		ETAssert(imageExtent.height < MaxImageDimension, "tiled image height {} must be < {} (was {})", imageExtent.height, uint32(MaxImageDimension));
+		ETAssert(imageExtent.depth < MaxImageDimension, "tiled image depth {} must be < {} (was {})", imageExtent.depth, uint32(MaxImageDimension));
+
 		using ::Eldritch2::Swap;
 
-		HashSet<Tile> residentTiles(_residentTiles.GetAllocator());
+		ResidentSet residentTiles(_residentTiles.GetAllocator());
 
 		Swap(_residentTiles, residentTiles);
 		Swap(_tileExtent, tileExtent);
@@ -43,14 +49,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void TileManager::FreeResources(Gpu& gpu) {
+	void TileManager::FreeResources(Gpu& gpu) ETNoexceptHint {
 		_tileExtent = { 0u, 0u, 0u };
 		_residentTiles.Clear();
 	}
 
 	// ---------------------------------------------------
 
-	void Swap(TileManager& lhs, TileManager& rhs) {
+	void Swap(TileManager& lhs, TileManager& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs._residentTiles, rhs._residentTiles);

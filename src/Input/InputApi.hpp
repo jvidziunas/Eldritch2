@@ -16,15 +16,14 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Input {
-	class InputDevice;
+	class InputClient;
 }} // namespace Eldritch2::Input
 
 namespace Eldritch2 { namespace Input {
 
-	using ActionFlags = uint32;
-	using DeviceId    = uintptr;
-	using ActionId    = uint8;
-	using ScanCode    = uint8;
+	enum class DeviceId : uint32 { Invalid = 0xFFFFFFFF };
+	enum class ScanCode : uint8 {};
+	enum class Action : uint8 {};
 
 	// ---
 
@@ -37,31 +36,8 @@ namespace Eldritch2 { namespace Input {
 	 *	[32:39] Action index
 	 *	[40:47] PADDING to round up to 16-bit boundary */
 	struct Binding {
-		int16    weight;
-		ActionId action;
-	};
-
-	// ---
-
-	class ETPureAbstractHint InputClient {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Constructs this @ref InputClient instance.
-		InputClient(const InputClient&) ETNoexceptHint = default;
-		//!	Constructs this @ref InputClient instance.
-		InputClient() ETNoexceptHint = default;
-
-		~InputClient() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		virtual void Activate(ActionId id, int32 amount) abstract;
-
-		virtual void OnConnect(const InputDevice& device);
-
-		virtual void OnDisconnect(const InputDevice& device);
+		int16  weight;
+		Action action;
 	};
 
 	// ---
@@ -105,9 +81,9 @@ namespace Eldritch2 { namespace Input {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		Mutex        _mutex;
-		InputClient* _handler;
-		BindingMap   _actionByScanCode;
+		ETCacheLineAligned mutable Mutex _mutex;
+		InputClient*                     _handler;
+		BindingMap                       _actionByScanCode;
 
 		// ---------------------------------------------------
 
@@ -116,8 +92,76 @@ namespace Eldritch2 { namespace Input {
 
 	// ---
 
-	struct DeviceDisposer {
-		void operator()(InputDevice* device) const ETNoexceptHint;
+	class ETPureAbstractHint InputClient {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref InputClient instance.
+		InputClient(const InputClient&) ETNoexceptHint = default;
+		//!	Constructs this @ref InputClient instance.
+		InputClient() ETNoexceptHint = default;
+
+		~InputClient() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		virtual void Activate(Action id, int32 amount) abstract;
+
+		virtual void OnConnect(const InputDevice& device);
+
+		virtual void OnDisconnect(const InputDevice& device);
+	};
+
+	// ---
+
+	class DeviceLocator {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using DeviceSpan = Span<InputDevice*>;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		DeviceLocator(const DeviceLocator&) = delete;
+		//!	Constructs this @ref DeviceLocator instance.
+		DeviceLocator() ETNoexceptHint;
+
+		~DeviceLocator() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		bool TryAcquireOpenDevice(DeviceId& outId, InputClient& handler, InputDevice::BindingMap bindingByCode);
+
+		bool TryAcquireDevice(DeviceId id, InputClient& handler, InputDevice::BindingMap bindingByCode);
+
+		void ReleaseDevice(DeviceId id);
+
+		// ---------------------------------------------------
+
+	public:
+		DeviceSpan::SizeType GetDeviceCount() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		Result BindResources(Mutex& mutex, Span<InputDevice*> devices);
+
+		void FreeResources() ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		DeviceLocator& operator=(const DeviceLocator&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		Mutex*             _mutex;
+		Span<InputDevice*> _devices;
 	};
 
 }} // namespace Eldritch2::Input

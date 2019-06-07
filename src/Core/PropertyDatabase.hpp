@@ -16,33 +16,31 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Core {
-	class PropertyRegistrar;
-}} // namespace Eldritch2::Core
-
-namespace Eldritch2 { namespace Core {
 
 	class PropertyDatabase {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using DynamicSetter = Function<void(StringView /*name*/, StringView /*value*/) ETNoexceptHint>;
-		using Setter        = Function<void(StringView /*value*/) ETNoexceptHint>;
-		using SetterKey     = Pair<StringView, StringView>;
+		using DynamicSetter = Function<void(StringSpan /*name*/, StringSpan /*value*/)>;
+		using Setter        = Function<void(StringSpan /*value*/)>;
+		using SetterKey     = Pair<StringSpan, StringSpan>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
-		PropertyDatabase(const PropertyDatabase&) = delete;
+		PropertyDatabase(const PropertyDatabase&) = default;
 		//! Constructs this @ref PropertyDatabase instance.
-		PropertyDatabase();
+		PropertyDatabase(PropertyDatabase&&) ETNoexceptHint = default;
+		//! Constructs this @ref PropertyDatabase instance.
+		PropertyDatabase() ETNoexceptHint;
 
 		~PropertyDatabase() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		bool SetValue(StringView group, StringView name, StringView value) ETNoexceptHint;
+		bool SetValue(StringSpan group, StringSpan name, StringSpan value) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -53,11 +51,11 @@ namespace Eldritch2 { namespace Core {
 
 	private:
 		CachingHashMap<SetterKey, Setter>         _settersByKey;
-		CachingHashMap<StringView, DynamicSetter> _dynamicSettersByGroup;
+		CachingHashMap<StringSpan, DynamicSetter> _dynamicSettersByGroup;
 
 		// - FRIEND CLASS DECLARATION ------------------------
 
-		friend class Core::PropertyRegistrar;
+		friend class PropertyApiBuilder;
 	};
 
 }} // namespace Eldritch2::Core

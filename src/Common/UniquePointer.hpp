@@ -14,16 +14,14 @@
 //==================================================================//
 #include <Common/Containers/RangeAdapters.hpp>
 #include <Common/Memory/InstanceDeleter.hpp>
-#include <Common/Mpl/IntTypes.hpp>
-#include <Common/Mpl/Compiler.hpp>
+#include <Common/Mpl/TypeTraits.hpp>
 //------------------------------------------------------------------//
-#include <eastl/type_traits.h>
 #include <eastl/unique_ptr.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-template <typename T, typename Deleter = typename eastl::type_select<eastl::is_array<T>::value, InstanceArrayDeleter, InstanceDeleter>::type>
+template <typename T, typename Deleter = typename Conditional<IsArray<T>::Value, InstanceArrayDeleter, InstanceDeleter>::Type>
 class UniquePointer : private eastl::unique_ptr<T, Deleter> {
 	// - TYPE PUBLISHING ---------------------------------
 
@@ -38,16 +36,17 @@ public:
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
-	template <typename AlternateObject, typename AlternateDeleter>
-	UniquePointer(UniquePointer<AlternateObject, AlternateDeleter>&&) ETNoexceptHint;
 	//!	Constructs this @ref UniquePointer instance.
 	UniquePointer(Pointer pointer, const DeleterType& deleter = DeleterType()) ETNoexceptHint;
+	//!	Constructs this @ref UniquePointer instance.
+	template <typename T2, typename Deleter2>
+	UniquePointer(UniquePointer<T2, Deleter2>&&) ETNoexceptHint;
 	//!	Disable copy construction.
 	explicit UniquePointer(const UniquePointer&) = delete;
 	//!	Constructs this @ref UniquePointer instance.
-	UniquePointer(std::nullptr_t) ETNoexceptHint;
-	//!	Constructs this @ref UniquePointer instance.
 	UniquePointer(UniquePointer&&) ETNoexceptHint;
+	//!	Constructs this @ref UniquePointer instance.
+	UniquePointer(std::nullptr_t) ETNoexceptHint;
 	//!	Constructs this @ref UniquePointer instance.
 	UniquePointer() ETNoexceptHint;
 
@@ -56,8 +55,8 @@ public:
 	// ---------------------------------------------------
 
 public:
-	template <typename AlternateObject, typename AlternateDeleter>
-	UniquePointer& operator=(UniquePointer<AlternateObject, AlternateDeleter>&&);
+	template <typename T2, typename Deleter2>
+	UniquePointer& operator=(UniquePointer<T2, Deleter2>&&);
 	//!	Disable copy assignment.
 	UniquePointer& operator=(const UniquePointer&) = delete;
 	UniquePointer& operator=(UniquePointer&&) = default;
@@ -72,14 +71,11 @@ public:
 	// ---------------------------------------------------
 
 public:
-	void Reset(Pointer value = Pointer()) ETNoexceptHint;
-
-	// ---------------------------------------------------
-
-public:
 	Pointer Release() ETNoexceptHint;
 
 	Pointer Get() const ETNoexceptHint;
+
+	void Reset(Pointer value = Pointer()) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -89,11 +85,11 @@ public:
 
 	// ---------------------------------------------------
 
-	template <typename AlternateObject, typename AlternateDeleter>
+	template <typename T2, typename Deleter2>
 	friend class UniquePointer;
 
-	template <typename T, typename Deleter>
-	friend void Swap(UniquePointer<T, Deleter>&, UniquePointer<T, Deleter>&);
+	template <typename T2, typename Deleter2>
+	friend void Swap(UniquePointer<T2, Deleter2>&, UniquePointer<T2, Deleter2>&) ETNoexceptHint;
 };
 
 // ---
@@ -109,6 +105,7 @@ public:
 	using DeleterType = typename UnderlyingContainer::deleter_type;
 	using ElementType = typename UnderlyingContainer::element_type;
 	using Pointer     = typename UnderlyingContainer::pointer;
+	using SizeType    = size_t;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -143,8 +140,8 @@ public:
 	// ---------------------------------------------------
 
 public:
-	template <typename AlternateDeleter>
-	UniquePointer& operator=(UniquePointer<T[], AlternateDeleter>&&);
+	template <typename Deleter2>
+	UniquePointer& operator=(UniquePointer<T[], Deleter2>&&);
 	//!	Disable copy assignment.
 	UniquePointer& operator=(const UniquePointer&) = delete;
 	UniquePointer& operator=(UniquePointer&&) = default;
@@ -159,7 +156,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	void Reset(Pointer pointer, size_t arraySizeInElements) ETNoexceptHint;
+	void Reset(Pointer pointer, SizeType arraySizeInElements) ETNoexceptHint;
 	void Reset() ETNoexceptHint;
 
 	// ---------------------------------------------------
@@ -181,7 +178,7 @@ public:
 	friend class UniquePointer;
 
 	template <typename T, typename Deleter>
-	friend void Swap(UniquePointer<T[], Deleter>&, UniquePointer<T[], Deleter>&);
+	friend void Swap(UniquePointer<T[], Deleter>&, UniquePointer<T[], Deleter>&) ETNoexceptHint;
 };
 
 // ---------------------------------------------------
@@ -190,10 +187,10 @@ template <typename Object, typename... Args>
 UniquePointer<Object, InstanceDeleter> MakeUnique(Allocator& allocator, Args&&... args);
 
 template <typename Object, typename... Args>
-UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, size_t arraySizeInElements, Args&... args);
+UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, size_t arraySize, Args&... args);
 
 template <typename Object, typename Iterator>
-UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, Iterator firstElement, Iterator lastElement);
+UniquePointer<Object[], InstanceArrayDeleter> MakeUniqueArray(Allocator& allocator, Iterator begin, Iterator end);
 
 } // namespace Eldritch2
 

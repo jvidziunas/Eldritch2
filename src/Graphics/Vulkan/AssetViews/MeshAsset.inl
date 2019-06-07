@@ -17,9 +17,9 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	ETInlineHint ETForceInlineHint MeshSurface MeshAsset::GetSurface(uint32 surface) const ETNoexceptHint {
-		ET_ASSERT(surface < _surfaces.GetSize(), "Surface {} is out-of-bounds (limit {}) for mesh {}", surface, _surfaces.GetSize(), GetPath());
-		return _surfaces[surface];
+	ETInlineHint ETForceInlineHint Meshlet MeshAsset::GetMeshlet(uint32 meshlet) const ETNoexceptHint {
+		ETAssert(meshlet < _meshlets.GetSize(), "Meshlet {} is out-of-bounds (valid range [0-{})) for mesh {}", meshlet, _meshlets.GetSize(), GetPath());
+		return _meshlets[meshlet];
 	}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

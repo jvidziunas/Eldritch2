@@ -17,8 +17,8 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-class ErrorCode;
-}
+enum class Result : int;
+} // namespace Eldritch2
 
 #if ET_PLATFORM_WINDOWS
 using HANDLE = void*;
@@ -42,16 +42,16 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ErrorCode Append(const void* const sourceData, size_t writeLengthInBytes) ETNoexceptHint;
+	Result Append(const void* const sourceData, size_t writeLengthInBytes) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode CreateOrTruncate(const PlatformChar* path) ETNoexceptHint;
+	Result CreateOrTruncate(const PlatformChar* path) ETNoexceptHint;
 
-	ErrorCode OpenOrCreate(const PlatformChar* path) ETNoexceptHint;
+	Result OpenOrCreate(const PlatformChar* path) ETNoexceptHint;
 
-	ErrorCode Open(const PlatformChar* path) ETNoexceptHint;
+	Result Open(const PlatformChar* path) ETNoexceptHint;
 
 	// ---------------------------------------------------
 

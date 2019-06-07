@@ -16,59 +16,58 @@
 #include <Common/Mpl/Compiler.hpp>
 //------------------------------------------------------------------//
 #include <EASTL/type_traits.h>
-#include <atomic>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-	template <class BackingAllocator>
-	class UsageMixin : public BackingAllocator {
+template <class BackingAllocator>
+class UsageMixin : public BackingAllocator {
 	// - TYPE PUBLISHING ---------------------------------
 
-	public:
-		using SizeType = typename BackingAllocator::SizeType;
+public:
+	using SizeType = typename BackingAllocator::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	//!	Constructs this @ref TrackingAllocatorMixin instance.
-		template <class = eastl::enable_if<eastl::is_copy_constructible<BackingAllocator>::value>>
-		UsageMixin( const UsageMixin& );
+	template <typename... Arguments>
+	UsageMixin(Arguments&&... args) ETNoexceptHint;
 	//!	Constructs this @ref TrackingAllocatorMixin instance.
-		template <typename... Arguments>
-		UsageMixin( Arguments&&... args );
+	template <class = eastl::enable_if<eastl::is_copy_constructible_v<BackingAllocator>>>
+	UsageMixin(const UsageMixin&) ETNoexceptHint;
 
-		~UsageMixin() = default;
+	~UsageMixin() = default;
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
-	public:
-		ETRestrictHint void*	Allocate( SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal ) override;
-		ETRestrictHint void*	Allocate( SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal ) override;
+public:
+	ETRestrictHint void* Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override;
+	ETRestrictHint void* Allocate(SizeType byteSize, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override;
 
-		void					Deallocate( void* const address, typename BackingAllocator::SizeType sizeInBytes ) override;
-
-	// ---------------------------------------------------
-
-	public:
-		typename BackingAllocator::SizeType	GetPeakUsageInBytes() const;
+	void Deallocate(void* const address, SizeType byteSize) ETNoexceptHint override;
 
 	// ---------------------------------------------------
 
-	public:
-		void	Swap( UsageMixin& allocator );
+public:
+	SizeType GetPeakUsageInBytes() const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
+private:
 	//!	Amount of memory currently being used from this allocator, specified in bytes.
 	/*!	@remarks Updated during each call to @ref Allocate(). */
-		std::atomic<SizeType>	_usage;
+	Atomic<SizeType> _usage;
 	//!	Peak amount of memory used from this allocator, specified in bytes.
 	/*!	@remarks Updated during each call to @ref Allocate(). */
-		std::atomic<SizeType>	_peakUsage;
-	};
+	Atomic<SizeType> _peakUsage;
 
-}	// namespace Eldritch2
+	// ---------------------------------------------------
+
+	template <typename BackingAllocator2>
+	friend void Swap(UsageMixin<BackingAllocator2>&, UsageMixin<BackingAllocator2>&) ETNoexceptHint;
+};
+
+} // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

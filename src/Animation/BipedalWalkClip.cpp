@@ -10,6 +10,12 @@
 #pragma once
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Animation/BipedalWalkClip.hpp>
@@ -17,6 +23,6 @@
 
 namespace Eldritch2 { namespace Animation {
 
-	BipedalWalkClip::BipedalWalkClip() {}
+	BipedalWalkClip::BipedalWalkClip(MicrosecondTime startTime) ETNoexceptHint : Clip(startTime) {}
 
 }} // namespace Eldritch2::Animation

@@ -9,37 +9,33 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Navigation/Recast/RecastEngineComponent.hpp>
-#include <Navigation/Recast/RecastWorldComponent.hpp>
-#include <Assets/AssetDatabase.hpp>
+#include <Core/AssetDatabase.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2::Assets;
-using namespace ::Eldritch2::Core;
 
 namespace Eldritch2 { namespace Navigation { namespace Recast {
 
-	RecastEngineComponent::RecastEngineComponent(const ObjectLocator& services) :
-		EngineComponent(services) {}
+	using namespace ::Eldritch2::Core;
 
 	// ---------------------------------------------------
 
-	UniquePointer<WorldComponent> RecastEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
-		return MakeUnique<RecastWorldComponent>(allocator, services);
-	}
+	RecastEngineComponent::RecastEngineComponent(const ObjectInjector& services) ETNoexceptHint : EngineComponent(services) {}
 
 	// ---------------------------------------------------
 
-	void RecastEngineComponent::PublishConfiguration(PropertyRegistrar& /*properties*/) {
-		ET_PROFILE_SCOPE("Engine/Initialization", "Recast property registration", 0xBBBBBB);
-	}
+	void RecastEngineComponent::PublishApi(PropertyApiBuilder& /*api*/) {}
 
 	// ---------------------------------------------------
 
-	void RecastEngineComponent::PublishAssetTypes(AssetApiBuilder& /*api*/) {
-		ET_PROFILE_SCOPE("Engine/Initialization", "Recast asset factory registration", 0xBBBBBB);
-	}
+	void RecastEngineComponent::PublishApi(AssetApiBuilder& /*api*/) {}
 
 }}} // namespace Eldritch2::Navigation::Recast

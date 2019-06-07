@@ -29,13 +29,17 @@ protected:
 	using UnderlyingContainer = eastl::list<Value, EaStlAllocatorMixin<Allocator>>;
 
 public:
-	using AllocatorType  = typename UnderlyingContainer::allocator_type::PublicType;
-	using ValueType      = typename UnderlyingContainer::value_type;
-	using ConstIterator  = typename UnderlyingContainer::const_iterator;
-	using Iterator       = typename UnderlyingContainer::iterator;
-	using SizeType       = typename UnderlyingContainer::size_type;
-	using ConstReference = const ValueType&;
-	using Reference      = ValueType&;
+	using AllocatorType        = typename UnderlyingContainer::allocator_type::PublicType;
+	using ValueType            = typename UnderlyingContainer::value_type;
+	using ConstPointer         = typename UnderlyingContainer::const_pointer;
+	using Pointer              = typename UnderlyingContainer::pointer;
+	using ConstReference       = typename UnderlyingContainer::const_reference;
+	using Reference            = typename UnderlyingContainer::reference;
+	using ConstIterator        = typename UnderlyingContainer::const_iterator;
+	using Iterator             = typename UnderlyingContainer::iterator;
+	using ConstReverseIterator = typename UnderlyingContainer::const_reverse_iterator;
+	using ReverseIterator      = typename UnderlyingContainer::reverse_iterator;
+	using SizeType             = typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -44,7 +48,7 @@ public:
 	template <typename InputIterator>
 	LinkedList(const AllocatorType& allocator, InputIterator first, InputIterator last);
 	//! Constructs this @ref LinkedList instance.
-	LinkedList(const AllocatorType& allocator, std::initializer_list<ValueType>);
+	LinkedList(const AllocatorType& allocator, InitializerList<ValueType>);
 	//! Constructs this @ref LinkedList instance.
 	LinkedList(const AllocatorType& allocator, const LinkedList&);
 	//! Constructs this @ref LinkedList instance.
@@ -69,20 +73,20 @@ public:
 
 public:
 	//! Retrieves a @ref ConstIterator pointing to the first element stored in this @ref LinkedList.
-	ConstIterator ConstBegin() const;
+	ConstIterator ConstBegin() const ETNoexceptHint;
 
 	//!	Retrieves a @ref ConstIterator pointing one position after the last element stored in this @ref LinkedList.
-	ConstIterator ConstEnd() const;
+	ConstIterator ConstEnd() const ETNoexceptHint;
 
 	//!	Retrieves a @ref ConstIterator pointing to the first element stored in this @ref LinkedList.
-	ConstIterator Begin() const;
+	ConstIterator Begin() const ETNoexceptHint;
 	//!	Retrieves an @ref Iterator pointing to the first element stored in this @ref LinkedList.
-	Iterator Begin();
+	Iterator Begin() ETNoexceptHint;
 
 	//!	Retrieves a @ref ConstIterator pointing one position after the last element stored in this @ref LinkedList.
-	ConstIterator End() const;
+	ConstIterator End() const ETNoexceptHint;
 	//!	Retrieves an @ref Iterator pointing one position after the last element stored in this @ref LinkedList.
-	Iterator End();
+	Iterator End() ETNoexceptHint;
 
 	// - END POINT MANIPULATION --------------------------
 
@@ -129,6 +133,9 @@ public:
 	//!	Removes an element at the position specified, reducing the size of the @ref LinkedList by one element.
 	Iterator Erase(Iterator where);
 
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
+
 	//!	Removes all elements from the @ref LinkedList.
 	void Clear();
 
@@ -142,17 +149,17 @@ public:
 
 public:
 	//!	Counts the number of elements contained within this @ref LinkedList.
-	SizeType GetSize() const;
+	SizeType GetSize() const ETNoexceptHint;
 
 	//!	Returns a bool indicating whether or not there are any elements contained in this @ref LinkedList.
-	bool IsEmpty() const;
+	bool IsEmpty() const ETNoexceptHint;
 
-	explicit operator bool() const;
+	explicit operator bool() const ETNoexceptHint;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	const AllocatorType& GetAllocator() const;
+	const AllocatorType& GetAllocator() const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 

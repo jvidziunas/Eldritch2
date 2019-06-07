@@ -24,7 +24,7 @@ namespace Eldritch2 { namespace Logging {
 		//!	Disable copy construction.
 		FileLog(const FileLog&) = delete;
 		//!	Constructs this @ref FileLog instance.
-		FileLog();
+		FileLog() ETNoexceptHint;
 
 		~FileLog() = default;
 
@@ -37,9 +37,9 @@ namespace Eldritch2 { namespace Logging {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(PlatformStringView path);
+		Result BindResources(PlatformStringSpan path, StringSpan header = "");
 
-		void FreeResources();
+		void FreeResources(StringSpan footer = "") ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace Eldritch2 { namespace Logging {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		FileAppender _appender;
+		FileAppender _sink;
 
 		// ---------------------------------------------------
 

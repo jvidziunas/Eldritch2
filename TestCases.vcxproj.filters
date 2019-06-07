@@ -177,9 +177,6 @@
     <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\Mpl\Matrices.cpp">
-      <Filter>Source Files\Code</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Engine.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
@@ -190,9 +187,6 @@
       <Filter>Source Files\Code</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\PropertyDatabase.cpp">
-      <Filter>Source Files\Code</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\PropertyRegistrar.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\TimeAccumulator.cpp">
@@ -304,9 +298,6 @@
       <Filter>Source Files\Code</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\PhysX\ScriptClasses\TriggerVolume.WrenScriptApi.cpp">
-      <Filter>Source Files\Code</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureAsset.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\PhysX\AssetViews\PhysicsAsset.cpp">
@@ -588,10 +579,19 @@
     <ClCompile Include="src\Renderer\Vulkan\OutputWindow.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\ObjectLocator.cpp">
+    <ClCompile Include="src\Animation\AnimationApi.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
-    <ClCompile Include="src\Animation\AnimationApi.cpp">
+    <ClCompile Include="src\Core\PropertyApiBuilder.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\ObjectInjector.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Mpl\Matrix.cpp">
+      <Filter>Source Files\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureDefinitionAsset.cpp">
       <Filter>Source Files\Code</Filter>
     </ClCompile>
   </ItemGroup>
@@ -779,9 +779,6 @@
     <None Include="src\Common\Mpl\CharTypes.inl">
       <Filter>Source Files\Code</Filter>
     </None>
-    <None Include="src\Common\Mpl\Matrices.inl">
-      <Filter>Source Files\Code</Filter>
-    </None>
     <None Include="src\Common\Mpl\Vectors.inl">
       <Filter>Source Files\Code</Filter>
     </None>
@@ -792,9 +789,6 @@
       <Filter>Source Files\Code</Filter>
     </None>
     <None Include="src\Core\IniParser.inl">
-      <Filter>Source Files\Code</Filter>
-    </None>
-    <None Include="src\Core\PropertyRegistrar.inl">
       <Filter>Source Files\Code</Filter>
     </None>
     <None Include="src\Core\TimeAccumulator.inl">
@@ -941,7 +935,13 @@
     <None Include="src\Renderer\Vulkan\GpuResidencyManager.inl">
       <Filter>Source Files\Code</Filter>
     </None>
-    <None Include="src\Common\ObjectLocator.inl">
+    <None Include="src\Core\PropertyApiBuilder.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\ObjectInjector.inl">
+      <Filter>Source Files\Code</Filter>
+    </None>
+    <None Include="src\Common\Mpl\Matrix.inl">
       <Filter>Source Files\Code</Filter>
     </None>
   </ItemGroup>

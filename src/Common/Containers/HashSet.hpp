@@ -27,21 +27,23 @@ ET_POP_MSVC_WARNING_STATE()
 
 namespace Eldritch2 {
 
-template <typename Value, class HashPredicate = Hash<Value>, class EqualityPredicate = EqualTo<Value>, class Allocator = MallocAllocator, bool cacheHashCode = false>
+template <typename Value, class HashPredicate = Hash<Value>, class EqualityPredicate = EqualTo<Value>, class Allocator = MallocAllocator, bool CacheHashCode = false>
 class HashSet {
 	// - TYPE PUBLISHING ---------------------------------
 
 protected:
-	using UnderlyingContainer = eastl::hash_set<Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, cacheHashCode>;
+	using UnderlyingContainer = eastl::hash_set<Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, CacheHashCode>;
 
 public:
 	using ValueType             = typename UnderlyingContainer::value_type;
+	using ConstReference        = typename UnderlyingContainer::const_reference;
+	using Reference             = typename UnderlyingContainer::reference;
 	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
-	using SizeType              = typename UnderlyingContainer::size_type;
-	using Iterator              = typename UnderlyingContainer::iterator;
 	using ConstIterator         = typename UnderlyingContainer::const_iterator;
-	using LocalIterator         = typename UnderlyingContainer::local_iterator;
+	using Iterator              = typename UnderlyingContainer::iterator;
 	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
+	using LocalIterator         = typename UnderlyingContainer::local_iterator;
+	using SizeType              = typename UnderlyingContainer::size_type;
 	using HashPredicateType     = HashPredicate;
 	using EqualityPredicateType = EqualityPredicate;
 
@@ -49,18 +51,18 @@ public:
 
 public:
 	//! Constructs this @ref HashSet instance.
-	HashSet(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
+	HashSet(const AllocatorType& allocator = AllocatorType(), SizeType buckets = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
 	//! Constructs this @ref HashSet instance.
 	template <typename InputIterator>
-	HashSet(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
+	HashSet(const AllocatorType& allocator, SizeType buckets, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashSet instance.
-	HashSet(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, std::initializer_list<ValueType>);
+	HashSet(const AllocatorType& allocator, SizeType buckets, const HashPredicateType& hash, const EqualityPredicateType& equal, InitializerList<ValueType>);
 	//! Constructs this @ref HashSet instance.
 	HashSet(const AllocatorType& allocator, const HashSet&);
 	//! Constructs this @ref HashSet instance.
 	HashSet(const HashSet&) = default;
 	//! Constructs this @ref HashSet instance.
-	HashSet(HashSet&&) = default;
+	HashSet(HashSet&&) ETNoexceptHint = default;
 
 	~HashSet() = default;
 
@@ -69,18 +71,18 @@ public:
 public:
 	//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
 	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
-	ConstIterator Find(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) const;
+	ConstIterator Find(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) const ETNoexceptHint;
 	//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
 	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
-	Iterator Find(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal);
+	Iterator Find(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) ETNoexceptHint;
 	//! Retrieves a @ref ConstIterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-	ConstIterator Find(const ValueType& value) const;
+	ConstIterator Find(ConstReference) const ETNoexceptHint;
 	//! Retrieves an @ref Iterator pointing to the first element with a key equal to the specified, or an iterator to the end element if no item is found.
-	Iterator Find(const ValueType& value);
+	Iterator Find(ConstReference) ETNoexceptHint;
 
 	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
-	bool Contains(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) const;
-	bool Contains(const ValueType& value) const;
+	bool Contains(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal) const ETNoexceptHint;
+	bool Contains(ConstReference) const ETNoexceptHint;
 
 	//! Erases all elements for which the result of the predicate returns true.
 	template <typename UnaryPredicate>
@@ -90,56 +92,61 @@ public:
 
 public:
 	//!	Retrieves a @ref ConstLocalIterator to the first element stored in the specified bucket of this @ref HashSet.
-	ConstLocalIterator ConstBegin(SizeType bucketIndex) const;
+	ConstLocalIterator ConstBegin(SizeType bucket) const ETNoexceptHint;
 	//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
-	ConstIterator ConstBegin() const;
+	ConstIterator ConstBegin() const ETNoexceptHint;
 
 	//!	Retrieves a @ref ConstLocalIterator to one past the end of all elements stored in this @ref HashSet.
-	ConstLocalIterator ConstEnd(SizeType bucketIndex) const;
+	ConstLocalIterator ConstEnd(SizeType bucket) const ETNoexceptHint;
 	//!	Retrieves a @ref ConstIterator to one past the end of all elements stored in this @ref HashSet.
-	ConstIterator ConstEnd() const;
+	ConstIterator ConstEnd() const ETNoexceptHint;
 
 	//!	Retrieves a @ref ConstLocalIterator to the first element stored in this @ref HashSet.
-	ConstLocalIterator Begin(SizeType bucketIndex) const;
+	ConstLocalIterator Begin(SizeType bucket) const ETNoexceptHint;
 	//!	Retrieves a @ref LocalIterator to the first element stored in this @ref HashSet.
-	LocalIterator Begin(SizeType bucketIndex);
+	LocalIterator Begin(SizeType bucket) ETNoexceptHint;
 	//!	Retrieves a @ref ConstIterator to the first element stored in this @ref HashSet.
-	ConstIterator Begin() const;
+	ConstIterator Begin() const ETNoexceptHint;
 	//!	Retrieves an @ref Iterator to the first element stored in this @ref HashSet.
-	Iterator Begin();
+	Iterator Begin() ETNoexceptHint;
 
 	//! Retrieves a @ref ConstLocalIterator to one past the end of all elements stored in this @ref HashSet.
-	ConstIterator End(SizeType bucketIndex) const;
+	ConstIterator End(SizeType bucket) const ETNoexceptHint;
 	//!	Retrieves an @ref LocalIterator to one past the end of all elements stored in this @ref HashSet.
-	Iterator End(SizeType bucketIndex);
+	Iterator End(SizeType bucket) ETNoexceptHint;
 	//! Retrieves a @ref ConstIterator to one past the end of all elements stored in this @ref HashSet.
-	ConstIterator End() const;
+	ConstIterator End() const ETNoexceptHint;
 	//!	Retrieves an @ref Iterator to one past the end of all elements stored in this @ref HashSet.
-	Iterator End();
+	Iterator End() ETNoexceptHint;
 
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	Pair<Iterator, bool> Insert(const ValueType& value);
-	Pair<Iterator, bool> Insert(ValueType&& value);
+	Pair<Iterator, bool> Insert(ConstReference);
+	Pair<Iterator, bool> Insert(ValueType&&);
 
 	template <typename... Args>
 	Pair<Iterator, bool> Emplace(Args&&... args);
 
 	Iterator Erase(Iterator begin, Iterator end);
 	Iterator Erase(Iterator where);
-	SizeType Erase(const ValueType& key);
+	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
+	SizeType Erase(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal);
+	SizeType Erase(ConstReference);
 
-	void Clear();
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer) ETNoexceptHint(noexcept(disposer(Declval<Reference>())));
+
+	void Clear() ETNoexceptHint;
 
 	// - CONTENT QUERY -----------------------------------
 
 public:
-	SizeType GetSize() const;
+	SizeType GetSize() const ETNoexceptHint;
 
-	bool IsEmpty() const;
+	bool IsEmpty() const ETNoexceptHint;
 
-	explicit operator bool() const;
+	explicit operator bool() const ETNoexceptHint;
 
 	// - CAPACITY QUERY ----------------------------------
 
@@ -150,16 +157,16 @@ public:
 
 public:
 	HashSet& operator=(const HashSet&) = default;
-	HashSet& operator=(HashSet&&) = default;
+	HashSet& operator=(HashSet&&) ETNoexceptHint = default;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	const EqualityPredicateType& GetEqualityPredicate() const;
+	EqualityPredicateType GetEqualityPredicate() const ETNoexceptHint;
 
-	const HashPredicateType& GetHash() const;
+	HashPredicateType GetHash() const ETNoexceptHint;
 
-	const AllocatorType& GetAllocator() const;
+	const AllocatorType& GetAllocator() const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -168,8 +175,8 @@ private:
 
 	// ---------------------------------------------------
 
-	template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-	friend void Swap(HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&, HashSet<Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&);
+	template <typename Value2, class HashPredicate2, class EqualityPredicate2, class Allocator2, bool CacheHashCode2>
+	friend void Swap(HashSet<Value2, HashPredicate2, EqualityPredicate2, Allocator2, CacheHashCode2>&, HashSet<Value2, HashPredicate2, EqualityPredicate2, Allocator2, CacheHashCode2>&) ETNoexceptHint;
 };
 
 template <typename Value, class HashPredicate = Hash<Value>, class EqualityPredicate = EqualTo<Value>, class Allocator = MallocAllocator>

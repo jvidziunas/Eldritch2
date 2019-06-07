@@ -8,6 +8,11 @@
   ©2010-2015 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
+//==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
 
 //==================================================================//
 // INCLUDES
@@ -15,7 +20,5 @@
 #include <Build.hpp>
 //------------------------------------------------------------------//
 
-using namespace ::Eldritch2;
-
-const Utf8Char* const	buildDateStamp = __TIMESTAMP__;
-const wchar_t* const	wideBuildDateStamp = ET_PREPROCESSOR_JOIN(L, __TIMESTAMP__);
+const Eldritch2::Utf8Char* const buildDate     = __TIMESTAMP__;
+const wchar_t* const             wideBuildDate = ET_CPP_JOIN(L, __TIMESTAMP__);

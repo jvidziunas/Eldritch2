@@ -17,26 +17,32 @@
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
-	ETCpp14Constexpr ETInlineHint ETForceInlineHint ForeignMethod::ForeignMethod() ETNoexceptHint : body(nullptr), signature { '\0' } {}
+	ETConstexpr ETForceInlineHint ForeignMethod::ForeignMethod() ETNoexceptHint : body(nullptr), signature { '\0' } {}
 
 	// ---------------------------------------------------
 
 	template <class Class>
-	ETInlineHint ETForceInlineHint void ApiBuilder::DefineClass(StringView wrenModule, StringView wrenName, std::initializer_list<ForeignMethod> staticMethods, std::initializer_list<ForeignMethod> methods) {
-		return DefineClass(typeid(Class), wrenModule, wrenName, constructors, staticMethods, properties, methods, [](void* object) ETNoexceptHint { InvokeDestructor()(static_cast<Class*>(object)); });
+	ETInlineHint ETForceInlineHint void ApiBuilder::DefineClass(StringSpan name, StringSpan moduleName, InitializerList<ForeignMethod> staticMethods, InitializerList<ForeignMethod> methods) {
+		return DefineClass(GetType<Class>(), name, moduleName, staticMethods, methods, /*finalizer =*/[](void* object) ETNoexceptHint { static_cast<Class*>(object)->~Class(); });
 	}
 
 	// ---------------------------------------------------
 
 	template <class Class, typename... Arguments>
-	ETInlineHint ETForceInlineHint Class* ApiBuilder::DefineVariable(StringView wrenModule, StringView wrenName, Arguments&&... arguments) {
-		return new (DefineVariable(typeid(Class), sizeof(Class), wrenModule, wrenName)) Class(eastl::forward<Arguments>(arguments)...);
+	ETInlineHint ETForceInlineHint Class* ApiBuilder::DefineVariable(StringSpan name, StringSpan moduleName, Arguments&&... arguments) {
+		return new (DefineVariable(GetType<Class>(), sizeof(Class), moduleName, name)) Class(Forward<Arguments>(arguments)...);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint ApiBuilder::ClassMap ApiBuilder::ReleaseClasses() {
-		return eastl::exchange(_classByCppType, ClassMap(_classByCppType.GetAllocator()));
+	ETConstexpr ETForceInlineHint ApiBuilder::ClassMap& ApiBuilder::GetClasses() ETNoexceptHint {
+		return _classByCppType;
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint WrenVM*& ApiBuilder::GetVm() ETNoexceptHint {
+		return _vm;
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

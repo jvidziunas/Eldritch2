@@ -9,12 +9,18 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/TriggerArea.hpp>
 //------------------------------------------------------------------//
 /*	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does.
- *		We can't fix this, but we can at least disable the warning. */
+ *	We can't fix this, but we can at least disable the warning. */
 ET_PUSH_MSVC_WARNING_STATE(disable : 6326)
 #include <PxRigidStatic.h>
 ET_POP_MSVC_WARNING_STATE()
@@ -24,10 +30,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	using namespace ::physx;
 
-	TriggerArea::TriggerArea(PhysxPointer<PxRigidStatic> actor, PhysxPointer<PxShape> shape) :
-		_actor(eastl::move(actor)),
-		_collisionShape(eastl::move(shape)) {
-	}
+	TriggerArea::TriggerArea(PhysxPointer<PxRigidStatic> actor, PhysxPointer<PxShape> shape) ETNoexceptHint : _actor(Move(actor)), _collisionShape(Move(shape)) {}
 
 	// ---------------------------------------------------
 

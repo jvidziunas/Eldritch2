@@ -19,20 +19,25 @@
 
 namespace Eldritch2 {
 
-ETInlineHint MallocAllocator::MallocAllocator(const Utf8Char* name) ETNoexceptHint : Allocator(name) {}
+ETConstexpr ETForceInlineHint MallocAllocator::MallocAllocator(const Utf8Char* name) ETNoexceptHint : Allocator(name) {}
 
 // ---------------------------------------------------
 
-ETInlineHint MallocAllocator::MallocAllocator(const MallocAllocator& allocator) ETNoexceptHint : Allocator(allocator) {}
-
-// ---------------------------------------------------
-
-ETInlineHint MallocAllocator& MallocAllocator::operator=(const MallocAllocator& /*allocator*/) ETNoexceptHint {
+ETConstexpr ETForceInlineHint MallocAllocator& MallocAllocator::operator=(const MallocAllocator& /*allocator*/) ETNoexceptHint {
 	return *this;
 }
 
 // ---------------------------------------------------
 
-ETInlineHint void Swap(MallocAllocator& /*lhs*/, MallocAllocator& /*rhs*/) ETNoexceptHint {}
+ETConstexpr ETForceInlineHint bool operator==(const MallocAllocator&, const MallocAllocator&) ETNoexceptHint {
+	// Malloc-based allocators are stateless and always refer to the global heap.
+	return true;
+}
+
+// ---------------------------------------------------
+
+ETConstexpr ETForceInlineHint void Swap(MallocAllocator&, MallocAllocator&) ETNoexceptHint {
+	// Malloc-based allocators are stateless and always refer to the global heap.
+}
 
 } // namespace Eldritch2

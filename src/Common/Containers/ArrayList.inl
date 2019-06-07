@@ -17,6 +17,19 @@
 
 namespace Eldritch2 {
 
+template <typename ForwardIterator, typename UnaryPredicate>
+ForwardIterator RemoveIf(ForwardIterator begin, ForwardIterator end, UnaryPredicate filter);
+
+template <typename InputIterator, typename Value>
+InputIterator Find(InputIterator begin, InputIterator end, const Value& value) ETNoexceptHintIf(IsNoThrowCallable<EqualTo<Value>, const Value&, typename DereferenceType<InputIterator>::Type>());
+
+template <typename T, typename... U>
+ETCpp14Constexpr ETPureFunctionHint ETNeverThrowsHint T Minimum(T, U...) ETNoexceptHint;
+
+} // namespace Eldritch2
+
+namespace Eldritch2 {
+
 template <typename Value, typename Allocator>
 ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>::ArrayList(const AllocatorType& allocator, SizeType capacityHint) :
 	_container(allocator) {
@@ -33,9 +46,8 @@ ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>::ArrayList(const Allo
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>::ArrayList(const AllocatorType& allocator, std::initializer_list<ValueType> list) :
-	_container(list, allocator) {
-}
+ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>::ArrayList(const AllocatorType& allocator, InitializerList<ValueType> values) :
+	_container(values, allocator) {}
 
 // ---------------------------------------------------
 
@@ -46,53 +58,45 @@ ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>::ArrayList(const Allo
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::ConstIterator ArrayList<Value, Allocator>::Find(ConstReference value) const {
-	return eastl::find(_container.begin(), _container.end(), value);
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::ConstIterator ArrayList<Value, Allocator>::Find(ConstReference value) const ETNoexceptHint {
+	return Eldritch2::Find(_container.cbegin(), _container.cend(), value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Find(ConstReference item) {
-	return eastl::find(_container.begin(), _container.end(), item);
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Find(ConstReference value) ETNoexceptHint {
+	return Eldritch2::Find(_container.begin(), _container.end(), value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::ConstIterator ArrayList<Value, Allocator>::Find(ConstReference value, ConstIterator where) const {
-	return eastl::find(where, _container.end(), value);
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::ConstIterator ArrayList<Value, Allocator>::Find(ConstReference value, ConstIterator where) const ETNoexceptHint {
+	return Eldritch2::Find(where, _container.cend(), value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Find(ConstReference value, Iterator where) {
-	return eastl::find(where, _container.end(), value);
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Find(ConstReference value, Iterator where) ETNoexceptHint {
+	return Eldritch2::Find(where, _container.end(), value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint bool ArrayList<Value, Allocator>::Contains(ConstReference value) const {
-	return eastl::find(_container.cbegin(), _container.cend(), value) != _container.cend();
+ETInlineHint ETForceInlineHint bool ArrayList<Value, Allocator>::Contains(ConstReference value) const ETNoexceptHint {
+	return Eldritch2::Find(_container.cbegin(), _container.cend(), value) != _container.cend();
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
 template <typename UnaryPredicate>
-ETInlineHint void ArrayList<Value, Allocator>::EraseIf(UnaryPredicate condition) {
-	const auto lastValid(eastl::remove_if(eastl::make_move_iterator(_container.begin()), eastl::make_move_iterator(_container.end()), eastl::move(condition)));
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::EraseIf(UnaryPredicate condition) {
+	const auto lastValid(Eldritch2::RemoveIf(eastl::make_move_iterator(_container.begin()), eastl::make_move_iterator(_container.end()), Move(condition)));
 	_container.erase(lastValid.base(), _container.end());
-}
-
-// ---------------------------------------------------
-
-template <typename Value, typename Allocator>
-template <typename UnaryPredicate>
-ETInlineHint void ArrayList<Value, Allocator>::Sort(UnaryPredicate sort) {
-	eastl::sort(_container.begin(), _container.end(), eastl::move(sort));
 }
 
 // ---------------------------------------------------
@@ -210,7 +214,7 @@ ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Reference A
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Append(const ValueType& value) {
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Append(ConstReference value) {
 	_container.push_back(value);
 }
 
@@ -218,7 +222,7 @@ ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Append(const Va
 
 template <typename Value, typename Allocator>
 ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Append(ValueType&& value) {
-	_container.push_back(eastl::move(value));
+	_container.push_back(Move(value));
 }
 
 // ---------------------------------------------------
@@ -226,7 +230,7 @@ ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Append(ValueTyp
 template <typename Value, typename Allocator>
 template <typename... Arguments>
 ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Reference ArrayList<Value, Allocator>::EmplaceBack(Arguments&&... arguments) {
-	return _container.emplace_back(eastl::forward<Arguments>(arguments)...);
+	return _container.emplace_back(Forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
@@ -239,15 +243,43 @@ ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Pop() {
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::ConstReference ArrayList<Value, Allocator>::operator[](SizeType offset) const ETNoexceptHint {
-	return _container[offset];
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::ConstSliceType ArrayList<Value, Allocator>::Slice(SizeType offset, SizeType length) const ETNoexceptHint {
+	return { _container.cbegin() + offset, _container.cbegin() + Eldritch2::Minimum(_container.size() - offset, length) };
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Reference ArrayList<Value, Allocator>::operator[](SizeType offset) ETNoexceptHint {
-	return _container[offset];
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::SliceType ArrayList<Value, Allocator>::Slice(SizeType offset, SizeType length) ETNoexceptHint {
+	return { _container.begin() + offset, _container.begin() + Eldritch2::Minimum(_container.size() - offset, length) };
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>::operator ConstSliceType() const ETNoexceptHint {
+	return { _container.cbegin(), _container.cend() };
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>::operator SliceType() ETNoexceptHint {
+	return { _container.begin(), _container.end() };
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::ConstReference ArrayList<Value, Allocator>::operator[](SizeType index) const ETNoexceptHint {
+	return _container[index];
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Reference ArrayList<Value, Allocator>::operator[](SizeType index) ETNoexceptHint {
+	return _container[index];
 }
 
 // ---------------------------------------------------
@@ -289,14 +321,14 @@ ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Assign(InputIte
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Assign(std::initializer_list<ValueType> list) {
-	_container.assign(list);
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Assign(InitializerList<ValueType> values) {
+	_container.assign(values);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Insert(Iterator where, SizeType count, const ValueType& value) {
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Insert(Iterator where, SizeType count, ConstReference value) {
 	_container.insert(where, count, value);
 }
 
@@ -311,7 +343,7 @@ ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Insert(Iterator
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Insert(Iterator where, const ValueType& value) {
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Insert(Iterator where, ConstReference value) {
 	return _container.insert(where, value);
 }
 
@@ -319,7 +351,7 @@ ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator Ar
 
 template <typename Value, typename Allocator>
 ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Insert(Iterator where, ValueType&& value) {
-	return _container.insert(where, eastl::move(value));
+	return _container.insert(where, Move(value));
 }
 
 // ---------------------------------------------------
@@ -327,7 +359,7 @@ ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator Ar
 template <typename Value, typename Allocator>
 template <typename... Arguments>
 ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::Emplace(Iterator where, Arguments&&... arguments) {
-	return _container.emplace(where, eastl::forward<Arguments>(arguments)...);
+	return _container.emplace(where, Forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
@@ -375,49 +407,73 @@ ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator Ar
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseFirst(const ValueType& value) {
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseFirst(ConstReference value) {
 	return _container.erase_first(value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseLast(const ValueType& value) {
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseLast(ConstReference value) {
 	return _container.erase_last(value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseFirstUnordered(const ValueType& value) {
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseFirstUnordered(ConstReference value) {
 	return _container.erase_first_unsorted(value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseLastUnordered(const ValueType& value) {
+ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::Iterator ArrayList<Value, Allocator>::EraseLastUnordered(ConstReference value) {
 	return _container.erase_last_unsorted(value);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Clear() {
-	_container.clear();
-}
+template <typename UnaryPredicate>
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::ClearAndDispose(const ReleaseMemorySemantics, UnaryPredicate disposer) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>()) {
+	while (!_container.empty()) {
+		disposer(_container.back());
+		_container.pop_back();
+	}
 
-// ---------------------------------------------------
-
-template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Clear(const ReleaseMemorySemantics) {
 	_container.reset_lose_memory();
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Resize(SizeType sizeInElements, const ValueType& filler) {
+template <typename UnaryPredicate>
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::ClearAndDispose(UnaryPredicate disposer) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>()) {
+	while (!_container.empty()) {
+		disposer(_container.back());
+		_container.pop_back();
+	}
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Clear(const ReleaseMemorySemantics) ETNoexceptHint {
+	_container.reset_lose_memory();
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Clear() ETNoexceptHint {
+	_container.clear();
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Resize(SizeType sizeInElements, ConstReference filler) {
 	_container.resize(sizeInElements, filler);
 }
 
@@ -459,22 +515,23 @@ ETInlineHint ETForceInlineHint typename ArrayList<Value, Allocator>::SizeType Ar
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::SetCapacity(SizeType capacityInElements) {
-	_container.set_capacity(capacityInElements);
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::SetCapacity(SizeType capacity) {
+	_container.set_capacity(capacity);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Reserve(SizeType capacityHintInElements) {
-	_container.reserve(capacityHintInElements);
+ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::Reserve(SizeType minimumCapacity) {
+	_container.reserve(minimumCapacity);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void ArrayList<Value, Allocator>::ShrinkToFit() {
+ETInlineHint ETForceInlineHint ArrayList<Value, Allocator>& ArrayList<Value, Allocator>::ShrinkToFit() {
 	_container.shrink_to_fit();
+	return *this;
 }
 
 // ---------------------------------------------------
@@ -487,14 +544,14 @@ ETInlineHint ETForceInlineHint typename const ArrayList<Value, Allocator>::Alloc
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint bool ArrayList<Value, Allocator>::ValidateIterator(ConstIterator iterator) const {
+ETInlineHint ETForceInlineHint bool ArrayList<Value, Allocator>::Validate(ConstIterator iterator) const ETNoexceptHint {
 	return _container.validate_iterator(iterator);
 }
 
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
-ETInlineHint ETForceInlineHint void Swap(ArrayList<Value, Allocator>& lhs, ArrayList<Value, Allocator>& rhs) {
+ETInlineHint ETForceInlineHint void Swap(ArrayList<Value, Allocator>& lhs, ArrayList<Value, Allocator>& rhs) ETNoexceptHint {
 	lhs._container.swap(rhs._container);
 }
 

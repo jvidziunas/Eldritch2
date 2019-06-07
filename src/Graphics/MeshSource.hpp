@@ -17,16 +17,15 @@
 
 namespace Eldritch2 { namespace Graphics {
 
-	template <typename OutputIterator>
 	struct MeshElementRequest {
-		OutputIterator out;
-		uint32         first;
-		uint32         last;
+		uint32  stream;
+		uint32  first;
+		uint32  last;
+		byte*   out;
 	};
 
 	// ---
 
-	template <typename Vertex>
 	class ETPureAbstractHint MeshSource {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -41,16 +40,14 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		virtual MeshDescription GetDescription() const ETNoexceptHint abstract;
+		virtual MeshDescriptor DescribeSelf() const ETNoexceptHint abstract;
 
-		virtual MeshSurface GetSurface(uint32 surface) const ETNoexceptHint abstract;
+		virtual Meshlet GetMeshlet(uint32 meshlet) const ETNoexceptHint abstract;
 
 		// ---------------------------------------------------
 
 	public:
-		virtual void Stream(MeshElementRequest<StridingIterator<Vertex>> request) const ETNoexceptHint abstract;
-
-		virtual void Stream(MeshElementRequest<MeshIndex*> request) const ETNoexceptHint abstract;
+		virtual void Stream(MeshElementRequest request) const ETNoexceptHint abstract;
 	};
 
 }} // namespace Eldritch2::Graphics

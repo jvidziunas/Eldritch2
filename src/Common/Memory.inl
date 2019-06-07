@@ -23,9 +23,9 @@ ETConstexpr ETPureFunctionHint size_t GetHashCode(const void* pointer, size_t se
 
 // ---------------------------------------------------
 
-ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t sizeInBytes, size_t seed) ETNoexceptHint {
+ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t byteLength, size_t seed) ETNoexceptHint {
 	struct SizeHelper {
-		static ETCpp14Constexpr ETInlineHint ETPureFunctionHint uint64 Mix(uint64& value) ETNoexceptHint {
+		static ETCpp14Constexpr ETPureFunctionHint uint64 Mix(uint64& value) ETNoexceptHint {
 			value ^= value >> 23;
 			value *= 0x2127599bf4325c37ULL;
 			value ^= value >> 47;
@@ -33,24 +33,24 @@ ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t
 			return value;
 		}
 
-		static ETCpp14Constexpr ETPureFunctionHint uint64 Hash(const void* buffer, size_t lengthInBytes, uint64 seed) ETNoexceptHint {
+		static ETCpp14Constexpr ETPureFunctionHint uint64 Hash(const void* buffer, size_t byteLength, uint64 seed) ETNoexceptHint {
 			enum : uint64 { m = 0x880355f21e6d1965ull };
 
 			// ---
 
-			uint64 hash(seed ^ (lengthInBytes * m));
+			uint64 hash(seed ^ (byteLength * m));
 			auto   pos(static_cast<const uint64*>(buffer));
 
-			for (const auto end(pos + (lengthInBytes / sizeof(pos[0]))); pos != end;) {
+			for (const auto end(pos + (byteLength / sizeof(pos[0]))); pos != end;) {
 				uint64 v = *pos++;
 				hash ^= Mix(v);
 				hash *= m;
 			}
 
 			const auto pos2(reinterpret_cast<const unsigned char*>(pos));
-			uint64     v = 0ull;
+			uint64     v(0ull);
 
-			switch (lengthInBytes & 7) {
+			switch (byteLength & 7) {
 			case 7: v ^= uint64(pos2[6]) << 48;
 			case 6: v ^= uint64(pos2[5]) << 40;
 			case 5: v ^= uint64(pos2[4]) << 32;
@@ -68,15 +68,15 @@ ETCpp14Constexpr ETPureFunctionHint size_t HashMemory(const void* memory, size_t
 
 		// ---------------------------------------------------
 
-		static ETCpp14Constexpr ETPureFunctionHint uint32 Hash(const void* buffer, size_t lengthInBytes, uint32 seed) ETNoexceptHint {
+		static ETCpp14Constexpr ETPureFunctionHint uint32 Hash(const void* buffer, size_t byteLength, uint32 seed) ETNoexceptHint {
 			/*	Converts the 64-bit hash code to Fermat residue, which retains information from both the higher and
 			 *	lower parts of the code. */
-			const uint64 hash(Hash(buffer, lengthInBytes, uint64(seed)));
+			const uint64 hash(Hash(buffer, byteLength, uint64(seed)));
 			return uint32(hash - (hash >> 32));
 		}
 	};
 
-	return SizeHelper::Hash(memory, sizeInBytes, seed);
+	return SizeHelper::Hash(memory, byteLength, seed);
 }
 
 } // namespace Eldritch2

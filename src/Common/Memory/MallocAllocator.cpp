@@ -11,11 +11,14 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Memory/MallocAllocator.hpp>
-//------------------------------------------------------------------//
-#include <memory>
 #if ET_COMPILER_IS_MSVC || ET_COMPILER_IS_ICC
 #	include <malloc.h>
 #elif ET_COMPILER_IS_GCC
@@ -25,9 +28,9 @@
 
 namespace Eldritch2 {
 
-ETRestrictHint void* MallocAllocator::Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration) {
-	if (((offsetInBytes % alignmentInBytes) == 0) && (alignmentInBytes <= 16u)) {
-		return Allocate(sizeInBytes, duration);
+ETRestrictHint void* MallocAllocator::Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration duration) ETNoexceptHint {
+	if (((byteOffset % byteAlignment) == 0) && (byteAlignment <= 16u)) {
+		return Allocate(byteSize, duration);
 	}
 
 	return nullptr;
@@ -35,13 +38,13 @@ ETRestrictHint void* MallocAllocator::Allocate(SizeType sizeInBytes, SizeType al
 
 // ---------------------------------------------------
 
-ETRestrictHint void* MallocAllocator::Allocate(SizeType sizeInBytes, AllocationDuration /*duration*/) {
-	return malloc(sizeInBytes);
+ETRestrictHint void* MallocAllocator::Allocate(SizeType byteSize, AllocationDuration /*duration*/) ETNoexceptHint {
+	return malloc(byteSize);
 }
 
 // ---------------------------------------------------
 
-void MallocAllocator::Deallocate(void* const address, SizeType /*sizeInBytes*/) {
+void MallocAllocator::Deallocate(void* const address, SizeType /*byteSize*/) ETNoexceptHint {
 	free(address);
 }
 

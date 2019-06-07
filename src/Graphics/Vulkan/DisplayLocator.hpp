@@ -12,10 +12,21 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/Display.hpp>
+#include <Graphics/Vulkan/GpuResourceApi.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+	class DisplayBus;
+	class Display;
+}}} // namespace Eldritch2::Graphics::Vulkan
+
+namespace Eldritch2 { namespace Graphics { namespace Vulkan {
+
+	enum class ViewportId : uintptr {
+		Invalid = ~uintptr(0u)
+	};
+
+	// ---
 
 	class DisplayLocator {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -31,20 +42,27 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		UniquePointer<Viewport, ViewportDisposer> TryAcquireViewport(const GraphicsPipelineBuilder& pipeline);
+		VkResult PresentImages() const;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(DisplayList& displays, Mutex& mutex);
+		ViewportId TryAcquireViewport(const PipelineBuilder& pipeline);
 
-		void FreeResources();
+		void ReleaseViewport(ViewportId id) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, DisplayBus& bus);
+
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		DisplayList* _displays;
-		Mutex*       _displayMutex;
+		DisplayBus*                       _bus;
+		ArrayMap<ViewportId, Framebuffer> _framebufferById;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

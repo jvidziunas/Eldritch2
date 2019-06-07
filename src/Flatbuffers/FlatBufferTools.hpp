@@ -15,40 +15,48 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-namespace FlatBuffers {
-	struct CompressedUnitQuaternion;
-	struct Transformation;
-	struct Quaternion;
-	struct Float3;
-	struct Float2;
-} // namespace FlatBuffers
 
 template <typename Character>
-class AbstractStringView;
+class AbstractStringSpan;
 class Transformation;
 class Vector;
+
 } // namespace Eldritch2
 
 namespace flatbuffers {
-struct String;
 
 template <typename T>
 class Vector;
 
+struct Transformation;
+struct UnitQuaternion;
+struct Quaternion;
+struct Float3;
+struct Float2;
+struct String;
+
 } // namespace flatbuffers
 
-namespace Eldritch2 {
+namespace flatbuffers {
 
-AbstractStringView<char> AsString(const flatbuffers::String* string) ETNoexceptHint;
-Transformation ETSimdCall AsTransformation(const FlatBuffers::Transformation& transform) ETNoexceptHint;
-Quaternion ETSimdCall AsQuaternion(const FlatBuffers::CompressedUnitQuaternion& quaternion) ETNoexceptHint;
-Quaternion ETSimdCall AsQuaternion(const FlatBuffers::Quaternion& quaternion) ETNoexceptHint;
-Vector ETSimdCall AsVector(const FlatBuffers::Float3& vector) ETNoexceptHint;
+template <typename T>
+ETPureFunctionHint Eldritch2::Span<const T*> AsRange(const Vector<T>* vector) ETNoexceptHint;
 
-template <typename Type>
-using FlatbufferVector = flatbuffers::Vector<Type>;
+ETPureFunctionHint Eldritch2::AbstractStringSpan<char> AsString(const String* string) ETNoexceptHint;
 
-} // namespace Eldritch2
+ETPureFunctionHint Eldritch2::Transformation ETSimdCall AsTransformation(const Transformation& transform) ETNoexceptHint;
+
+ETPureFunctionHint Eldritch2::Quaternion ETSimdCall AsQuaternion(const UnitQuaternion& quaternion) ETNoexceptHint;
+ETPureFunctionHint Eldritch2::Quaternion ETSimdCall AsQuaternion(const Quaternion& quaternion) ETNoexceptHint;
+
+ETPureFunctionHint Eldritch2::Vector ETSimdCall AsVector(const Float3& vector) ETNoexceptHint;
+
+ETPureFunctionHint Eldritch2::Span<const Eldritch2::byte*> AsBytes(const Vector<uint8_t>* bytes) ETNoexceptHint;
+
+template <typename T>
+const T* GetVerifiedRoot(Eldritch2::Span<const Eldritch2::byte*> bytes, const char identifier[]) ETNoexceptHint;
+
+} // namespace flatbuffers
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

@@ -25,47 +25,49 @@ namespace Eldritch2 { namespace Animation {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		enum class LoopMode : uint8 {
-			Hold,
-			Repeat,
-			Mirror,
+		struct Interval {
+			ETConstexpr bool Covers(ClipTime time) const ETNoexceptHint;
+
+			ClipTime begin;
+			ClipTime end;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Constructs this @ref KeyframeClip instance.
-		KeyframeClip(Allocator& allocator, const AssetViews::KeyframeClipAsset& asset);
+		ETConstexpr KeyframeClip(MicrosecondTime startTime, const AssetViews::KeyframeClipAsset& asset) ETNoexceptHint;
 		//! Constructs this @ref KeyframeClip instance.
-		KeyframeClip(const KeyframeClip&) = default;
+		KeyframeClip(const KeyframeClip&) ETNoexceptHint = default;
 
 		~KeyframeClip() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		void SetStartTimestamp(uint64 worldTime);
+		ETConstexpr ClipTime AsLocalTime(MicrosecondTime worldTime) const ETNoexceptHint;
 
-		void SetPlaybackRate(float32 rate);
-
-		// ---------------------------------------------------
-
-	public:
-		float32 AsLocalTime(uint64 globalTime) const;
+		void Evaluate(MicrosecondTime worldTime, BoneIndex maximumBone, SoaTransformation pose[]) ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		void FetchKnots(KnotCache& knots, BoneIndex maximumBone, uint64 time) override;
+		ETConstexpr void SetPlaybackRate(float32 rate) ETNoexceptHint;
+
+		ETConstexpr void SetLoopMode(LoopMode mode) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	private:
+		void UpdateCache(ClipTime time) ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
+		float32                              _playbackRate;
+		LoopMode                             _loop;
 		const AssetViews::KeyframeClipAsset* _asset;
-		uint64                               _startTimestamp;
-		uint32                               _duration;
-		LoopMode                             _loop[2];
-		float32                              _inverseLength;
+		Interval                             _validPeriod;
 	};
 
 }} // namespace Eldritch2::Animation

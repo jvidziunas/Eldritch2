@@ -19,20 +19,19 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	extern const struct FormatDescriptor {
-		VkFormat           deviceFormat;
-		VkComponentMapping shaderSwizzle;
-	} TextureFormats[size_t(GpuFormat::MAX) + 1];
+	struct FormatDescriptor {
+		VkFormat           format;
+		VkComponentMapping swizzle;
+	};
 
-	ETCpp14Constexpr ETPureFunctionHint VkSampleCountFlagBits GetSampleCountFlags(uint32 samples) ETNoexceptHint;
+	// ---
 
-	ETCpp14Constexpr ETPureFunctionHint VkImageAspectFlags GetAspectsByUsage(VkImageUsageFlags usages) ETNoexceptHint;
+	struct NullHandle {
+		template <typename VulkanType>
+		ETConstexpr ETPureFunctionHint operator VulkanType*() const ETNoexceptHint;
+	};
 
-	ETCpp14Constexpr ETPureFunctionHint VkImageViewType GetViewType(VkImageCreateFlags flags, VkImageType type, uint32 layers) ETNoexceptHint;
-
-	ETConstexpr ETPureFunctionHint VkImageType GetImageType(VkExtent3D extent) ETNoexceptHint;
-
-	// ---------------------------------------------------
+	// ---
 
 	ETConstexpr ETPureFunctionHint bool Succeeded(VkResult result) ETNoexceptHint;
 
@@ -40,7 +39,29 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	ETPureFunctionHint VkViewport GetViewport(VkRect2D renderArea, bool invertDepth = true) ETNoexceptHint;
+	ETCpp14Constexpr ETPureFunctionHint FormatDescriptor AsVulkan(GpuFormat) ETNoexceptHint;
+	ETCpp14Constexpr ETPureFunctionHint VkFormat AsVkFormat(GpuFormat) ETNoexceptHint;
+
+	ETCpp14Constexpr ETPureFunctionHint VkSampleCountFlagBits GetSampleCountFlags(uint32 samples) ETNoexceptHint;
+
+	ETCpp14Constexpr ETPureFunctionHint VkImageAspectFlags GetAspects(VkImageUsageFlags usages) ETNoexceptHint;
+
+	ETCpp14Constexpr ETPureFunctionHint VkImageViewType GetImageType(VkImageCreateFlags flags, VkImageType type, uint32 layers) ETNoexceptHint;
+	ETConstexpr ETPureFunctionHint VkImageType GetImageType(VkExtent3D extent) ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETPureFunctionHint VkViewport GetViewport(VkRect2D renderArea, bool reverseDepth = true) ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETPureFunctionHint size_t GetHashCode(VkFormat format, size_t seed = 0u) ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+	ETConstexpr VkOffset2D ScreenOrigin{ 0, 0 };
+
+	ETConstexpr NullHandle NullVulkanHandle;
 
 }}} // namespace Eldritch2::Graphics::Vulkan
 

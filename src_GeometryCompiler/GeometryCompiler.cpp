@@ -12,9 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/MappedFile.hpp>
-#include <Common/ErrorCode.hpp>
 #include <GeometryCompiler.hpp>
+#include <Common/FileView.hpp>
+#include <Common/Result.hpp>
 //------------------------------------------------------------------//
 #include <fbxsdk.h>
 //------------------------------------------------------------------//
@@ -25,26 +25,26 @@
 ET_LINK_LIBRARY("libfbxsdk-md.lib")
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Tools {
+namespace Eldritch2 { namespace Tools {
 
-	GeometryCompiler::GeometryCompiler() :
-		_password(MallocAllocator("Password Allocator")),
-		_sourcePaths(MallocAllocator("Input File Name Collection Allocator")) {
-	}
+	using namespace ::Eldritch2::Logging;
+
+	// ---------------------------------------------------
+
+	GeometryCompiler::GeometryCompiler() ETNoexceptHint : _meshes(MallocAllocator("Input File Name Collection Allocator")), _password(MallocAllocator("Password Allocator")) {}
 
 	// ---------------------------------------------------
 
 	void GeometryCompiler::RegisterOptions(OptionRegistrar& options) {
-		options.Register<bool>(L"--skipTextureCoordinates", L"-t", _skipTextureCoordinates);
-		options.Register<bool>(L"--skipOrientation", L"-o", _skipOrientation);
-		options.Register(L"--password", L"-p", [this](StringView<PlatformChar> password) -> int {
+		options.Register<bool>(SL("--skipTextureCoordinates"), SL("-t"), _skipTextureCoordinates);
+		options.Register<bool>(SL("--skipOrientation"), SL("-o"), _skipOrientation);
+		options.Register(SL("--password"), SL("-p"), [this](PlatformStringSpan password) -> int {
 			_password = password;
 
 			return 0;
 		});
-		options.RegisterInputFileHandler([this](StringView<PlatformChar> path) -> int {
-			_sourcePaths.Emplace(MallocAllocator("Input File Name Allocator"), path);
+		options.RegisterInputFileHandler([this](Log&, PlatformStringSpan path) -> int {
+			_meshes.Emplace(MallocAllocator("Input File Name Allocator"), path);
 
 			return 0;
 		});
@@ -52,13 +52,11 @@ namespace Tools {
 
 	// ---------------------------------------------------
 
-	ErrorCode GeometryCompiler::ProcessMesh(StringView<PlatformChar> path) {
-		FbxAutoDestroyPtr<FbxScene>    scene(FbxScene::Create(manager.Get(), ""));
+	Result GeometryCompiler::ProcessMesh(Log& log, MeshList::Reference sourceMesh) {
 		FbxAutoDestroyPtr<FbxImporter> importer(FbxImporter::Create(manager.Get(), ""));
+		FbxAutoDestroyPtr<FbxScene>    scene(FbxScene::Create(manager.Get(), ""));
 
-		if (!scene || !importer) {
-			return Error::Unspecified;
-		}
+		ET_ABORT_UNLESS(scene != nullptr && importer != nullptr ? Result::Success : Result::Unspecified);
 
 		if (!importer->Initialize(path, -1, settings.Get()) || importer->Import(scene.Get())) {
 			return Error::Unspecified;
@@ -67,12 +65,12 @@ namespace Tools {
 
 	// ---------------------------------------------------
 
-	ErrorCode GeometryCompiler::Process() {
+	Result GeometryCompiler::Process(Log& log) {
 		FbxAutoDestroyPtr<FbxManager>    manager(FbxManager::Create());
 		FbxAutoDestroyPtr<FbxIOSettings> settings(FbxIOSettings::Create(manager.Get(), IOSROOT));
 
 		if (!manager || !settings) {
-			return Error::Unspecified;
+			return Result::Unspecified;
 		}
 
 		//	Set the password for protected files, if applicable.
@@ -81,10 +79,11 @@ namespace Tools {
 			settings->SetBoolProp(IMP_FBX_PASSWORD_ENABLE, true);
 		}
 
-		for (const String<>& path : _sourcePaths) {
+		for (MeshList::Reference sourceMesh : _meshes) {
+			ET_ABORT_UNLESS(ProcessMesh(log, sourceMesh));
 		}
 
-		return 0;
+		return Result::Success;
 	}
 
 }} // namespace Eldritch2::Tools

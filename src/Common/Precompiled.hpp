@@ -12,6 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+// Build/deploy configuration
+#include <Common/Mpl/CompileOptions.hpp>
+
 //	Meta-programming library
 #include <Common/Mpl/CharTypes.hpp>
 #include <Common/Mpl/Compiler.hpp>
@@ -19,18 +22,20 @@
 #include <Common/Mpl/FloatTypes.hpp>
 #include <Common/Mpl/FunctionTraits.hpp>
 #include <Common/Mpl/IntTypes.hpp>
-#include <Common/Mpl/Matrices.hpp>
+#include <Common/Mpl/Matrix.hpp>
 #include <Common/Mpl/Platform.hpp>
+#include <Common/Mpl/Tuple.hpp>
 #include <Common/Mpl/TypeTraits.hpp>
-#include <Common/Mpl/Vectors.hpp>
+#include <Common/Mpl/Vector.hpp>
 
 //	Containers library
 #include <Common/Containers/AbstractString.hpp>
-#include <Common/Containers/AbstractStringView.hpp>
+#include <Common/Containers/AbstractStringSpan.hpp>
 #include <Common/Containers/ArrayBvh.hpp>
 #include <Common/Containers/ArrayList.hpp>
 #include <Common/Containers/ArrayMap.hpp>
 #include <Common/Containers/ArraySet.hpp>
+#include <Common/Containers/Cache.hpp>
 #include <Common/Containers/Dequeue.hpp>
 #include <Common/Containers/HashMap.hpp>
 #include <Common/Containers/HashMultiMap.hpp>
@@ -42,8 +47,8 @@
 #include <Common/Containers/Path.hpp>
 #include <Common/Containers/PriorityQueue.hpp>
 #include <Common/Containers/Queue.hpp>
-#include <Common/Containers/Range.hpp>
-#include <Common/Containers/SoArrayList.hpp>
+#include <Common/Containers/SoaList.hpp>
+#include <Common/Containers/Span.hpp>
 #include <Common/Containers/Stack.hpp>
 #include <Common/Containers/String.hpp>
 #include <Common/Containers/TreeMap.hpp>
@@ -71,10 +76,11 @@
 #include <Common/CountedPointer.hpp>
 #include <Common/CppType.hpp>
 #include <Common/EqualTo.hpp>
-#include <Common/ErrorCode.hpp>
+#include <Common/Fiber.hpp>
 #include <Common/FileAppender.hpp>
 #include <Common/FileReader.hpp>
 #include <Common/Filesystem.hpp>
+#include <Common/FileView.hpp>
 #include <Common/FileWriter.hpp>
 #include <Common/Function.hpp>
 #include <Common/GoapPlanner.hpp>
@@ -82,28 +88,24 @@
 #include <Common/Hash.hpp>
 #include <Common/IdentifierPool.hpp>
 #include <Common/LessThan.hpp>
-#include <Common/MappedFile.hpp>
 #include <Common/Math.hpp>
 #include <Common/Memory.hpp>
 #include <Common/Mutex.hpp>
-#include <Common/ObjectLocator.hpp>
+#include <Common/ObjectInjector.hpp>
 #include <Common/Pair.hpp>
 #include <Common/Platform.hpp>
 #include <Common/Ratio.hpp>
+#include <Common/Result.hpp>
 #include <Common/RuleSet.hpp>
 #include <Common/ScopeGuard.hpp>
 #include <Common/Semaphore.hpp>
 #include <Common/Sort.hpp>
 #include <Common/Stopwatch.hpp>
 #include <Common/StridingIterator.hpp>
-#include <Common/SymbolTable.hpp>
+#include <Common/SymbolSet.hpp>
 #include <Common/Thread.hpp>
-#include <Common/Tuple.hpp>
 #include <Common/UniquePointer.hpp>
 #include <Common/WaitableEvent.hpp>
 #include <Common/Win32Tools.hpp>
 #include <Common/Window.hpp>
-
-// Performance profiling library
-#include <Common/Profiler.hpp>
 //------------------------------------------------------------------//

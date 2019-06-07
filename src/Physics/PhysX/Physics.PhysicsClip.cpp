@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysxMarshals.hpp>
@@ -77,12 +83,12 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 			const Transformation poseToLocal(AsTransformation(static_cast<PxRigidActor*>(actors[bone])->getGlobalPose()) * globalToLocal);
 			const size_t         firstTrack(bone * TracksPerBone);
 
-			eastl::fill_n(eastl::get<KnotCache::StartTimes>(knot) + firstTrack, TracksPerBone, 0.0f);
-			eastl::fill_n(eastl::get<KnotCache::ReciprocalDurations>(knot) + firstTrack, TracksPerBone, 0.0f);
-			eastl::fill_n(eastl::get<KnotCache::StartValues>(knot) + firstTrack, TracksPerBone, 0.0f);
-			eastl::fill_n(eastl::get<KnotCache::EndValues>(knot) + firstTrack, TracksPerBone, 0.0f);
-			eastl::fill_n(eastl::get<KnotCache::StartTangents>(knot) + firstTrack, TracksPerBone, 0.0f);
-			eastl::fill_n(eastl::get<KnotCache::EndTangents>(knot) + firstTrack, TracksPerBone, 0.0f);
+			eastl::fill_n(Get<KnotCache::StartTimes>(knot) + firstTrack, TracksPerBone, 0.0f);
+			eastl::fill_n(Get<KnotCache::ReciprocalDurations>(knot) + firstTrack, TracksPerBone, 0.0f);
+			eastl::fill_n(Get<KnotCache::StartValues>(knot) + firstTrack, TracksPerBone, 0.0f);
+			eastl::fill_n(Get<KnotCache::EndValues>(knot) + firstTrack, TracksPerBone, 0.0f);
+			eastl::fill_n(Get<KnotCache::StartTangents>(knot) + firstTrack, TracksPerBone, 0.0f);
+			eastl::fill_n(Get<KnotCache::EndTangents>(knot) + firstTrack, TracksPerBone, 0.0f);
 		}
 	}
 

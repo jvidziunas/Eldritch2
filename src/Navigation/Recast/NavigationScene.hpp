@@ -42,9 +42,9 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(const dtNavMeshParams& meshParameters, int maxAgents, float32 agentRadius);
+		Result BindResources(int maxAgents, float32 agentRadius, const dtNavMeshParams& meshParameters);
 
-		void FreeResources();
+		void FreeResources() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

@@ -9,49 +9,80 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Audio/XAudio2/XAudio2Listener.hpp>
 #include <Audio/XAudio2/XAudioMarshals.hpp>
 //------------------------------------------------------------------//
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-#	include <C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include/XAudio2.h>
-#else
-#	include <XAudio2.h>
-#endif
-//------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
-	XAudio2Voice::XAudio2Voice(float32 loudnessDb, IXAudio2SourceVoice* sourceVoice, IXAudio2Voice* effectVoice) :
-		Voice(loudnessDb),
-		_sourceVoice(sourceVoice),
-		_effectVoice(effectVoice) {
-	}
+	namespace {
 
-	// ---------------------------------------------------
-
-	XAudio2Voice::XAudio2Voice(XAudio2Voice&& voice) :
-		Voice(voice),
-		_sourceVoice(eastl::exchange(voice._sourceVoice, nullptr)),
-		_effectVoice(eastl::exchange(voice._effectVoice, nullptr)) {
-	}
-
-	// ---------------------------------------------------
-
-	XAudio2Voice::~XAudio2Voice() {
-		if (_effectVoice) {
-			_effectVoice->DestroyVoice();
+		ETForceInlineHint ETPureFunctionHint bool Failed(HRESULT result) ETNoexceptHint {
+			return FAILED(result);
 		}
 
-		if (_sourceVoice) {
-			_sourceVoice->DestroyVoice();
-		}
+	} // anonymous namespace
+
+	XAudio2DiegeticVoice::XAudio2DiegeticVoice(Transformation localToWorld, MicrosecondTime startTime, float32 loudnessDb) :
+		DiegeticVoice(localToWorld, startTime, loudnessDb),
+		_source(nullptr),
+		_effect(nullptr) {}
+
+	// ---------------------------------------------------
+
+	XAudio2DiegeticVoice::XAudio2DiegeticVoice(XAudio2DiegeticVoice&& voice) :
+		DiegeticVoice(Move(voice)),
+		_source(Exchange(_source, nullptr)),
+		_effect(Exchange(voice._effect, nullptr)) {
 	}
 
 	// ---------------------------------------------------
 
-	void XAudio2Voice::UpdateDsp(const XAudio2Listener& listener, const X3DAUDIO_HANDLE& settings, float32 timeScalar, UINT32 operationSet) const {
+	XAudio2DiegeticVoice::~XAudio2DiegeticVoice() {}
+
+	// ---------------------------------------------------
+
+	HRESULT XAudio2DiegeticVoice::MakeActive(IXAudio2* xaudio, IXAudio2SubmixVoice* diegeticMix, OpusVoice& source) {
+		using ::Eldritch2::Swap;
+
+		XAUDIO2_SEND_DESCRIPTOR   sendDescriptors[] = { { /*Flags =*/0u, diegeticMix } };
+		const XAUDIO2_VOICE_SENDS sends{ UINT32(ETCountOf(sendDescriptors)), sendDescriptors };
+
+		IXAudio2SubmixVoice* effect(nullptr);
+		ET_ABORT_UNLESS(xaudio->CreateSubmixVoice(ETAddressOf(effect), /*InputChannels =*/2u, /*InputSampleRate =*/48000, /*Flags =*/0u, /*ProcessingStage =*/0u, ETAddressOf(sends)));
+		ET_AT_SCOPE_EXIT(if (effect) effect->DestroyVoice());
+
+		Swap(_effect, effect);
+		return S_OK;
+	}
+
+	// ---------------------------------------------------
+
+	void XAudio2DiegeticVoice::MakeVirtual() {
+		if (IXAudio2SubmixVoice* const effectVoice = Exchange(_effect, nullptr)) {
+			effectVoice->DestroyVoice();
+		}
+
+		_source = nullptr;
+	}
+
+	// ---------------------------------------------------
+
+	XAudio2Listener::XAudio2Listener(Transformation localToWorld, Vector linearVelocity) ETNoexceptHint : Listener<XAudio2DiegeticVoice>(localToWorld, linearVelocity),
+																										  _diegeticMix(nullptr),
+																										  _nonDiegeticMix(nullptr) {}
+
+	// ---------------------------------------------------
+
+	void XAudio2Listener::Mix(UINT32 operationSet, float32 timeScalar) const {
 		enum : uint32 {
 			MaxSourceChannels = 4u,
 			MaxOutputChannels = 8u,
@@ -63,54 +94,65 @@ namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 				| X3DAUDIO_CALCULATE_EMITTER_ANGLE
 		};
 
-		X3DAUDIO_DSP_SETTINGS dsp {
+		X3DAUDIO_DSP_SETTINGS dsp{
 			/*pMatrixCoefficients =*/ETStackAlloc(FLOAT32, MaxOutputChannels * MaxSourceChannels),
 			/*pDelayTimes =*/ETStackAlloc(FLOAT32, MaxOutputChannels),
 			/*SrcChannelCount =*/1u,
 			/*DstChannelCount =*/2u
 		};
 
-		X3DAudioCalculate(settings, &listener._listener, &_emitter, CalculateFlags, &dsp);
-		_sourceVoice->SetOutputMatrix(_effectVoice, dsp.SrcChannelCount, dsp.DstChannelCount, dsp.pMatrixCoefficients, operationSet);
-		_sourceVoice->SetVolume(GetHdrAmplitudeScalar(listener.GetWindowTop()), operationSet);
-		_sourceVoice->SetFrequencyRatio(dsp.DopplerFactor * timeScalar, operationSet);
-	}
+		Transformation          localToWorld(GetLocalToWorld());
+		const X3DAUDIO_LISTENER listener{
+			/*OrientFront =*/AsX3dAudioVector(localToWorld.rotation.GetForward()),
+			/*OrientTop =*/AsX3dAudioVector(localToWorld.rotation.GetUp()),
+			/*Position =*/AsX3dAudioVector(localToWorld.translation),
+			/*Velocity =*/AsX3dAudioVector(GetLinearVelocity()),
+			/*pCone =*/nullptr
+		};
 
-	// ---------------------------------------------------
+		const float32 hdrWindowTopDb(GetWindowTopDb());
+		for (ArrayList<XAudio2DiegeticVoice>::ConstReference voice : GetActiveVoices()) {
+			const X3DAUDIO_EMITTER emitter{};
 
-	XAudio2Listener::XAudio2Listener(Transformation localToWorld) :
-		Listener<XAudio2Voice>() {
-		SetLocalToWorld(localToWorld);
-		_listener.Velocity = X3DAUDIO_VECTOR { 0.0f, 0.0f, 0.0f };
-		_listener.pCone    = nullptr;
-	}
-
-	// ---------------------------------------------------
-
-	void XAudio2Listener::UpdateVoices(const X3DAUDIO_HANDLE& settings, float32 timeScalar, UINT32 operationSet) {
-		for (const XAudio2Voice& voice : GetActiveVoices()) {
-			voice.UpdateDsp(*this, settings, timeScalar, operationSet);
+			X3DAudioCalculate(_settings, ETAddressOf(listener), ETAddressOf(emitter), CalculateFlags, ETAddressOf(dsp));
 		}
 	}
 
 	// ---------------------------------------------------
 
-	Transformation ETSimdCall XAudio2Listener::GetLocalToWorld() const {
-		return Transformation(AsVector(_listener.Position), AsBasis(AsVector(_listener.OrientFront), AsVector(_listener.OrientTop)));
+	HRESULT XAudio2Listener::BindResources(IXAudio2* xaudio, uint32 masteringHz, DWORD channelMask) {
+		using ::Eldritch2::Swap;
+
+		static ETConstexpr UINT32 ChannelCount(2u);
+
+		X3DAUDIO_HANDLE settings;
+		X3DAudioInitialize(channelMask, X3DAUDIO_SPEED_OF_SOUND, settings);
+
+		IXAudio2SubmixVoice* diegeticMix(nullptr);
+		ET_ABORT_UNLESS(xaudio->CreateSubmixVoice(ETAddressOf(diegeticMix), ChannelCount, masteringHz));
+		ET_AT_SCOPE_EXIT(if (diegeticMix) diegeticMix->DestroyVoice());
+
+		IXAudio2SubmixVoice* nonDiegeticMix(nullptr);
+		ET_ABORT_UNLESS(xaudio->CreateSubmixVoice(ETAddressOf(nonDiegeticMix), ChannelCount, masteringHz));
+		ET_AT_SCOPE_EXIT(if (nonDiegeticMix) nonDiegeticMix->DestroyVoice());
+
+		Swap(_settings, settings);
+		Swap(_diegeticMix, diegeticMix);
+		Swap(_nonDiegeticMix, nonDiegeticMix);
+
+		return S_OK;
 	}
 
 	// ---------------------------------------------------
 
-	Transformation ETSimdCall XAudio2Listener::GetWorldToLocal() const {
-		return Transformation(-AsVector(_listener.Position), AsBasis(-AsVector(_listener.OrientFront), -AsVector(_listener.OrientTop)));
-	}
+	void XAudio2Listener::FreeResources() {
+		if (IXAudio2SubmixVoice* const nonDiegeticMix = Exchange(_nonDiegeticMix, nullptr)) {
+			nonDiegeticMix->DestroyVoice();
+		}
 
-	// ---------------------------------------------------
-
-	void ETSimdCall XAudio2Listener::SetLocalToWorld(Transformation value) {
-		_listener.OrientFront = AsX3dAudioVector(value.rotation.GetForward());
-		_listener.OrientTop   = AsX3dAudioVector(value.rotation.GetUp());
-		_listener.Position    = AsX3dAudioVector(value.translation);
+		if (IXAudio2SubmixVoice* const diegeticMix = Exchange(_diegeticMix, nullptr)) {
+			diegeticMix->DestroyVoice();
+		}
 	}
 
 }}} // namespace Eldritch2::Audio::XAudio2

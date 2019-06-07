@@ -9,9 +9,17 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/AssetViews/DialogueSetAsset.hpp>
+#include <Flatbuffers/FlatBufferTools.hpp>
+#include <Logging/Log.hpp>
 //------------------------------------------------------------------//
 #include <Flatbuffers/DialogueSet_generated.h>
 //------------------------------------------------------------------//
@@ -20,13 +28,16 @@ namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetView
 
 	using namespace ::Eldritch2::Scripting::Wren::FlatBuffers;
 	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Core;
 	using namespace ::flatbuffers;
+
+	// ---------------------------------------------------
 
 	namespace {
 
-		ETInlineHint ETForceInlineHint void ParseCriterion(Wren::DialogueSet::RuleBuilderType& result, const FlatBuffers::Criterion* criterion) {
+		ETForceInlineHint void ParseCriterion(DialogueSet::RuleBuilderType& rule, const RuleCriterion* criterion) ETNoexceptHint {
 			switch (criterion->Value_type()) {
+			default: break;
 			case FactValue::BoolValue: criterion->Value_as<BoolValue>()->Value(); break;
 			case FactValue::DoubleValue: criterion->Value_as<DoubleValue>()->Value(); break;
 			case FactValue::LongValue: criterion->Value_as<LongValue>()->Value(); break;
@@ -37,58 +48,57 @@ namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetView
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint void ParseRule(Wren::DialogueSet& responses, const FlatBuffers::Rule* const rule) {
-			Wren::DialogueSet::RuleBuilderType builder(MallocAllocator(""), responses.GetSymbols());
-			const auto                         criteria(rule->Criteria());
+		ETForceInlineHint Result ParseRule(DialogueSet& responses, const RuleDescriptor* const rule) {
+			DialogueSet::RuleBuilderType builder(MallocAllocator(""), responses.GetSymbols());
+			const auto                   criteria(rule->Criteria());
 			for (uoffset_t index(0u); index < criteria->size(); ++index) {
 				ParseCriterion(builder, criteria->Get(index));
 			}
 
-			responses.Insert(eastl::move(builder), DialogueResponse(nullptr));
+			responses.Emplace(Move(builder), DialogueResponse(nullptr));
+			return Result::Success;
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint ErrorCode ParseDialogueSet(Wren::DialogueSet& responses, const FlatBuffers::DialogueSet* const dialogue) {
+		ETForceInlineHint Result ParseDialogueSet(DialogueSet& responses, const DialogueSetDescriptor* const dialogue) {
 			const auto rules(dialogue->Rules());
 			for (uoffset_t id(0u); id < rules->size(); ++id) {
-				ParseRule(responses, rules->Get(id));
+				ET_ABORT_UNLESS(ParseRule(responses, rules->Get(id)));
 			}
 
-			return Error::None;
+			return Result::Success;
 		}
 
 	} // anonymous namespace
 
-	DialogueSetAsset::DialogueSetAsset(StringView path) :
-		Asset(path) {}
+	DialogueSetAsset::DialogueSetAsset(StringSpan path) ETNoexceptHint : Asset(path) {}
 
 	// ---------------------------------------------------
 
-	ErrorCode DialogueSetAsset::BindResources(const Builder& asset) {
+	Result DialogueSetAsset::BindResources(Log& log, const AssetBuilder& asset) {
 		//	Ensure we're working with data that can plausibly represent a dialogue set.
-		Verifier verifier(reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize());
-		if (!VerifyDialogueSetBuffer(verifier)) {
-			asset.WriteLog(Severity::Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath());
-			return Error::InvalidParameter;
-		}
+		const auto dialogue(GetVerifiedRoot<DialogueSetDescriptor>(asset.bytes, DialogueSetDescriptorIdentifier()));
+		ET_ABORT_UNLESS(dialogue ? Result::Success : Result::InvalidParameter, log.Write(Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath()));
 
-		Wren::DialogueSet responses;
-		ET_ABORT_UNLESS(ParseDialogueSet(responses, GetDialogueSet(asset.Begin())));
+		DialogueSet responses;
+		ET_ABORT_UNLESS(ParseDialogueSet(responses, dialogue));
 
 		Swap(*this, responses);
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void DialogueSetAsset::FreeResources() {}
+	void DialogueSetAsset::FreeResources() ETNoexceptHint {
+		Clear();
+	}
 
 	// ---------------------------------------------------
 
-	ETPureFunctionHint StringView DialogueSetAsset::GetExtension() {
-		return { DialogueSetExtension(), StringLength(DialogueSetExtension()) };
+	ETPureFunctionHint StringSpan DialogueSetAsset::GetExtension() ETNoexceptHint {
+		return { DialogueSetDescriptorExtension(), StringLength(DialogueSetDescriptorExtension()) };
 	}
 
 }}}} // namespace Eldritch2::Scripting::Wren::AssetViews

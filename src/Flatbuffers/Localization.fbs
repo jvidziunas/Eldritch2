@@ -1,0 +1,14 @@
+namespace Eldritch2;
+
+table LocalizationString {
+	Id     : uint (key);
+	String : string (required);
+}
+
+table LocalizationDescriptor {
+	Strings : [LocalizationString];
+}
+
+file_identifier	"E2LS";
+file_extension	".e2localization";
+root_type LocalizationDescriptor;

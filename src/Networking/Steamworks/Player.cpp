@@ -9,16 +9,18 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Networking/Steamworks/Player.hpp>
 //------------------------------------------------------------------//
 #include <steam_api.h>
 //------------------------------------------------------------------//
-
-#if defined(ZeroMemory)
-#	undef ZeroMemory
-#endif
 
 namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
@@ -29,24 +31,24 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 	} // anonymous namespace
 
 	Player::Player() ETNoexceptHint : _user(InvalidUser) {
-		ZeroMemory(_name);
+		Fill(Begin(_name), End(_name), '\0');
 	}
 
 	// ---------------------------------------------------
 
 	Player::~Player() {
-		ET_ASSERT(_user == InvalidUser, "Leaking Steamworks user {}!", _user);
+		ETAssert(_user == InvalidUser, "Leaking Steamworks user {}!", _user);
 	}
 
 	// ---------------------------------------------------
 
-	StringView Player::GetName() const ETNoexceptHint {
+	StringSpan Player::GetName() const ETNoexceptHint {
 		return _name;
 	}
 
 	// ---------------------------------------------------
 
-	void Player::SetName(StringView name) ETNoexceptHint {
+	void Player::SetName(StringSpan name) ETNoexceptHint {
 		name.Copy(_name, ETCountOf(_name));
 	}
 
@@ -58,36 +60,36 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
 	// ---------------------------------------------------
 
-	ErrorCode Player::BindResources(HSteamPipe pipe, EAccountType accountType) {
+	Result Player::BindResources(HSteamPipe pipe, EAccountType accountType) {
 		using ::Eldritch2::Swap;
 
 		HSteamUser user(SteamClient()->CreateLocalUser(ETAddressOf(pipe), accountType));
-		ET_ABORT_UNLESS(user != InvalidUser ? Error::None : Error::Unspecified);
+		ET_ABORT_UNLESS(user != InvalidUser ? Result::Success : Result::Unspecified);
 		ET_AT_SCOPE_EXIT(if (user != InvalidUser) SteamClient()->ReleaseUser(user, pipe));
 
 		Swap(_user, user);
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode Player::BindResources(HSteamPipe pipe) {
+	Result Player::BindResources(HSteamPipe pipe) {
 		using ::Eldritch2::Swap;
 
 		HSteamUser user(SteamClient()->ConnectToGlobalUser(pipe));
-		ET_ABORT_UNLESS(user != InvalidUser ? Error::None : Error::Unspecified);
+		ET_ABORT_UNLESS(user != InvalidUser ? Result::Success : Result::Unspecified);
 		ET_AT_SCOPE_EXIT(if (user != InvalidUser) SteamClient()->ReleaseUser(user, pipe));
 
 		Swap(_user, user);
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void Player::FreeResources(HSteamPipe pipe) {
-		if (const HSteamUser user = eastl::exchange(_user, InvalidUser)) {
+	void Player::FreeResources(HSteamPipe pipe) ETNoexceptHint {
+		if (const HSteamUser user = Exchange(_user, InvalidUser)) {
 			SteamClient()->ReleaseUser(user, pipe);
 		}
 	}

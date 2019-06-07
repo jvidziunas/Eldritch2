@@ -26,8 +26,8 @@ ETInlineHint ETForceInlineHint ArrayMap<Key, Value, SortPredicate, Allocator>::A
 // ---------------------------------------------------
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
-ETInlineHint ETForceInlineHint ArrayMap<Key, Value, SortPredicate, Allocator>::ArrayMap(const AllocatorType& allocator, const SortPredicateType& sort, std::initializer_list<ValueType> map) :
-	_container(map, sort, allocator) {}
+ETInlineHint ETForceInlineHint ArrayMap<Key, Value, SortPredicate, Allocator>::ArrayMap(const AllocatorType& allocator, const SortPredicateType& sort, InitializerList<ValueType> values) :
+	_container(values, sort, allocator) {}
 
 // ---------------------------------------------------
 
@@ -70,7 +70,7 @@ ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allo
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 template <typename Key2, typename SortPredicate2>
 ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allocator>::ConstIterator ArrayMap<Key, Value, SortPredicate, Allocator>::Find(const Key2& key, SortPredicate2 sort) const {
-	return _container.find_as<Key2, SortPredicate2>(key, eastl::move(sort));
+	return _container.find_as<Key2, SortPredicate2>(key, Move(sort));
 }
 
 // ---------------------------------------------------
@@ -85,7 +85,7 @@ ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allo
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 template <typename Key2, typename SortPredicate2>
 ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator ArrayMap<Key, Value, SortPredicate, Allocator>::Find(const Key2& key, SortPredicate2 sort) {
-	return _container.find_as<Key2, SortPredicate2>(key, eastl::move(sort));
+	return _container.find_as<Key2, SortPredicate2>(key, Move(sort));
 }
 
 // ---------------------------------------------------
@@ -100,7 +100,7 @@ ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allo
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 template <typename Key2, typename SortPredicate2>
 ETInlineHint ETForceInlineHint bool ArrayMap<Key, Value, SortPredicate, Allocator>::Contains(const Key2& key, SortPredicate2 sort) const {
-	return _container.find_as<Key2, SortPredicate2>(key, eastl::move(sort)) != _container.end();
+	return _container.find_as<Key2, SortPredicate2>(key, Move(sort)) != _container.end();
 }
 
 // ---------------------------------------------------
@@ -205,7 +205,7 @@ ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allo
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allocator>::MappedType& ArrayMap<Key, Value, SortPredicate, Allocator>::operator[](KeyType&& key) {
-	return _container[eastl::move(key)];
+	return _container[Move(key)];
 }
 
 // ---------------------------------------------------
@@ -219,7 +219,7 @@ ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate,
 
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator, bool> ArrayMap<Key, Value, SortPredicate, Allocator>::Insert(ValueType&& value) {
-	return _container.insert(eastl::move(value));
+	return _container.insert(Move(value));
 }
 
 // ---------------------------------------------------
@@ -232,7 +232,7 @@ ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate,
 		return { where, false };
 	}
 
-	return _container.emplace(key, MappedType(eastl::forward<Arguments>(arguments)...));
+	return _container.emplace(key, MappedType(Forward<Arguments>(arguments)...));
 }
 
 // ---------------------------------------------------
@@ -245,7 +245,7 @@ ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate,
 		return { where, false };
 	}
 
-	return _container.emplace(eastl::move(key), MappedType(eastl::forward<Arguments>(arguments)...));
+	return _container.emplace(Move(key), MappedType(Forward<Arguments>(arguments)...));
 }
 
 // ---------------------------------------------------
@@ -253,7 +253,7 @@ ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate,
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 template <typename... Arguments>
 ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator, bool> ArrayMap<Key, Value, SortPredicate, Allocator>::Emplace(ConstIterator where, Arguments&&... arguments) {
-	return _container.emplace(where, eastl::forward<Arguments>(arguments)...);
+	return _container.emplace(where, Forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
@@ -261,7 +261,7 @@ ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate,
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 template <typename... Args>
 ETInlineHint ETForceInlineHint Pair<typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator, bool> ArrayMap<Key, Value, SortPredicate, Allocator>::Emplace(Args&&... args) {
-	return _container.emplace(eastl::forward<Args>(args)...);
+	return _container.emplace(Forward<Args>(args)...);
 }
 
 // ---------------------------------------------------
@@ -283,6 +283,18 @@ ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allo
 template <typename Key, typename Value, typename SortPredicate, class Allocator>
 ETInlineHint ETForceInlineHint typename ArrayMap<Key, Value, SortPredicate, Allocator>::Iterator ArrayMap<Key, Value, SortPredicate, Allocator>::Erase(Iterator begin, Iterator end) {
 	return _container.erase(begin, end);
+}
+
+// ---------------------------------------------------
+
+template <typename Key, typename Value, typename SortPredicate, class Allocator>
+template <typename UnaryPredicate>
+ETInlineHint ETForceInlineHint void ArrayMap<Key, Value, SortPredicate, Allocator>::ClearAndDispose(UnaryPredicate disposer) {
+	for (ValueType& value : _container) {
+		disposer(value.second);
+	}
+
+	_container.clear();
 }
 
 // ---------------------------------------------------

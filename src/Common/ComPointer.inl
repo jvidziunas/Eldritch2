@@ -29,25 +29,23 @@ ETInlineHint ETForceInlineHint ComPointer<Interface>::ComPointer(decltype(nullpt
 
 template <class Interface>
 template <class CompatibleInterface>
-ETInlineHint ETForceInlineHint ComPointer<Interface>::ComPointer(ComPointer<CompatibleInterface>&& pointer) ETNoexceptHint : ComPointer() {
-	Reset(pointer.Release());
-}
+ETInlineHint ETForceInlineHint ComPointer<Interface>::ComPointer(ComPointer<CompatibleInterface>&& pointer) ETNoexceptHint : ComPointer(pointer.Release()) {}
 
 // ---------------------------------------------------
 
 template <class Interface>
 template <class CompatibleInterface>
-ETInlineHint ETForceInlineHint ComPointer<Interface>::ComPointer(const ComPointer<CompatibleInterface>& pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef())) {
+ETInlineHint ETForceInlineHint ComPointer<Interface>::ComPointer(const ComPointer<CompatibleInterface>& pointer) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>()) : ComPointer(pointer.Get()) {
+	if (_pointer) {
+		_pointer->AddRef();
+	}
 }
 
 // ---------------------------------------------------
 
 template <class Interface>
-ETInlineHint ETForceInlineHint ComPointer<Interface>::ComPointer(const ComPointer<Interface>& pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef())) :
-	ComPointer<Interface>(pointer.Get()) {
-	if (_pointer) {
-		_pointer->AddRef();
-	}
+ETInlineHint ETForceInlineHint ComPointer<Interface>::ComPointer(const ComPointer<Interface>& pointer) ETNoexceptHintIf(IsNoThrowAddRef<Interface>()) : ComPointer<Interface>() {
+	*this = pointer;
 }
 
 // ---------------------------------------------------
@@ -66,64 +64,60 @@ ETInlineHint ETForceInlineHint ComPointer<Interface>::~ComPointer() {
 // ---------------------------------------------------
 
 template <class Interface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint Interface* ComPointer<Interface>::Release() ETNoexceptHint {
-	return eastl::exchange(_pointer, nullptr);
+ETInlineHint ETForceInlineHint Interface* ComPointer<Interface>::Release() ETNoexceptHint {
+	return Exchange(_pointer, nullptr);
 }
 
 // ---------------------------------------------------
 
 template <class Interface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint Interface* ComPointer<Interface>::Get() const ETNoexceptHint {
+ETInlineHint ETForceInlineHint Interface* ComPointer<Interface>::Get() const ETNoexceptHint {
 	return _pointer;
 }
 
 // ---------------------------------------------------
 
 template <class Interface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint void ComPointer<Interface>::Reset(Interface* pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().Release())) {
-	Swap(_pointer, pointer);
-	if (pointer != nullptr) {
-		pointer->Release();
+ETInlineHint ETForceInlineHint void ComPointer<Interface>::Reset(Interface* pointer) ETNoexceptHintIf(IsNoThrowRelease<Interface>()) {
+	if (Interface* const old = Exchange(_pointer, pointer)) {
+		old->Release();
 	}
 }
 
 // ---------------------------------------------------
 
 template <class Interface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint void ComPointer<Interface>::Acquire(Interface* pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release())) {
+ETInlineHint ETForceInlineHint void ComPointer<Interface>::Acquire(Interface* pointer) ETNoexceptHintIf(IsNoThrowAddRef<Interface>() && IsNoThrowRelease<Interface>()) {
 	if (pointer)
 		pointer->AddRef();
-	if (_pointer)
-		_pointer->Release();
-	_pointer = pointer;
+
+	Reset(pointer);
 }
 
 // ---------------------------------------------------
 
 template <class Interface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint ComPointer<Interface>& ComPointer<Interface>::operator=(const ComPointer<Interface>& pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release())) {
-	Acquire(pointer.Get());
-	return *this;
+ETInlineHint ETForceInlineHint ComPointer<Interface>& ComPointer<Interface>::operator=(const ComPointer<Interface>& pointer) ETNoexceptHintIf(IsNoThrowAddRef<Interface>() && IsNoThrowRelease<Interface>()) {
+	return *this = Move(ComPointer<Interface>(pointer));
 }
 
 // ---------------------------------------------------
 
 template <class Interface>
 template <class CompatibleInterface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint ComPointer<Interface>& ComPointer<Interface>::operator=(const ComPointer<CompatibleInterface>& pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release())) {
+ETInlineHint ETForceInlineHint ComPointer<Interface>& ComPointer<Interface>::operator=(const ComPointer<CompatibleInterface>& pointer) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>() && IsNoThrowRelease<Interface>()) {
 	static_assert(eastl::is_convertible<CompatibleInterface*, Interface*>::value, "COM pointers can only be assigned to compatible types!");
 
 	// ---
 
-	Acquire(pointer.Get());
-	return *this;
+	return *this = Move(ComPointer<Interface>(pointer));
 }
 
 // ---------------------------------------------------
 
 template <class Interface>
 template <class CompatibleInterface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint ComPointer<Interface>& ComPointer<Interface>::operator=(ComPointer<CompatibleInterface>&& pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release())) {
+ETInlineHint ETForceInlineHint ETNeverThrowsHint ComPointer<Interface>& ComPointer<Interface>::operator=(ComPointer<CompatibleInterface>&& pointer) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>() && IsNoThrowRelease<Interface>()) {
 	static_assert(eastl::is_convertible<CompatibleInterface*, Interface*>::value, "COM pointers can only be assigned to compatible types!");
 
 	// ---
@@ -136,7 +130,7 @@ ETInlineHint ETForceInlineHint ETNeverThrowsHint ComPointer<Interface>& ComPoint
 
 template <class Interface>
 template <class CompatibleInterface>
-ETInlineHint ETForceInlineHint ETNeverThrowsHint ComPointer<Interface>& ComPointer<Interface>::operator=(CompatibleInterface* pointer) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().Release())) {
+ETInlineHint ETForceInlineHint ETNeverThrowsHint ComPointer<Interface>& ComPointer<Interface>::operator=(CompatibleInterface* pointer) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>() && IsNoThrowRelease<Interface>()) {
 	static_assert(eastl::is_convertible<CompatibleInterface*, Interface*>::value, "COM pointers can only be assigned to compatible types!");
 
 	// ---
@@ -162,7 +156,7 @@ ETInlineHint ETForceInlineHint ComPointer<Interface>::operator bool() const ETNo
 // ---------------------------------------------------
 
 template <class Interface>
-ETInlineHint ETForceInlineHint Interface** ComPointer<Interface>::GetInterfacePointer() ETNoexceptHintIf(noexcept(eastl::declval<Interface>().Release())) {
+ETInlineHint ETForceInlineHint Interface** ComPointer<Interface>::GetInterfacePointer() ETNoexceptHintIf(IsNoThrowRelease<Interface>()) {
 	this->Reset();
 	return ETAddressOf(_pointer);
 }

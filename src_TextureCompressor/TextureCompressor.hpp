@@ -12,34 +12,34 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/HashSet.hpp>
+#include <Common/Containers/SoaList.hpp>
 #include <Common/Containers/Path.hpp>
+#include <Common/FileReader.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 {
-class ErrorCode;
-}
 
 namespace Eldritch2 { namespace Tools {
 
 	class TextureCompressor : public CrtpTool<TextureCompressor> {
+	public:
+		using ImageList = SoaList<Path, FileReader>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		TextureCompressor(const TextureCompressor&) = delete;
 		//!	Constructs this @ref TextureCompressor instance.
-		TextureCompressor();
+		TextureCompressor() ETNoexceptHint;
 
 		~TextureCompressor() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode ProcessImage(const Path& path);
+		Result ProcessImage(Logging::Log& log, ImageList::Reference sourceImage);
 
-		ErrorCode Process();
+		Result Process(Logging::Log& log);
 
 		void RegisterOptions(OptionRegistrar& options);
 
@@ -51,13 +51,13 @@ namespace Eldritch2 { namespace Tools {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		HashSet<Path> _sourcePaths;
-		uint32        _threadCount;
-		uint32        _imageQuality;
-		uint32        _mipLevels;
-		uint32        _alphaToCoverageSamplesPerPixel;
-		bool          _correctAlphaTestDistribution;
-		bool          _isColorData;
+		ImageList _sourceImages;
+		uint32    _threadCount;
+		uint32    _imageQuality;
+		uint32    _mipLevels;
+		uint32    _alphaToCoverageSamplesPerPixel;
+		bool      _correctAlphaTestDistribution;
+		bool      _isColorData;
 	};
 
 }} // namespace Eldritch2::Tools

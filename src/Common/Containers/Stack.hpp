@@ -24,9 +24,11 @@ class Stack {
 public:
 	using ContainerType  = typename Container;
 	using ValueType      = typename ContainerType::ValueType;
-	using SizeType       = typename ContainerType::SizeType;
 	using ConstReference = typename ContainerType::ConstReference;
 	using Reference      = typename ContainerType::Reference;
+	using ConstPointer   = typename ContainerType::ConstPointer;
+	using Pointer        = typename ContainerType::Pointer;
+	using SizeType       = typename ContainerType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -77,6 +79,7 @@ public:
 	template <class... Arguments>
 	void EmplaceBack(Arguments&&... arguments);
 
+	void Pop(ValueType& outValue);
 	void Pop();
 
 	// ---------------------------------------------------

@@ -17,8 +17,8 @@
 
 namespace Eldritch2 {
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashMultiMap(
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMultiMap(
 	const AllocatorType&         allocator,
 	SizeType                     bucketCount,
 	const HashPredicateType&     hash,
@@ -28,9 +28,9 @@ ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityP
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 template <typename InputIterator>
-ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashMultiMap(
+ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMultiMap(
 	const AllocatorType&         allocator,
 	SizeType                     bucketCount,
 	const HashPredicateType&     hash,
@@ -42,28 +42,28 @@ ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityP
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashMultiMap(
-	const AllocatorType&             allocator,
-	SizeType                         bucketCount,
-	const HashPredicateType&         hash,
-	const EqualityPredicateType&     equal,
-	std::initializer_list<ValueType> map) :
-	_container(map, bucketCount, hash, equal, allocator) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMultiMap(
+	const AllocatorType&         allocator,
+	SizeType                     bucketCount,
+	const HashPredicateType&     hash,
+	const EqualityPredicateType& equal,
+	InitializerList<ValueType>   values) :
+	_container(values, bucketCount, hash, equal, allocator) {
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashMultiMap(const AllocatorType& allocator, const HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& map) :
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMultiMap(const AllocatorType& allocator, const HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>& map) :
 	_container(map.Begin(), map.End(), 0u, map.GetHash(), map.GetEqualityPredicate(), allocator) {
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
-ETInlineHint ETForceInlineHint Range<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EqualRange(
+ETInlineHint ETForceInlineHint Span<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstIterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Slice(
 	const Key2&               key,
 	const HashPredicate2&     hash,
 	const EqualityPredicate2& equal) const {
@@ -73,9 +73,9 @@ ETInlineHint ETForceInlineHint Range<typename HashMultiMap<Key, Value, HashPredi
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
-ETInlineHint ETForceInlineHint Range<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EqualRange(
+ETInlineHint ETForceInlineHint Span<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Slice(
 	const Key2&               key,
 	const HashPredicate2&     hash,
 	const EqualityPredicate2& equal) {
@@ -85,25 +85,25 @@ ETInlineHint ETForceInlineHint Range<typename HashMultiMap<Key, Value, HashPredi
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint Range<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EqualRange(const KeyType& key) const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint Span<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstIterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Slice(const KeyType& key) const {
 	const auto resultPair(_container.equal_range(key));
 	return { resultPair.first, resultPair.second };
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint Range<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EqualRange(const KeyType& key) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint Span<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Slice(const KeyType& key) {
 	const auto resultPair(_container.equal_range(key));
 	return { resultPair.first, resultPair.second };
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 template <typename UnaryPredicate>
-ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EraseIf(UnaryPredicate condition) {
+ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::EraseIf(UnaryPredicate condition) {
 	for (Iterator element(_container.begin()), end(_container.end()); element != end;) {
 		if (condition(*element)) {
 			element = _container.erase(element);
@@ -115,145 +115,145 @@ ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, Equa
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstBegin(SizeType bucketIndex) const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstBegin(SizeType bucketIndex) const {
 	return _container.begin(bucketIndex);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstBegin() const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstBegin() const {
 	return _container.begin();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstEnd(SizeType bucketIndex) const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstEnd(SizeType bucketIndex) const {
 	return _container.end(bucketIndex);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstEnd() const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstEnd() const {
 	return _container.end();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Begin(SizeType bucketIndex) const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Begin(SizeType bucketIndex) const {
 	return _container.begin(bucketIndex);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::LocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Begin(SizeType bucketIndex) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::LocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Begin(SizeType bucketIndex) {
 	return _container.begin(bucketIndex);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Begin() const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Begin() const {
 	return _container.begin();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Begin() {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Begin() {
 	return _container.begin();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::End(SizeType bucketIndex) const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstLocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::End(SizeType bucketIndex) const {
 	return _container.end(bucketIndex);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::LocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::End(SizeType bucketIndex) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::LocalIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::End(SizeType bucketIndex) {
 	return _container.end();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::End() const {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ConstIterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::End() const {
 	return _container.end();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::End() {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::End() {
 	return _container.end();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint Pair<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Insert(const ValueType& value) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint Pair<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator, bool> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Insert(const ValueType& value) {
 	return _container.insert(value);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint Pair<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Insert(ValueType&& value) {
-	return _container.insert(eastl::move(value));
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint Pair<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator, bool> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Insert(ValueType&& value) {
+	return _container.insert(Move(value));
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 template <typename... Arguments>
-ETInlineHint ETForceInlineHint Pair<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator, bool> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Emplace(Arguments&&... arguments) {
-	return _container.emplace(eastl::forward<Arguments>(arguments)...);
+ETInlineHint ETForceInlineHint Pair<typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator, bool> HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Emplace(Arguments&&... arguments) {
+	return _container.emplace(Forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::SizeType HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase(const KeyType& key) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::SizeType HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Erase(const KeyType& key) {
 	return _container.erase(key);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase(Iterator begin, Iterator end) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Erase(Iterator begin, Iterator end) {
 	return _container.erase(begin, end);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Erase(Iterator where) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Iterator HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Erase(Iterator where) {
 	return _container.erase(where);
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::Clear() {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::Clear() {
 	_container.clear();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-template <typename Disposer>
-ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::ClearAndDispose(Disposer disposer) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+template <typename UnaryPredicate>
+ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::ClearAndDispose(UnaryPredicate disposer) {
 	for (ValueType& value : _container) {
-		disposer(value);
+		disposer(value.second);
 	}
 
 	_container.clear();
@@ -261,50 +261,50 @@ ETInlineHint ETForceInlineHint void HashMultiMap<Key, Value, HashPredicate, Equa
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::SizeType HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetSize() const ETNoexceptHint {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::SizeType HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetSize() const ETNoexceptHint {
 	return _container.size();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint bool HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::IsEmpty() const ETNoexceptHint {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint bool HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::IsEmpty() const ETNoexceptHint {
 	return _container.empty();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::operator bool() const ETNoexceptHint {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::operator bool() const ETNoexceptHint {
 	return !_container.empty();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename const HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::EqualityPredicateType& HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetEqualityPredicate() const ETNoexceptHint {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::EqualityPredicateType HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetEqualityPredicate() const ETNoexceptHint {
 	return _container.key_eq();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename const HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::HashPredicateType& HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetHash() const ETNoexceptHint {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashPredicateType HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetHash() const ETNoexceptHint {
 	return _container.hash_predicate();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint typename const HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::AllocatorType& HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>::GetAllocator() const ETNoexceptHint {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint typename const HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::AllocatorType& HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetAllocator() const ETNoexceptHint {
 	return _container.get_allocator();
 }
 
 // ---------------------------------------------------
 
-template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-ETInlineHint ETForceInlineHint void Swap(HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& lhs, HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>& rhs) {
+template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
+ETInlineHint ETForceInlineHint void Swap(HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>& lhs, HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>& rhs) {
 	lhs._container.swap(rhs._container);
 }
 

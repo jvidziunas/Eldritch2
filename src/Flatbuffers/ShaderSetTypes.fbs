@@ -1,10 +1,5 @@
 namespace Eldritch2.Graphics.FlatBuffers;
 
-enum PolygonFillMode : ubyte {
-	Wireframe,
-	Solid
-}
-
 enum FaceCullMode : ubyte {
 	FrontFace,
 	BackFace,
@@ -63,14 +58,11 @@ enum ChannelWriteMask : ubyte (bit_flags) {
 }
 
 enum RasterizationFlags : ubyte (bit_flags) {
-	DepthClipEnable,
-	ScissorClipEnable,
 	AllowMsaa,
+	SendAlphaToCoverage
 }
 
 enum DepthStencilFlags : ubyte (bit_flags) {
-	DepthTestEnable,
-	StencilTestEnable,
 	DepthWriteEnable
 }
 
@@ -104,12 +96,11 @@ struct StencilDescriptor {
 }
 
 table RasterizerDescriptor {
-	FillMode						: PolygonFillMode		= Solid;
 	CullMode						: FaceCullMode			= BackFace;
 	DepthBias						: int					= 0;
 	DepthBiasClamp					: float					= 0.0;
 	SlopeScaledDepthBias			: float					= 0.0;
-	Flags							: RasterizationFlags	= DepthClipEnable;
+	Flags							: RasterizationFlags	= AllowMsaa;
 }
 
 table DepthStencilDescriptor {

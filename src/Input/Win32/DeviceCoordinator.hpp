@@ -25,10 +25,10 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref DeviceCoordinator instance.
-		DeviceCoordinator(Logging::Log& log);
 		//!	Disable copy construction.
 		DeviceCoordinator(const DeviceCoordinator&) = delete;
+		//!	Constructs this @ref DeviceCoordinator instance.
+		DeviceCoordinator() ETNoexceptHint;
 
 		~DeviceCoordinator() = default;
 
@@ -41,11 +41,11 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// ---------------------------------------------------
 
 	public:
-		ArrayList<InputDevice>& GetKeyboards();
+		Span<InputDevice*> GetKeyboards() ETNoexceptHint;
 
-		ArrayList<InputDevice>& GetMice();
+		Span<InputDevice*> GetMice() ETNoexceptHint;
 
-		const Mutex& GetMutex() const;
+		ETConstexpr Mutex& GetMutex() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -61,11 +61,11 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable Logging::ChildLog _log;
-		mutable Mutex             _deviceMutex;
-		ArrayMap<HANDLE, UINT>    _indexByHandle;
-		ArrayList<InputDevice>    _keyboards;
-		ArrayList<InputDevice>    _mice;
+		mutable Logging::ChildLog        _log;
+		ETCacheLineAligned mutable Mutex _deviceMutex;
+		ArrayMap<HANDLE, UINT>           _indexByHandle;
+		ArrayList<InputDevice>           _keyboards;
+		ArrayList<InputDevice>           _mice;
 	};
 
 }}} // namespace Eldritch2::Input::Win32

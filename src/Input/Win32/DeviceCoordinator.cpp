@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Input/Win32/DeviceCoordinator.hpp>
@@ -194,7 +200,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 		// ---------------------------------------------------
 
-		ETCpp14Constexpr ETInlineHint ETPureFunctionHint StringView GetDeviceTypeName(DWORD type) {
+		ETCpp14Constexpr ETInlineHint ETPureFunctionHint StringSpan GetDeviceTypeName(DWORD type) {
 			switch (type) {
 			case RIM_TYPEMOUSE: return "mouse";
 			case RIM_TYPEKEYBOARD: return "keyboard";
@@ -205,12 +211,9 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 	} // anonymous namespace
 
-	DeviceCoordinator::DeviceCoordinator(Log& log) :
-		_log(log),
-		_indexByHandle(MallocAllocator("Win32 Raw Input Device By Handle Map Allocator")),
-		_keyboards(MallocAllocator("Win32 Raw Input Keyboard List Allocator")),
-		_mice(MallocAllocator("Win32 Raw Input Mouse List Allocator")) {
-	}
+	DeviceCoordinator::DeviceCoordinator() ETNoexceptHint : _indexByHandle(MallocAllocator("Win32 Raw Input Device By Handle Map Allocator")),
+															_keyboards(MallocAllocator("Win32 Raw Input Keyboard List Allocator")),
+															_mice(MallocAllocator("Win32 Raw Input Mouse List Allocator")) {}
 
 	// ---------------------------------------------------
 
@@ -257,13 +260,14 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 			_log.Write(Severity::Message, "Bound {} (handle: {})." ET_NEWLINE, GetDeviceTypeName(devices[id].dwType), devices[id].hDevice);
 		}
 		{
-			Lock _(_deviceMutex);
+			ET_LOCK_SCOPE(_deviceMutex);
 
 			//	Publish the new set of devices.
 			Swap(_indexByHandle, indexByHandle);
 			Swap(_keyboards, keyboards);
 			Swap(_mice, mice);
-		} // End of lock scope.
+			// End of lock scope.
+		}
 
 		_log.Write(Severity::Message, "Win32 raw input enumeration complete." ET_NEWLINE);
 		return true;

@@ -30,7 +30,7 @@ ReflowComments: true
 SortIncludes: false
 SortUsingDeclarations: true
 SpaceAfterTemplateKeyword: true
-SpaceBeforeCtorInitializerColon: true
+#SpaceBeforeCtorInitializerColon: true
 SpaceBeforeParens: ControlStatements
 SpacesInParentheses: false
 Standard: Cpp11

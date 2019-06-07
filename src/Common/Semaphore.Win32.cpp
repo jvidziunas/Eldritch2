@@ -9,17 +9,20 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Semaphore.hpp>
-//------------------------------------------------------------------//
 #include <Windows.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-Semaphore::Semaphore(uint32 maximumCount, uint32 initialCount) :
-	_semaphore(CreateSemaphoreW(nullptr, static_cast<LONG>(initialCount), static_cast<LONG>(maximumCount), nullptr)) {}
+Semaphore::Semaphore(uint32 maximumCount, uint32 initialCount) ETNoexceptHint : _semaphore(CreateSemaphoreW(nullptr, LONG(initialCount), LONG(maximumCount), nullptr)) {}
 
 // ---------------------------------------------------
 
@@ -29,23 +32,23 @@ Semaphore::~Semaphore() {
 
 // ---------------------------------------------------
 
-uint32 Semaphore::IncreaseCount(uint32 count) {
+uint32 Semaphore::IncreaseCount(uint32 count) ETNoexceptHint {
 	LONG previousCount(0);
 
 	ReleaseSemaphore(_semaphore, static_cast<LONG>(count), &previousCount);
 
-	return static_cast<uint32>(previousCount);
+	return uint32(previousCount);
 }
 
 // ---------------------------------------------------
 
-void Semaphore::Acquire() {
+void Semaphore::Acquire() ETNoexceptHint {
 	WaitForSingleObject(_semaphore, INFINITE);
 }
 
 // ---------------------------------------------------
 
-bool Semaphore::TryAcquire() {
+bool Semaphore::TryAcquire() ETNoexceptHint {
 	return WaitForSingleObject(_semaphore, 0u) == WAIT_OBJECT_0;
 }
 

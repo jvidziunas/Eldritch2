@@ -28,10 +28,12 @@ public:
 
 public:
 	//! Constructs this @ref EaStlAllocatorMixin instance.
-	template <typename... Arguments>
-	EaStlAllocatorMixin(Arguments&&... arguments) ETNoexceptHint;
+	explicit EaStlAllocatorMixin(const EaStlAllocatorMixin&) ETNoexceptHintIf(IsNoThrowCopyConstructible<PublicType>()) = default;
 	//! Constructs this @ref EaStlAllocatorMixin instance.
-	EaStlAllocatorMixin(const EaStlAllocatorMixin&) = default;
+	explicit EaStlAllocatorMixin(EaStlAllocatorMixin&&) ETNoexceptHintIf(IsNoThrowMoveConstructible<PublicType>()) = default;
+	//! Constructs this @ref EaStlAllocatorMixin instance.
+	template <typename... Arguments>
+	EaStlAllocatorMixin(Arguments&&...) ETNoexceptHintIf(IsNoThrowConstructible<PublicType, Arguments&&...>());
 
 	~EaStlAllocatorMixin() = default;
 
@@ -46,19 +48,20 @@ public:
 	// ---------------------------------------------------
 
 public:
-	const char* get_name() const;
+	const char* get_name() const ETNoexceptHint;
 
-	void set_name(const char* name);
+	void set_name(const char* name) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	ETInlineHint EaStlAllocatorMixin& operator=(const EaStlAllocatorMixin&) = default;
+	EaStlAllocatorMixin& operator=(const EaStlAllocatorMixin&) = default;
+	EaStlAllocatorMixin& operator=(EaStlAllocatorMixin&&) = default;
 
 	// ---------------------------------------------------
 
 	template <typename EldritchAllocator>
-	friend void Swap(EaStlAllocatorMixin<EldritchAllocator>&, EaStlAllocatorMixin<EldritchAllocator>&);
+	friend void Swap(EaStlAllocatorMixin<EldritchAllocator>&, EaStlAllocatorMixin<EldritchAllocator>&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

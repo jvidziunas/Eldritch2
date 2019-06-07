@@ -27,20 +27,20 @@ namespace Eldritch2 { namespace Logging {
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint ErrorCode ChildLog::BindResources(Log& parent) {
+	ETInlineHint ETForceInlineHint Result ChildLog::BindResources(Log& parent) {
 		_parent = ETAddressOf(parent);
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void ChildLog::FreeResources() {
+	ETInlineHint ETForceInlineHint void ChildLog::FreeResources() ETNoexceptHint {
 		_parent = nullptr;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void Swap(ChildLog& lhs, ChildLog& rhs) {
+	ETInlineHint ETForceInlineHint void Swap(ChildLog& lhs, ChildLog& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs._parent, rhs._parent);

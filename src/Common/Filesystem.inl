@@ -17,14 +17,14 @@
 
 namespace Eldritch2 {
 
-ETInlineHint ETForceInlineHint ErrorCode Copy(KnownDirectory directory, AbstractStringView<PlatformChar> destinationFileName, AbstractStringView<PlatformChar> sourceFileName, CopyMode mode) {
-	return Copy(directory, destinationFileName, directory, sourceFileName, mode);
+ETInlineHint ETForceInlineHint Result Copy(KnownDirectory directory, AbstractStringSpan<PlatformChar> destinationPath, AbstractStringSpan<PlatformChar> sourcePath, FileCopyMode mode) {
+	return Copy(directory, destinationPath, directory, sourcePath, mode);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETForceInlineHint ErrorCode Move(KnownDirectory directory, AbstractStringView<PlatformChar> destinationFileName, AbstractStringView<PlatformChar> sourceFileName) {
-	return Move(directory, destinationFileName, directory, sourceFileName);
+ETInlineHint ETForceInlineHint Result Move(KnownDirectory directory, AbstractStringSpan<PlatformChar> destinationPath, AbstractStringSpan<PlatformChar> sourcePath) {
+	return Move(directory, destinationPath, directory, sourcePath);
 }
 
 } // namespace Eldritch2

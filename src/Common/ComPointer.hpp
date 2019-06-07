@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Mpl/Compiler.hpp>
+#include <Common/Mpl/TypeTraits.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -24,7 +24,7 @@ class ComPointer {
 public:
 	//!	Constructs this @ref ComPointer instance.
 	template <class CompatibleInterface>
-	ComPointer(const ComPointer<CompatibleInterface>&) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()));
+	ComPointer(const ComPointer<CompatibleInterface>&) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>());
 	//!	Constructs this @ref ComPointer instance.
 	template <class CompatibleInterface>
 	ComPointer(ComPointer<CompatibleInterface>&&) ETNoexceptHint;
@@ -32,7 +32,7 @@ public:
 	template <class CompatibleInterface>
 	ComPointer(CompatibleInterface*) ETNoexceptHint;
 	//!	Constructs this @ref ComPointer instance.
-	ComPointer(const ComPointer&) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()));
+	ComPointer(const ComPointer&) ETNoexceptHintIf(IsNoThrowAddRef<Interface>());
 	//!	Constructs this @ref ComPointer instance.
 	ComPointer(decltype(nullptr)) ETNoexceptHint;
 	//!	Constructs this @ref ComPointer instance.
@@ -44,29 +44,29 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ETNeverThrowsHint Interface* Release() ETNoexceptHint;
+	Interface* Release() ETNoexceptHint;
 
-	ETNeverThrowsHint Interface* Get() const ETNoexceptHint;
+	Interface* Get() const ETNoexceptHint;
 
-	ETNeverThrowsHint void Reset(Interface* = nullptr) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().Release()));
+	void Reset(Interface* = nullptr) ETNoexceptHintIf(IsNoThrowRelease<Interface>());
 
-	ETNeverThrowsHint void Acquire(Interface*) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release()));
-
-	// ---------------------------------------------------
-
-public:
-	template <class CompatibleInterface>
-	ETNeverThrowsHint ComPointer& operator=(const ComPointer<CompatibleInterface>&) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release()));
-	template <class CompatibleInterface>
-	ETNeverThrowsHint ComPointer& operator=(ComPointer<CompatibleInterface>&&) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release()));
-	template <class CompatibleInterface>
-	ETNeverThrowsHint ComPointer& operator=(CompatibleInterface*) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().Release()));
-	ETNeverThrowsHint ComPointer& operator=(const ComPointer&) ETNoexceptHintIf(noexcept(eastl::declval<Interface>().AddRef()) && noexcept(eastl::declval<Interface>().Release()));
+	void Acquire(Interface*) ETNoexceptHintIf(IsNoThrowAddRef<Interface>() && IsNoThrowRelease<Interface>());
 
 	// ---------------------------------------------------
 
 public:
-	Interface** GetInterfacePointer() ETNoexceptHintIf(noexcept(eastl::declval<Interface>().Release()));
+	template <class CompatibleInterface>
+	ComPointer& operator=(const ComPointer<CompatibleInterface>&) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>() && IsNoThrowRelease<Interface>());
+	template <class CompatibleInterface>
+	ComPointer& operator=(ComPointer<CompatibleInterface>&&) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>() && IsNoThrowRelease<Interface>());
+	template <class CompatibleInterface>
+	ComPointer& operator=(CompatibleInterface*) ETNoexceptHintIf(IsNoThrowAddRef<CompatibleInterface>() && IsNoThrowRelease<Interface>());
+	ComPointer& operator=(const ComPointer&) ETNoexceptHintIf(IsNoThrowAddRef<Interface>() && IsNoThrowRelease<Interface>());
+
+	// ---------------------------------------------------
+
+public:
+	Interface** GetInterfacePointer() ETNoexceptHintIf(IsNoThrowRelease<Interface>());
 
 	Interface* operator->() const ETNoexceptHint;
 

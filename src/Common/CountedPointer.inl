@@ -71,7 +71,7 @@ ETInlineHint CountedPointer<Object, Disposer>::~CountedPointer() {
 
 template <class Object, typename Disposer>
 ETInlineHint Object* CountedPointer<Object, Disposer>::Release() ETNoexceptHint {
-	return eastl::exchange(_pointerAndDeleter.first(), nullptr);
+	return Exchange(_pointerAndDeleter.first(), nullptr);
 }
 
 // ---------------------------------------------------
@@ -89,7 +89,7 @@ ETInlineHint void CountedPointer<Object, Disposer>::Reset(Object* pointer) {
 		pointer->AddReference();
 	}
 
-	const auto old(eastl::exchange(_pointerAndDeleter.first(), pointer));
+	const auto old(Exchange(_pointerAndDeleter.first(), pointer));
 	if (old && (old->ReleaseReference() == 1u)) {
 		GetDisposer()(*old);
 	}
@@ -151,7 +151,7 @@ template <typename CompatibleObject, typename CompatibleDeleter>
 ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=(CountedPointer<CompatibleObject, CompatibleDeleter>&& pointer) ETNoexceptHint {
 	Reset();
 	_pointerAndDeleter.first()  = pointer.Release();
-	_pointerAndDeleter.second() = eastl::move(pointer._pointerAndDeleter.second());
+	_pointerAndDeleter.second() = Move(pointer._pointerAndDeleter.second());
 
 	return *this;
 }
@@ -162,7 +162,7 @@ template <class Object, typename Disposer>
 ETInlineHint CountedPointer<Object, Disposer>& CountedPointer<Object, Disposer>::operator=(CountedPointer<Object, Disposer>&& pointer) ETNoexceptHint {
 	Reset();
 	_pointerAndDeleter.first()  = pointer.Release();
-	_pointerAndDeleter.second() = eastl::move(pointer._pointerAndDeleter.second());
+	_pointerAndDeleter.second() = Move(pointer._pointerAndDeleter.second());
 
 	return *this;
 }

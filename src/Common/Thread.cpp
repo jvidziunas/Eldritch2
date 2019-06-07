@@ -9,9 +9,15 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Thread.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -25,12 +31,12 @@ Thread::Thread() ETNoexceptHint : _state(ExecutionState::Uninitialized) {}
 // ---------------------------------------------------
 
 Thread::~Thread() {
-	ET_ASSERT(GetState() != ExecutionState::Running, "Destroying thread before it has completed!");
+	ETAssert(GetState() != ExecutionState::Running, "Destroying thread before it has completed!");
 }
 
 // ---------------------------------------------------
 
-void Thread::AwaitCompletion() {
+void Thread::AwaitCompletion() ETNoexceptHint {
 	SetShouldShutDown();
 	while (GetState() == ExecutionState::Running) {
 		//	Busy loop waiting for join.

@@ -17,19 +17,19 @@
 
 namespace Eldritch2 { namespace Input { namespace Win32 {
 
-	ETInlineHint ArrayList<InputDevice>& DeviceCoordinator::GetKeyboards() {
+	ETInlineHint ETForceInlineHint Span<InputDevice*> DeviceCoordinator::GetKeyboards() ETNoexceptHint {
 		return _keyboards;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ArrayList<InputDevice>& DeviceCoordinator::GetMice() {
+	ETInlineHint ETForceInlineHint Span<InputDevice*> DeviceCoordinator::GetMice() ETNoexceptHint {
 		return _mice;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint const Mutex& DeviceCoordinator::GetMutex() const {
+	ETConstexpr ETInlineHint ETForceInlineHint Mutex& DeviceCoordinator::GetMutex() ETNoexceptHint {
 		return _deviceMutex;
 	}
 

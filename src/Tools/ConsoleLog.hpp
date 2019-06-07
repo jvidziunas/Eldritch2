@@ -22,11 +22,11 @@ namespace Eldritch2 { namespace Logging {
 
 	public:
 		//! Disable copy construction.
-		ConsoleLog(const ConsoleLog&) = delete;
+		ConsoleLog(const ConsoleLog&) ETNoexceptHint = default;
 		//!	Constructs this @ref ConsoleLog instance.
-		ConsoleLog();
+		ConsoleLog() ETNoexceptHint = default;
 
-		~ConsoleLog();
+		~ConsoleLog() = default;
 
 		// ---------------------------------------------------
 

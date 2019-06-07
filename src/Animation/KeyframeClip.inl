@@ -11,31 +11,42 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/AssetViews/KeyframeClipAsset.hpp>
-#include <Animation/KeyframeClip.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Animation {
 
-	ETInlineHint ETForceInlineHint KeyframeClip::KeyframeClip(Allocator& /*allocator*/, const AssetViews::KeyframeClipAsset& asset) :
-		_asset(ETAddressOf(asset)) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint float32 KeyframeClip::AsLocalTime(uint64 globalTime) const {
-		return AsFloat(Min(globalTime, _startTimestamp) - _startTimestamp) * _inverseLength;
+	ETConstexpr ETForceInlineHint bool KeyframeClip::Interval::Covers(ClipTime time) const ETNoexceptHint {
+		return bool(time > begin) & bool(time < end);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void KeyframeClip::SetStartTimestamp(uint64 worldTime) {
-		_startTimestamp = worldTime;
+	ETConstexpr KeyframeClip::KeyframeClip(MicrosecondTime startTime, const AssetViews::KeyframeClipAsset& asset) ETNoexceptHint : Clip(startTime),
+																																   _asset(ETAddressOf(asset)),
+																																   _validPeriod{ ClipTime::End, ClipTime::Start },
+																																   _playbackRate(0.0f),
+																																   _loop(LoopMode::Repeat) {}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint ClipTime KeyframeClip::AsLocalTime(MicrosecondTime worldTime) const ETNoexceptHint {
+		switch (_loop) {
+		case LoopMode::Repeat: return ClipTime(uint32(float32(uint64(worldTime) - uint64(GetStartTime())) * _playbackRate));
+		case LoopMode::Hold: return ClipTime(Minimum(uint32(float32(uint64(worldTime) - uint64(GetStartTime())) * _playbackRate), uint32(ClipTime::End)));
+		};
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void KeyframeClip::SetPlaybackRate(float32 rate) {
-		_inverseLength = rate != 0.0f ? Reciprocal(AsFloat(_duration) * rate) : 0.0f;
+	ETConstexpr ETForceInlineHint void KeyframeClip::SetPlaybackRate(float32 rate) ETNoexceptHint {
+		_playbackRate = rate;
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint void KeyframeClip::SetLoopMode(LoopMode mode) ETNoexceptHint {
+		_loop = mode;
 	}
 
 }} // namespace Eldritch2::Animation

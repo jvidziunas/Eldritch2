@@ -23,14 +23,9 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint physx::PxMaterial& PhysicsScene::GetCharacterMaterial() const {
-		return *_knownMaterials[Character];
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint physx::PxMaterial& PhysicsScene::GetTriggerMaterial() const {
-		return *_knownMaterials[Trigger];
+	 ETConstexpr ETForceInlineHint physx::PxMaterial& PhysicsScene::GetMaterial(KnownMaterial material) const ETNoexceptHint {
+		ETAssert(material < KnownMaterials, "material type {} out of bounds", material);
+		return *_knownMaterials[size_t(material)];
 	}
 
 	// ---------------------------------------------------
@@ -59,7 +54,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		const physx::PxQueryFilterData& filterData,
 		physx::PxQueryFilterCallback*   filter,
 		const physx::PxQueryCache*      cache,
-		float32                         inflation) const {
+		float32                         inflation) {
 		return scene.sweep(geometry, pose, direction, distance, callback, hitFlags, filterData, filter, cache, inflation);
 	}
 
@@ -72,7 +67,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		const physx::PxTransform&       pose,
 		Callback                        callback,
 		const physx::PxQueryFilterData& filterData,
-		physx::PxQueryFilterCallback*   filter) const {
+		physx::PxQueryFilterCallback*   filter) {
 		return scene.overlap(geometry, pose, callback, filterData, filter);
 	}
 
@@ -88,7 +83,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		physx::PxHitFlags               hitFlags,
 		const physx::PxQueryFilterData& filterData,
 		physx::PxQueryFilterCallback*   filter,
-		const physx::PxQueryCache*      cache) const {
+		const physx::PxQueryCache*      cache) {
 		return scene.raycast(origin, direction, distance, callback, hitFlags, filterData, filter, cache);
 	}
 

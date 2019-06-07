@@ -9,26 +9,32 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Scripting/Wren/AssetViews/SerializedWorldAsset.hpp>
 #include <Scripting/Wren/AssetViews/DialogueSetAsset.hpp>
 #include <Scripting/Wren/AssetViews/ScriptAsset.hpp>
 #include <Scripting/Wren/WrenEngineComponent.hpp>
-#include <Assets/AssetDatabase.hpp>
-//------------------------------------------------------------------//
-#include <microprofile/microprofile.h>
+#include <Core/ContentDatabase.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	using namespace ::Eldritch2::Scripting::Wren::AssetViews;
-	using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Core;
 
-	void WrenEngineComponent::PublishAssetTypes(AssetApiBuilder& factories) {
-		ET_PROFILE_SCOPE("Engine/Initialization", "Asset factory registration", 0xBBBBBB);
+	// ---------------------------------------------------
 
-		factories.DefineType(DialogueSetAsset::GetExtension(), AssetApiBuilder::DefaultFactory<DialogueSetAsset>());
-		factories.DefineType(ScriptAsset::GetExtension(), AssetApiBuilder::DefaultFactory<ScriptAsset>());
+	void WrenEngineComponent::PublishApi(AssetApiBuilder& api) {
+		api.DefineType(SerializedWorldAsset::GetExtension(), api.MakeFactory<SerializedWorldAsset>());
+		api.DefineType(DialogueSetAsset::GetExtension(), api.MakeFactory<DialogueSetAsset>());
+		api.DefineType(ScriptAsset::GetExtension(), api.MakeFactory<ScriptAsset>());
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

@@ -4,12 +4,20 @@ file_extension	".e2armature";
 
 namespace Eldritch2.Animation.FlatBuffers;
 
+struct JointDescriptor {
+	BindPose	: Eldritch2.FlatBuffers.Transformation;
+	Parent		: ushort;
+}
+
 struct ConstraintDescriptor {
 	Min         : float;
 	Max         : float;
 }
 
 struct PhysicsConstraintDescriptor {
+	Joint		: ushort;
+	Parent		: ushort;
+
 	XDistance   : ConstraintDescriptor;
 	YDistance   : ConstraintDescriptor;
 	ZDistance   : ConstraintDescriptor;
@@ -19,20 +27,9 @@ struct PhysicsConstraintDescriptor {
 	ZRotation   : ConstraintDescriptor;
 }
 
-struct JointDescriptor {
-	ParentIndex : ubyte;
-	BindPose    : Eldritch2.FlatBuffers.Transformation;
-	Constraint  : PhysicsConstraintDescriptor;
-}
-
-table SocketDescriptor {
-	BoneIndex   : ubyte;
-	Name        : string (required);
-}
-
 table ArmatureDescriptor {
 	Joints      : [JointDescriptor] (required);
-	Sockets		: [SocketDescriptor] (required);
+	Constraints	: [PhysicsConstraintDescriptor] (required);
 }
 
 root_type ArmatureDescriptor;

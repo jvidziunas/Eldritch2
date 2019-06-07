@@ -12,29 +12,43 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <new>
+
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Physics {
-namespace PhysX {
+namespace Eldritch2 { namespace Physics { namespace PhysX {
 
-	ETInlineHint PhysicsShape::PhysicsShape( const physx::PxCapsuleGeometry& capsule ) {
-		new (&this->asCapsule) physx::PxCapsuleGeometry( capsule );
+	ETConstexpr ETForceInlineHint PhysicsShape::PhysicsShape(const physx::PxCapsuleGeometry& shape) ETNoexceptHint : _as{ shape } {}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint PhysicsShape::PhysicsShape(const physx::PxSphereGeometry& shape) ETNoexceptHint : _as{ shape } {}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint PhysicsShape::PhysicsShape(const physx::PxBoxGeometry& shape) ETNoexceptHint : _as{ shape } {}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint PhysicsShape::operator const PxGeometry&() const ETNoexceptHint {
+		return _as.geometry;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	ETInlineHint PhysicsShape::PhysicsShape( const physx::PxSphereGeometry& sphere ) {
-		new (&this->asSphere) physx::PxSphereGeometry( sphere );
+	ETConstexpr ETForceInlineHint PhysicsShape& PhysicsShape::operator=(const physx::PxCapsuleGeometry& shape) ETNoexceptHint {
+		_as.capsule = shape;
 	}
 
-// ---------------------------------------------------
+	// ---------------------------------------------------
 
-	ETInlineHint PhysicsShape::PhysicsShape( const physx::PxBoxGeometry& box ) {
-		new (&this->asBox) physx::PxBoxGeometry( box );
+	ETConstexpr ETForceInlineHint PhysicsShape& PhysicsShape::operator=(const physx::PxSphereGeometry& shape) ETNoexceptHint {
+		_as.sphere = shape;
 	}
 
-}	// namespace PhysX
-}	// namespace Physics
-}	// namespace Eldritch2
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint PhysicsShape& PhysicsShape::operator=(const physx::PxBoxGeometry& shape) ETNoexceptHint {
+		_as.box = shape;
+	}
+
+}}} // namespace Eldritch2::Physics::PhysX

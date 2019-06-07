@@ -25,9 +25,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	public:
 		//!	Constructs this @ref DialogueResponse instance.
-		DialogueResponse(const DialogueResponse&) = default;
+		DialogueResponse(const DialogueResponse&) ETNoexceptHint = default;
 		//!	Constructs this @ref DialogueResponse instance.
-		DialogueResponse(WrenHandle* function);
+		DialogueResponse(WrenHandle* function) ETNoexceptHint;
 
 		~DialogueResponse() = default;
 

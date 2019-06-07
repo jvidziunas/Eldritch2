@@ -11,11 +11,14 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Assert.hpp>
-#include <Common/Atomic.hpp>
-//------------------------------------------------------------------//
 #if ET_PLATFORM_WINDOWS
 #	ifndef NOMINMAX
 #		define NOMINMAX
@@ -25,13 +28,19 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+
 namespace {
 
-	Atomic<AssertionHandler> handler = [](StringView condition, StringView file, uint32 line, StringView message) -> AssertionFailure {
+	Atomic<AssertionHandler> handler = [](StringSpan message) ETNoexceptHint -> AssertionFailure {
 #if ET_PLATFORM_WINDOWS
-		fmt::memory_buffer string;
-		fmt::format_to(string, fmt::string_view("{}({}): [{}] {}"), file, line, condition, message);
-		OutputDebugStringA(string.data());
+		const int      maxChars(message.GetSize() + 1);
+		wchar_t* const displayString(ETStackAlloc(wchar_t, maxChars));
+
+		MultiByteToWideChar(CP_UTF8, 0u, message.GetData(), int(message.GetSize()), displayString, maxChars);
+		if (IsDebuggerPresent() || MessageBoxW(nullptr, displayString, nullptr, MB_ICONERROR | MB_RETRYCANCEL | MB_SYSTEMMODAL | MB_SETFOREGROUND) == IDRETRY) {
+			OutputDebugStringW(displayString);
+			return AssertionFailure::NonFatal;
+		}
 #endif
 
 		return AssertionFailure::Fatal;
@@ -39,14 +48,18 @@ namespace {
 
 } // anonymous namespace
 
-AssertionHandler InstallHandler(AssertionHandler newHandler) {
+AssertionHandler InstallHandler(AssertionHandler newHandler) ETNoexceptHint {
 	return handler.exchange(newHandler, std::memory_order_acq_rel);
 }
 
 // ---------------------------------------------------
 
-AssertionFailure ReportFailure(StringView condition, StringView file, uint32 line, StringView message) {
-	return handler.load(std::memory_order_acquire)(condition, file, line, message);
+void ReportFailure(StringSpan message) ETNoexceptHint {
+	if (handler.load(std::memory_order_acquire)(message) == AssertionFailure::NonFatal) {
+		ET_TRIGGER_DEBUGBREAK();
+	} else {
+		std::terminate();
+	}
 }
 
 } // namespace Eldritch2

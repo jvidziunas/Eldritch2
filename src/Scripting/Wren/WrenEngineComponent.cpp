@@ -9,23 +9,23 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/WrenEngineComponent.hpp>
-#include <Scripting/Wren/WrenWorldComponent.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	using namespace ::Eldritch2::Core;
 
-	WrenEngineComponent::WrenEngineComponent(const ObjectLocator& services) :
-		EngineComponent(services) {}
-
 	// ---------------------------------------------------
 
-	UniquePointer<WorldComponent> WrenEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
-		return MakeUnique<WrenWorldComponent>(allocator, services);
-	}
+	WrenEngineComponent::WrenEngineComponent(const ObjectInjector& services) ETNoexceptHint : EngineComponent(services) {}
 
 }}} // namespace Eldritch2::Scripting::Wren

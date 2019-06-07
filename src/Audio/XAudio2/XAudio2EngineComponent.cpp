@@ -9,50 +9,44 @@
 \*==================================================================*/
 
 //==================================================================//
-// INCLUDES
+// PRECOMPILED HEADER
 //==================================================================//
-#include <Audio/XAudio2/XAudio2EngineComponent.hpp>
-#include <Audio/XAudio2/XAudio2WorldComponent.hpp>
-#include <Core/PropertyRegistrar.hpp>
-#include <Core/Engine.hpp>
+#include <Common/Precompiled.hpp>
 //------------------------------------------------------------------//
 
 //==================================================================//
-// LIBRARIES
+// INCLUDES
 //==================================================================//
-#if (_WIN32_WINNT_WIN8 <= _WIN32_WINNT)
-ET_LINK_LIBRARY("XAudio2.lib")
-#else
-ET_LINK_LIBRARY("x3daudio.lib")
-#endif
+#include <Audio/XAudio2/XAudio2EngineComponent.hpp>
+#include <Core/PropertyApiBuilder.hpp>
+#include <Core/Profiler.hpp>
+#include <Core/Engine.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
 	using namespace ::Eldritch2::Scheduling;
-	using namespace ::Eldritch2::Scripting;
 	using namespace ::Eldritch2::Logging;
 	using namespace ::Eldritch2::Core;
 
-	namespace {
+	// ---------------------------------------------------
 
-		MICROPROFILE_DEFINE(audioProcessingPass, "Engine/XAudio2", "Audio processing pass", 0xCCBBCB);
-
-	} // anonymous namespace
-
-	XAudio2EngineComponent::XAudio2EngineComponent(const ObjectLocator& services) :
-		EngineComponent(services),
-		_allocator("XAudio2 Audio Renderer Allocator"),
-		_log(FindService<Engine>()->GetLog()),
-		_speakerCount(0u),
-		_affinityMask(uint32(XAUDIO2_PROCESSOR::XAUDIO2_DEFAULT_PROCESSOR)),
-		_deviceName(MallocAllocator("XAudio2 Device Name Allocator")),
-		_glitchCount(0u) {
-	}
+	XAudio2EngineComponent::XAudio2EngineComponent(const ObjectInjector& services) ETNoexceptHint : EngineComponent(services),
+																									_xaudioLibrary(nullptr),
+																									_deviceName(MallocAllocator("XAudio2 Device Name Allocator")),
+																									_affinityMask(uint32(XAUDIO2_DEFAULT_PROCESSOR)),
+																									_channelCount(XAUDIO2_DEFAULT_CHANNELS),
+																									_sampleRateHz(XAUDIO2_DEFAULT_SAMPLERATE),
+																									_operationSet(0u),
+																									_glitchCount(0u) {}
 
 	// ---------------------------------------------------
 
 	XAudio2EngineComponent::~XAudio2EngineComponent() {
+		if (_output) {
+			_output->DestroyVoice();
+		}
+
 		if (_xaudio) {
 			_xaudio->StopEngine();
 		}
@@ -64,88 +58,85 @@ namespace Eldritch2 { namespace Audio { namespace XAudio2 {
 
 	// ---------------------------------------------------
 
-	UniquePointer<WorldComponent> XAudio2EngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
-		return MakeUnique<XAudio2WorldComponent>(allocator, services);
+	uint32 XAudio2EngineComponent::GetFrameOperationSet(MemoryOrder order) const ETNoexceptHint {
+		return _operationSet.load(order);
 	}
 
 	// ---------------------------------------------------
 
-	void XAudio2EngineComponent::BindResourcesEarly(JobExecutor& /*executor*/) {
+	void XAudio2EngineComponent::BindResourcesEarly(JobExecutor& /*executor*/) ETNoexceptHint {
 		ET_SUPPRESS_MSVC_WARNINGS(6239 6326)
-		if (_WIN32_WINNT < _WIN32_WINNT_WIN8) {
-			_xaudioLibrary = LoadLibraryExW(ETIsReleaseBuild() ? L"XAudio2_7.DLL" : L"XAudio2_7D.DLL", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-			ET_VERIFY(_xaudioLibrary, "Error loading XAudio2 DLL!");
+		if (!IsWindows8OrNewer()) {
+			_xaudioLibrary = LoadLibraryExW(ETReleaseToggle(SL("XAudio2_7.DLL"), SL("XAudio2_7D.DLL")), /*hFile =*/nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+			ETVerify(_xaudioLibrary != nullptr, "Error loading XAudio2 DLL!");
 		}
 	}
 
 	// ---------------------------------------------------
 
-	void XAudio2EngineComponent::BindConfigurableResources(JobExecutor& /*executor*/) {
+	void XAudio2EngineComponent::BindConfigurableResources(JobExecutor& /*executor*/) ETNoexceptHint {
+		using ::Eldritch2::Swap;
+
 		ComPointer<IXAudio2> xaudio;
-		if (FAILED(XAudio2Create(xaudio.GetInterfacePointer(), 0, XAUDIO2_DEFAULT_PROCESSOR))) {
-			_log.Write(Severity::Error, "Unable to create XAudio2 instance!" ET_NEWLINE);
-			FindService<Engine>()->SetShouldShutDown();
-			return;
+		if (FAILED(XAudio2Create(xaudio.GetInterfacePointer(), /*Flags =*/0u, XAUDIO2_PROCESSOR(_affinityMask))) || FAILED(xaudio->RegisterForCallbacks(this))) {
+			Inject<Log>()->Write(Severity::Error, "Unable to create XAudio2 instance!" ET_NEWLINE);
+			return Inject<AbstractEngine>()->SetShouldShutDown();
 		}
 
-		if (FAILED(xaudio->RegisterForCallbacks(this))) {
-			_log.Write(Severity::Error, "Unable to register XAudio2 device callbacks!" ET_NEWLINE);
-			FindService<Engine>()->SetShouldShutDown();
-			return;
+		IXAudio2MasteringVoice* output(nullptr);
+		ET_AT_SCOPE_EXIT(if (output) output->DestroyVoice());
+		if (IsWindows8OrNewer() ? FAILED(xaudio->CreateMasteringVoice(ETAddressOf(output), _channelCount, _sampleRateHz, /*Flags =*/0u)) : true) {
+			Inject<Log>()->Write(Severity::Error, "Unable to create XAudio2 mastering voice!" ET_NEWLINE);
+			return Inject<AbstractEngine>()->SetShouldShutDown();
 		}
 
-		if (FAILED(xaudio->StartEngine())) {
-			_log.Write(Severity::Error, "Unable to start XAudio2 engine!" ET_NEWLINE);
-			FindService<Engine>()->SetShouldShutDown();
-			return;
-		}
+		ET_TERMINATE_ENGINE_UNLESS(SUCCEEDED(xaudio->StartEngine()));
 
-		_log.Write(Severity::Message, "XAudio2 initialized successfully." ET_NEWLINE);
-
-		//	Commit changes to the service.
+		_operationSet.store(0u, std::memory_order_release);
 		Swap(_xaudio, xaudio);
+		Swap(_output, output);
+
+		Inject<Log>()->Write(Severity::Message, "XAudio2 initialized successfully." ET_NEWLINE);
 	}
 
 	// ---------------------------------------------------
 
-	void XAudio2EngineComponent::PublishConfiguration(PropertyRegistrar& properties) {
-		properties.BeginSection("XAudio2")
-			.DefineProperty("AudioProcessingThreadAffinityMask", _affinityMask)
-			.DefineProperty("ForcedSpeakerCount", _speakerCount)
-			.DefineProperty("PreferredDeviceName", [this](StringView name) {
+	void XAudio2EngineComponent::PublishApi(PropertyApiBuilder& api) {
+		api.DefineGroup("XAudio2")
+			.DefineProperty("AudioProcessingThreadAffinityMask", PropertyApiBuilder::MakeSetter(_affinityMask))
+			.DefineProperty("ForcedChannelCount", PropertyApiBuilder::MakeSetter(_channelCount))
+			.DefineProperty("ForcedSampleRateHz", PropertyApiBuilder::MakeSetter(_sampleRateHz))
+			.DefineProperty("PreferredDeviceName", [this](StringSpan name) ETNoexceptHint {
 				_deviceName = name;
 			});
 	}
 
 	// ---------------------------------------------------
 
-	void XAudio2EngineComponent::TickEarly(JobExecutor& /*executor*/) {
+	void XAudio2EngineComponent::TickEarly(JobExecutor& /*executor*/) ETNoexceptHint {
 		ET_PROFILE_SCOPE("Engine/ServiceTick", "Update XAudio", 0xABBBCB);
-		XAUDIO2_PERFORMANCE_DATA performance;
 
-		_xaudio->GetPerformanceData(&performance);
-		if (performance.GlitchesSinceEngineStarted != eastl::exchange(_glitchCount, performance.GlitchesSinceEngineStarted)) {
-			_log.Write(Severity::Error, "XAudio processing stall since last invocation of IXAudio2::GetPerformanceData()!" ET_NEWLINE);
+		ET_TERMINATE_ENGINE_UNLESS(SUCCEEDED(_xaudio->CommitChanges(_operationSet.fetch_add(1u, std::memory_order_acquire))));
+
+		XAUDIO2_PERFORMANCE_DATA performance;
+		_xaudio->GetPerformanceData(ETAddressOf(performance));
+		if (performance.GlitchesSinceEngineStarted != _glitchCount.exchange(performance.GlitchesSinceEngineStarted, std::memory_order_consume)) {
+			Inject<Log>()->Write(Severity::Error, "XAudio processing stall since last invocation of IXAudio2::GetPerformanceData()!" ET_NEWLINE);
 		}
 	}
 
 	// ---------------------------------------------------
 
-	void XAudio2EngineComponent::OnProcessingPassStart() {
-		MICROPROFILE_ENTER(audioProcessingPass);
-	}
+	void XAudio2EngineComponent::OnProcessingPassStart() {}
 
 	// ---------------------------------------------------
 
-	void XAudio2EngineComponent::OnProcessingPassEnd() {
-		MICROPROFILE_LEAVE();
-	}
+	void XAudio2EngineComponent::OnProcessingPassEnd() {}
 
 	// ---------------------------------------------------
 
-	void XAudio2EngineComponent::OnCriticalError(HRESULT /*error*/) {
-		//	TODO: Convert the HRESULT value into something printable.
-		_log.Write(Severity::Error, "Critical error in XAudio!" ET_NEWLINE);
+	void XAudio2EngineComponent::OnCriticalError(HRESULT error) {
+		Inject<Log>()->Write(Severity::Error, "Critical error in XAudio! (HRESULT: {#x})" ET_NEWLINE, error);
 	}
 
 }}} // namespace Eldritch2::Audio::XAudio2

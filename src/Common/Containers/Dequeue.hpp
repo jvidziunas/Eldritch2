@@ -33,9 +33,11 @@ public:
 	using ReverseIterator      = typename UnderlyingContainer::reverse_iterator;
 	using ConstIterator        = typename UnderlyingContainer::const_iterator;
 	using Iterator             = typename UnderlyingContainer::iterator;
+	using ValueType            = typename UnderlyingContainer::value_type;
+	using ConstPointer         = typename UnderlyingContainer::const_pointer;
+	using Pointer              = typename UnderlyingContainer::pointer;
 	using ConstReference       = typename UnderlyingContainer::const_reference;
 	using Reference            = typename UnderlyingContainer::reference;
-	using ValueType            = typename UnderlyingContainer::value_type;
 	using SizeType             = typename UnderlyingContainer::size_type;
 
 	enum : unsigned int {
@@ -49,7 +51,7 @@ public:
 	template <typename InputIterator>
 	Dequeue(const AllocatorType& allocator, InputIterator begin, InputIterator end);
 	//!	Constructs this @ref Dequeue instance.
-	Dequeue(const AllocatorType& allocator, std::initializer_list<ValueType>);
+	Dequeue(const AllocatorType& allocator, InitializerList<ValueType>);
 	//!	Constructs this @ref Dequeue instance.
 	Dequeue(const AllocatorType& allocator, const Dequeue&);
 	//!	Constructs this @ref Dequeue instance.
@@ -87,7 +89,7 @@ public:
 public:
 	template <typename InputIterator>
 	void Assign(InputIterator first, InputIterator last);
-	void Assign(std::initializer_list<ValueType> values);
+	void Assign(InitializerList<ValueType> values);
 	void Assign(SizeType n, const ValueType& value);
 
 	// - ELEMENT ITERATION -------------------------------
@@ -145,7 +147,7 @@ public:
 
 	template <typename InputIterator>
 	void     Insert(ConstIterator position, InputIterator first, InputIterator last);
-	Iterator Insert(ConstIterator position, std::initializer_list<ValueType> ilist);
+	Iterator Insert(ConstIterator position, InitializerList<ValueType>);
 	void     Insert(ConstIterator position, SizeType n, const ValueType& value);
 	Iterator Insert(ConstIterator position, const ValueType& value);
 	Iterator Insert(ConstIterator position, ValueType&& value);

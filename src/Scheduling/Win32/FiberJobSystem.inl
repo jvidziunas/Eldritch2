@@ -17,20 +17,6 @@
 
 namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
-	namespace {
-
-		ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint size_t GetRandom(size_t& seed) {
-			enum : size_t {
-				Shift = size_t(sizeof(size_t) == sizeof(uint64) ? 32u : 16u),
-				Mask  = size_t(sizeof(size_t) == sizeof(uint64) ? 0x7FFFFFFF : 0x7FFF)
-			};
-
-			seed = (214013u * seed + 2531011u);
-			return (seed >> Shift) & Mask;
-		}
-
-	} // anonymous namespace
-
 	ETInlineHint ETForceInlineHint bool FiberJobSystem::JobThread::ShouldAwaitTransfer() const ETNoexceptHint {
 		return _transferCell.load(std::memory_order_consume) == TransferState::AwaitingTransfer;
 	}
@@ -65,23 +51,33 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 	// ---------------------------------------------------
 
 	template <typename WorkItem>
-	ETInlineHint ErrorCode FiberJobSystem::BootOnCaller(size_t totalWorkerCount, WorkItem initialTask) {
-		ET_ASSERT(_workers.IsEmpty(), "Duplicate scheduler boot operation!");
+	ETInlineHint Result FiberJobSystem::BootOnCaller(ArrayList<JobThread>::SizeType workers, WorkItem bootTask) {
+		ETAssert(_workers.IsEmpty(), "Duplicate scheduler boot operation!");
 
-		_workers.Resize(Max<size_t>(totalWorkerCount, 2u), JobThread(*this));
+		_workers.Resize(Maximum(workers, 2u), JobThread(*this));
 		//	Attach all worker threads that *aren't* run on the main thread...
-		for (size_t worker(1u); worker < _workers.GetSize(); ++worker) {
+		for (ArrayList<JobThread>::SizeType worker(1u); worker < _workers.GetSize(); ++worker) {
 			_workers[worker].Boot("Worker Thread");
 		}
-		//	Queue the first task...
-		_workers.Front().StartAsync(_dummy, eastl::move(initialTask));
+
+		_workers.Front().StartAsync(_dummy, Move(bootTask));
 		return _workers.Front().BootOnCaller("Main Thread");
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint FiberJobSystem::JobThread& FiberJobSystem::FindVictim(size_t& victimSeed) ETNoexceptHint {
-		return _workers[GetRandom(victimSeed) % _workers.GetSize()];
+	ETInlineHint ETForceInlineHint FiberJobSystem::JobThread& FiberJobSystem::FindVictim(size_t& seed) ETNoexceptHint {
+		static ETConstexpr auto GetRandom([](size_t& seed) ETNoexceptHint -> size_t {
+			enum : size_t {
+				Shift = size_t(sizeof(size_t) == sizeof(uint64) ? 32u : 16u),
+				Mask  = size_t(sizeof(size_t) == sizeof(uint64) ? 0x7FFFFFFF : 0x7FFF)
+			};
+
+			seed = (214013u * seed + 2531011u);
+			return (seed >> Shift) & Mask;
+		});
+
+		return _workers[GetRandom(seed) % _workers.GetSize()];
 	}
 
 }}} // namespace Eldritch2::Scheduling::Win32

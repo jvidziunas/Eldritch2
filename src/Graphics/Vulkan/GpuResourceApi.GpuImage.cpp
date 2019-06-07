@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -18,44 +24,46 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	GpuImage::GpuImage() :
-		_backing(nullptr),
-		_image(nullptr) {}
-
-	// ---------------------------------------------------
-
 	GpuImage::~GpuImage() {
-		ET_ASSERT(_image == nullptr, "Leaking Vulkan image!");
-		ET_ASSERT(_backing == nullptr, "Leaking Vulkan allocation!");
+		ETAssert(_image == NullVulkanHandle, "Leaking Vulkan image {}!", fmt::ptr(_image));
+		ETAssert(_backing == NullVulkanHandle, "Leaking Vulkan allocation {}!", fmt::ptr(_backing));
 	}
 
 	// ---------------------------------------------------
 
 	VkResult GpuImage::BindResources(Gpu& gpu, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo) {
-		using ::Eldritch2::Swap;
+		VkImage image;
+		ET_ABORT_UNLESS(vkCreateImage(gpu, ETAddressOf(imageInfo), gpu.GetAllocationCallbacks(), ETAddressOf(image)));
+		ET_AT_SCOPE_EXIT(vkDestroyImage(gpu, image, gpu.GetAllocationCallbacks()));
 
 		VmaAllocation backing;
-		VkImage       image;
-		ET_ABORT_UNLESS(vmaCreateImage(gpu, ETAddressOf(imageInfo), ETAddressOf(allocationInfo), ETAddressOf(image), ETAddressOf(backing), /*pAllocationInfo =*/nullptr));
-		ET_AT_SCOPE_EXIT(vmaDestroyImage(gpu, image, backing));
+		ET_ABORT_UNLESS(gpu.AllocateMemory(backing, allocationInfo, image));
 
-		Swap(_image, image);
-		Swap(_backing, backing);
+		return GpuImage::BindResources(gpu, Exchange(image, NullVulkanHandle), backing);
+	}
+
+	// ---------------------------------------------------
+
+	VkResult GpuImage::BindResources(Gpu& gpu, VkImage image, VmaAllocation backing) ETNoexceptHint {
+		gpu.Finalize([oldImage = Exchange(_image, image), oldBacking = Exchange(_backing, backing)](Gpu& gpu) ETNoexceptHint {
+			if (oldBacking) {
+				vkDestroyImage(gpu, oldImage, gpu.GetAllocationCallbacks());
+				gpu.DeallocateMemory(oldBacking);
+			}
+		});
 
 		return VK_SUCCESS;
 	}
 
 	// ---------------------------------------------------
 
-	void GpuImage::FreeResources(Gpu& gpu) {
-		if (VkImage image = eastl::exchange(_image, nullptr)) {
-			gpu.AddGarbage(image, eastl::exchange(_backing, nullptr));
-		}
+	void GpuImage::FreeResources(Gpu& gpu) ETNoexceptHint {
+		GpuImage::BindResources(gpu, NullVulkanHandle, NullVulkanHandle);
 	}
 
 	// ---------------------------------------------------
 
-	void Swap(GpuImage& lhs, GpuImage& rhs) {
+	void Swap(GpuImage& lhs, GpuImage& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs._image, rhs._image);

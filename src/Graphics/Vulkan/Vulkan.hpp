@@ -16,10 +16,13 @@
 #include <Graphics/Vulkan/DisplayBus.hpp>
 #include <Graphics/Vulkan/HostMixin.hpp>
 #include <Graphics/Vulkan/Gpu.hpp>
-#include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 #include <vulkan/vulkan_core.h>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 { namespace Logging {
+	class Log;
+}} // namespace Eldritch2::Logging
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
@@ -28,8 +31,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	public:
 		enum : VkDeviceSize {
-			HeapBlockSize      = 256u * 1024u * 1024u, /*256MB*/
-			TransferBufferSize = 128u * 1024u * 1024u, /*128MB*/
+			HeapBlockSize = 256u * 1024u * 1024u, /*256MB*/
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -38,14 +40,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		Device(const Device&) = delete;
 		//!	Constructs this @ref Device instance.
-		Device() = default;
+		Device() ETNoexceptHint = default;
 
 		~Device() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(VkInstance vulkan, VkPhysicalDevice device, VkDeviceSize heapBlockSize = HeapBlockSize, VkDeviceSize transferBufferSize = TransferBufferSize);
+		VkResult BindResources(VkInstance vulkan, VkPhysicalDevice device, VkDeviceSize heapBlockSize);
 
 		void FreeResources();
 	};
@@ -61,10 +63,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref Vulkan instance.
-		Vulkan(Logging::Log& log);
 		//!	Disable copy construction.
 		Vulkan(const Vulkan&) = delete;
+		//!	Constructs this @ref Vulkan instance.
+		Vulkan() ETNoexceptHint;
 
 		~Vulkan();
 
@@ -78,7 +80,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources();
+		VkResult BindResources(Logging::Log& log, uint32 apiVersion, Span<const char* const*> layers);
 
 		void FreeResources();
 
@@ -90,11 +92,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable HostAllocator     _allocator;
-		mutable Logging::ChildLog _log;
-		VkInstance                _vulkan;
-		VkDebugReportCallbackEXT  _debugCallback;
-		Device                    _device;
+		mutable HostAllocator    _allocator;
+		VkInstance               _vulkan;
+		VkDebugReportCallbackEXT _debugCallback;
+		Device                   _device;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

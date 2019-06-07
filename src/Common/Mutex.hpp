@@ -20,9 +20,12 @@
 #endif
 //------------------------------------------------------------------//
 
+#define ET_LOCK_SCOPE(mutex) ::Eldritch2::Lock ET_CPP_JOIN(scopedLock, __LINE__)(mutex);
+#define ET_READ_LOCK_SCOPE(mutex) ::Eldritch2::ReadLock ET_CPP_JOIN(scopedLock, __LINE__)(mutex);
+
 namespace Eldritch2 {
 
-ETCacheLineAligned class Mutex {
+class Mutex {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:

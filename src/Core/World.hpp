@@ -16,90 +16,144 @@
 // INCLUDES
 //==================================================================//
 #include <Core/TimeAccumulator.hpp>
-#include <Core/WorldComponent.hpp>
-#include <Logging/ChildLog.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Scheduling {
+namespace Eldritch2 {
+namespace Scripting { namespace Wren {
+	class ApiBuilder;
+}} // namespace Scripting::Wren
+
+namespace Scheduling {
 	class JobExecutor;
-}} // namespace Eldritch2::Scheduling
+} // namespace Scheduling
+} // namespace Eldritch2
 
 namespace Eldritch2 { namespace Core {
 
-	class World {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		template <typename Allocator = MallocAllocator>
-		using ComponentList = ArrayList<UniquePointer<WorldComponent>, MallocAllocator>;
-
+	class ETPureAbstractHint AbstractWorld {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref World instance.
-		World(const ObjectLocator& services);
+		//! Constructs this @ref AbstractWorld instance.
+		AbstractWorld(const ObjectInjector& services) ETNoexceptHint;
 		//! Disable copy construction.
-		World(const World&) = delete;
+		AbstractWorld(const AbstractWorld&) = delete;
 
-		~World() = default;
+		virtual ~AbstractWorld() = default;
 
 		// - STATE INSPECTION --------------------------------
 
 	public:
-		Range<const UniquePointer<WorldComponent>*> GetComponents() const ETNoexceptHint;
+		//!	Notifies the world that it should cease updating as soon as possible.
+		/*!	@remarks Idempotent, thread-safe. */
+		void SetShouldShutDown(MemoryOrder order = std::memory_order_relaxed) const ETNoexceptHint;
 
-		ETConstexpr Logging::Log& GetLog() const ETNoexceptHint;
-
-		float32 GetTimeScalar() const ETNoexceptHint;
-
-		void SetTimeScalar(float32 scalar) ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	public:
-		void Tick(Scheduling::JobExecutor& executor);
-
-		// ---------------------------------------------------
-
-	public:
 		bool ShouldShutDown(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
+		bool ShouldSimulate(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
+
+		bool ShouldExecute(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
+
 		//!	Notifies the world that it should cease updating as soon as possible.
-		/*!	@param[in] andEngine boolean option indicating whether or not a shutdown request should be
-				placed for the owning @ref Engine as well.
-			@remarks Idempotent, thread-safe. */
-		void SetShouldShutDown(bool andEngine = false) const ETNoexceptHint;
-
-		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
-
-		bool IsRunning(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
-
+		/*!	@remarks Idempotent, thread-safe. */
 		void SetShouldPause(MemoryOrder order = std::memory_order_relaxed) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		template <typename Iterator>
-		ErrorCode BindResources(Scheduling::JobExecutor& executor, Iterator firstComponent, Iterator lastComponent);
-		ErrorCode BindResources(Scheduling::JobExecutor& executor);
+		void Tick(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
-		void FreeResources(Scheduling::JobExecutor& executor);
+		// ---------------------------------------------------
+
+	public:
+		template <typename ApiBuilder>
+		ApiBuilder BuildApi(ApiBuilder api) const;
+
+		virtual void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint abstract;
+
+		virtual void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint abstract;
+
+		// ---------------------------------------------------
+
+	protected:
+		virtual void VariableTick(Scheduling::JobExecutor& executor, MicrosecondTime duration, float32 blendFraction) ETNoexceptHint abstract;
+
+		virtual void FixedTick(Scheduling::JobExecutor& executor, MicrosecondTime duration) ETNoexceptHint abstract;
+
+		// ---------------------------------------------------
+
+	protected:
+		virtual void PublishComponents(Scripting::Wren::ApiBuilder&) const abstract;
+
+		virtual void PublishComponents(ObjectInjector&) const abstract;
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
-		World& operator=(const World&) = delete;
+		AbstractWorld& operator=(const AbstractWorld&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	protected:
+		ObjectInjector _services;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable MallocAllocator   _allocator;
-		ObjectLocator             _services;
-		mutable Logging::ChildLog _log;
-		mutable Atomic<bool>      _shouldShutDown;
-		Atomic<uint32>            _pauseCounter;
-		TimeAccumulator           _timeAccumulator;
-		ComponentList<>           _components;
+		mutable Atomic<bool> _shouldShutDown;
+		Atomic<uint32>       _pauseCounter;
+		TimeAccumulator      _timeAccumulator;
+	};
+
+	// ---
+
+	template <typename... Components>
+	class World : public AbstractWorld {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//! Constructs this @ref World instance.
+		World(const ObjectInjector& services) ETNoexceptHint;
+		//! Disable copy construction.
+		World(const World&) = delete;
+
+		~World() override = default;
+
+		// ---------------------------------------------------
+
+	public:
+		void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+		void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+		// ---------------------------------------------------
+
+	protected:
+		void VariableTick(Scheduling::JobExecutor& executor, MicrosecondTime duration, float32 blendFraction) ETNoexceptHint override;
+
+		void FixedTick(Scheduling::JobExecutor& executor, MicrosecondTime duration) ETNoexceptHint override;
+
+		// ---------------------------------------------------
+
+	protected:
+		void PublishComponents(Scripting::Wren::ApiBuilder&) const override;
+
+		void PublishComponents(ObjectInjector&) const override;
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		AbstractWorld& operator=(const AbstractWorld&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		mutable Tuple<Components...> _components;
+
+		// ---------------------------------------------------
+
+		//!	Disable swap.
+		void Swap(World&, World&) = delete;
 	};
 
 }} // namespace Eldritch2::Core

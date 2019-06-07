@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysxMarshals.hpp>
@@ -30,9 +36,11 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	using namespace ::physx;
 
+	// ---------------------------------------------------
+
 	namespace {
 
-		PxFilterFlags FilterShader(PxFilterObjectAttributes lhsAttributes, PxFilterData lhsFilter, PxFilterObjectAttributes rhsAttributes, PxFilterData rhsFilter, PxPairFlags& flags, const void* constants, PxU32 constantsSize) {
+		PxFilterFlags FilterShader(PxFilterObjectAttributes lhsAttributes, PxFilterData lhsFilter, PxFilterObjectAttributes rhsAttributes, PxFilterData rhsFilter, PxPairFlags& flags, const void* constants, PxU32 constantsSize) ETNoexceptHint {
 			return PxDefaultSimulationFilterShader(lhsAttributes, lhsFilter, rhsAttributes, rhsFilter, flags, constants, constantsSize);
 		}
 
@@ -43,13 +51,15 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	// ---------------------------------------------------
 
 	void PhysicsScene::Simulate(MicrosecondTime duration) {
-		_controllerManager->computeInteractions(AsSeconds(duration));
-		_scene->simulate(AsSeconds(duration), /*completionTask =*/nullptr, _scratchMemory, PxU32(ETCountOf(_scratchMemory)));
+		const float32 durationSeconds(AsMilliseconds(duration) / /*milliseconds per second*/1000.0f);
+
+		_controllerManager->computeInteractions(durationSeconds);
+		_scene->simulate(durationSeconds, /*completionTask =*/nullptr, _scratchMemory, PxU32(ETCountOf(_scratchMemory)));
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode PhysicsScene::FinishSimulation() {
+	Result PhysicsScene::FinishSimulation() {
 		const PxContactPairHeader* pairs;
 		PxU32                      pairsCount, errorState;
 		if (_scene->fetchResultsStart(pairs, pairsCount, /*block =*/true)) {
@@ -57,22 +67,22 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		}
 
 		_scene->fetchResultsFinish(ETAddressOf(errorState));
-		return errorState == 0u ? Error::None : Error::Unspecified;
+		return errorState == 0u ? Result::Success : Result::Unspecified;
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode PhysicsScene::BindResources(PxCpuDispatcher& dispatcher) {
+	Result PhysicsScene::BindResources(PxCpuDispatcher& dispatcher) {
 		PxSceneDesc sceneProperties(PxGetPhysics().getTolerancesScale());
 		sceneProperties.filterShader          = ETAddressOf(FilterShader);
 		sceneProperties.cpuDispatcher         = ETAddressOf(dispatcher);
 		sceneProperties.contactModifyCallback = this;
 
 		PhysxPointer<PxScene> scene(PxGetPhysics().createScene(sceneProperties));
-		ET_ABORT_UNLESS(scene ? Error::None : Error::Unspecified);
+		ET_ABORT_UNLESS(scene ? Result::Success : Result::Unspecified);
 
 		PhysxPointer<PxControllerManager> controllerManager(PxCreateControllerManager(*scene, /*lockingEnabled =*/false));
-		ET_ABORT_UNLESS(controllerManager ? Error::None : Error::Unspecified);
+		ET_ABORT_UNLESS(controllerManager ? Result::Success : Result::Unspecified);
 
 		PhysxPointer<PxMaterial> knownMaterials[ETCountOf(_knownMaterials)] = {
 			PxGetPhysics().createMaterial(/*staticFriction =*/0.0f, /*dynamicFriction =*/0.0f, /*restitution =*/0.0f),
@@ -83,7 +93,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		Swap(_controllerManager, controllerManager);
 		Swap(_knownMaterials, knownMaterials);
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------

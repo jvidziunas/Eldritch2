@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Audio/Listener.hpp>
@@ -16,13 +22,6 @@
 
 namespace Eldritch2 { namespace Audio {
 
-	Voice::Voice(float32 loudnessDb) :
-		loudnessDb(loudnessDb) {}
-
-	// ---------------------------------------------------
-
-	float32 Voice::GetHdrAmplitudeScalar(float32 windowTopDb) const {
-		return Pow(10.0f, (loudnessDb - windowTopDb) / 20.0f);
-	}
+	DiegeticVoice::DiegeticVoice(Transformation localToWorld, MicrosecondTime startTime, float32 loudnessDb) ETNoexceptHint : localToWorld(localToWorld), startTime(startTime), loudnessDb(loudnessDb) {}
 
 }} // namespace Eldritch2::Audio

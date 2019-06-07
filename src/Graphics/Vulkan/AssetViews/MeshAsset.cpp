@@ -9,19 +9,25 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/AssetViews/MeshAsset.hpp>
+#include <Flatbuffers/FlatBufferTools.hpp>
+#include <Logging/Log.hpp>
 //------------------------------------------------------------------//
 #include <Flatbuffers/Mesh_generated.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	using namespace ::Eldritch2::Graphics::FlatBuffers;
 	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
-	using namespace ::flatbuffers;
+	using namespace ::Eldritch2::Core;
 
 	namespace {
 
@@ -35,64 +41,61 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		ETConstexpr uint16 MeshIndices[] = { 0u, 1u, 2u };
 
-		// ---
-
-		ETConstexpr Box MeshBounds({ 0.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f });
-
 	} // anonymous namespace
 
-	MeshAsset::MeshAsset(StringView path) :
-		Asset(path),
-		_surfaces(MallocAllocator("Mesh Asset Element Collection Allocator")) {
+	MeshAsset::MeshAsset(StringSpan path) ETNoexceptHint : Asset(path), _meshlets(MallocAllocator("Mesh Asset Element Collection Allocator")) {}
+
+	// ---------------------------------------------------
+
+	MeshDescriptor MeshAsset::DescribeSelf() const ETNoexceptHint {
+		return MeshDescriptor{
+			uint32(_meshlets.GetSize()),
+			/*indexStream =*/0u,
+			/*streamSizes =*/{ sizeof(MeshIndices), sizeof(MeshVertices) }
+		};
 	}
 
 	// ---------------------------------------------------
 
-	MeshDescription MeshAsset::GetDescription() const ETNoexceptHint {
-		return MeshDescription { uint32(_surfaces.GetSize()), sizeof(MeshVertices), sizeof(MeshIndices) };
-	}
-
-	// ---------------------------------------------------
-
-	void MeshAsset::Stream(MeshElementRequest<StridingIterator<SkinnedVertex>> request) const ETNoexceptHint {
-		while (request.first != request.last) {
-			CopyMemoryNonTemporal(ETAddressOf(*request.out++), ETAddressOf(MeshVertices[request.first++]), sizeof(MeshVertices[0]));
+	void MeshAsset::Stream(MeshElementRequest request) const ETNoexceptHint {
+		switch (request.stream) {
+		case 0:
+			Copy(MeshIndices + request.first, MeshIndices + request.last, reinterpret_cast<MeshIndex*>(request.out));
+			break;
+		case 1:
+			Copy(MeshVertices + request.first, MeshVertices + request.last, reinterpret_cast<SkinnedVertex*>(request.out));
+			break;
 		}
 	}
 
 	// ---------------------------------------------------
 
-	void MeshAsset::Stream(MeshElementRequest<MeshIndex*> request) const ETNoexceptHint {
-		CopyMemoryNonTemporal(request.out, MeshIndices + request.first, (request.last - request.first) * sizeof(*MeshIndices));
-	}
+	Result MeshAsset::BindResources(Log& log, const AssetBuilder& asset) {
+		using namespace ::Eldritch2::Graphics::FlatBuffers;
+		using namespace ::flatbuffers;
 
-	// ---------------------------------------------------
-
-	ErrorCode MeshAsset::BindResources(const Builder& asset) {
 		//	Verify the data we're working with can plausibly represent a mesh.
-		Verifier verifier(reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize());
-		if (!VerifyMeshBuffer(verifier)) {
-			asset.WriteLog(Severity::Error, "Mesh {} is malformed!" ET_NEWLINE, GetPath());
-			return Error::Unspecified;
-		}
+		const auto mesh(GetVerifiedRoot<FlatBuffers::MeshDescriptor>(asset.bytes, MeshDescriptorIdentifier()));
+		ET_ABORT_UNLESS(mesh ? Result::Success : Result::InvalidParameter, log.Write(Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath()));
 
-		ArrayList<MeshSurface> surfaces(_surfaces.GetAllocator(), { MeshSurface(GpuPrimitive::Triangle, 0u, ETCountOf(MeshIndices), MeshBounds, "lol") });
+		ArrayList<Meshlet> surfaces(_meshlets.GetAllocator(), { Meshlet(GpuPrimitive::Triangle, 0u, ETCountOf(MeshIndices), "lol") });
+		Swap(_meshlets, surfaces);
 
-		Swap(_surfaces, surfaces);
-
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void MeshAsset::FreeResources() {
-		_surfaces.Clear(ReleaseMemorySemantics());
+	void MeshAsset::FreeResources() ETNoexceptHint {
+		_meshlets.Clear(ReleaseMemorySemantics());
 	}
 
 	// ---------------------------------------------------
 
-	ETPureFunctionHint StringView MeshAsset::GetExtension() ETNoexceptHint {
-		return { MeshExtension(), StringLength(MeshExtension()) };
+	ETPureFunctionHint StringSpan MeshAsset::GetExtension() ETNoexceptHint {
+		using namespace ::Eldritch2::Graphics::FlatBuffers;
+
+		return StringSpan(MeshDescriptorExtension(), StringSpan::SizeType(StringLength(MeshDescriptorExtension())));
 	}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

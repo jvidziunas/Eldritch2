@@ -22,44 +22,44 @@ namespace Eldritch2 { namespace Graphics {
 
 	public:
 		//!	Constructs this @ref RgbColor instance.
-		ETConstexpr RgbColor(const RgbColor&) ETNoexceptHint = default;
+		ETConstexpr RgbColor(float32 red, float32 green, float32 blue) ETNoexceptHint;
 		//!	Constructs this @ref RgbColor instance.
-		RgbColor(float32 red, float32 green, float32 blue);
+		ETConstexpr RgbColor(const RgbColor&) ETNoexceptHint = default;
 
 		~RgbColor() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		float16 GetRed() const ETNoexceptHint;
+		ETConstexpr float32 GetRed() const ETNoexceptHint;
 
-		float16 GetGreen() const ETNoexceptHint;
+		ETConstexpr float32 GetGreen() const ETNoexceptHint;
 
-		float16 GetBlue() const ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	public:
-		float32 GetRec709Luminance() const ETNoexceptHint;
+		ETConstexpr float32 GetBlue() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		RgbColor& operator=(const RgbColor&) = default;
+		ETConstexpr float32 GetRec709Luminance() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		ETConstexpr RgbColor& operator=(const RgbColor&) ETNoexceptHint = default;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		float16 _channels[3];
+		float32 _channels[3];
 	};
 
 	// ---
 
-	ETPureFunctionHint RgbColor GetRgbFromCieXyz(float32 x, float32 y, float32 z);
+	ETPureFunctionHint RgbColor GetRgbFromCieXyz(float32 x, float32 y, float32 z) ETNoexceptHint;
 
-	ETPureFunctionHint RgbColor GetRgbFromEv(uint8 red, uint8 green, uint8 blue, float32 exposureStops = 1.0f);
+	ETPureFunctionHint RgbColor GetRgbFromEv(uint8 red, uint8 green, uint8 blue, float32 exposureStops = 1.0f) ETNoexceptHint;
 
-	ETPureFunctionHint RgbColor GetRgbFromKelvin(float32 degrees);
+	ETPureFunctionHint RgbColor GetRgbFromKelvin(float32 degrees) ETNoexceptHint;
 
 }} // namespace Eldritch2::Graphics
 

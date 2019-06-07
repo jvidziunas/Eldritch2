@@ -23,12 +23,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	public:
 		//!	Constructs this @ref HostMixin instance.
-		template <typename... Arguments, class = eastl::enable_if<eastl::is_constructible<EldritchAllocator, Arguments...>::value>::type>
-		HostMixin(Arguments&&... arguments);
-		//!	Disable copy construction.
-		HostMixin(const HostMixin&) = delete;
+		template <typename... Arguments>
+		HostMixin(Arguments&&... arguments) ETNoexceptHintIf(IsNoThrowConstructible<EldritchAllocator, Arguments...>());
 		//!	Constructs this @ref HostMixin instance.
-		HostMixin(HostMixin&&);
+		HostMixin(const HostMixin&) = default;
+		//!	Constructs this @ref HostMixin instance.
+		HostMixin(HostMixin&&) = default;
 
 		~HostMixin() = default;
 

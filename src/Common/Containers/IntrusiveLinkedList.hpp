@@ -14,6 +14,7 @@
 //==================================================================//
 #include <Common/Containers/IntrusiveListHook.hpp>
 #include <Common/Containers/RangeAdapters.hpp>
+#include <Common/Mpl/TypeTraits.hpp>
 //------------------------------------------------------------------//
 #include <eastl/intrusive_list.h>
 //------------------------------------------------------------------//
@@ -29,12 +30,14 @@ private:
 
 public:
 	using ValueType            = typename UnderlyingContainer::value_type;
-	using Reference            = typename UnderlyingContainer::reference;
+	using ConstPointer         = typename UnderlyingContainer::const_pointer;
+	using Pointer              = typename UnderlyingContainer::pointer;
 	using ConstReference       = typename UnderlyingContainer::const_reference;
-	using Iterator             = typename UnderlyingContainer::iterator;
+	using Reference            = typename UnderlyingContainer::reference;
 	using ReverseIterator      = typename UnderlyingContainer::reverse_iterator;
-	using ConstIterator        = typename UnderlyingContainer::const_iterator;
+	using Iterator             = typename UnderlyingContainer::iterator;
 	using ConstReverseIterator = typename UnderlyingContainer::const_reverse_iterator;
+	using ConstIterator        = typename UnderlyingContainer::const_iterator;
 	using SizeType             = typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -42,9 +45,9 @@ public:
 public:
 	//!	Disable copy construction.
 	IntrusiveLinkedList(const IntrusiveLinkedList&) = delete;
-	//!	Constructs this @ref IntrusiveList instance.
+	//!	Constructs this @ref IntrusiveLinkedList instance.
 	IntrusiveLinkedList(IntrusiveLinkedList&&) = default;
-	//!	Constructs this @ref IntrusiveList instance.
+	//!	Constructs this @ref IntrusiveLinkedList instance.
 	IntrusiveLinkedList() = default;
 
 	~IntrusiveLinkedList() = default;
@@ -53,16 +56,16 @@ public:
 
 public:
 	template <typename UnaryPredicate>
-	ConstIterator Find(ConstIterator searchHint, UnaryPredicate condition) const;
+	ConstIterator Find(ConstIterator searchHint, UnaryPredicate condition) const ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, ConstReference>());
 	template <typename UnaryPredicate>
-	Iterator Find(Iterator searchHint, UnaryPredicate condition);
+	Iterator Find(Iterator searchHint, UnaryPredicate condition) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>());
 	template <typename UnaryPredicate>
-	ConstIterator Find(UnaryPredicate condition) const;
+	ConstIterator Find(UnaryPredicate condition) const ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, ConstReference>());
 	template <typename UnaryPredicate>
-	Iterator Find(UnaryPredicate condition);
+	Iterator Find(UnaryPredicate condition) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>());
 
-	template <typename UnaryPredicate, typename Disposer>
-	void EraseAndDisposeIf(UnaryPredicate condition, Disposer disposer);
+	template <typename UnaryPredicate, typename UnaryPredicate2>
+	void EraseAndDisposeIf(UnaryPredicate condition, UnaryPredicate2 disposer);
 
 	template <typename UnaryPredicate>
 	void EraseIf(UnaryPredicate predicate);
@@ -70,15 +73,15 @@ public:
 	// - ELEMENT ITERATION -------------------------------
 
 public:
-	ConstIterator ConstBegin() const;
+	ConstIterator ConstBegin() const ETNoexceptHint;
 
-	ConstIterator ConstEnd() const;
+	ConstIterator ConstEnd() const ETNoexceptHint;
 
-	ConstIterator Begin() const;
-	Iterator      Begin();
+	ConstIterator Begin() const ETNoexceptHint;
+	Iterator      Begin() ETNoexceptHint;
 
-	ConstIterator End() const;
-	Iterator      End();
+	ConstIterator End() const ETNoexceptHint;
+	Iterator      End() ETNoexceptHint;
 
 	ConstIterator IteratorTo(ConstReference element) const;
 	Iterator      IteratorTo(Reference element);
@@ -86,69 +89,70 @@ public:
 	// - END POINT MANIPULATION --------------------------
 
 public:
-	//	Retrieves a reference to the first element stored in this @ref IntrusiveList.
+	//!	Retrieves a reference to the first element stored in this @ref IntrusiveLinkedList.
 	ConstReference Front() const;
-	//	Retrieves a reference to the first element stored in this @ref IntrusiveList.
+	//!	Retrieves a reference to the first element stored in this @ref IntrusiveLinkedList.
 	Reference Front();
 
-	//	Retrieves a reference to the last element stored in this @ref IntrusiveList.
+	//!	Retrieves a reference to the last element stored in this @ref IntrusiveLinkedList.
 	ConstReference Back() const;
-	//	Retrieves a reference to the last element stored in this @ref IntrusiveList.
+	//!	Retrieves a reference to the last element stored in this @ref IntrusiveLinkedList.
 	Reference Back();
 
-	//	Adds the passed-in item to the head of this @ref IntrusiveList.
-	void Prepend(Reference value);
+	//!	Adds the passed-in item to the head of this @ref IntrusiveLinkedList.
+	void Prepend(Reference value) ETNoexceptHint;
 
-	//	Adds the passed-in item to the tail of this @ref IntrusiveList.
-	void Append(Reference value);
+	//!	Adds the passed-in item to the tail of this @ref IntrusiveLinkedList.
+	void Append(Reference value) ETNoexceptHint;
 
-	//	Removes the head element of this @ref IntrusiveList, reducing its size by one element.
-	void PopFront();
+	//!	Removes the head element of this @ref IntrusiveLinkedList, reducing its size by one element.
+	void PopFront() ETNoexceptHint;
 
-	//	Removes the tail element of this @ref IntrusiveList, reducing its size by one element.
-	void Pop();
+	//!	Removes the tail element of this @ref IntrusiveLinkedList, reducing its size by one element.
+	void Pop() ETNoexceptHint;
 
-	//	Removes the head element of this @ref IntrusiveList, reducing its size by one element.
-	template <typename Disposer>
-	void PopFrontAndDispose(Disposer disposer);
+	//!	Removes the head element of this @ref IntrusiveLinkedList, reducing its size by one element.
+	template <typename UnaryPredicate>
+	void PopFrontAndDispose(UnaryPredicate disposer);
 
-	//	Removes the tail element of this @ref IntrusiveList, reducing its size by one element. Operator() is invoked on the specified disposer, with the popped element passed in as the sole parameter.
-	template <typename Disposer>
-	void PopAndDispose(Disposer disposer);
+	//!	Removes the tail element of this @ref IntrusiveLinkedList, reducing its size by one element. Operator() is invoked on the specified disposer, with the popped element passed in as the sole parameter.
+	template <typename UnaryPredicate>
+	void PopAndDispose(UnaryPredicate disposer);
 
 	// - CONTAINER DUPLICATION ---------------------------
 
 public:
-	template <typename Disposer, typename ElementCloner>
-	void CloneFrom(const IntrusiveLinkedList& list, Disposer disposer, ElementCloner cloner);
+	template <typename UnaryPredicate, typename Cloner>
+	void CloneFrom(const IntrusiveLinkedList& list, UnaryPredicate disposer, Cloner cloner);
 
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	//	Inserts an element at the position specified, shifting all antecedent elements down one position.
+	//!	Inserts an element before the position specified.
 	Iterator Insert(Iterator where, Reference item);
 
 	Iterator Erase(Iterator first, Iterator last);
 	Iterator Erase(Iterator where);
+	static void Erase(Reference where);
 
-	template <typename Disposer>
-	Iterator EraseAndDispose(Iterator first, Iterator last, Disposer disposer);
-	template <typename Disposer>
-	Iterator EraseAndDispose(Iterator where, Disposer disposer);
+	template <typename UnaryPredicate>
+	Iterator EraseAndDispose(Iterator first, Iterator last, UnaryPredicate disposer);
+	template <typename UnaryPredicate>
+	Iterator EraseAndDispose(Iterator where, UnaryPredicate disposer);
 
-	template <typename Disposer>
-	void ClearAndDispose(Disposer disposer);
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
-	void Clear();
+	void Clear() ETNoexceptHint;
 
 	// - CONTENT QUERY -----------------------------------
 
 public:
-	SizeType GetSize() const;
+	SizeType GetSize() const ETNoexceptHint;
 
-	bool IsEmpty() const;
+	bool IsEmpty() const ETNoexceptHint;
 
-	explicit operator bool() const;
+	explicit operator bool() const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -157,8 +161,8 @@ private:
 
 	// ---------------------------------------------------
 
-	template <typename Value>
-	friend void Swap(IntrusiveLinkedList<Value>&, IntrusiveLinkedList<Value>&);
+	template <typename Value2>
+	friend void Swap(IntrusiveLinkedList<Value2>&, IntrusiveLinkedList<Value2>&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

@@ -9,10 +9,15 @@
 \*==================================================================*/
 
 //==================================================================//
-// INCLUDES
+// PRECOMPILED HEADER
 //==================================================================//
-#include <Common/RuleSet.hpp>
+#include <Common/Precompiled.hpp>
 //------------------------------------------------------------------//
 
-template class Eldritch2::QueryBuilder<Eldritch2::SymbolTable<Eldritch2::Utf8Char, Eldritch2::ChildAllocator>, Eldritch2::MallocAllocator>;
-template class Eldritch2::RuleBuilder<Eldritch2::SymbolTable<Eldritch2::Utf8Char, Eldritch2::ChildAllocator>, Eldritch2::MallocAllocator>;
+//==================================================================//
+// INCLUDES
+//==================================================================//
+#include <Common/SymbolSet.hpp>
+//------------------------------------------------------------------//
+
+template class Eldritch2::RuleBuilder<Eldritch2::SymbolSet<Eldritch2::Utf8Char>, Eldritch2::MallocAllocator>;

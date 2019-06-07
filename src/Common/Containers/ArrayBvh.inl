@@ -17,85 +17,52 @@
 
 namespace Eldritch2 {
 
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint ArrayBvh<Value, Allocator>::ArrayBvh(const AllocatorType& allocator) :
-	_allocator(allocator),
-	_leaves(ChildAllocator(_allocator, "Array BVH Leaf Allocator")),
-	_splits(ChildAllocator(_allocator, "Array BVH Split Allocator")) {
+template <typename Value, typename SortPredicate, class Allocator>
+ETInlineHint ETForceInlineHint ArrayBvh<Value, SortPredicate, Allocator>::ArrayBvh(const AllocatorType& allocator, const SortType& sort) ETNoexceptHint : _leaves(allocator), _sort(sort), _splits(SizeType(0u)) {}
+
+// ---------------------------------------------------
+
+template <typename Value, typename SortPredicate, class Allocator>
+ETInlineHint ETForceInlineHint void ArrayBvh<Value, SortPredicate, Allocator>::Insert(const ValueType& value) {
+	_leaves.EmplaceBack(value, typename SortPredicate::Key(), SplitType{});
 }
 
 // ---------------------------------------------------
 
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint typename ArrayBvh<Value, Allocator>::SplitConstIterator ArrayBvh<Value, Allocator>::ConstBegin() const ETNoexceptHint {
-	return _splits.ConstBegin();
+template <typename Value, typename SortPredicate, class Allocator>
+ETInlineHint ETForceInlineHint typename ArrayBvh<Value, SortPredicate, Allocator>::SizeType ArrayBvh<Value, SortPredicate, Allocator>::Erase(const ValueType& value) {
+	_leaves.EraseUnordered(_leaves.Find(value)) != _leaves.End() ? 1u : 0u;
 }
 
 // ---------------------------------------------------
 
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint typename ArrayBvh<Value, Allocator>::SplitConstIterator ArrayBvh<Value, Allocator>::ConstEnd() const ETNoexceptHint {
-	return _splits.ConstEnd();
+template <typename Value, typename SortPredicate, class Allocator>
+ETInlineHint ETForceInlineHint const typename ArrayBvh<Value, SortPredicate, Allocator>::SplitType& ArrayBvh<Value, SortPredicate, Allocator>::operator[](SizeType index) const ETNoexceptHint {
+	return _leaves.GetData<Splits>()[index];
 }
 
 // ---------------------------------------------------
 
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint typename ArrayBvh<Value, Allocator>::SplitConstIterator ArrayBvh<Value, Allocator>::Begin() const ETNoexceptHint {
-	return _splits.Begin();
+template <typename Value, typename SortPredicate, class Allocator>
+template <typename... ExtraArgs>
+ETInlineHint ETForceInlineHint void ArrayBvh<Value, SortPredicate, Allocator>::Sort(ExtraArgs&... args) {
+	_sort.SortValues(args..., _leaves.Begin<Values>(), _leaves.End<Values>(), _leaves.Begin<Keys>());
+	_splits = _sort.FindSplits(args..., _leaves.Begin<Values>(), _leaves.End<Values>(), _leaves.Begin<Splits>());
 }
 
 // ---------------------------------------------------
 
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint typename ArrayBvh<Value, Allocator>::SplitConstIterator ArrayBvh<Value, Allocator>::End() const ETNoexceptHint {
-	return _splits.End();
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint typename ArrayBvh<Value, Allocator>::LeafConstIterator ArrayBvh<Value, Allocator>::Find(const ValueType& value) const ETNoexceptHint {
-	return Find(_leaves.Begin(), _leaves.End(), [&value](typename LeafContainer::ConstReference leaf) { return eastl::get<Value&>(leaf) == value; });
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint typename ArrayBvh<Value, Allocator>::LeafIterator ArrayBvh<Value, Allocator>::Find(const ValueType& value) ETNoexceptHint {
-	return Find(_leaves.Begin(), _leaves.End(), [&value](typename LeafContainer::Reference leaf) { return eastl::get<Value&>(leaf) == value; });
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint void ArrayBvh<Value, Allocator>::Insert(const ValueType& value) {
-	_values.Append(value);
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint typename ArrayBvh<Value, Allocator>::LeafIterator ArrayBvh<Value, Allocator>::Erase(const ValueType& value) {
-	_leaves.EraseUnordered(Find(value));
-}
-
-// ---------------------------------------------------
-
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint void ArrayBvh<Value, Allocator>::Clear() {
+template <typename Value, typename SortPredicate, class Allocator>
+ETInlineHint ETForceInlineHint void ArrayBvh<Value, SortPredicate, Allocator>::Clear() ETNoexceptHint {
 	_leaves.Clear();
-	_splits.Clear();
 }
 
 // ---------------------------------------------------
 
-template <typename Value, class Allocator>
-ETInlineHint ETForceInlineHint void Swap(ArrayBvh<Value, Allocator>& lhs, ArrayBvh<Value, Allocator>& rhs) {
-	Swap(lhs._allocator, rhs._allocator);
-	Swap(lhs._extractor, rhs._extractor);
+template <typename Value, typename SortPredicate, class Allocator>
+ETInlineHint ETForceInlineHint void Swap(ArrayBvh<Value, Allocator>& lhs, ArrayBvh<Value, Allocator>& rhs) ETNoexceptHint {
 	Swap(lhs._leaves, rhs._leaves);
-	Swap(lhs._splits, rhs._splits);
+	Swap(lhs._sort, rhs._sort);
 }
 
 } // namespace Eldritch2

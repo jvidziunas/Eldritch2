@@ -11,113 +11,69 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Common/Containers/SoaList.hpp>
 #include <Common/Containers/String.hpp>
+#include <Common/Filesystem.hpp>
 #include <Tools/CrtpTool.hpp>
 #include <Common/Memory.hpp>
 //------------------------------------------------------------------//
-#ifdef ET_PLATFORM_WINDOWS
-#	include <Windows.h>
-#endif
-#include <simpleopt/SimpleGlob.h>
 #include <simpleopt/SimpleOpt.h>
-#include <iostream>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Tools { namespace Detail {
+namespace Eldritch2 { namespace Tools {
 
-	Tool::OptionRegistrar::OptionRegistrar() :
-		_options(MallocAllocator("Tool Option Registry Allocator")) {}
-
-	// ---------------------------------------------------
-
-	Tool::OptionRegistrar& Tool::OptionRegistrar::Register(PlatformStringView name, Setter setter) {
-		_options.EmplaceBack(eastl::move(name), eastl::move(setter));
-		return *this;
-	}
+	using namespace ::Eldritch2::Logging;
 
 	// ---------------------------------------------------
 
-	Tool::OptionRegistrar& Tool::OptionRegistrar::Register(PlatformStringView name, PlatformStringView shortName, Setter setter) {
-		//	Create one copy for the long name argument...
-		_options.EmplaceBack(name, setter);
-		//	... and directly move the argument for the short name.
-		_options.EmplaceBack(eastl::move(shortName), eastl::move(setter));
-		return *this;
-	}
+	AbstractCrtpTool::OptionRegistrar::OptionRegistrar() ETNoexceptHint : _options(OptionList::AllocatorType("Tool Option Registry Allocator")) {}
 
 	// ---------------------------------------------------
 
-	Tool::OptionRegistrar& Tool::OptionRegistrar::RegisterInputFileHandler(Setter setter) {
-		_inputFileHandler = eastl::move(setter);
-		return *this;
-	}
-
-	// ---------------------------------------------------
-
-	int Tool::OptionRegistrar::Dispatch(int argc, PlatformChar** argv) {
-		using OptionGlobber = CSimpleGlobTempl<PlatformChar>;
-		using OptionParser  = CSimpleOptTempl<PlatformChar>;
-
-		// ---
-
-		ArrayList<OptionParser::SOption> convertedOptions;
-		ArrayList<PlatformString>        terminatedOptions;
-		int                              index(0);
+	Result AbstractCrtpTool::OptionRegistrar::Dispatch(Log& log, Span<PlatformChar**> args) {
+		using OptionParser = CSimpleOptTempl<PlatformChar>;
 
 		//	Converted option count should be one larger than the number of registered options, as the parser library uses a sentinel to delimit the end of registered options.
-		convertedOptions.SetCapacity(_options.GetSize() + 1);
-		terminatedOptions.SetCapacity(_options.GetSize());
-		for (const Option& option : _options) {
-			terminatedOptions.EmplaceBack(MallocAllocator(), option.first);
-			convertedOptions.EmplaceBack(index++, terminatedOptions.Back().AsCString(), SO_REQ_SEP);
+		SoaList<PlatformString, OptionParser::SOption> options(MallocAllocator(), _options.GetSize() + 1);
+		for (OptionList::ConstReference option : _options) {
+			PlatformString path(PlatformString::AllocatorType(), Get<StringSpan&>(option));
+			options.EmplaceBack(Move(path), OptionParser::SOption{ int(options.GetSize()), path.AsCString(), SO_REQ_SEP });
 		}
 		//	Terminate the list to be handed off to the option parser.
-		convertedOptions.Append(SO_END_OF_OPTIONS);
-
+		options.EmplaceBack(PlatformString(PlatformString::AllocatorType(), SL("<dummy>")), SO_END_OF_OPTIONS);
 		{
-			OptionParser  parser(argc, argv, convertedOptions.GetData(), SO_O_SHORTARG | SO_O_CLUMP);
-			OptionGlobber globber;
-
+			OptionParser parser(int(args.GetSize()), args.Begin(), options.GetData<OptionParser::SOption>(), SO_O_SHORTARG | SO_O_CLUMP);
 			while (parser.Next()) {
 				switch (parser.LastError()) {
 				case SO_SUCCESS: {
-					const int result(_options[parser.OptionId()].second({ parser.OptionArg(), StringLength(parser.OptionArg()) }));
-					if (result != 0) {
-						return result;
-					}
-
+					ET_ABORT_UNLESS(Get<Setter&>(_options[parser.OptionId()])(log, PlatformStringSpan(parser.OptionArg(), StringLength(parser.OptionArg()))));
 					break;
 				} // case SO_SUCCESS
 				case SO_OPT_INVALID: {
-					std::cerr << "Unknown option " << parser.OptionText() << ", ignoring." << std::endl;
+					log.Write(Severity::Warning, "\tignoring (unknown) option {}" ET_NEWLINE, parser.OptionText());
 					break;
 				} // case SO_OPT_INVALID
 				case SO_ARG_MISSING: {
-					std::cerr << "Option " << parser.OptionText() << " requires an argument, but none was provided!" << std::endl;
+					log.Write(Severity::Error, "\t{} needs an (missing) argument" ET_NEWLINE, parser.OptionText());
 					break;
 				} // case SO_OPT_INVALID
-				default: {
-					std::cerr << "Fatal error parsing command line." << std::endl;
-					return 1;
-				} // default case
 				} // switch(parser.LastError())
 			}
 
 			for (int file(0); file < parser.FileCount(); ++file) {
-				globber.Add(parser.File(file));
-			}
-			for (int file(0); file < globber.FileCount(); ++file) {
-				_inputFileHandler({ globber.File(file), StringLength(globber.File(file)) });
+				ForEachFile(PlatformStringSpan(parser.File(file), StringLength(parser.File(file))), [&](PlatformStringSpan path) {
+					_inputFileHandler(log, path);
+				});
 			}
 		}
 
-		return 0;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void Tool::RegisterOptions(OptionRegistrar& /*visitor*/) {
+	void AbstractCrtpTool::RegisterOptions(OptionRegistrar& /*options*/) {
 		//	Default implementation does nothing.
 	}
 
-}}} // namespace Eldritch2::Tools::Detail
+}} // namespace Eldritch2::Tools

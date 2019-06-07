@@ -73,7 +73,7 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Tools\ConsoleLog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -108,7 +108,7 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="src\Tools\ConsoleLog.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

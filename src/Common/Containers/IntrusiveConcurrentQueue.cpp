@@ -9,41 +9,44 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Common/Containers/IntrusiveConcurrentQueue.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Detail {
+
 	namespace {
 
 		template <typename T>
-		ETInlineHint ETPureFunctionHint T AtomicLoad(T& value, MemoryOrder order) {
-			return std::atomic_load_explicit(reinterpret_cast<std::atomic<T>*>(&value), order);
+		ETForceInlineHint ETPureFunctionHint T AtomicLoad(T& value, MemoryOrder order) ETNoexceptHint {
+			return std::atomic_load_explicit(reinterpret_cast<std::atomic<T>*>(ETAddressOf(value)), order);
 		}
 
 		// ---------------------------------------------------
 
 		template <typename T>
-		ETInlineHint ETPureFunctionHint void AtomicStore(T& value, T desiredValue, MemoryOrder order) {
-			return std::atomic_store_explicit(reinterpret_cast<std::atomic<T>*>(&value), desiredValue, order);
+		ETForceInlineHint ETPureFunctionHint void AtomicStore(T& value, T desiredValue, MemoryOrder order) ETNoexceptHint {
+			return std::atomic_store_explicit(reinterpret_cast<std::atomic<T>*>(ETAddressOf(value)), desiredValue, order);
 		}
 
 	} // anonymous namespace
 
-	QueueStorage::QueueStorage() :
-		_head(&_stub),
-		_tail(&_stub) {
-		_stub.mpNext = nullptr;
-	}
+	QueueStorage::QueueStorage() ETNoexceptHint : _stub { /*mpNext= */ nullptr }, _head(ETAddressOf(_stub)), _tail(ETAddressOf(_stub)) {}
 
 	// ---------------------------------------------------
 
-	IntrusiveForwardListBaseHook* MpscQueuePolicy::Pop() {
+	IntrusiveForwardListBaseHook* MpscQueuePolicy::Pop() ETNoexceptHint {
 		auto tail(_tail.load(std::memory_order_acquire));
 		auto tailNext(AtomicLoad(tail->mpNext, std::memory_order_consume));
 
-		if (tail == &_stub) {
+		if (tail == ETAddressOf(_stub)) {
 			if (tailNext == nullptr) {
 				return nullptr;
 			}
@@ -76,12 +79,11 @@ namespace Eldritch2 { namespace Detail {
 
 	// ---------------------------------------------------
 
-	void MpscQueuePolicy::Push(IntrusiveForwardListBaseHook& object) {
+	void MpscQueuePolicy::Push(IntrusiveForwardListBaseHook& object) ETNoexceptHint {
 		object.mpNext = nullptr;
 
-		auto previous(_head.exchange(&object, std::memory_order_release));
-
-		AtomicStore(previous->mpNext, &object, std::memory_order_consume);
+		auto previous(_head.exchange(ETAddressOf(object), std::memory_order_release));
+		AtomicStore(previous->mpNext, ETAddressOf(object), std::memory_order_consume);
 	}
 
 }} // namespace Eldritch2::Detail

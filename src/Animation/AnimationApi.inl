@@ -12,96 +12,51 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Animation/AnimateSkeleton_generated.h>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Animation {
 
-	ETInlineHint ETForceInlineHint KnotCache::ConstReference KnotCache::operator[](SizeType offset) const ETNoexceptHint {
-		return _knots[offset];
+	ETInlineHint ETForceInlineHint Span<const SoaTransformation*> ArmatureDefinition::GetBindPose() const ETNoexceptHint {
+		return { reinterpret_cast<const SoaTransformation*>(_bindPose.Begin()), reinterpret_cast<const SoaTransformation*>(_bindPose.End()) };
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint KnotCache::Reference KnotCache::operator[](SizeType offset) ETNoexceptHint {
-		return _knots[offset];
+	ETInlineHint ETForceInlineHint Span<const ArmatureDefinition::Joint*> ArmatureDefinition::GetJoints() const ETNoexceptHint {
+		return { _joints.Begin(), _joints.End() };
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint KnotCache::ConstPointer KnotCache::Get(SizeType /*offset*/) const ETNoexceptHint {
-		return _knots.GetData();
+	ETConstexpr ETForceInlineHint Armature::Armature(Transformation localToWorld) ETNoexceptHint : _localToWorld(localToWorld) {}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint Transformation ETSimdCall Armature::GetLocalToWorld() const ETNoexceptHint {
+		return _localToWorld;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint KnotCache::Pointer KnotCache::Get(SizeType /*offset*/) ETNoexceptHint {
-		return _knots.GetData();
+	ETConstexpr ETForceInlineHint void ETSimdCall Armature::SetLocalToWorld(Transformation localToWorld) ETNoexceptHint {
+		_localToWorld = localToWorld;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint KnotCache::SizeType KnotCache::GetSize() const ETNoexceptHint {
-		return _knots.GetSize();
+	ETConstexpr ETForceInlineHint Clip::Clip(MicrosecondTime startTime) ETNoexceptHint : _startTime(startTime) {}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint MicrosecondTime Clip::GetStartTime() const ETNoexceptHint {
+		return _startTime;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint KnotCache::SizeType KnotCache::Append(SizeType count, const ChannelIndex* channels) {
-		const SizeType first(_knots.GetSize());
-		_knots.Reserve(first + count);
-
-		for (SizeType knot(0u); knot < count; ++knot) {
-			_knots.Append(/*start =*/0.0f, /*reciprocalDuration =*/0.0f, /*startValue =*/0u, /*endValue =*/0u, /*startTangent =*/0u, /*endTangent =*/0u, channels[knot]);
-		}
-
-		return first;
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint void KnotCache::Reserve(SizeType capacityHint) {
-		_knots.Reserve(capacityHint);
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint void KnotCache::Clear() ETNoexceptHint {
-		_knots.Clear();
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint void EvaluatePose(BoneIndex maximumBone, float32 time, Transformation poseToLocals[], Transformation poseToVelocity[], float32 scratch[], const KnotCache& cache, const Blend& blend) {
-		enum : size_t { FloatsPerTransform = sizeof(Transformation) / sizeof(float32) };
-		static_assert(sizeof(*poseToLocals) == 2u * sizeof(float32[4]), "Size mismatch between ISPC float structure and Transform type");
-
-		const size_t   floatsPerPose(FloatsPerTransform * maximumBone);
-		float32* const velocityPalette(scratch + floatsPerPose);
-		float32* const palette(velocityPalette + floatsPerPose);
-		const auto     knots(cache.Get(0));
-
-		ispc::BulkHermiteWithDerivative(maximumBone, time, palette, velocityPalette, eastl::get<KnotCache::TargetChannels>(knots), eastl::get<KnotCache::StartTimes>(knots), eastl::get<KnotCache::ReciprocalDurations>(knots), eastl::get<KnotCache::StartValues>(knots), eastl::get<KnotCache::EndValues>(knots), eastl::get<KnotCache::StartTangents>(knots), eastl::get<KnotCache::EndTangents>(knots));
-
-		blend.Evaluate(maximumBone, scratch, palette);
-		ispc::TransposeTransforms(maximumBone, reinterpret_cast<float32(*)[4]>(poseToLocals), scratch);
-		blend.Evaluate(maximumBone, scratch, velocityPalette);
-		ispc::TransposeTransforms(maximumBone, reinterpret_cast<float32(*)[4]>(poseToVelocity), scratch);
-	}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint void EvaluatePose(BoneIndex maximumBone, float32 time, Transformation poseToLocals[], float32 scratch[], const KnotCache& cache, const Blend& blend) {
-		enum : size_t { FloatsPerTransform = sizeof(Transformation) / sizeof(float32) };
-		static_assert(sizeof(*poseToLocals) == 2u * sizeof(float32[4]), "Size mismatch between ISPC float structure and Transform type");
-
-		float32* const palette(scratch + FloatsPerTransform * maximumBone);
-		const auto     knots(cache.Get(0));
-
-		ispc::BulkHermite(maximumBone, time, palette, eastl::get<KnotCache::TargetChannels>(knots), eastl::get<KnotCache::StartTimes>(knots), eastl::get<KnotCache::ReciprocalDurations>(knots), eastl::get<KnotCache::StartValues>(knots), eastl::get<KnotCache::EndValues>(knots), eastl::get<KnotCache::StartTangents>(knots), eastl::get<KnotCache::EndTangents>(knots));
-
-		blend.Evaluate(maximumBone, scratch, palette);
-		ispc::TransposeTransforms(maximumBone, reinterpret_cast<float32(*)[4]>(poseToLocals), scratch);
+	ETConstexpr ETForceInlineHint void Clip::SetStartTime(MicrosecondTime worldTime) ETNoexceptHint {
+		_startTime = worldTime;
 	}
 
 }} // namespace Eldritch2::Animation

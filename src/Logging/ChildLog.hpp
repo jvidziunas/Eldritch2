@@ -37,9 +37,9 @@ namespace Eldritch2 { namespace Logging {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(Log& parent);
+		Result BindResources(Log& parent);
 
-		void FreeResources();
+		void FreeResources() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

@@ -9,10 +9,17 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/CpuDispatcher.hpp>
 #include <Scheduling/JobExecutor.hpp>
+#include <Core/Profiler.hpp>
 //------------------------------------------------------------------//
 /*	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does.
  *	We can't fix this, but we can at least disable the warning. */
@@ -26,19 +33,20 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::physx;
 
-	CpuDispatcher::CpuDispatcher(PxU32 taskCount) ETNoexceptHint : _taskCount(taskCount), _tasksCompleted(0) {}
+	CpuDispatcher::CpuDispatcher() ETNoexceptHint : _tasksCompleted(0) {}
 
 	// ---------------------------------------------------
 
-	PxU32 CpuDispatcher::getWorkerCount() const {
-		return _taskCount;
+	PxU32 CpuDispatcher::getWorkerCount() const ETNoexceptHint {
+		return Maximum(GetCoreInfo().physicalCores - 1u, 1u);
 	}
 
 	// ---------------------------------------------------
 
-	void CpuDispatcher::submitTask(PxBaseTask& task) {
-		GetExecutor()->StartAsync(_tasksCompleted, [&task](JobExecutor& /*executor*/) {
+	void CpuDispatcher::submitTask(PxBaseTask& task) ETNoexceptHint {
+		GetExecutor()->StartAsync(_tasksCompleted, [&](JobExecutor& /*executor*/) ETNoexceptHint {
 			ET_PROFILE_SCOPE("PhysX", "PhysX Task (Opaque)", 0x76b900);
+
 			task.run();
 			task.release();
 		});

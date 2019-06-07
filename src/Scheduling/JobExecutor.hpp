@@ -19,21 +19,26 @@
 #	define ET_ENABLE_JOB_DEBUGGING ET_DEBUG_BUILD
 #endif
 
-namespace Eldritch2 { namespace Scheduling {
-
-	namespace Detail {
-
-#if ET_PLATFORM_WINDOWS
-		using PlatformFiber = void*;
-#else
-#	error Platform needs fiber implementation!
+#if !defined(ET_JOB_CLOSURE_SIZE)
+#	define ET_JOB_CLOSURE_SIZE (3u * sizeof(void*))
 #endif
 
-	} // namespace Detail
+#define AwaitCondition(...) AwaitCondition_(__FILE__, __LINE__, [&]() -> bool { return __VA_ARGS__; })
+#define AwaitFence(fence) AwaitFence_(__FILE__, __LINE__, fence)
+#define AwaitWork(...) AwaitWork_(__FILE__, __LINE__, __VA_ARGS__)
+
+namespace Eldritch2 { namespace Scheduling {
+
+	enum : size_t {
+		JobClosureSizeBytes  = ET_JOB_CLOSURE_SIZE,
+		WaitClosureSizeBytes = ET_JOB_CLOSURE_SIZE,
+	};
+
+	// ---
 
 	using JobFence = Atomic<int>;
 
-	// ---------------------------------------------------
+	// ---
 
 	class JobExecutor {
 		// - TYPE PUBLISHING ---------------------------------
@@ -44,11 +49,11 @@ namespace Eldritch2 { namespace Scheduling {
 
 		public:
 			//!	Constructs this @ref JobClosure instance.
-			JobClosure(JobFence& completedFence, Function<void(JobExecutor& /*executor*/) ETNoexceptHint> work);
+			JobClosure(JobFence& completedFence, FixedFunction<JobClosureSizeBytes, void(JobExecutor& /*executor*/)>) ETNoexceptHint;
 			//!	Constructs this @ref JobClosure instance.
 			JobClosure(const JobClosure&) = default;
 			//!	Constructs this @ref JobClosure instance.
-			JobClosure(JobClosure&&) = default;
+			JobClosure(JobClosure&&) ETNoexceptHint = default;
 
 			~JobClosure() = default;
 
@@ -56,13 +61,13 @@ namespace Eldritch2 { namespace Scheduling {
 
 		public:
 			JobClosure& operator=(const JobClosure&) = default;
-			JobClosure& operator=(JobClosure&&) = default;
+			JobClosure& operator=(JobClosure&&) ETNoexceptHint = default;
 
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			JobFence*                                   completedFence;
-			Function<void(JobExecutor&) ETNoexceptHint> work;
+			JobFence*                                                           completedFence;
+			FixedFunction<JobClosureSizeBytes, void(JobExecutor& /*executor*/)> work;
 		};
 
 		// ---
@@ -72,15 +77,13 @@ namespace Eldritch2 { namespace Scheduling {
 
 		public:
 			//!	Constructs this @ref SuspendedJob instance.
-			SuspendedJob(const char* file, int line, Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume);
+			SuspendedJob(const char* file, int line, PlatformFiber fiber, FixedFunction<WaitClosureSizeBytes, bool()> shouldResume) ETNoexceptHint;
 			//!	Constructs this @ref SuspendedJob instance.
-			SuspendedJob(Detail::PlatformFiber fiber, Function<bool() ETNoexceptHint> shouldResume);
+			SuspendedJob(PlatformFiber fiber, FixedFunction<WaitClosureSizeBytes, bool()> shouldResume) ETNoexceptHint;
 			//!	Constructs this @ref SuspendedJob instance.
 			SuspendedJob(const SuspendedJob&) = default;
 			//!	Constructs this @ref SuspendedJob instance.
-			SuspendedJob(SuspendedJob&&) = default;
-			//!	Constructs this @ref SuspendedJob instance.
-			SuspendedJob() = default;
+			SuspendedJob(SuspendedJob&&) ETNoexceptHint = default;
 
 			~SuspendedJob() = default;
 
@@ -88,7 +91,7 @@ namespace Eldritch2 { namespace Scheduling {
 
 		public:
 			SuspendedJob& operator=(const SuspendedJob&) = default;
-			SuspendedJob& operator=(SuspendedJob&&) = default;
+			SuspendedJob& operator=(SuspendedJob&&) ETNoexceptHint = default;
 
 			// - DATA MEMBERS ------------------------------------
 
@@ -101,8 +104,8 @@ namespace Eldritch2 { namespace Scheduling {
 			//!	Line number in the file indicating where the wait occurred. Used for debugging deadlock/stalled task dependencies.
 			int line;
 #endif
-			Detail::PlatformFiber           fiber;
-			Function<bool() ETNoexceptHint> shouldResume;
+			PlatformFiber                               fiber;
+			FixedFunction<WaitClosureSizeBytes, bool()> shouldResume;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -111,21 +114,17 @@ namespace Eldritch2 { namespace Scheduling {
 		//!	Disable copy construction.
 		JobExecutor(const JobExecutor&) = delete;
 		//!	Constructs this @ref JobExecutor instance.
-		JobExecutor();
+		JobExecutor() ETNoexceptHint;
 
 		~JobExecutor() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		void AwaitCondition_(const char* file, int line, Function<bool() ETNoexceptHint> condition);
+		void AwaitCondition_(const char* file, int line, FixedFunction<WaitClosureSizeBytes, bool()> condition);
 		template <typename... WorkItems>
 		void AwaitWork_(const char* file, int line, WorkItems... workItems);
 		void AwaitFence_(const char* file, int line, JobFence& fence);
-
-#define AwaitCondition(...) AwaitCondition_(__FILE__, __LINE__, [&]() -> bool { return __VA_ARGS__; })
-#define AwaitFence(fence) AwaitFence_(__FILE__, __LINE__, fence)
-#define AwaitWork(...) AwaitWork_(__FILE__, __LINE__, __VA_ARGS__)
 
 		// ---------------------------------------------------
 
@@ -137,31 +136,55 @@ namespace Eldritch2 { namespace Scheduling {
 		template <typename... WorkItems>
 		void StartAsync(JobFence& completed, WorkItems... workItems);
 
-		template <size_t splitSize, typename InputIterator, typename OutputIterator, typename AlternateInputIterator, typename TrinaryPredicate>
-		void Transform(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, OutputIterator out, TrinaryPredicate transformer);
-		template <size_t splitSize, typename InputIterator, typename OutputIterator, typename BinaryPredicate>
-		void Transform(InputIterator begin, InputIterator end, OutputIterator out, BinaryPredicate transformer);
-
-		template <size_t splitSize, typename InputIterator, typename AlternateInputIterator, typename QuaternaryPredicate>
-		void ForEachSplit(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, QuaternaryPredicate predicate);
-		template <size_t splitSize, typename InputIterator, typename TrinaryPredicate>
+		//!	General pseudo-synchronous parallel algorithm template.
+		/*!	Task split threshold is used to control how many individual processing jobs are created to complete work and should be proportional to the amount of
+			computation required for a single block of predicate invocations.
+			@param[in] begin Iterator to the first element to be processed.
+			@param[in] end Iterator to the last element to be processed.
+			@param[in] begin2 Iterator to the first 'dual' element to be processed at 1:1 ratio with the elements in [begin, end).
+			@param[in] predicate @parblock Element-processing functionoid with call signature (@ref JobExecutor&, InputIterator, InputIterator, InputIterator2).
+				Unlike @ref ForEach(), the predicate is responsible for processing a range of elements rather than a single input. @endparblock */
+		template <size_t SplitSize, typename InputIterator, typename InputIterator2, typename QuaternaryPredicate>
+		void ForEachSplit(InputIterator begin, InputIterator end, InputIterator2 begin2, QuaternaryPredicate predicate);
+		//!	General pseudo-synchronous parallel algorithm template.
+		/*!	Task split threshold is used to control how many individual processing jobs are created to complete work and should be proportional to the amount of computation
+			@param[in] begin Iterator to the first element to be processed.
+			@param[in] end Iterator to the last element to be processed.
+			@param[in] predicate @parblock Element-processing functionoid with call signature (@ref JobExecutor&, InputIterator, InputIterator).
+				Unlike @ref ForEach(), the predicate is responsible for processing a range of elements rather than a single input. @endparblock */
+		template <size_t SplitSize, typename InputIterator, typename TrinaryPredicate>
 		void ForEachSplit(InputIterator begin, InputIterator end, TrinaryPredicate predicate);
 
-		template <size_t splitSize, typename InputIterator, typename AlternateInputIterator, typename TrinaryPredicate>
-		void ForEach(InputIterator begin, InputIterator end, AlternateInputIterator alternateBegin, TrinaryPredicate predicate);
-		template <size_t splitSize, typename InputIterator, typename BinaryPredicate>
+		template <size_t SplitSize, typename InputIterator, typename InputIterator2, typename TrinaryPredicate>
+		void ForEach(InputIterator begin, InputIterator end, InputIterator2 begin2, TrinaryPredicate predicate);
+		template <size_t SplitSize, typename InputIterator, typename BinaryPredicate>
 		void ForEach(InputIterator begin, InputIterator end, BinaryPredicate predicate);
+		template <typename BinaryPredicate, typename... Types>
+		void ForEach(Tuple<Types...>&&, BinaryPredicate predicate);
+		template <typename BinaryPredicate, typename... Types>
+		void ForEach(Tuple<Types...>&, BinaryPredicate predicate);
+
+		template <size_t SplitSize, typename InputIterator, typename OutputIterator, typename BinaryPredicate>
+		void Transform(InputIterator begin, InputIterator end, OutputIterator out, BinaryPredicate transformer);
 
 		// ---------------------------------------------------
 
 	protected:
-		void SwitchFibers(Detail::PlatformFiber fiber);
+		template <typename BinaryPredicate, typename Tuple, size_t... Indices>
+		void ForEach(Tuple&&, IndexSequence<Indices...>, BinaryPredicate predicate);
+		template <typename BinaryPredicate, typename Tuple, size_t... Indices>
+		void ForEach(Tuple&, IndexSequence<Indices...>, BinaryPredicate predicate);
 
-		void BootFibers(size_t supportFiberStackSizeInBytes = 32768u, size_t fiberStackSizeInBytes = 524288u);
+	// ---------------------------------------------------
+
+	protected:
+		void ResumeOnCaller(PlatformFiber fiber);
+
+		void BootFibers(size_t supportStackBytes = 32768u, size_t stackBytes = 524288u);
 
 		//!	Binds this @ref JobExecutor as the active context on the calling thread.
 		/*!	@see @ref GetExecutor */
-		void SetActive();
+		void SetActive() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -171,14 +194,14 @@ namespace Eldritch2 { namespace Scheduling {
 		// - DATA MEMBERS ------------------------------------
 
 	protected:
-		ArrayList<JobClosure>            _jobs;
-		ArrayList<SuspendedJob>          _suspendedJobs;
-		ArrayList<Detail::PlatformFiber> _pooledFibers;
-		Detail::PlatformFiber            _bootFiber;
-		Detail::PlatformFiber            _waitFiber;
-		Detail::PlatformFiber            _switchFiber;
-		Detail::PlatformFiber            _transitionTarget;
-		SuspendedJob                     _transitionSource;
+		ArrayList<JobClosure>    _jobs;
+		ArrayList<SuspendedJob>  _suspendedJobs;
+		ArrayList<PlatformFiber> _pooledFibers;
+		PlatformFiber            _bootFiber;
+		PlatformFiber            _waitFiber;
+		PlatformFiber            _switchFiber;
+		PlatformFiber            _transitionTarget;
+		SuspendedJob             _transitionSource;
 	};
 
 	// ---------------------------------------------------

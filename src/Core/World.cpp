@@ -12,120 +12,56 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Scheduling/JobExecutor.hpp>
-#include <Assets/PackageDatabase.hpp>
-#include <Core/Engine.hpp>
 #include <Core/World.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Core {
 
 	using namespace ::Eldritch2::Scheduling;
-	using namespace ::Eldritch2::Scripting;
-	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
 
-	namespace {
+	// ---------------------------------------------------
 
-		enum : size_t {
-			HighParallelismSplit = 1u,
-			LowParallelismSplit  = 2u
-		};
-
-		// ---
-
-		ETInlineHint ETForceInlineHint ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime microseconds) ETNoexceptHint {
-			return AsFloat(microseconds) / /*microseconds per millisecond*/ 1000.0f;
-		}
-
-	} // anonymous namespace
-
-	World::World(const ObjectLocator& services) :
-		_allocator("World Root Allocator"),
-		_services(services),
-		_shouldShutDown(false),
-		_pauseCounter(0u),
-		_timeAccumulator(/*default fixed tick framerate*/ 60u, 1.0f),
-		_components(MallocAllocator("World Services Collection Allocator")) {
-		_services.PublishService<World>(*this);
+	AbstractWorld::AbstractWorld(const ObjectInjector& services) ETNoexceptHint : _services(services),
+																				  _shouldShutDown(false),
+																				  _pauseCounter(0u),
+																				  _timeAccumulator(/*targetFrameRateInHz =*/60u, /*timeScale =*/1.0f) {
+		// FIXME: This needs to go in a dedicated bind function, it can violate function noexcept contract.
+		_services.PublishService(_timeAccumulator);
+		_services.PublishService(*this);
 	}
 
 	// ---------------------------------------------------
 
-	void World::Tick(JobExecutor& executor) {
+	void AbstractWorld::Tick(JobExecutor& executor) ETNoexceptHint {
 		//	Avoid spiral of death by capping the number of fixed-rate ticks that can be run per main loop invocation.
 		enum : uint32 { MaxFixedTicksPerInvocation = 3 };
 
 		/*	Execute a variable-rate tick exactly once per main loop iteration. Variable-rate ticks handle real-time
 		 *	update tasks like rendering to the screen, mixing sound or polling the network. */
 		Stopwatch timer;
-		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [this](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-			component->OnVariableRateTick(executor, _timeAccumulator.GetTickDurationInMicroseconds(), _timeAccumulator.GetResidualBlendFactor());
-		});
+		VariableTick(executor, _timeAccumulator.GetTickDurationInMicroseconds(), _timeAccumulator.GetResidualBlendFactor());
 
 		/*	Execute fixed-rate ticks until we are caught up with the real-time clock or no longer have enough time left to account
 		 *	for a full frame. The residual time will be carried over into the next @ref World::Tick() invocation(s). */
-		for (uint32 tick(0u); IsRunning() && tick < MaxFixedTicksPerInvocation; ++tick) {
-			if (ShouldRun()) {
-				_timeAccumulator.AddWallTime(timer.GetDurationAndZero());
+		for (uint32 tick(0u); ShouldExecute() && tick < MaxFixedTicksPerInvocation; ++tick) {
+			if (ShouldSimulate()) {
+				_timeAccumulator.AddWallTime(AsMicroseconds(timer.GetDurationAndZero()));
 			}
-			if (!_timeAccumulator.ShouldTick()) {
+
+			if (!_timeAccumulator.ShouldSimulate()) {
 				break;
 			}
 
-			const MicrosecondTime delta(_timeAccumulator.GetTickDurationInMicroseconds());
 			_timeAccumulator.DeductTime();
-
-			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [delta](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-				component->OnFixedRateTickEarly(executor, delta);
-			});
-			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [delta](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-				component->OnFixedRateTick(executor, delta);
-			});
-			executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [delta](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-				component->OnFixedRateTickLate(executor, delta);
-			});
-		}
-	}
-
-	// ---------------------------------------------------
-
-	ErrorCode World::BindResources(JobExecutor& executor) {
-		Stopwatch timer;
-		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-			component->BindResourcesEarly(executor);
-		});
-		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-			component->BindResources(executor);
-		});
-
-		if (ShouldShutDown()) {
-			//	Components indicate unsuccessful initialization by requesting that the world shut down.
-			return Error::Unspecified;
-		}
-
-		_log.Write(Severity::Message, "Initialized world {} in {:.2f}ms." ET_NEWLINE, fmt::ptr(this), AsMilliseconds(timer.GetDuration()));
-		return Error::None;
-	}
-
-	// ---------------------------------------------------
-
-	void World::FreeResources(JobExecutor& executor) {
-		executor.ForEach<HighParallelismSplit>(_components.Begin(), _components.End(), [](JobExecutor& executor, UniquePointer<WorldComponent>& component) {
-			component->FreeResources(executor);
-		});
-
-		_components.Clear(ReleaseMemorySemantics());
-	}
-
-	// ---------------------------------------------------
-
-	void World::SetShouldShutDown(bool andEngine) const {
-		_shouldShutDown.store(true, std::memory_order_release);
-		if (andEngine) {
-			_services.Find<Engine>()->SetShouldShutDown();
+			FixedTick(executor, _timeAccumulator.GetTickDurationInMicroseconds());
 		}
 	}
 

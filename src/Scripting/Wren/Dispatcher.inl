@@ -25,51 +25,65 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---
 
-	ETConstexpr ETInlineHint ETForceInlineHint ScriptEvent::ScriptEvent(Time when, WrenHandle* receiver) ETNoexceptHint : when(when), receiver(receiver) {}
+	ETConstexpr ETInlineHint ETForceInlineHint ScriptEvent::ScriptEvent(GameTime when, WrenHandle* receiver) ETNoexceptHint : when(when), receiver(receiver) {}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint ScriptEvent::ScriptEvent(ScriptEvent&& event) ETNoexceptHint : when(event.when), receiver(eastl::exchange(event.receiver, nullptr)) {}
+	ETInlineHint ETForceInlineHint ScriptEvent::ScriptEvent(ScriptEvent&& event) ETNoexceptHint : when(event.when), receiver(Exchange(event.receiver, nullptr)) {}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint bool ScriptEvent::ShouldDispatch(Time now) const ETNoexceptHint {
+	ETInlineHint ETForceInlineHint bool ScriptEvent::ShouldDispatch(GameTime now) const ETNoexceptHint {
 		return when <= now;
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint ScriptEvent::Time Dispatcher::GetNow() const ETNoexceptHint {
-		return AsScriptTime(_gameTime);
+	ETInlineHint ETForceInlineHint ScriptEvent& ScriptEvent::operator=(ScriptEvent&& rhs) ETNoexceptHint {
+		using ::Eldritch2::Swap;
+
+		Swap(when, rhs.when);
+		Swap(receiver, rhs.receiver);
+
+		return *this;
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint MicrosecondTime Dispatcher::SetGameTime(MicrosecondTime microseconds) ETNoexceptHint {
-		return eastl::exchange(_gameTime, microseconds);
+	ETConstexpr ETInlineHint ETForceInlineHint GameTime Dispatcher::GetNow() const ETNoexceptHint {
+		return AsGameTime(_gameTime);
+	}
+
+	// ---------------------------------------------------
+
+	ETCpp14Constexpr ETInlineHint ETForceInlineHint MicrosecondTime Dispatcher::SetGameTime(MicrosecondTime microseconds) ETNoexceptHint {
+		return Exchange(_gameTime, microseconds);
 	}
 
 	// ---------------------------------------------------
 
 	ETConstexpr ETInlineHint ETForceInlineHint double Dispatcher::GetTimeScalar() const ETNoexceptHint {
-		return _timeScalar;
+		return _targetTimeScalar;
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint double Dispatcher::SetTimeScalar(double value) ETNoexceptHint {
-		return eastl::exchange(_timeScalar, value);
+	ETCpp14Constexpr ETInlineHint ETForceInlineHint double Dispatcher::SetTimeScalar(double value) ETNoexceptHint {
+		const double _(_targetTimeScalar);
+		_targetTimeScalar = value;
+
+		return _;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void Dispatcher::CallAtGameTime(ScriptEvent::Time when, WrenHandle* receiver) {
+	ETInlineHint ETForceInlineHint void Dispatcher::CallAtGameTime(GameTime when, WrenHandle* receiver) {
 		_events.Emplace(when, receiver);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint void Dispatcher::CallOnDelay(ScriptEvent::Time delay, WrenHandle* receiver) {
+	ETInlineHint ETForceInlineHint void Dispatcher::CallOnDelay(GameTime delay, WrenHandle* receiver) {
 		CallAtGameTime(GetNow() + delay, receiver);
 	}
 
@@ -87,7 +101,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator<(const ScriptEvent& lhs, const ScriptEvent& rhs) ETNoexceptHint {
+	ETConstexpr ETForceInlineHint ETPureFunctionHint bool operator<(const ScriptEvent& lhs, const ScriptEvent& rhs) ETNoexceptHint {
 		/*	The comparison ordering here is somewhat unintutitive at first; conceptually we want the list ordered by ascending dispatch time such that events scheduled
 		 *	to complete sooner sort before those completing later. However, the semantics of @ref PriorityQueue mean that a call to Top() returns the element with greatest
 		 *	priority, i.e. with smallest timestamp. Naive semantics result in the exact opposite invariant; the elements with the greatest timestamp will be returned before
@@ -97,14 +111,38 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint ScriptEvent::Time AsScriptTime(MicrosecondTime when) ETNoexceptHint {
-		return ScriptEvent::Time(when / MicrosecondsPerTick);
+	ETConstexpr ETForceInlineHint ETPureFunctionHint GameTime operator+(GameTime lhs, GameTime rhs) ETNoexceptHint {
+		return GameTime(uint64(lhs) + uint64(rhs));
 	}
 
 	// ---------------------------------------------------
 
-	ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint MicrosecondTime AsMicroseconds(ScriptEvent::Time when) ETNoexceptHint {
-		return when * MicrosecondsPerTick;
+	ETConstexpr ETForceInlineHint ETPureFunctionHint GameTime operator-(GameTime lhs, GameTime rhs) ETNoexceptHint {
+		return GameTime(uint64(lhs) - uint64(rhs));
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint ETPureFunctionHint GameTime& operator+=(GameTime& lhs, GameTime rhs) ETNoexceptHint {
+		return lhs = (lhs + rhs);
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint ETPureFunctionHint GameTime& operator-=(GameTime& lhs, GameTime rhs) ETNoexceptHint {
+		return lhs = (lhs - rhs);
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint GameTime AsGameTime(MicrosecondTime when) ETNoexceptHint {
+		return GameTime(uint64(when) / MicrosecondsPerTick);
+	}
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint MicrosecondTime AsMicrosecondTime(GameTime when) ETNoexceptHint {
+		return MicrosecondTime(uint64(when) * MicrosecondsPerTick);
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

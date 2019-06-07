@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-//	(6340) Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
+//	(6340) Valve has a few mismatches in their printf specifiers, disable the warning.
 ET_PUSH_MSVC_WARNING_STATE(disable : 6340)
 #include <isteamclient.h>
 ET_POP_MSVC_WARNING_STATE()
@@ -34,9 +34,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		// ---------------------------------------------------
 
 	public:
-		StringView GetName() const ETNoexceptHint;
+		StringSpan GetName() const ETNoexceptHint;
 
-		void SetName(StringView name) ETNoexceptHint;
+		void SetName(StringSpan name) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -46,10 +46,10 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(HSteamPipe pipe, EAccountType type);
-		ErrorCode BindResources(HSteamPipe pipe);
+		Result BindResources(HSteamPipe pipe, EAccountType type);
+		Result BindResources(HSteamPipe pipe);
 
-		void FreeResources(HSteamPipe pipe);
+		void FreeResources(HSteamPipe pipe) ETNoexceptHint;
 
 		// ---------------------------------------------------
 

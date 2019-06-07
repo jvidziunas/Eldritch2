@@ -25,6 +25,20 @@ namespace Scripting { namespace Wren {
 }} // namespace Scripting::Wren
 } // namespace Eldritch2
 
+#define ET_TERMINATE_WORLD_IF(cond, ...)                    \
+	if ((cond)) {                                           \
+		__VA_ARGS__;                                        \
+		Inject<Core::AbstractWorld>()->SetShouldShutDown(); \
+		return;                                             \
+	}
+#define ET_TERMINATE_WORLD_UNLESS(cond, ...)                \
+	if (!(cond)) {                                          \
+		__VA_ARGS__;                                        \
+		Inject<Core::AbstractWorld>()->SetShouldShutDown(); \
+		return;                                             \
+	}
+#define ET_TERMINATE_WORLD_IF_FAILED(cond, ...) ET_TERMINATE_WORLD_IF(Failed(cond), __VA_ARGS__)
+
 namespace Eldritch2 { namespace Core {
 
 	class ETPureAbstractHint WorldComponent {
@@ -32,48 +46,50 @@ namespace Eldritch2 { namespace Core {
 
 	public:
 		//!	Constructs this @ref WorldComponent instance.
-		WorldComponent(const ObjectLocator& services) ETNoexceptHint;
+		WorldComponent(const ObjectInjector& services) ETNoexceptHint;
 		//!	Disable copy construction.
 		WorldComponent(const WorldComponent&) = delete;
+		//!	Constructs this @ref WorldComponent instance.
+		WorldComponent(WorldComponent&&) ETNoexceptHint = default;
 
 		~WorldComponent() = default;
 
 		// - WORLD COMPONENT SANDBOX METHODS -----------------
 
 	public:
-		virtual void BindResourcesEarly(Scheduling::JobExecutor& executor);
+		virtual void BindResourcesEarly(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
-		virtual void BindResources(Scheduling::JobExecutor& executor);
+		virtual void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
-		virtual void FreeResources(Scheduling::JobExecutor& executor);
+		virtual void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		// - WORLD COMPONENT SANDBOX METHODS -----------------
 
 	public:
-		virtual void OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction);
+		virtual void OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction) ETNoexceptHint;
 
-		virtual void OnFixedRateTickEarly(Scheduling::JobExecutor& executor, MicrosecondTime delta);
+		virtual void OnFixedRateTickEarly(Scheduling::JobExecutor& executor, MicrosecondTime delta) ETNoexceptHint;
 
-		virtual void OnFixedRateTick(Scheduling::JobExecutor& executor, MicrosecondTime delta);
+		virtual void OnFixedRateTick(Scheduling::JobExecutor& executor, MicrosecondTime delta) ETNoexceptHint;
 
-		virtual void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime delta);
+		virtual void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime delta) ETNoexceptHint;
 
 		// - WORLD COMPONENT SANDBOX METHODS -----------------
 
 	public:
 		//! Interested service classes should override this method in order to participate in script API setup.
-		/*!	@param[in] registrar @parblock @ref Scripting::Wren::ApiBuilder that will handle publishing the service's types,
+		/*!	@param[in] @parblock @ref Scripting::Wren::ApiBuilder that will handle publishing the service's types,
 				methods and variables to scripts. @endparblock
 			@remark The default implementation does nothing. */
-		virtual void DefineScriptApi(Scripting::Wren::ApiBuilder& api);
+		virtual void PublishApi(Scripting::Wren::ApiBuilder&);
 
-		virtual void PublishServices(ObjectLocator& services);
+		virtual void PublishApi(ObjectInjector&);
 
 		// - WORLD SERVICE DISCOVERY -------------------------
 
 	protected:
-		template <typename ServiceType>
-		ServiceType* FindService() const;
+		template <typename Service>
+		Service* Inject() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -83,7 +99,7 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const ObjectLocator* _services;
+		const ObjectInjector* _services;
 	};
 
 }} // namespace Eldritch2::Core

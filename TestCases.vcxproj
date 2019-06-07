@@ -225,7 +225,7 @@
     <ClCompile Include="src\Audio\XAudio2\Xaudio2WorldComponent.WrenScriptApi.cpp" />
     <ClCompile Include="src\Build.cpp" />
     <ClCompile Include="src\Common\Assert.cpp" />
-    <ClCompile Include="src\Common\ObjectLocator.cpp" />
+    <ClCompile Include="src\Common\ObjectInjector.cpp" />
     <ClCompile Include="src\Common\Containers\AbstractString.cpp" />
     <ClCompile Include="src\Common\Containers\ArrayList.cpp" />
     <ClCompile Include="src\Common\Containers\IntrusiveConcurrentQueue.cpp" />
@@ -242,7 +242,7 @@
     <ClCompile Include="src\Common\Memory\MallocAllocator.cpp" />
     <ClCompile Include="src\Common\Memory\NullAllocator.cpp" />
     <ClCompile Include="src\Common\Memory\Win32HeapAllocator.cpp" />
-    <ClCompile Include="src\Common\Mpl\Matrices.cpp" />
+    <ClCompile Include="src\Common\Mpl\Matrix.cpp" />
     <ClCompile Include="src\Common\RuleDatabase.cpp" />
     <ClCompile Include="src\Common\Sort.cpp" />
     <ClCompile Include="src\Common\Stopwatch.cpp" />
@@ -252,7 +252,7 @@
     <ClCompile Include="src\Core\Engine.ManagementComponent.cpp" />
     <ClCompile Include="src\Core\EngineComponent.cpp" />
     <ClCompile Include="src\Core\PropertyDatabase.cpp" />
-    <ClCompile Include="src\Core\PropertyRegistrar.cpp" />
+    <ClCompile Include="src\Core\PropertyApiBuilder.cpp" />
     <ClCompile Include="src\Core\TimeAccumulator.cpp" />
     <ClCompile Include="src\Core\World.cpp" />
     <ClCompile Include="src\Core\World.ManagementComponent.cpp" />
@@ -278,7 +278,7 @@
     <ClCompile Include="src\Networking\Steamworks\SteamTools.cpp" />
     <ClCompile Include="src\Networking\Steamworks\SteamworksEngineComponent.cpp" />
     <ClCompile Include="src\Networking\Steamworks\SteamworksWorldComponent.cpp" />
-    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureAsset.cpp" />
+    <ClCompile Include="src\Physics\PhysX\AssetViews\ArmatureDefinitionAsset.cpp" />
     <ClCompile Include="src\Physics\PhysX\AssetViews\PhysicsAsset.cpp" />
     <ClCompile Include="src\Physics\PhysX\AssetViews\TerrainAsset.cpp" />
     <ClCompile Include="src\Physics\PhysX\CpuDispatcher.cpp" />
@@ -398,7 +398,7 @@
     <None Include="src\Assets\PackageProvider.inl" />
     <None Include="src\Common\Algorithms.inl" />
     <None Include="src\Common\Assert.inl" />
-    <None Include="src\Common\ObjectLocator.inl" />
+    <None Include="src\Common\ObjectInjector.inl" />
     <None Include="src\Common\Cache.inl" />
     <None Include="src\Common\ComPointer.inl" />
     <None Include="src\Common\Containers\AbstractString.inl" />
@@ -443,7 +443,7 @@
     <None Include="src\Common\Memory\TrackingAllocatorMixin.inl" />
     <None Include="src\Common\Mpl\Angle.inl" />
     <None Include="src\Common\Mpl\CharTypes.inl" />
-    <None Include="src\Common\Mpl\Matrices.inl" />
+    <None Include="src\Common\Mpl\Matrix.inl" />
     <None Include="src\Common\Mpl\Vectors.inl" />
     <None Include="src\Common\Result.inl" />
     <None Include="src\Common\RuleDatabase.inl" />
@@ -454,7 +454,7 @@
     <None Include="src\Core\Engine.inl" />
     <None Include="src\Core\EngineComponent.inl" />
     <None Include="src\Core\IniParser.inl" />
-    <None Include="src\Core\PropertyRegistrar.inl" />
+    <None Include="src\Core\PropertyApiBuilder.inl" />
     <None Include="src\Core\TimeAccumulator.inl" />
     <None Include="src\Core\World.inl" />
     <None Include="src\Core\WorldComponent.inl" />

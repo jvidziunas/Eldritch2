@@ -1,0 +1,14 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define ETConstexpr constexpr
+#define ETCpp14Constexpr constexpr
+#define ETNoexceptHint noexcept
+#define ETNoexceptHintIf(...) noexcept(__VA_ARGS__)
+#define ETAddressOf(value) __builtin_addressof(value)
+#define ETInfiniteLoop for(;;)
+#define ETInlineHint inline
+#define ETForceInlineHint __forceinline
+#define ETPureAbstractHint
+#define ET_TEMPLATE_SFINAE(...) typename = eastl::enable_if_t<__VA_ARGS__>
+#define ET_PROFILE_SCOPE(a, b, c)

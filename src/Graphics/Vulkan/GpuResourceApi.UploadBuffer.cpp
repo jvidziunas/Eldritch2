@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -16,8 +22,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	UploadBuffer::UploadBuffer(UploadBuffer&& buffer) :
-		UploadBuffer() {
+	UploadBuffer::UploadBuffer(UploadBuffer&& buffer) ETNoexceptHint : UploadBuffer() {
 		Swap(*this, buffer);
 	}
 
@@ -28,7 +33,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		return GpuBuffer::BindResources(
 			gpu,
-			VkBufferCreateInfo {
+			VkBufferCreateInfo{
 				VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 				/*pNext =*/nullptr,
 				/*flags =*/0u,
@@ -38,7 +43,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				/*queueFamilyIndexCount =*/0u,    // Exclusive sharing.
 				/*pQueueFamilyIndices =*/nullptr, // Exclusive sharing.
 			},
-			VmaAllocationCreateInfo {
+			VmaAllocationCreateInfo{
 				VMA_ALLOCATION_CREATE_MAPPED_BIT,
 				VMA_MEMORY_USAGE_CPU_ONLY,
 				/*requiredFlags =*/InferFromUsage,
@@ -50,8 +55,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(UploadBuffer& lhs, UploadBuffer& rhs) {
-		Swap(static_cast<GpuBuffer&>(lhs), rhs);
+	void Swap(UploadBuffer& lhs, UploadBuffer& rhs) ETNoexceptHint {
+		Swap(static_cast<GpuBuffer&>(lhs), static_cast<GpuBuffer&>(rhs));
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

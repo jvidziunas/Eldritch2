@@ -9,20 +9,27 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Common/FileAppender.hpp>
 #include <Common/Algorithms.hpp>
-#include <Common/ErrorCode.hpp>
+#include <Common/Result.hpp>
 //------------------------------------------------------------------//
 #include <Windows.h>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
+
 namespace {
 
-	ETInlineHint ETForceInlineHint HANDLE MakeAppender(const wchar_t* const path, DWORD creationDisposition) ETNoexceptHint {
-		return CreateFileW(path, FILE_APPEND_DATA, FILE_SHARE_READ, nullptr, creationDisposition, FILE_FLAG_POSIX_SEMANTICS, nullptr);
+	ETInlineHint ETForceInlineHint HANDLE MakeAppender(const wchar_t* const path, DWORD disposition) ETNoexceptHint {
+		return CreateFileW(path, FILE_APPEND_DATA, FILE_SHARE_READ, nullptr, disposition, FILE_FLAG_POSIX_SEMANTICS, nullptr);
 	}
 
 } // anonymous namespace
@@ -47,58 +54,51 @@ FileAppender::~FileAppender() {
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::Append(const void* const sourceData, size_t lengthToWriteInBytes) ETNoexceptHint {
-	DWORD writtenLengthInBytes;
-
-	return WriteFile(_file, sourceData, DWORD(lengthToWriteInBytes), ETAddressOf(writtenLengthInBytes), nullptr) != FALSE ? Error::None : Error::Unspecified;
+Result FileAppender::Append(const void* const bytes, size_t byteSize) ETNoexceptHint {
+	DWORD writtenBytes;
+	return WriteFile(_file, bytes, DWORD(byteSize), ETAddressOf(writtenBytes), nullptr) != FALSE ? Result::Success : Result::Unspecified;
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::CreateOrTruncate(const PlatformChar* path) ETNoexceptHint {
+Result FileAppender::CreateOrTruncate(const PlatformChar* path) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
 	HANDLE file(MakeAppender(path, CREATE_ALWAYS));
-	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Result::Success : Result::InvalidPath);
+	ET_AT_SCOPE_EXIT(if (file != INVALID_HANDLE_VALUE) CloseHandle(file));
 
 	Swap(_file, file);
-	if (file != INVALID_HANDLE_VALUE) {
-		CloseHandle(file);
-	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::OpenOrCreate(const PlatformChar* path) ETNoexceptHint {
+Result FileAppender::OpenOrCreate(const PlatformChar* path) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
 	HANDLE file(MakeAppender(path, OPEN_ALWAYS));
-	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Result::Success : Result::InvalidPath);
+	ET_AT_SCOPE_EXIT(if (file != INVALID_HANDLE_VALUE) CloseHandle(file));
 
 	Swap(_file, file);
-	if (file != INVALID_HANDLE_VALUE) {
-		CloseHandle(file);
-	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileAppender::Open(const PlatformChar* path) ETNoexceptHint {
+Result FileAppender::Open(const PlatformChar* path) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
 	HANDLE file(MakeAppender(path, OPEN_EXISTING));
-	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Result::Success : Result::InvalidPath);
+	ET_AT_SCOPE_EXIT(if (file != INVALID_HANDLE_VALUE) CloseHandle(file));
 
 	Swap(_file, file);
-	if (file != INVALID_HANDLE_VALUE) {
-		CloseHandle(file);
-	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------

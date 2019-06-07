@@ -20,8 +20,7 @@ namespace Eldritch2 {
 namespace Detail {
 
 	template <typename Value>
-	ETInlineHint ETForceInlineHint ValueRange<Value>::ValueRange(Value begin, Value end) ETNoexceptHint : begin(begin),
-																										  end(end) {}
+	ETInlineHint ETForceInlineHint ValueRange<Value>::ValueRange(Value begin, Value end) ETNoexceptHint : begin(begin), end(end) {}
 
 	// ---------------------------------------------------
 
@@ -68,7 +67,7 @@ namespace Detail {
 } // namespace Detail
 
 template <typename Identifier, class Allocator>
-ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator, std::initializer_list<RangeType> ranges) :
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator, InitializerList<RangeType> ranges) :
 	IdentifierPool(allocator) {
 	Assign(ranges);
 }
@@ -84,8 +83,7 @@ ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::Identifier
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator) :
-	_ranges(allocator) {}
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>::IdentifierPool(const AllocatorType& allocator) ETNoexceptHint : _ranges(allocator) {}
 
 // ---------------------------------------------------
 
@@ -118,7 +116,7 @@ ETInlineHint ETForceInlineHint Pair<typename IdentifierPool<Identifier, Allocato
 
 template <typename Identifier, class Allocator>
 ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Deallocate(ValueType id) {
-	return this->Deallocate({ id, id + ValueType(1) });
+	return IdentifierPool<Identifier, Allocator>::Deallocate(RangeType(id, id + ValueType(1)));
 }
 
 // ---------------------------------------------------
@@ -232,7 +230,7 @@ ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Deall
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Clear() {
+ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Clear() ETNoexceptHint {
 	_ranges.Clear();
 }
 
@@ -240,15 +238,13 @@ ETInlineHint ETForceInlineHint void IdentifierPool<Identifier, Allocator>::Clear
 
 template <typename Identifier, class Allocator>
 ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>& IdentifierPool<Identifier, Allocator>::Assign(ValueType begin, ValueType end) {
-	_ranges.Clear();
-	_ranges.EmplaceBack(begin, end);
-	return *this;
+	return IdentifierPool<Identifier, Allocator>::Assign({ RangeType(begin, end) });
 }
 
 // ---------------------------------------------------
 
 template <typename Identifier, class Allocator>
-ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>& IdentifierPool<Identifier, Allocator>::Assign(std::initializer_list<RangeType> ranges) {
+ETInlineHint ETForceInlineHint IdentifierPool<Identifier, Allocator>& IdentifierPool<Identifier, Allocator>::Assign(InitializerList<RangeType> ranges) {
 	_ranges.Clear();
 	_ranges.Assign(ranges);
 	return *this;
@@ -266,7 +262,7 @@ ETInlineHint ETForceInlineHint bool IdentifierPool<Identifier, Allocator>::IsEmp
 template <typename Identifier, class Allocator>
 ETInlineHint ETForceInlineHint typename IdentifierPool<Identifier, Allocator>::ValueType IdentifierPool<Identifier, Allocator>::GetLargestRange() const ETNoexceptHint {
 	return Reduce(_ranges.Begin(), _ranges.End(), [](const RangeType& range, typename RangeList::SizeType longest) ETNoexceptHint {
-		return Max(range.GetSize(), longest);
+		return Maximum(range.GetSize(), longest);
 	});
 }
 

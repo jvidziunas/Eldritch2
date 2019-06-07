@@ -22,18 +22,22 @@ class Queue {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using ContainerType = Container;
-	using AllocatorType = typename ContainerType::AllocatorType;
-	using SizeType      = typename ContainerType::SizeType;
-	using ValueType     = typename ContainerType::ValueType;
+	using ContainerType  = Container;
+	using ValueType      = typename ContainerType::ValueType;
+	using ConstPointer   = typename ContainerType::ConstPpointer;
+	using Pointer        = typename ContainerType::Pointer;
+	using ConstReference = typename ContainerType::ConstReference;
+	using Reference      = typename ContainerType::Reference;
+	using AllocatorType  = typename ContainerType::AllocatorType;
+	using SizeType       = typename ContainerType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref Queue instance.
-	Queue(const AllocatorType& allocator, const Queue&);
-	//!	Constructs this @ref Queue instance.
 	Queue(const AllocatorType& allocator = AllocatorType());
+	//!	Constructs this @ref Queue instance.
+	Queue(const AllocatorType& allocator, const Queue&);
 	//!	Constructs this @ref Queue instance.
 	Queue(const Queue&) = default;
 	//!	Constructs this @ref Queue instance.
@@ -56,6 +60,7 @@ public:
 	void Push(const ValueType& value);
 	void Push(ValueType&& value);
 
+	void Pop(ValueType& outValue);
 	void Pop();
 
 	// - CONTAINER MANIPULATION --------------------------

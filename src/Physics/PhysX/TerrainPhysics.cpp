@@ -8,6 +8,11 @@
   ©2010-2016 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
+//==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
 
 //==================================================================//
 // INCLUDES
@@ -17,16 +22,11 @@
 #include <PxRigidStatic.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Physics {
-		namespace PhysX {
+namespace Eldritch2 { namespace Physics { namespace PhysX {
 
-			using namespace ::physx;
+	using namespace ::physx;
 
-			TerrainPhysics::TerrainPhysics(PhysxPointer<PxRigidStatic> actor) : _actor(eastl::move(actor)) {
-				_actor->userData = this;
-			}
-
-		}	// namespace PhysX
-	}	// namespace Physics
-}	// namespace Eldritch2
+	TerrainPhysics::TerrainPhysics(PhysxPointer<PxRigidStatic> actor) ETNoexceptHint : _actor(Move(actor)) {
+		_actor->userData = this;
+	}
+}}} // namespace Eldritch2::Physics::PhysX

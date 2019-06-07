@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -17,32 +23,40 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	Mesh::Mesh() ETNoexceptHint : _vertices(VK_NULL_HANDLE), _indices(VK_NULL_HANDLE), _verticesOffset(0u), _indicesOffset(0u), _verticesSize(0u), _indicesSize(0u) {}
+	namespace {
+
+		enum : VkDeviceSize {
+			InvalidOffset = ~VkDeviceSize(0u),
+			InvalidSize   = VkDeviceSize(0u),
+		};
+
+	} // anonymous namespace
+
+	Mesh::Mesh() ETNoexceptHint : _vertices(nullptr), _indices(nullptr), _verticesOffset(InvalidOffset), _indicesOffset(InvalidOffset), _verticesSize(InvalidSize), _indicesSize(InvalidSize) {}
 
 	// ---------------------------------------------------
 
-	Mesh::Mesh(Mesh&& mesh) :
-		Mesh() {
+	Mesh::Mesh(Mesh&& mesh) ETNoexceptHint : Mesh() {
 		Swap(*this, mesh);
 	}
 
 	// ---------------------------------------------------
 
-	VkResult Mesh::BindResources(VertexCache& cache, VkDeviceSize verticesSize, VkDeviceSize indicesSize) {
+	VkResult Mesh::BindResources(GeometryCache& cache, const MeshDescriptor& description) {
 		using ::Eldritch2::Swap;
 
-		VkDeviceSize vertexOffset;
-		ET_ABORT_UNLESS(cache.AllocateVertices(vertexOffset, verticesSize));
-		ET_AT_SCOPE_EXIT(cache.DeallocateVertices(vertexOffset, verticesSize));
-
-		VkDeviceSize indexOffset;
+		VkDeviceSize indexOffset, indicesSize(description.streamSizes[0]);
 		ET_ABORT_UNLESS(cache.AllocateIndices(indexOffset, indicesSize));
 		ET_AT_SCOPE_EXIT(cache.DeallocateIndices(indexOffset, indicesSize));
 
-		Swap(_verticesOffset, vertexOffset);
+		VkDeviceSize vertexOffset, verticesSize(description.streamSizes[1]);
+		ET_ABORT_UNLESS(cache.AllocateVertices(vertexOffset, verticesSize));
+		ET_AT_SCOPE_EXIT(cache.DeallocateVertices(vertexOffset, verticesSize));
+
 		Swap(_indicesOffset, indexOffset);
-		Swap(_verticesSize, verticesSize);
+		Swap(_verticesOffset, vertexOffset);
 		Swap(_indicesSize, indicesSize);
+		Swap(_verticesSize, verticesSize);
 		_vertices = cache.GetVertexBuffer();
 		_indices  = cache.GetIndexBuffer();
 
@@ -51,9 +65,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Mesh::FreeResources(VertexCache& cache) {
-		cache.DeallocateVertices(eastl::exchange(_verticesOffset, 0u), eastl::exchange(_verticesSize, 0u));
-		cache.DeallocateIndices(eastl::exchange(_indicesOffset, 0u), eastl::exchange(_indicesSize, 0u));
+	void Mesh::FreeResources(GeometryCache& cache) {
+		cache.DeallocateVertices(Exchange(_verticesOffset, InvalidOffset), Exchange(_verticesSize, InvalidSize));
+		cache.DeallocateIndices(Exchange(_indicesOffset, InvalidOffset), Exchange(_indicesSize, InvalidSize));
 		_vertices = VK_NULL_HANDLE;
 		_indices  = VK_NULL_HANDLE;
 	}

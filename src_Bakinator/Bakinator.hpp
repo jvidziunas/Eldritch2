@@ -12,25 +12,31 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/ArrayList.hpp>
+#include <Common/Containers/SoaList.hpp>
 #include <Common/Containers/Path.hpp>
+#include <Common/FileReader.hpp>
 #include <Tools/CrtpTool.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-class ErrorCode;
-}
+enum class Result : int;
+} // namespace Eldritch2
 
 namespace Eldritch2 { namespace Tools {
 
 	class Bakinator : public CrtpTool<Bakinator> {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using ExportList = SoaList<Path, FileReader>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		Bakinator(const Bakinator&) = delete;
 		//!	Constructs this @ref Bakinator instance.
-		Bakinator();
+		Bakinator() ETNoexceptHint;
 
 		~Bakinator() = default;
 
@@ -39,7 +45,7 @@ namespace Eldritch2 { namespace Tools {
 	public:
 		void RegisterOptions(OptionRegistrar& options);
 
-		ErrorCode Process();
+		Result Process(Logging::Log& log);
 
 		// ---------------------------------------------------
 
@@ -49,9 +55,9 @@ namespace Eldritch2 { namespace Tools {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<Path> _exports;
-		Path            _indexPath;
-		Path            _blobPath;
+		ExportList _exports;
+		Path       _indexPath;
+		Path       _blobPath;
 	};
 
 }} // namespace Eldritch2::Tools

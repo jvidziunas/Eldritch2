@@ -12,34 +12,36 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/AbstractStringView.hpp>
+#include <Common/Containers/AbstractStringSpan.hpp>
 #include <Common/Mpl/IntTypes.hpp>
 #include <Common/Function.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-enum class KnownDirectory : uint32;
-class ErrorCode;
+
+enum class KnownDirectory : unsigned int;
+enum class Result : int;
+
 } // namespace Eldritch2
 
 namespace Eldritch2 {
 
-enum class CopyMode : uint32 {
+enum class FileCopyMode : bool {
 	SkipIfExists,
 	OverwriteIfExists
 };
 
-ErrorCode ForEachFile(AbstractStringView<PlatformChar> specifier, Function<void(AbstractStringView<PlatformChar> /*path*/) ETNoexceptHint> handler);
+Result ForEachFile(AbstractStringSpan<PlatformChar> specifier, Function<void(AbstractStringSpan<PlatformChar> /*path*/)> handler);
 
-ErrorCode Copy(KnownDirectory destinationDirectory, AbstractStringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, AbstractStringView<PlatformChar> sourcePath, CopyMode mode);
-ErrorCode Copy(KnownDirectory directory, AbstractStringView<PlatformChar> destinationPath, AbstractStringView<PlatformChar> sourcePath, CopyMode mode);
+Result Copy(KnownDirectory destinationDirectory, AbstractStringSpan<PlatformChar> destinationPath, KnownDirectory sourceDirectory, AbstractStringSpan<PlatformChar> sourcePath, FileCopyMode);
+Result Copy(KnownDirectory directory, AbstractStringSpan<PlatformChar> destinationPath, AbstractStringSpan<PlatformChar> sourcePath, FileCopyMode);
 
-ErrorCode Move(KnownDirectory destinationDirectory, AbstractStringView<PlatformChar> destinationPath, KnownDirectory sourceDirectory, AbstractStringView<PlatformChar> sourcePath);
-ErrorCode Move(KnownDirectory directory, AbstractStringView<PlatformChar> destinationPath, AbstractStringView<PlatformChar> sourcePath);
+Result Move(KnownDirectory destinationDirectory, AbstractStringSpan<PlatformChar> destinationPath, KnownDirectory sourceDirectory, AbstractStringSpan<PlatformChar> sourcePath);
+Result Move(KnownDirectory directory, AbstractStringSpan<PlatformChar> destinationPath, AbstractStringSpan<PlatformChar> sourcePath);
 
-ErrorCode EnsureDirectoryExists(KnownDirectory root, AbstractStringView<PlatformChar> path = L"");
+Result EnsureDirectoryExists(KnownDirectory root, AbstractStringSpan<PlatformChar> path = SL(""));
 
-ErrorCode Delete(KnownDirectory directory, AbstractStringView<PlatformChar> path);
+Result Delete(KnownDirectory directory, AbstractStringSpan<PlatformChar> path);
 
 } // namespace Eldritch2
 

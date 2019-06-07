@@ -9,39 +9,39 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scheduling/Win32/FiberJobSystem.hpp>
 //------------------------------------------------------------------//
-#include <Windows.h>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
-	FiberJobSystem::JobThread::JobThread(FiberJobSystem& owner) :
-		JobExecutor(),
-		_owner(ETAddressOf(owner)),
-		_thief(this),
-		_victimSeed(size_t(__rdtsc())),
-		_runBehavior(RunBehavior::Continue),
-		_transferCell(TransferState::Complete),
-		_victim(nullptr) {
-	}
+	FiberJobSystem::JobThread::JobThread(FiberJobSystem& owner) ETNoexceptHint : JobExecutor(),
+																				 _owner(ETAddressOf(owner)),
+																				 _thief(this),
+																				 _victimSeed(size_t(__rdtsc())),
+																				 _runBehavior(RunBehavior::Continue),
+																				 _transferCell(TransferState::Complete),
+																				 _victim(nullptr) {}
 
 	// ---------------------------------------------------
 
-	FiberJobSystem::JobThread::JobThread(const JobThread& thread) :
-		JobThread(*thread._owner) {
-	}
+	FiberJobSystem::JobThread::JobThread(const JobThread& thread) ETNoexceptHint : JobThread(*thread._owner) {}
 
 	// ---------------------------------------------------
 
 	FiberJobSystem::JobThread::~JobThread() {
 		if (_waitFiber) {
-			DeleteFiber(_waitFiber);
+			DestroyPlatformFiber(_waitFiber);
 		}
 		if (_switchFiber) {
-			DeleteFiber(_switchFiber);
+			DestroyPlatformFiber(_switchFiber);
 		}
 	}
 
@@ -62,23 +62,21 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 	// ---------------------------------------------------
 
-	ErrorCode FiberJobSystem::JobThread::EnterOnCaller() {
+	Result FiberJobSystem::JobThread::EnterOnCaller() ETNoexceptHint {
 		BootFibers();
 
-		_bootFiber = ConvertThreadToFiberEx(this, FIBER_FLAG_FLOAT_SWITCH);
-
+		_bootFiber = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
 		//	Client fibers have relinqished execution; time to shut down.
 		while (_pooledFibers) {
 			const PlatformFiber fiber(_pooledFibers.Back());
 			_pooledFibers.Pop();
 
-			SwitchToFiber(fiber);
-			DeleteFiber(_transitionSource.fiber);
-
+			ActivateFiber(fiber);
+			DestroyPlatformFiber(_transitionSource.fiber);
 			//	We will resume here once one of the work fibers receives the quit signal.
 		}
 
-		return ConvertFiberToThread() != FALSE ? Error::None : Error::Unspecified;
+		return ConvertFiberToThread() != FALSE ? Result::Success : Result::Unspecified;
 	}
 
 	// ---------------------------------------------------
@@ -87,7 +85,7 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 		SetActive();
 		_thief.store(nullptr, std::memory_order_release);
 
-		while (ET_LIKELY(_runBehavior.load(std::memory_order_consume) != RunBehavior::Terminate)) {
+		ETInfiniteLoop {
 			/*	Distribute any work (if it remains) to other worker threads as requested. Prefer the expanded load/store
 			 *	over exchange here to avoid false sharing/contention. */
 			if (JobThread* thief = _thief.load(std::memory_order_consume)) {
@@ -95,18 +93,18 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 					thief->StealFrom(*this);
 				}
 			}
+
 			/*	Execute one of the following code paths:
 			 *	1) Complete an outstanding work item.
 			 *	2) Resume a suspended work item.
-			 *	3) Steal work. */
-
+			 *	3) Terminate scheduling loop or steal work. */
 			if (_jobs) { // 1)
 				/*	Work items may suspend and re-enter this function in a different fiber, so it is important that the element be
 				 *	destroyed *before* execution to avoid races. */
-				const JobClosure job(eastl::move(_jobs.Back()));
+				const JobClosure job(Move(_jobs.Back()));
 				_jobs.Pop();
 				job.work(*this);
-				job.completed->fetch_sub(1, std::memory_order_release);
+				job.completedFence->fetch_sub(1, std::memory_order_release);
 
 				continue;
 			}
@@ -115,46 +113,46 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 				//	Locate a closure capable of resuming by evaluating its condition function.
 				/*	Empirically, most stalled work items are jobs waiting for their dependencies to complete in LIFO order. We can exploit this pattern
 				 *	to reduce the number of tests by searching the list of suspended fibers in *reverse* order. */
-				const auto job(FindIf(_suspendedJobs.ReverseBegin(), _suspendedJobs.ReverseEnd(), [](const SuspendedJob& job) { return job.shouldResume(); }));
+				const auto job(FindIf(_suspendedJobs.ReverseBegin(), _suspendedJobs.ReverseEnd(), [](const SuspendedJob& job) ETNoexceptHint {
+					return job.shouldResume();
+				}));
 				if (job != _suspendedJobs.ReverseEnd()) {
-					const Detail::PlatformFiber fiber(job->fiber);
+					const PlatformFiber fiber(job->fiber);
 					_suspendedJobs.EraseUnordered(job);
 
-					SwitchFibers(fiber);
+					ResumeOnCaller(fiber);
 				}
 
 				continue;
 			}
 
 			{ // 3
+				if (ET_UNLIKELY(_runBehavior.load(std::memory_order_consume) == RunBehavior::Terminate)) {
+					break;
+				}
+
 				/*	At this point we have no previously queued work items to complete and no suspended tasks are ready to resume. In the interest of
 				 *	Pareto optimality, find a victim thread and attempt to load balance work across the two threads by way of a steal-half sharing
 				 *	policy. */
 
 				//	Write is not explicitly ordered as transfer cell is only visible to us until we find a victim.
 				_transferCell.store(TransferState::AwaitingTransfer, std::memory_order_relaxed);
-
 				DisableSharing();
+				ET_AT_SCOPE_EXIT(EnableSharing());
 
 				JobThread& victim(_owner->FindVictim(_victimSeed));
 				if (victim.BeginShareWith(*this)) {
 #if ET_ENABLE_JOB_DEBUGGING
 					//	Update the victim value for easier inspection in a debugger.
-					_victim = &victim;
+					_victim = ETAddressOf(victim);
+					ET_AT_SCOPE_EXIT(_victim = nullptr);
 #endif // ET_ENABLE_JOB_DEBUGGING
 
-					//	TO CONSIDER: Timeout?
 					//	Enter idle loop waiting for completion.
-					while (ShouldAwaitTransfer() && victim.GetState() == ExecutionState::Running) {
+					while (ShouldAwaitTransfer() && victim.GetState() == ExecutionState::Running) { //	TO CONSIDER: Timeout?
 						_mm_pause();
 					}
-
-#if ET_ENABLE_JOB_DEBUGGING
-					_victim = nullptr;
-#endif // ET_ENABLE_JOB_DEBUGGING
 				}
-
-				EnableSharing();
 			}
 		}
 
@@ -162,8 +160,8 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 		DisableSharing();
 
 		//	Switch back to the main fiber.
-		_transitionSource.fiber = GetCurrentFiber();
-		SwitchToFiber(_bootFiber);
+		_transitionSource.fiber = GetActiveFiber();
+		ActivateFiber(_bootFiber);
 	}
 
 }}} // namespace Eldritch2::Scheduling::Win32

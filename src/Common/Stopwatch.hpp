@@ -18,40 +18,50 @@
 
 namespace Eldritch2 {
 
-	class Stopwatch {
+class Stopwatch {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
 	//!	Constructs this @ref Stopwatch instance.
-		Stopwatch(CpuTimestamp start);
+	Stopwatch(CpuTimestamp start) ETNoexceptHint;
 	//!	Constructs this @ref Stopwatch instance.
-		Stopwatch(const Stopwatch&);
+	Stopwatch(const Stopwatch&) ETNoexceptHint;
 	//!	Constructs this @ref Stopwatch instance.
-		Stopwatch();
+	Stopwatch() ETNoexceptHint;
 
-		~Stopwatch() = default;
+	~Stopwatch() = default;
 
 	// ---------------------------------------------------
 
-	public:
-		CpuTimestamp	GetDurationAndZero();
+public:
+	CpuTimestamp GetDurationAndZero() ETNoexceptHint;
 
-		CpuTimestamp	GetDuration() const;
+	CpuTimestamp GetDuration() const ETNoexceptHint;
+
+	float32 GetDurationMillisecondsAndZero() ETNoexceptHint;
+
+	float32 GetDurationMilliseconds() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	public:
-		CpuTimestamp	GetStartTimestamp() const;
+public:
+	CpuTimestamp GetStartTimestamp() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	public:
-		Stopwatch & operator=(const Stopwatch&);
+public:
+	Stopwatch& operator=(const Stopwatch&) ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
-	private:
-		Atomic<CpuTimestamp>	_start;
-	};
+private:
+	Atomic<CpuTimestamp> _start;
+};
 
-}	// namespace Eldritch2
+} // namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Common/Stopwatch.inl>
+//------------------------------------------------------------------//

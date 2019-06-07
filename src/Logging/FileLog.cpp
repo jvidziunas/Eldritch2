@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Logging/FileLog.hpp>
@@ -16,33 +22,36 @@
 
 namespace Eldritch2 { namespace Logging {
 
-	FileLog::FileLog() :
-		_appender() {}
+	FileLog::FileLog() ETNoexceptHint {}
 
 	// ---------------------------------------------------
 
 	void FileLog::Write(const Utf8Char* string, size_t lengthInOctets) ETNoexceptHint {
-		_appender.Append(string, lengthInOctets);
+		_sink.Append(string, lengthInOctets);
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode FileLog::BindResources(PlatformStringView path) {
-		const Path   absolutePath(MallocAllocator("Log Path Temporary Allocator"), KnownDirectory::Logs, path);
-		FileAppender appender;
+	Result FileLog::BindResources(PlatformStringSpan sourcePath, StringSpan header) {
+		FileAppender sink;
+		const Path   path(Path::AllocatorType("Log Path Temporary Allocator"), KnownDirectory::Logs, sourcePath);
 
-		ET_ABORT_UNLESS(appender.CreateOrTruncate(absolutePath));
-		Swap(_appender, appender);
+		EnsureDirectoryExists(KnownDirectory::Logs, SL(""));
+		ET_ABORT_UNLESS(sink.CreateOrTruncate(path));
+		Swap(_sink, sink);
 
-		return Error::None;
+		Write(header.GetData(), header.GetSize());
+
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void FileLog::FreeResources() {
-		FileAppender appender;
+	void FileLog::FreeResources(StringSpan footer) ETNoexceptHint {
+		Write(footer.GetData(), footer.GetSize());
 
-		Swap(_appender, appender);
+		FileAppender sink;
+		Swap(_sink, sink);
 	}
 
 }} // namespace Eldritch2::Logging

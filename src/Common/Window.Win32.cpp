@@ -9,18 +9,18 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Win32Tools.hpp>
-#include <Common/Algorithms.hpp>
-#include <Common/ErrorCode.hpp>
-#include <Common/Window.hpp>
-#include <Common/Assert.hpp>
 #include <Build.hpp>
 //------------------------------------------------------------------//
 #include <resources/Eldritch2.Resources.h>
 //------------------------------------------------------------------//
-#include <eastl/utility.h>
 #include <Windows.h>
 #include <process.h>
 //------------------------------------------------------------------//
@@ -29,125 +29,45 @@ namespace Eldritch2 {
 namespace {
 
 	enum : DWORD {
-		WM_CustomClose = WM_USER
+		WM_AllocateWindow = WM_USER,
+		WM_FreeWindow
 	};
 
-	static ETPureFunctionHint ATOM RegisterWindowClass(const wchar_t* className, WNDPROC windowProc) {
-		const HINSTANCE thisInstance(GetModuleByAddress());
-		WNDCLASSEXW     windowClass;
-
-		windowClass.cbSize        = sizeof(WNDCLASSEXW);
-		windowClass.style         = CS_OWNDC;
-		windowClass.lpfnWndProc   = windowProc;
-		windowClass.hInstance     = GetModuleByAddress(reinterpret_cast<void*>(windowProc));
-		windowClass.cbClsExtra    = 0;
-		windowClass.cbWndExtra    = 0;
-		windowClass.hIcon         = static_cast<HICON>(LoadImageW(
-            thisInstance,
-            MAKEINTRESOURCEW(IDI_ICON1),
-            IMAGE_ICON,
-            GetSystemMetrics(SM_CXICON),
-            GetSystemMetrics(SM_CYICON),
-            LR_DEFAULTCOLOR));
-		windowClass.hCursor       = nullptr;
-		windowClass.hbrBackground = nullptr;
-		windowClass.lpszMenuName  = nullptr;
-		windowClass.lpszClassName = className;
-		windowClass.hIconSm       = static_cast<HICON>(LoadImageW(
-            thisInstance,
-            MAKEINTRESOURCEW(IDI_ICON1),
-            IMAGE_ICON,
-            GetSystemMetrics(SM_CXSMICON),
-            GetSystemMetrics(SM_CYSMICON),
-            LR_DEFAULTCOLOR));
-
-		const ATOM result(RegisterClassExW(&windowClass));
-
-		ET_ASSERT(result != 0, "Error registering application window class!");
-
-		return result;
-	}
+	static Atomic<HANDLE> UiThread(nullptr);
+	static Atomic<DWORD>  UiThreadId(0u);
+	static Atomic<bool>   IsActiveApplication(false);
 
 	// ---------------------------------------------------
 
-	static ETPureFunctionHint unsigned int ETStdCall MessageThreadEntryPoint(void* windowPointer) {
-		static const ATOM windowAtom(RegisterWindowClass(L"Eldritch2", [](HWND window, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
-			switch (message) {
-			case WM_SETCURSOR: {
-				if (LOWORD(lParam) == HTCLIENT) {
-					//	Hide the cursor.
-					SetCursor(nullptr);
+	static ETPureFunctionHint ATOM RegisterWindowClass(LPCWSTR name, LPCWSTR icon, WNDPROC windowProc) ETNoexceptHint {
+		const HINSTANCE   instance(GetModuleByAddress());
+		const WNDCLASSEXW windowClass{
+			/*cbSize =*/sizeof(WNDCLASSEXW),
+			/*style =*/CS_OWNDC,
+			/*lpfnWndProc =*/windowProc,
+			/*cbClsExtra =*/0,
+			/*cbWndExtra =*/0,
+			/*hInstance =*/instance,
+			/*hIcon =*/HICON(LoadImageW(instance, icon, IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR)),
+			/*hCursor =*/nullptr,
+			/*hbrBackground =*/nullptr,
+			/*lpszMenuName =*/nullptr,
+			/*lpszClassName =*/name,
+			/*hIconSm =*/HICON(LoadImageW(instance, icon, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR)),
+		};
 
-					return TRUE;
-				}
-			} // case WM_SETCURSOR
-
-				/*	We deliberately ignore the system close event in favor of our custom one (an alias for WM_USER). This is done to avoid
-			 *	the scenario where the user closes the window and the system frees the resources associated with said window while we
-			 *	still need it for use by the renderer, etc.*/
-			case WM_CLOSE: {
-				return 0;
-			} // case WM_CLOSE
-
-			case WM_CustomClose: {
-				PostQuitMessage(int(wParam));
-			}  // case WM_CustomClose
-			}; // switch( message )
-
-			return DefWindowProcW(window, message, wParam, lParam);
-		}));
-
-		// ---
-
-		const HWND window(CreateWindowExW(
-			0L,
-			reinterpret_cast<LPCWSTR>(windowAtom),
-			WPROJECT_NAME,
-			WS_OVERLAPPED,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			0,
-			0,
-			nullptr,
-			nullptr,
-			GetModuleByAddress(nullptr),
-			nullptr));
-
-		//	Publish readiness to the world.
-		static_cast<Atomic<HWND>*>(windowPointer)->store(window, std::memory_order_release);
-		if (!window) {
-			return GetLastError();
-		}
-
-		MSG message;
-		/*	Create the thread message queue. This is done so that the thread can be terminated cleanly with the help of PostThreadMessage() and WM_QUIT.
-		 *	See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644946(v=vs.85).aspx */
-		PeekMessageW(&message, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
-
-		while (GetMessageW(&message, window, 0u, 0u) != 0) {
-			TranslateMessage(&message);
-			DispatchMessageW(&message);
-		}
-
-		DestroyWindow(window);
-
-		/*	This will contain the WPARAM value sent by PostQuitMessage() once we have exited the dispatch loop above.
-		 *	See https://msdn.microsoft.com/en-us/library/windows/desktop/ms644936(v=vs.85).aspx
-		 *	See https://msdn.microsoft.com/en-us/library/windows/desktop/ms644945(v=vs.85).aspx */
-		return message.wParam;
+		return RegisterClassExW(ETAddressOf(windowClass));
 	}
 
 } // anonymous namespace
 
-Window::Window() :
-	_window(nullptr),
-	_messageThread(nullptr) {}
+Window::Window() ETNoexceptHint : _window(nullptr) {}
 
 // ---------------------------------------------------
 
-Window::Window(Window&& window) :
-	_window(eastl::exchange(window._window, nullptr)),
-	_messageThread(eastl::exchange(window._messageThread, nullptr)) {}
+Window::Window(Window&& window) ETNoexceptHint : Window() {
+	Swap(*this, window);
+}
 
 // ---------------------------------------------------
 
@@ -158,113 +78,173 @@ Window::~Window() {
 // ---------------------------------------------------
 
 DisplayMode Window::GetDisplayMode() const {
-	RECT clientArea;
-
-	if (GetClientRect(_window, &clientArea) == FALSE) {
+	RECT area;
+	if (ET_UNLIKELY(GetClientRect(GetHwnd(), ETAddressOf(area)) == FALSE)) {
 		return { _mode, 0, 0 };
 	}
 
-	return { _mode, static_cast<uint16>(clientArea.right - clientArea.left), static_cast<uint16>(clientArea.bottom - clientArea.top) };
+	return { _mode, uint16(area.right - area.left), uint16(area.bottom - area.top) };
 }
 
 // ---------------------------------------------------
 
 void Window::SetDisplayMode(DisplayMode mode) {
-	enum : DWORD {
-		WindowedBehaviors   = SWP_ASYNCWINDOWPOS | SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER,
-		FullscreenBehaviors = SWP_ASYNCWINDOWPOS | SWP_SHOWWINDOW,
-
-		WindowedStyle   = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME,
-		FullscreenStyle = WS_POPUP
+	const DWORD style(mode.mode == FullscreenMode::Windowed ? (WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME) : WS_POPUP);
+	const HWND  parent(mode.mode == FullscreenMode::Windowed ? nullptr : HWND_TOPMOST);
+	const UINT  behaviors(mode.mode == FullscreenMode::Windowed ? (SWP_ASYNCWINDOWPOS | SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER) : (SWP_ASYNCWINDOWPOS | SWP_SHOWWINDOW));
+	RECT        area{
+        /*left =*/0,
+        /*top =*/0,
+        /*right =*/mode.mode != FullscreenMode::Windowed ? GetSystemMetrics(SM_CXFULLSCREEN) : mode.widthInPixels,
+        /*bottom =*/mode.mode != FullscreenMode::Windowed ? GetSystemMetrics(SM_CYFULLSCREEN) : mode.heightInPixels
 	};
 
-	// ---
-
-	const HWND  parentWindow(mode.mode == FullscreenMode::Windowed ? nullptr : HWND_TOPMOST);
-	const DWORD style(mode.mode == FullscreenMode::Windowed ? WindowedStyle : FullscreenStyle);
-	const UINT  behaviors(mode.mode == FullscreenMode::Windowed ? WindowedBehaviors : FullscreenBehaviors);
-	RECT        clientArea;
-
-	clientArea.left   = 0;
-	clientArea.top    = 0;
-	clientArea.right  = mode.mode != FullscreenMode::Windowed ? GetSystemMetrics(SM_CXFULLSCREEN) : mode.widthInPixels;
-	clientArea.bottom = mode.mode != FullscreenMode::Windowed ? GetSystemMetrics(SM_CYFULLSCREEN) : mode.heightInPixels;
-
-	AdjustWindowRect(&clientArea, style, FALSE);
-
+	AdjustWindowRect(ETAddressOf(area), style, /*bMenu =*/FALSE);
 	SetWindowLongPtrW(_window, GWL_STYLE, style);
-	SetWindowPos(_window, parentWindow, clientArea.left, clientArea.top, clientArea.right, clientArea.bottom, behaviors);
+	SetWindowPos(_window, parent, area.left, area.top, area.right, area.bottom, behaviors);
 }
 
 // ---------------------------------------------------
 
 void Window::EnsureVisible() {
-	SetWindowPos(_window, HWND_TOP, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW));
+	SetWindowPos(_window, HWND_TOP, /*X =*/0, /*Y =*/0, /*cX =*/0, /*cY =*/0, (SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW));
 }
 
 // ---------------------------------------------------
 
-bool Window::Exists() const {
+bool Window::Exists() const ETNoexceptHint {
 	return _window != nullptr;
 }
 
 // ---------------------------------------------------
 
-ErrorCode Window::BindResources() {
-	//	This value intentionally not legal.
-	static const HWND WaitingForResponse(reinterpret_cast<HWND>(-1L));
-	Atomic<HWND>      window(WaitingForResponse);
+Result Window::BindResources() {
+	ETAssert(UiThread.load(std::memory_order_acquire) != nullptr, "UI thread must be initialized before creating application windows!");
 
-	const HANDLE thread(reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 4096u, &MessageThreadEntryPoint, &window, 0, nullptr)));
-	if (thread == nullptr) {
-		return Error::Unspecified;
+	//	This value intentionally nonsense/illegal.
+	Atomic<HWND> window(HWND(-1L));
+
+	ETVerify(PostThreadMessageW(UiThreadId, WM_AllocateWindow, WPARAM(ETAddressOf(window)), /*lParam=*/0) != FALSE, "Error sending create message to UI thread");
+	while (window.load(std::memory_order_consume) == HWND(-1L)) {
+		//	Busy wait while the UI thread creates the window.
 	}
 
-	while (window.load(std::memory_order_consume) == WaitingForResponse) {
-		//	Busy wait while the new thread creates the window.
+	if (const HWND old = Exchange(_window, window.load(std::memory_order_consume))) {
+		PostThreadMessageW(UiThreadId, WM_FreeWindow, WPARAM(old), /*lParam=*/0);
 	}
 
-	_window        = window.load(std::memory_order_relaxed);
-	_messageThread = thread;
-
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
 void Window::FreeResources() {
-	if (const HWND window = eastl::exchange(_window, nullptr)) {
-		/*	Send the custom close message to cause the window to shut down. This will in turn
-		 *	cause the message pump thread to terminate. */
-		SendMessageW(window, WM_CustomClose, 0, 0);
-	}
-
-	if (const HANDLE messageThread = eastl::exchange(_messageThread, nullptr)) {
-		WaitForSingleObject(messageThread, INFINITE);
-		CloseHandle(messageThread);
+	if (const HWND window = Exchange(_window, nullptr)) {
+		PostThreadMessageW(UiThreadId, WM_FreeWindow, WPARAM(window), /*lParam=*/0);
 	}
 }
 
 // ---------------------------------------------------
 
-HINSTANCE Window::GetHinstance() const {
-	return reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_window, GWLP_HINSTANCE));
+HINSTANCE Window::GetHinstance() const ETNoexceptHint {
+	return HINSTANCE(GetWindowLongPtrW(_window, GWLP_HINSTANCE));
 }
 
 // ---------------------------------------------------
 
-HWND Window::GetHwnd() const {
+HWND Window::GetHwnd() const ETNoexceptHint {
 	return _window;
 }
 
 // ---------------------------------------------------
 
-void Swap(Window& lhs, Window& rhs) {
+void Swap(Window& lhs, Window& rhs) ETNoexceptHint {
 	using ::Eldritch2::Swap;
 
 	Swap(lhs._mode, rhs._mode);
 	Swap(lhs._window, rhs._window);
-	Swap(lhs._messageThread, rhs._messageThread);
+}
+
+// ---------------------------------------------------
+
+bool IsForegroundApplication(MemoryOrder order) {
+	return IsActiveApplication.load(order);
+}
+
+// ---------------------------------------------------
+
+Result InitializeUiThread() {
+	const auto MessageThreadEntryPoint([](void* /*unused*/) ETNoexceptHint -> unsigned int {
+		const ATOM windowAtom(RegisterWindowClass(SL("Eldritch2.UiWindow"), MAKEINTRESOURCEW(IDI_ICON1), [](HWND window, UINT message, WPARAM wParam, LPARAM lParam) ETNoexceptHint -> LRESULT {
+			switch (message) {
+			case WM_ACTIVATEAPP: {
+				IsActiveApplication.store(wParam == TRUE, std::memory_order_release);
+				return 0;
+			} // case WM_ACTIVATEAPP
+			case WM_SETCURSOR: {
+				if (LOWORD(lParam) == HTCLIENT) {
+					//	Hide the cursor.
+					SetCursor(nullptr);
+					return TRUE;
+				}
+			} // case WM_SETCURSOR
+
+			/*	We deliberately ignore the system close event. This is done to avoid the scenario where the user closes the window and the system frees
+			 *	the resources associated with this window while the application still needs them for use by the renderer, etc.*/
+			case WM_CLOSE: {
+				return 0;
+			}  // case WM_CLOSE
+			}; // switch( message )
+
+			return DefWindowProcW(window, message, wParam, lParam);
+		}));
+
+		MSG message;
+		/*	Create the thread message queue. This is done so that the thread can be terminated cleanly with the help of PostThreadMessage() and WM_QUIT.
+		*	See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644946(v=vs.85).aspx */
+		PeekMessageW(ETAddressOf(message), /*hWnd =*/nullptr, WM_USER, WM_USER, PM_NOREMOVE);
+
+		while (GetMessageW(ETAddressOf(message), /*hWnd =*/nullptr, /*wMsgFilterMin =*/0u, /*wMsgFilterMax =*/0u) != 0) {
+			if (message.hwnd == nullptr && message.message == WM_AllocateWindow) {
+				reinterpret_cast<Atomic<HWND>*>(message.wParam)->store(CreateWindowExW(
+																		   /*dwExStyle =*/0L, LPCWSTR(windowAtom), PROJECT_NAME_LIT, WS_OVERLAPPED, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
+																		   /*hWndParent =*/nullptr,
+																		   /*hMenu =*/nullptr, GetModuleByAddress(nullptr), nullptr),
+																	   std::memory_order_release);
+				continue;
+			}
+
+			if (message.hwnd == nullptr && message.message == WM_FreeWindow) {
+				DestroyWindow(HWND(message.wParam));
+				continue;
+			}
+
+			TranslateMessage(ETAddressOf(message));
+			DispatchMessageW(ETAddressOf(message));
+		}
+
+		/*	This will contain the WPARAM value sent by PostQuitMessage() once we have exited the dispatch loop above.
+		 *	See https://msdn.microsoft.com/en-us/library/windows/desktop/ms644936(v=vs.85).aspx
+		 *	See https://msdn.microsoft.com/en-us/library/windows/desktop/ms644945(v=vs.85).aspx */
+		return message.wParam;
+	});
+
+	ETAssert(UiThread.load(std::memory_order_acquire) == nullptr, "UI thread must be initialized exactly once!");
+	const HANDLE thread(HANDLE(_beginthreadex(/*_Security =*/nullptr, /*StackSize =*/4096u, MessageThreadEntryPoint, /*_ArgList =*/nullptr, 0, nullptr)));
+
+	return thread != nullptr ? Result::Success : Result::Unspecified;
+}
+
+// ---------------------------------------------------
+
+void TerminateUiThread() {
+	const HANDLE thread(UiThread.exchange(nullptr, std::memory_order_consume));
+	if (thread == nullptr) {
+		return;
+	}
+
+	WaitForSingleObject(thread, INFINITE);
+	CloseHandle(thread);
 }
 
 } // namespace Eldritch2

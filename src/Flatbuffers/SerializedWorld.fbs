@@ -1,15 +1,23 @@
-file_identifier	"EWDF";
+include			"Eldritch2Types.fbs";
+
+file_identifier	"E2SW";
 file_extension	".e2world";
 
-namespace Eldritch2.Core.FlatBuffers;
+namespace Eldritch2.Scripting.Wren.FlatBuffers;
 
-table PropertyDescriptor {
-	Name	: string (required);
-	Value	: string (required);
+struct ObjectReference {
+	Id : uint32;
+}
+
+table EntityDescriptor {
+	Type   : string (required);
+	Fields : [ubyte] (flexbuffer);
 }
 
 table WorldDescriptor {
-	Properties : [PropertyDescriptor];
+	ApiFingerprint : [ubyte] (required);
+	Packages       : [string] (required);
+	Entities       : [EntityDescriptor];
 }
 
 root_type WorldDescriptor;

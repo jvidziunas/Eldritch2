@@ -13,17 +13,19 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Mpl/Compiler.hpp>
+#include <Common/Mpl/TypeTraits.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-class InvokeDestructor {
+struct InvokeDestructor {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 public:
 	//!	Constructs this @ref InvokeDestructor instance.
-	InvokeDestructor(const InvokeDestructor&) ETNoexceptHint = default;
+	ETConstexpr InvokeDestructor(const InvokeDestructor&) ETNoexceptHint = default;
 	//!	Constructs this @ref InvokeDestructor instance.
-	InvokeDestructor() ETNoexceptHint = default;
+	ETConstexpr InvokeDestructor() ETNoexceptHint = default;
 
 	~InvokeDestructor() = default;
 
@@ -42,12 +44,14 @@ public:
 
 // ---------------------------------------------------
 
-class InvokeTrivialConstructor {
+struct InvokeTrivialConstructor {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 public:
 	//!	Constructs this @ref InvokeTrivialConstructor instance.
-	InvokeTrivialConstructor(const InvokeTrivialConstructor&) ETNoexceptHint = default;
+	ETConstexpr InvokeTrivialConstructor(const InvokeTrivialConstructor&) ETNoexceptHint = default;
 	//!	Constructs this @ref InvokeTrivialConstructor instance.
-	InvokeTrivialConstructor() ETNoexceptHint = default;
+	ETConstexpr InvokeTrivialConstructor() ETNoexceptHint = default;
 
 	~InvokeTrivialConstructor() = default;
 
@@ -55,41 +59,100 @@ public:
 
 public:
 	template <typename ObjectType>
-	ETInlineHint ETForceInlineHint void operator()(ObjectType& object) const {
+	ETInlineHint ETForceInlineHint void operator()(ObjectType& object) const ETNoexceptHintIf(IsNoThrowConstructible<ObjectType>()) {
 		new (ETAddressOf(object)) ObjectType();
 	}
 	template <typename ObjectType>
-	ETInlineHint ETForceInlineHint void operator()(ObjectType* object) const {
+	ETInlineHint ETForceInlineHint void operator()(ObjectType* object) const ETNoexceptHintIf(IsNoThrowConstructible<ObjectType>()) {
 		new (object) ObjectType();
 	}
 };
 
 // ---------------------------------------------------
 
-template <typename InputIterator, typename UnaryPredicate>
-InputIterator FindIf(InputIterator begin, InputIterator end, UnaryPredicate condition);
+template <typename Counter>
+struct CountingIterator {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-template <typename InputIterator, typename Value>
-InputIterator Find(InputIterator begin, InputIterator end, const Value& value);
+public:
+	//! Constructs this @ref CountingIterator instance.
+	ETConstexpr ETForceInlineHint CountingIterator(const CountingIterator&) ETNoexceptHint = default;
+	//! Constructs this @ref CountingIterator instance.
+	ETConstexpr ETForceInlineHint CountingIterator(Counter value) ETNoexceptHint : _value(Move(value)) {}
+
+	~CountingIterator() = default;
+
+	// ---------------------------------------------------
+
+public:
+	ETConstexpr ETForceInlineHint Counter operator*() const ETNoexceptHint {
+		return _value;
+	}
+
+	ETCpp14Constexpr ETForceInlineHint CountingIterator operator++(ETPostfixSemantics) ETNoexceptHint {
+		return CountingIterator(_value++);
+	}
+	ETCpp14Constexpr ETForceInlineHint CountingIterator& operator++() ETNoexceptHint {
+		++value;
+		return *this;
+	}
+
+	ETCpp14Constexpr ETForceInlineHint CountingIterator operator--(ETPostfixSemantics) ETNoexceptHint {
+		return CountingIterator(_value--);
+	}
+	ETCpp14Constexpr ETForceInlineHint CountingIterator& operator--() ETNoexceptHint {
+		--value;
+		return *this;
+	}
+
+	// - DATA MEMBERS ------------------------------------
+
+private:
+	Counter _value;
+};
 
 // ---------------------------------------------------
 
 template <typename InputIterator, typename UnaryPredicate>
-InputIterator FindIfNot(InputIterator begin, InputIterator end, UnaryPredicate condition);
+InputIterator FindIf(InputIterator begin, InputIterator end, UnaryPredicate condition) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, typename DereferenceType<InputIterator>::Type>());
+
+template <typename InputIterator, typename Value>
+InputIterator Find(InputIterator begin, InputIterator end, const Value& value) ETNoexceptHintIf(IsNoThrowCallable<EqualTo<Value>, const Value&, typename DereferenceType<InputIterator>::Type>());
+
+// ---------------------------------------------------
+
+template <typename InputIterator, typename UnaryPredicate>
+InputIterator FindIfNot(InputIterator begin, InputIterator end, UnaryPredicate condition) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, typename DereferenceType<InputIterator>::Type>());
+
+// ---------------------------------------------------
+
+template <typename InputIterator, typename UnaryPredicate>
+bool All(InputIterator begin, InputIterator end, UnaryPredicate condition) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, typename DereferenceType<InputIterator>::Type>());
+
+template <typename InputIterator, typename UnaryPredicate>
+bool Any(InputIterator begin, InputIterator end, UnaryPredicate condition) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, typename DereferenceType<InputIterator>::Type>());
 
 // ---------------------------------------------------
 
 //	Applies the operator() method of the specified predicate to each element in the specified range.
 //	Returns a copy of the predicate after all operations have been performed.
 template <typename InputIterator, typename UnaryPredicate>
-UnaryPredicate ForEach(InputIterator begin, InputIterator end, UnaryPredicate predicate);
+UnaryPredicate ForEach(InputIterator begin, InputIterator end, UnaryPredicate predicate) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, typename DereferenceType<InputIterator>::Type>());
+template <typename InputIterator, typename InputIterator2, typename BinaryPredicate>
+BinaryPredicate ForEach(InputIterator begin, InputIterator end, InputIterator2 begin2, BinaryPredicate predicate) ETNoexceptHintIf(IsNoThrowCallable<BinaryPredicate, typename DereferenceType<InputIterator>::Type, typename DereferenceType<InputIterator2>::Type>());
+template <typename Tuple, typename UnaryPredicate>
+UnaryPredicate ForEach(const Tuple&, UnaryPredicate predicate);
+template <typename Tuple, typename UnaryPredicate>
+UnaryPredicate ForEach(Tuple&&, UnaryPredicate predicate);
+template <typename Tuple, typename UnaryPredicate>
+UnaryPredicate ForEach(Tuple&, UnaryPredicate predicate);
 
 // ---------------------------------------------------
 
 template <typename InputIterator, typename Value, typename BinaryPredicate>
 Value Reduce(InputIterator begin, InputIterator end, Value initial, BinaryPredicate reducer);
 template <typename InputIterator, typename BinaryPredicate>
-auto Reduce(InputIterator begin, InputIterator end, BinaryPredicate reducer) -> decltype(*begin);
+typename DereferenceType<InputIterator>::Type Reduce(InputIterator begin, InputIterator end, BinaryPredicate reducer);
 
 // ---------------------------------------------------
 
@@ -109,8 +172,8 @@ OutputIterator Transform(InputIterator begin, InputIterator end, InputIterator2 
 
 template <typename OutputIterator, typename Generator>
 OutputIterator Generate(OutputIterator begin, OutputIterator end, Generator generator);
-template <typename OutputIterator, typename Generator>
-OutputIterator Generate(OutputIterator begin, size_t count, Generator generator);
+template <typename OutputIterator, typename Size, typename Generator>
+OutputIterator GenerateN(OutputIterator begin, Size count, Generator generator);
 
 // ---------------------------------------------------
 
@@ -159,33 +222,39 @@ OutputIterator CopyAndTerminate(InputIterator begin, InputIterator end, OutputIt
 // ---------------------------------------------------
 
 template <typename Container>
-typename Container::ConstIterator Begin(const Container& container);
+typename Container::ConstIterator Begin(const Container&) ETNoexceptHintIf(HasNoThrowMemberBegin<const Container>());
 template <typename Container>
-typename Container::Iterator Begin(Container& container);
-template <typename Value, size_t length>
-ETCpp14Constexpr const Value* Begin(const Value (&array)[length]) ETNoexceptHint;
-template <typename Value, size_t length>
-ETCpp14Constexpr Value* Begin(Value (&array)[length]) ETNoexceptHint;
+typename Container::Iterator Begin(Container&) ETNoexceptHintIf(HasNoThrowMemberBegin<Container>());
+template <typename Value, size_t ArraySize>
+ETConstexpr const Value* Begin(const Value (&)[ArraySize]) ETNoexceptHint;
+template <typename Value, size_t ArraySize>
+ETConstexpr Value* Begin(Value (&)[ArraySize]) ETNoexceptHint;
+template <typename Value>
+ETConstexpr const Value* Begin(const InitializerList<Value>&) ETNoexceptHint;
 
 template <typename Container>
-typename Container::ConstIterator End(const Container& container);
+typename Container::ConstIterator End(const Container&) ETNoexceptHintIf(HasNoThrowMemberEnd<const Container>());
 template <typename Container>
-typename Container::Iterator End(Container& container);
-template <typename Value, size_t length>
-ETCpp14Constexpr const Value* End(const Value (&array)[length]) ETNoexceptHint;
-template <typename Value, size_t length>
-ETCpp14Constexpr Value* End(Value (&array)[length]) ETNoexceptHint;
+typename Container::Iterator End(Container&) ETNoexceptHintIf(HasNoThrowMemberEnd<Container>());
+template <typename Value, size_t ArraySize>
+ETConstexpr const Value* End(const Value (&)[ArraySize]) ETNoexceptHint;
+template <typename Value, size_t ArraySize>
+ETConstexpr Value* End(Value (&)[ArraySize]) ETNoexceptHint;
+template <typename Value>
+ETConstexpr const Value* End(const InitializerList<Value>&) ETNoexceptHint;
 
 // ---------------------------------------------------
 
-template <typename T, size_t size>
-void Swap(const T (&lhs)[size], const T (&rhs)[size]) = delete;
-template <typename T, size_t size>
-void Swap(T (&lhs)[size], T (&rhs)[size]);
+template <typename T, size_t ArraySize>
+ETCpp14Constexpr void Swap(T (&)[ArraySize], T (&)[ArraySize]) ETNoexceptHintIf(IsNoThrowSwappable<T>());
+template <typename T, ET_TEMPLATE_SFINAE(!IsArray<T>())>
+ETCpp14Constexpr void Swap(T&, T&) ETNoexceptHintIf(IsNoThrowMoveConstructible<T>() && IsNoThrowMoveAssignable<T>());
+
+template <typename T, typename U>
+ETCpp14Constexpr T Exchange(T&, U&&) ETNoexceptHintIf(IsNoThrowMoveConstructible<T>() && IsNoThrowAssignable<T, U&&>());
+
 template <typename T>
-void Swap(const T& lhs, const T& rhs) = delete;
-template <typename T>
-void Swap(T& lhs, T& rhs);
+ETConstexpr CountingIterator<T> AsCounter(T value) ETNoexceptHint;
 
 } // namespace Eldritch2
 

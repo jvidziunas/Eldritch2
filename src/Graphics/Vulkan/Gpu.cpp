@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/VulkanTools.hpp>
@@ -20,10 +26,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	namespace {
 
 		template <typename InputIterator, size_t count>
-		ETInlineHint ETPureFunctionHint VkResult FindQueueFamily(uint32& outFamily, InputIterator begin, InputIterator end, const VkQueueFlags (&flags)[count]) {
+		ETInlineHint ETPureFunctionHint VkResult FindQueueFamily(uint32& outFamily, InputIterator begin, InputIterator end, const VkQueueFlags (&flags)[count]) ETNoexceptHint {
 			for (VkQueueFlags desiredFlags : flags) {
 				//	Try to find a dedicated match.
-				const auto candidate(FindIf(begin, end, [desiredFlags](const VkQueueFamilyProperties& family) {
+				const auto candidate(FindIf(begin, end, [desiredFlags](const VkQueueFamilyProperties& family) ETNoexceptHint {
 					return family.queueFlags == desiredFlags;
 				}));
 				if (candidate != end) {
@@ -33,7 +39,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			}
 
 			for (VkQueueFlags desiredFlags : flags) {
-				const auto candidate(FindIf(begin, end, [desiredFlags](const VkQueueFamilyProperties& family) {
+				const auto candidate(FindIf(begin, end, [desiredFlags](const VkQueueFamilyProperties& family) ETNoexceptHint {
 					return (family.queueFlags & desiredFlags) == desiredFlags;
 				}));
 				if (candidate != end) {
@@ -47,7 +53,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint VkResult FindQueueFamilies(uint32 (&families)[QueueConcepts], VkPhysicalDevice device) {
+		ETInlineHint ETForceInlineHint VkResult FindQueueFamilies(uint32 (&families)[QueueClasses], VkPhysicalDevice device) ETNoexceptHint {
 			uint32 count(0u);
 
 			vkGetPhysicalDeviceQueueFamilyProperties(device, ETAddressOf(count), nullptr);
@@ -66,17 +72,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		ETInlineHint VkResult BuildQueueCreateInfos(VkDeviceQueueCreateInfo (&out)[QueueConcepts], uint32& outQueueCount, VkPhysicalDevice device) {
-			uint32 indices[QueueConcepts];
+		ETInlineHint VkResult BuildQueueCreateInfos(VkDeviceQueueCreateInfo (&out)[QueueClasses], uint32& outQueueCount, VkPhysicalDevice device) ETNoexceptHint {
+			uint32 indices[QueueClasses];
 
 			ET_ABORT_UNLESS(FindQueueFamilies(indices, device));
 			Sort(indices, End(indices));
 			const auto lastUnique(Unique(indices, End(indices)));
 
 			outQueueCount = uint32(eastl::distance(indices, lastUnique));
-			Transform(indices, lastUnique, out, [](uint32 family) {
+			Transform(indices, lastUnique, out, [](uint32 family) ETNoexceptHint {
 				static ETConstexpr float32 priorities[] = { 1.0f };
-				return VkDeviceQueueCreateInfo {
+				return VkDeviceQueueCreateInfo{
 					VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 					/*pNext =*/nullptr,
 					/*flags =*/0u,
@@ -91,58 +97,41 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	} // anonymous namespace
 
 	void Gpu::CommandQueue::BindResources(VkDevice device, uint32_t familyIndex) {
-		vkGetDeviceQueue(device, familyIndex, 0u, ETAddressOf(queue));
-		family = familyIndex;
+		vkGetDeviceQueue(device, familyIndex, /*queueIndex =*/0u, ETAddressOf(_queue));
+		_family = familyIndex;
 	}
 
 	// ---------------------------------------------------
 
-	Gpu::Gpu() :
-		_allocator("Gpu Root Allocator"),
-		_physicalDevice(nullptr),
-		_device(nullptr),
-		_pipelineCache(nullptr),
-		_gpuAllocator(nullptr),
-		_imageGarbage(MallocAllocator("Vulkan GPU Image Garbage List Allocator")),
-		_bufferGarbage(MallocAllocator("Vulkan GPU Buffer Garbage List Allocator")),
-		_allocationGarbage(MallocAllocator("Vulkan GPU Allocation Garbage List Allocator")) {
-	}
+	Gpu::Gpu() ETNoexceptHint : _allocator("GPU Root Allocator"),
+								_physicalDevice(NullVulkanHandle),
+								_device(NullVulkanHandle),
+								_gpuAllocator(NullVulkanHandle),
+								_finalizerArena("GPU Finalizer Arena Allocator") {}
 
 	// ---------------------------------------------------
 
 	Gpu::~Gpu() {
-		ET_ASSERT(_device == nullptr, "Leaking Vulkan device {}!", fmt::ptr(_device));
-		ET_ASSERT(_pipelineCache == nullptr, "Leaking Vulkan pipeline cache {}!", fmt::ptr(_pipelineCache));
-		ET_ASSERT(_gpuAllocator == nullptr, "Leaking Vulkan GPU allocator {}!", fmt::ptr(_gpuAllocator));
+		ETAssert(_device == NullVulkanHandle, "Leaking Vulkan device {}!", fmt::ptr(_device));
+		ETAssert(_gpuAllocator == NullVulkanHandle, "Leaking Vulkan GPU allocator {}!", fmt::ptr(_gpuAllocator));
 	}
 
 	// ---------------------------------------------------
 
-	void Gpu::DestroyGarbage() {
-		ArrayList<VkImage>       imageGarbage(_imageGarbage.GetAllocator());
-		ArrayList<VkBuffer>      bufferGarbage(_bufferGarbage.GetAllocator());
-		ArrayList<VmaAllocation> allocationGarbage(_allocationGarbage.GetAllocator());
-
+	void Gpu::DestroyGarbage() ETNoexceptHint {
 		{
-			Lock _(_garbageMutex);
-			Swap(_imageGarbage, imageGarbage);
-			Swap(_bufferGarbage, bufferGarbage);
-			Swap(_allocationGarbage, allocationGarbage);
-		} // End of lock scope.
-
-		for (VkImage garbage : imageGarbage) {
-			vkDestroyImage(_device, garbage, GetAllocationCallbacks());
+			ET_LOCK_SCOPE(_gpuAllocatorMutex);
+			_allocationFinalizers.ClearAndDispose([this](Finalizer<Gpu&, VmaAllocator>& finalizer) ETNoexceptHint {
+				finalizer(*this, _gpuAllocator);
+			});
+			// End of lock scope.
 		}
 
-		for (VkBuffer garbage : bufferGarbage) {
-			vkDestroyBuffer(_device, garbage, GetAllocationCallbacks());
-		}
+		_finalizers.ClearAndDispose([this](Finalizer<Gpu&>& finalizer) ETNoexceptHint {
+			finalizer(*this);
+		});
 
-		for (VmaAllocation garbage : allocationGarbage) {
-			// To consider: Can we hoist the scope of this lock out of the loop?
-			Lock _(_gpuAllocatorMutex);
-			vmaFreeMemory(_gpuAllocator, garbage);
-		} // End of lock scope.
+		_finalizerArena.Restore(_frameStartCheckpoint);
 	}
 
 	// ---------------------------------------------------
@@ -150,46 +139,37 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	VkResult Gpu::BindResources(VkInstance vulkan, VkPhysicalDevice physicalDevice, VkDeviceSize heapBlockSize, uint32 frameUseCount) {
 		using ::Eldritch2::Swap;
 
-		ArrayList<const char*> enabledExtensions;
+		const InitializerList<const char*> extensions {
 #if VK_KHR_swapchain
-		enabledExtensions.Append(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 #endif
+		};
 
 		uint32                  queueInfoCount(0u);
-		VkDeviceQueueCreateInfo queueInfos[QueueConcepts];
+		VkDeviceQueueCreateInfo queueInfos[QueueClasses];
 		ET_ABORT_UNLESS(BuildQueueCreateInfos(queueInfos, queueInfoCount, physicalDevice));
 
 		VkDevice                 device;
-		const VkDeviceCreateInfo deviceInfo {
+		const VkDeviceCreateInfo deviceInfo{
 			VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 			/*pNext =*/nullptr,
 			/*flags =*/0u,
-			/*queueCreateInfoCount =*/queueInfoCount, queueInfos,
+			/*queueCreateInfoCount =*/queueInfoCount, Begin(queueInfos),
 			/*enabledLayerCount =*/0u, /*ppEnabledLayerNames =*/nullptr,
-			/*enabledExtensionCount =*/uint32(enabledExtensions.GetSize()), enabledExtensions.GetData(),
+			/*enabledExtensionCount =*/uint32(extensions.size()), Begin(extensions),
 			/*pEnabledFeatures =*/nullptr
 		};
 		ET_ABORT_UNLESS(vkCreateDevice(physicalDevice, ETAddressOf(deviceInfo), _allocator, ETAddressOf(device)));
 		ET_AT_SCOPE_EXIT(vkDestroyDevice(device, _allocator));
 
-		VkPipelineCache                 pipelineCache;
-		const VkPipelineCacheCreateInfo pipelineCacheInfo {
-			VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
-			/*pNext =*/nullptr,
-			/*flags =*/0u,
-			/*initialDataSize =*/0u, /*pInitialData =*/nullptr
-		};
-		ET_ABORT_UNLESS(vkCreatePipelineCache(device, ETAddressOf(pipelineCacheInfo), _allocator, ETAddressOf(pipelineCache)));
-		ET_AT_SCOPE_EXIT(if (device) vkDestroyPipelineCache(device, pipelineCache, _allocator););
-
-		uint32 families[QueueConcepts];
+		uint32 families[QueueClasses];
 		ET_ABORT_UNLESS(FindQueueFamilies(families, physicalDevice));
 		for (uint32 concept(0u); concept < ETCountOf(_queues); ++concept) {
 			_queues[concept].BindResources(device, families[concept]);
 		}
 
 		VmaAllocator                 gpuAllocator;
-		const VmaAllocatorCreateInfo gpuAllocatorInfo {
+		const VmaAllocatorCreateInfo gpuAllocatorInfo{
 			VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT,
 			physicalDevice,
 			device,
@@ -203,10 +183,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		ET_ABORT_UNLESS(vmaCreateAllocator(ETAddressOf(gpuAllocatorInfo), ETAddressOf(gpuAllocator)));
 		ET_AT_SCOPE_EXIT(vmaDestroyAllocator(gpuAllocator));
 
+		if (Failed(_finalizerArena.BindResources(_allocator, /*byteSize =*/512u * 1024u, AllocationDuration::Permanent))) {
+			return VK_ERROR_OUT_OF_HOST_MEMORY;
+		}
+
+		_frameStartCheckpoint = _finalizerArena.GetHead();
+
 		Swap(_vulkan, vulkan);
 		Swap(_physicalDevice, physicalDevice);
 		Swap(_device, device);
-		Swap(_pipelineCache, pipelineCache);
 		Swap(_gpuAllocator, gpuAllocator);
 
 		return VK_SUCCESS;
@@ -214,16 +199,15 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Gpu::FreeResources() {
+	void Gpu::FreeResources() ETNoexceptHint {
 		//	Ensure all rendering operations are complete before destroying the device.
 		vkDeviceWaitIdle(_device);
 		DestroyGarbage();
 
-		vmaDestroyAllocator(eastl::exchange(_gpuAllocator, nullptr));
-		vkDestroyPipelineCache(_device, eastl::exchange(_pipelineCache, nullptr), _allocator);
-		vkDestroyDevice(eastl::exchange(_device, nullptr), _allocator);
-		_physicalDevice = VK_NULL_HANDLE;
-		_vulkan         = VK_NULL_HANDLE;
+		vmaDestroyAllocator(Exchange(_gpuAllocator, NullVulkanHandle));
+		vkDestroyDevice(Exchange(_device, NullVulkanHandle), _allocator);
+		_physicalDevice = NullVulkanHandle;
+		_vulkan         = NullVulkanHandle;
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

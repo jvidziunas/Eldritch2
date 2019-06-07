@@ -23,11 +23,6 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using ProcessorAffinity = uint64;
-		using PlatformFiber     = void*;
-
-		// ---
-
 		class JobThread : public Thread, public Scheduling::JobExecutor {
 			// - TYPE PUBLISHING ---------------------------------
 
@@ -42,9 +37,9 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 		public:
 			//!	Constructs this @ref JobThread instance.
-			JobThread(FiberJobSystem& owner);
+			JobThread(FiberJobSystem& owner) ETNoexceptHint;
 			//!	Constructs this @ref JobThread instance.
-			JobThread(const JobThread&);
+			JobThread(const JobThread&) ETNoexceptHint;
 
 			~JobThread();
 
@@ -52,8 +47,6 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 		public:
 			void SetShouldShutDown() ETNoexceptHint override sealed;
-
-			ErrorCode EnterOnCaller() override sealed;
 
 			// ---------------------------------------------------
 
@@ -67,6 +60,11 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 			void EnableSharing() ETNoexceptHint;
 
 			void DisableSharing() ETNoexceptHint;
+
+			// ---------------------------------------------------
+
+		public:
+			Result EnterOnCaller() ETNoexceptHint override sealed;
 
 			// ---------------------------------------------------
 
@@ -84,13 +82,18 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 			JobThread*            _victim;
 		};
 
+		// ---
+
+	public:
+		using ProcessorAffinity = uint64;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		FiberJobSystem(const FiberJobSystem&) = delete;
 		//!	Constructs this @ref FiberJobSystem instance.
-		FiberJobSystem();
+		FiberJobSystem() ETNoexceptHint;
 
 		~FiberJobSystem();
 
@@ -98,14 +101,14 @@ namespace Eldritch2 { namespace Scheduling { namespace Win32 {
 
 	public:
 		template <typename WorkItem>
-		ErrorCode BootOnCaller(size_t workerCount, WorkItem bootTask);
+		Result BootOnCaller(ArrayList<JobThread>::SizeType workerCount, WorkItem bootTask);
 
-		void SetShouldShutDown(ErrorCode result) ETNoexceptHint override;
+		void SetShouldShutDown(Result result) ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		void BackOff(BackoffContext& context) ETNoexceptHint override;
+		void BackOff(BackoffCounter& context) ETNoexceptHint override;
 
 		// ---------------------------------------------------
 

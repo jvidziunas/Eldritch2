@@ -8,6 +8,11 @@
   ©2010-2017 Eldritch Entertainment, LLC.
 \*==================================================================*/
 
+//==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
 
 //==================================================================//
 // INCLUDES
@@ -15,10 +20,8 @@
 #include <Scripting/Storyboard.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-	namespace Scripting {
+namespace Eldritch2 { namespace Scripting {
 
-		Storyboard::Storyboard() : _events(MallocAllocator("Storyboard Event Allocator")) {}
+	Storyboard::Storyboard() ETNoexceptHint : _events(MallocAllocator("Storyboard Event Allocator")) {}
 
-	}	// namespace Scripting
-}	// namespace Eldritch2
+}} // namespace Eldritch2::Scripting

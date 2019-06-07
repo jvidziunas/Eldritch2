@@ -9,12 +9,14 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Win32Tools.hpp>
-#include <Common/Memory.hpp>
-//------------------------------------------------------------------//
-#include <wchar.h>
 #ifndef NOMINMAX
 #	define NOMINMAX
 #endif
@@ -28,10 +30,6 @@
 ET_LINK_LIBRARY("Shlwapi.lib")
 //------------------------------------------------------------------//
 
-#if defined GetCommandLine
-#	undef GetCommandLine
-#endif
-
 namespace Eldritch2 {
 namespace {
 
@@ -39,39 +37,37 @@ namespace {
 
 } // anonymous namespace
 
-void StoreMainArguments(HINSTANCE /*hInstance*/, int nCmdShow) {
+void StoreMainArguments(HINSTANCE /*hInstance*/, int nCmdShow) ETNoexceptHint {
 	cmdShow = nCmdShow;
 }
 
 // ---------------------------------------------------
 
-bool ETNeverThrowsHint CommandLineContains(char* const option) {
+bool ETPureFunctionHint CommandLineContains(char* const option) ETNoexceptHint {
 	return Find(GetCommandLineA(), option) != nullptr;
 }
 
 // ---------------------------------------------------
 
-bool ETNeverThrowsHint CommandLineContains(wchar_t* const option) {
+bool ETPureFunctionHint CommandLineContains(wchar_t* const option) ETNoexceptHint {
 	return Find(GetCommandLineW(), option) != nullptr;
 }
 
 // ---------------------------------------------------
 
-HINSTANCE GetModuleByAddress(void* addressOfItemInModule) {
-	HINSTANCE instance(nullptr);
-
+HINSTANCE ETPureFunctionHint GetModuleByAddress(void* addressOfItemInModule) ETNoexceptHint {
 	if (!addressOfItemInModule) {
-		addressOfItemInModule = reinterpret_cast<void*>(&GetModuleByAddress);
+		addressOfItemInModule = LPVOID(ETAddressOf(GetModuleByAddress));
 	}
 
-	GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, LPWSTR(addressOfItemInModule), &instance);
-
+	HINSTANCE instance(nullptr);
+	GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, LPWSTR(addressOfItemInModule), ETAddressOf(instance));
 	return instance;
 }
 
 // ---------------------------------------------------
 
-int ETPureFunctionHint ETNeverThrowsHint GetCmdShow() {
+int ETPureFunctionHint GetCmdShow() ETNoexceptHint {
 	return cmdShow;
 }
 

@@ -16,8 +16,8 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-class Matrix4x4;
-}
+class Matrix;
+} // namespace Eldritch2
 
 namespace Eldritch2 { namespace Graphics {
 
@@ -26,40 +26,39 @@ namespace Eldritch2 { namespace Graphics {
 
 	public:
 		//!	Constructs this @ref Camera instance.
-		Camera(Transformation localToWorld, Angle verticalFov);
+		ETConstexpr Camera(Transformation localToWorld, Angle verticalFov) ETNoexceptHint;
 		//!	Constructs this @ref Camera instance.
-		Camera(const Camera&) = default;
+		ETConstexpr Camera(const Camera&) ETNoexceptHint = default;
 
 		~Camera() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		Transformation ETSimdCall GetLocalToWorld() const;
+		ETConstexpr Transformation ETSimdCall GetLocalToWorld() const ETNoexceptHint;
 
-		Transformation ETSimdCall GetWorldToLocal() const;
-
-		void ETSimdCall SetLocalToWorld(Transformation transform);
+		ETConstexpr void ETSimdCall SetLocalToWorld(Transformation transform) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		Angle GetHorizontalFov(float32 aspectRatio) const;
+		ETConstexpr Angle GetHorizontalFov(float32 aspectRatio) const ETNoexceptHint;
 
-		Angle GetVerticalFov() const;
+		ETConstexpr Angle GetVerticalFov() const ETNoexceptHint;
 
-		void SetVerticalFov(Angle angle);
+		ETConstexpr void SetVerticalFov(Angle angle) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		Matrix4x4 ETSimdCall GetInverseViewProjection(float32 aspectRatio, float32 nearPlane, float32 farPlane) const;
+		Matrix ETSimdCall GetInverseViewProjection(float32 aspectRatio, float32 nearPlane, float32 farPlane) const ETNoexceptHint;
 
-		Matrix4x4 ETSimdCall GetViewProjection(float32 aspectRatio, float32 nearPlane, float32 farPlane) const;
+		Matrix ETSimdCall GetViewProjection(float32 aspectRatio, float32 nearPlane, float32 farPlane) const ETNoexceptHint;
+		Matrix ETSimdCall GetViewProjection(float32 aspectRatio, float32 nearPlane) const ETNoexceptHint;
 
-		Matrix4x4 ETSimdCall GetInverseView() const;
+		Matrix ETSimdCall GetInverseView() const ETNoexceptHint;
 
-		Matrix4x4 ETSimdCall GetView() const;
+		Matrix ETSimdCall GetView() const ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -69,3 +68,9 @@ namespace Eldritch2 { namespace Graphics {
 	};
 
 }} // namespace Eldritch2::Graphics
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Graphics/Camera.inl>
+//------------------------------------------------------------------//

@@ -20,16 +20,22 @@ namespace Scheduling {
 	class JobExecutor;
 }
 
-namespace Assets {
-	class AssetApiBuilder;
-}
-
 namespace Core {
-	class PropertyRegistrar;
-	class WorldComponent;
-	class World;
+	class PropertyApiBuilder;
+	class AssetApiBuilder;
 } // namespace Core
 } // namespace Eldritch2
+
+#define ET_TERMINATE_ENGINE_UNLESS(cond)                          \
+	if (!(cond)) {                                                \
+		Inject<Core::AbstractEngine>()->SetShouldShutDown(); \
+		return;                                                   \
+	}
+#define ET_TERMINATE_ENGINE_IF_FAILED(cond)                       \
+	if (Failed(cond)) {                                           \
+		Inject<Core::AbstractEngine>()->SetShouldShutDown(); \
+		return;                                                   \
+	}
 
 namespace Eldritch2 { namespace Core {
 
@@ -38,7 +44,7 @@ namespace Eldritch2 { namespace Core {
 
 	public:
 		//!	Constructs this @ref EngineComponent instance.
-		EngineComponent(const ObjectLocator& services);
+		EngineComponent(const ObjectInjector& services) ETNoexceptHint;
 		//!	Disable copy construction.
 		EngineComponent(const EngineComponent&) = delete;
 
@@ -47,59 +53,58 @@ namespace Eldritch2 { namespace Core {
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+		/*!	@param[in] executor The Scheduling::JobExecutor instance that should execute any internal work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduling::JobExecutor */
-		virtual void TickEarly(Scheduling::JobExecutor& executor);
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+		virtual void TickEarly(Scheduling::JobExecutor& executor) ETNoexceptHint;
+		/*!	@param[in] executor The Scheduling::JobExecutor instance that should execute any internal work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduling::JobExecutor */
-		virtual void Tick(Scheduling::JobExecutor& executor);
-
-		// - ENGINE SERVICE SANDBOX METHODS ------------------
-
-	public:
-		virtual UniquePointer<WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services);
+		virtual void Tick(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
 		//! Interested service classes should override this method to schedule simple bootstrap tasks with no additional data dependencies.
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+		/*!	@param[in] executor The Scheduling::JobExecutor instance that should execute any internal work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduling::JobExecutor */
-		virtual void BindResourcesEarly(Scheduling::JobExecutor& executor);
+		virtual void BindResourcesEarly(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		//! Interested service classes should override this method to schedule initialization tasks that require the use of user-configurable variables.
-		/*!	@param[in] executingContext The Scheduling::JobExecutor instance that should execute any internal work.
+		/*!	@param[in] executor The Scheduling::JobExecutor instance that should execute any internal work.
 			@remark The default implementation does nothing.
 			@see @ref Scheduling::JobExecutor */
-		virtual void BindConfigurableResources(Scheduling::JobExecutor& executor);
+		virtual void BindConfigurableResources(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		//! Interested service classes should override this method in order to perform any final initialization that interacts with other attached services.
 		/*!	@remark The default implementation does nothing. */
-		virtual void BindResources(Scheduling::JobExecutor& executor);
+		virtual void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint;
+
+		//! Interested service classes should override this method in order to perform any cleanup that can safely be performed in parallel.
+		/*!	@remark The default implementation does nothing. */
+		virtual void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		//! Interested service classes should override this method in order to participate in configurable variable setup.
 		/*!	@remark The default implementation does nothing.
-			@see @ref Core::PropertyRegistrar */
-		virtual void PublishConfiguration(Core::PropertyRegistrar& properties);
+			@see @ref Core::PropertyApiBuilder */
+		virtual void PublishApi(Core::PropertyApiBuilder&);
 
 		//! Interested service classes should override this method in order to participate in resource/world view creation.
 		/*!	@remark The default implementation does nothing.
-			@see @ref Assets::AssetFactoryRegistrar */
-		virtual void PublishAssetTypes(Assets::AssetApiBuilder& factories);
+			@see @ref Core::AssetApiBuilder */
+		virtual void PublishApi(Core::AssetApiBuilder&);
 
 		//!	Interested service classes should override this method in order to participate in world service location.
 		/*!	@remark the default implementation does nothing.
-			@see @ref Core::Blackboard */
-		virtual void PublishServices(ObjectLocator& services);
+			@see @ref ObjectInjector */
+		virtual void PublishApi(ObjectInjector&);
 
 		// ---------------------------------------------------
 
 	protected:
-		template <typename ServiceType>
-		ServiceType* FindService() const;
+		template <typename Service>
+		Service* Inject() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -109,7 +114,7 @@ namespace Eldritch2 { namespace Core {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const ObjectLocator* _services;
+		const ObjectInjector* _services;
 	};
 
 }} // namespace Eldritch2::Core

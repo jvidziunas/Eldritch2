@@ -21,22 +21,10 @@ namespace Eldritch2 { namespace Graphics {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		struct ImageDescription {
-			GpuFormat format;
-			uint32    mips;
-			uint32    slices;
-			uint32    texelWidth;
-			uint32    texelHeight;
-			uint32    texelDepth;
-		};
-
-		// ---
-
 		struct StreamRequest {
-			uint32 subimageId;
-			uint32 scanlineStrideInBytes;
-			uint32 sliceStrideInBytes;
-			void*  target;
+			uint32       firstSubimage;
+			uint32       scanlineStrideInBytes;
+			Span<byte**> targets;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -45,24 +33,24 @@ namespace Eldritch2 { namespace Graphics {
 		//!	Constructs this @ref ImageSource instance.
 		ImageSource(const ImageSource&) = default;
 		//!	Constructs this @ref ImageSource instance.
-		ImageSource() = default;
+		ImageSource() ETNoexceptHint = default;
 
 		~ImageSource() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		virtual void StreamTexels(const StreamRequest& request) const abstract;
+		virtual void StreamTexels(const StreamRequest& request) const ETNoexceptHint abstract;
 
 		// ---------------------------------------------------
 
 	public:
-		virtual ImageDescription GetDescription() const abstract;
+		virtual ImageDescriptor DescribeSelf() const ETNoexceptHint abstract;
 	};
 
 	// ---
 
-	template <GpuFormat format, typename Generator>
+	template <GpuFormat Format, typename Generator>
 	class GeneratedImageSource : public ImageSource {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -79,30 +67,28 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		void StreamTexels(const StreamRequest& request) const override;
+		void StreamTexels(const StreamRequest& request) const ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		ImageDescription GetDescription() const override;
+		ImageDescriptor DescribeSelf() const ETNoexceptHint override;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		uint32    _width, _height, _depth;
+		uint32    _width;
+		uint32    _height;
+		uint32    _depth;
 		Generator _generator;
 	};
 
 	// ---
 
-	template <GpuFormat format, typename Generator>
-	ETConstexpr GeneratedImageSource<format, Generator> MakeGeneratedImage(uint32 width, uint32 height, uint32 depth, Generator generator) ETNoexceptHint;
+	template <GpuFormat Format, typename Generator>
+	ETConstexpr GeneratedImageSource<Format, Generator> MakeGeneratedImage(uint32 width, uint32 height, uint32 depth, Generator generator) ETNoexceptHint;
 
-	ETConstexpr ETPureFunctionHint uint32 GetSubimageIndex(uint32 slice, uint32 mip, uint32 imageMips) ETNoexceptHint;
-
-	ETPureFunctionHint float32 GetModelScreenCoverageConstant(float32 modelViewZ, Angle fov, float32 reciprocalResolution) ETNoexceptHint;
-
-	ETConstexpr ETPureFunctionHint float32 FastTriangleScreenArea(float32 worldArea, float32 screenCoverageConstant) ETNoexceptHint;
+	ETConstexpr ETPureFunctionHint uint32 AsSubimage(uint32 slice, uint32 mip, uint32 imageMips) ETNoexceptHint;
 
 	ETPureFunctionHint float32 GetTriangleTextureLod(float32 triangleScreenArea, float32 triangleUvArea) ETNoexceptHint;
 

@@ -21,6 +21,7 @@ namespace Eldritch2 {
 
 template <typename Value>
 using Atomic      = std::atomic<Value>;
+using AtomicFlag  = std::atomic_flag;
 using MemoryOrder = std::memory_order;
 
 } // namespace Eldritch2

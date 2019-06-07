@@ -19,13 +19,13 @@ using HINSTANCE = struct HINSTANCE__*;
 
 namespace Eldritch2 {
 
-void ETNeverThrowsHint StoreMainArguments(HINSTANCE hInstance, int nCmdShow);
+void StoreMainArguments(HINSTANCE hInstance, int nCmdShow) ETNoexceptHint;
 
-int ETPureFunctionHint ETNeverThrowsHint GetCmdShow();
+int ETPureFunctionHint GetCmdShow() ETNoexceptHint;
 
-bool ETNeverThrowsHint CommandLineContains(wchar_t* option);
-bool ETNeverThrowsHint CommandLineContains(char* option);
+bool ETPureFunctionHint CommandLineContains(wchar_t* option) ETNoexceptHint;
+bool ETPureFunctionHint CommandLineContains(char* option) ETNoexceptHint;
 
-HINSTANCE ETNeverThrowsHint GetModuleByAddress(void* addressOfItemInModule = nullptr);
+HINSTANCE ETPureFunctionHint GetModuleByAddress(void* addressOfItemInModule = nullptr) ETNoexceptHint;
 
 } // namespace Eldritch2

@@ -13,43 +13,49 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GraphicsPipeline.hpp>
-#include <Graphics/Vulkan/CommandList.hpp>
 #include <Graphics/Vulkan/Display.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class DisplayBus {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using ResizeDelegate = Function<VkResult(Gpu&)>;
+		using PresentList    = SoaList<VkResult /*presentResult*/, VkSemaphore /*ready*/, VkSwapchainKHR /*swapchain*/, uint32 /*index*/, ResizeDelegate /*onResize*/>;
+		using DisplayList    = ArrayList<Display>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//! Disable copy construction.
 		DisplayBus(const DisplayBus&) = delete;
 		//! Constructs this @ref DisplayBus instance.
-		DisplayBus();
+		DisplayBus() ETNoexceptHint;
 
 		~DisplayBus() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult PresentSwapchainImages(Gpu& gpu);
+		void ScheduleFlip(VkSemaphore ready, VkSwapchainKHR swapchain, uint32 index, ResizeDelegate onResize);
 
-		VkResult AcquireSwapchainImages(Gpu& gpu);
+		VkResult FlipSwapchainImages(Gpu& gpu);
 
 		// ---------------------------------------------------
 
 	public:
-		ETConstexpr DisplayList& GetDisplays() ETNoexceptHint;
-
 		ETConstexpr Mutex& GetDisplaysMutex() ETNoexceptHint;
+
+		DisplayList::SliceType GetDisplays() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
 		VkResult BindResources(Gpu& gpu);
 
-		void FreeResources(Gpu& gpu);
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -61,8 +67,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	private:
 		HashMap<VkFormat, GraphicsPipeline> _compositorByFormat;
-		mutable Mutex                       _displayMutex;
+		ETCacheLineAligned mutable Mutex    _displaysMutex;
 		DisplayList                         _displays;
+		ETCacheLineAligned mutable Mutex    _presentableImagesMutex;
+		PresentList                         _presentableImages;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

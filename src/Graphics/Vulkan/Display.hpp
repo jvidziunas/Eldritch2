@@ -16,41 +16,39 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class CommandList;
-}}} // namespace Eldritch2::Graphics::Vulkan
-
-namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	class Display {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using ImageList = SoaList<VkImageView /*view*/, VkSemaphore /*ready*/>;
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		Display(const Display&) = delete;
 		//!	Constructs this @ref Display instance.
-		Display(Display&&);
+		Display(Display&&) ETNoexceptHint;
 		//!	Constructs this @ref Display instance.
-		Display();
+		Display() ETNoexceptHint;
 
 		~Display();
 
 		// ---------------------------------------------------
 
 	public:
-		ETConstexpr auto GetViewports() const ETNoexceptHint -> const Viewport (&)[4];
-		ETConstexpr auto GetViewports() ETNoexceptHint -> Viewport (&)[4];
+		VkResult AcquireImage(Gpu& gpu, VkSwapchainKHR& outSwapchain, VkSemaphore& outWaitSemaphore, uint32& outIndex, uint32 deviceMask = 0u);
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindSwapchain(Gpu& gpu, VkSwapchainKHR& outSwapchain, VkSwapchainKHR old) ETNoexceptHint;
-
-		void FreeSwapchain(Gpu& gpu, VkSwapchainKHR swapchain) ETNoexceptHint;
+		VkResult BindSwapchain(Gpu& gpu);
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, bool preferVerticalSync, uint32 formatCount, const VkFormat* preferredFormats);
+		VkResult BindResources(Gpu& gpu, bool preferVerticalSync, uint32 formatCount, const VkFormat preferredFormats[]);
 
 		void FreeResources(Gpu& gpu);
 
@@ -61,27 +59,22 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// - DATA MEMBERS ------------------------------------
 
+	public:
+		VkRect2D displayRects[4];
+
+		// - DATA MEMBERS ------------------------------------
+
 	private:
 		Window             _window;
 		VkSurfaceKHR       _surface;
 		VkSurfaceFormatKHR _format;
 		VkPresentModeKHR   _presentMode;
-		Viewport           _viewports[4];
+		VkSwapchainKHR     _swapchain;
+		ImageList          _images;
 
 		// ---------------------------------------------------
 
 		friend void Swap(Display&, Display&);
 	};
 
-	// ---
-
-	using ImageList   = SoArrayList<VkImageView /*view*/, Framebuffer /*backbuffer*/, CommandList /*commands*/, VkSemaphore /*ready*/>;
-	using DisplayList = SoArrayList<Display /*display*/, VkResult /*presentResult*/, VkSwapchainKHR /*swapchain*/, VkSemaphore /*ready*/, uint32 /*index*/, ImageList /*images*/>;
-
 }}} // namespace Eldritch2::Graphics::Vulkan
-
-//==================================================================//
-// INLINE FUNCTION DEFINITIONS
-//==================================================================//
-#include <Graphics/Vulkan/Display.inl>
-//------------------------------------------------------------------//

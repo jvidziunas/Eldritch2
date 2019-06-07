@@ -19,71 +19,55 @@
 using HANDLE = void*;
 
 namespace Eldritch2 {
-namespace Detail {
 
-	class Win32HeapAllocatorBase : public Allocator {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	protected:
-		//! Constructs this @ref Win32HeapAllocatorBase instance.
-		Win32HeapAllocatorBase(HANDLE heap, const Utf8Char* const name);
-		//!	Disable copy construction.
-		Win32HeapAllocatorBase(const Win32HeapAllocatorBase&) = delete;
-
-		~Win32HeapAllocatorBase() = default;
-
-		// - MEMORY ALLOCATION/DEALLOCATION ------------------
-
-	public:
-		ETRestrictHint void* Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration options = AllocationDuration::Normal) override sealed;
-		ETRestrictHint void* Allocate(SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal) override sealed;
-
-		void Deallocate(void* const address, SizeType sizeInBytes) override sealed;
-
-		// - NATIVE HANDLE ACCESS ----------------------------
-
-	public:
-		//! Retrieves the handle to the Win32 heap used for servicing allocations.
-		HANDLE GetHeap() const;
-
-		// ---------------------------------------------------
-
-		//!	Disable assignment.
-		Win32HeapAllocatorBase& operator=(const Win32HeapAllocatorBase&) = delete;
-
-		// - DATA MEMBERS ------------------------------------
-
-	private:
-		const HANDLE _heap;
-	};
-
-} // namespace Detail
-
-class Win32GlobalHeapAllocator : public Detail::Win32HeapAllocatorBase {
+class AbstractWin32HeapAllocator : public Allocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-public:
-	//!	Constructs this @ref Win32GlobalHeapAllocator instance.
-	Win32GlobalHeapAllocator(const Win32GlobalHeapAllocator&);
-	//! Constructs this @ref Win32GlobalHeapAllocator instance.
-	Win32GlobalHeapAllocator(const Utf8Char* const name);
+protected:
+	//! Constructs this @ref Win32HeapAllocatorBase instance.
+	AbstractWin32HeapAllocator(HANDLE heap, const Utf8Char* const name) ETNoexceptHint;
+	//!	Disable copy construction.
+	AbstractWin32HeapAllocator(const AbstractWin32HeapAllocator&) = delete;
 
-	~Win32GlobalHeapAllocator() = default;
+	~AbstractWin32HeapAllocator() = default;
+
+	// - MEMORY ALLOCATION/DEALLOCATION ------------------
+
+public:
+	ETRestrictHint void* Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override sealed;
+	ETRestrictHint void* Allocate(SizeType byteSize, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override sealed;
+
+	void Deallocate(void* const address, SizeType byteSize) ETNoexceptHint override sealed;
+
+	// - NATIVE HANDLE ACCESS ----------------------------
+
+public:
+	//! Retrieves the handle to the Win32 heap used for servicing allocations.
+	ETConstexpr HANDLE GetHeap() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 	//!	Disable assignment.
-	Win32GlobalHeapAllocator& operator=(const Win32GlobalHeapAllocator&) = delete;
+	AbstractWin32HeapAllocator& operator=(const AbstractWin32HeapAllocator&) = delete;
+
+	// - DATA MEMBERS ------------------------------------
+
+private:
+	HANDLE _heap;
+
+	// ---------------------------------------------------
+
+	friend ETConstexpr bool operator==(AbstractWin32HeapAllocator&, AbstractWin32HeapAllocator&) ETNoexceptHint;
 };
 
-// ---------------------------------------------------
+// ---
 
-class Win32PrivateHeapAllocator : public Detail::Win32HeapAllocatorBase {
+class Win32PrivateHeapAllocator : public AbstractWin32HeapAllocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//! Constructs this @ref Win32PrivateHeapAllocator instance.
-	Win32PrivateHeapAllocator(SizeType allocationLimitInBytes, const Utf8Char* const name);
+	Win32PrivateHeapAllocator(SizeType allocationByteLimit, const Utf8Char* const name) ETNoexceptHint;
 	//!	Disable copy construction.
 	Win32PrivateHeapAllocator(const Win32PrivateHeapAllocator&) = delete;
 
@@ -95,4 +79,29 @@ public:
 	Win32PrivateHeapAllocator& operator=(const Win32PrivateHeapAllocator&) = delete;
 };
 
+// ---
+
+class Win32HeapAllocator : public AbstractWin32HeapAllocator {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+public:
+	//! Constructs this @ref Win32GlobalHeapAllocator instance.
+	Win32HeapAllocator(const Utf8Char* const name) ETNoexceptHint;
+	//!	Constructs this @ref Win32GlobalHeapAllocator instance.
+	Win32HeapAllocator(const Win32HeapAllocator&) ETNoexceptHint;
+
+	~Win32HeapAllocator() = default;
+
+	// ---------------------------------------------------
+
+	//!	Disable assignment.
+	Win32HeapAllocator& operator=(const Win32HeapAllocator&) = delete;
+};
+
 } // namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Common/Memory/Win32HeapAllocator.inl>
+//------------------------------------------------------------------//

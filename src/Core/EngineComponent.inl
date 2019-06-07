@@ -17,14 +17,13 @@
 
 namespace Eldritch2 { namespace Core {
 
-	ETInlineHint ETForceInlineHint EngineComponent::EngineComponent(const ObjectLocator& services) :
-		_services(ETAddressOf(services)) {}
+	ETInlineHint ETForceInlineHint EngineComponent::EngineComponent(const ObjectInjector& services) ETNoexceptHint : _services(ETAddressOf(services)) {}
 
 	// ---------------------------------------------------
 
-	template <typename ServiceType>
-	ETInlineHint ETForceInlineHint ServiceType* EngineComponent::FindService() const {
-		return _services->Find<ServiceType>();
+	template <typename Service>
+	ETInlineHint ETForceInlineHint Service* EngineComponent::Inject() const ETNoexceptHint {
+		return _services->Find<Service>();
 	}
 
 }} // namespace Eldritch2::Core

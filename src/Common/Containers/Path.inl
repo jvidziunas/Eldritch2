@@ -19,16 +19,16 @@ namespace Eldritch2 {
 
 template <class Allocator>
 template <typename... Arguments>
-ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringView<CharacterType> format, Arguments&&... arguments) :
+ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringSpan<CharacterType> format, Arguments&&... arguments) :
 	AbstractPath(allocator) {
-	Assign(root, format, eastl::forward<Arguments>(arguments)...);
+	Assign(root, format, Forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
 
 template <class Allocator>
 template <typename Character>
-ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringView<Character> path) :
+ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocator, KnownDirectory root, AbstractStringSpan<Character> path) :
 	AbstractPath(allocator) {
 	Assign(root, path);
 }
@@ -36,16 +36,8 @@ ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocato
 // ---------------------------------------------------
 
 template <class Allocator>
-ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocator, AbstractStringView<CharacterType> path) :
-	AbstractString<PlatformChar, Allocator>(allocator, path) {
-}
-
-// ---------------------------------------------------
-
-template <class Allocator>
 ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocator, SizeType reservedLength) :
-	AbstractString<PlatformChar, Allocator>(allocator, reservedLength) {
-}
+	AbstractString<PlatformChar, Allocator>(allocator, reservedLength) {}
 
 // ---------------------------------------------------
 
@@ -57,8 +49,8 @@ ETInlineHint AbstractPath<Allocator>::AbstractPath(const AllocatorType& allocato
 
 template <class Allocator>
 template <typename... Arguments>
-ETInlineHint AbstractPath<Allocator>& AbstractPath<Allocator>::Assign(KnownDirectory root, AbstractStringView<CharacterType> format, Arguments&&... arguments) {
-	Assign(GetPath(root)).Append(format, eastl::forward<Arguments>(arguments)...);
+ETInlineHint AbstractPath<Allocator>& AbstractPath<Allocator>::Assign(KnownDirectory root, AbstractStringSpan<CharacterType> format, Arguments&&... arguments) {
+	Assign(GetPath(root)).Append(format, Forward<Arguments>(arguments)...);
 	return *this;
 };
 
@@ -66,7 +58,7 @@ ETInlineHint AbstractPath<Allocator>& AbstractPath<Allocator>::Assign(KnownDirec
 
 template <class Allocator>
 template <typename Character>
-ETInlineHint AbstractPath<Allocator>& AbstractPath<Allocator>::Assign(KnownDirectory root, AbstractStringView<Character> path) {
+ETInlineHint AbstractPath<Allocator>& AbstractPath<Allocator>::Assign(KnownDirectory root, AbstractStringSpan<Character> path) {
 	Assign(GetPath(root)).Append(path);
 	return *this;
 }
@@ -74,7 +66,7 @@ ETInlineHint AbstractPath<Allocator>& AbstractPath<Allocator>::Assign(KnownDirec
 // ---------------------------------------------------
 
 template <class Allocator>
-ETInlineHint void Swap(AbstractPath<Allocator>& lhs, AbstractPath<Allocator>& rhs) {
+ETInlineHint void Swap(AbstractPath<Allocator>& lhs, AbstractPath<Allocator>& rhs) ETNoexceptHint {
 	lhs._container.swap(rhs._container);
 }
 

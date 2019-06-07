@@ -27,6 +27,20 @@ namespace Eldritch2 { namespace Networking {
 		WorldEventClient() ETNoexceptHint = default;
 
 		~WorldEventClient() ETNoexceptHint = default;
+
+		// ---------------------------------------------------
+
+	public:
+		virtual Result AcceptPacket(Span<const byte*> bytes);
+
+		virtual Result AcceptPlayerJoinRequest();
+
+		virtual Result AcceptPlayerLeaveRequest();
+
+		// ---------------------------------------------------
+
+		//!	Disable copy assignment.
+		WorldEventClient& operator=(const WorldEventClient&) = delete;
 	};
 
 }} // namespace Eldritch2::Networking

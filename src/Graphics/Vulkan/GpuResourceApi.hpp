@@ -12,16 +12,20 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/GraphicsPipelineApi.hpp>
+#include <Graphics/PipelineBuilder.hpp>
 //------------------------------------------------------------------//
 #include <vk_mem_alloc.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class PipelineAttachmentDescription;
-	class GraphicsPipelineBuilder;
-	class Gpu;
-}}} // namespace Eldritch2::Graphics::Vulkan
+namespace Eldritch2 { namespace Graphics {
+	namespace Vulkan {
+		class Gpu;
+	} // namespace Vulkan
+
+	class PipelineBuilder;
+	struct ImageDescriptor;
+	struct MeshDescriptor;
+}} // namespace Eldritch2::Graphics
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
@@ -31,10 +35,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	protected:
 		//!	Disable copy construction.
 		GpuBuffer(const GpuBuffer&) = delete;
-		//!	Disable move construction; clients should implement themselves via Swap().
+		//!	Disable move construction.
 		GpuBuffer(GpuBuffer&&) = delete;
-		//!	Constructs this @ref Buffer instance.
-		GpuBuffer();
+		//!	Constructs this @ref GpuBuffer instance.
+		GpuBuffer() ETNoexceptHint;
 
 		~GpuBuffer();
 
@@ -45,15 +49,18 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		ETConstexpr VkBuffer Get() const ETNoexceptHint;
 
+		ETConstexpr bool IsBound() const ETNoexceptHint;
+
 		// ---------------------------------------------------
 
 	public:
-		void FreeResources(Gpu& gpu);
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	protected:
 		VkResult BindResources(Gpu& gpu, const VkBufferCreateInfo& bufferInfo, const VmaAllocationCreateInfo& allocationInfo);
+		VkResult BindResources(Gpu& gpu, VkBuffer buffer, VmaAllocation backing) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -68,7 +75,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		friend void Swap(GpuBuffer&, GpuBuffer&);
+		friend void Swap(GpuBuffer&, GpuBuffer&) ETNoexceptHint;
 	};
 
 	// ---
@@ -79,29 +86,32 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	protected:
 		//!	Disable copy construction.
 		GpuImage(const GpuImage&) = delete;
-		//!	Disable move construction; clients should implement themselves via Swap().
+		//!	Constructs this @ref GpuImage instance.
+		ETConstexpr GpuImage() ETNoexceptHint;
+		//!	Disable move construction.
 		GpuImage(GpuImage&&) = delete;
-		//!	Constructs this @ref Image instance.
-		GpuImage();
 
 		~GpuImage();
 
 		// ---------------------------------------------------
 
 	public:
+		ETConstexpr operator VkImage() const ETNoexceptHint;
+
 		ETConstexpr VkImage Get() const ETNoexceptHint;
 
-		ETConstexpr operator VkImage() const ETNoexceptHint;
+		ETConstexpr bool IsBound() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void FreeResources(Gpu& gpu);
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	protected:
 		VkResult BindResources(Gpu& gpu, const VkImageCreateInfo& imageInfo, const VmaAllocationCreateInfo& allocationInfo);
+		VkResult BindResources(Gpu& gpu, VkImage image, VmaAllocation backing) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -116,37 +126,37 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		friend void Swap(GpuImage&, GpuImage&);
+		friend void Swap(GpuImage&, GpuImage&) ETNoexceptHint;
 	};
 
 	// ---
 
-	class VertexBuffer : public GpuBuffer {
+	class AttributeBuffer : public GpuBuffer {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
-		VertexBuffer(const VertexBuffer&) = delete;
+		AttributeBuffer(const AttributeBuffer&) = delete;
 		//!	Constructs this @ref VertexBuffer instance.
-		VertexBuffer(VertexBuffer&&);
+		AttributeBuffer(AttributeBuffer&&) ETNoexceptHint;
 		//!	Constructs this @ref VertexBuffer instance.
-		VertexBuffer() = default;
+		AttributeBuffer() ETNoexceptHint = default;
 
-		~VertexBuffer() = default;
+		~AttributeBuffer() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
+		VkResult BindResources(Gpu& gpu, VkDeviceSize byteSize);
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
-		VertexBuffer& operator=(const VertexBuffer&) = delete;
+		AttributeBuffer& operator=(const AttributeBuffer&) = delete;
 
 		// ---------------------------------------------------
 
-		friend void Swap(VertexBuffer&, VertexBuffer&);
+		friend void Swap(AttributeBuffer&, AttributeBuffer&) ETNoexceptHint;
 	};
 
 	// ---
@@ -158,16 +168,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		IndexBuffer(const IndexBuffer&) = delete;
 		//!	Constructs this @ref IndexBuffer instance.
-		IndexBuffer(IndexBuffer&&);
+		IndexBuffer(IndexBuffer&&) ETNoexceptHint;
 		//!	Constructs this @ref IndexBuffer instance.
-		IndexBuffer() = default;
+		IndexBuffer() ETNoexceptHint = default;
 
 		~IndexBuffer() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
+		VkResult BindResources(Gpu& gpu, VkDeviceSize byteSize);
 
 		// ---------------------------------------------------
 
@@ -176,7 +186,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		friend void Swap(IndexBuffer&, IndexBuffer&);
+		friend void Swap(IndexBuffer&, IndexBuffer&) ETNoexceptHint;
 	};
 
 	// ---
@@ -187,17 +197,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	public:
 		//!	Disable copy construction.
 		UploadBuffer(const UploadBuffer&) = delete;
-		//!	Constructs this @ref TransferBuffer instance.
-		UploadBuffer(UploadBuffer&&);
-		//!	Constructs this @ref TransferBuffer instance.
-		UploadBuffer() = default;
+		//!	Constructs this @ref UploadBuffer instance.
+		UploadBuffer(UploadBuffer&&) ETNoexceptHint;
+		//!	Constructs this @ref UploadBuffer instance.
+		UploadBuffer() ETNoexceptHint = default;
 
 		~UploadBuffer() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
+		VkResult BindResources(Gpu& gpu, VkDeviceSize byteSize);
 
 		// ---------------------------------------------------
 
@@ -206,7 +216,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		friend void Swap(UploadBuffer&, UploadBuffer&);
+		friend void Swap(UploadBuffer&, UploadBuffer&) ETNoexceptHint;
 	};
 
 	// ---
@@ -218,16 +228,16 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		UniformBuffer(const UniformBuffer&) = delete;
 		//!	Constructs this @ref UniformBuffer instance.
-		UniformBuffer(UniformBuffer&&);
+		UniformBuffer(UniformBuffer&&) ETNoexceptHint;
 		//!	Constructs this @ref UniformBuffer instance.
-		UniformBuffer() = default;
+		UniformBuffer() ETNoexceptHint = default;
 
 		~UniformBuffer() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkDeviceSize sizeInBytes);
+		VkResult BindResources(Gpu& gpu, VkDeviceSize byteSize);
 
 		// ---------------------------------------------------
 
@@ -236,30 +246,30 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		friend void Swap(UniformBuffer&, UniformBuffer&);
+		friend void Swap(UniformBuffer&, UniformBuffer&) ETNoexceptHint;
 	};
 
 	// ---
 
-	class VertexCache {
+	class GeometryCache {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
-		VertexCache(const VertexCache&) = delete;
-		//! Constructs this @ref VertexCache instance.
-		VertexCache();
+		GeometryCache(const GeometryCache&) = delete;
+		//! Constructs this @ref GeometryCache instance.
+		GeometryCache() ETNoexceptHint;
 
-		~VertexCache() = default;
+		~GeometryCache() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult AllocateVertices(VkDeviceSize& outOffset, VkDeviceSize size);
-		VkResult AllocateIndices(VkDeviceSize& outOffset, VkDeviceSize size);
+		VkResult AllocateVertices(VkDeviceSize& outOffset, VkDeviceSize byteSize);
+		VkResult AllocateIndices(VkDeviceSize& outOffset, VkDeviceSize byteSize);
 
-		void DeallocateVertices(VkDeviceSize offset, VkDeviceSize size);
-		void DeallocateIndices(VkDeviceSize offset, VkDeviceSize size);
+		void DeallocateVertices(VkDeviceSize offset, VkDeviceSize byteSize);
+		void DeallocateIndices(VkDeviceSize offset, VkDeviceSize byteSize);
 
 		// ---------------------------------------------------
 
@@ -271,26 +281,26 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkDeviceSize vertexCacheSize, VkDeviceSize indexCacheSize);
+		VkResult BindResources(Gpu& gpu, VkDeviceSize vertexCacheByteSize, VkDeviceSize indexCacheByteSize);
 
-		void FreeResources(Gpu& gpu);
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
-		VertexCache& operator=(const VertexCache&) = delete;
+		GeometryCache& operator=(const GeometryCache&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VertexBuffer                 _vertices;
+		AttributeBuffer              _vertices;
 		IdentifierPool<VkDeviceSize> _vertexRanges;
 		IndexBuffer                  _indices;
 		IdentifierPool<VkDeviceSize> _indexRanges;
 
 		// ---------------------------------------------------
 
-		friend void Swap(VertexCache&, VertexCache&);
+		friend void Swap(GeometryCache&, GeometryCache&) ETNoexceptHint;
 	};
 
 	// ---
@@ -302,7 +312,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		Mesh(const Mesh&) = delete;
 		//!	Constructs this @ref Mesh instance.
-		Mesh(Mesh&&);
+		Mesh(Mesh&&) ETNoexceptHint;
 		//!	Constructs this @ref Mesh instance.
 		Mesh() ETNoexceptHint;
 
@@ -315,20 +325,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		ETConstexpr VkBuffer GetIndices() const ETNoexceptHint;
 
-		ETConstexpr VkDeviceSize GetVertexOffset() const ETNoexceptHint;
+		ETConstexpr VkDeviceSize GetVertexByteOffset() const ETNoexceptHint;
 
-		ETConstexpr VkDeviceSize GetIndexOffset() const ETNoexceptHint;
+		ETConstexpr VkDeviceSize GetIndexByteOffset() const ETNoexceptHint;
 
-		ETConstexpr VkDeviceSize GetVerticesSize() const ETNoexceptHint;
+		ETConstexpr VkDeviceSize GetVerticesByteSize() const ETNoexceptHint;
 
-		ETConstexpr VkDeviceSize GetIndicesSize() const ETNoexceptHint;
+		ETConstexpr VkDeviceSize GetIndicesByteSize() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(VertexCache& cache, VkDeviceSize verticesSize, VkDeviceSize indicesSize);
+		VkResult BindResources(GeometryCache& cache, const MeshDescriptor& description);
 
-		void FreeResources(VertexCache& cache);
+		void FreeResources(GeometryCache& cache);
 
 		// ---------------------------------------------------
 
@@ -340,10 +350,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	private:
 		VkBuffer     _vertices;
 		VkBuffer     _indices;
-		VkDeviceSize _verticesOffset;
 		VkDeviceSize _indicesOffset;
-		VkDeviceSize _verticesSize;
+		VkDeviceSize _verticesOffset;
 		VkDeviceSize _indicesSize;
+		VkDeviceSize _verticesSize;
 
 		// ---------------------------------------------------
 
@@ -359,58 +369,40 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		ShaderImage(const ShaderImage&) = delete;
 		//!	Constructs this @ref ShaderImage instance.
-		ShaderImage(ShaderImage&&);
+		ShaderImage(ShaderImage&&) ETNoexceptHint;
 		//!	Constructs this @ref ShaderImage instance.
-		ShaderImage() = default;
+		ShaderImage() ETNoexceptHint = default;
 
 		~ShaderImage() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32_t mips, uint32_t layers);
+		VkResult BindResources(Gpu& gpu, const ImageDescriptor& description);
 
 		// ---------------------------------------------------
 
+	private:
 		//!	Disable copy assignment.
 		ShaderImage& operator=(const ShaderImage&) = delete;
 
 		// ---------------------------------------------------
 
-		friend void Swap(ShaderImage&, ShaderImage&);
+		friend void Swap(ShaderImage&, ShaderImage&) ETNoexceptHint;
 	};
 
 	// ---
 
-	class TileManager {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		enum : uint32 {
-			PageCoordinateBits  = 18u,
-			MaxImageDimension   = 1u << PageCoordinateBits,
-			PageSubresourceBits = 10u
-		};
-
-		// ---
-
-	public:
-		struct Tile {
-			uint64 x : PageCoordinateBits;
-			uint64 y : PageCoordinateBits;
-			uint64 z : PageCoordinateBits;
-			uint64 subresource : PageSubresourceBits;
-		};
-
+	class TileManager : public Cache<ImageTile, VkDeviceSize> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		TileManager(const TileManager&) = delete;
 		//!	Constructs this @ref TileManager instance.
-		TileManager(TileManager&&);
+		TileManager(TileManager&&) ETNoexceptHint;
 		//!	Constructs this @ref TileManager instance.
-		TileManager();
+		TileManager() ETNoexceptHint;
 
 		~TileManager() = default;
 
@@ -422,16 +414,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		bool Touch(Tile tile) ETNoexceptHint;
-
-		void ReplaceLru(Tile tile) ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	public:
 		VkResult BindResources(Gpu& gpu, VkExtent3D imageExtent, VkExtent3D tileExtent);
 
-		void FreeResources(Gpu& gpu);
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -441,12 +426,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		HashSet<Tile> _residentTiles;
-		VkExtent3D    _tileExtent;
+		VkExtent3D _tileExtent;
 
 		// ---------------------------------------------------
 
-		friend void Swap(TileManager&, TileManager&);
+		friend void Swap(TileManager&, TileManager&) ETNoexceptHint;
 	};
 
 	// ---
@@ -457,21 +441,21 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	public:
 		//!	Disable copy construction.
 		HostSparseTileCache(const HostSparseTileCache&) = delete;
-		//!	Constructs this @ref SparseTileCache instance.
-		HostSparseTileCache(HostSparseTileCache&&);
-		//!	Constructs this @ref SparseTileCache instance.
-		HostSparseTileCache();
+		//!	Constructs this @ref HostSparseTileCache instance.
+		HostSparseTileCache(HostSparseTileCache&&) ETNoexceptHint;
+		//!	Constructs this @ref HostSparseTileCache instance.
+		HostSparseTileCache() ETNoexceptHint;
 
 		~HostSparseTileCache() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		bool IsCached(VkDeviceSize& outOffset, TileManager::Tile tile) const ETNoexceptHint;
+		bool IsLoading(ImageTile tile) const ETNoexceptHint;
 
-		bool IsLoading(TileManager::Tile tile) const ETNoexceptHint;
+		bool ShouldDecode(VkDeviceSize& outOffset, ImageTile tile) const ETNoexceptHint;
 
-		void NotifyCached(VkDeviceSize offset, TileManager::Tile tile);
+		void NotifyCached(VkDeviceSize offset, ImageTile tile);
 
 		// ---------------------------------------------------
 
@@ -488,12 +472,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	private:
-		HashMap<TileManager::Tile, VkDeviceSize> _cachedPagesByTile;
-		HashSet<TileManager::Tile>               _loadingTiles;
+		HashSet<ImageTile> _loadingTiles;
 
 		// ---------------------------------------------------
 
-		friend void Swap(HostSparseTileCache&, HostSparseTileCache&);
+		friend void Swap(HostSparseTileCache&, HostSparseTileCache&) ETNoexceptHint;
 	};
 
 	// ---
@@ -514,9 +497,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		SparseShaderImage(const SparseShaderImage&) = delete;
 		//!	Constructs this @ref SparseShaderImage instance.
-		SparseShaderImage(SparseShaderImage&&);
+		SparseShaderImage(SparseShaderImage&&) ETNoexceptHint;
 		//!	Constructs this @ref SparseShaderImage instance.
-		SparseShaderImage() = default;
+		SparseShaderImage() ETNoexceptHint = default;
 
 		~SparseShaderImage() = default;
 
@@ -528,12 +511,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		CacheResult MakeResident(const HostSparseTileCache& cache, TileManager::Tile tile);
+		CacheResult MakeResident(const HostSparseTileCache& cache, ImageTile tile);
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkFormat format, VkExtent3D extent, uint32 mips, uint32 layers);
+		VkResult BindResources(Gpu& gpu, const ImageDescriptor& description);
 
 		void FreeResources(Gpu& gpu);
 
@@ -549,7 +532,82 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		// ---------------------------------------------------
 
-		friend void Swap(SparseShaderImage&, SparseShaderImage&);
+		friend void Swap(SparseShaderImage&, SparseShaderImage&) ETNoexceptHint;
+	};
+
+	// ---
+
+	class DescriptorTable {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		enum : size_t {
+			SourceImages,
+			ImageViews
+		};
+
+		// ---
+
+		using ImageList     = SoaList<const GpuImage* /*sourceImages*/, VkImageView /*imageViews*/>;
+		using ResourceIndex = ImageList::SizeType;
+
+		ETStaticAssert(IsSame<typename ImageList::template ValueType<SourceImages>, const GpuImage*>(), "type mismatch for descriptor table");
+		ETStaticAssert(IsSame<typename ImageList::template ValueType<ImageViews>, VkImageView>(), "type mismatch for descriptor table");
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy construction.
+		DescriptorTable(const DescriptorTable&) = delete;
+		//!	Constructs this @ref DescriptorTable instance.
+		DescriptorTable(DescriptorTable&&) ETNoexceptHint;
+		//!	Constructs this @ref DescriptorTable instance.
+		DescriptorTable() ETNoexceptHint;
+
+		~DescriptorTable();
+
+		// ---------------------------------------------------
+
+	public:
+		ETConstexpr VkDescriptorSet GetDescriptorSet() const ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		template <typename InputIterator>
+		ResourceIndex ReserveSlots(InputIterator begin, InputIterator end);
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResourceViews(Gpu& gpu, ResourceIndex begin, ResourceIndex end);
+
+		VkResult PushToGpu(Gpu& gpu, ResourceIndex begin, ResourceIndex end);
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, VkDescriptorSetLayout layout, InitializerList<VkDescriptorPoolSize> pools);
+
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	public:
+		//!	Disable copy assignment.
+		DescriptorTable& operator=(const DescriptorTable&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		ResourceIndex    _lastCurrent;
+		ImageList        _images;
+		VkDescriptorPool _pool;
+		VkDescriptorSet  _descriptors;
+
+		// ---------------------------------------------------
+
+		friend void Swap(DescriptorTable&, DescriptorTable&) ETNoexceptHint;
 	};
 
 	// ---
@@ -558,11 +616,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using ExternalImageMap = ArrayMap<size_t /*index*/, VkImage /*image*/>;
-
-		// ---
-
-		class Image {
+		class Image : public GpuImage {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
@@ -571,34 +625,20 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			//! Constructs this @ref Image instance.
 			Image(Image&&) ETNoexceptHint;
 			//! Constructs this @ref Image instance.
-			Image() ETNoexceptHint;
+			Image() ETNoexceptHint = default;
 
-			~Image();
-
-			// ---------------------------------------------------
-
-		public:
-			ETConstexpr operator VkImage() const ETNoexceptHint;
+			~Image() = default;
 
 			// ---------------------------------------------------
 
 		public:
-			VkResult BindResources(Gpu& gpu, const PipelineAttachmentDescription& description, VkExtent2D baseDimensions, uint32 baseLayers);
-			VkResult BindResources(Gpu& gpu, const PipelineAttachmentDescription& description, VkImage externalImage);
-
-			void FreeResources(Gpu& gpu);
+			VkResult BindResources(Gpu& gpu, const PipelineAttachment& description, VkExtent2D dimensions, uint32 slices);
+			VkResult BindResources(Gpu& gpu, VkImage externalImage) ETNoexceptHint;
 
 			// ---------------------------------------------------
 
 			//!	Disable copy assignment.
 			Image& operator=(const Image&) = delete;
-
-			// - DATA MEMBERS ------------------------------------
-
-		private:
-			VkImage       _image;
-			VmaAllocation _backing;
-			bool          _ownsImage;
 
 			// ---------------------------------------------------
 
@@ -608,55 +648,56 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---
 
 	public:
-		class PassImages {
+		class StageImageSet {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Disable copy construction.
-			PassImages(const PassImages&) = delete;
-			//!	Constructs this @ref PassImages instance.
-			PassImages(PassImages&&) ETNoexceptHint;
-			//!	Constructs this @ref PassImages instance.
-			PassImages() ETNoexceptHint;
+			StageImageSet(const StageImageSet&) = delete;
+			//!	Constructs this @ref ImageSet instance.
+			StageImageSet(StageImageSet&&) ETNoexceptHint;
+			//!	Constructs this @ref ImageSet instance.
+			ETConstexpr StageImageSet() ETNoexceptHint;
 
-			~PassImages();
+			~StageImageSet();
 
 			// ---------------------------------------------------
 
 		public:
-			VkResult BindResources(Gpu& gpu, const PipelinePassDescription& pass, const PipelineAttachmentDescription descriptions[], const Image images[]);
+			VkResult BindResources(Gpu& gpu, const StageBuilder& stage, const PipelineAttachment attachments[], const Image images[]);
 
-			void FreeResources(Gpu& gpu);
+			void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 			// ---------------------------------------------------
 
 			//!	Disable copy assignment.
-			PassImages& operator=(const PassImages&) = delete;
+			StageImageSet& operator=(const StageImageSet&) = delete;
 
 			// - DATA MEMBERS ------------------------------------
 
 		public:
-			VkImageView views[ETCountOf(PipelineFramebufferDescription::colorAttachments) + ETCountOf(PipelineFramebufferDescription::inputAttachments) + 1];
+			VkImageView views[ETCountOf(StageBuilder::colorAttachments) + ETCountOf(StageBuilder::inputAttachments) + 1];
 
 			// ---------------------------------------------------
 
-			friend void Swap(PassImages&, PassImages&) ETNoexceptHint;
+			friend void Swap(StageImageSet&, StageImageSet&) ETNoexceptHint;
 		};
 
 		// ---
 
-		class Pass {
+	public:
+		class StageFramebuffer {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref Pass instance.
-			Pass(Pass&&) ETNoexceptHint;
 			//!	Disable copy construction.
-			Pass(const Pass&) = delete;
-			//!	Constructs this @ref Pass instance.
-			Pass() ETNoexceptHint;
+			StageFramebuffer(const StageFramebuffer&) = delete;
+			//!	Constructs this @ref StageFramebuffer instance.
+			StageFramebuffer(StageFramebuffer&&) ETNoexceptHint;
+			//!	Constructs this @ref StageFramebuffer instance.
+			StageFramebuffer() ETNoexceptHint;
 
-			~Pass();
+			~StageFramebuffer();
 
 			// ---------------------------------------------------
 
@@ -666,14 +707,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 			// ---------------------------------------------------
 
 		public:
-			VkResult BindResources(Gpu& gpu, const PipelinePassDescription& pass, VkExtent2D dimensions, uint32 layers, const PassImages& images);
+			VkResult BindResources(Gpu& gpu, const StageBuilder& pass, VkExtent2D dimensions, uint32 slices, const StageImageSet& images);
 
-			void FreeResources(Gpu& gpu);
+			void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 			// ---------------------------------------------------
 
 			//!	Disable copy assignment.
-			Pass& operator=(const Pass&) = delete;
+			StageFramebuffer& operator=(const StageFramebuffer&) = delete;
 
 			// - DATA MEMBERS ------------------------------------
 
@@ -685,8 +726,22 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 			// ---------------------------------------------------
 
-			friend void Swap(Pass&, Pass&) ETNoexceptHint;
+			friend void Swap(StageFramebuffer&, StageFramebuffer&) ETNoexceptHint;
 		};
+
+		// ---
+
+	public:
+		struct ExternalImage {
+			uint32  attachmentIndex;
+			VkImage image;
+		};
+
+		// ---
+
+	public:
+		using StageResourceList = SoaList<StageImageSet, StageFramebuffer>;
+		using ImageList         = ArrayList<Image>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -694,30 +749,32 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		Framebuffer(const Framebuffer&) = delete;
 		//!	Constructs this @ref Framebuffer instance.
-		Framebuffer(Framebuffer&&);
+		Framebuffer(Framebuffer&&) ETNoexceptHint;
 		//!	Constructs this @ref Framebuffer instance.
-		Framebuffer();
+		Framebuffer() ETNoexceptHint;
 
 		~Framebuffer();
 
 		// ---------------------------------------------------
 
 	public:
+		ETConstexpr const DescriptorTable& GetShaderResources() const ETNoexceptHint;
+
+		Span<const StageFramebuffer*> GetStages() const ETNoexceptHint;
+
 		ETConstexpr VkQueryPool GetTimingPool() const ETNoexceptHint;
 
-		Range<const Pass*> GetPasses() const ETNoexceptHint;
+		// ---------------------------------------------------
+
+	public:
+		VkResult UpdateScaling(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult UpdateScaling(Gpu& gpu);
+		VkResult BindResources(Gpu& gpu, const PipelineBuilder& pipeline, VkExtent2D dimensions, uint32 slices, InitializerList<ExternalImage> externalImages = {});
 
-		// ---------------------------------------------------
-
-	public:
-		VkResult BindResources(Gpu& gpu, const GraphicsPipelineBuilder& pipeline, VkExtent2D dimensions, uint32 layers, ExternalImageMap externalImages = ExternalImageMap {});
-
-		void FreeResources(Gpu& gpu);
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -727,56 +784,14 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		VkQueryPool                   _timingPool;
-		ArrayList<Image>              _images;
-		SoArrayList<PassImages, Pass> _passes;
+		VkQueryPool       _timingPool;
+		ImageList         _images;
+		StageResourceList _stageResources;
+		DescriptorTable   _shaderResources;
 
 		// ---------------------------------------------------
 
 		friend void Swap(Framebuffer&, Framebuffer&) ETNoexceptHint;
-	};
-
-	// ---
-
-	class Viewport : public Framebuffer {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Construct this @ref Viewport instance.
-		Viewport(Viewport&&) ETNoexceptHint;
-		//!	Disable copy construction.
-		Viewport(const Viewport&) = delete;
-		//!	Construct this @ref Viewport instance.
-		Viewport();
-
-		~Viewport() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		VkResult Resize(Gpu& gpu, VkExtent2D dimensions, uint32 layers, ExternalImageMap externalImages = ExternalImageMap {});
-
-		// ---------------------------------------------------
-
-	public:
-		bool TryAcquire(const GraphicsPipelineBuilder& generator) ETNoexceptHint;
-
-		void Release() ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-	private:
-		Atomic<const GraphicsPipelineBuilder*> _generator;
-
-		// ---------------------------------------------------
-
-		friend void Swap(Viewport&, Viewport&) ETNoexceptHint;
-	};
-
-	// ---
-
-	struct ViewportDisposer {
-		ETPureFunctionHint void operator()(Viewport* viewport) const ETNoexceptHint;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Navigation/Recast/NavigationScene.hpp>
@@ -21,20 +27,20 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 	// ---------------------------------------------------
 
 	void NavigationScene::Simulate(MicrosecondTime duration) {
-		dtCrowd::update(AsSeconds(duration), /*debug =*/nullptr);
+		dtCrowd::update(AsMilliseconds(duration) / /*milliseconds per second*/1000.0f, /*debug =*/nullptr);
 	}
 
 	// ---------------------------------------------------
 
-	ErrorCode NavigationScene::BindResources(const dtNavMeshParams& meshParameters, int maxAgents, float32 agentRadius) {
-		ET_ABORT_UNLESS(dtNavMesh::init(ETAddressOf(meshParameters)) == DT_SUCCESS ? Error::None : Error::Unspecified);
-		ET_ABORT_UNLESS(dtCrowd::init(maxAgents, agentRadius, this) ? Error::None : Error::Unspecified);
+	Result NavigationScene::BindResources(int maxAgents, float32 agentRadius, const dtNavMeshParams& meshParameters) {
+		ET_ABORT_UNLESS(dtNavMesh::init(ETAddressOf(meshParameters)) == DT_SUCCESS ? Result::Success : Result::Unspecified);
+		ET_ABORT_UNLESS(dtCrowd::init(maxAgents, agentRadius, this) ? Result::Success : Result::Unspecified);
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void NavigationScene::FreeResources() {}
+	void NavigationScene::FreeResources() ETNoexceptHint {}
 
 }}} // namespace Eldritch2::Navigation::Recast

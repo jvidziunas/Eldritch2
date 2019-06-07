@@ -21,7 +21,6 @@
 //------------------------------------------------------------------//
 #include <Windows.h>
 #include <dxc/dxcapi.h>
-#include <iostream>
 //------------------------------------------------------------------//
 
 //==================================================================//
@@ -30,12 +29,12 @@
 ET_LINK_LIBRARY("dxcompiler.lib")
 //------------------------------------------------------------------//
 
-#define ET_ABORT_UNLESS_HRESULT(operation) \
-	{                                      \
-		const auto _(operation);           \
-		if (FAILED(_)) {                   \
-			return _;                      \
-		}                                  \
+#define ET_ABORT_UNLESS_HRESULT(operation)                                                                                             \
+	{                                                                                                                                  \
+		const ::Eldritch2::Result FUNC_RESULT(SUCCEEDED(operation) ? ::Eldritch2::Result::Success : ::Eldritch2::Result::Unspecified); \
+		if (Failed(FUNC_RESULT)) {                                                                                                     \
+			return FUNC_RESULT;                                                                                                        \
+		}                                                                                                                              \
 	}
 
 namespace Eldritch2 {
@@ -44,30 +43,37 @@ namespace Tools {
 	using namespace ::Eldritch2::Graphics::Direct3D::FlatBuffers;
 	using namespace ::Eldritch2::Graphics::Vulkan::FlatBuffers;
 	using namespace ::Eldritch2::Graphics::FlatBuffers;
+	using namespace ::Eldritch2::Logging;
 	using namespace ::flatbuffers;
+
+	// ---------------------------------------------------
 
 	namespace {
 
-		ETInlineHint ETForceInlineHint ETPureFunctionHint PlatformStringView GetName(ShaderModel target) {
+		ETForceInlineHint ETPureFunctionHint PlatformStringSpan GetName(ShaderModel target) ETNoexceptHint {
 			switch (target) {
-			case ShaderModel5_0: return L"5_0"; break;
-			case ShaderModel6_0: return L"6_0"; break;
-			case ShaderModel6_1: return L"6_1"; break;
-			default: return L""; break;
+			case ShaderModel::_5_0: return SL("5_0"); break;
+			case ShaderModel::_6_0: return SL("6_0"); break;
+			case ShaderModel::_6_1:
+				return SL("6_1");
+				break;
+				ET_NO_DEFAULT_CASE;
 			}; // switch(target)
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint ETPureFunctionHint PlatformStringView GetName(ShaderStage stage) {
+		ETForceInlineHint ETPureFunctionHint PlatformStringSpan GetName(ShaderStage stage) ETNoexceptHint {
 			switch (stage) {
-			case Vertex: return L"vs"; break;
-			case Hull: return L"hs"; break;
-			case Domain: return L"ds"; break;
-			case Geometry: return L"gs"; break;
-			case Pixel: return L"ps"; break;
-			case Compute: return L"cs"; break;
-			default: return L""; break;
+			case ShaderStage::Vertex: return SL("vs"); break;
+			case ShaderStage::Hull: return SL("hs"); break;
+			case ShaderStage::Domain: return SL("ds"); break;
+			case ShaderStage::Geometry: return SL("gs"); break;
+			case ShaderStage::Pixel: return SL("ps"); break;
+			case ShaderStage::Compute:
+				return SL("cs");
+				break;
+				ET_NO_DEFAULT_CASE;
 			}; // switch (stage)
 		}
 
@@ -77,9 +83,10 @@ namespace Tools {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
+			//!	Constructs this @ref DxcInvocation instance.
+			DxcInvocation(PlatformStringSpan usage) ETNoexceptHint : _usage(MallocAllocator("DXC Invocation Usage Name Allocator"), usage) {}
+			//!	Constructs this @ref DxcInvocation instance.
 			DxcInvocation(const DxcInvocation&) = default;
-			DxcInvocation(PlatformStringView usage) :
-				_usage(MallocAllocator("DXC Invocation Usage Name Allocator"), usage) {}
 
 			~DxcInvocation() = default;
 
@@ -87,7 +94,7 @@ namespace Tools {
 
 		public:
 			ETInlineHint size_t GetBytecodeSize() const ETNoexceptHint {
-				return Reduce(Begin(_bytecodeByStage), End(_bytecodeByStage), 0u, [](const ComPointer<IDxcBlob>& code, size_t sum) {
+				return Reduce(Begin(_bytecodeByStage), End(_bytecodeByStage), 0u, [](const ComPointer<IDxcBlob>& code, size_t sum) ETNoexceptHint {
 					return sum + (code ? code->GetBufferSize() : 0u);
 				});
 			}
@@ -108,17 +115,15 @@ namespace Tools {
 
 			// ---------------------------------------------------
 
-			ETInlineHint void WriteErrors() const ETNoexceptHint {
+			ETInlineHint void WriteErrors(Log& log) const ETNoexceptHint {
+				static const auto IsPrintable([](UINT32 codePage) ETNoexceptHint { return codePage == CP_UTF8 || codePage == CP_ACP; });
+
 				for (const ComPointer<IDxcBlobEncoding>& errors : _outputByStage) {
 					BOOL   knownEncoding(FALSE);
 					UINT32 codePage;
 
-					if (FAILED(errors->GetEncoding(ETAddressOf(knownEncoding), ETAddressOf(codePage)))) {
-						continue;
-					}
-
-					if (codePage == CP_UTF8 || codePage == CP_ACP) {
-						std::cout.write(LPCSTR(errors->GetBufferPointer()), errors->GetBufferSize()).flush();
+					if (SUCCEEDED(errors->GetEncoding(ETAddressOf(knownEncoding), ETAddressOf(codePage))) && IsPrintable(codePage)) {
+						log.Write(Severity::Error, StringSpan(LPCSTR(errors->GetBufferPointer()), errors->GetBufferSize()));
 					}
 				}
 			}
@@ -126,60 +131,60 @@ namespace Tools {
 			// ---------------------------------------------------
 
 		public:
-			HRESULT operator()(IDxcCompiler* const compiler, IDxcBlobEncoding* const hlsl, LPCWSTR path, ShaderModel target, const ArrayList<LPCWSTR>& arguments, const ArrayList<DxcDefine>& defines) ETNoexceptHint {
-				for (uint32 stage(Vertex); stage < _countof(_invokeStage); ++stage) {
+			ETInlineHint Result operator()(IDxcCompiler* const compiler, IDxcBlobEncoding* const hlsl, LPCWSTR path, ShaderModel target, const ArrayList<LPCWSTR>& arguments, const ArrayList<DxcDefine>& defines) ETNoexceptHint {
+				for (uint32 stage(uint32(ShaderStage::Vertex)); stage < uint32(ShaderStage::MAX_STAGE); ++stage) {
 					if (_invokeStage[stage] == false) {
 						continue;
 					}
 
-					ET_ABORT_UNLESS_HRESULT((*this)(compiler, hlsl, path, target, ShaderStage(stage), arguments, defines));
+					ET_ABORT_UNLESS((*this)(compiler, hlsl, path, target, ShaderStage(stage), arguments, defines));
 				}
 
-				return S_OK;
+				return Result::Success;
 			}
 
-			HRESULT operator()(IDxcCompiler* const compiler, IDxcBlobEncoding* const hlsl, LPCWSTR path, ShaderModel target, ShaderStage stage, const ArrayList<LPCWSTR>& arguments, const ArrayList<DxcDefine>& defines) ETNoexceptHint {
-				const PlatformString            entryPoint(MallocAllocator("Entry Point Name Allocator"), L"{}_{}", _usage, GetName(stage));
-				const PlatformString            profile(MallocAllocator("Target Profile Allocator"), L"{}_{}", GetName(target), GetName(stage));
+			ETInlineHint Result operator()(IDxcCompiler* const compiler, IDxcBlobEncoding* const hlsl, LPCWSTR path, ShaderModel target, ShaderStage stage, const ArrayList<LPCWSTR>& arguments, const ArrayList<DxcDefine>& defines) ETNoexceptHint {
+				const PlatformString            entryPoint(MallocAllocator("Entry Point Name Allocator"), SL("{}_{}"), _usage, GetName(stage));
+				const PlatformString            profile(MallocAllocator("Target Profile Allocator"), SL("{}_{}"), GetName(target), GetName(stage));
 				ComPointer<IDxcOperationResult> result;
-				HRESULT                         compilation;
+				HRESULT                         status;
 
 				ET_ABORT_UNLESS_HRESULT(compiler->Compile(hlsl, path, entryPoint, profile, const_cast<LPCWSTR*>(arguments.GetData()), arguments.GetSize(), defines.GetData(), defines.GetSize(), nullptr, result.GetInterfacePointer()));
-				ET_ABORT_UNLESS_HRESULT(result->GetStatus(ETAddressOf(compilation)));
-				if (SUCCEEDED(compilation)) {
+				ET_ABORT_UNLESS_HRESULT(result->GetStatus(ETAddressOf(status)));
+				if (SUCCEEDED(status)) {
 					ComPointer<IDxcBlob> code;
 					ET_ABORT_UNLESS_HRESULT(result->GetResult(code.GetInterfacePointer()));
-					_bytecodeByStage[stage] = eastl::move(code);
+					_bytecodeByStage[uint32(stage)] = Move(code);
 				} else {
 					ComPointer<IDxcBlobEncoding> errors;
 					ET_ABORT_UNLESS_HRESULT(result->GetErrorBuffer(errors.GetInterfacePointer()));
-					_outputByStage[stage] = eastl::move(errors);
+					_outputByStage[uint32(stage)] = Move(errors);
 				}
 
-				return S_OK;
+				return Result::Success;
 			}
 
 			// - DATA MEMBERS ------------------------------------
 
 		private:
 			PlatformString               _usage;
-			bool                         _invokeStage[Compute + 1u];
-			ComPointer<IDxcBlob>         _bytecodeByStage[Compute + 1u];
-			ComPointer<IDxcBlobEncoding> _outputByStage[Compute + 1u];
+			bool                         _invokeStage[uint32(ShaderStage::MAX_STAGE)];
+			ComPointer<IDxcBlob>         _bytecodeByStage[uint32(ShaderStage::MAX_STAGE)];
+			ComPointer<IDxcBlobEncoding> _outputByStage[uint32(ShaderStage::MAX_STAGE)];
 		};
 
 		// ---------------------------------------------------
 
 		template <typename Allocator>
-		ETInlineHint ETForceInlineHint size_t GetBytecodeSize(const ArrayList<DxcInvocation, Allocator>& invocations) {
-			return Reduce(invocations.Begin(), invocations.End(), 0u, [](const DxcInvocation& invocation, size_t sum) {
+		ETForceInlineHint size_t GetBytecodeSize(const ArrayList<DxcInvocation, Allocator>& invocations) ETNoexceptHint {
+			return Reduce(invocations.Begin(), invocations.End(), 0u, [](const DxcInvocation& invocation, size_t sum) ETNoexceptHint {
 				return invocation.GetBytecodeSize() + sum;
 			});
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint ErrorCode WriteFlatbuffer(const Path& path, const FlatBufferBuilder& flatbuffer) {
+		ETForceInlineHint Result WriteFlatbuffer(const Path& path, const FlatBufferBuilder& flatbuffer) {
 			FileWriter file;
 			ET_ABORT_UNLESS(file.CreateOrTruncate(path));
 
@@ -188,47 +193,58 @@ namespace Tools {
 
 	} // anonymous namespace
 
-	ShaderCompiler::ShaderCompiler() :
-		_pipelinePath(MallocAllocator("Input Pipeline Path Allocator")),
-		_hlslPath(MallocAllocator("Input HLSL Path Allocator")),
-		_spirvOutPath(MallocAllocator("SPIR-V Output Pipeline Path Allocator")),
-		_dxbcOutPath(MallocAllocator("DXBC Output Pipeline Path Allocator")),
-		_shaderModel(ShaderModel5_0),
-		_emitSpirV(false),
-		_emitDxbc(false) {}
+	ShaderCompiler::ShaderCompiler() ETNoexceptHint : _pipelinePath(MallocAllocator("Input Pipeline Path Allocator")),
+													  _hlslPath(MallocAllocator("Input HLSL Path Allocator")),
+													  _spirvOutPath(MallocAllocator("SPIR-V Output Pipeline Path Allocator")),
+													  _dxbcOutPath(MallocAllocator("DXBC Output Pipeline Path Allocator")),
+													  _shaderModel(ShaderModel::_5_0),
+													  _emitSpirV(true),
+													  _emitDxbc(true) {}
 
 	// ---------------------------------------------------
 
 	void ShaderCompiler::RegisterOptions(OptionRegistrar& options) {
-		options.Register(L"--dxbc", L"-d", [this](PlatformStringView /*source*/) -> int {
-			_emitDxbc = true;
-			return 0;
-		});
-
-		options.Register(L"--spirv", L"-s", [this](PlatformStringView /*source*/) -> int {
-			_emitSpirV = true;
-			return 0;
-		});
-
-		options.RegisterInputFileHandler([this](PlatformStringView path) -> int {
-			static ETConstexpr PlatformStringView SourceSuffix = L".e2shaderset.json";
-
-			if (path.IsEmpty()) {
-				return 1;
+		options.Register(SL("--emitSpirv"), SL("-s"), OptionRegistrar::MakePodSetter(_emitSpirV));
+		options.Register(SL("--emitDxbc"), SL("-d"), OptionRegistrar::MakePodSetter(_emitDxbc));
+		options.Register(SL("--shaderModel"), SL("-m"), [this](Log& log, PlatformStringSpan source) ETNoexceptHint -> Result {
+			if (source == SL("5_0")) {
+				_shaderModel = ShaderModel::_5_0;
+			} else if (source == SL("6_0")) {
+				_shaderModel = ShaderModel::_6_0;
+			} else if (source == SL("6_1")) {
+				_shaderModel = ShaderModel::_6_1;
+			} else {
+				log.Write(Severity::Error, "unknown shader model {}" ET_NEWLINE, source);
+				return Result::InvalidParameter;
 			}
 
-			_pipelinePath.Assign(path).EnsureSuffix(SourceSuffix).ReplaceAll('\\', '/');
-			_hlslPath.Assign(_pipelinePath.Begin(), _pipelinePath.FindLast(SourceSuffix)).Append(L".hlsl");
-			_spirvOutPath.Assign(_pipelinePath.Begin(), _pipelinePath.FindLast(SourceSuffix)).Append(SpirVShaderSetExtension());
-			_dxbcOutPath.Assign(_pipelinePath.Begin(), _pipelinePath.FindLast(SourceSuffix)).Append(DxbcShaderSetExtension());
+			return Result::Success;
+		});
+		options.RegisterInputFileHandler([this](Logging::Log& /*log*/, PlatformStringSpan path) -> Result {
+			static ETConstexpr PlatformStringSpan SourceSuffix = SL(".e2shaderset.json");
 
-			return 0;
+			Path pipelinePath(_pipelinePath.GetAllocator(), KnownDirectory::Relative, path);
+			// Canonicalize path separators.
+			pipelinePath.ReplaceAll(SL('\\'), SL('/'));
+			pipelinePath.EnsureSuffix(SourceSuffix);
+
+			const PlatformStringSpan nameRoot(pipelinePath.Slice(0, pipelinePath.FindLast(SourceSuffix)));
+			Path                     hlslPath(_hlslPath.GetAllocator(), KnownDirectory::Relative, SL("{}.hlsl"), nameRoot);
+			Path                     spirVOutPath(_spirvOutPath.GetAllocator(), KnownDirectory::Relative, SL("{}.spirv.e2shaderset"), nameRoot);
+			Path                     dxbcOutPath(_dxbcOutPath.GetAllocator(), KnownDirectory::Relative, SL("{}.dxbc.e2shaderset"), nameRoot);
+
+			Swap(_pipelinePath, pipelinePath);
+			Swap(_hlslPath, hlslPath);
+			Swap(_spirvOutPath, spirVOutPath);
+			Swap(_dxbcOutPath, dxbcOutPath);
+
+			return Result::Success;
 		});
 	}
 
 	// ---------------------------------------------------
 
-	int ShaderCompiler::Process() {
+	Result ShaderCompiler::Process(Log& log) {
 		ComPointer<IDxcCompiler> compiler;
 		ET_ABORT_UNLESS_HRESULT(DxcCreateInstance(CLSID_DxcCompiler, __uuidof(IDxcCompiler), reinterpret_cast<void**>(compiler.GetInterfacePointer())));
 
@@ -240,12 +256,12 @@ namespace Tools {
 
 		ArrayList<DxcInvocation> invocations(MallocAllocator("Invocation List Allocator"));
 		if (_emitDxbc) {
-			ArrayList<DxcDefine> defines(MallocAllocator("Define List Allocator"), { { L"DIRECT3D", L"1" } });
+			ArrayList<DxcDefine> defines(MallocAllocator("Define List Allocator"), { { SL("DIRECT3D"), SL("1") } });
 			ArrayList<LPCWSTR>   arguments(MallocAllocator("Argument List Allocator"));
 
-			for (DxcInvocation& dxc : invocations) {
-				ET_ABORT_UNLESS_HRESULT(dxc(compiler.Get(), hlsl.Get(), _hlslPath, _shaderModel, arguments, defines));
-				dxc.WriteErrors();
+			for (ArrayList<DxcInvocation>::Reference dxc : invocations) {
+				ET_ABORT_UNLESS(dxc(compiler.Get(), hlsl.Get(), _hlslPath, _shaderModel, arguments, defines));
+				dxc.WriteErrors(log);
 			}
 
 			FlatBufferBuilder buffer;
@@ -261,16 +277,16 @@ namespace Tools {
 			buffer.Finish(CreateDxbcShaderSet(buffer, usagesOffset, bytecodeOffset), DxbcShaderSetIdentifier());
 			WriteFlatbuffer(_dxbcOutPath, buffer);
 
-			std::cout << "Wrote " << _dxbcOutPath.AsCString() << '.' << std::endl;
+			log.Write(Severity::Message, "wrote {}" ET_NEWLINE, _dxbcOutPath);
 		}
 
 		if (_emitSpirV) {
-			ArrayList<DxcDefine> defines(MallocAllocator("Define List Allocator"), { { L"VULKAN", L"1" } });
-			ArrayList<LPCWSTR>   arguments(MallocAllocator("Argument List Allocator"), { L"-spirv" });
+			ArrayList<DxcDefine> defines(MallocAllocator("Define List Allocator"), { { SL("VULKAN"), SL("1") } });
+			ArrayList<LPCWSTR>   arguments(MallocAllocator("Argument List Allocator"), { SL("-spirv") });
 
 			for (DxcInvocation& dxc : invocations) {
-				ET_ABORT_UNLESS_HRESULT(dxc(compiler.Get(), hlsl.Get(), _hlslPath, _shaderModel, arguments, defines));
-				dxc.WriteErrors();
+				ET_ABORT_UNLESS(dxc(compiler.Get(), hlsl.Get(), _hlslPath, _shaderModel, arguments, defines));
+				dxc.WriteErrors(log);
 			}
 
 			FlatBufferBuilder buffer;
@@ -286,10 +302,10 @@ namespace Tools {
 			buffer.Finish(CreateSpirVShaderSet(buffer, usagesOffset, bytecodeOffset), SpirVShaderSetIdentifier());
 			WriteFlatbuffer(_spirvOutPath, buffer);
 
-			std::cout << "Wrote " << _spirvOutPath.AsCString() << '.' << std::endl;
+			log.Write(Severity::Message, "wrote {}" ET_NEWLINE, _spirvOutPath);
 		}
 
-		return 0;
+		return Result::Success;
 	}
 
 }} // namespace Eldritch2::Tools

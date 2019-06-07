@@ -27,7 +27,7 @@ ETInlineHint ETForceInlineHint Stack<Value, Container>::Stack(const AllocatorTyp
 template <typename Value, class Container>
 template <class AllocatorType>
 ETInlineHint ETForceInlineHint Stack<Value, Container>::Stack(const AllocatorType& allocator, Stack&& stack) :
-	c(allocator, eastl::move(stack.c)) {}
+	c(allocator, Move(stack.c)) {}
 
 // ---------------------------------------------------
 
@@ -46,7 +46,7 @@ ETInlineHint ETForceInlineHint Stack<Value, Container>::Stack(const ContainerTyp
 
 template <typename Value, class Container>
 ETInlineHint ETForceInlineHint Stack<Value, Container>::Stack(ContainerType&& stack) :
-	c(eastl::move(stack)) {}
+	c(Move(stack)) {}
 
 // ---------------------------------------------------
 
@@ -94,7 +94,7 @@ ETInlineHint ETForceInlineHint void Stack<Value, Container>::Push(const ValueTyp
 
 template <typename Value, class Container>
 ETInlineHint ETForceInlineHint void Stack<Value, Container>::Push(ValueType&& value) {
-	c.Append(eastl::move(value));
+	c.Append(Move(value));
 }
 
 // ---------------------------------------------------
@@ -102,7 +102,15 @@ ETInlineHint ETForceInlineHint void Stack<Value, Container>::Push(ValueType&& va
 template <typename Value, class Container>
 template <class... Arguments>
 ETInlineHint ETForceInlineHint void Stack<Value, Container>::EmplaceBack(Arguments&&... arguments) {
-	c.EmplaceBack(eastl::forward<Arguments>(args)...);
+	c.EmplaceBack(Forward<Arguments>(args)...);
+}
+
+// ---------------------------------------------------
+
+template <typename Value, class Container>
+ETInlineHint ETForceInlineHint void Stack<Value, Container>::Pop(ValueType& outValue) {
+	outValue = Move(c.Back());
+	c.Pop();
 }
 
 // ---------------------------------------------------

@@ -12,14 +12,9 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/BatchCoordinator.hpp>
-#include <Graphics/Vulkan/DescriptorTable.hpp>
-#include <Graphics/GraphicsPipelineApi.hpp>
+#include <Graphics/Vulkan/PipelineBatcher.hpp>
+#include <Graphics/PipelineBuilder.hpp>
 //------------------------------------------------------------------//
-
-namespace Eldritch2 { namespace Graphics { namespace Vulkan {
-	class PipelineAttachmentDescription;
-}}} // namespace Eldritch2::Graphics::Vulkan
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
@@ -27,23 +22,23 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		class Pass {
+		class Stage {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
-			//!	Constructs this @ref Pass instance.
-			Pass(const Pass&) ETNoexceptHint = default;
-			//!	Constructs this @ref Pass instance.
-			Pass() ETNoexceptHint;
+			//!	Constructs this @ref Stage instance.
+			Stage(const Stage&) ETNoexceptHint = default;
+			//!	Constructs this @ref Stage instance.
+			Stage() ETNoexceptHint;
 
-			~Pass();
+			~Stage();
 
 			// ---------------------------------------------------
 
 		public:
-			VkResult BindResources(Gpu& gpu, const PipelinePassDescription& pass, const PipelineAttachmentDescription globalAttachments[]);
+			VkResult BindResources(Gpu& gpu, const StageBuilder& stage, const VkAttachmentDescription attachments[]);
 
-			void FreeResources(Gpu& gpu);
+			void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 			// - DATA MEMBERS ------------------------------------
 
@@ -57,27 +52,32 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		//!	Disable copy construction.
 		GraphicsPipeline(const GraphicsPipeline&) = delete;
 		//!	Constructs this @ref GraphicsPipeline instance.
-		GraphicsPipeline(GraphicsPipeline&&);
+		GraphicsPipeline(GraphicsPipeline&&) ETNoexceptHint;
 		//!	Constructs this @ref GraphicsPipeline instance.
-		GraphicsPipeline();
+		GraphicsPipeline() ETNoexceptHint = default;
 
 		~GraphicsPipeline() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		ETConstexpr const BatchCoordinator& GetBatches() const ETNoexceptHint;
-		ETConstexpr BatchCoordinator& GetBatches() ETNoexceptHint;
-
 		ETConstexpr const DescriptorTable& GetShaderResources() const ETNoexceptHint;
-		ETConstexpr DescriptorTable& GetShaderResources() ETNoexceptHint;
+
+		ETConstexpr const PipelineBatcher& GetBatches() const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, const GraphicsPipelineBuilder& builder, size_t commandPoolCount);
+		VkResult BindResourceViews(Gpu& gpu);
 
-		void FreeResources(Gpu& gpu);
+		VkResult PushToGpu(Gpu& gpu);
+
+		// ---------------------------------------------------
+
+	public:
+		VkResult BindResources(Gpu& gpu, const PipelineBuilder& builder, PipelineBatcher::CommandPoolList::SizeType poolCount);
+
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -87,12 +87,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		BatchCoordinator _batches;
-		DescriptorTable  _shaderResources;
+		PipelineBatcher _batches;
+		DescriptorTable _shaderResources;
 
 		// ---------------------------------------------------
 
-		friend void Swap(GraphicsPipeline&, GraphicsPipeline&);
+		friend void Swap(GraphicsPipeline&, GraphicsPipeline&) ETNoexceptHint;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

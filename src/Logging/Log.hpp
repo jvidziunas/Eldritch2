@@ -33,7 +33,7 @@ namespace Eldritch2 { namespace Logging {
 	protected:
 		//! Constructs this @ref Log instance.
 		/*!	Designed to be called from subclasses. */
-		Log(const Log&) = delete;
+		Log(const Log&) ETNoexceptHint;
 		//! Constructs this @ref Log instance.
 		/*!	Designed to be called from subclasses. */
 		Log() ETNoexceptHint;
@@ -46,14 +46,14 @@ namespace Eldritch2 { namespace Logging {
 		virtual void Write(const Utf8Char* string, size_t lengthInOctets) ETNoexceptHint abstract;
 
 		template <typename... Arguments>
-		void Write(Severity severity, StringView format, Arguments&&... arguments);
+		void Write(Severity severity, StringSpan format, Arguments&&... arguments);
 
 		// ---------------------------------------------------
 
 	public:
-		Severity GetWriteThreshold() const ETNoexceptHint;
+		Severity GetWriteThreshold(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
-		void SetWriteThreshold(Severity threshold) ETNoexceptHint;
+		void SetWriteThreshold(Severity threshold, MemoryOrder order = std::memory_order_release) ETNoexceptHint;
 
 		// ---------------------------------------------------
 

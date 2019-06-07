@@ -11,6 +11,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Input/Win32/Win32InputEngineComponent.hpp>
@@ -24,10 +30,12 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 	using namespace ::Eldritch2::Scheduling;
 	using namespace ::Eldritch2::Logging;
 
+	// ---------------------------------------------------
+
 	namespace {
 
-		ETInlineHint LPCWSTR RegisterWindowClass(LPCWSTR className, WNDPROC windowProc, HINSTANCE instance) {
-			WNDCLASSEXW windowClass {
+		ETForceInlineHint LPCWSTR RegisterWindowClass(LPCWSTR className, WNDPROC windowProc, HINSTANCE instance) ETNoexceptHint {
+			WNDCLASSEXW windowClass{
 				/*cbSize =*/sizeof(WNDCLASSEXW),
 				/*style =*/0,
 				/*lpfnWndProc =*/windowProc,
@@ -42,23 +50,20 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 				/*hIconSm =*/nullptr
 			};
 
-			return LPCWSTR(RegisterClassExW(&windowClass));
+			return LPCWSTR(RegisterClassExW(ETAddressOf(windowClass)));
 		}
 
 		// ---------------------------------------------------
 
-		static ETInlineHint bool RegisterListeners(HWND window) {
-			enum : DWORD { AttachFlags = RIDEV_INPUTSINK | RIDEV_NOLEGACY };
+		ETForceInlineHint bool RegisterListeners(HWND window) ETNoexceptHint {
 			enum : USHORT {
-				KeyboardPage  = 0x01,
 				KeyboardUsage = 0x06,
-				MousePage     = 0x01,
 				MouseUsage    = 0x02
 			};
 
 			const RAWINPUTDEVICE listeners[] = {
-				{ KeyboardPage, KeyboardUsage, AttachFlags, window },
-				{ MousePage, MouseUsage, AttachFlags, window }
+				{ /*usUsagePage =*/0x01, KeyboardUsage, /*dwFlags =*/ RIDEV_INPUTSINK | RIDEV_NOLEGACY, window },
+				{ /*usUsagePage =*/0x01, MouseUsage, /*dwFlags =*/RIDEV_INPUTSINK | RIDEV_NOLEGACY, window }
 			};
 
 			// ---
@@ -77,19 +82,19 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 
 	// ---------------------------------------------------
 
-	ErrorCode Win32InputEngineComponent::ReaderThread::EnterOnCaller() {
+	Result Win32InputEngineComponent::ReaderThread::EnterOnCaller() ETNoexceptHint {
 		/*	Since we operate in short bursts of work before sleeping, boost thread priority slightly to reduce the amount of downtime before the
 		 *	scheduler will queue us for execution. Windows internally does some priority boosting for us behind the scenes when we receive input,
 		 *	this is designed to supplement that behavior. */
 		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-		const LPCWSTR windowClass(RegisterWindowClass(L"MessageWindow", &DefWindowProcW, GetModuleByAddress(&DefWindowProcW)));
-		ET_AT_SCOPE_EXIT(UnregisterClassW(windowClass, GetModuleByAddress(&DefWindowProcW)));
+		const LPCWSTR windowClass(RegisterWindowClass(L"MessageWindow", ETAddressOf(DefWindowProcW), GetModuleByAddress(ETAddressOf(DefWindowProcW))));
+		ET_AT_SCOPE_EXIT(UnregisterClassW(windowClass, GetModuleByAddress(ETAddressOf(DefWindowProcW))));
 
 		const HWND window(CreateWindowExW(0, windowClass, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, nullptr, nullptr));
 		ET_AT_SCOPE_EXIT(DestroyWindow(window));
 		if (!RegisterListeners(window) || !_devices->Enumerate()) {
 			_window.store(nullptr, std::memory_order_release);
-			return Error::Unspecified;
+			return Result::Unspecified;
 		}
 
 		//	Signal to the outside world that we have initialized.
@@ -98,28 +103,28 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		RAWINPUT input;
 		BOOL     hadError;
 		//	GetMessage() returns 0 if it recieved a WM_QUIT message. This call intentionally blocks.
-		for (MSG event; ET_LIKELY(hadError = GetMessageW(&event, window, 0u, 0u)) != 0; /*no increment*/) {
+		for (MSG event; ET_LIKELY(hadError = GetMessageW(ETAddressOf(event), window, 0u, 0u)) != 0; /*no increment*/) {
 			if (ET_UNLIKELY(hadError == -1)) {
 				break;
 			}
 
 			if (ET_LIKELY(event.message == WM_INPUT)) {
-				PRAWINPUT ptr(&input);
+				PRAWINPUT ptr(ETAddressOf(input));
 				UINT      size(sizeof(input));
 
-				if (ET_LIKELY(GetRawInputData(HRAWINPUT(event.lParam), RID_INPUT, ptr, &size, sizeof(RAWINPUTHEADER)) > 0)) {
+				if (ET_LIKELY(GetRawInputData(HRAWINPUT(event.lParam), RID_INPUT, ptr, ETAddressOf(size), sizeof(RAWINPUTHEADER)) > 0)) {
 					_devices->Route(input);
 				}
 
 				//	This seems to be a no-op in all versions of Windows, but we do it just to be safe.
-				DefRawInputProc(&ptr, 1, sizeof(RAWINPUTHEADER));
+				DefRawInputProc(ETAddressOf(ptr), 1, sizeof(RAWINPUTHEADER));
 			}
 
-			TranslateMessage(&event);
-			DispatchMessageW(&event);
+			TranslateMessage(ETAddressOf(event));
+			DispatchMessageW(ETAddressOf(event));
 		}
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------

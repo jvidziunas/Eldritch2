@@ -12,33 +12,33 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Assets/Asset.hpp>
+#include <Core/Asset.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren { namespace AssetViews {
 
-	class ScriptAsset : public AbstractString<char>, public Assets::Asset {
+	class ScriptAsset : public AbstractString<char>, public Core::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		ScriptAsset(const ScriptAsset&) = delete;
 		//! Constructs this @ref ScriptAsset instance.
-		ScriptAsset(StringView path);
+		ScriptAsset(StringSpan path) ETNoexceptHint;
 
 		~ScriptAsset() override = default;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(const Builder& builder) override;
+		Result BindResources(Logging::Log& log, const Core::AssetBuilder& builder) override;
 
-		void FreeResources() override;
+		void FreeResources() ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+		static ETPureFunctionHint StringSpan GetExtension() ETNoexceptHint;
 
 		// ---------------------------------------------------
 

@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Flatbuffers/FlatBufferPackageProvider.hpp>
+#include <Core/StringLocalization.hpp>
 #include <Core/EngineComponent.hpp>
 #include <Logging/FileLog.hpp>
 #include <Core/World.hpp>
@@ -20,34 +20,38 @@
 
 namespace Eldritch2 { namespace Core {
 
-	class Engine {
+	class ETPureAbstractHint AbstractEngine {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
+		template <typename ContentDatabase>
 		class ManagementComponent : public EngineComponent {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
+			//!	Constructs this @ref ManagementComponent instance.
+			template <typename... ProviderCtorArgs>
+			ManagementComponent(const ObjectInjector& services, ProviderCtorArgs&&...) ETNoexceptHint;
 			//!	Disable copy construction.
 			ManagementComponent(const ManagementComponent&) = delete;
-			//!	Constructs this @ref ManagementComponent instance.
-			ManagementComponent(Engine& owner);
 
 			~ManagementComponent() = default;
 
 			// - ENGINE SERVICE SANDBOX METHODS ------------------
 
-		protected:
-			void BindResourcesEarly(Scheduling::JobExecutor& executor) override;
+		public:
+			void BindResourcesEarly(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
-			void PublishConfiguration(Core::PropertyRegistrar& properties) override;
+			void PublishApi(Core::PropertyApiBuilder& api) override;
+
+			using EngineComponent::PublishApi;
 
 			// - ENGINE SERVICE SANDBOX METHODS ------------------
 
-		protected:
-			void TickEarly(Scheduling::JobExecutor& executor) override;
+		public:
+			void TickEarly(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
-			void Tick(Scheduling::JobExecutor& executor) override;
+			void Tick(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
 			// ---------------------------------------------------
 
@@ -57,85 +61,152 @@ namespace Eldritch2 { namespace Core {
 			// - DATA MEMBERS ------------------------------------
 
 		private:
-			Engine* _owner;
-			size_t  _packageSweepLimitPerFrame;
+			ContentDatabase _content;
+			uint32          _maxSweepsPerFrame;
 		};
+
+		// ---
+
+	public:
+		using WorldList = ArrayList<UniquePointer<AbstractWorld>>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
-		Engine(const Engine&) = delete;
-		//!	Constructs this @ref Engine instance.
-		Engine();
+		AbstractEngine(const AbstractEngine&) = delete;
+		//!	Constructs this @ref AbstractEngine instance.
+		AbstractEngine() ETNoexceptHint;
 
-		~Engine() = default;
+		virtual ~AbstractEngine() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		const ObjectLocator& GetServiceLocator() const;
+		void SetShouldShutDown(MemoryOrder order = std::memory_order_release) const ETNoexceptHint;
 
-		Logging::Log& GetLog() const;
+		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
 
 		// - WORLD MANAGEMENT --------------------------------
 
 	public:
 		//!	Creates a new @ref World that will host a game instance.
-		/*!	@param[in] executor @ref JobExecutor that will run the world's deserialization and initialization jobs.
+		/*!	@param[in] executor @ref JobExecutor that will run the world's initialization jobs.
 			@returns @ref Errors::None if the world was instantiated successfully, or an @ref ErrorCode with information on why the operation failed.
 			@remarks See world service implementations for examples of properties that may be configured here. */
-		ErrorCode CreateWorld(Scheduling::JobExecutor& executor);
+		void CreateWorld(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void SetShouldShutDown(MemoryOrder order = std::memory_order_release) const;
-
-		bool ShouldRun(MemoryOrder order = std::memory_order_consume) const;
+		void ApplyProperties(Scheduling::JobExecutor& executor, PlatformStringSpan path) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode ApplyConfiguration(PlatformStringView filePath);
-
-		// ---------------------------------------------------
-
-	public:
-		template <class... Components>
-		ErrorCode BootOnCaller(Scheduling::JobExecutor& executor, Components&... components);
-		ErrorCode BootOnCaller(Scheduling::JobExecutor& executor);
+		void BootOnCaller(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	private:
-		void RunFrame(Scheduling::JobExecutor& executor);
+		virtual void RunFrame(Scheduling::JobExecutor& executor) ETNoexceptHint abstract;
 
-		void TickWorlds(Scheduling::JobExecutor& executor);
+		void TickWorlds(Scheduling::JobExecutor& executor) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	private:
-		void BindComponents(Scheduling::JobExecutor& executor);
+		template <typename ApiBuilder>
+		ApiBuilder BuildApi(ApiBuilder api) const;
 
-		void CreateBootWorld(Scheduling::JobExecutor& executor);
+		Result BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint;
+
+		void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint;
+
+		// ---------------------------------------------------
+
+	private:
+		virtual void BindComponents(Scheduling::JobExecutor& executor) ETNoexceptHint abstract;
+
+		virtual void FreeComponents(Scheduling::JobExecutor& executor) ETNoexceptHint abstract;
+
+		virtual void BindConfigurableResources(Scheduling::JobExecutor& executor) ETNoexceptHint abstract;
+
+		// ---------------------------------------------------
+
+	private:
+		virtual UniquePointer<AbstractWorld> AllocateWorld(Allocator&, const ObjectInjector&) abstract;
+
+		virtual void PublishComponents(PropertyApiBuilder&) const abstract;
+
+		virtual void PublishComponents(AssetApiBuilder&) const abstract;
+
+		virtual void PublishComponents(ObjectInjector&) const abstract;
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
-		Engine& operator=(const Engine&) = delete;
+		AbstractEngine& operator=(const AbstractEngine&) = delete;
+
+		// - DATA MEMBERS ------------------------------------
+
+	protected:
+		ObjectInjector _services;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable UsageMixin<MallocAllocator>    _allocator;
-		ObjectLocator                          _services;
-		mutable Logging::FileLog               _log;
-		mutable Atomic<bool>                   _shouldRun;
-		FlatBuffers::FlatBufferPackageProvider _packageProvider;
-		ArrayList<EngineComponent*>            _components;
-		mutable Mutex                          _worldsMutex;
-		ArrayList<UniquePointer<World>>        _worlds;
+		mutable UsageMixin<MallocAllocator> _allocator;
+		StringLocalization                  _localization;
+		Logging::FileLog                    _log;
+		mutable Atomic<bool>                _shouldRun;
+		ETCacheLineAligned mutable Mutex    _worldsMutex;
+		WorldList                           _worlds;
+	};
+
+	// ---
+
+	template <typename... Components>
+	class Engine : public Core::AbstractEngine {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Disable copy assignment.
+		Engine(const Engine&) = delete;
+		//!	Constructs this @ref Engine instance.
+		Engine() ETNoexceptHint;
+
+		~Engine() override = default;
+
+		// ---------------------------------------------------
+
+	private:
+		void RunFrame(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+		// ---------------------------------------------------
+
+	private:
+		void BindComponents(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+		void FreeComponents(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+		void BindConfigurableResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+		// ---------------------------------------------------
+
+	private:
+		UniquePointer<AbstractWorld> AllocateWorld(Allocator&, const ObjectInjector&) override;
+
+		void PublishComponents(PropertyApiBuilder&) const override;
+
+		void PublishComponents(AssetApiBuilder&) const override;
+
+		void PublishComponents(ObjectInjector&) const override;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		mutable Tuple<Components...> _components;
 	};
 
 }} // namespace Eldritch2::Core

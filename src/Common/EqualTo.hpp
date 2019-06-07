@@ -23,14 +23,16 @@ class EqualTo {
 
 public:
 	//!	Constructs this @ref EqualTo instance.
-	EqualTo() = default;
+	EqualTo(const EqualTo&) ETNoexceptHint = default;
+	//!	Constructs this @ref EqualTo instance.
+	EqualTo() ETNoexceptHint = default;
 
 	~EqualTo() = default;
 
 	// ---------------------------------------------------
 
 public:
-	bool operator()(const T& object0, const T& object1) const;
+	bool operator()(const T&, const T&) const ETNoexceptHint;
 };
 
 } // namespace Eldritch2

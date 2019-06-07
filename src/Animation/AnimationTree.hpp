@@ -15,53 +15,44 @@
 #include <Animation/AnimationApi.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Animation {
+namespace Eldritch2 { namespace Animation {
 
-	template <typename Allocator = MallocAllocator>
 	class AnimationTree {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using AllocatorType = Allocator;
+		struct RootLink {
+			AnimationTree* parent;
+			BoneIndex      bone;
+		};
+		
+		// ---
+
+	public:
+		using ClipList = ArrayList<UniquePointer<Clip>>;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref AnimationTree instance.
-		AnimationTree(const AllocatorType& allocator);
 		//! Disable copy construction.
 		AnimationTree(const AnimationTree&) = delete;
+		//! Constructs this @ref AnimationTree instance.
+		AnimationTree() ETNoexceptHint;
 
 		~AnimationTree() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		ETConstexpr const KnotCache& GetKnots() const ETNoexceptHint;
-
-		const Blend* GetRoot() const;
-
-		// ---------------------------------------------------
-
-	public:
-		void FetchKnots(uint64 time, BoneIndex maximumBone);
+		template <typename PublicClip, typename... CtorArgs>
+		PublicClip& InsertClip(CtorArgs&&...);
 
 		// ---------------------------------------------------
 
 	public:
-		template <typename PublicBlend, typename... ConstructorArguments>
-		PublicBlend& InsertBlend(ConstructorArguments&&... arguments);
+		Result BindResources(const ArmatureDefinition& definition);
 
-		template <typename PublicClip, typename... ConstructorArguments>
-		PublicClip& InsertClip(ConstructorArguments&&... arguments);
-
-		void SetRoot(uint32 index);
-
-		// ---------------------------------------------------
-
-	public:
-		void Clear();
+		void FreeResources() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -71,16 +62,13 @@ namespace Animation {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		mutable Allocator                               _allocator;
-		KnotCache                                       _knots;
-		ArrayList<UniquePointer<Clip>, ChildAllocator>  _clips;
-		ArrayList<UniquePointer<Blend>, ChildAllocator> _blends;
-		uint32                                          _root;
+		const ArmatureDefinition* _definition;
+		MallocAllocator           _allocator;
+		ClipList                  _clips;
 
 		// ---------------------------------------------------
 
-		template <typename Allocator>
-		friend void Swap(AnimationTree<Allocator>&, AnimationTree<Allocator>&);
+		friend void Swap(AnimationTree&, AnimationTree&) ETNoexceptHint;
 	};
 
 }} // namespace Eldritch2::Animation

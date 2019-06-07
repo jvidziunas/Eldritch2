@@ -16,8 +16,12 @@
 //==================================================================//
 #include <Input/Win32/DeviceCoordinator.hpp>
 #include <Core/EngineComponent.hpp>
-#include <Logging/ChildLog.hpp>
+#include <Core/WorldComponent.hpp>
 //------------------------------------------------------------------//
+
+namespace Eldritch2 { namespace Input {
+	class DeviceLocator;
+}} // namespace Eldritch2::Input
 
 using HHOOK = struct HHOOK__*;
 using HWND  = struct HWND__*;
@@ -27,7 +31,47 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 	class Win32InputEngineComponent : public Core::EngineComponent {
 		// - TYPE PUBLISHING ---------------------------------
 
-	private:
+	public:
+		class WorldComponent : public Core::WorldComponent {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref WorldComponent instance.
+			WorldComponent(const ObjectInjector& services) ETNoexceptHint;
+			//!	Disable copy construction.
+			WorldComponent(const WorldComponent&) = delete;
+
+			~WorldComponent() = default;
+
+			// - WORLD COMPONENT SANDBOX METHODS -----------------
+
+		public:
+			void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+			void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+			// ---------------------------------------------------
+
+		public:
+			void PublishApi(Scripting::Wren::ApiBuilder&) ETNoexceptHint override;
+
+			using Core::WorldComponent::PublishApi;
+
+			// ---------------------------------------------------
+
+			//!	Disable copy assignment.
+			WorldComponent& operator=(const WorldComponent&) = delete;
+
+			// - DATA MEMBERS ------------------------------------
+
+		private:
+			DeviceLocator* _keyboards;
+			DeviceLocator* _mice;
+		};
+
+		// ---
+
+	public:
 		class ReaderThread : public Thread {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -44,7 +88,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		public:
 			void SetShouldShutDown() ETNoexceptHint override;
 
-			ErrorCode EnterOnCaller() override sealed;
+			Result EnterOnCaller() ETNoexceptHint override sealed;
 
 			// ---------------------------------------------------
 
@@ -56,7 +100,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		private:
 			/*!	Win32 raw input requires a window for input registration. The handle is exposed primarily for the
 				engine component to issue a shutdown request to the sampling thread when the application terminates,
-				as there is little need to push state to the window. */
+				as there is effectively no need to push state to the window. */
 			Atomic<HWND>       _window;
 			DeviceCoordinator* _devices;
 		};
@@ -67,18 +111,21 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		//!	Disable copy construction.
 		Win32InputEngineComponent(const Win32InputEngineComponent&) = delete;
 		//!	Constructs this @ref Win32InputEngineComponent instance.
-		Win32InputEngineComponent(const ObjectLocator& services);
+		Win32InputEngineComponent(const ObjectInjector& services) ETNoexceptHint;
 
 		~Win32InputEngineComponent();
 
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
-	protected:
-		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
+	public:
+		void BindResourcesEarly(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
-		void BindResourcesEarly(Scheduling::JobExecutor& executor) override;
+		// ---------------------------------------------------
 
-		void PublishServices(ObjectLocator& services) override;
+	public:
+		void PublishApi(ObjectInjector& services) override;
+
+		using EngineComponent::PublishApi;
 
 		// ---------------------------------------------------
 
@@ -88,7 +135,7 @@ namespace Eldritch2 { namespace Input { namespace Win32 {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const HHOOK       _keyboardHook;
+		HHOOK             _keyboardHook;
 		DeviceCoordinator _devices;
 		ReaderThread      _inputReader;
 	};

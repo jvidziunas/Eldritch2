@@ -15,39 +15,51 @@
 
 //------------------------------------------------------------------//
 
-const char* wrenGetSlotBytes(WrenVM*, int, int*);
+namespace Eldritch2 { namespace Scripting { namespace Wren {
+	template <typename T>
+	void wrenSetSlotCppTypeHandle(WrenVM* vm, int slot) ETNoexceptHint;
+}}} // namespace Eldritch2::Scripting::Wren
+
 void*       wrenSetSlotNewForeign(WrenVM*, int, int, size_t);
+const char* wrenGetSlotBytes(WrenVM*, int, int*);
 void*       wrenGetSlotForeign(WrenVM*, int);
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	template <typename T, typename... Arguments>
-	ETInlineHint ETForceInlineHint T& SetReturn(WrenVM* vm, int classSlot, Arguments&&... arguments) {
-		return *new (wrenSetSlotNewForeign(vm, /*slot=*/0, classSlot, sizeof(T))) T(eastl::forward<Arguments>(arguments)...);
+	ETForceInlineHint T& wrenSetReturn(WrenVM* vm, int classSlot, Arguments&&... arguments) {
+		return *new (wrenSetSlotNewForeign(vm, /*slot=*/0, classSlot, sizeof(T))) T(Forward<Arguments>(arguments)...);
 	}
 
 	// ---------------------------------------------------
 
 	template <typename T, typename... Arguments>
-	ETInlineHint ETForceInlineHint T& SetReturn(WrenVM* vm, Arguments&&... arguments) {
+	ETForceInlineHint T& wrenSetReturn(WrenVM* vm, Arguments&&... arguments) {
 		wrenSetSlotCppTypeHandle<T>(vm, 0);
-		return SetReturn<T>(vm, /*classSlot =*/0, eastl::forward<Arguments>(arguments));
+		return wrenSetReturn<T>(vm, /*classSlot =*/0, Forward<Arguments>(arguments)...);
 	}
 
 	// ---------------------------------------------------
 
 	template <typename T>
-	ETInlineHint ETPureFunctionHint T& GetSlotAs(WrenVM* vm, int slot) ETNoexceptHint {
+	ETForceInlineHint ETPureFunctionHint T& wrenGetSlotAs(WrenVM* vm, int slot) ETNoexceptHint {
 		return *static_cast<T*>(wrenGetSlotForeign(vm, slot));
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETPureFunctionHint StringView GetSlotStringView(WrenVM* vm, int slot) ETNoexceptHint {
+	template <typename T>
+	ETForceInlineHint ETPureFunctionHint T& wrenGetReceiver(WrenVM* vm) ETNoexceptHint {
+		return wrenGetSlotAs<T>(vm, 0);
+	}
+
+	// ---------------------------------------------------
+
+	ETForceInlineHint ETPureFunctionHint StringSpan wrenGetSlotStringView(WrenVM* vm, int slot) ETNoexceptHint {
 		int               length;
 		const char* const data(wrenGetSlotBytes(vm, slot, ETAddressOf(length)));
 
-		return { data, StringView::SizeType(length) };
+		return { data, StringSpan::SizeType(length) };
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

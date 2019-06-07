@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Common/CppType.hpp>
@@ -16,7 +22,6 @@
 
 namespace Eldritch2 {
 
-CppType::CppType() :
-	CppType(([]() -> const std::type_info& { struct Dummy {}; return typeid(Dummy); })()) {}
+ETConstexpr CppType::CppType() ETNoexceptHint : CppType(([]() ETNoexceptHint -> CppType { struct NullType {}; return GetType<NullType>(); })()) {}
 
 } // namespace Eldritch2

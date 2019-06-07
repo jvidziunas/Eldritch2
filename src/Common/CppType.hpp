@@ -14,46 +14,47 @@
 //==================================================================//
 #include <Common/Mpl/Compiler.hpp>
 //------------------------------------------------------------------//
-#include <typeinfo>
-//------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
 class CppType {
+	// - TYPE PUBLISHING ---------------------------------
+
+private:
+	using TypeId = void(*)();
+
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref CppType instance.
-	CppType(const std::type_info& type);
+	ETConstexpr CppType(const CppType&) ETNoexceptHint = default;
 	//!	Constructs this @ref CppType instance.
-	CppType(const CppType&) = default;
+	ETConstexpr CppType(TypeId) ETNoexceptHint;
 	//!	Constructs this @ref CppType instance.
-	CppType();
+	ETConstexpr CppType() ETNoexceptHint;
 
 	~CppType() = default;
-
-	// ---------------------------------------------------
-
-public:
-	const char* GetName() const;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	const std::type_info* _type;
+	TypeId _id;
 
 	// ---------------------------------------------------
 
 public:
-	friend ETPureFunctionHint size_t GetHashCode(const CppType& type, size_t seed) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint size_t GetHashCode(const CppType&, size_t seed) ETNoexceptHint;
 
-	friend ETPureFunctionHint bool operator==(const CppType& left, const CppType& right) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint bool operator==(const CppType&, const CppType&) ETNoexceptHint;
 
-	friend ETPureFunctionHint bool operator!=(const CppType& left, const CppType& right) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint bool operator!=(const CppType&, const CppType&) ETNoexceptHint;
 
-	friend ETPureFunctionHint bool operator<(const CppType& left, const CppType& right) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint bool operator<(const CppType&, const CppType&) ETNoexceptHint;
 
-	friend ETPureFunctionHint bool operator<=(const CppType& left, const CppType& right) ETNoexceptHint;
+	friend ETConstexpr ETPureFunctionHint bool operator<=(const CppType&, const CppType&) ETNoexceptHint;
+
+	template <typename T>
+	friend ETConstexpr ETPureFunctionHint CppType GetType() ETNoexceptHint;
 };
 
 } // namespace Eldritch2

@@ -12,107 +12,98 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Mpl/Compiler.hpp>
-//------------------------------------------------------------------//
-#include <eastl/type_traits.h>
+#include <Common/Mpl/TypeTraits.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
 template <typename Container>
-auto begin(Container&& container) -> decltype(eastl::declval<Container>().Begin()) {
+auto begin(Container&& container) ETNoexceptHintIf(HasNoThrowMemberBegin<Container>()) -> decltype(Declval<Container&>().Begin()) {
 	return container.Begin();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto begin(const Container& container) -> decltype(eastl::declval<const Container>().Begin()) {
+auto begin(const Container& container) ETNoexceptHintIf(HasNoThrowMemberBegin<const Container>()) -> decltype(Declval<const Container&>().Begin()) {
 	return container.Begin();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto rbegin(Container&& container) -> decltype(eastl::declval<Container>().ReverseBegin()) {
-	return container.Begin();
+auto rbegin(Container&& container) -> decltype(Declval<Container&>().ReverseBegin()) {
+	return container.ReverseBegin();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto rbegin(const Container& container) -> decltype(eastl::declval<const Container>().ReverseBegin()) {
-	return container.Begin();
+auto rbegin(const Container& container) -> decltype(Declval<const Container&>().ReverseBegin()) {
+	return container.ReverseBegin();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto cbegin(const Container& container) -> decltype(eastl::declval<const Container>().ConstBegin()) {
+auto cbegin(const Container& container) -> decltype(Declval<const Container&>().ConstBegin()) {
 	return container.ConstBegin();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto crbegin(Container&& container) -> decltype(eastl::declval<Container>().ConstReverseBegin()) {
-	return container.Begin();
+auto crbegin(const Container& container) -> decltype(Declval<const Container&>().ConstReverseBegin()) {
+	return container.ConstReverseBegin();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto crbegin(const Container& container) -> decltype(eastl::declval<const Container>().ConstReverseBegin()) {
-	return container.Begin();
-}
-
-// ---------------------------------------------------
-
-template <typename Container>
-auto end(Container&& container) -> decltype(eastl::declval<Container>().End()) {
+auto end(Container&& container) ETNoexceptHintIf(HasNoThrowMemberEnd<Container>()) -> decltype(Declval<Container&>().End()) {
 	return container.End();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto end(const Container& container) -> decltype(eastl::declval<const Container>().End()) {
+auto end(const Container& container) ETNoexceptHintIf(HasNoThrowMemberEnd<const Container>()) -> decltype(Declval<const Container&>().End()) {
 	return container.End();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto rend(Container&& container) -> decltype(eastl::declval<Container>().ReverseEnd()) {
-	return container.End();
+auto rend(Container&& container) -> decltype(Declval<Container&>().ReverseEnd()) {
+	return container.ReverseEnd();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto rend(const Container& container) -> decltype(eastl::declval<const Container>().ReverseEnd()) {
-	return container.End();
+auto rend(const Container& container) -> decltype(Declval<const Container&>().ReverseEnd()) {
+	return container.ReverseEnd();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto cend(const Container& container) -> decltype(eastl::declval<const Container>().ConstEnd()) {
+auto cend(const Container& container) -> decltype(Declval<const Container&>().ConstEnd()) {
 	return container.ConstEnd();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto crend(Container&& container) -> decltype(eastl::declval<Container>().ConstReverseEnd()) {
-	return container.End();
+auto crend(Container&& container) -> decltype(Declval<Container&>().ConstReverseEnd()) {
+	return container.ConstReverseEnd();
 }
 
 // ---------------------------------------------------
 
 template <typename Container>
-auto crend(const Container& container) -> decltype(eastl::declval<const Container>().ConstReverseEnd()) {
-	return container.End();
+auto crend(const Container& container) -> decltype(Declval<const Container&>().ConstReverseEnd()) {
+	return container.ConstReverseEnd();
 }
 
 } // namespace Eldritch2

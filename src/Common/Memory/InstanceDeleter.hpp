@@ -15,13 +15,21 @@
 #include <Common/Function.hpp>
 //------------------------------------------------------------------//
 
+#if !defined(ET_INSTANCE_DELETER_SIZE)
+#	define ET_INSTANCE_DELETER_SIZE (2u * sizeof(void*))
+#endif
+
+#if !defined(ET_INSTANCE_ARRAY_DELETER_SIZE)
+#	define ET_INSTANCE_ARRAY_DELETER_SIZE (3u * sizeof(void*))
+#endif
+
 namespace Eldritch2 {
 
 class InstanceDeleter {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using DeleterFunction = Function<void(void*)>;
+	using DeleterFunction = FixedFunction<ET_INSTANCE_DELETER_SIZE, void (void*)>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -39,7 +47,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	void operator()(void* object) const;
+	void operator()(void* object) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -58,7 +66,7 @@ class InstanceArrayDeleter {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using DeleterFunction = Function<void(void*, size_t)>;
+	using DeleterFunction = FixedFunction<ET_INSTANCE_ARRAY_DELETER_SIZE, void(void*)>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -76,12 +84,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	size_t GetSize() const;
-
-	// ---------------------------------------------------
-
-public:
-	void operator()(void* objects) const;
+	void operator()(void* objects) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -92,7 +95,6 @@ public:
 
 private:
 	DeleterFunction _deleter;
-	size_t          _countInObjects;
 };
 
 } // namespace Eldritch2

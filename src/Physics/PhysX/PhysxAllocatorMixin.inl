@@ -28,7 +28,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	template <typename BackingAllocator>
 	template <typename... ConstructorArguments>
 	ETInlineHint PhysxAllocatorMixin<BackingAllocator>::PhysxAllocatorMixin(ConstructorArguments&&... constructorArguments) :
-		BackingAllocator(eastl::forward<ConstructorArguments>(constructorArguments)...) {}
+		BackingAllocator(Forward<ConstructorArguments>(constructorArguments)...) {}
 
 	// ---------------------------------------------------
 

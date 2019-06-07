@@ -31,7 +31,7 @@ namespace Eldritch2 {
 
 	public:
 	//!	Constructs this @ref Semaphore instance.
-		Semaphore(uint32 maximumCount, uint32 initialCount = 0u);
+		Semaphore(uint32 maximumCount, uint32 initialCount = 0u) ETNoexceptHint;
 	//!	Constructs this @ref Semaphore instance.
 		Semaphore(const Semaphore&) = delete;
 
@@ -40,11 +40,11 @@ namespace Eldritch2 {
 	// ---------------------------------------------------
 
 	public:
-		uint32	IncreaseCount(uint32 count = 1u);
+		uint32	IncreaseCount(uint32 count = 1u) ETNoexceptHint;
 
-		void	Acquire();
+		void	Acquire() ETNoexceptHint;
 
-		bool	TryAcquire();
+		bool	TryAcquire() ETNoexceptHint;
 
 	// ---------------------------------------------------
 

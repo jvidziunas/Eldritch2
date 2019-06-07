@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/DialogueSet.hpp>
@@ -18,8 +24,7 @@
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
-	DialogueResponse::DialogueResponse(WrenHandle* function) :
-		_function(function) {}
+	DialogueResponse::DialogueResponse(WrenHandle* function) ETNoexceptHint : _function(function) {}
 
 	// ---------------------------------------------------
 

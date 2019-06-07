@@ -9,16 +9,23 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/ActionSetClient.hpp>
-#include <Scripting/Wren/Context.hpp>
-#include <Input/DeviceLocator.hpp>
+#include <Scripting/Wren/ScriptExecutor.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	using namespace ::Eldritch2::Input;
+
+	// ---------------------------------------------------
 
 	namespace {
 
@@ -26,21 +33,18 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	} // anonymous namespace
 
-	ActionSetClient::ActionSetClient() :
-		ArrayList<InputAction>(MallocAllocator("Wren Action Set Allocator")),
-		_links(MallocAllocator("Device Binding List Allocator")) {}
+	ActionSetClient::ActionSetClient() ETNoexceptHint : ArrayList<InputAction>(MallocAllocator("Wren Action Set Allocator")), _links(MallocAllocator("Device Binding List Allocator")) {}
 
 	// ---------------------------------------------------
 
 	ActionSetClient::~ActionSetClient() {
-		ET_ASSERT(IsEmpty(), "Leaking Wren handles!");
-		ReleaseDevices();
+		ETAssert(IsEmpty(), "Leaking Wren handles!");
 	}
 
 	// ---------------------------------------------------
 
-	void ActionSetClient::Activate(ActionId id, int32 amount) {
-		InputAction& action((*this)[id]);
+	void ActionSetClient::Activate(Action id, int32 amount) {
+		InputAction& action((*this)[ArrayList<InputAction>::SizeType(id)]);
 		if (amount > 0) {
 			action.weights.pressed.fetch_add(uint32(amount), std::memory_order_relaxed);
 		} else {
@@ -58,7 +62,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	bool ActionSetClient::DispatchEvents(Context& context) {
+	bool ActionSetClient::DispatchEvents(ScriptExecutor& context) {
 		ETConstexpr uint64 PressedMask(~0u);
 		ETConstexpr uint64 ReleasedMask(~PressedMask);
 
@@ -67,7 +71,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 			const uint32 pressed(state & PressedMask);
 			const uint32 released((state & ReleasedMask) >> 32u);
 
-			if (ET_UNLIKELY(!context.Call(action.closure, pressed != 0u, released != 0u, AsFloat64(pressed) - AsFloat64(released)))) {
+			if (ET_UNLIKELY(!context.Call(action.closure, /*isPressed =*/pressed != 0u, /*isReleased =*/released != 0u, /*weight =*/AsFloat64(pressed) - AsFloat64(released)))) {
 				return false;
 			}
 		}
@@ -77,19 +81,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	void ActionSetClient::AcquireDevice(DeviceLink link) {
-		_links.Append(eastl::move(link));
-	}
-
-	// ---------------------------------------------------
-
-	void ActionSetClient::ReleaseDevices() {
-		_links.Clear();
-	}
-
-	// ---------------------------------------------------
-
-	ErrorCode ActionSetClient::BindResources(Context& vm, int bindingsSlot) {
+	Result ActionSetClient::BindResources(ScriptExecutor& vm, int bindingsSlot) {
 #if 0
 		WrenHandle* const   map(wrenGetSlotHandle(vm, bindingsSlot));
 		const ObjMap* const bindings(AS_MAP(map->value));
@@ -110,17 +102,15 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 		Swap(*this, actions);
 
-		return Error::None;
+		return Result::Success;
 	}
 
 	// ---------------------------------------------------
 
-	void ActionSetClient::FreeResources(Context& vm) {
-		for (InputAction& action : *this) {
-			vm.Free(eastl::exchange(action.closure, nullptr));
-		}
-
-		Clear();
+	void ActionSetClient::FreeResources(ScriptExecutor& vm) ETNoexceptHint {
+		ClearAndDispose([&](InputAction& action) ETNoexceptHint {
+			vm.Free(Exchange(action.closure, nullptr));
+		});
 	}
 
 }}} // namespace Eldritch2::Scripting::Wren

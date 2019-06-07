@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -17,7 +23,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	VertexCache::VertexCache() :
+	GeometryCache::GeometryCache() ETNoexceptHint :
 		_vertices(),
 		_vertexRanges(MallocAllocator("Vulkan Vertex Cache Vertex Free List Allocator")),
 		_indices(),
@@ -25,10 +31,10 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult VertexCache::BindResources(Gpu& gpu, VkDeviceSize vertexCacheSize, VkDeviceSize indexCacheSize) {
+	VkResult GeometryCache::BindResources(Gpu& gpu, VkDeviceSize vertexCacheSize, VkDeviceSize indexCacheSize) {
 		using ::Eldritch2::Swap;
 
-		VertexBuffer vertices;
+		AttributeBuffer vertices;
 		ET_ABORT_UNLESS(vertices.BindResources(gpu, vertexCacheSize));
 		ET_AT_SCOPE_EXIT(vertices.FreeResources(gpu));
 
@@ -46,7 +52,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult VertexCache::AllocateVertices(VkDeviceSize& outOffset, VkDeviceSize size) {
+	VkResult GeometryCache::AllocateVertices(VkDeviceSize& outOffset, VkDeviceSize size) {
 		const auto result(_vertexRanges.Allocate(size));
 		if (ET_UNLIKELY(!result.second)) {
 			return VK_ERROR_OUT_OF_POOL_MEMORY;
@@ -58,7 +64,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult VertexCache::AllocateIndices(VkDeviceSize& outOffset, VkDeviceSize size) {
+	VkResult GeometryCache::AllocateIndices(VkDeviceSize& outOffset, VkDeviceSize size) {
 		const auto result(_indexRanges.Allocate(size));
 		if (ET_UNLIKELY(!result.second)) {
 			return VK_ERROR_OUT_OF_POOL_MEMORY;
@@ -70,7 +76,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void VertexCache::DeallocateVertices(VkDeviceSize offset, VkDeviceSize size) {
+	void GeometryCache::DeallocateVertices(VkDeviceSize offset, VkDeviceSize size) {
 		if (ET_UNLIKELY(size == 0u)) {
 			return;
 		}
@@ -80,7 +86,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void VertexCache::DeallocateIndices(VkDeviceSize offset, VkDeviceSize size) {
+	void GeometryCache::DeallocateIndices(VkDeviceSize offset, VkDeviceSize size) {
 		if (ET_UNLIKELY(size == 0u)) {
 			return;
 		}
@@ -90,7 +96,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void VertexCache::FreeResources(Gpu& gpu) {
+	void GeometryCache::FreeResources(Gpu& gpu) ETNoexceptHint {
 		_indexRanges.Clear();
 		_indices.FreeResources(gpu);
 		_vertexRanges.Clear();
@@ -99,7 +105,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(VertexCache& lhs, VertexCache& rhs) {
+	void Swap(GeometryCache& lhs, GeometryCache& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
 		Swap(lhs._vertices, rhs._vertices);

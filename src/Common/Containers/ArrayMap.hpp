@@ -34,6 +34,10 @@ public:
 	using ValueType            = typename UnderlyingContainer::value_type;
 	using KeyType              = typename UnderlyingContainer::key_type;
 	using MappedType           = typename UnderlyingContainer::mapped_type;
+	using ConstPointer         = typename UnderlyingContainer::const_pointer;
+	using Pointer              = typename UnderlyingContainer::pointer;
+	using ConstReference       = typename UnderlyingContainer::const_reference;
+	using Reference            = typename UnderlyingContainer::reference;
 	using SortPredicateType    = typename UnderlyingContainer::key_compare;
 	using AllocatorType        = typename UnderlyingContainer::allocator_type::PublicType;
 	using Iterator             = typename UnderlyingContainer::iterator;
@@ -49,7 +53,7 @@ public:
 	template <typename InputIterator>
 	ArrayMap(const AllocatorType& allocator, const SortPredicateType& sort, InputIterator begin, InputIterator end);
 	//! Constructs this @ref ArrayMap instance.
-	ArrayMap(const AllocatorType& allocator, const SortPredicateType& sort, std::initializer_list<ValueType>);
+	ArrayMap(const AllocatorType& allocator, const SortPredicateType& sort, InitializerList<ValueType>);
 	//! Constructs this @ref ArrayMap instance.
 	ArrayMap(const AllocatorType& allocator = AllocatorType(), const SortPredicateType& sort = SortPredicateType(), SizeType capacity = 0u);
 	//! Constructs this @ref ArrayMap instance.
@@ -123,6 +127,9 @@ public:
 	Iterator Erase(Iterator begin, Iterator end);
 	Iterator Erase(Iterator where);
 	SizeType Erase(const KeyType& key);
+
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
 	void Clear();
 

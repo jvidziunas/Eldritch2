@@ -54,8 +54,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 		physx::PxScene& GetScene();
 
-		physx::PxMaterial& GetCharacterMaterial() const;
-		physx::PxMaterial& GetTriggerMaterial() const;
+		ETConstexpr physx::PxMaterial& GetMaterial(KnownMaterial material) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -67,12 +66,12 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	public:
 		void Simulate(MicrosecondTime duration);
 
-		ErrorCode FinishSimulation();
+		Result FinishSimulation();
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(physx::PxCpuDispatcher& dispatcher);
+		Result BindResources(physx::PxCpuDispatcher& dispatcher);
 
 		void FreeResources();
 

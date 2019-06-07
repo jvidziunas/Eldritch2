@@ -12,6 +12,7 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Memory/MallocAllocator.hpp>
+#include <Common/Memory.hpp>
 #include <Bakinator.hpp>
 //------------------------------------------------------------------//
 #include <Windows.h>
@@ -19,23 +20,12 @@
 
 using namespace ::Eldritch2;
 
-namespace {
-
-template <size_t size>
-static bool Utf8FromWideString(Utf8Char (&out)[size], const PlatformChar* source) {
-	return 0 != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, source, -1, out, size, NULL, NULL);
-}
-
-} // anonymous namespace
-
-int wmain(int argc, PlatformChar** argv) {
-	ArrayList<Utf8Char[MAX_PATH]> arguments(static_cast<size_t>(argc), MallocAllocator("Global Allocator"));
+int wmain(int argc, PlatformChar* argv[]) {
+	ArrayList<Utf8Char[MAX_PATH]> arguments(MallocAllocator("Global Allocator"), size_t(argc));
 
 	for (int i(0); i < argc; ++i) {
-		if (!Utf8FromWideString(arguments[i], argv[i])) {
-			return 1;
-		}
+		TranscodeString<Utf8Char>(argv[i], FindTerminator(argv[i]), arguments[i]);
 	}
 
-	return Tools::Bakinator().Run(arguments.Begin(), arguments.End());
+	return AsPosixInt(Tools::Bakinator().Run({arguments.Begin(), arguments.End()});
 }

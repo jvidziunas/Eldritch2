@@ -81,15 +81,15 @@ public:
 
 public:
 	//!	Constructs this @ref IdentifierPool instance.
-	IdentifierPool(const AllocatorType& allocator, std::initializer_list<RangeType> ranges);
+	IdentifierPool(const AllocatorType& allocator, InitializerList<RangeType> ranges);
 	//!	Constructs this @ref IdentifierPool instance.
 	IdentifierPool(const AllocatorType& allocator, ValueType begin, ValueType end);
 	//!	Constructs this @ref IdentifierPool instance.
-	IdentifierPool(const AllocatorType& allocator);
+	IdentifierPool(const AllocatorType& allocator) ETNoexceptHint;
 	//!	Constructs this @ref IdentifierPool instance.
 	IdentifierPool(const IdentifierPool&) = default;
 	//!	Constructs this @ref IdentifierPool instance.
-	IdentifierPool(IdentifierPool&&) = default;
+	IdentifierPool(IdentifierPool&&) ETNoexceptHint = default;
 
 	~IdentifierPool() = default;
 
@@ -107,7 +107,7 @@ public:
 public:
 	bool IsEmpty() const ETNoexceptHint;
 
-	void Clear();
+	void Clear() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -122,7 +122,7 @@ public:
 	// ---------------------------------------------------
 
 public:
-	IdentifierPool& Assign(std::initializer_list<RangeType> ranges);
+	IdentifierPool& Assign(InitializerList<RangeType> ranges);
 	IdentifierPool& Assign(ValueType begin, ValueType end);
 
 	IdentifierPool& operator=(const IdentifierPool&) = default;

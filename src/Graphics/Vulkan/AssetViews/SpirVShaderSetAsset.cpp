@@ -9,12 +9,18 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/AssetViews/SpirVShaderSetAsset.hpp>
 #include <Graphics/Vulkan/VulkanTools.hpp>
 #include <Flatbuffers/FlatBufferTools.hpp>
-#include <Assets/AssetDatabase.hpp>
+#include <Logging/Log.hpp>
 //------------------------------------------------------------------//
 #include <FlatBuffers/SpirVShaderSet_generated.h>
 //------------------------------------------------------------------//
@@ -24,23 +30,25 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 	using namespace ::Eldritch2::Graphics::Vulkan::FlatBuffers;
 	using namespace ::Eldritch2::Graphics::FlatBuffers;
 	using namespace ::Eldritch2::Logging;
-	using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Core;
 	using namespace ::flatbuffers;
+
+	// ---------------------------------------------------
 
 	namespace {
 
 		template <typename BitField>
-		ETConstexpr ETInlineHint ETForceInlineHint ETPureFunctionHint bool IsFlagEnabled(BitField field, BitField flags) ETNoexceptHint {
-			using FlagBits = typename eastl::underlying_type<BitField>::type;
+		ETConstexpr ETForceInlineHint ETPureFunctionHint bool TestFlag(BitField field, BitField flags) ETNoexceptHint {
+			using Bits = eastl::underlying_type_t<BitField>;
 
 			// ---
 
-			return FlagBits(field) & FlagBits(flags) == FlagBits(flags);
+			return (Bits(field) & Bits(flags)) == Bits(flags);
 		}
 
 		// ---------------------------------------------------
 
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkStencilOp ParseStencilOp(StencilOperation operation) ETNoexceptHint {
+		ETCpp14Constexpr ETForceInlineHint ETPureFunctionHint VkStencilOp ParseStencilOp(StencilOperation operation) ETNoexceptHint {
 			switch (operation) {
 			default:
 			case StencilOperation::KeepExisting: return VK_STENCIL_OP_KEEP;
@@ -56,7 +64,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkCompareOp ParseComparisonOp(ComparisonFunction function) ETNoexceptHint {
+		ETCpp14Constexpr ETForceInlineHint ETPureFunctionHint VkCompareOp ParseComparisonOp(ComparisonFunction function) ETNoexceptHint {
 			switch (function) {
 			default:
 			case ComparisonFunction::NeverPass: return VK_COMPARE_OP_NEVER;
@@ -72,7 +80,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkBlendOp ParseBlendOp(BlendOperator operation) ETNoexceptHint {
+		ETCpp14Constexpr ETForceInlineHint ETPureFunctionHint VkBlendOp ParseBlendOp(BlendOperator operation) ETNoexceptHint {
 			switch (operation) {
 			default:
 			case BlendOperator::Add: return VK_BLEND_OP_ADD;
@@ -85,7 +93,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(ColorBlendFactor factor) ETNoexceptHint {
+		ETCpp14Constexpr ETForceInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(ColorBlendFactor factor) ETNoexceptHint {
 			switch (factor) {
 			default:
 			case ColorBlendFactor::Zero: return VK_BLEND_FACTOR_ZERO;
@@ -112,7 +120,7 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 
 		// ---------------------------------------------------
 
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(AlphaBlendFactor factor) ETNoexceptHint {
+		ETCpp14Constexpr ETForceInlineHint ETPureFunctionHint VkBlendFactor ParseBlendFactor(AlphaBlendFactor factor) ETNoexceptHint {
 			switch (factor) {
 			default:
 			case AlphaBlendFactor::Zero: return VK_BLEND_FACTOR_ZERO;
@@ -132,181 +140,138 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetVie
 		// ---------------------------------------------------
 
 		ETInlineHint ETForceInlineHint ETPureFunctionHint VkColorComponentFlags ParseWriteMask(ChannelWriteMask channels) ETNoexceptHint {
-			return IsFlagEnabled(channels, ChannelWriteMask::Red) ? VK_COLOR_COMPONENT_R_BIT : 0u // clang-format off
-				| IsFlagEnabled(channels, ChannelWriteMask::Green) ? VK_COLOR_COMPONENT_G_BIT : 0u
-				| IsFlagEnabled(channels, ChannelWriteMask::Blue) ? VK_COLOR_COMPONENT_B_BIT : 0u
-				| IsFlagEnabled(channels, ChannelWriteMask::Alpha) ? VK_COLOR_COMPONENT_A_BIT : 0u; // clang-format on
+			return (TestFlag(channels, ChannelWriteMask::Red) ? VK_COLOR_COMPONENT_R_BIT : 0u) // clang-format off
+				| (TestFlag(channels, ChannelWriteMask::Green) ? VK_COLOR_COMPONENT_G_BIT : 0u)
+				| (TestFlag(channels, ChannelWriteMask::Blue) ? VK_COLOR_COMPONENT_B_BIT : 0u)
+				| (TestFlag(channels, ChannelWriteMask::Alpha) ? VK_COLOR_COMPONENT_A_BIT : 0u); // clang-format on
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint ETPureFunctionHint VkPipelineColorBlendAttachmentState ParseColorBlendState(const OutputState* asset) ETNoexceptHint {
-			return VkPipelineColorBlendAttachmentState {
-				/*blendEnable =*/VK_TRUE,
-				ParseBlendFactor(asset->SourceColorBlendFactor()),
-				ParseBlendFactor(asset->DestinationColorBlendFactor()),
-				ParseBlendOp(asset->ColorBlendOperator()),
-				ParseBlendFactor(asset->SourceAlphaBlendFactor()),
-				ParseBlendFactor(asset->DestinationAlphaBlendFactor()),
-				ParseBlendOp(asset->AlphaBlendOperator()),
-				ParseWriteMask(asset->WriteMask())
-			};
-		}
-
-		// ---------------------------------------------------
-
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkStencilOpState ParseStencilOpState(uint8 readMask, uint8 writeMask, uint8 reference, const StencilBehavior* asset) ETNoexceptHint {
-			return VkStencilOpState {
-				ParseStencilOp(asset->StencilAndDepthFailBehavior()),
-				ParseStencilOp(asset->StencilAndDepthPassBehavior()),
-				ParseStencilOp(asset->StencilPassDepthFailBehavior()),
-				ParseComparisonOp(asset->StencilComparisonFunction()),
-				readMask,
-				writeMask,
-				reference
-			};
-		}
-
-		// ---------------------------------------------------
-
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkPolygonMode ParsePolygonMode(PolygonFillMode fill) ETNoexceptHint {
-			switch (fill) {
-			default:
-			case PolygonFillMode::Solid: return VK_POLYGON_MODE_FILL;
-			case PolygonFillMode::Wireframe: return VK_POLYGON_MODE_LINE;
-			}; // switch(mode)
-		}
-
-		// ---------------------------------------------------
-
-		ETCpp14Constexpr ETInlineHint ETForceInlineHint ETPureFunctionHint VkCullModeFlags ParseCullMode(FaceCullMode cull) ETNoexceptHint {
-			switch (cull) {
-			default:
-			case FaceCullMode::None: return VK_CULL_MODE_NONE;
-			case FaceCullMode::FrontFace: return VK_CULL_MODE_FRONT_BIT;
-			case FaceCullMode::BackFace: return VK_CULL_MODE_BACK_BIT;
-			}; // switch(mode)
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ETForceInlineHint ETPureFunctionHint VkResult ParseDepthStencilState(SpirVShader& shader, const DepthStencilState* asset) ETNoexceptHint {
+		ETForceInlineHint ETPureFunctionHint Result ParseDepthStencilState(SpirVShader& shader, const DepthStencilDescriptor* asset) ETNoexceptHint {
 			using FlagBits = eastl::underlying_type<DepthStencilFlags>::type;
+
+			static ETConstexpr auto ParseStencilOpState([](uint8 readMask, uint8 writeMask, uint8 reference, const StencilDescriptor* asset) ETNoexceptHint -> VkStencilOpState {
+				return VkStencilOpState{
+					ParseStencilOp(asset->StencilAndDepthFailBehavior()),
+					ParseStencilOp(asset->StencilAndDepthPassBehavior()),
+					ParseStencilOp(asset->StencilPassDepthFailBehavior()),
+					ParseComparisonOp(asset->StencilComparisonFunction()),
+					readMask,
+					writeMask,
+					reference
+				};
+			});
 
 			// ---
 
 			shader.depthStencil.flags                = 0u;
-			shader.depthStencil.shouldTest           = IsFlagEnabled(asset->Flags(), DepthStencilFlags::DepthTestEnable) ? VK_TRUE : VK_FALSE;
-			shader.depthStencil.shouldWrite          = IsFlagEnabled(asset->Flags(), DepthStencilFlags::DepthWriteEnable) ? VK_TRUE : VK_FALSE;
+			shader.depthStencil.shouldWrite          = TestFlag(asset->Flags(), DepthStencilFlags::DepthWriteEnable) ? VK_TRUE : VK_FALSE;
 			shader.depthStencil.depthOperator        = ParseComparisonOp(asset->DepthComparisonFunction());
-			shader.depthStencil.shouldClipBounds     = VK_FALSE;
-			shader.depthStencil.shouldTestStencil    = FlagBits(asset->Flags()) & FlagBits(DepthStencilFlags::StencilTestEnable) ? VK_TRUE : VK_FALSE;
-			shader.depthStencil.frontStencilOperator = ParseStencilOpState(0xFF, 0xFF, 0xFF, asset->FrontFaceBehavior());
-			shader.depthStencil.backStencilOperator  = ParseStencilOpState(0xFF, 0xFF, 0xFF, asset->BackFaceBehavior());
-			shader.depthStencil.minDepthBounds       = 0.0f;
-			shader.depthStencil.maxDepthBounds       = 1.0f;
+			shader.depthStencil.frontStencilOperator = ParseStencilOpState(/*readMask =*/0xFF, /*writeMask =*/0xFF, /*reference =*/0xFF, asset->FrontFaceBehavior());
+			shader.depthStencil.backStencilOperator  = ParseStencilOpState(/*readMask =*/0xFF, /*writeMask =*/0xFF, /*reference =*/0xFF, asset->BackFaceBehavior());
 
-			return VK_SUCCESS;
+			return Result::Success;
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint ETPureFunctionHint VkResult ParseRasterizationState(SpirVShader& shader, const RasterizationState* asset) ETNoexceptHint {
-			shader.rasterizer.flags               = 0,
-			shader.rasterizer.shouldClampDepth    = VK_FALSE;
-			shader.rasterizer.shouldDiscardOutput = VK_FALSE;
-			shader.rasterizer.fill                = ParsePolygonMode(asset->FillMode());
-			shader.rasterizer.cullMode            = ParseCullMode(asset->CullMode());
-			shader.rasterizer.frontFace           = VK_FRONT_FACE_CLOCKWISE;
-			shader.rasterizer.depthBias           = AsFloatBits(asset->DepthBias());
-			shader.rasterizer.depthBiasClamp      = asset->DepthBiasClamp();
-			shader.rasterizer.slopeDepthBias      = asset->SlopeScaledDepthBias();
+		ETForceInlineHint ETPureFunctionHint Result ParseRasterizationState(SpirVShader& shader, const RasterizerDescriptor* asset) ETNoexceptHint {
+			static ETConstexpr auto ParseCullMode([](FaceCullMode cull) ETNoexceptHint -> VkCullModeFlags {
+				switch (cull) {
+				default:
+				case FaceCullMode::None: return VK_CULL_MODE_NONE;
+				case FaceCullMode::FrontFace: return VK_CULL_MODE_FRONT_BIT;
+				case FaceCullMode::BackFace: return VK_CULL_MODE_BACK_BIT;
+				}; // switch(mode)
+			});
 
-			return VK_SUCCESS;
+			// ---
+
+			shader.rasterizer.flags          = 0u;
+			shader.rasterizer.cullMode       = ParseCullMode(asset->CullMode());
+			shader.rasterizer.depthBias      = AsFloatBits(asset->DepthBias());
+			shader.rasterizer.depthBiasClamp = asset->DepthBiasClamp();
+			shader.rasterizer.slopeDepthBias = asset->SlopeScaledDepthBias();
+
+			return Result::Success;
 		}
 
 		// ---------------------------------------------------
 
-		ETInlineHint ETForceInlineHint VkResult ParseOutputStates(SpirVShader& shader, const FlatbufferVector<Offset<OutputState>>* assets) ETNoexceptHint {
-			if (assets->size() > ETCountOf(shader.blending.attachments)) {
-				return VK_ERROR_FEATURE_NOT_PRESENT;
+		ETForceInlineHint Result ParseOutputStates(SpirVShader& shader, const flatbuffers::Vector<Offset<OutputDescriptor>>* assets) ETNoexceptHint {
+			ET_ABORT_UNLESS(assets->size() <= ETCountOf(shader.blending.attachments) ? Result::Success : Result::InvalidParameter);
+
+			Transform(assets->begin(), assets->end(), shader.blending.attachments, [](const OutputDescriptor* asset) ETNoexceptHint -> VkPipelineColorBlendAttachmentState {
+				return VkPipelineColorBlendAttachmentState{
+					/*blendEnable =*/VK_TRUE,
+					ParseBlendFactor(asset->SourceColorBlendFactor()),
+					ParseBlendFactor(asset->DestinationColorBlendFactor()),
+					ParseBlendOp(asset->ColorBlendOperator()),
+					ParseBlendFactor(asset->SourceAlphaBlendFactor()),
+					ParseBlendFactor(asset->DestinationAlphaBlendFactor()),
+					ParseBlendOp(asset->AlphaBlendOperator()),
+					ParseWriteMask(asset->WriteMask())
+				};
+			});
+
+			return Result::Success;
+		}
+
+		// ---------------------------------------------------
+
+		ETForceInlineHint Result ParseShaders(SpirVShaderSet::SubshaderMap& shaders, const flatbuffers::Vector<Offset<ShaderDescriptor>>* asset) {
+			static ETConstexpr auto ParseBytecode([](ArrayList<SpirVShader::Opcode>& bytecode, const flatbuffers::Vector<uint32>* asset) {
+				bytecode.Assign(reinterpret_cast<const SpirVShader::Opcode*>(asset->data()), reinterpret_cast<const SpirVShader::Opcode*>(asset->data() + asset->size()));
+			});
+
+			const auto ParseShader([&](SpirVShader& shader, const ShaderDescriptor* asset) ETNoexceptHint -> Result {
+				ET_ABORT_UNLESS(ParseRasterizationState(shader, asset->Rasterizer()));
+				ET_ABORT_UNLESS(ParseOutputStates(shader, asset->Outputs()));
+				ET_ABORT_UNLESS(ParseDepthStencilState(shader, asset->DepthStencil()));
+
+				return Result::Success;
+			});
+
+			// ---
+
+			for (uoffset_t shader(0u); shader < asset->size(); ++shader) {
+				String name(String::AllocatorType("Shader Name Allocator"), AsString(asset->Get(shader)->Name()));
+				ET_ABORT_UNLESS(ParseShader(shaders[Move(name)], asset->Get(shader)));
 			}
 
-			Transform(assets->begin(), assets->end(), shader.blending.attachments, [](const OutputState* asset) { return ParseColorBlendState(asset); });
-			return VK_SUCCESS;
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ETForceInlineHint void ParseBytecode(ArrayList<uint32>& bytecode, const FlatbufferVector<uint32>* asset) {
-			bytecode.Assign(asset->data(), asset->data() + asset->size());
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ETForceInlineHint VkResult ParseShader(SpirVShader& shader, Range<const uint32*> bytecode, const Shader* asset) ETNoexceptHint {
-			ET_ABORT_UNLESS(ParseRasterizationState(shader, asset->RasterizationBehavior()));
-			ET_ABORT_UNLESS(ParseOutputStates(shader, asset->Outputs()));
-			ET_ABORT_UNLESS(ParseDepthStencilState(shader, asset->DepthStencilBehavior()));
-
-			return VK_SUCCESS;
-		}
-
-		// ---------------------------------------------------
-
-		ETInlineHint ETForceInlineHint VkResult ParseShaders(SpirVShaderSetAsset::ContainerType& shaders, Range<const uint32*> bytecode, const FlatbufferVector<Offset<Shader>>* asset) {
-			for (uint32 shader(0u); shader < asset->size(); ++shader) {
-				SpirVShader asdf;
-				ET_ABORT_UNLESS(ParseShader(asdf, bytecode, asset->Get(shader)));
-				shaders.Insert(eastl::move(asdf));
-			}
-
-			return VK_SUCCESS;
+			return Result::Success;
 		}
 
 	} // anonymous namespace
 
-	SpirVShaderSetAsset::SpirVShaderSetAsset(StringView path) :
-		Vulkan::SpirVShaderSet(MallocAllocator("SPIR-V Shader Set Allocator")),
-		Asset(path),
-		_bytecode(MallocAllocator("SPIR-V Shader Package Bytecode Allocator")) {}
+	SpirVShaderSetAsset::SpirVShaderSetAsset(StringSpan path) ETNoexceptHint : Asset(path) {}
 
 	// ---------------------------------------------------
 
-	ErrorCode SpirVShaderSetAsset::BindResources(const Builder& asset) {
+	Result SpirVShaderSetAsset::BindResources(Log& log, const AssetBuilder& asset) {
 		//	Ensure we're working with data that can plausibly represent a shader set.
-		Verifier verifier(reinterpret_cast<const uint8_t*>(asset.Begin()), asset.GetSize());
-		if (!VerifySpirVShaderSetBuffer(verifier)) {
-			asset.WriteLog(Severity::Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath());
-			return Error::InvalidParameter;
-		}
+		const auto shaderDescriptor(GetVerifiedRoot<SpirVShaderSetDescriptor>(asset.bytes, SpirVShaderSetDescriptorIdentifier()));
+		ET_ABORT_UNLESS(shaderDescriptor ? Result::Success : Result::InvalidParameter, log.Write(Error, "Data integrity check failed for {}, aborting load." ET_NEWLINE, GetPath()));
 
-		ArrayList<uint32> bytecode(_bytecode.GetAllocator());
-		ParseBytecode(bytecode, GetSpirVShaderSet(asset.Begin())->Bytecode());
+		SpirVShaderSet::BytecodeList bytecode;
 
-		const auto    shaderAsset(GetSpirVShaderSet(asset.Begin()));
-		ContainerType shaders(GetAllocator(), shaderAsset->Shaders()->size());
-		if (Failed(ParseShaders(shaders, { bytecode.GetData(), bytecode.GetData() + bytecode.GetSize() }, shaderAsset->Shaders()))) {
-			return Error::InvalidParameter;
-		}
+		SpirVShaderSet::SubshaderMap subshaderByPass;
+		ET_ABORT_UNLESS(ParseShaders(subshaderByPass, shaderDescriptor->Shaders()));
 
-		Swap(*this, shaders);
-		Swap(_bytecode, bytecode);
-
-		return Error::None;
+		return SpirVShaderSet::BindResources(bytecode, subshaderByPass);
 	}
 
 	// ---------------------------------------------------
 
-	void SpirVShaderSetAsset::FreeResources() {
-		Clear();
-		_bytecode.Clear();
+	void SpirVShaderSetAsset::FreeResources() ETNoexceptHint {
+		SpirVShaderSet::FreeResources();
 	}
 
 	// ---------------------------------------------------
 
-	ETPureFunctionHint StringView SpirVShaderSetAsset::GetExtension() ETNoexceptHint {
-		return { SpirVShaderSetExtension(), StringLength(SpirVShaderSetExtension()) };
+	ETPureFunctionHint StringSpan SpirVShaderSetAsset::GetExtension() ETNoexceptHint {
+		return StringSpan(SpirVShaderSetDescriptorExtension(), StringSpan::SizeType(StringLength(SpirVShaderSetDescriptorExtension())));
 	}
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

@@ -9,11 +9,17 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Common/FileReader.hpp>
 #include <Common/Algorithms.hpp>
-#include <Common/ErrorCode.hpp>
+#include <Common/Result.hpp>
 #include <Common/Math.hpp>
 //------------------------------------------------------------------//
 #include <Windows.h>
@@ -23,7 +29,7 @@ namespace Eldritch2 {
 
 namespace {
 
-	ETInlineHint ETForceInlineHint HANDLE MakeReader(const wchar_t* const path, DWORD disposition) ETNoexceptHint {
+	ETForceInlineHint HANDLE MakeReader(const wchar_t* const path, DWORD disposition) ETNoexceptHint {
 		return CreateFileW(path, GENERIC_READ, (FILE_SHARE_READ | FILE_SHARE_WRITE), /*lpSecurityAttributes =*/nullptr, disposition, FILE_FLAG_POSIX_SEMANTICS, /*hTemplateFile =*/nullptr);
 	}
 
@@ -49,43 +55,43 @@ FileReader::~FileReader() {
 
 // ---------------------------------------------------
 
-ErrorCode FileReader::Open(const PlatformChar* path) ETNoexceptHint {
+Result FileReader::Open(const PlatformChar* path) ETNoexceptHint {
 	HANDLE file(MakeReader(path, OPEN_EXISTING));
-	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Result::Success : Result::InvalidPath);
 	ET_AT_SCOPE_EXIT(if (file != INVALID_HANDLE_VALUE) CloseHandle(file));
 
 	Swap(_file, file);
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileReader::Read(void* const destination, size_t byteLength) ETNoexceptHint {
+Result FileReader::Read(void* const destination, size_t byteLength) ETNoexceptHint {
 	/*	Since Windows can only work with reads representable with a DWORD, we need a loop to accommodate read requests
 	 *	with sizes that do not fit within DWORD ranges. */
 	const auto end(static_cast<char*>(destination) + byteLength);
 	while (byteLength) {
 		DWORD bytesRead;
-		if (ReadFile(_file, end - byteLength, DWORD(Min<size_t>(byteLength, DWORD(-1))), ETAddressOf(bytesRead), /*lpOverlapped =*/nullptr) == FALSE) {
-			return Error::Unspecified;
+		if (ReadFile(_file, end - byteLength, DWORD(Minimum<size_t>(byteLength, DWORD(-1))), ETAddressOf(bytesRead), /*lpOverlapped =*/nullptr) == FALSE) {
+			return Result::Unspecified;
 		}
 
 		byteLength -= bytesRead;
 	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileReader::Read(void* const destination, size_t byteLength, uint64 byteOffset) ETNoexceptHint {
+Result FileReader::Read(void* const destination, size_t byteLength, uint64 fileByteOffset) ETNoexceptHint {
 	LARGE_INTEGER fileOffsetHelper;
-	fileOffsetHelper.QuadPart = byteOffset;
+	fileOffsetHelper.QuadPart = fileByteOffset;
 
 	//	Update the file pointer to reference the desired offset...
 	if (SetFilePointerEx(_file, fileOffsetHelper, /*lpNewFilePointer =*/nullptr, FILE_BEGIN) == 0) {
-		return Error::Unspecified;
+		return Result::Unspecified;
 	}
 
 	//	... then take the traditional write path.
@@ -94,9 +100,18 @@ ErrorCode FileReader::Read(void* const destination, size_t byteLength, uint64 by
 
 // ---------------------------------------------------
 
-uint64 FileReader::GetSizeInBytes() const ETNoexceptHint {
+uint64 FileReader::GetByteSize() const ETNoexceptHint {
 	LARGE_INTEGER byteSize;
 	return GetFileSizeEx(_file, ETAddressOf(byteSize)) != FALSE ? uint64(byteSize.QuadPart) : 0u;
+}
+
+// ---------------------------------------------------
+
+FileTime FileReader::GetLastWriteTime() const ETNoexceptHint {
+	FILETIME lastWriteTime{ DWORD(-1), DWORD(-1) };
+	GetFileTime(_file, /*lpCreationTime =*/nullptr, /*lpLastAccessTime =*/nullptr, ETAddressOf(lastWriteTime));
+
+	return FileTime(ULARGE_INTEGER{ lastWriteTime.dwHighDateTime, lastWriteTime.dwLowDateTime }.QuadPart);
 }
 
 // ---------------------------------------------------

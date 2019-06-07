@@ -18,14 +18,7 @@
 namespace Eldritch2 {
 
 template <typename Lambda>
-ETInlineHint ETForceInlineHint ScopeGuard<Lambda>::ScopeGuard(Lambda onScopeExit) :
-	_onScopeExit(eastl::move(onScopeExit)) {}
-
-// ---------------------------------------------------
-
-template <typename Lambda>
-ETInlineHint ETForceInlineHint ScopeGuard<Lambda>::ScopeGuard(ScopeGuard&& guard) :
-	_onScopeExit(eastl::move(guard._onScopeExit)) {}
+ETConstexpr ETForceInlineHint ScopeGuard<Lambda>::ScopeGuard(Lambda onScopeExit) ETNoexceptHint : _onScopeExit(Move(onScopeExit)) {}
 
 // ---------------------------------------------------
 
@@ -37,8 +30,8 @@ ETInlineHint ETForceInlineHint ScopeGuard<Lambda>::~ScopeGuard() {
 // ---------------------------------------------------
 
 template <typename Lambda>
-ScopeGuard<Lambda> AtScopeExit(Lambda lambda) {
-	return ScopeGuard<Lambda>(eastl::move(lambda));
+ETConstexpr ScopeGuard<Lambda> AtScopeExit(Lambda lambda) ETNoexceptHint {
+	return ScopeGuard<Lambda>(Move(lambda));
 }
 
 } // namespace Eldritch2

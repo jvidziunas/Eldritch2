@@ -14,100 +14,16 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <eastl/type_traits.h>
-//------------------------------------------------------------------//
-#include <cstdarg>
 #include <cstring>
 #include <cwctype>
 #include <cctype>
 #include <cstdio>
 #include <cwchar>
 //------------------------------------------------------------------//
+#include <eastl/internal/char_traits.h>
+//------------------------------------------------------------------//
 
 namespace Eldritch2 {
-
-ETForceInlineHint ETPureFunctionHint void* CopyMemory(void* ETRestrictPtrHint destination, const void* ETRestrictPtrHint source, size_t lengthInBytes) ETNoexceptHint {
-	return std::memcpy(destination, source, lengthInBytes);
-}
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint void* CopyMemoryNonTemporal(void* ETRestrictPtrHint destination, const void* ETRestrictPtrHint source, size_t lengthInBytes) ETNoexceptHint {
-	return std::memcpy(destination, source, lengthInBytes);
-}
-
-// ---------------------------------------------------
-
-template <typename T>
-ETForceInlineHint ETPureFunctionHint T* CopyArray(T* ETRestrictPtrHint destination, const T* ETRestrictPtrHint source, size_t sizeInElements) ETNoexceptHint {
-	return static_cast<T*>(Eldritch2::CopyMemory(destination, source, sizeInElements * sizeof(T)));
-}
-
-// ---------------------------------------------------
-
-template <typename T, size_t sizeInElements>
-ETForceInlineHint ETPureFunctionHint auto CopyArray(T (&destination)[sizeInElements], const T (&source)[sizeInElements]) ETNoexceptHint -> decltype(destination) {
-	return (Eldritch2::CopyArray(destination, source, sizeInElements), destination);
-}
-
-// ---------------------------------------------------
-
-template <typename T>
-ETForceInlineHint ETPureFunctionHint T* CopyArrayNonTemporal(T* ETRestrictPtrHint destination, const T* ETRestrictPtrHint source, size_t sizeInElements) ETNoexceptHint {
-	return static_cast<T*>(Eldritch2::CopyMemoryNonTemporal(destination, source, sizeInElements * sizeof(T)));
-}
-
-// ---------------------------------------------------
-
-template <typename T, size_t size>
-ETForceInlineHint ETPureFunctionHint auto CopyArrayNonTemporal(T (&destination)[size], const T (&source)[size]) ETNoexceptHint -> decltype(destination) {
-	return (Eldritch2::CopyArrayNonTemporal(destination, source, size), destination);
-}
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint void* MoveMemory(void* destination, const void* source, size_t lengthInBytes) ETNoexceptHint {
-	return std::memmove(destination, source, lengthInBytes);
-}
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint void* MoveMemoryNonTemporal(void* destination, const void* source, size_t lengthInBytes) ETNoexceptHint {
-	return Eldritch2::MoveMemory(destination, source, lengthInBytes);
-}
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint void* SetMemory(void* destination, int bitPattern, size_t lengthInBytes) ETNoexceptHint {
-	return std::memset(destination, bitPattern, lengthInBytes);
-}
-
-// ---------------------------------------------------
-
-template <typename T>
-ETForceInlineHint ETPureFunctionHint T* ZeroMemory(T* destination, size_t sizeInElements) ETNoexceptHint {
-	static_assert(eastl::is_trivially_copyable<T>::value, "Zeroing polymorphic types destroys virtual function tables and is disabled.");
-
-	// ---
-
-	return static_cast<T*>(Eldritch2::SetMemory(destination, 0, sizeInElements * sizeof(T)));
-}
-
-// ---------------------------------------------------
-
-//	Semi-hack: Define a specialization for the void type for compatibility with the more conventional usage
-ETForceInlineHint ETPureFunctionHint void* ZeroMemory(void* destination, size_t bufferSizeInBytes) ETNoexceptHint {
-	return Eldritch2::SetMemory(destination, 0, bufferSizeInBytes);
-}
-
-// ---------------------------------------------------
-
-template <typename T, size_t size>
-ETForceInlineHint ETPureFunctionHint auto ZeroMemory(T (&destination)[size]) ETNoexceptHint -> decltype(destination) {
-	return (Eldritch2::ZeroMemory(static_cast<T*>(destination), size), destination);
-}
-
-// ---------------------------------------------------
 
 ETForceInlineHint ETPureFunctionHint int OrderBuffersCaseInsensitive(const void* lhs, const void* rhs, size_t spanInBytes) ETNoexceptHint {
 	return _memicmp(lhs, rhs, spanInBytes);
@@ -287,81 +203,14 @@ ETForceInlineHint ETPureFunctionHint bool StringsEqualCaseInsensitive(const wcha
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const char* string) ETNoexceptHint {
-	return std::strlen(string);
+ETCpp14Constexpr ETPureFunctionHint size_t StringLength(const char* string) ETNoexceptHint {
+	return eastl::CharStrlen(string);
 }
 
 // ---------------------------------------------------
 
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const wchar_t* string) ETNoexceptHint {
-	return std::wcslen(string);
-}
-
-// ---------------------------------------------------
-
-template <size_t length>
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const char (&string)[length]) ETNoexceptHint {
-	return Eldritch2::StringLength(static_cast<const char*>(string));
-}
-
-// ---------------------------------------------------
-
-template <size_t length>
-ETForceInlineHint ETPureFunctionHint size_t StringLength(const wchar_t (&string)[length]) ETNoexceptHint {
-	return Eldritch2::StringLength(static_cast<const wchar_t*>(string));
-}
-
-// ---------------------------------------------------
-
-ET_PUSH_MSVC_WARNING_STATE(disable : 4996)
-ETForceInlineHint ETPureFunctionHint char* CopyString(char* destination, const char* source, size_t maxLengthInCharacters) ETNoexceptHint {
-	return std::strncpy(destination, source, maxLengthInCharacters);
-}
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint wchar_t* CopyString(wchar_t* destination, const wchar_t* source, size_t maxLengthInCharacters) ETNoexceptHint {
-	return std::wcsncpy(destination, source, maxLengthInCharacters);
-}
-
-// ---------------------------------------------------
-
-template <size_t length>
-ETForceInlineHint ETPureFunctionHint auto CopyString(char (&destination)[length], const char* source) ETNoexceptHint -> decltype(destination) {
-	return (Eldritch2::CopyString(static_cast<char*>(destination), source, length), destination);
-}
-
-// ---------------------------------------------------
-
-template <size_t length>
-ETForceInlineHint ETPureFunctionHint auto CopyString(wchar_t (&destination)[length], const wchar_t* source) ETNoexceptHint -> decltype(destination) {
-	return (Eldritch2::CopyString(static_cast<wchar_t*>(destination), source, length), destination);
-}
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint char* AppendString(char* destination, const char* source, size_t maxLengthInCharacters) ETNoexceptHint {
-	return std::strncat(destination, source, maxLengthInCharacters);
-}
-
-// ---------------------------------------------------
-
-ETForceInlineHint ETPureFunctionHint wchar_t* AppendString(wchar_t* destination, const wchar_t* source, size_t maxLengthInCharacters) ETNoexceptHint {
-	return std::wcsncat(destination, source, maxLengthInCharacters);
-}
-
-// ---------------------------------------------------
-
-template <size_t length>
-ETForceInlineHint ETPureFunctionHint auto AppendString(char (&destination)[length], const char* source) ETNoexceptHint -> decltype(destination) {
-	return (Eldritch2::AppendString(static_cast<char*>(destination), source, length), destination);
-}
-
-// ---------------------------------------------------
-
-template <size_t length>
-ETForceInlineHint ETPureFunctionHint auto AppendString(wchar_t (&destination)[length], const wchar_t* source) ETNoexceptHint -> decltype(destination) {
-	return (Eldritch2::AppendString(static_cast<wchar_t*>(destination), source, length), destination);
+ETCpp14Constexpr ETPureFunctionHint size_t StringLength(const wchar_t* string) ETNoexceptHint {
+	return eastl::CharStrlen(string);
 }
 
 // ---------------------------------------------------

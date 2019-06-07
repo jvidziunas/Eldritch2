@@ -16,8 +16,8 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
+	class ScriptExecutor;
 	class Dispatcher;
-	class Context;
 }}} // namespace Eldritch2::Scripting::Wren
 
 struct WrenHandle;
@@ -32,23 +32,23 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		//!	Disable copy construction.
 		GameObject(const GameObject&) = delete;
 		//!	Constructs this @ref GameObject instance.
-		GameObject();
+		GameObject() ETNoexceptHint;
 
 		~GameObject();
 
 		// ---------------------------------------------------
 
 	public:
-		WrenHandle* FindComponent(WrenVM* vm, WrenHandle* wrenClass) const ETNoexceptHint;
+		WrenHandle* FindComponent(WrenHandle* wrenClass) const ETNoexceptHint;
 
-		bool HasComponent(WrenVM* vm, WrenHandle* wrenClass) const ETNoexceptHint;
+		bool HasComponent(WrenHandle* wrenClass) const ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		void InsertComponent(Context& vm, WrenHandle* wrenClass);
+		bool BindComponent(ScriptExecutor& vm, WrenHandle* wrenClass);
 
-		void FreeComponents(Context& vm);
+		void FreeComponents(ScriptExecutor& vm) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -58,7 +58,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		ArrayList<WrenHandle*> _components;
+		ArrayMap<WrenHandle*, WrenHandle*> _componentByClass;
 	};
 
 	// ---
@@ -70,23 +70,21 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		//!	Disable copy construction.
 		Game(const Game&) = delete;
 		//!	Constructs this @ref Game instance.
-		Game();
+		Game() ETNoexceptHint;
 
 		~Game();
 
 		// ---------------------------------------------------
 
 	public:
-		void HandlePlayerJoin(Dispatcher& dispatcher, StringView name);
-
-		void HandlePlayerLeave(Dispatcher& dispatcher, StringView name);
+		void QueueEvents(Dispatcher& dispatcher);
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(Context& vm, Dispatcher& dispatcher);
+		Result BindResources(ScriptExecutor& vm);
 
-		void FreeResources(Context& vm);
+		void FreeResources(ScriptExecutor& vm) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -98,7 +96,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	private:
 		WrenHandle*            _whenPlayerJoinsStub;
 		WrenHandle*            _whenPlayerLeavesStub;
-		SymbolTable<Utf8Char>  _tags;
+		SymbolSet<Utf8Char>    _tags;
 		ArrayList<WrenHandle*> _gameObjects;
 
 		// ---------------------------------------------------

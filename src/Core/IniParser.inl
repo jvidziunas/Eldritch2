@@ -17,67 +17,55 @@
 
 namespace Eldritch2 { namespace Core {
 
-	static ETConstexpr StringView Whitespace = " \f\n\r\t\v";
+	template <typename TrinaryConsumer>
+	ETInlineHint void ParseIni(StringSpan source, TrinaryConsumer keyHandler) ETNoexceptHint {
+		static ETConstexpr StringSpan Whitespace = " \f\n\r\t\v";
+		static ETConstexpr Utf8Char Comment      = ';';
 
-	// ---------------------------------------------------
+		StringSpan group;
 
-	template <typename TrinaryConsumer, typename AltTrinaryConsumer>
-	void ParseIniAssignment(StringView group, StringView line, TrinaryConsumer& keyHandler, AltTrinaryConsumer& unknownKeyHandler) {
-		using Offset = StringView::SizeType;
+		const auto ParseGroupHeader([&](StringSpan line) ETNoexceptHint -> void {
+			const StringSpan::SizeType delimiter(line.FindAny("];", 1u));
+			if (delimiter == StringSpan::SizeType(-1) || line[delimiter] == Comment) {
+				//	Comments may not be placed within the group header, though they may appear after the end of the header.
+				return;
+			}
 
-		const Offset delimiter(line.FindAny("=;"));
-		if (delimiter == Offset(-1) || line[delimiter] == ';') { // Ensure that any comments come *after* the assignment.
-			return;
-		}
+			line = line.Slice(0u, delimiter);
 
-		// Split name/value pair across '=' delimiter and strip comment if present.
-		StringView name(line.Substring(0u, delimiter));
-		StringView value(line.Substring(line.FindNot(Whitespace, delimiter + 1), line.Find(';', delimiter + 1)));
-		name  = name.Substring(0u, name.FindNotLast(Whitespace));
-		value = value.Substring(0u, value.FindNotLast(Whitespace));
+			const StringSpan::SizeType groupBegin(line.FindNot(Whitespace, 1u));
+			group = line.Slice(groupBegin, line.FindNotLast(Whitespace, groupBegin));
+		});
 
-		if (!keyHandler(group, name, value)) {
-			unknownKeyHandler(group, name, value);
-		}
-	}
+		const auto ParseAssignment([&](StringSpan line) ETNoexceptHint -> void {
+			const StringSpan::SizeType delimiter(line.FindAny("=;"));
+			if (delimiter == StringSpan::SizeType(-1) || line[delimiter] == Comment) { // Ensure that any comments come *after* the assignment.
+				return;
+			}
 
-	// ---------------------------------------------------
+			// Split name/value pair across '=' delimiter and strip comment if present.
+			StringSpan name(line.Slice(0u, delimiter));
+			StringSpan value(line.Slice(line.FindNot(Whitespace, delimiter + 1u), line.Find(Comment, delimiter + 1u)));
 
-	StringView ParseSectionHeader(StringView line) {
-		using Offset = StringView::SizeType;
+			keyHandler(group, name.Slice(0u, name.FindNotLast(Whitespace)), value.Slice(0u, value.FindNotLast(Whitespace)));
+		});
 
-		const Offset delimiter(line.FindAny("];", 1u));
-		if (delimiter == Offset(-1) || line[delimiter] == ';') {
-			//	Comments may not be placed within the section header, though they may appear after the end of the header.
-			return "";
-		}
-		StringView section(line.Substring(line.FindNot(Whitespace, 1u), delimiter));
-		return section.Substring(0u, section.FindNotLast(Whitespace));
-	}
+		// Strip BOM if present.
+		source.RemovePrefix(/*UTF-8 BOM*/ "\0xEF\0xBB\0xBF");
+		for (StringSpan::SizeType sourcePos(0u), newline(source.Find('\n', sourcePos)); sourcePos < source.GetLength(); sourcePos = newline, newline = source.Find('\n', sourcePos)) {
+			const StringSpan::SizeType lineBegin(source.FindNot(Whitespace, sourcePos));
+			const StringSpan           line(source.Slice(lineBegin, source.FindNotLast(Whitespace, lineBegin)));
 
-	// ---------------------------------------------------
-
-	template <typename TrinaryConsumer, typename AltTrinaryConsumer>
-	void ParseIni(StringView source, TrinaryConsumer keyHandler, AltTrinaryConsumer unknownKeyHandler) {
-		using Offset = StringView::SizeType;
-
-		StringView section;
-
-		source.RemovePrefix("\0xEF\0xBB\0xBF" /*UTF-8 BOM*/);
-		for (Offset position(0u), newline(source.Find('\n', position)); position < source.GetLength(); position = newline, newline = source.Find('\n', position)) {
-			StringView line(source.Substring(source.FindNot(Whitespace, position), newline));
-			line = line.Substring(0, line.FindNotLast(Whitespace));
-
-			if (line.IsEmpty() || line.Front() == ';') {
+			if (line.IsEmpty() || line.Front() == Comment) {
 				continue; // Comment-only/empty line.
 			}
 
 			if (line.Front() == '[') {
-				section = ParseSectionHeader(line);
+				ParseGroupHeader(line);
 				continue;
 			}
 
-			ParseIniAssignment(section, line, keyHandler, unknownKeyHandler);
+			ParseAssignment(line);
 		}
 	}
 

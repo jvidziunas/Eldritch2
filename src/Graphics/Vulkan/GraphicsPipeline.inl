@@ -17,25 +17,13 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETConstexpr ETInlineHint ETForceInlineHint const BatchCoordinator& GraphicsPipeline::GetBatches() const ETNoexceptHint {
-		return _batches;
-	}
-
-	// ---------------------------------------------------
-
-	ETConstexpr ETInlineHint ETForceInlineHint BatchCoordinator& GraphicsPipeline::GetBatches() ETNoexceptHint {
+	ETConstexpr ETInlineHint ETForceInlineHint const PipelineBatcher& GraphicsPipeline::GetBatches() const ETNoexceptHint {
 		return _batches;
 	}
 
 	// ---------------------------------------------------
 
 	ETConstexpr ETInlineHint ETForceInlineHint const DescriptorTable& GraphicsPipeline::GetShaderResources() const ETNoexceptHint {
-		return _shaderResources;
-	}
-
-	// ---------------------------------------------------
-
-	ETConstexpr ETInlineHint ETForceInlineHint DescriptorTable& GraphicsPipeline::GetShaderResources() ETNoexceptHint {
 		return _shaderResources;
 	}
 

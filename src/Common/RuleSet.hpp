@@ -12,94 +12,51 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Memory/ChildAllocator.hpp>
+#include <Common/Memory/MallocAllocator.hpp>
 #include <Common/Containers/ArrayList.hpp>
 #include <Common/Containers/ArrayMap.hpp>
 #include <Common/Mpl/FloatTypes.hpp>
-#include <Common/SymbolTable.hpp>
 #include <Common/Function.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-template <typename Symbol>
-union QueryFact {
-	void*   asPointer;
-	Symbol  asSymbol;
-	float64 asFloat;
-	uint64  asUInt;
-	int64   asInt;
-	bool    asBool;
-};
-
-// ---
-
-template <typename SymbolTable, class Allocator>
-class QueryBuilder {
-	// - TYPE PUBLISHING ---------------------------------
-
-public:
-	using SymbolTableType = SymbolTable;
-	using AllocatorType   = Allocator;
-	using SymbolType      = typename SymbolTableType::Symbol;
-	using FactType        = QueryFact<SymbolType>;
-	using FactMapType     = ArrayMap<SymbolType, FactType, LessThan<SymbolType>, AllocatorType>;
-	using FactNameType    = AbstractStringView<typename SymbolTableType::CharacterType>;
-
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-public:
-	//!	Constructs this @ref QueryBuilder instance.
-	QueryBuilder(const AllocatorType& allocator, const SymbolTableType& symbols);
-	//!	Constructs this @ref QueryBuilder instance.
-	QueryBuilder(const QueryBuilder&) = default;
-
-	~QueryBuilder() = default;
-
-	// ---------------------------------------------------
-
-public:
-	const FactMapType& GetFacts() const ETNoexceptHint;
-
-	// ---------------------------------------------------
-
-public:
-	//!	Publishes a pattern for matching with various @ref Rule instances.
-	/*!	@param[in] name String view containing the name of the fact to be added.
-		@param[in] value Fact value.
-		@returns A reference to *this for method chaining. */
-	QueryBuilder& Insert(FactNameType name, SymbolType value);
-	QueryBuilder& Insert(FactNameType name, float64 value);
-	QueryBuilder& Insert(FactNameType name, uint64 value);
-	QueryBuilder& Insert(FactNameType name, int64 value);
-	QueryBuilder& Insert(FactNameType name, bool value);
-	QueryBuilder& Insert(FactNameType name);
-
-	// - DATA MEMBERS ------------------------------------
-
-private:
-	const SymbolTable* _symbols;
-	FactMapType        _facts;
-};
-
-// ---
-
-template <typename SymbolTable, class Allocator>
+template <typename SymbolSet, class Allocator>
 class RuleBuilder {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using SymbolTableType = SymbolTable;
-	using AllocatorType   = Allocator;
-	using SymbolType      = typename SymbolTable::Symbol;
-	using CriteriaSetType = ArrayMap<SymbolType, Function<bool(const QueryFact<SymbolType>&) ETNoexceptHint>, LessThan<SymbolType>, AllocatorType>;
-	using FactNameType    = AbstractStringView<typename SymbolTableType::CharacterType>;
+	union Fact {
+		Fact(typename SymbolSet::Symbol) ETNoexceptHint;
+		Fact(float64) ETNoexceptHint;
+		Fact(uint64) ETNoexceptHint;
+		Fact(int64) ETNoexceptHint;
+		Fact(bool) ETNoexceptHint;
+		Fact() ETNoexceptHint;
+
+		// ---
+
+		typename SymbolSet::Symbol asSymbol;
+		float64                    asFloat;
+		uint64                     asUInt;
+		int64                      asInt;
+		bool                       asBool;
+	};
+
+	// ---
+
+public:
+	using SymbolSetType = SymbolSet;
+	using CriteriaSet   = ArrayMap<typename SymbolSet::Symbol, Function<bool(Fact)>, LessThan<typename SymbolSet::Symbol>, Allocator>;
+	using SymbolType    = typename CriteriaSet::KeyType;
+	using AllocatorType = typename CriteriaSet::AllocatorType;
+	using FactNameType  = AbstractStringSpan<typename SymbolSetType::CharacterType>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref RuleBuilder instance.
-	RuleBuilder(const AllocatorType& allocator, SymbolTableType& symbols);
+	RuleBuilder(const AllocatorType& allocator, SymbolSetType& symbols) ETNoexceptHint;
 	//!	Constructs this @ref RuleBuilder instance.
 	RuleBuilder(const RuleBuilder&) = default;
 
@@ -108,42 +65,92 @@ public:
 	// ---------------------------------------------------
 
 public:
-	const CriteriaSetType& GetCriteria() const ETNoexceptHint;
-	CriteriaSetType&       GetCriteria() ETNoexceptHint;
+	const CriteriaSet& GetCriteria() const ETNoexceptHint;
+	CriteriaSet&       GetCriteria() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	RuleBuilder& Insert(FactNameType name, typename CriteriaSetType::MappedType evaluator);
+	template <typename UnaryPredicate>
+	RuleBuilder& Insert(FactNameType name, UnaryPredicate evaluator);
 	RuleBuilder& Insert(FactNameType name);
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	SymbolTableType* _symbols;
-	CriteriaSetType  _criteria;
+	SymbolSetType* _symbols;
+	CriteriaSet    _criteria;
 };
 
 // ---
 
-template <typename Response, class Allocator = MallocAllocator>
-class RuleSet {
+template <typename Builder, typename Response, typename Allocator = MallocAllocator>
+class RuleSet : public Builder::SymbolSetType {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	using AllocatorType    = Allocator;
-	using SymbolTableType  = SymbolTable<Utf8Char, ChildAllocator>;
-	using SymbolType       = typename SymbolTableType::Symbol;
-	using QueryBuilderType = QueryBuilder<SymbolTableType, MallocAllocator>;
-	using RuleBuilderType  = RuleBuilder<SymbolTableType, MallocAllocator>;
-	using Rule             = Pair<typename RuleBuilderType::CriteriaSetType, Response>;
-	using RuleIterator     = typename ArrayList<Rule>::ConstIterator;
+	using RuleBuilderType = Builder;
+	using RuleList        = ArrayList<Pair<typename RuleBuilderType::CriteriaSetType, Response>, Allocator>;
+	using AllocatorType   = typename RuleList::AllocatorType;
+	using RuleType        = typename RuleList::ValueType;
+	using MatchType       = typename RuleList::ConstIterator;
+	using SizeType        = typename RuleList::SizeType;
+
+	// ---
+
+public:
+	class Query {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using FactMap       = ArrayMap<typename Builder::SymbolType, typename Builder::FactType, LessThan<typename Builder::SymbolType>, Allocator>;
+		using FactNameType  = typename Builder::SymbolTableType;
+		using AllocatorType = typename FactMap::AllocatorType;
+		using FactType      = typename FactMap::MappedType;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref Query instance.
+		Query(const AllocatorType& allocator, const RuleSet<Builder, Response, Allocator>& rules) ETNoexceptHint;
+		//!	Constructs this @ref Query instance.
+		Query(const Query&) = default;
+
+		~Query() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		//!	Publishes a pattern for matching with various @ref Rule instances.
+		/*!	@param[in] fact String view containing the name of the fact to be added.
+			@param[in] value Fact value.
+			@returns A reference to *this for method chaining. */
+		template <typename Value>
+		Query& Insert(FactNameType fact, Value value);
+		Query& Insert(FactNameType fact);
+
+		// ---------------------------------------------------
+
+	public:
+		template <class Allocator2>
+		ArrayList<MatchType, Allocator2> GetMatches(const Allocator2& allocator) const;
+
+		template <class Allocator2>
+		MatchType GetBestMatch(const Allocator2& allocator) const;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		const RuleSet* _rules;
+		FactMap        _facts;
+	};
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref RuleSet instance.
-	RuleSet(const AllocatorType& allocator);
+	template <typename... SymbolTableArgs>
+	RuleSet(const AllocatorType& allocator, SymbolTableArgs&&... symbolTableArgs) ETNoexceptHint;
 	//!	Constructs this @ref RuleSet instance.
 	RuleSet(const RuleSet&) = default;
 
@@ -152,45 +159,19 @@ public:
 	// ---------------------------------------------------
 
 public:
-	const SymbolTableType& GetSymbols() const ETNoexceptHint;
-	SymbolTableType&       GetSymbols() ETNoexceptHint;
-
-	// ---------------------------------------------------
-
-public:
-	RuleIterator Begin() const ETNoexceptHint;
-
-	RuleIterator End() const ETNoexceptHint;
-
-	// ---------------------------------------------------
-
-public:
-	template <class TemporaryAllocator>
-	ArrayList<RuleIterator, TemporaryAllocator> MatchAll(const TemporaryAllocator& allocator, const QueryBuilderType& query) const;
-
-	template <class TemporaryAllocator>
-	RuleIterator Match(const TemporaryAllocator& allocator, const QueryBuilderType& query) const;
-
-	// ---------------------------------------------------
-
-public:
-	void Insert(const RuleBuilderType& ruleBuilder, const Response& response);
-	void Insert(RuleBuilderType&& ruleBuilder, Response&& response);
-
-	void Clear();
+	void Emplace(const RuleBuilderType& rule, const Response& response);
+	void Emplace(RuleBuilderType&& rule, Response&& response);
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	mutable AllocatorType           _allocator;
-	SymbolTableType                 _symbols;
-	ArrayList<Rule, ChildAllocator> _rules;
+	RuleList _rules;
 };
 
 // ---
 
 template <typename InputIterator, typename FactMap>
-size_t GetRuleScore(InputIterator criteria, InputIterator criteriaEnd, const FactMap& facts);
+typename Span<InputIterator>::SizeType ScoreCriteria(Span<InputIterator> criteria, const FactMap& facts);
 
 } // namespace Eldritch2
 

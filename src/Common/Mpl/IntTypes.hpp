@@ -15,8 +15,10 @@
 //==================================================================//
 #include <Common/Mpl/Compiler.hpp>
 //------------------------------------------------------------------//
+#include <eastl/internal/integer_sequence.h>
 #include <EABase/eabase.h>
-#include <limits.h>
+//------------------------------------------------------------------//
+#include <climits>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
@@ -38,5 +40,20 @@ using uintptr = uintptr_t;
 using byte    = unsigned char;
 
 ETConstexpr size_t BitsPerByte(CHAR_BIT);
+
+template <typename T, T... Sequence>
+using IntegerSequence = typename eastl::integer_sequence<T, Sequence...>;
+
+template <typename T, size_t Length>
+using MakeIntegerSequence = typename eastl::make_integer_sequence<T, Length>;
+
+template <size_t... Indices>
+using IndexSequence = typename eastl::index_sequence<Indices...>;
+
+template <typename... Types>
+using IndexSequenceFor = typename eastl::make_index_sequence<sizeof...(Types)>;
+
+template <typename T, typename... Types>
+using IntegerSequenceFor = MakeIntegerSequence<T, sizeof...(Types)>;
 
 } // namespace Eldritch2

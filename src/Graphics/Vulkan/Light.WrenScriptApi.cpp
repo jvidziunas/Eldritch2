@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
@@ -21,16 +27,22 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	using namespace ::Eldritch2::Scripting::Wren;
 
+	// ---------------------------------------------------
+
 	namespace {
 
-		class Light : public Graphics::Light {
+		class Light : public RenderLight {
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
 		public:
 			//!	Constructs this @ref Light instance.
-			ETInlineHint ETForceInlineHint Light(Transformation localToWorld, RgbColor color, float16 radius) ETNoexceptHint : Graphics::Light(localToWorld, color, radius) {}
+			ETForceInlineHint Light(Transformation localToWorld, RgbColor color, float32 radius) ETNoexceptHint : RenderLight(localToWorld, color, radius) {}
 			//! Disable copy assignment.
 			Light(const Light&) = delete;
 
 			~Light() = default;
+
+			// ---------------------------------------------------
 
 			//!	Disable copy construction.
 			Light& operator=(const Light&) = delete;
@@ -38,24 +50,24 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	} // anonymous namespace
 
-	ET_IMPLEMENT_WREN_CLASS(Light) {
-		api.DefineClass<Light>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "Light", // clang-format off
+	ET_IMPLEMENT_WREN_CLASS(Light, api, moduleName) {
+		api.DefineClass<Light>("Light", moduleName, // clang-format off
 			{ /* Static methods */
 				ForeignMethod("new(_,_,_)", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<Light>(vm, /*classSlot =*/0, GetSlotAs<Transformation>(vm, 2), GetSlotAs<RgbColor>(vm, 3), float16(wrenGetSlotDouble(vm, 4)));
+					wrenSetReturn<Light>(vm, /*classSlot =*/0, wrenGetSlotAs<Transformation>(vm, 2), wrenGetSlotAs<RgbColor>(vm, 3), float32(wrenGetSlotDouble(vm, 4)));
 				}), },
 			{ /* Methods */
 				ForeignMethod("color", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<RgbColor>(vm, GetSlotAs<Light>(vm, 0).color);
+					wrenSetReturn<RgbColor>(vm, wrenGetSlotAs<Light>(vm, 0).color);
 				}),
 				ForeignMethod("color=(_)", [](WrenVM* vm) ETNoexceptHint {
-					GetSlotAs<Light>(vm, 0).color = GetSlotAs<RgbColor>(vm, 1);
+					wrenGetSlotAs<Light>(vm, 0).color = wrenGetSlotAs<RgbColor>(vm, 1);
 				}),
 				ForeignMethod("localToWorld", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<Transformation>(vm, GetSlotAs<Light>(vm, 0).localToWorld);
+					wrenSetReturn<Transformation>(vm, wrenGetSlotAs<Light>(vm, 0).localToWorld);
 				}),
 				ForeignMethod("localToWorld=(_)", [](WrenVM* vm) ETNoexceptHint {
-					GetSlotAs<Light>(vm, 0).localToWorld = GetSlotAs<Transformation>(vm, 1);
+					wrenGetSlotAs<Light>(vm, 0).localToWorld = wrenGetSlotAs<Transformation>(vm, 1);
 				}), }); // clang-format on
 	}
 

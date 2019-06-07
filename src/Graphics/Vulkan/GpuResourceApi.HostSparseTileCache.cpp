@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/GpuResourceApi.hpp>
@@ -19,20 +25,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	namespace {
 
-		ETConstexpr ETInlineHint ETForceInlineHint VkDeviceSize GetBytesPerTile(VkExtent3D tileExtent, VkDeviceSize bitsPerTexel) ETNoexceptHint {
+		ETConstexpr ETForceInlineHint VkDeviceSize GetBytesPerTile(VkExtent3D tileExtent, VkDeviceSize bitsPerTexel) ETNoexceptHint {
 			return (tileExtent.width * tileExtent.height * tileExtent.depth * bitsPerTexel) / BitsPerByte;
 		}
 
 	} // anonymous namespace
 
-	HostSparseTileCache::HostSparseTileCache() :
-		_cachedPagesByTile(MallocAllocator("Tile Cache Cached Page Set Allocator")),
-		_loadingTiles(MallocAllocator("Tile Cache Loading Tile Set Allocator")) {}
+	HostSparseTileCache::HostSparseTileCache() ETNoexceptHint : _cachedPagesByTile(MallocAllocator("Tile Cache Cached Page Set Allocator")), _loadingTiles(MallocAllocator("Tile Cache Loading Tile Set Allocator")) {}
 
 	// ---------------------------------------------------
 
-	HostSparseTileCache::HostSparseTileCache(HostSparseTileCache&& cache) :
-		HostSparseTileCache() {
+	HostSparseTileCache::HostSparseTileCache(HostSparseTileCache&& cache) ETNoexceptHint : HostSparseTileCache() {
 		Swap(*this, cache);
 	}
 
@@ -75,8 +78,8 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void Swap(HostSparseTileCache& lhs, HostSparseTileCache& rhs) {
-		Swap(static_cast<GpuBuffer&>(lhs), rhs);
+	void Swap(HostSparseTileCache& lhs, HostSparseTileCache& rhs) ETNoexceptHint {
+		Swap(static_cast<GpuBuffer&>(lhs), static_cast<GpuBuffer&>(rhs));
 		Swap(lhs._cachedPagesByTile, rhs._cachedPagesByTile);
 		Swap(lhs._loadingTiles, rhs._loadingTiles);
 	}

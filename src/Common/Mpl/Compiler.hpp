@@ -16,14 +16,13 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-
+#include <EABase/eabase.h>
 //------------------------------------------------------------------//
 
 #define _NULL_MACRO ((void)0)
 #define _ET_NULL_DEFINE
-#define ET_PREPROCESSOR_JOIN(a, b) ET_PREPROCESSOR_JOIN1(a, b)
-#define ET_PREPROCESSOR_JOIN1(a, b) ET_PREPROCESSOR_JOIN2(a, b)
-#define ET_PREPROCESSOR_JOIN2(a, b) a##b
+#define ET_CPP_JOIN(a, b) ET_CPP_JOIN2(a, b)
+#define ET_CPP_JOIN2(a, b) a##b
 
 // Since the Intel compiler tries to be a drop-in replacement for MSVC, we'll check against its properties first in order to rule it out
 #if defined(__INTEL_COMPILER) || defined(__ICC) || defined(__ECC)
@@ -255,18 +254,27 @@
 #endif
 
 #if !defined(ET_COMPILER_SUPPORTS_CPP11)
-#	if defined(__cplusplus) && (__cplusplus != 199711L)
+#	if defined(__cplusplus) && (__cplusplus > 199711L)
 #		define ET_COMPILER_SUPPORTS_CPP11 1
 #	else
 #		define ET_COMPILER_SUPPORTS_CPP11 0
 #	endif
 #endif
 
-#define ETUnreferencedParameter(ParameterName) static_cast<void>(ParameterName)
+#if !defined(ET_COMPILER_SUPPORTS_CPP14)
+#	if defined(__cplusplus) && (__cplusplus > 199711L)
+#		define ET_COMPILER_SUPPORTS_CPP14 1
+#	else
+#		define ET_COMPILER_SUPPORTS_CPP14 0
+#	endif
+#endif
+
+#define ETUnreferencedParameter(parameter) static_cast<void>(parameter)
 
 /* Syntatic sugar. The function-style #define can be used to make platform-dependent code and if/else
  * blocks look nice, while the compiler symbol-style #define can be used to control typedefs and similar. */
 #define ETCompilerSupportsCpp11() ET_COMPILER_SUPPORTS_CPP11
+#define ETCompilerSupportsCpp14() ET_COMPILER_SUPPORTS_CPP14
 #define ETIsCompilerMsvc() ET_COMPILER_IS_MSVC
 #define ETIsCompilerGcc() ET_COMPILER_IS_GCC
 #define ETIsCompilerIcc() ET_COMPILER_IS_ICC
@@ -276,12 +284,15 @@
 #if defined(_DEBUG) || defined(DEBUG)
 #	define ET_DEBUG_BUILD 1
 #	define ET_RELEASE_BUILD 0
+#	define ETReleaseToggle(release, debug) debug
 #else
 #	define ET_DEBUG_BUILD 0
 #	define ET_RELEASE_BUILD 1
+#	define ETReleaseToggle(release, debug) release
 #endif
 #define ETIsDebugBuild() ET_DEBUG_BUILD
 #define ETIsReleaseBuild() ET_RELEASE_BUILD
+
 //-------------------------------------------------------
 
 #define ETCacheLineAligned ET16ByteAligned
@@ -294,10 +305,11 @@
 
 #if ET_COMPILER_SUPPORTS_CPP11
 #	define ETNoexceptHint noexcept
-#	define ETNoexceptHintIf(condition) noexcept(condition)
+#	define ETNoexceptHintIf(...) noexcept(__VA_ARGS__)
+#	include <initializer_list>
 #else
 #	define ETNoexceptHint
-#	define ETNoexceptHintIf(condition)
+#	define ETNoexceptHintIf(...)
 #endif
 
 #define ETConstexpr constexpr
@@ -305,38 +317,175 @@
 
 #define ETInfiniteLoop for (;;)
 
-using ETPostfixOperatorHint = int;
+using ETPostfixSemantics = int;
 
 namespace Eldritch2 {
 
-namespace Detail {
+template <typename T, T Expansion>
+struct IntegralConstant {
+	// - TYPE PUBLISHING ---------------------------------
 
-	template <typename Type>
-	struct AlignmentOf {
+public:
+	using ValueType = T;
+	using Type      = IntegralConstant<T, Expansion>;
+
+	// ---------------------------------------------------
+
+public:
+	static ETConstexpr T Value = Expansion;
+
+	// ---------------------------------------------------
+
+	ETConstexpr ETForceInlineHint operator ValueType() const ETNoexceptHint {
+		return Value;
+	}
+
+	ETConstexpr ETForceInlineHint ValueType operator()() const ETNoexceptHint {
+		return Value;
+	}
+};
+
+struct ETPureAbstractHint EmptyBase {};
+
+using FalseType = IntegralConstant<bool, false>;
+using TrueType  = IntegralConstant<bool, true>;
+
+using YesType = char;
+using NoType  = char[2];
+
+template <typename T>
+struct Identity { using Type = T; };
+
+template <typename...>
+struct MakeVoid { using Type = void; };
+template <typename... Ts>
+using Void_t = typename MakeVoid<Ts...>::Type;
+
+template <typename T>
+struct RemoveArray : public Identity<T> {};
+template <typename T, size_t ArraySize>
+struct RemoveArray<const volatile T[ArraySize]> : public Identity<const volatile T> {};
+template <typename T, size_t ArraySize>
+struct RemoveArray<volatile T[ArraySize]> : public Identity<volatile T> {};
+template <typename T, size_t ArraySize>
+struct RemoveArray<const T[ArraySize]> : public Identity<const T> {};
+template <typename T, size_t ArraySize>
+struct RemoveArray<T[ArraySize]> : public Identity<T> {};
+template <typename T>
+struct RemoveArray<const volatile T[]> : public Identity<const volatile T> {};
+template <typename T>
+struct RemoveArray<volatile T[]> : public Identity<volatile T> {};
+template <typename T>
+struct RemoveArray<const T[]> : public Identity<const T> {};
+template <typename T>
+struct RemoveArray<T[]> : public Identity<T> {};
+
+template <typename T>
+struct RemovePointer : public Identity<T> {};
+template <typename T>
+struct RemovePointer<T* const volatile> : public Identity<T> {};
+template <typename T>
+struct RemovePointer<T* volatile> : public Identity<T> {};
+template <typename T>
+struct RemovePointer<T* const> : public Identity<T> {};
+template <typename T>
+struct RemovePointer<T*> : public Identity<T> {};
+
+template <typename T>
+struct RemoveReference : public Identity<T> {};
+template <typename T>
+struct RemoveReference<const volatile T&> : public Identity<const volatile T> {};
+template <typename T>
+struct RemoveReference<volatile T&> : public Identity<volatile T> {};
+template <typename T>
+struct RemoveReference<const T&> : public Identity<const T> {};
+template <typename T>
+struct RemoveReference<T&> : public Identity<T> {};
+
+template <typename T>
+struct RemoveConst : public Identity<T> {};
+template <typename T>
+struct RemoveConst<const T> : public Identity<T> {};
+
+template <typename T>
+struct RemoveVolatile : public Identity<T> {};
+template <typename T>
+struct RemoveVolatile<volatile T> : public Identity<T> {};
+
+template <typename T>
+struct RemoveConstVolatile : public Identity<typename RemoveConst<typename RemoveVolatile<T>::Type>::Type> {};
+
+template <typename>
+struct TupleSize : public IntegralConstant<size_t, 1u> {};
+template <typename T>
+struct TupleSize<T[]> { static_assert(sizeof(T) == 0u, "TupleSize cannot be used with arrays of unknown size"); };
+template <typename T, size_t Size>
+struct TupleSize<T[Size]> : public IntegralConstant<size_t, Size> {};
+template <typename T, size_t Size>
+struct TupleSize<const volatile T (&)[Size]> : public TupleSize<T[Size]> {};
+template <typename T, size_t Size>
+struct TupleSize<volatile T (&)[Size]> : public TupleSize<T[Size]> {};
+template <typename T, size_t Size>
+struct TupleSize<const T (&)[Size]> : public TupleSize<T[Size]> {};
+template <typename T, size_t Size>
+struct TupleSize<T (&)[Size]> : public TupleSize<T[Size]> {};
+
+template <typename T>
+ETConstexpr ETForceInlineHint void ExpandPack() ETNoexceptHint{};
+
+template <typename T>
+ETConstexpr T Declval() ETNoexceptHint;
+
+template <size_t Index, typename T, size_t Size>
+ETConstexpr ETForceInlineHint const T& Get(const T (&elements)[Size]) ETNoexceptHint {
+	static_assert(Index < Size, "compile-time array index out of bounds");
+	return elements[Index];
+}
+
+template <size_t Index, typename T, size_t Size>
+ETConstexpr ETForceInlineHint T&& Get(T(&&elements)[Size]) ETNoexceptHint {
+	static_assert(Index < Size, "compile-time array index out of bounds");
+	return elements[Index];
+}
+
+template <size_t Index, typename T, size_t Size>
+ETConstexpr ETForceInlineHint T& Get(T (&elements)[Size]) ETNoexceptHint {
+	static_assert(Index < Size, "compile-time array index out of bounds");
+	return elements[Index];
+}
+
 #if ET_COMPILER_SUPPORTS_CPP11
-		enum : size_t { Value = alignof(Type) };
-#else
-#	if ET_COMPILER_IS_MSVC
-		enum : size_t { Value = __alignof(Type) };
-#	elif ET_COMPILER_IS_GCC
-		enum : size_t { Value = __alignof__(Type) };
-#	else
-		enum : size_t { Value = static_cast<size_t>(offsetof(struct { char c; Type m; }, m)) };
-#	endif
-#endif // ET_COMPILER_SUPPORTS_CPP11
-	};
+template <typename T>
+ETConstexpr ETForceInlineHint T&& Move(T& value) ETNoexceptHint {
+	return static_cast<T&&>(value);
+}
 
-} // namespace Detail
+template <typename T>
+ETConstexpr ETForceInlineHint T&& Forward(typename RemoveReference<T>::Type&& value) ETNoexceptHint {
+	return static_cast<T&&>(value);
+}
+
+template <typename T>
+ETConstexpr ETForceInlineHint T&& Forward(typename RemoveReference<T>::Type& value) ETNoexceptHint {
+	return static_cast<T&&>(value);
+}
 
 template <typename... Ts>
-ETConstexpr void DiscardReturns(Ts&&...) ETNoexceptHint {}
+ETConstexpr ETForceInlineHint void DiscardArguments(Ts&&... /*discarded*/) ETNoexceptHint {}
+
+template <typename T>
+using InitializerList = std::initializer_list<T>;
+#endif
 
 } // namespace Eldritch2
 
-#define ETAlignOf(type) static_cast<size_t>(::Eldritch2::Detail::AlignmentOf<type>::Value)
+#define ETAlignOf(type) alignof(type)
 #define ETAddressOf(value) __builtin_addressof(value)
-#define ETCountOf(value) _countof(value)
-#define ETOffsetOf(structure, field) __builtin_offsetof(structure, field)
+#define ETCountOf(value) ::Eldritch2::TupleSize<typename ::Eldritch2::RemoveReference<decltype(value)>::Type>::Value
+#define ETOffsetOf(structure, field) ((size_t)&reinterpret_cast<char const volatile&>((((structure*)0)->field)))
+
+#define ET_TEMPLATE_SFINAE(...) typename = eastl::enable_if_t<__VA_ARGS__>
+#define ET_TEMPLATE_SFINAE_PARAM typename
 
 /*	Since the override specifiers and enum class language extensions are safely wrapped away in here, turn off the warnings.
  *	(4505) Some template classes will have unreferenced inline members. The optimizer/linker will strip these out, so we don't need to worry.

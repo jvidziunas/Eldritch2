@@ -4,21 +4,31 @@ file_extension	".e2animation";
 
 namespace Eldritch2.Animation.FlatBuffers;
 
-struct KnotDescriptor {
-	StartTime    : float;
-	EndTime      : float;
-	StartValue	 : Eldritch2.FlatBuffers.Float3;
-	StartTangent : Eldritch2.FlatBuffers.Float3;
-	EndValue     : Eldritch2.FlatBuffers.Float3;
-	EndTangent   : Eldritch2.FlatBuffers.Float3;
+struct TranslationKey {
+	Time			: ushort;
+	Track			: ushort;
+	X				: ushort;
+	Y				: ushort;
+	Z				: ushort;
 }
 
-table TrackDescriptor {
-	Target	: string (required);
+struct OrientationKey {
+	Time			: ushort;
+	Track			: ushort;
+	Component0		: ushort;
+	Component1		: ushort;
+	Component2		: ushort;
+}
+
+table EventKey {
+	Time			: ushort;
+	Name			: string (required);
 }
 
 table AnimationDescriptor {
-	Tracks	: [TrackDescriptor] (required);
+	TranslationKeys	: [TranslationKey] (required);
+	OrientationKeys : [OrientationKey] (required);
+	EventKeys		: [EventKey] (required);
 }
 
 root_type AnimationDescriptor;

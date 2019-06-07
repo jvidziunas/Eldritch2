@@ -29,10 +29,12 @@ private:
 
 public:
 	using ValueType      = typename UnderlyingContainer::value_type;
-	using Reference      = typename UnderlyingContainer::reference;
+	using ConstPointer   = typename UnderlyingContainer::const_pointer;
+	using Pointer        = typename UnderlyingContainer::pointer;
 	using ConstReference = typename UnderlyingContainer::const_reference;
-	using Iterator       = typename UnderlyingContainer::iterator;
+	using Reference      = typename UnderlyingContainer::reference;
 	using ConstIterator  = typename UnderlyingContainer::const_iterator;
+	using Iterator       = typename UnderlyingContainer::iterator;
 	using SizeType       = typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -62,8 +64,8 @@ public:
 	template <typename UnaryPredicate>
 	Iterator FindIf(UnaryPredicate predicate);
 
-	template <typename UnaryPredicate, typename Disposer>
-	void EraseAndDisposeIf(UnaryPredicate condition, Disposer disposer);
+	template <typename UnaryPredicate, typename UnaryPredicate2>
+	void EraseAndDisposeIf(UnaryPredicate condition, UnaryPredicate2 disposer);
 
 	template <typename UnaryPredicate>
 	void EraseIf(UnaryPredicate condition);
@@ -98,8 +100,8 @@ public:
 	void Prepend(Reference value);
 
 	//! Removes the head element of this @ref IntrusiveForwardList, reducing its size by one element.
-	template <typename Disposer>
-	void PopFrontAndDispose(Disposer disposer);
+	template <typename UnaryPredicate>
+	void PopFrontAndDispose(UnaryPredicate disposer);
 
 	void PopFront();
 
@@ -124,13 +126,13 @@ public:
 	Iterator EraseAfter(Iterator beforeBegin, Iterator end);
 	Iterator EraseAfter(Iterator where);
 
-	template <typename Disposer>
-	void EraseAndDispose(Iterator first, Iterator last, Disposer disposer);
-	template <typename Disposer>
-	Iterator EraseAndDispose(Iterator where, Disposer disposer);
+	template <typename UnaryPredicate>
+	void EraseAndDispose(Iterator first, Iterator last, UnaryPredicate disposer);
+	template <typename UnaryPredicate>
+	Iterator EraseAndDispose(Iterator where, UnaryPredicate disposer);
 
-	template <typename Disposer>
-	void ClearAndDispose(Disposer disposer);
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
 	void Clear();
 

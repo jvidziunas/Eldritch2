@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysxMarshals.hpp>
@@ -28,13 +34,13 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		api.DefineClass<PhysicsShape>(ET_BUILTIN_WREN_MODULE_NAME(Physics), "PhysicsShape", // clang-format off
 			{ /* Static methods */
 				ForeignMethod("ofCapsule(_,_)", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<PhysicsShape>(vm, PxCapsuleGeometry(wrenGetSlotDouble(vm, 1), wrenGetSlotDouble(vm, 2)));
+					wrenSetReturn<PhysicsShape>(vm, PxCapsuleGeometry(wrenGetSlotDouble(vm, 1), wrenGetSlotDouble(vm, 2)));
 				}),
 				ForeignMethod("ofSphere(_)", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<PhysicsShape>(vm, PxSphereGeometry(wrenGetSlotDouble(vm, 1)));
+					wrenSetReturn<PhysicsShape>(vm, PxSphereGeometry(wrenGetSlotDouble(vm, 1)));
 				}),
 				ForeignMethod("ofBox(_)", [](WrenVM* vm) ETNoexceptHint {
-					SetReturn<PhysicsShape>(vm, PxBoxGeometry(AsPxVec3(GetSlotAs<Vector>(vm, 1))));
+					wrenSetReturn<PhysicsShape>(vm, PxBoxGeometry(AsPxVec3(wrenGetSlotAs<Vector>(vm, 1))));
 				}) },
 			{ /* Methods */ }); // clang-format on
 	}

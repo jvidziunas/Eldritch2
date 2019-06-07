@@ -24,9 +24,9 @@ class MallocAllocator : public Allocator {
 
 public:
 	//!	Constructs this @ref MallocAllocator instance.
-	MallocAllocator(const Utf8Char* name = "<unnamed allocator>") ETNoexceptHint;
+	ETConstexpr MallocAllocator(const Utf8Char* name = "<unnamed allocator>") ETNoexceptHint;
 	//!	Constructs this @ref MallocAllocator instance.
-	MallocAllocator(const MallocAllocator&) ETNoexceptHint;
+	ETConstexpr MallocAllocator(const MallocAllocator&) ETNoexceptHint = default;
 
 	~MallocAllocator() = default;
 
@@ -34,21 +34,23 @@ public:
 
 public:
 	//! Allocates a contiguous chunk of memory with the specified length and alignment using the passed-in allocation behavior duration.
-	ETRestrictHint void* Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal) override;
+	ETRestrictHint void* Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override;
 	//! Allocates a contiguous chunk of memory with the specified length using the passed-in allocation behavior duration.
-	ETRestrictHint void* Allocate(SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal) override;
+	ETRestrictHint void* Allocate(SizeType byteSize, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override;
 
 	//! Releases a chunk of memory previously allocated by @ref Allocate().
-	void Deallocate(void* const address, SizeType sizeInBytes) override;
+	void Deallocate(void* const address, SizeType byteSize) ETNoexceptHint override;
 
 	// ---------------------------------------------------
 
 public:
-	MallocAllocator& operator=(const MallocAllocator&) ETNoexceptHint;
+	ETConstexpr MallocAllocator& operator=(const MallocAllocator&) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
-	friend void Swap(MallocAllocator&, MallocAllocator&) ETNoexceptHint;
+	friend ETConstexpr bool operator==(const MallocAllocator&, const MallocAllocator&) ETNoexceptHint;
+
+	friend ETConstexpr void Swap(MallocAllocator&, MallocAllocator&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

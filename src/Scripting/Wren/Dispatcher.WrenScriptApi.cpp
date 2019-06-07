@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/Dispatcher.hpp>
@@ -36,7 +42,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 				}),
 				ForeignMethod("callAfterDelay(_,_)", [](WrenVM* vm) ETNoexceptHint {
 					const double delay(wrenGetSlotDouble(vm, 1));
-					ET_ABORT_WREN_IF(delay <= 0.0, "Events cannot be scheduled in the past!");
+					ET_ABORT_WREN_IF(vm, delay <= 0.0, "Events cannot be scheduled in the past!");
 
 					GetSlotAs<Dispatcher>(vm, 0).CallOnDelay(AsInt(delay), wrenGetSlotHandle(vm, 2));
 				}),

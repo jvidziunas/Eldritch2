@@ -15,24 +15,28 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Memory/Allocator.hpp>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-Allocator::Allocator(const Utf8Char* const name) ETNoexceptHint {
 #if ET_DEBUG_BUILD
-	_name = name;
+ETConstexpr ETForceInlineHint Allocator::Allocator(const Utf8Char* const name) ETNoexceptHint : _name(name) {}
 #else
-	ETUnreferencedParameter(name);
+ETConstexpr ETForceInlineHint Allocator::Allocator(const Utf8Char* const) ETNoexceptHint {}
 #endif
-}
 
 // ---------------------------------------------------
 
-const Utf8Char* Allocator::GetName() const ETNoexceptHint {
+ETConstexpr const Utf8Char* Allocator::GetName() const ETNoexceptHint {
 #if ET_DEBUG_BUILD
 	return _name;
 #else

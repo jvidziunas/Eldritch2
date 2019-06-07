@@ -19,24 +19,44 @@
 #include <geometry/PxBoxGeometry.h>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Physics {
-namespace PhysX {
+namespace Eldritch2 { namespace Physics { namespace PhysX {
 
-	union PhysicsShape {
-		PhysicsShape( const physx::PxCapsuleGeometry& capsule );
-		PhysicsShape( const physx::PxSphereGeometry& sphere );
-		PhysicsShape( const physx::PxBoxGeometry& box );
+	class PhysicsShape {
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-		physx::PxGeometry			asGeometry;
-		physx::PxCapsuleGeometry	asCapsule;
-		physx::PxSphereGeometry		asSphere;
-		physx::PxBoxGeometry		asBox;
+	public:
+		//! Constructs this @ref PhysicsShape instance.
+		ETConstexpr PhysicsShape(const physx::PxCapsuleGeometry&) ETNoexceptHint;
+		//! Constructs this @ref PhysicsShape instance.
+		ETConstexpr PhysicsShape(const physx::PxSphereGeometry&) ETNoexceptHint;
+		//! Constructs this @ref PhysicsShape instance.
+		ETConstexpr PhysicsShape(const physx::PxBoxGeometry&) ETNoexceptHint;
+		//! Constructs this @ref PhysicsShape instance.
+		ETConstexpr PhysicsShape(const PhysicsShape&) ETNoexceptHint = default;
+
+		~PhysicsShape() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		ETConstexpr operator const PxGeometry&() const ETNoexceptHint;
+
+		ETConstexpr PhysicsShape& operator=(const physx::PxCapsuleGeometry&) ETNoexceptHint;
+		ETConstexpr PhysicsShape& operator=(const physx::PxSphereGeometry&) ETNoexceptHint;
+		ETConstexpr PhysicsShape& operator=(const physx::PxBoxGeometry&) ETNoexceptHint;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		union {
+			physx::PxGeometry        geometry;
+			physx::PxCapsuleGeometry capsule;
+			physx::PxSphereGeometry  sphere;
+			physx::PxBoxGeometry     box;
+		} _as;
 	};
 
-}	// namespace PhysX
-}	// namespace Physics
-}	// namespace Eldritch2
+}}} // namespace Eldritch2::Physics::PhysX
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS

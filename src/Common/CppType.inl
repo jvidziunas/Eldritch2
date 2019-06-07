@@ -17,43 +17,44 @@
 
 namespace Eldritch2 {
 
-ETInlineHint ETForceInlineHint CppType::CppType(const std::type_info& type) :
-	_type(ETAddressOf(type)) {}
+ETConstexpr ETForceInlineHint CppType::CppType(TypeId id) ETNoexceptHint : _id(id) {}
 
 // ---------------------------------------------------
 
-ETInlineHint ETForceInlineHint const char* CppType::GetName() const {
-	return _type->name();
+ETConstexpr ETPureFunctionHint ETForceInlineHint size_t GetHashCode(const CppType& type, size_t seed) ETNoexceptHint {
+	return size_t(type._id) + seed;
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint ETForceInlineHint size_t GetHashCode(const CppType& type, size_t seed) ETNoexceptHint {
-	return type._type->hash_code() + seed;
+ETConstexpr ETPureFunctionHint ETForceInlineHint bool operator==(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
+	return lhs._id == rhs._id;
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint ETForceInlineHint bool operator==(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
-	return (*lhs._type == *rhs._type);
-}
-
-// ---------------------------------------------------
-
-ETInlineHint ETPureFunctionHint ETForceInlineHint bool operator!=(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
+ETConstexpr ETPureFunctionHint ETForceInlineHint bool operator!=(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
 	return !(lhs == rhs);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint ETForceInlineHint bool operator<(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
-	return lhs._type->before(*rhs._type);
+ETConstexpr ETPureFunctionHint ETForceInlineHint bool operator<(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
+	return lhs._id < rhs._id;
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETPureFunctionHint ETForceInlineHint bool operator<=(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
+ETConstexpr ETPureFunctionHint ETForceInlineHint bool operator<=(const CppType& lhs, const CppType& rhs) ETNoexceptHint {
 	return !(rhs < lhs);
+}
+
+// ---------------------------------------------------
+
+template <typename T>
+ETConstexpr ETPureFunctionHint CppType GetType() ETNoexceptHint {
+	ETConstexpr auto dummy([]() {});
+	return CppType(dummy);
 }
 
 } // namespace Eldritch2

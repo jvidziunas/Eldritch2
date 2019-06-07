@@ -9,47 +9,35 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/AssetViews/MeshAsset.hpp>
 #include <Graphics/Vulkan/VulkanGraphicsScene.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
-#include <Assets/ContentLocator.hpp>
-//------------------------------------------------------------------//
-#include <wren.h>
+#include <Core/ContentDatabase.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	using namespace ::Eldritch2::Graphics::Vulkan::AssetViews;
-	using namespace ::Eldritch2::Scripting::Wren;
 	using namespace ::Eldritch2::Animation;
-	using namespace ::Eldritch2::Assets;
+	using namespace ::Eldritch2::Core;
+
+	// ---------------------------------------------------
 
 	namespace {
 
-		class StaticMeshInstance : public MeshInstance {
-			// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-		public:
-			//!	Constructs this @ref StaticMeshInstance instance.
-			ETInlineHint ETForceInlineHint StaticMeshInstance(const Armature& armature, const MeshAsset& asset) :
-				MeshInstance(armature, asset) {}
-			//!	Disable copy construction.
-			StaticMeshInstance(const StaticMeshInstance&) = delete;
-
-			~StaticMeshInstance() = default;
-		};
-
-		// ---
-
-		class MeshInstance : public Graphics::MeshInstance {
+		class MeshInstance : public RenderMesh {
 			// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 		public:
 			//!	Constructs this @ref MeshInstance instance.
-			ETInlineHint ETForceInlineHint MeshInstance(const Armature& armature, const MeshAsset& asset) :
-				Graphics::MeshInstance(armature, asset) {}
+			ETForceInlineHint MeshInstance(const Armature& armature, const MeshSource& asset) ETNoexceptHint : RenderMesh(armature, asset) {}
 			//!	Disable copy construction.
 			MeshInstance(const MeshInstance&) = delete;
 
@@ -58,28 +46,17 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	} // anonymous namespace
 
-	ET_IMPLEMENT_WREN_CLASS(StaticMeshInstance) {
-		api.DefineClass<StaticMeshInstance>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "StaticMesh", // clang-format off
+	ET_IMPLEMENT_WREN_CLASS(MeshInstance, api, moduleName) {
+		using namespace ::Eldritch2::Graphics::Vulkan::AssetViews;
+		using namespace ::Eldritch2::Scripting::Wren;
+
+		api.DefineClass<MeshInstance>("Mesh", moduleName, // clang-format off
 			{ /* Static methods */
-				ForeignMethod("new(_,_,_)", [](WrenVM* vm) ETNoexceptHint {
-					auto&      scene(GetSlotAs<VulkanGraphicsScene>(vm, 1));
-					const auto asset(Cast<MeshAsset>(GetSlotAs<AssetReference>(vm, 3)));
-					ET_ABORT_WREN_UNLESS(asset, "Asset must be a MeshAsset.");
+				ForeignMethod("new(_,_)", [](WrenVM* vm) ETNoexceptHint {
+					const auto asset(Get<MeshAsset>(wrenGetSlotAs<AssetReference>(vm, 2)));
+					ET_ABORT_WREN_IF(asset == nullptr, vm, "Asset must be a MeshAsset.");
 
-					SetReturn<StaticMeshInstance>(vm, /*classSlot =*/0, GetSlotAs<Armature>(vm, 2), *asset);
-				}), },
-			{ /* Methods */ }); // clang-format on
-	}
-
-	ET_IMPLEMENT_WREN_CLASS(MeshInstance) {
-		api.DefineClass<MeshInstance>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "Mesh", // clang-format off
-			{ /* Static methods */
-				ForeignMethod("new(_,_,_)", [](WrenVM* vm) ETNoexceptHint {
-					auto&      scene(GetSlotAs<VulkanGraphicsScene>(vm, 1));
-					const auto asset(Cast<MeshAsset>(GetSlotAs<AssetReference>(vm, 3)));
-					ET_ABORT_WREN_UNLESS(asset, "Asset must be a MeshAsset.");
-
-					SetReturn<MeshInstance>(vm, /*classSlot =*/0, GetSlotAs<Armature>(vm, 2), *asset);
+					wrenSetReturn<MeshInstance>(vm, /*classSlot =*/0, wrenGetSlotAs<Armature>(vm, 1), *asset);
 				}), },
 			{ /* Methods */ }); // clang-format on
 	}

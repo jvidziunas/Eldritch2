@@ -12,6 +12,8 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
 /*	(4200) Wren makes extensive use of flexible arrays for its objects, but MSVC works the way it wants.
  *	(4100) Some Wren utility functions don't use the VM parameter. */
 ET_PUSH_MSVC_WARNING_STATE(disable : 4200 4100)

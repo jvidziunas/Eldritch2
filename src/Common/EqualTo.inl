@@ -18,8 +18,8 @@
 namespace Eldritch2 {
 
 template <typename T>
-ETInlineHint bool EqualTo<T>::operator()(const T& object0, const T& object1) const {
-	return object0 == object1;
+ETInlineHint ETForceInlineHint bool EqualTo<T>::operator()(const T& lhs, const T& rhs) const ETNoexceptHint {
+	return lhs == rhs;
 }
 
 } // namespace Eldritch2

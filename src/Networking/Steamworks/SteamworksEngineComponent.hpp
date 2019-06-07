@@ -14,49 +14,146 @@
 //==================================================================//
 #include <Networking/Steamworks/SteamTools.hpp>
 #include <Core/EngineComponent.hpp>
-#include <Logging/ChildLog.hpp>
+#include <Core/WorldComponent.hpp>
 //------------------------------------------------------------------//
-//	(6340) Valve has a few mismatches in their printf specifiers, it seems! We can't fix these, so disable the warning.
+//	(6340) Valve has a few mismatches in their printf specifiers; we can't fix these, so disable the warning.
 ET_PUSH_MSVC_WARNING_STATE(disable : 6340)
-#include <steamclientpublic.h>
+#include <steam_gameserver.h>
 ET_POP_MSVC_WARNING_STATE()
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Networking { namespace Steamworks {
 
-	using NetworkPort = uint16;
+	enum class NetworkPort : uint16 {
+		Unspecified      = 0u,
+		DefaultSteamPort = 6690u
+	};
 
 	// ---
 
 	class SteamworksEngineComponent : public Core::EngineComponent {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		class WorldComponent : public Core::WorldComponent {
+			// - TYPE PUBLISHING ---------------------------------
+
+		public:
+			template <typename CallbackData>
+			using SteamCallback = CCallbackManual<WorldComponent, CallbackData>;
+
+			// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+		public:
+			//!	Constructs this @ref WorldComponent instance.
+			WorldComponent(const ObjectInjector& services) ETNoexceptHint;
+			//!	Disable copy construction.
+			WorldComponent(const WorldComponent&) = delete;
+
+			~WorldComponent();
+
+			// ---------------------------------------------------
+
+		public:
+			ETConstexpr bool IsConnectedToSteam() const ETNoexceptHint;
+
+			// ---------------------------------------------------
+
+		public:
+			void OnVariableRateTick(Scheduling::JobExecutor& executor, MicrosecondTime tickDuration, float32 residualFraction) ETNoexceptHint override;
+
+			void OnFixedRateTickLate(Scheduling::JobExecutor& executor, MicrosecondTime delta) ETNoexceptHint override;
+
+			// ---------------------------------------------------
+
+		public:
+			void BindResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+			void FreeResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+			// ---------------------------------------------------
+
+		public:
+			void PublishApi(Scripting::Wren::ApiBuilder& api) override;
+
+			using Core::WorldComponent::PublishApi;
+
+			// ---------------------------------------------------
+
+		private:
+			Result ConnectToSteam(NetworkPort port);
+
+			void DisconnectFromSteam();
+
+			// ---------------------------------------------------
+
+		private:
+			void OnSteamConnection(SteamServersConnected_t*) ETNoexceptHint;
+
+			void OnSteamConnectionFailure(SteamServerConnectFailure_t*) ETNoexceptHint;
+
+			void OnSteamDisconnection(SteamServersDisconnected_t*) ETNoexceptHint;
+
+			void OnPeerToPeerSessionInitiation(P2PSessionRequest_t*) ETNoexceptHint;
+
+			void OnPeerToPeerSessionFailure(P2PSessionConnectFail_t*) ETNoexceptHint;
+
+			void OnServerPolicyResponse(GSPolicyResponse_t*) ETNoexceptHint;
+
+			void OnAuthResponse(ValidateAuthTicketResponse_t*) ETNoexceptHint;
+
+			void OnClientKick(GSClientKick_t*) ETNoexceptHint;
+
+			// ---------------------------------------------------
+
+			//!	Disable copy assignment.
+			WorldComponent& operator=(const WorldComponent&) = delete;
+
+			// - DATA MEMBERS ------------------------------------
+
+		private:
+			bool                                        _connectedToSteam;
+			HSteamPipe                                  _pipe;
+			HSteamUser                                  _serverUser;
+			NetworkPort                                 _port;
+			SteamCallback<SteamServersConnected_t>      _serversConnected;
+			SteamCallback<SteamServerConnectFailure_t>  _serversFailedToConnect;
+			SteamCallback<SteamServersDisconnected_t>   _serversDisconnected;
+			SteamCallback<P2PSessionRequest_t>          _peerToPeerSessionInitiated;
+			SteamCallback<P2PSessionConnectFail_t>      _peerToPeerSessionFailure;
+			SteamCallback<GSPolicyResponse_t>           _serverPolicyResponse;
+			SteamCallback<ValidateAuthTicketResponse_t> _authResponseReceived;
+			SteamCallback<GSClientKick_t>               _clientKicked;
+		};
+
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref SteamworksEngineComponent instance.
-		SteamworksEngineComponent(const ObjectLocator& services);
 		//!	Disable copy construction.
 		SteamworksEngineComponent(const SteamworksEngineComponent&) = delete;
+		//! Constructs this @ref SteamworksEngineComponent instance.
+		SteamworksEngineComponent(const ObjectInjector& services) ETNoexceptHint;
 
 		~SteamworksEngineComponent();
 
 		// - ENGINE SERVICE SANDBOX METHODS ------------------
 
 	public:
-		UniquePointer<Core::WorldComponent> CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) override;
-
-		void BindConfigurableResources(Scheduling::JobExecutor& executor) override;
-
-		void PublishConfiguration(Core::PropertyRegistrar& properties) override;
-
-		// - ENGINE SERVICE SANDBOX METHODS ------------------
-
-	public:
-		void TickEarly(Scheduling::JobExecutor& executor) override;
+		void TickEarly(Scheduling::JobExecutor& executor) ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
 		void AddLocalUser();
+
+		// - ENGINE SERVICE SANDBOX METHODS ------------------
+
+	public:
+		void BindConfigurableResources(Scheduling::JobExecutor& executor) ETNoexceptHint override;
+
+		void PublishApi(Core::PropertyApiBuilder& api) override;
+
+		using Core::EngineComponent::PublishApi;
 
 		// ---------------------------------------------------
 
@@ -66,11 +163,9 @@ namespace Eldritch2 { namespace Networking { namespace Steamworks {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		//!	Mutable so logs can be written in const methods.
-		mutable Logging::ChildLog   _log;
-		NetworkPort                 _steamPort;
-		IdentifierPool<NetworkPort> _worldPorts;
-		HashSet<CSteamID>           _bannedIds;
+		NetworkPort            _steamPort;
+		IdentifierPool<uint16> _ports;
+		HashSet<CSteamID>      _bannedIds;
 	};
 
 }}} // namespace Eldritch2::Networking::Steamworks

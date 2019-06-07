@@ -28,30 +28,29 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//!	Constructs this @ref CpuDispatcher instance.
-		CpuDispatcher(physx::PxU32 taskCount) ETNoexceptHint;
 		//!	Disable copy construction.
 		CpuDispatcher(const CpuDispatcher&) = delete;
+		//!	Constructs this @ref CpuDispatcher instance.
+		CpuDispatcher() ETNoexceptHint;
 
 		~CpuDispatcher() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		Scheduling::JobFence& GetTasksCompletedFence() ETNoexceptHint;
+		ETConstexpr Scheduling::JobFence& GetTasksCompletedFence() ETNoexceptHint;
 
 		// - PXCPUDISPATCHER METHODS -------------------------
 
 	public:
-		physx::PxU32 getWorkerCount() const override;
+		physx::PxU32 getWorkerCount() const ETNoexceptHint override;
 
-		void submitTask(physx::PxBaseTask& task) override;
+		void submitTask(physx::PxBaseTask& task) ETNoexceptHint override;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
 		Scheduling::JobFence _tasksCompleted;
-		physx::PxU32         _taskCount;
 	};
 
 }}} // namespace Eldritch2::Physics::PhysX

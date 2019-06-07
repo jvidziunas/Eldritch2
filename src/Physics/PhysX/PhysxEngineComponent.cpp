@@ -9,10 +9,16 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysxEngineComponent.hpp>
-#include <Physics/PhysX/PhysxWorldComponent.hpp>
+#include <Core/Profiler.hpp>
 #include <Core/Engine.hpp>
 //------------------------------------------------------------------//
 //	(6326) MSVC doesn't like some of the compile-time constant comparison PhysX does. We can't fix this, but we can at least disable the warning.
@@ -32,7 +38,6 @@ ET_LINK_DEBUGGABLE_LIBRARY("PxFoundationDEBUG_x64.lib", "PxFoundation_x64.lib");
 ET_LINK_DEBUGGABLE_LIBRARY("PhysX3ExtensionsDEBUG.lib", "PhysX3Extensions.lib");
 ET_LINK_DEBUGGABLE_LIBRARY("PhysX3CommonDEBUG_x64.lib", "PhysX3Common_x64.lib");
 ET_LINK_DEBUGGABLE_LIBRARY("PhysX3DEBUG_x64.lib", "PhysX3_x64.lib");
-ET_LINK_DEBUGGABLE_LIBRARY("PhysX3CharacterKinematicDEBUG_x64.lib", "PhysX3CharacterKinematic_x64.lib");
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Physics { namespace PhysX {
@@ -42,33 +47,18 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	using namespace ::Eldritch2::Core;
 	using namespace ::physx;
 
-	PhysxEngineComponent::PhysxEngineComponent(const ObjectLocator& services) :
-		EngineComponent(services),
-		_allocator("PhysX Root Allocator") {}
+	// ---------------------------------------------------
+
+	PhysxEngineComponent::PhysxEngineComponent(const ObjectInjector& services) ETNoexceptHint : EngineComponent(services), _allocator("PhysX Root Allocator") {}
 
 	// ---------------------------------------------------
 
-	UniquePointer<WorldComponent> PhysxEngineComponent::CreateWorldComponent(Allocator& allocator, const ObjectLocator& services) {
-		return MakeUnique<PhysxWorldComponent>(allocator, services);
-	}
-
-	// ---------------------------------------------------
-
-	void PhysxEngineComponent::BindResourcesEarly(JobExecutor& /*executor*/) {
+	void PhysxEngineComponent::BindResourcesEarly(JobExecutor& /*executor*/) ETNoexceptHint {
 		ET_PROFILE_SCOPE("Engine/Initialization/PhysX", "PhysX SDK creation", 0x76b900);
 
-		_log.BindResources(FindService<Engine>()->GetLog());
-		if (!PxCreateFoundation(PX_FOUNDATION_VERSION, _allocator, _log)) {
-			_log.Write(Severity::Error, "Error creating PhysX foundation object!" ET_NEWLINE);
-			FindService<Engine>()->SetShouldShutDown();
-			return;
-		}
-
-		if (!PxCreatePhysics(PX_PHYSICS_VERSION, PxGetFoundation(), PxTolerancesScale())) {
-			_log.Write(Severity::Error, "Error creating PhysX object!" ET_NEWLINE);
-			FindService<Engine>()->SetShouldShutDown();
-			return;
-		}
+		ET_TERMINATE_ENGINE_IF_FAILED(_log.BindResources(*Inject<Log>()));
+		ET_TERMINATE_ENGINE_UNLESS(PxCreateFoundation(PX_FOUNDATION_VERSION, _allocator, _log));
+		ET_TERMINATE_ENGINE_UNLESS(PxCreatePhysics(PX_PHYSICS_VERSION, PxGetFoundation(), PxTolerancesScale()));
 
 		_log.Write(Severity::Message, "PhysX SDK initialized successfully." ET_NEWLINE);
 	}

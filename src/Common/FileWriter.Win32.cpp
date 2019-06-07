@@ -9,13 +9,14 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/FileWriter.hpp>
-#include <Common/Algorithms.hpp>
-#include <Common/ErrorCode.hpp>
-#include <Common/Math.hpp>
-//------------------------------------------------------------------//
 #include <Windows.h>
 //------------------------------------------------------------------//
 
@@ -27,19 +28,19 @@ namespace {
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint HANDLE MakeWriter(const wchar_t* const path, DWORD creationDisposition) {
+	ETForceInlineHint HANDLE MakeWriter(const wchar_t* const path, DWORD creationDisposition) ETNoexceptHint {
 		return CreateFileW(path, GENERIC_WRITE, /*dwShareMode =*/0u, /*lpSecurityAttributes =*/nullptr, creationDisposition, FILE_FLAG_POSIX_SEMANTICS, /*hTemplateFile =*/nullptr);
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint ETPureFunctionHint DWORD ClampDword(size_t size) {
-		return DWORD(Min<size_t>(size, DWORD(-1)));
+	ETForceInlineHint ETPureFunctionHint DWORD ClampDword(size_t size) ETNoexceptHint {
+		return DWORD(Minimum<size_t>(size, DWORD(-1)));
 	}
 
 } // anonymous namespace
 
-FileWriter::FileWriter(FileWriter&& file) ETNoexceptHint : _file(eastl::exchange(file._file, INVALID_HANDLE_VALUE)) {}
+FileWriter::FileWriter(FileWriter&& file) ETNoexceptHint : _file(Exchange(file._file, INVALID_HANDLE_VALUE)) {}
 
 // ---------------------------------------------------
 
@@ -57,12 +58,12 @@ FileWriter::~FileWriter() {
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::Write(const void* source, size_t byteLength, uint64 fileByteOffset) ETNoexceptHint {
+Result FileWriter::Write(const void* source, size_t byteLength, uint64 fileByteOffset) ETNoexceptHint {
 	LARGE_INTEGER newOffset;
 	newOffset.QuadPart = fileByteOffset;
 
 	if (SetFilePointerEx(_file, newOffset, /*lpNewFilePointer =*/nullptr, FILE_BEGIN) == FALSE) {
-		return Error::Unspecified;
+		return Result::Unspecified;
 	}
 
 	return Append(source, byteLength);
@@ -70,26 +71,25 @@ ErrorCode FileWriter::Write(const void* source, size_t byteLength, uint64 fileBy
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::Append(const void* source, size_t byteLength) ETNoexceptHint {
+Result FileWriter::Append(const void* source, size_t byteLength) ETNoexceptHint {
 	const char* end(static_cast<const char*>(source) + byteLength);
 	while (byteLength) {
 		DWORD bytesWritten;
 
 		if (WriteFile(_file, end - byteLength, ClampDword(byteLength), ETAddressOf(bytesWritten), /*lpOverlapped =*/nullptr) == FALSE) {
-			return Error::Unspecified;
+			return Result::Unspecified;
 		}
 
 		byteLength -= bytesWritten;
 	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
 uint64 FileWriter::GetFileCursorInBytes() const ETNoexceptHint {
-	LARGE_INTEGER cursor { 0, 0 };
-
+	LARGE_INTEGER cursor(ZeroOffset);
 	/* Win32 APIs combine set/get file pointer into SetFilePointer()/SetFilePointerEx().
 	 * See https://docs.microsoft.com/en-us/windows/desktop/FileIO/positioning-a-file-pointer for details. */
 	SetFilePointerEx(_file, ZeroOffset, ETAddressOf(cursor), FILE_CURRENT);
@@ -106,7 +106,7 @@ void FileWriter::AdvanceToEnd() ETNoexceptHint {
 // ---------------------------------------------------
 
 void FileWriter::SetSize(uint64 sizeInBytes) ETNoexceptHint {
-	LARGE_INTEGER cursor { 0, 0 };
+	LARGE_INTEGER cursor(ZeroOffset);
 	SetFilePointerEx(_file, ZeroOffset, ETAddressOf(cursor), FILE_CURRENT);
 
 	LARGE_INTEGER newCursor;
@@ -122,44 +122,44 @@ void FileWriter::SetSize(uint64 sizeInBytes) ETNoexceptHint {
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::CreateOrTruncate(const PlatformChar* path) ETNoexceptHint {
+Result FileWriter::CreateOrTruncate(const PlatformChar* path) ETNoexceptHint {
 	HANDLE file(MakeWriter(path, CREATE_ALWAYS));
-	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Result::Success : Result::InvalidPath);
 
 	Swap(_file, file);
 	if (file != INVALID_HANDLE_VALUE) {
 		CloseHandle(file);
 	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::CreateOrOpen(const PlatformChar* path) ETNoexceptHint {
+Result FileWriter::CreateOrOpen(const PlatformChar* path) ETNoexceptHint {
 	HANDLE file(MakeWriter(path, OPEN_ALWAYS));
-	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Result::Success : Result::InvalidPath);
 
 	Swap(_file, file);
 	if (file != INVALID_HANDLE_VALUE) {
 		CloseHandle(file);
 	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-ErrorCode FileWriter::Open(const PlatformChar* path) ETNoexceptHint {
+Result FileWriter::Open(const PlatformChar* path) ETNoexceptHint {
 	HANDLE file(MakeWriter(path, OPEN_EXISTING));
-	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Error::None : Error::InvalidFileName);
+	ET_ABORT_UNLESS(file != INVALID_HANDLE_VALUE ? Result::Success : Result::InvalidPath);
 
 	Swap(_file, file);
 	if (file != INVALID_HANDLE_VALUE) {
 		CloseHandle(file);
 	}
 
-	return Error::None;
+	return Result::Success;
 }
 
 } // namespace Eldritch2

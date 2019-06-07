@@ -21,33 +21,61 @@ namespace Eldritch2 { namespace Scheduling {
 
 namespace Eldritch2 { namespace Graphics {
 
-	template <typename Instance, class Allocator = Eldritch2::MallocAllocator>
-	class RenderConcept : public ArrayBvh<Instance, Allocator> {
+	template <typename Instance, typename Key = uint32>
+	class RenderSortPredicate {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using HierarchyType = ArrayBvh<Instance, Allocator>;
-		using AllocatorType = typename HierarchyType::AllocatorType;
-		using ValueType     = typename HierarchyType::ValueType;
+		using ConstIterator = const Instance*;
+		using Iterator      = Instance*;
+		using KeyType       = Key;
+
+		// - CONSTRUCTOR/DESTRUCTOR --------------------------
+
+	public:
+		//!	Constructs this @ref RenderSortPredicate instance.
+		ETConstexpr RenderSortPredicate(const RenderSortPredicate&) ETNoexceptHint = default;
+		//!	Constructs this @ref RenderSortPredicate instance.
+		RenderSortPredicate(Vector cellSize) ETNoexceptHint;
+
+		~RenderSortPredicate() = default;
+
+		// ---------------------------------------------------
+
+	public:
+		void SortValues(Scheduling::JobExecutor& executor, Iterator begin, Iterator end, KeyType outKeys[]) ETNoexceptHint;
+
+		template <typename Split>
+		uint32 FindSplits(Scheduling::JobExecutor& executor, ConstIterator begin, ConstIterator end, Split splits[]) ETNoexceptHint;
+
+		// - DATA MEMBERS ------------------------------------
+
+	private:
+		Vector _inverseCellSize;
+	};
+
+	// ---
+
+	template <typename Instance, class Allocator = Eldritch2::MallocAllocator>
+	class RenderConcept : public ArrayBvh<Instance, RenderSortPredicate<Instance>, Allocator> {
+		// - TYPE PUBLISHING ---------------------------------
+
+	public:
+		using BvhType       = ArrayBvh<Instance, RenderSortPredicate<Instance>, Allocator>;
+		using AllocatorType = typename BvhType::AllocatorType;
+		using SortType      = typename BvhType::SortType;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref RenderConcept instance.
-		RenderConcept(const AllocatorType& allocator);
+		RenderConcept(const AllocatorType& allocator, const SortType& sort) ETNoexceptHint;
 		//!	Disable copy construction.
-		RenderConcept(const RenderConcept&) = delete;
+		RenderConcept(const RenderConcept&) = default;
 		//!	Constructs this @ref RenderConcept instance.
-		RenderConcept(RenderConcept&&) = default;
+		RenderConcept(RenderConcept&&) ETNoexceptHint = default;
 
 		~RenderConcept() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		void Insert(const ValueType& value);
-
-		void Erase(const ValueType& value);
 
 		// ---------------------------------------------------
 
@@ -63,51 +91,15 @@ namespace Eldritch2 { namespace Graphics {
 
 	private:
 		Atomic<bool> _shouldRebuildHierarchy;
-	};
-
-	// ---
-
-	template <typename Value, class Allocator>
-	class ViewConcept {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using ConstIterator = typename ArrayList<const Value*, Allocator>::ConstIterator;
-		using AllocatorType = Allocator;
-
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Constructs this @ref ViewConcept instance.
-		ViewConcept(const AllocatorType& allocator);
-		//!	Disable copy construction.
-		ViewConcept(const ViewConcept&) = delete;
-
-		~ViewConcept() = default;
 
 		// ---------------------------------------------------
 
-	public:
-		ConstIterator Begin() const ETNoexceptHint;
+		template <typename ViewType, typename Instance2, class Allocator2>
+		friend void BuildShadowViewList(ArrayList<ViewType>& views, const RenderConcept<Instance2, Allocator2>& source);
 
-		ConstIterator End() const ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-		//!	Disable copy assignment.
-		ViewConcept& operator=(const ViewConcept&) = delete;
-
-		// - DATA MEMBERS ------------------------------------
-
-	private:
-		mutable Mutex                          _mutex;
-		ArrayList<const Value*, AllocatorType> _views;
+		template <typename ViewType, typename Instance2, class Allocator2>
+		friend void BuildViewList(ArrayList<ViewType>& views, const RenderConcept<Instance2, Allocator2>& source);
 	};
-
-	// ---
-
-	template <typename Instance, class Allocator, typename Extractor>
-	void Rebuild(Scheduling::JobExecutor& executor, RenderConcept<Instance, Allocator>& concept, Extractor extractor);
 
 }} // namespace Eldritch2::Graphics
 

@@ -18,49 +18,84 @@
 
 namespace Eldritch2 {
 
-using CpuTimestamp    = uint64;
-using MicrosecondTime = uint64;
+enum class MicrosecondTime : uint64 { Uninitialized = 0ull };
+enum class CpuTimestamp : uint64 { Uninitialized = 0ull };
+enum class FileTime : int64 { Unavailable = -1ll };
+
+enum : uint32 { MicrosecondsPerSecond = 1000000u };
 
 struct CoreInfo {
 	uint32 physicalCores;
 	uint32 logicalCores;
 };
 
+// ---
+
+enum class WindowsApiVersion {
+	Unavailable,
+	Windows7,
+	Windows8,
+	Windows10
+};
+
+// ---
+
+enum class MacApiVersion {
+	Unavailable,
+	OSX
+};
+
+// ---
+
+enum class PosixApiVersion {
+	Unavailable,
+};
+
 // - MEMORY STATISTICS -------------------------------
 
-size_t GetVirtualMemoryAllocationGranularityInBytes();
+size_t GetVirtualMemoryAllocationByteGranularity() ETNoexceptHint;
 
-size_t GetCurrentWorkingSetInBytes();
+size_t GetCurrentWorkingSetInBytes() ETNoexceptHint;
 
-size_t GetMaximumWorkingSetInBytes();
+size_t GetMaximumWorkingSetInBytes() ETNoexceptHint;
 
-size_t GetPeakWorkingSetInBytes();
+size_t GetPeakWorkingSetInBytes() ETNoexceptHint;
 
 // - PROCESSOR STATISTICS ----------------------------
 
-ETPureFunctionHint CoreInfo GetCoreInfo();
+ETPureFunctionHint CoreInfo GetCoreInfo() ETNoexceptHint;
 
-ETPureFunctionHint size_t GetL0CacheLineSizeInBytes();
+ETPureFunctionHint size_t GetL0CacheLineSizeInBytes() ETNoexceptHint;
 
 // - TIMING DATA -------------------------------------
 
-CpuTimestamp ReadCpuTimestamp();
+CpuTimestamp ReadCpuTimestamp() ETNoexceptHint;
 
 // - OPERATING SYSTEM CAPABILITY QUERY ---------------
 
-ETPureFunctionHint bool IsWindows10OrNewer();
+ETPureFunctionHint bool IsWindows10OrNewer() ETNoexceptHint;
 
-ETPureFunctionHint bool IsWindows8OrNewer();
+ETPureFunctionHint bool IsWindows8OrNewer() ETNoexceptHint;
 
-ETPureFunctionHint bool IsWindows7OrNewer();
+ETPureFunctionHint bool IsWindows7OrNewer() ETNoexceptHint;
 
-ETPureFunctionHint bool IsPosix();
+ETPureFunctionHint bool IsMacOsX() ETNoexceptHint;
 
-ETPureFunctionHint bool IsMacOsX();
+ETPureFunctionHint bool IsPosix() ETNoexceptHint;
 
 // - TIME UNIT CONVERSION ----------------------------
 
+ETPureFunctionHint MicrosecondTime AsMicroseconds(CpuTimestamp timestamp) ETNoexceptHint;
+
 ETConstexpr ETPureFunctionHint float32 AsMilliseconds(MicrosecondTime microseconds) ETNoexceptHint;
-ETConstexpr ETPureFunctionHint float32 AsSeconds(MicrosecondTime microseconds) ETNoexceptHint;
+ETPureFunctionHint float32 AsMilliseconds(CpuTimestamp timestamp) ETNoexceptHint;
+
+ETConstexpr ETPureFunctionHint MicrosecondTime MicrosecondsPerFrame(uint32 framerateInHz) ETNoexceptHint;
 
 } // namespace Eldritch2
+
+//==================================================================//
+// INLINE FUNCTION DEFINITIONS
+//==================================================================//
+#include <Common/Platform.inl>
+//------------------------------------------------------------------//

@@ -13,48 +13,38 @@
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/SpirVShaderSet.hpp>
-#include <Assets/Asset.hpp>
+#include <Core/Asset.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan { namespace AssetViews {
 
-	class SpirVShaderSetAsset : public Vulkan::SpirVShaderSet, public Assets::Asset {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using ContainerType = Vulkan::SpirVShaderSet;
-
+	class SpirVShaderSetAsset : public SpirVShaderSet, public Core::Asset {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		SpirVShaderSetAsset(const SpirVShaderSetAsset&) = delete;
 		//!	Constructs this @ref SpirVShaderSetAsset instance.
-		SpirVShaderSetAsset(StringView path);
+		SpirVShaderSetAsset(StringSpan path) ETNoexceptHint;
 
 		~SpirVShaderSetAsset() override = default;
 
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources(const Builder& builder) override;
+		Result BindResources(Logging::Log& log, const Core::AssetBuilder& builder) override;
 
-		void FreeResources() override;
+		void FreeResources() ETNoexceptHint override;
 
 		// ---------------------------------------------------
 
 	public:
-		static ETPureFunctionHint StringView GetExtension() ETNoexceptHint;
+		static ETPureFunctionHint StringSpan GetExtension() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 		//!	Disable copy assignment.
 		SpirVShaderSetAsset& operator=(const SpirVShaderSetAsset&) = delete;
-
-		// - DATA MEMBERS ------------------------------------
-
-	private:
-		ArrayList<uint32> _bytecode;
 	};
 
 }}}} // namespace Eldritch2::Graphics::Vulkan::AssetViews

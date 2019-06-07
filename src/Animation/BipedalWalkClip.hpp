@@ -22,32 +22,25 @@ namespace Eldritch2 { namespace Animation {
 
 	public:
 		struct FootState {
-			Vector  centerOfMassPosition;
-			float16 centerOfMassVelocity[3];
-			uint64  stepEndTime;
-		};
-
-		// ---
-
-	public:
-		enum : size_t {
-			FootCount = 2u
+			Vector          centerOfMassPosition;
+			float32         centerOfMassVelocity[3];
+			MicrosecondTime strikeTime;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Constructs this @ref BipedalWalkClip instance.
-		BipedalWalkClip(const BipedalWalkClip&) = delete;
+		BipedalWalkClip(MicrosecondTime startTime) ETNoexceptHint;
 		//!	Constructs this @ref BipedalWalkClip instance.
-		BipedalWalkClip();
+		BipedalWalkClip(const BipedalWalkClip&) ETNoexceptHint = default;
 
 		~BipedalWalkClip() = default;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		FootState _feet[FootCount];
+		FootState _feet[2];
 	};
 
 }} // namespace Eldritch2::Animation

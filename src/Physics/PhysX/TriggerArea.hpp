@@ -29,7 +29,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	public:
 		//!	Constructs this @ref TriggerArea instance.
-		TriggerArea(PhysxPointer<physx::PxRigidStatic> actor, PhysxPointer<physx::PxShape> shape);
+		TriggerArea(PhysxPointer<physx::PxRigidStatic> actor, PhysxPointer<physx::PxShape> shape) ETNoexceptHint;
 		//!	Disable copy construction.
 		TriggerArea(const TriggerArea&) = delete;
 

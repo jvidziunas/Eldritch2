@@ -17,8 +17,8 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-class ErrorCode;
-}
+enum class Result : int;
+} // namespace Eldritch2
 
 #if ET_PLATFORM_WINDOWS
 using HANDLE = void*;
@@ -47,13 +47,13 @@ public:
 		@param[in] byteLength Number of bytes to write.
 		@param[in] fileByteOffset Offset into the file to begin writing data. This must be a multiple of the backing media sector size.
 		@returns an @ref ErrorCode describing the result of the operation. */
-	ErrorCode Write(const void* source, size_t byteLength, uint64 fileByteOffset) ETNoexceptHint;
+	Result Write(const void* source, size_t byteLength, uint64 fileByteOffset) ETNoexceptHint;
 	//!	Performs a blocking write operation to the output device the @ref FileWriter uses as its backing.
 	/*!	@param[in] source Pointer to a region of memory containing the bit patterns to be written.
 		@param[in] byteLength Number of bytes to write. This must be a multiple of the backing media sector size.
 		@returns an @ref ErrorCode describing the result of the operation.
 		@see @ref Write(const void*, size_t, uint64) */
-	ErrorCode Append(const void* source, size_t byteLength) ETNoexceptHint;
+	Result Append(const void* source, size_t byteLength) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -72,11 +72,11 @@ public:
 	// ---------------------------------------------------
 
 public:
-	ErrorCode CreateOrTruncate(const PlatformChar* path) ETNoexceptHint;
+	Result CreateOrTruncate(const PlatformChar* path) ETNoexceptHint;
 
-	ErrorCode CreateOrOpen(const PlatformChar* path) ETNoexceptHint;
+	Result CreateOrOpen(const PlatformChar* path) ETNoexceptHint;
 
-	ErrorCode Open(const PlatformChar* path) ETNoexceptHint;
+	Result Open(const PlatformChar* path) ETNoexceptHint;
 
 	// ---------------------------------------------------
 

@@ -27,7 +27,7 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	public:
 		//! Constructs this @ref TerrainPhysics instance.
-		TerrainPhysics(PhysxPointer<physx::PxRigidStatic> actor);
+		TerrainPhysics(PhysxPointer<physx::PxRigidStatic> actor) ETNoexceptHint;
 		//!	Disable copy construction.
 		TerrainPhysics(const TerrainPhysics&) = delete;
 

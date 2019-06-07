@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Input/InputApi.hpp>
@@ -16,9 +22,8 @@
 
 namespace Eldritch2 { namespace Input {
 
-	InputDevice::InputDevice() :
-		_actionByScanCode(MallocAllocator("Input Device Binding Map Allocator")),
-		_handler(nullptr) {}
+	InputDevice::InputDevice() ETNoexceptHint : _actionByScanCode(MallocAllocator("Input Device Binding Map Allocator")),
+												_handler(nullptr) {}
 
 	// ---------------------------------------------------
 
@@ -35,7 +40,7 @@ namespace Eldritch2 { namespace Input {
 		}
 
 		handler.OnConnect(*this);
-		_actionByScanCode = eastl::move(actionByScanCode);
+		_actionByScanCode = Move(actionByScanCode);
 
 		return true;
 	}

@@ -17,20 +17,17 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ETCpp14Constexpr size_t GetHashCode(const SpirVShader& shader, size_t seed = 0u) ETNoexceptHint {
-		return HashMemory(shader.name, StringLength(shader.name) * sizeof(*shader.name), seed);
+	ETInlineHint ETForceInlineHint SpirVShaderSet::BytecodeList::ConstSliceType SpirVShaderSet::GetBytecode() const ETNoexceptHint {
+		return _combinedBytecode;
 	}
 
 	// ---------------------------------------------------
 
-	ETInlineHint ETForceInlineHint ETPureFunctionHint bool operator==(const SpirVShader& lhs, const SpirVShader& rhs) ETNoexceptHint {
-		return lhs == StringView(rhs.name);
-	}
+	ETInlineHint ETForceInlineHint void Swap(SpirVShaderSet& lhs, SpirVShaderSet& rhs) ETNoexceptHint {
+		using ::Eldritch2::Swap;
 
-	// ---------------------------------------------------
-
-	ETPureFunctionHint ETForceInlineHint ETPureFunctionHint bool operator==(const SpirVShader& lhs, const StringView& rhs) ETNoexceptHint {
-		return StringView(lhs.name) == rhs;
+		Swap(lhs._combinedBytecode, rhs._combinedBytecode);
+		Swap(lhs._subshaderByPass, rhs._subshaderByPass);
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan

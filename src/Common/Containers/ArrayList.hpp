@@ -15,6 +15,7 @@
 #include <Common/Memory/EaStlAllocatorMixin.hpp>
 #include <Common/Containers/RangeAdapters.hpp>
 #include <Common/Memory/MallocAllocator.hpp>
+#include <Common/Containers/Span.hpp>
 //------------------------------------------------------------------//
 #include <eastl/vector.h>
 //------------------------------------------------------------------//
@@ -44,6 +45,8 @@ public:
 	using ConstIterator        = typename UnderlyingContainer::const_iterator;
 	using Iterator             = typename UnderlyingContainer::iterator;
 	using SizeType             = typename UnderlyingContainer::size_type;
+	using ConstSliceType       = typename Span<ConstIterator>;
+	using SliceType            = typename Span<Iterator>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -58,14 +61,14 @@ public:
 	ArrayList(const AllocatorType& allocator, InputIterator begin, InputIterator end);
 	//! Constructs this @ref ArrayList instance.
 	/*!	@param[in] allocator Allocator template for the container. */
-	ArrayList(const AllocatorType& allocator, std::initializer_list<ValueType>);
+	ArrayList(const AllocatorType& allocator, InitializerList<ValueType>);
 	//! Constructs this @ref ArrayList instance.
 	/*!	@param[in] allocator Allocator template for the container. */
 	ArrayList(const AllocatorType& allocator, const ArrayList&);
 	//! Constructs this @ref ArrayList instance.
 	ArrayList(const ArrayList&) = default;
 	//! Constructs this @ref ArrayList instance.
-	ArrayList(ArrayList&&) = default;
+	ArrayList(ArrayList&&) ETNoexceptHint  = default;
 
 	~ArrayList() = default;
 
@@ -77,38 +80,31 @@ public:
 		@param[in] start Iterator to the first element in the container to compare. The iterator must belong to this container.
 		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator
 			to the first such element. Otherwise, it returns the end iterator for the container. */
-	ConstIterator Find(ConstReference value, ConstIterator where) const;
+	ConstIterator Find(ConstReference value, ConstIterator where) const ETNoexceptHint;
 	//! Locates the first element in the container that compares equal to the passed-in reference.
 	/*!	@param[in] item The item to search for.
 		@param[in] start Iterator to the first element in the container to compare. The iterator must belong to this container.
 		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator
 			to the first such element. Otherwise, it returns the end iterator for the container. */
-	Iterator Find(ConstReference value, Iterator where);
+	Iterator Find(ConstReference value, Iterator where) ETNoexceptHint;
 	//! Locates the first element in the container that compares equal to the passed-in reference.
 	/*!	@param[in] item The item to search for.
 		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator
 			to the first such element. Otherwise, it returns the end iterator for the container. */
-	ConstIterator Find(ConstReference value) const;
+	ConstIterator Find(ConstReference value) const ETNoexceptHint;
 	//! Locates the first element in the container that compares equal to the passed-in reference.
 	/*!	@param[in] item The item to search for.
 		@returns If there is at least one element stored in the container equal to _itemTemplate_, then the function returns an iterator
 			to the first such element. Otherwise, it returns the end iterator for the container. */
-	Iterator Find(ConstReference value);
+	Iterator Find(ConstReference value) ETNoexceptHint;
 
 	//! Examines the elements in the ArrayList to determine if any are equivalent to the argument.
 	/*!	@param[in] item The item to search for.
 		@returns *true* if an item equal to the template was found, *false* if none exist in the container. */
-	bool Contains(ConstReference value) const;
+	bool Contains(ConstReference value) const ETNoexceptHint;
 
 	template <typename UnaryPredicate>
 	void EraseIf(UnaryPredicate condition);
-
-	//! Rearranges the elements within this ResizeableArray according to a customizable ordering.
-	/*!	@param[in] sort The ordering predicate to use. This method invokes operator() on the predicate, which should take two arguments
-			of type ConstReference and return a bool indicating if the element in the first argument should be placed before the element
-			in the second. */
-	template <typename BinaryPredicate>
-	void Sort(BinaryPredicate sort);
 
 	// - ELEMENT ITERATION -------------------------------
 
@@ -133,6 +129,12 @@ public:
 	ConstIterator End() const ETNoexceptHint;
 	Iterator      End() ETNoexceptHint;
 
+	ConstSliceType Slice(SizeType offset, SizeType length) const ETNoexceptHint;
+	SliceType      Slice(SizeType offset, SizeType length) ETNoexceptHint;
+
+	operator ConstSliceType() const ETNoexceptHint;
+	operator SliceType() ETNoexceptHint;
+
 	// - ELEMENT ACCESS ----------------------------------
 
 public:
@@ -156,8 +158,8 @@ public:
 public:
 	template <typename InputIterator>
 	void     Insert(Iterator where, InputIterator first, InputIterator last);
-	void     Insert(Iterator where, SizeType itemCount, const ValueType& value);
-	Iterator Insert(Iterator where, const ValueType& value);
+	void     Insert(Iterator where, SizeType itemCount, ConstReference value);
+	Iterator Insert(Iterator where, ConstReference value);
 	Iterator Insert(Iterator where, ValueType&& value);
 
 	template <typename... Arguments>
@@ -168,18 +170,18 @@ public:
 	Iterator        Erase(Iterator first, Iterator last);
 	Iterator        Erase(Iterator where);
 
+	Iterator EraseFirst(ConstReference value);
+
+	Iterator EraseLast(ConstReference value);
+
 	void EraseUnordered(ReverseIterator where);
 	void EraseUnordered(Iterator where);
 
-	Iterator EraseFirst(const ValueType& value);
+	Iterator EraseFirstUnordered(ConstReference value);
 
-	Iterator EraseLast(const ValueType& value);
+	Iterator EraseLastUnordered(ConstReference value);
 
-	Iterator EraseFirstUnordered(const ValueType& value);
-
-	Iterator EraseLastUnordered(const ValueType& value);
-
-	void Append(const ValueType& value);
+	void Append(ConstReference value);
 	void Append(ValueType&& value);
 
 	template <typename... Arguments>
@@ -187,13 +189,18 @@ public:
 
 	void Pop();
 
-	void Clear(const ReleaseMemorySemantics);
+	template <typename UnaryPredicate>
+	void ClearAndDispose(const ReleaseMemorySemantics, UnaryPredicate disposer) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>());
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer) ETNoexceptHintIf(IsNoThrowCallable<UnaryPredicate, Reference>());
+
+	void Clear(const ReleaseMemorySemantics) ETNoexceptHint;
 	//! Removes all elements from this vector and calls their destructors.
 	/*!	@remarks Doesn't release memory. */
-	void Clear();
+	void Clear() ETNoexceptHint;
 
-	void Resize(SizeType elementCount, const ValueType& filler);
-	void Resize(SizeType elementCount);
+	void Resize(SizeType size, ConstReference filler);
+	void Resize(SizeType size);
 
 	// - CAPACITY QUERY ----------------------------------
 
@@ -202,22 +209,22 @@ public:
 
 	SizeType GetSize() const ETNoexceptHint;
 
-	void SetCapacity(SizeType capacityInElements);
+	void SetCapacity(SizeType capacity);
 
-	void Reserve(SizeType capacityHintInElements);
-
-	void ShrinkToFit();
+	void Reserve(SizeType minimumCapacity);
 
 	explicit operator bool() const ETNoexceptHint;
 
 	bool IsEmpty() const ETNoexceptHint;
+
+	ArrayList& ShrinkToFit();
 
 	// - CONTAINER DUPLICATION ---------------------------
 
 public:
 	template <typename InputIterator>
 	void Assign(InputIterator first, InputIterator last);
-	void Assign(std::initializer_list<ValueType>);
+	void Assign(InitializerList<ValueType>);
 
 	ArrayList& operator=(const ArrayList&) = default;
 	ArrayList& operator=(ArrayList&&) = default;
@@ -230,7 +237,7 @@ public:
 	// - ITERATOR DEBUGGING ------------------------------
 
 public:
-	bool ValidateIterator(ConstIterator iterator) const;
+	bool Validate(ConstIterator iterator) const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -240,7 +247,7 @@ private:
 	// ---------------------------------------------------
 
 	template <typename Value, typename Allocator>
-	friend void Swap(ArrayList<Value, Allocator>&, ArrayList<Value, Allocator>&);
+	friend void Swap(ArrayList<Value, Allocator>&, ArrayList<Value, Allocator>&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

@@ -37,8 +37,8 @@ ETInlineHint ETForceInlineHint ArraySet<Value, SortPredicate, Allocator>::ArrayS
 // ---------------------------------------------------
 
 template <typename Value, typename SortPredicate, class Allocator>
-ETInlineHint ETForceInlineHint ArraySet<Value, SortPredicate, Allocator>::ArraySet(const AllocatorType& allocator, const SorterType& sort, std::initializer_list<ValueType> set) :
-	_container(set, sort, allocator) {}
+ETInlineHint ETForceInlineHint ArraySet<Value, SortPredicate, Allocator>::ArraySet(const AllocatorType& allocator, const SorterType& sort, InitializerList<ValueType> values) :
+	_container(values, sort, allocator) {}
 
 // ---------------------------------------------------
 
@@ -81,7 +81,7 @@ ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator
 template <typename Value, typename SortPredicate, class Allocator>
 template <typename Value2, typename SortPredicate2>
 ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator>::ConstIterator ArraySet<Value, SortPredicate, Allocator>::Find(const Value2& value, SortPredicate2 sort) const {
-	return _container.find_as<Value2, SortPredicate2>(value, eastl::move(sort));
+	return _container.find_as<Value2, SortPredicate2>(value, Move(sort));
 }
 
 // ---------------------------------------------------
@@ -89,7 +89,7 @@ ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator
 template <typename Value, typename SortPredicate, class Allocator>
 template <typename Value2, typename SortPredicate2>
 ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator>::Iterator ArraySet<Value, SortPredicate, Allocator>::Find(const Value2& value, SortPredicate2 sort) {
-	return _container.find_as<Value2, SortPredicate2>(value, eastl::move(sort));
+	return _container.find_as<Value2, SortPredicate2>(value, Move(sort));
 }
 
 // ---------------------------------------------------
@@ -111,7 +111,7 @@ ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator
 template <typename Value, typename SortPredicate, class Allocator>
 template <typename Value2, typename SortPredicate2>
 ETInlineHint ETForceInlineHint bool ArraySet<Value, SortPredicate, Allocator>::Contains(const Value2& value, SortPredicate2 sort) const {
-	return _container.find_as<Value2, SortPredicate2>(value, eastl::move(sort)) != _container.end();
+	return _container.find_as<Value2, SortPredicate2>(value, Move(sort)) != _container.end();
 }
 
 // ---------------------------------------------------
@@ -197,7 +197,7 @@ ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator
 template <typename Value, typename SortPredicate, class Allocator>
 template <typename... Arguments>
 ETInlineHint ETForceInlineHint Pair<typename ArraySet<Value, SortPredicate, Allocator>::Iterator, bool> ArraySet<Value, SortPredicate, Allocator>::Emplace(Arguments&&... arguments) {
-	return _container.emplace(eastl::forward<Arguments>(arguments)...);
+	return _container.emplace(Forward<Arguments>(arguments)...);
 }
 
 // ---------------------------------------------------
@@ -211,7 +211,7 @@ ETInlineHint ETForceInlineHint Pair<typename ArraySet<Value, SortPredicate, Allo
 
 template <typename Value, typename SortPredicate, class Allocator>
 ETInlineHint ETForceInlineHint Pair<typename ArraySet<Value, SortPredicate, Allocator>::Iterator, bool> ArraySet<Value, SortPredicate, Allocator>::Insert(ValueType&& value) {
-	return _container.insert(eastl::move(value));
+	return _container.insert(Move(value));
 }
 
 // ---------------------------------------------------
@@ -233,6 +233,19 @@ ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator
 template <typename Value, typename SortPredicate, class Allocator>
 ETInlineHint ETForceInlineHint typename ArraySet<Value, SortPredicate, Allocator>::Iterator ArraySet<Value, SortPredicate, Allocator>::Erase(Iterator where) {
 	return _container.erase(where);
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename SortPredicate, class Allocator>
+template <typename UnaryPredicate>
+ETInlineHint ETForceInlineHint void ArraySet<Value, SortPredicate, Allocator>::ClearAndDispose(UnaryPredicate disposer) {
+	for (const ValueType& value : _container) {
+		/*	Use of const_cast is gross, but this is one of the suggested solutions in http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#103 */
+		disposer(const_cast<ValueType&>(value));
+	}
+
+	_container.clear();
 }
 
 // ---------------------------------------------------

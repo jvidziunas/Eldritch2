@@ -21,27 +21,25 @@
 namespace Eldritch2 { namespace Physics { namespace PhysX {
 
 	ETInlineHint ETPureFunctionHint physx::PxExtendedVec3 ETSimdCall AsPxExtendedVec3(Vector value) {
-		float32 coefficients[4];
+		ET16ByteAligned float32 coefficients[4];
 
-		value.ExtractCoefficients(coefficients);
-
-		return { coefficients[0], coefficients[1], coefficients[2] };
+		StreamCoefficients(coefficients, value);
+		return { coefficients[Vector::X], coefficients[Vector::Y], coefficients[Vector::Z] };
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint ETPureFunctionHint physx::PxVec3 ETSimdCall AsPxVec3(Vector value) {
-		float32 coefficients[4];
+		ET16ByteAligned float32 coefficients[4];
 
-		value.ExtractCoefficients(coefficients);
-
-		return { coefficients[0], coefficients[1], coefficients[2] };
+		StreamCoefficients(coefficients, value);
+		return { coefficients[Vector::X], coefficients[Vector::Y], coefficients[Vector::Z] };
 	}
 
 	// ---------------------------------------------------
 
 	ETInlineHint ETPureFunctionHint Vector ETSimdCall AsVector(physx::PxExtendedVec3 value) {
-		return { static_cast<float32>(value.x), static_cast<float32>(value.y), static_cast<float32>(value.z), 0.0f };
+		return { float32(value.x), float32(value.y), float32(value.z), 0.0f };
 	}
 
 	// ---------------------------------------------------
@@ -59,11 +57,10 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	// ---------------------------------------------------
 
 	ETInlineHint ETPureFunctionHint physx::PxQuat ETSimdCall AsPxQuat(Quaternion value) {
-		float32 coefficients[4];
+		ET16ByteAligned float32 coefficients[4];
 
-		value.ExtractCoefficients(coefficients);
-
-		return { coefficients[0], coefficients[1], coefficients[2], coefficients[3] };
+		StreamCoefficients(coefficients, value);
+		return { coefficients[Quaternion::I], coefficients[Quaternion::J], coefficients[Quaternion::K], coefficients[Quaternion::W] };
 	}
 
 	// ---------------------------------------------------

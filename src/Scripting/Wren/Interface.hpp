@@ -39,7 +39,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		//!	Disable copy construction.
 		Interface(const Interface&) = delete;
 		//!	Constructs this @ref Interface instance.
-		Interface();
+		Interface() ETNoexceptHint;
 
 		~Interface();
 
@@ -104,9 +104,9 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// ---------------------------------------------------
 
 	public:
-		ErrorCode BindResources();
+		Result BindResources();
 
-		void FreeResources();
+		void FreeResources() ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 

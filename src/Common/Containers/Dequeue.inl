@@ -25,8 +25,8 @@ ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const AllocatorType
 // ---------------------------------------------------
 
 template <typename Value, class Allocator, unsigned int granularity>
-ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const AllocatorType& allocator, std::initializer_list<ValueType> dequeue) :
-	_container(dequeue, allocator) {}
+ETInlineHint Dequeue<Value, Allocator, granularity>::Dequeue(const AllocatorType& allocator, InitializerList<ValueType> values) :
+	_container(values, allocator) {}
 
 // ---------------------------------------------------
 
@@ -79,7 +79,7 @@ ETInlineHint void Dequeue<Value, Allocator, granularity>::Prepend(const ValueTyp
 
 template <typename Value, class Allocator, unsigned int granularity>
 ETInlineHint void Dequeue<Value, Allocator, granularity>::Prepend(ValueType&& value) {
-	return _container.push_front(eastl::forward<ValueType>(value));
+	return _container.push_front(Forward<ValueType>(value));
 }
 
 // ---------------------------------------------------
@@ -100,7 +100,7 @@ ETInlineHint void Dequeue<Value, Allocator, granularity>::Append(const ValueType
 
 template <typename Value, class Allocator, unsigned int granularity>
 ETInlineHint void Dequeue<Value, Allocator, granularity>::Append(ValueType&& value) {
-	_container.push_back(eastl::forward<ValueType>(value));
+	_container.push_back(Forward<ValueType>(value));
 }
 
 // ---------------------------------------------------
@@ -135,7 +135,7 @@ ETInlineHint void Dequeue<Value, Allocator, granularity>::Assign(InputIterator f
 // ---------------------------------------------------
 
 template <typename Value, class Allocator, unsigned int granularity>
-ETInlineHint void Dequeue<Value, Allocator, granularity>::Assign(std::initializer_list<ValueType> values) {
+ETInlineHint void Dequeue<Value, Allocator, granularity>::Assign(InitializerList<ValueType> values) {
 	_container.assign(values);
 }
 
@@ -291,7 +291,7 @@ ETInlineHint typename Dequeue<Value, Allocator, granularity>::Reference Dequeue<
 template <typename Value, class Allocator, unsigned int granularity>
 template <class... Args>
 ETInlineHint typename Dequeue<Value, Allocator, granularity>::Iterator Dequeue<Value, Allocator, granularity>::Emplace(ConstIterator position, Args&&... args) {
-	return _container.emplace(position, eastl::forward<Args>(args)...);
+	return _container.emplace(position, Forward<Args>(args)...);
 }
 
 // ---------------------------------------------------
@@ -299,7 +299,7 @@ ETInlineHint typename Dequeue<Value, Allocator, granularity>::Iterator Dequeue<V
 template <typename Value, class Allocator, unsigned int granularity>
 template <class... Args>
 ETInlineHint void Dequeue<Value, Allocator, granularity>::EmplaceFront(Args&&... args) {
-	_container.emplace_front(eastl::forward<Args>(args)...);
+	_container.emplace_front(Forward<Args>(args)...);
 }
 
 // ---------------------------------------------------
@@ -307,7 +307,7 @@ ETInlineHint void Dequeue<Value, Allocator, granularity>::EmplaceFront(Args&&...
 template <typename Value, class Allocator, unsigned int granularity>
 template <class... Args>
 ETInlineHint void Dequeue<Value, Allocator, granularity>::EmplaceBack(Args&&... args) {
-	_container.emplace_back(eastl::forward<Args>(args)...);
+	_container.emplace_back(Forward<Args>(args)...);
 }
 
 // ---------------------------------------------------
@@ -321,7 +321,7 @@ ETInlineHint void Dequeue<Value, Allocator, granularity>::Insert(ConstIterator p
 // ---------------------------------------------------
 
 template <typename Value, class Allocator, unsigned int granularity>
-ETInlineHint typename Dequeue<Value, Allocator, granularity>::Iterator Dequeue<Value, Allocator, granularity>::Insert(ConstIterator position, std::initializer_list<ValueType> values) {
+ETInlineHint typename Dequeue<Value, Allocator, granularity>::Iterator Dequeue<Value, Allocator, granularity>::Insert(ConstIterator position, InitializerList<ValueType> values) {
 	return _container.insert(position, values);
 }
 
@@ -343,7 +343,7 @@ ETInlineHint typename Dequeue<Value, Allocator, granularity>::Iterator Dequeue<V
 
 template <typename Value, class Allocator, unsigned int granularity>
 ETInlineHint typename Dequeue<Value, Allocator, granularity>::Iterator Dequeue<Value, Allocator, granularity>::Insert(ConstIterator position, ValueType&& value) {
-	return _container.insert(position, eastl::forward<ValueType>(value));
+	return _container.insert(position, Forward<ValueType>(value));
 }
 
 // ---------------------------------------------------

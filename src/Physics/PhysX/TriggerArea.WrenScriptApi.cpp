@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Physics/PhysX/PhysxMarshals.hpp>
@@ -31,29 +37,31 @@ namespace Eldritch2 { namespace Physics { namespace PhysX {
 	using namespace ::Eldritch2::Scripting;
 	using namespace ::physx;
 
+	// ---------------------------------------------------
+
 	ET_IMPLEMENT_WREN_CLASS(TriggerArea) {
 		api.DefineClass<TriggerArea>(ET_BUILTIN_WREN_MODULE_NAME(Physics), "TriggerArea", // clang-format off
 			{ /* Static methods */
 				ForeignMethod("new(_,_,_)", [](WrenVM* vm) ETNoexceptHint {
-					PhysicsScene&               scene(GetSlotAs<PhysicsScene>(vm, 1));
-					PhysxPointer<PxRigidStatic> actor(PxGetPhysics().createRigidStatic(AsPxTransform(GetSlotAs<Transformation>(vm, 2))));
-					ET_ABORT_WREN_UNLESS(actor, "Error creating PhysX actor for trigger.");
-
+					PhysicsScene&         scene(wrenGetSlotAs<PhysicsScene>(vm, 1));
 					PhysxPointer<PxShape> shape(PxGetPhysics().createShape(
-						GetSlotAs<PhysicsShape>(vm, 3).asGeometry,
-						scene.GetTriggerMaterial(),
+						wrenGetSlotAs<PhysicsShape>(vm, 2),
+						scene.GetMaterial(Trigger),
 						/*isExclusive =*/true, // Shapes are owned by the trigger that created them.
 						PxShapeFlags(PxShapeFlag::eVISUALIZATION | PxShapeFlag::eSCENE_QUERY_SHAPE)));
-					ET_ABORT_WREN_UNLESS(shape, "Error creating PhysX shape for trigger.");
+					ET_ABORT_WREN_IF(shape == nullptr, vm, "Error creating PhysX shape for trigger.");
 
-					SetReturn<TriggerArea>(vm, /*classSlot =*/0, eastl::move(actor), eastl::move(shape));
+					PhysxPointer<PxRigidStatic> actor(PxGetPhysics().createRigidStatic(AsPxTransform(wrenGetSlotAs<Transformation>(vm, 3))));
+					ET_ABORT_WREN_IF(actor == nullptr, vm, "Error creating PhysX actor for trigger.");
+
+					wrenSetReturn<TriggerArea>(vm, /*classSlot =*/0, Move(actor), Move(shape));
 				}), },
 			{ /* Methods */
 				ForeignMethod("enable()", [](WrenVM* vm) ETNoexceptHint {
-					GetSlotAs<TriggerArea>(vm, 0).Enable();
+					wrenGetSlotAs<TriggerArea>(vm, 0).Enable();
 				}),
 				ForeignMethod("disable()", [](WrenVM* vm) ETNoexceptHint {
-					GetSlotAs<TriggerArea>(vm, 0).Disable();
+					wrenGetSlotAs<TriggerArea>(vm, 0).Disable();
 				}), }); // clang-format on
 	}
 

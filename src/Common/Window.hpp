@@ -14,11 +14,12 @@
 //==================================================================//
 #include <Common/Mpl/IntTypes.hpp>
 #include <Common/Mpl/Platform.hpp>
+#include <Common/Atomic.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-class ErrorCode;
-}
+enum class Result : int;
+} // namespace Eldritch2
 
 #if ET_PLATFORM_WINDOWS
 using HINSTANCE = struct HINSTANCE__*;
@@ -51,9 +52,9 @@ public:
 	//!	Disable copy construction.
 	Window(const Window&) = delete;
 	//!	Constructs this @ref Window instance.
-	Window(Window&&);
+	Window(Window&&) ETNoexceptHint;
 	//!	Constructs this @ref Window instance.
-	Window();
+	Window() ETNoexceptHint;
 
 	~Window();
 
@@ -66,11 +67,11 @@ public:
 
 	// ---------------------------------------------------
 
-public:
 #if ET_PLATFORM_WINDOWS
-	HINSTANCE GetHinstance() const;
+public:
+	HINSTANCE GetHinstance() const ETNoexceptHint;
 
-	HWND GetHwnd() const;
+	HWND GetHwnd() const ETNoexceptHint;
 #endif
 
 	// ---------------------------------------------------
@@ -78,12 +79,12 @@ public:
 public:
 	void EnsureVisible();
 
-	bool Exists() const;
+	bool Exists() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode BindResources();
+	Result BindResources();
 
 	void FreeResources();
 
@@ -98,12 +99,17 @@ private:
 #if ET_PLATFORM_WINDOWS
 	FullscreenMode _mode;
 	HWND           _window;
-	HANDLE         _messageThread;
 #endif
 
 	// ---------------------------------------------------
 
-	friend void Swap(Window&, Window&);
+	friend void Swap(Window&, Window&) ETNoexceptHint;
 };
+
+bool IsForegroundApplication(MemoryOrder order = std::memory_order_acq_rel);
+
+Result InitializeUiThread();
+
+void TerminateUiThread();
 
 } // namespace Eldritch2

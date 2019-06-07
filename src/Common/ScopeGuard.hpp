@@ -15,9 +15,8 @@
 
 //------------------------------------------------------------------//
 
-#define STRING_JOIN(arg1, arg2) STRING_JOIN2(arg1, arg2)
-#define STRING_JOIN2(arg1, arg2) arg1##arg2
-#define ET_AT_SCOPE_EXIT(...) auto STRING_JOIN(scopeExit, __LINE__)(::Eldritch2::AtScopeExit([&]() -> void { __VA_ARGS__; }))
+#define ET_AT_SCOPE_EXIT(...) auto ET_CPP_JOIN(scopeExit, __LINE__)(::Eldritch2::AtScopeExit([&]() -> void { __VA_ARGS__; }))
+#define ET_FOREACH_AT_SCOPE_EXIT(element, aggregate, ...) auto ET_CPP_JOIN(scopeExit, __LINE__)(::Eldritch2::AtScopeExit([&]() -> void { for( auto& element : aggregate ) { __VA_ARGS__; } }))
 
 namespace Eldritch2 {
 
@@ -26,13 +25,15 @@ class ScopeGuard {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
-	//!	Disable copy construction.
-	ScopeGuard(const ScopeGuard&) = delete;
-	//!	Constructs this @ref ScopeGuard instance.
-	ScopeGuard(ScopeGuard&&);
 	//!	Constructs this @ref ScopeGuard instance.
 	/*!	@param[in] onScopeExit Code to be executed when this object leaves scope. */
-	ScopeGuard(Lambda onScopeExit);
+	ETConstexpr ScopeGuard(Lambda onScopeExit) ETNoexceptHint;
+	//!	Constructs this @ref ScopeGuard instance.
+	ETConstexpr ScopeGuard(ScopeGuard&&) ETNoexceptHint = default;
+	//!	Disable copy construction.
+	ScopeGuard(const ScopeGuard&) = delete;
+	//!	Disable default construction.
+	ScopeGuard() = delete;
 
 	~ScopeGuard();
 
@@ -45,7 +46,7 @@ private:
 // ---
 
 template <typename Lambda>
-ScopeGuard<Lambda> AtScopeExit(Lambda lambda);
+ETConstexpr ScopeGuard<Lambda> AtScopeExit(Lambda lambda) ETNoexceptHint;
 
 } // namespace Eldritch2
 

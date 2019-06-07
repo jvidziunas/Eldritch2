@@ -13,103 +13,90 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Memory/ArenaAllocator.hpp>
-#include <Common/ErrorCode.hpp>
-#include <Common/Assert.hpp>
-//------------------------------------------------------------------//
-#include <eastl/memory.h>
+
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
 
-AbstractArenaAllocator::AbstractArenaAllocator(const Utf8Char* const name) :
-	Allocator(name),
-	_arena(nullptr),
-	_arenaEnd(nullptr) {}
-
-// ---------------------------------------------------
-
-AbstractArenaAllocator::AbstractArenaAllocator(AbstractArenaAllocator&& allocator) :
-	Allocator(eastl::forward<Allocator>(allocator)),
-	_arena(allocator._arena.load(std::memory_order_relaxed)),
-	_arenaEnd(allocator._arenaEnd) {}
-
-// ---------------------------------------------------
-
-ETRestrictHint void* AbstractArenaAllocator::Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType /*offsetInBytes*/, AllocationDuration duration) {
-	size_t allocationSizeInBytes(sizeInBytes + (alignmentInBytes - 1u));
-	void*  allocation(AbstractArenaAllocator::Allocate(allocationSizeInBytes, duration));
-
-	return allocation ? eastl::align(alignmentInBytes, sizeInBytes, allocation, allocationSizeInBytes) : nullptr;
+AbstractArenaAllocator::~AbstractArenaAllocator() {
+	ETAssert(_head == _tail.load(std::memory_order_consume), "arena {} is leaking memory!", fmt::ptr(this));
 }
 
 // ---------------------------------------------------
 
-ETRestrictHint void* AbstractArenaAllocator::Allocate(SizeType sizeInBytes, AllocationDuration /*duration*/) {
-	char* allocation(_arena.load(std::memory_order_consume));
+ETRestrictHint void* AbstractArenaAllocator::Allocate(SizeType byteSize, SizeType byteAlignment, SizeType /*byteOffset*/, AllocationDuration duration) ETNoexceptHint {
+	SizeType allocationByteSize(byteSize + (byteAlignment - 1u));
+	void*    allocation(AbstractArenaAllocator::Allocate(allocationByteSize, duration));
+
+	return allocation ? eastl::align(byteAlignment, byteSize, allocation, allocationByteSize) : nullptr;
+}
+
+// ---------------------------------------------------
+
+ETRestrictHint void* AbstractArenaAllocator::Allocate(SizeType sizeInBytes, AllocationDuration /*duration*/) ETNoexceptHint {
+	const byte* const head(_head);
+	byte*             allocation(_tail.load(std::memory_order_consume));
 
 	do {
-		if (static_cast<size_t>(allocation - _arenaEnd) < sizeInBytes) {
+		if (SizeType(allocation - head) < sizeInBytes) {
 			return nullptr;
 		}
-	} while (!_arena.compare_exchange_weak(allocation, allocation + sizeInBytes, std::memory_order_release));
+		allocation = allocation - sizeInBytes;
+	} while (!_tail.compare_exchange_weak(allocation, allocation - sizeInBytes, std::memory_order_release));
 
 	return allocation;
 }
 
 // ---------------------------------------------------
 
-void AbstractArenaAllocator::Deallocate(void* const /*address*/, SizeType /*sizeInBytes*/) {
-	//	Arena allocators only release memory when expressly destroyed.
+void AbstractArenaAllocator::Deallocate(void* const address, SizeType byteSize) ETNoexceptHint {
+#if ET_ASSERTIONS_ENABLED
+	_freedBytes.fetch_add(address ? byteSize : 0u, std::memory_order_relaxed);
+#else  // !ET_ASSERTIONS_ENABLED
+	ETUnreferencedParameter(address);
+	ETUnreferencedParameter(byteSize);
+#endif // ET_ASSERTIONS_ENABLED
 }
 
 // ---------------------------------------------------
 
-AbstractArenaAllocator::Checkpoint AbstractArenaAllocator::CreateCheckpoint() const {
-	return _arena;
+void AbstractArenaAllocator::Restore(Checkpoint checkpoint) ETNoexceptHint {
+	ETAssert(IsValid(checkpoint), "Restoring invalid checkpoint {} on allocator {}!", fmt::ptr(checkpoint), fmt::ptr(this));
+	_tail.store(static_cast<byte*>(const_cast<void*>(checkpoint)), std::memory_order_release);
 }
 
 // ---------------------------------------------------
 
-void AbstractArenaAllocator::RestoreCheckpoint(Checkpoint checkpoint) {
-	ET_ASSERT(static_cast<const char*>(checkpoint) <= _arena.load(std::memory_order_relaxed), "Attempting to restore arena checkpoint for different/invalid allocator!");
-
-	_arena.store(static_cast<char*>(const_cast<void*>(checkpoint)), std::memory_order_release);
+void AbstractArenaAllocator::Reset(byte* head, byte* tail) ETNoexceptHint {
+#if ET_ASSERTIONS_ENABLED
+	_freedBytes.store(0u, std::memory_order_release);
+#endif // ET_ASSERTIONS_ENABLED
+	_head = head;
+	_tail.store(tail, std::memory_order_release);
 }
 
 // ---------------------------------------------------
 
-void AbstractArenaAllocator::Reset(char* arena, const char* end) {
-	_arena    = arena;
-	_arenaEnd = end;
+void AbstractArenaAllocator::Swap(AbstractArenaAllocator& rhs) ETNoexceptHint {
+	using ::Eldritch2::Swap;
+
+	Swap(_head, rhs._head);
+	_tail.store(rhs._tail.exchange(_tail.load(std::memory_order_relaxed), std::memory_order_release), std::memory_order_release);
 }
 
 // ---------------------------------------------------
 
-ExternalArenaAllocator::ExternalArenaAllocator(const Utf8Char* const name) :
-	AbstractArenaAllocator(name) {}
-
-// ---------------------------------------------------
-
-ExternalArenaAllocator::ExternalArenaAllocator(ExternalArenaAllocator&& allocator) :
-	AbstractArenaAllocator(eastl::forward<AbstractArenaAllocator>(allocator)) {}
-
-// ---------------------------------------------------
-
-ArenaChildAllocator::ArenaChildAllocator(const Utf8Char* const name) :
-	AbstractArenaAllocator(name),
-	_parent(nullptr),
-	_allocation(nullptr) {}
-
-// ---------------------------------------------------
-
-ArenaChildAllocator::ArenaChildAllocator(
-	ArenaChildAllocator&& allocator) :
-	AbstractArenaAllocator(eastl::forward<AbstractArenaAllocator>(allocator)),
-	_allocation(eastl::exchange(allocator._allocation, nullptr)),
-	_parent(eastl::exchange(allocator._parent, nullptr)) {
+ArenaChildAllocator::ArenaChildAllocator(ArenaChildAllocator&& allocator) ETNoexceptHint : ArenaChildAllocator(allocator.GetName()) {
+	using ::Eldritch2::Swap;
+	Swap(*this, allocator);
 }
 
 // ---------------------------------------------------
@@ -120,26 +107,43 @@ ArenaChildAllocator::~ArenaChildAllocator() {
 
 // ---------------------------------------------------
 
-ErrorCode ArenaChildAllocator::BindResources(Allocator& allocator, SizeType sizeInBytes, AllocationDuration duration) {
-	void* const allocation(allocator.Allocate(sizeInBytes, 16u, 0u, duration));
+Result ArenaChildAllocator::BindResources(Allocator& allocator, SizeType byteSize, AllocationDuration /*duration*/) ETNoexceptHint {
+	using Header = AllocationHeader<16u>;
 
-	if (allocation == nullptr) {
-		return Error::OutOfMemory;
+	const auto previous(Header::Get(AbstractArenaAllocator::GetHead()));
+	const auto header(new (allocator, byteSize) Header(byteSize));
+	ET_ABORT_UNLESS(header ? Result::Success : Result::OutOfMemory);
+
+	if (ETIsDebugBuild()) {
+		Fill(header->userBytes, header->userBytes + byteSize, byte(0u));
 	}
 
-	FreeResources();
+	AbstractArenaAllocator::Reset(header->userBytes, header->userBytes + byteSize);
+	if (Allocator* parent = Exchange(_parent, ETAddressOf(allocator))) {
+		parent->Deallocate(const_cast<Header*>(previous), sizeof(Header) + previous->userByteSize);
+	}
 
-	AbstractArenaAllocator::Reset(static_cast<char*>(allocation), static_cast<char*>(allocation) + sizeInBytes);
-
-	return Error::None;
+	return Result::Success;
 }
 
 // ---------------------------------------------------
 
-void ArenaChildAllocator::FreeResources() {
-	if (_parent) {
-		_parent->Deallocate(_allocation, GetEnd() - _allocation);
+void ArenaChildAllocator::FreeResources() ETNoexceptHint {
+	using Header = AllocationHeader<16u>;
+
+	const auto previous(Header::Get(AbstractArenaAllocator::GetHead()));
+
+	AbstractArenaAllocator::Reset(/*head =*/nullptr, /*tail =*/nullptr);
+	if (Allocator* parent = Exchange(_parent, nullptr)) {
+		parent->Deallocate(const_cast<Header*>(previous), sizeof(Header) + previous->userByteSize);
 	}
+}
+
+// ---------------------------------------------------
+
+void Swap(ArenaChildAllocator& lhs, ArenaChildAllocator& rhs) ETNoexceptHint {
+	lhs.Swap(rhs);
+	Swap(lhs._parent, rhs._parent);
 }
 
 } // namespace Eldritch2

@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/Planner.hpp>
@@ -20,17 +26,16 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 
 	// ---------------------------------------------------
 
-	Tactic::Tactic(Tactic&& action) ETNoexceptHint : _action(eastl::exchange(action._action, nullptr)) {}
+	Tactic::Tactic(Tactic&& tactic) ETNoexceptHint : _action(Exchange(tactic._action, nullptr)) {}
 
 	// ---------------------------------------------------
 
 	Tactic::~Tactic() {
-		ET_ASSERT(_action == nullptr, "Leaking Wren handle {}!", fmt::ptr(_action));
+		ETAssert(_action == nullptr, "Leaking Wren handle {}!", fmt::ptr(_action));
 	}
 
 	// ---------------------------------------------------
 
-	Planner::Planner() :
-		GoapPlanner(MallocAllocator("Wren Planner Allocator")) {}
+	Planner::Planner() : GoapPlanner(AllocatorType("Wren Planner Allocator")) {}
 
 }}} // namespace Eldritch2::Scripting::Wren

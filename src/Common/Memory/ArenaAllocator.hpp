@@ -14,11 +14,12 @@
 //==================================================================//
 #include <Common/Memory/Allocator.hpp>
 #include <Common/Atomic.hpp>
+#include <Common/Assert.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {
-class ErrorCode;
-}
+enum class Result : int;
+} // namespace Eldritch2
 
 namespace Eldritch2 {
 
@@ -36,7 +37,7 @@ public:
 
 	public:
 		//!	Constructs this @ref ScopedCheckpoint instance.
-		ScopedCheckpoint(AbstractArenaAllocator& arena);
+		ScopedCheckpoint(AbstractArenaAllocator& arena) ETNoexceptHint;
 		//!	Disable copy construction.
 		ScopedCheckpoint(const ScopedCheckpoint&) = delete;
 
@@ -57,73 +58,50 @@ public:
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 protected:
-	//! Constructs this @ref ArenaAllocatorBase instance.
-	AbstractArenaAllocator(const Utf8Char* const name);
+	//! Constructs this @ref AbstractArenaAllocator instance.
+	ETConstexpr AbstractArenaAllocator(const Utf8Char* name, byte* head, byte* tail) ETNoexceptHint;
 	//! Disable copy construction.
 	AbstractArenaAllocator(const AbstractArenaAllocator&) = delete;
-	//! Constructs this @ref ArenaAllocatorBase instance.
-	AbstractArenaAllocator(AbstractArenaAllocator&&);
 
-	~AbstractArenaAllocator() = default;
+	~AbstractArenaAllocator();
 
 	// - MEMORY ALLOCATION/DEALLOCATION ------------------
 
 public:
-	ETRestrictHint void* Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration = AllocationDuration::Normal) override sealed;
-	ETRestrictHint void* Allocate(SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal) override sealed;
+	ETRestrictHint void* Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override sealed;
+	ETRestrictHint void* Allocate(SizeType byteSize, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint override sealed;
 
-	void Deallocate(void* const address, SizeType sizeInBytes) override sealed;
-
-	// ---------------------------------------------------
-
-public:
-	const char* GetCurrent(std::memory_order order = std::memory_order_consume) const;
-
-	const char* GetEnd() const;
+	void Deallocate(void* const address, SizeType sizeInBytes) ETNoexceptHint override sealed;
 
 	// ---------------------------------------------------
 
 public:
-	Checkpoint CreateCheckpoint() const;
+	Checkpoint GetHead() const ETNoexceptHint;
 
-	void RestoreCheckpoint(Checkpoint checkpoint);
+	Checkpoint GetTail(MemoryOrder order = std::memory_order_consume) const ETNoexceptHint;
+
+	void Restore(Checkpoint checkpoint) ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 protected:
-	void Reset(char* arena, const char* end);
+	void Reset(byte* head, byte* tail) ETNoexceptHint;
+
+	void Swap(AbstractArenaAllocator&) ETNoexceptHint;
+
+	// ---------------------------------------------------
+
+protected:
+	bool IsValid(Checkpoint) const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
-	Atomic<char*> _arena;
-	const char*   _arenaEnd;
-};
-
-// ---------------------------------------------------
-
-class ExternalArenaAllocator : public AbstractArenaAllocator {
-	// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-public:
-	//!	Disable copy construction.
-	ExternalArenaAllocator(const ExternalArenaAllocator&) = delete;
-	//!	Constructs this @ref ExternalArenaAllocator instance.
-	ExternalArenaAllocator(const Utf8Char* const name);
-	//!	Constructs this @ref ExternalArenaAllocator instance.
-	ExternalArenaAllocator(ExternalArenaAllocator&&);
-
-	~ExternalArenaAllocator() = default;
-
-	// ---------------------------------------------------
-
-public:
-	using AbstractArenaAllocator::Reset;
-
-	// ---------------------------------------------------
-
-	//!	Disable assignment.
-	ExternalArenaAllocator& operator=(const ExternalArenaAllocator&) = delete;
+#if ET_ASSERTIONS_ENABLED
+	Atomic<SizeType> _freedBytes; //!< Count the number of bytes returned to the allocator for leak detection.
+#endif                            // ET_ASSERTIONS_ENABLED
+	const byte*   _head;          //!< Head pointer from which new allocations will be made.
+	Atomic<byte*> _tail;          //!< Tail pointer denoting the end of the owned region of memory.
 };
 
 // ---------------------------------------------------
@@ -132,65 +110,71 @@ class ArenaChildAllocator : public AbstractArenaAllocator {
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
+	//!	Constructs this @ref ArenaChildAllocator instance.
+	ETConstexpr ArenaChildAllocator(const Utf8Char* name) ETNoexceptHint;
 	//!	Disable copy construction.
 	ArenaChildAllocator(const ArenaChildAllocator&) = delete;
 	//!	Constructs this @ref ArenaChildAllocator instance.
-	ArenaChildAllocator(const Utf8Char* const name);
-	//!	Constructs this @ref ArenaChildAllocator instance.
-	ArenaChildAllocator(ArenaChildAllocator&&);
+	ArenaChildAllocator(ArenaChildAllocator&&) ETNoexceptHint;
 
 	~ArenaChildAllocator();
 
 	// ---------------------------------------------------
 
 public:
-	ErrorCode BindResources(Allocator& allocator, SizeType sizeInBytes, AllocationDuration duration = AllocationDuration::Normal);
+	Result BindResources(Allocator& allocator, SizeType byteSize, AllocationDuration = AllocationDuration::Normal) ETNoexceptHint;
 
-	void FreeResources();
+	void FreeResources() ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
 	ArenaChildAllocator& operator=(const ArenaChildAllocator&) = delete;
+	ArenaChildAllocator& operator                              =(ArenaChildAllocator&&) ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
 	Allocator* _parent;
-	char*      _allocation;
+
+	// ---------------------------------------------------
+
+	friend ETConstexpr bool operator==(const ArenaChildAllocator&, const ArenaChildAllocator&) ETNoexceptHint;
+
+	friend ETConstexpr bool operator!=(const ArenaChildAllocator&, const ArenaChildAllocator&) ETNoexceptHint;
+
+	friend void Swap(ArenaChildAllocator&, ArenaChildAllocator&) ETNoexceptHint;
 };
 
 // ---------------------------------------------------
 
-template <size_t sizeInBytes>
-class StackAllocator : public AbstractArenaAllocator {
+template <size_t ByteSize>
+class FixedArenaAllocator : public AbstractArenaAllocator {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
-	enum : SizeType {
-		ReservedSizeInBytes = sizeInBytes
-	};
+	enum : SizeType { ReservedByteSize = ByteSize };
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
+	//! Constructs this @ref FixedArenaAllocator instance.
+	ETConstexpr FixedArenaAllocator(const Utf8Char* const name) ETNoexceptHint;
 	//!	Disable copy construction.
-	StackAllocator(const StackAllocator&) = delete;
-	//! Constructs this @ref FixedStackAllocator instance.
-	StackAllocator(const Utf8Char* const name);
+	FixedArenaAllocator(const FixedArenaAllocator&) = delete;
 
-	~StackAllocator() = default;
+	~FixedArenaAllocator() = default;
 
 	// ---------------------------------------------------
 
 	//!	Disable copy assignment.
-	StackAllocator& operator=(const StackAllocator&) = delete;
+	FixedArenaAllocator& operator=(const FixedArenaAllocator&) = delete;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
 	//!	Aligned for generic type support.
-	ET16ByteAligned char _stack[ReservedSizeInBytes];
+	ET16ByteAligned char _stack[ReservedByteSize];
 };
 
 } // namespace Eldritch2

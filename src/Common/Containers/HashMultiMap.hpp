@@ -15,7 +15,7 @@
 #include <Common/Memory/EaStlAllocatorMixin.hpp>
 #include <Common/Containers/RangeAdapters.hpp>
 #include <Common/Memory/MallocAllocator.hpp>
-#include <Common/Containers/Range.hpp>
+#include <Common/Containers/Span.hpp>
 #include <Common/EqualTo.hpp>
 #include <Common/Hash.hpp>
 #include <Common/Pair.hpp>
@@ -25,23 +25,27 @@
 
 namespace Eldritch2 {
 
-template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
+template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool CacheHashCode = false>
 class HashMultiMap {
 	// - TYPE PUBLISHING ---------------------------------
 
 private:
-	using UnderlyingContainer = eastl::hash_multimap<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, cacheHashCode>;
+	using UnderlyingContainer = eastl::hash_multimap<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, CacheHashCode>;
 
 public:
 	using ValueType             = typename UnderlyingContainer::value_type;
 	using KeyType               = typename UnderlyingContainer::key_type;
 	using MappedType            = typename UnderlyingContainer::mapped_type;
+	using ConstPointer          = typename UnderlyingContainer::const_pointer;
+	using Pointer               = typename UnderlyingContainer::pointer;
+	using ConstReference        = typename UnderlyingContainer::const_reference;
+	using Reference             = typename UnderlyingContainer::reference;
 	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
 	using SizeType              = typename UnderlyingContainer::size_type;
-	using Iterator              = typename UnderlyingContainer::iterator;
 	using ConstIterator         = typename UnderlyingContainer::const_iterator;
-	using LocalIterator         = typename UnderlyingContainer::local_iterator;
+	using Iterator              = typename UnderlyingContainer::iterator;
 	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
+	using LocalIterator         = typename UnderlyingContainer::local_iterator;
 	using EqualityPredicateType = EqualityPredicate;
 	using HashPredicateType     = HashPredicate;
 
@@ -54,7 +58,7 @@ public:
 	template <typename InputIterator>
 	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashMultiMap instance.
-	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, std::initializer_list<ValueType>);
+	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InitializerList<ValueType>);
 	//! Constructs this @ref HashMultiMap instance.
 	HashMultiMap(const AllocatorType& allocator, const HashMultiMap&);
 	//! Constructs this @ref HashMultiMap instance.
@@ -68,11 +72,11 @@ public:
 
 public:
 	template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
-	Range<ConstIterator> EqualRange(const Key2& key, const HashPredicate2& hash, const EqualityPredicate2& equal) const;
+	Span<ConstIterator> Slice(const Key2& key, const HashPredicate2& hash, const EqualityPredicate2& equal) const;
 	template <typename Key2, typename HashPredicate2, typename EqualityPredicate2>
-	Range<Iterator>      EqualRange(const Key2& key, const HashPredicate2& hash, const EqualityPredicate2& equal);
-	Range<ConstIterator> EqualRange(const KeyType& key) const;
-	Range<Iterator>      EqualRange(const KeyType& key);
+	Span<Iterator>      Slice(const Key2& key, const HashPredicate2& hash, const EqualityPredicate2& equal);
+	Span<ConstIterator> Slice(const KeyType& key) const;
+	Span<Iterator>      Slice(const KeyType& key);
 
 	//! Erases all elements for which the result of the predicate returns true.
 	template <typename UnaryPredicate>
@@ -112,18 +116,18 @@ public:
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	Pair<Iterator, bool> Insert(const ValueType& value);
-	Pair<Iterator, bool> Insert(ValueType&& value);
+	Pair<Iterator, bool> Insert(const ValueType&);
+	Pair<Iterator, bool> Insert(ValueType&&);
 
 	template <typename... Arguments>
 	Pair<Iterator, bool> Emplace(Arguments&&... arguments);
 
 	Iterator Erase(Iterator begin, Iterator end);
 	Iterator Erase(Iterator where);
-	SizeType Erase(const KeyType& key);
+	SizeType Erase(const KeyType&);
 
-	template <typename Disposer>
-	void ClearAndDispose(Disposer disposer);
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
 	void Clear();
 
@@ -139,9 +143,9 @@ public:
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	const EqualityPredicateType& GetEqualityPredicate() const ETNoexceptHint;
+	EqualityPredicateType GetEqualityPredicate() const ETNoexceptHint;
 
-	const HashPredicateType& GetHash() const ETNoexceptHint;
+	HashPredicateType GetHash() const ETNoexceptHint;
 
 	const AllocatorType& GetAllocator() const ETNoexceptHint;
 
@@ -158,8 +162,8 @@ private:
 
 	// ---------------------------------------------------
 
-	template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
-	friend void Swap(HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&, HashMultiMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&);
+	template <typename Key2, typename Value2, class HashPredicate2, class EqualityPredicate2, class Allocator2, bool CacheHashCode2>
+	friend void Swap(HashMultiMap<Key2, Value2, HashPredicate2, EqualityPredicate2, Allocator2, CacheHashCode2>&, HashMultiMap<Key2, Value2, HashPredicate2, EqualityPredicate2, Allocator2, CacheHashCode2>&);
 };
 
 template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator>

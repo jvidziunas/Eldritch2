@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Navigation/Recast/NavigationScene.hpp>
@@ -19,17 +25,15 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 
 	using namespace Eldritch2::Animation;
 
-	BipedalAgent::BipedalAgent(Armature& armature) :
-		_armature(ETAddressOf(armature)),
-		_scene(nullptr),
-		_id(NavigationScene::InvalidAgentId) {}
+	BipedalAgent::BipedalAgent(Armature& armature) ETNoexceptHint : _armature(ETAddressOf(armature)),
+																	_scene(nullptr),
+																	_id(NavigationScene::InvalidAgentId) {}
 
 	// ---------------------------------------------------
 
-	BipedalAgent::BipedalAgent(BipedalAgent&& agent) :
-		_armature(agent._armature),
-		_scene(eastl::exchange(agent._scene, nullptr)),
-		_id(eastl::exchange(agent._id, NavigationScene::InvalidAgentId)) {}
+	BipedalAgent::BipedalAgent(BipedalAgent&& agent) ETNoexceptHint : _armature(agent._armature),
+																	  _scene(Exchange(agent._scene, nullptr)),
+																	  _id(Exchange(agent._id, NavigationScene::InvalidAgentId)) {}
 
 	// ---------------------------------------------------
 
@@ -49,7 +53,7 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 		static ETConstexpr float32 PathOptimizationTemporalHorizon = 1.0f;
 		static ETConstexpr uint8 AvoidanceId                       = 0u;
 		static ETConstexpr uint8 QueryFilterId                     = 0u;
-		const dtCrowdAgentParams configuration {
+		const dtCrowdAgentParams configuration{
 			AgentRadius,
 			AgentHeight,
 			MaxAcceleration,
@@ -86,7 +90,7 @@ namespace Eldritch2 { namespace Navigation { namespace Recast {
 			return;
 		}
 
-		eastl::exchange(_scene, nullptr)->removeAgent(eastl::exchange(_id, NavigationScene::InvalidAgentId));
+		Exchange(_scene, nullptr)->removeAgent(Exchange(_id, NavigationScene::InvalidAgentId));
 	}
 
 }}} // namespace Eldritch2::Navigation::Recast

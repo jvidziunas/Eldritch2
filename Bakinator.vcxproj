@@ -21,6 +21,7 @@
     <ClCompile Include="src\Common\FileWriter.Win32.cpp" />
     <ClCompile Include="src\Common\MappedFile.Win32.cpp" />
     <ClCompile Include="src\Common\Memory.cpp" />
+    <ClCompile Include="src\Tools\ConsoleLog.cpp" />
     <ClCompile Include="src\Tools\CrtpTool.cpp" />
     <ClCompile Include="src\Common\Assert.cpp" />
     <ClCompile Include="src\Common\Containers\AbstractString.cpp" />
@@ -36,10 +37,12 @@
     <ClInclude Include="src\Common\FileReader.hpp" />
     <ClInclude Include="src\Common\Filesystem.hpp" />
     <ClInclude Include="src\Common\FileWriter.hpp" />
-    <ClInclude Include="src\Common\MappedFile.hpp" />
+    <ClInclude Include="src\Common\FileView.hpp" />
     <ClInclude Include="src\Common\Memory.hpp" />
+    <ClInclude Include="src\Logging\Log.hpp" />
+    <ClInclude Include="src\Tools\ConsoleLog.hpp" />
     <ClInclude Include="src\Tools\CrtpTool.hpp" />
-    <ClInclude Include="src\Common\ErrorCode.hpp" />
+    <ClInclude Include="src\Common\Result.hpp" />
     <ClInclude Include="src\Common\Memory\Allocator.hpp" />
     <ClInclude Include="src\Common\Memory\ChildAllocator.hpp" />
     <ClInclude Include="src\Common\Memory\InstanceDeleter.hpp" />
@@ -54,13 +57,12 @@
     <ClInclude Include="src_Bakinator\Bakinator.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Flatbuffers\PackageIndex.fbs" />
+    <None Include="src\Logging\Log.inl" />
     <None Include="src\Tools\CrtpTool.inl" />
-    <None Include="src\Common\ErrorCode.inl" />
+    <None Include="src\Common\Result.inl" />
     <None Include="src\Common\Memory\ChildAllocator.inl" />
     <None Include="src\Common\Memory\MallocAllocator.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <FlatbufferSchemaItem Include="src\Flatbuffers\PackageIndex.fbc" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Eldritch2Types.natvis" />

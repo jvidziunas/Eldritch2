@@ -12,34 +12,26 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Graphics/Vulkan/BatchCoordinator.hpp>
 #include <Graphics/Vulkan/GraphicsPipeline.hpp>
-#include <Graphics/Vulkan/GpuResourceApi.hpp>
 #include <Graphics/GraphicsScene.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	class PlayerView {
-		// - TYPE PUBLISHING ---------------------------------
+	enum class ViewportId : Eldritch2::uintptr;
 
-	public:
-		using DisplayLink = UniquePointer<Viewport, ViewportDisposer>;
+	// ---
 
+	class RootView {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref PlayerView instance.
-		PlayerView(DisplayLink target, Transformation worldToView, Angle verticalFov);
+		//! Constructs this @ref RootView instance.
+		RootView(ViewportId target, Transformation worldToView, Angle verticalFov) ETNoexceptHint;
 		//! Disable copy construction.
-		PlayerView(const PlayerView&) = delete;
+		RootView(const RootView&) = delete;
 
-		~PlayerView() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		const Framebuffer& GetTarget() const ETNoexceptHint;
+		~RootView() = default;
 
 		// ---------------------------------------------------
 
@@ -55,12 +47,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 		//! Disable copy assignment.
-		PlayerView& operator=(const PlayerView&) = delete;
+		RootView& operator=(const RootView&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		DisplayLink    _target;
+		ViewportId     _target;
 		Transformation _worldToView;
 		Angle          _verticalFov;
 	};
@@ -71,30 +63,35 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
-		//! Constructs this @ref VulkanGraphicsScene instance.
-		VulkanGraphicsScene();
 		//! Disable copy construction.
 		VulkanGraphicsScene(const VulkanGraphicsScene&) = delete;
+		//! Constructs this @ref VulkanGraphicsScene instance.
+		VulkanGraphicsScene() ETNoexceptHint;
 
 		~VulkanGraphicsScene() = default;
 
 		// ---------------------------------------------------
 
 	public:
-		Range<const PlayerView* const*> GetRootViews() const ETNoexceptHint;
+		ETConstexpr const Framebuffer& GetShadowAtlas() const ETNoexceptHint;
+		ETConstexpr Framebuffer& GetShadowAtlas() ETNoexceptHint;
 
-		ETConstexpr const GraphicsPipeline& GetShadowPipeline() const ETNoexceptHint;
+		ETConstexpr const PipelineBuilder& GetShadowPipelineBuilder() const ETNoexceptHint;
+
+		ETConstexpr const PipelineBuilder& GetLitPipelineBuilder() const ETNoexceptHint;
+
+		ETConstexpr const GraphicsPipeline& GetShadowMapPipeline() const ETNoexceptHint;
+		ETConstexpr GraphicsPipeline& GetShadowMapPipeline() ETNoexceptHint;
 
 		ETConstexpr const GraphicsPipeline& GetLitPipeline() const ETNoexceptHint;
-
-		ETConstexpr const Framebuffer& GetShadowAtlas() const ETNoexceptHint;
+		ETConstexpr GraphicsPipeline& GetLitPipeline() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, const GraphicsPipelineBuilder& litPipelineBuilder, const GraphicsPipelineBuilder& shadowPipelineBuilder, VkExtent2D shadowResolution, VkDeviceSize transformArenaSize);
+		VkResult BindResources(Gpu& gpu, const PipelineBuilder& litPipeline, const PipelineBuilder& shadowPipeline, VkExtent2D shadowResolution);
 
-		void FreeResources(Gpu& gpu);
+		void FreeResources(Gpu& gpu) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -104,13 +101,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		const GraphicsPipelineBuilder* _shadowPipelineBuilder;
-		const GraphicsPipelineBuilder* _litPipelineBuilder;
-		ArrayList<PlayerView*>         _rootViews;
-		UniformBuffer                  _uniforms;
-		GraphicsPipeline               _shadowPipeline;
-		Framebuffer                    _shadowAtlas;
-		GraphicsPipeline               _litPipeline;
+		PipelineBuilder _shadowMapPipelineBuilder;
+		GraphicsPipeline        _shadowMapPipeline;
+		Framebuffer             _shadowMapAtlas;
+		PipelineBuilder _litPipelineBuilder;
+		GraphicsPipeline        _litPipeline;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

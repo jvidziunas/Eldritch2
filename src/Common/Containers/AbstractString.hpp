@@ -12,7 +12,7 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
-#include <Common/Containers/AbstractStringView.hpp>
+#include <Common/Containers/AbstractStringSpan.hpp>
 #include <Common/Memory/EaStlAllocatorMixin.hpp>
 #include <Common/Memory/MallocAllocator.hpp>
 //------------------------------------------------------------------//
@@ -37,13 +37,15 @@ public:
 	using CharacterType        = typename UnderlyingContainer::value_type;
 	using ValueType            = typename UnderlyingContainer::value_type;
 	using AllocatorType        = typename UnderlyingContainer::allocator_type::PublicType;
+	using SliceType            = AbstractStringSpan<CharacterType>;
+	using ConstSliceType       = AbstractStringSpan<CharacterType>;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//!	Constructs this @ref AbstractString instance.
 	template <typename... Arguments>
-	AbstractString(const AllocatorType& allocator, AbstractStringView<CharacterType> format, Arguments&&... arguments);
+	AbstractString(const AllocatorType& allocator, AbstractStringSpan<CharacterType> format, Arguments&&... arguments);
 	//!	Constructs this @ref AbstractString instance.
 	AbstractString(const AllocatorType& allocator = AllocatorType(), SizeType reservedLength = 0u);
 	//!	Constructs this @ref AbstractString instance.
@@ -51,52 +53,52 @@ public:
 	AbstractString(const AllocatorType& allocator, InputIterator begin, InputIterator end);
 	//!	Constructs this @ref AbstractString instance.
 	template <typename Character2>
-	AbstractString(const AllocatorType& allocator, AbstractStringView<Character2> string);
-	//!	Constructs this @ref AbstractString instance.
-	AbstractString(const AllocatorType& allocator, AbstractStringView<CharacterType> string);
+	AbstractString(const AllocatorType& allocator, AbstractStringSpan<Character2> string);
 	//!	Constructs this @ref AbstractString instance.
 	AbstractString(const AllocatorType& allocator, const AbstractString&);
 	//!	Constructs this @ref AbstractString instance.
 	AbstractString(const AbstractString&) = default;
 	//!	Constructs this @ref AbstractString instance.
-	AbstractString(AbstractString&&) = default;
+	AbstractString(AbstractString&&) ETNoexceptHint = default;
 
 	~AbstractString() = default;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	const AllocatorType& GetAllocator() const;
+	const AllocatorType& GetAllocator() const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
 public:
-	operator AbstractStringView<CharacterType>() const;
+	operator AbstractStringSpan<CharacterType>() const ETNoexceptHint;
 
-	operator const CharacterType*() const;
+	operator const CharacterType*() const ETNoexceptHint;
 
-	const CharacterType* AsCString() const;
+	SliceType Slice(SizeType offset, SizeType length) const ETNoexceptHint;
 
-	const CharacterType* GetData() const;
-	CharacterType*       GetData();
+	const CharacterType* AsCString() const ETNoexceptHint;
+
+	const CharacterType* GetData() const ETNoexceptHint;
+	CharacterType*       GetData() ETNoexceptHint;
 
 	// - ALGORITHMS --------------------------------------
 
 public:
-	SizeType Find(AbstractStringView<CharacterType> needle, SizeType offset = 0u) const;
-	SizeType Find(CharacterType character, SizeType offset = 0u) const;
+	SizeType Find(AbstractStringSpan<CharacterType> needle, SizeType offset = 0u) const ETNoexceptHint;
+	SizeType Find(CharacterType character, SizeType offset = 0u) const ETNoexceptHint;
 
-	SizeType FindLast(AbstractStringView<CharacterType> needle, SizeType offset = 0u) const;
-	SizeType FindLast(CharacterType character, SizeType offset = 0u) const;
+	SizeType FindLast(AbstractStringSpan<CharacterType> needle, SizeType offset = 0u) const ETNoexceptHint;
+	SizeType FindLast(CharacterType character, SizeType offset = 0u) const ETNoexceptHint;
 
-	bool Contains(AbstractStringView<CharacterType> string) const;
-	bool Contains(CharacterType character) const;
+	bool Contains(AbstractStringSpan<CharacterType> string) const ETNoexceptHint;
+	bool Contains(CharacterType character) const ETNoexceptHint;
 
-	bool StartsWith(AbstractStringView<CharacterType> prefix) const;
-	bool StartsWith(CharacterType prefix) const;
+	bool StartsWith(AbstractStringSpan<CharacterType> prefix) const ETNoexceptHint;
+	bool StartsWith(CharacterType prefix) const ETNoexceptHint;
 
-	bool EndsWith(AbstractStringView<CharacterType> suffix) const;
-	bool EndsWith(CharacterType suffix) const;
+	bool EndsWith(AbstractStringSpan<CharacterType> suffix) const ETNoexceptHint;
+	bool EndsWith(CharacterType suffix) const ETNoexceptHint;
 
 	// ---------------------------------------------------
 
@@ -113,27 +115,27 @@ public:
 	ConstIterator Erase(ConstIterator begin, ConstIterator end);
 	ConstIterator Erase(ConstIterator where);
 
-	void Trim(SizeType charactersToAdvanceBeginning, SizeType charactersToRemoveFromEnd);
+	void Trim(SizeType charactersToAdvance, SizeType charactersToRemove);
 	void Trim(ConstIterator newBegin, ConstIterator newEnd);
 
 	// - ELEMENT ITERATION -------------------------------
 
 public:
-	ConstIterator Begin() const;
+	ConstIterator Begin() const ETNoexceptHint;
 
-	ConstIterator End() const;
+	ConstIterator End() const ETNoexceptHint;
 
-	ConstReverseIterator ReverseBegin() const;
+	ConstReverseIterator ReverseBegin() const ETNoexceptHint;
 
-	ConstReverseIterator ReverseEnd() const;
+	ConstReverseIterator ReverseEnd() const ETNoexceptHint;
 
-	ConstIterator ConstBegin() const;
+	ConstIterator ConstBegin() const ETNoexceptHint;
 
-	ConstIterator ConstEnd() const;
+	ConstIterator ConstEnd() const ETNoexceptHint;
 
-	ConstReverseIterator ConstReverseBegin() const;
+	ConstReverseIterator ConstReverseBegin() const ETNoexceptHint;
 
-	ConstReverseIterator ConstReverseEnd() const;
+	ConstReverseIterator ConstReverseEnd() const ETNoexceptHint;
 
 	CharacterType Front() const;
 
@@ -143,41 +145,41 @@ public:
 
 public:
 	template <typename Character2>
-	AbstractString& Assign(AbstractStringView<Character2> string);
+	AbstractString& Assign(AbstractStringSpan<Character2> string);
 	template <typename... Arguments>
-	AbstractString& Assign(AbstractStringView<CharacterType> format, Arguments&&... arguments);
-	AbstractString& Assign(AbstractStringView<CharacterType> string);
+	AbstractString& Assign(AbstractStringSpan<CharacterType> format, Arguments&&... arguments);
+	AbstractString& Assign(AbstractStringSpan<CharacterType> string);
 
+	AbstractString& operator=(AbstractStringSpan<CharacterType>);
 	template <typename Character2>
-	AbstractString& operator=(AbstractStringView<Character2> string);
-	AbstractString& operator=(AbstractStringView<CharacterType> string);
+	AbstractString& operator=(AbstractStringSpan<Character2>);
 	AbstractString& operator=(const AbstractString&) = default;
 	AbstractString& operator=(AbstractString&&) = default;
 
 	// - CONTAINER MANIPULATION --------------------------
 
 public:
-	AbstractString& EnsurePrefix(AbstractStringView<CharacterType> prefix);
+	AbstractString& EnsurePrefix(AbstractStringSpan<CharacterType> prefix);
 	AbstractString& EnsurePrefix(CharacterType prefix);
 
-	AbstractString& EnsureSuffix(AbstractStringView<CharacterType> suffix);
+	AbstractString& EnsureSuffix(AbstractStringSpan<CharacterType> suffix);
 	AbstractString& EnsureSuffix(CharacterType suffix);
 
-	AbstractString& Prepend(AbstractStringView<CharacterType> string);
+	AbstractString& Prepend(AbstractStringSpan<CharacterType> string);
 	AbstractString& Prepend(CharacterType value);
 
-	template <typename Character2>
-	AbstractString& Append(AbstractStringView<Character2> string);
 	template <typename... Arguments>
-	AbstractString& Append(AbstractStringView<CharacterType> format, Arguments&&... arguments);
-	AbstractString& Append(AbstractStringView<CharacterType> string);
+	AbstractString& Append(AbstractStringSpan<CharacterType> format, Arguments&&... arguments);
+	AbstractString& Append(AbstractStringSpan<CharacterType> string);
+	template <typename Character2>
+	AbstractString& Append(AbstractStringSpan<Character2> string);
 	template <typename InputIterator>
 	AbstractString& Append(InputIterator begin, InputIterator end);
 	AbstractString& Append(CharacterType value);
 
-	AbstractString& operator+=(AbstractStringView<CharacterType> string);
+	AbstractString& operator+=(AbstractStringSpan<CharacterType> string);
 	template <typename Character2>
-	AbstractString& operator+=(AbstractStringView<Character2> string);
+	AbstractString& operator+=(AbstractStringSpan<Character2> string);
 	AbstractString& operator+=(CharacterType value);
 
 	// ---------------------------------------------------
@@ -187,12 +189,14 @@ public:
 
 	void Resize(SizeType size);
 
-	void Clear();
+	void Clear() ETNoexceptHint;
 
 	// - CONTAINER COMPARISON ----------------------------
 
 public:
-	int Compare(AbstractStringView<CharacterType> string) const;
+	int CompareCaseInsensitive(AbstractStringSpan<CharacterType> string) const ETNoexceptHint;
+
+	int Compare(AbstractStringSpan<CharacterType> string) const ETNoexceptHint;
 
 	// - ELEMENT ACCESS ----------------------------------
 
@@ -202,16 +206,16 @@ public:
 	// - CONTENT QUERY -----------------------------------
 
 public:
-	SizeType GetLength() const;
+	SizeType GetLength() const ETNoexceptHint;
 
-	bool IsEmpty() const;
+	bool IsEmpty() const ETNoexceptHint;
 
-	explicit operator bool() const;
+	explicit operator bool() const ETNoexceptHint;
 
 	// - CAPACITY QUERY ----------------------------------
 
 public:
-	SizeType GetCapacityInCharacters() const;
+	SizeType GetCapacityInCharacters() const ETNoexceptHint;
 
 	void Reserve(SizeType capacityInCharacters);
 
@@ -223,7 +227,7 @@ private:
 	// ---------------------------------------------------
 
 	template <typename Character, class Allocator>
-	friend void Swap(AbstractString<Character, Allocator>&, AbstractString<Character, Allocator>&);
+	friend void Swap(AbstractString<Character, Allocator>&, AbstractString<Character, Allocator>&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

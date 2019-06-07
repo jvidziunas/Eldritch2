@@ -31,13 +31,17 @@ protected:
 	using UnderlyingContainer = eastl::map<Key, Value, SortPredicate, EaStlAllocatorMixin<Allocator>>;
 
 public:
-	using ValueType     = typename UnderlyingContainer::value_type;
-	using KeyType       = typename UnderlyingContainer::key_type;
-	using MappedType    = typename UnderlyingContainer::data_type;
-	using AllocatorType = typename UnderlyingContainer::allocator_type::PublicType;
-	using Iterator      = typename UnderlyingContainer::iterator;
-	using ConstIterator = typename UnderlyingContainer::const_iterator;
-	using SizeType      = typename UnderlyingContainer::size_type;
+	using ValueType      = typename UnderlyingContainer::value_type;
+	using KeyType        = typename UnderlyingContainer::key_type;
+	using MappedType     = typename UnderlyingContainer::data_type;
+	using ConstPointer   = typename UnderlyingContainer::const_pointer;
+	using Pointer        = typename UnderlyingContainer::pointer;
+	using ConstReference = typename UnderlyingContainer::const_reference;
+	using Reference      = typename UnderlyingContainer::reference;
+	using ConstIterator  = typename UnderlyingContainer::const_iterator;
+	using Iterator       = typename UnderlyingContainer::iterator;
+	using AllocatorType  = typename UnderlyingContainer::allocator_type::PublicType;
+	using SizeType       = typename UnderlyingContainer::size_type;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -48,7 +52,7 @@ public:
 	template <typename InputIterator>
 	TreeMap(const AllocatorType& allocator, const SortPredicate& sort, InputIterator begin, InputIterator end);
 	//!	Constructs this @ref TreeMap instance.
-	TreeMap(const AllocatorType& allocator, const SortPredicate& sort, std::initializer_list<ValueType>);
+	TreeMap(const AllocatorType& allocator, const SortPredicate& sort, InitializerList<ValueType>);
 	//!	Constructs this @ref TreeMap instance.
 	TreeMap(const AllocatorType& allocator, const TreeMap&);
 	//!	Constructs this @ref TreeMap instance.
@@ -103,6 +107,9 @@ public:
 	Iterator Erase(Iterator begin, Iterator end);
 	Iterator Erase(Iterator where);
 	SizeType Erase(const KeyType& key);
+
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
 	void Clear();
 

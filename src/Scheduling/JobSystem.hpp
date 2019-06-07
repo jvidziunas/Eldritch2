@@ -28,9 +28,9 @@ namespace Eldritch2 { namespace Scheduling {
 
 	// ---
 
-	using BackoffContext = uintptr;
+	using BackoffCounter = uintptr;
 
-	// ---------------------------------------------------
+	// ---
 
 	class ETPureAbstractHint JobSystem {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -46,9 +46,9 @@ namespace Eldritch2 { namespace Scheduling {
 		// ---------------------------------------------------
 
 	public:
-		virtual void SetShouldShutDown(ErrorCode result) ETNoexceptHint abstract;
+		virtual void SetShouldShutDown(Result result) ETNoexceptHint abstract;
 
-		virtual void BackOff(BackoffContext& context) ETNoexceptHint;
+		virtual void BackOff(BackoffCounter& counter) ETNoexceptHint;
 
 		virtual void SetCallerExecutionPriority(ThreadExecutionPriority priority);
 

@@ -9,12 +9,18 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Scripting/Wren/AssetViews/DialogueSetAsset.hpp>
 #include <Scripting/Wren/DialogueSet.hpp>
 #include <Scripting/Wren/ApiBuilder.hpp>
-#include <Assets/ContentLocator.hpp>
+#include <Core/ContentLocator.hpp>
 //------------------------------------------------------------------//
 
 WrenHandle* wrenGetSlotHandle(WrenVM* vm, int slot);
@@ -54,16 +60,16 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	ET_IMPLEMENT_WREN_CLASS(DialogueSet) {
 		api.DefineClass<DialogueSet>(ET_BUILTIN_WREN_MODULE_NAME(Core), "DialogueSet", // clang-format off
 			{/*	Static methods */
-				ForeignMethod("new(_)", [](WrenVM* vm) {
-					const DialogueSetAsset* const asset(Cast<DialogueSetAsset>(GetSlotAs<AssetReference>(vm, 1)));
-					ET_ABORT_WREN_UNLESS(asset, "Asset must be a DialogueSetAsset.");
+				ForeignMethod("new(_)", [](WrenVM* vm) ETNoexceptHint {
+					const DialogueSetAsset* const asset(Cast<DialogueSetAsset>(wrenGetSlotAs<AssetReference>(vm, 1)));
+					ET_ABORT_WREN_UNLESS(vm, asset, "Asset must be a DialogueSetAsset.");
 
-					SetReturn<DialogueSet>(vm, /*classSlot =*/0);
+					wrenSetReturn<DialogueSet>(vm, /*classSlot =*/0);
 				}), },
 			{/*	Methods */
-				ForeignMethod("match(_)", [](WrenVM* vm) {
-					DialogueSet&      self(GetSlotAs<DialogueSet>(vm, 0));
+				ForeignMethod("match(_)", [](WrenVM* vm) ETNoexceptHint {
 					WrenHandle* const wrenFacts(wrenGetSlotHandle(vm, 1));
+					DialogueSet&      self(wrenGetSlotAs<DialogueSet>(vm, 0));
 					ET_AT_SCOPE_EXIT(wrenReleaseHandle(vm, wrenFacts));
 
 					// const ObjMap* const facts(AS_MAP(wrenFacts->value));

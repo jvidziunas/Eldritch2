@@ -26,25 +26,27 @@ ET_POP_MSVC_WARNING_STATE()
 
 namespace Eldritch2 {
 
-template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool cacheHashCode = false>
+template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator, bool CacheHashCode = false>
 class HashMap {
 	// - TYPE PUBLISHING ---------------------------------
 
 private:
-	using UnderlyingContainer = eastl::hash_map<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, cacheHashCode>;
+	using UnderlyingContainer = eastl::hash_map<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, CacheHashCode>;
 
 public:
 	using ValueType             = typename UnderlyingContainer::value_type;
 	using KeyType               = typename UnderlyingContainer::key_type;
 	using MappedType            = typename UnderlyingContainer::mapped_type;
 	using NodeType              = typename UnderlyingContainer::node_type;
+	using ConstReference        = typename UnderlyingContainer::const_reference;
+	using Reference             = typename UnderlyingContainer::reference;
 	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
 	using SizeType              = typename UnderlyingContainer::size_type;
 	using HashCode              = typename UnderlyingContainer::hash_code_t;
-	using Iterator              = typename UnderlyingContainer::iterator;
 	using ConstIterator         = typename UnderlyingContainer::const_iterator;
-	using LocalIterator         = typename UnderlyingContainer::local_iterator;
+	using Iterator              = typename UnderlyingContainer::iterator;
 	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
+	using LocalIterator         = typename UnderlyingContainer::local_iterator;
 	using EqualityPredicateType = EqualityPredicate;
 	using HashPredicateType     = HashPredicate;
 
@@ -56,7 +58,7 @@ public:
 	template <typename InputIterator>
 	HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashMap instance.
-	HashMap(const AllocatorType& allocator, std::initializer_list<ValueType>);
+	HashMap(const AllocatorType& allocator, InitializerList<ValueType>);
 	//! Constructs this @ref HashMap instance.
 	HashMap(const AllocatorType& allocator, const HashMap&);
 	//! Constructs this @ref HashMap instance.
@@ -87,27 +89,27 @@ public:
 	// - ELEMENT ITERATION -------------------------------
 
 public:
-	ConstLocalIterator ConstBegin(SizeType bucketIndex) const;
-	ConstIterator      ConstBegin() const;
+	ConstLocalIterator ConstBegin(SizeType bucketIndex) const ETNoexceptHint;
+	ConstIterator      ConstBegin() const ETNoexceptHint;
 
-	ConstLocalIterator ConstEnd(SizeType bucketIndex) const;
-	ConstIterator      ConstEnd() const;
+	ConstLocalIterator ConstEnd(SizeType bucketIndex) const ETNoexceptHint;
+	ConstIterator      ConstEnd() const ETNoexceptHint;
 
-	ConstLocalIterator Begin(SizeType bucketIndex) const;
-	LocalIterator      Begin(SizeType bucketIndex);
-	ConstIterator      Begin() const;
-	Iterator           Begin();
+	ConstLocalIterator Begin(SizeType bucketIndex) const ETNoexceptHint;
+	LocalIterator      Begin(SizeType bucketIndex) ETNoexceptHint;
+	ConstIterator      Begin() const ETNoexceptHint;
+	Iterator           Begin() ETNoexceptHint;
 
-	ConstLocalIterator End(SizeType bucketIndex) const;
-	LocalIterator      End(SizeType bucketIndex);
-	ConstIterator      End() const;
-	Iterator           End();
+	ConstLocalIterator End(SizeType bucketIndex) const ETNoexceptHint;
+	LocalIterator      End(SizeType bucketIndex) ETNoexceptHint;
+	ConstIterator      End() const ETNoexceptHint;
+	Iterator           End() ETNoexceptHint;
 
 	// - ELEMENT ACCESS ----------------------------------
 
 public:
-	MappedType& operator[](const KeyType& key);
-	MappedType& operator[](KeyType&& key);
+	MappedType& operator[](const KeyType&);
+	MappedType& operator[](KeyType&&);
 
 	// - CONTAINER DUPLICATION ---------------------------
 
@@ -131,30 +133,32 @@ public:
 
 	Iterator Erase(Iterator first, Iterator last);
 	Iterator Erase(Iterator where);
+	template <typename Value2, typename HashPredicate2, typename EqualityPredicate2>
+	SizeType Erase(const Value2& value, HashPredicate2 hash, EqualityPredicate2 equal);
 	SizeType Erase(const KeyType& key);
 
-	template <typename Disposer>
-	void ClearAndDispose(Disposer disposer);
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
 	void Clear();
 
 	// - CONTENT QUERY -----------------------------------
 
 public:
-	SizeType GetSize() const;
+	SizeType GetSize() const ETNoexceptHint;
 
-	bool IsEmpty() const;
+	bool IsEmpty() const ETNoexceptHint;
 
-	explicit operator bool() const;
+	explicit operator bool() const ETNoexceptHint;
 
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	const EqualityPredicateType& GetEqualityPredicate() const;
+	EqualityPredicateType GetEqualityPredicate() const ETNoexceptHint;
 
-	const HashPredicateType& GetHash() const;
+	HashPredicateType GetHash() const ETNoexceptHint;
 
-	const AllocatorType& GetAllocator() const;
+	const AllocatorType& GetAllocator() const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------
 
@@ -163,8 +167,8 @@ private:
 
 	// ---------------------------------------------------
 
-	template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool cacheHashCode>
-	friend void Swap(HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&, HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, cacheHashCode>&);
+	template <typename Key2, typename Value2, class HashPredicate2, class EqualityPredicate2, class Allocator2, bool CacheHashCode2>
+	friend void Swap(HashMap<Key2, Value2, HashPredicate2, EqualityPredicate2, Allocator2, CacheHashCode2>&, HashMap<Key2, Value2, HashPredicate2, EqualityPredicate2, Allocator2, CacheHashCode2>&) ETNoexceptHint;
 };
 
 template <typename Key, typename Value, class HashPredicate = Hash<Key>, class EqualityPredicate = EqualTo<Key>, class Allocator = MallocAllocator>

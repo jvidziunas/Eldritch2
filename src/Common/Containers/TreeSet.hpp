@@ -30,11 +30,15 @@ protected:
 	using UnderlyingContainer = eastl::set<Value, LessThan<Value>, EaStlAllocatorMixin<Allocator>>;
 
 public:
-	using ValueType     = typename UnderlyingContainer::value_type;
-	using AllocatorType = typename UnderlyingContainer::allocator_type::PublicType;
-	using Iterator      = typename UnderlyingContainer::iterator;
-	using ConstIterator = typename UnderlyingContainer::const_iterator;
-	using SizeType      = typename AllocatorType::SizeType;
+	using ValueType      = typename UnderlyingContainer::value_type;
+	using ConstPointer   = typename UnderlyingContainer::const_pointer;
+	using Pointer        = typename UnderlyingContainer::pointer;
+	using ConstReference = typename UnderlyingContainer::const_reference;
+	using Reference      = typename UnderlyingContainer::reference;
+	using ConstIterator  = typename UnderlyingContainer::const_iterator;
+	using Iterator       = typename UnderlyingContainer::iterator;
+	using AllocatorType  = typename UnderlyingContainer::allocator_type::PublicType;
+	using SizeType       = typename AllocatorType::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -43,7 +47,7 @@ public:
 	template <typename InputIterator>
 	TreeSet(const AllocatorType& allocator, const SortPredicate& sort, InputIterator begin, InputIterator end);
 	//!	Constructs this @ref TreeSet instance.
-	TreeSet(const AllocatorType& allocator, const SortPredicate& sort, std::initializer_list<ValueType>);
+	TreeSet(const AllocatorType& allocator, const SortPredicate& sort, InitializerList<ValueType>);
 	//!	Constructs this @ref TreeSet instance.
 	TreeSet(const AllocatorType& allocator = AllocatorType(), const SortPredicate& sort = SortPredicate());
 	//!	Constructs this @ref TreeSet instance.
@@ -89,6 +93,9 @@ public:
 
 	Iterator Erase(Iterator begin, Iterator end);
 	Iterator Erase(Iterator where);
+
+	template <typename UnaryPredicate>
+	void ClearAndDispose(UnaryPredicate disposer);
 
 	void Clear();
 

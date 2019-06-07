@@ -17,36 +17,41 @@
 
 namespace Eldritch2 {
 
-ETInlineHint ETForceInlineHint ChildAllocator::ChildAllocator(Allocator& allocator, const Utf8Char* const name) ETNoexceptHint : Allocator(name),
-																																 _parent(ETAddressOf(allocator)) {}
+ETConstexpr ETForceInlineHint ChildAllocator::ChildAllocator(Allocator& allocator, const Utf8Char* const name) ETNoexceptHint : Allocator(name), _parent(ETAddressOf(allocator)) {}
 
 // ---------------------------------------------------
 
-ETInlineHint ETForceInlineHint ETRestrictHint void* ChildAllocator::Allocate(SizeType sizeInBytes, AllocationDuration duration) {
-	return ChildAllocator::Allocate(sizeInBytes, 1u, 0u, duration);
+ETInlineHint ETForceInlineHint ETRestrictHint void* ChildAllocator::Allocate(SizeType byteSize, SizeType byteAlignment, SizeType byteOffset, AllocationDuration duration) ETNoexceptHint {
+	return _parent->Allocate(byteSize, byteAlignment, byteOffset, duration);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETForceInlineHint ETRestrictHint void* ChildAllocator::Allocate(SizeType sizeInBytes, SizeType alignmentInBytes, SizeType offsetInBytes, AllocationDuration duration) {
-	return _parent->Allocate(sizeInBytes, alignmentInBytes, offsetInBytes, duration);
+ETInlineHint ETForceInlineHint ETRestrictHint void* ChildAllocator::Allocate(SizeType byteSize, AllocationDuration duration) ETNoexceptHint {
+	return this->Allocate(byteSize, /*byteAlignment =*/1u, /*byteOffset =*/0u, duration);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETForceInlineHint void ChildAllocator::Deallocate(void* const address, SizeType sizeInBytes) {
+ETInlineHint ETForceInlineHint void ChildAllocator::Deallocate(void* const address, SizeType sizeInBytes) ETNoexceptHint {
 	_parent->Deallocate(address, sizeInBytes);
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETForceInlineHint Allocator& ChildAllocator::GetParent() const ETNoexceptHint {
+ETConstexpr ETForceInlineHint Allocator& ChildAllocator::GetParent() const ETNoexceptHint {
 	return *_parent;
 }
 
 // ---------------------------------------------------
 
-ETInlineHint ETForceInlineHint void Swap(ChildAllocator& lhs, ChildAllocator& rhs) ETNoexceptHint {
+ETConstexpr ETForceInlineHint bool operator==(ChildAllocator& lhs, ChildAllocator& rhs) ETNoexceptHint {
+	return ETAddressOf(lhs.GetParent()) == ETAddressOf(rhs.GetParent());
+}
+
+// ---------------------------------------------------
+
+ETConstexpr ETForceInlineHint void Swap(ChildAllocator& lhs, ChildAllocator& rhs) ETNoexceptHint {
 	Swap(lhs._parent, rhs._parent);
 }
 

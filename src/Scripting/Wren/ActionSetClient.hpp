@@ -16,7 +16,7 @@
 //------------------------------------------------------------------//
 
 namespace Eldritch2 { namespace Scripting { namespace Wren {
-	class Context;
+	class ScriptExecutor;
 }}} // namespace Eldritch2::Scripting::Wren
 
 struct WrenHandle;
@@ -36,29 +36,15 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 	// ---
 
 	class ActionSetClient : public ArrayList<InputAction>, public Input::InputClient {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using DeviceLink = UniquePointer<Input::InputDevice, Input::DeviceDisposer>;
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
 		//!	Disable copy construction.
 		ActionSetClient(const ActionSetClient&) = delete;
 		//!	Constructs this @ref ActionSetClient instance.
-		ActionSetClient();
+		ActionSetClient() ETNoexceptHint;
 
 		~ActionSetClient();
-
-		// ---------------------------------------------------
-
-	public:
-		void Activate(Input::ActionId id, int32 amount) override;
-
-		void OnConnect(const Input::InputDevice& device) override;
-
-		void OnDisconnect(const Input::InputDevice& device) override;
 
 		// ---------------------------------------------------
 
@@ -66,21 +52,23 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		//!	Invokes input event handlers for all actions attached to this @ref ActionSetClient.
 		/*!	@param[in] context Wren VM context that will execute script code.
 			@returns true if all listeners executed successfully, or false if a runtime exception occurred. */
-		bool DispatchEvents(Context& context);
+		bool DispatchEvents(ScriptExecutor& context);
 
 		// ---------------------------------------------------
 
 	public:
-		void AcquireDevice(DeviceLink link);
+		Result BindResources(ScriptExecutor& context, int bindingsSlot);
 
-		void ReleaseDevices();
+		void FreeResources(ScriptExecutor& context) ETNoexceptHint;
 
 		// ---------------------------------------------------
 
-	public:
-		ErrorCode BindResources(Context& context, int bindingsSlot);
+	protected:
+		void Activate(Input::Action id, int32 amount) override;
 
-		void FreeResources(Context& context);
+		void OnConnect(const Input::InputDevice& device) override;
+
+		void OnDisconnect(const Input::InputDevice& device) override;
 
 		// ---------------------------------------------------
 
@@ -90,7 +78,7 @@ namespace Eldritch2 { namespace Scripting { namespace Wren {
 		// - DATA MEMBERS ------------------------------------
 
 	public:
-		ArrayList<DeviceLink> _links;
+		ArrayList<Pair<Input::DeviceLocator*, Input::DeviceId>> _links;
 
 		// ---------------------------------------------------
 

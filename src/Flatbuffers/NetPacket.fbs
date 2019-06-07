@@ -5,13 +5,18 @@ table AttachPlayer {
 	GameData : [ubyte] (flexbuffer);
 }
 
-table DetachPlayer {
+struct DetachPlayer {
+	Id : ulong;
+}
+
+struct AckMessage {
 	Id : ulong;
 }
 
 union NetMessage {
 	AttachPlayer,
-	DetachPlayer
+	DetachPlayer,
+	AckMessage,
 }
 
 table NetPacket {

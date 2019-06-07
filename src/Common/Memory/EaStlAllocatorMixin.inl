@@ -19,63 +19,65 @@ namespace Eldritch2 {
 
 template <typename EldritchAllocator>
 template <typename... Arguments>
-ETInlineHint ETForceInlineHint EaStlAllocatorMixin<EldritchAllocator>::EaStlAllocatorMixin(Arguments&&... arguments) noexcept :
-	EldritchAllocator(eastl::forward<Arguments>(arguments)...) {}
+ETInlineHint ETForceInlineHint EaStlAllocatorMixin<EldritchAllocator>::EaStlAllocatorMixin(Arguments&&... arguments) ETNoexceptHintIf(IsNoThrowConstructible<PublicType, Arguments&&...>()) :
+	PublicType(Forward<Arguments>(arguments)...) {}
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint ETRestrictHint void* EaStlAllocatorMixin<EldritchAllocator>::allocate(size_t sizeInBytes, size_t alignmentInBytes, size_t offsetInBytes, int /*flags*/) {
-	return EldritchAllocator::Allocate(sizeInBytes, alignmentInBytes, offsetInBytes);
+ETInlineHint ETForceInlineHint ETRestrictHint void* EaStlAllocatorMixin<EldritchAllocator>::allocate(size_t byteSize, size_t byteAlignment, size_t byteOffset, int /*flags*/) {
+	return PublicType::Allocate(byteSize, byteAlignment, byteOffset);
 }
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint ETRestrictHint void* EaStlAllocatorMixin<EldritchAllocator>::allocate(size_t sizeInBytes, int /*flags*/) {
-	return EldritchAllocator::Allocate(sizeInBytes);
+ETInlineHint ETForceInlineHint ETRestrictHint void* EaStlAllocatorMixin<EldritchAllocator>::allocate(size_t byteSize, int /*flags*/) {
+	return PublicType::Allocate(byteSize);
 }
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint void EaStlAllocatorMixin<EldritchAllocator>::deallocate(void* pointer, size_t sizeInBytes) {
-	EldritchAllocator::Deallocate(pointer, sizeInBytes);
+ETInlineHint ETForceInlineHint void EaStlAllocatorMixin<EldritchAllocator>::deallocate(void* pointer, size_t byteSize) {
+	PublicType::Deallocate(pointer, byteSize);
 }
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint const char* EaStlAllocatorMixin<EldritchAllocator>::get_name() const {
-	return EldritchAllocator::GetName();
+ETInlineHint ETForceInlineHint const char* EaStlAllocatorMixin<EldritchAllocator>::get_name() const ETNoexceptHint {
+	return PublicType::GetName();
 }
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint void EaStlAllocatorMixin<EldritchAllocator>::set_name(const char* /*name*/) {
+ETInlineHint ETForceInlineHint void EaStlAllocatorMixin<EldritchAllocator>::set_name(const char* /*name*/) ETNoexceptHint {
 	//	Eldritch allocators do not support renaming.
 }
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint bool operator==(const EaStlAllocatorMixin<EldritchAllocator>& /*lhs*/, const EaStlAllocatorMixin<EldritchAllocator>& /*rhs*/) {
-	return false;
+ETInlineHint ETForceInlineHint bool operator==(const EaStlAllocatorMixin<EldritchAllocator>& lhs, const EaStlAllocatorMixin<EldritchAllocator>& rhs) ETNoexceptHint {
+	return static_cast<const typename EaStlAllocatorMixin<EldritchAllocator>::PublicType&>(lhs) == static_cast<const typename EaStlAllocatorMixin<EldritchAllocator>::PublicType&>(rhs);
 }
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint bool operator!=(const EaStlAllocatorMixin<EldritchAllocator>& /*lhs*/, const EaStlAllocatorMixin<EldritchAllocator>& /*rhs*/) {
-	return true;
+ETInlineHint ETForceInlineHint bool operator!=(const EaStlAllocatorMixin<EldritchAllocator>& lhs, const EaStlAllocatorMixin<EldritchAllocator>& rhs) ETNoexceptHint {
+	return !(lhs == rhs);
 }
 
 // ---------------------------------------------------
 
 template <typename EldritchAllocator>
-ETInlineHint ETForceInlineHint void Swap(EaStlAllocatorMixin<EldritchAllocator>& lhs, EaStlAllocatorMixin<EldritchAllocator>& rhs) {
-	Swap(static_cast<EldritchAllocator&>(lhs), static_cast<EldritchAllocator&>(rhs));
+ETInlineHint ETForceInlineHint void Swap(EaStlAllocatorMixin<EldritchAllocator>& lhs, EaStlAllocatorMixin<EldritchAllocator>& rhs) ETNoexceptHint {
+	using namespace ::Eldritch2;
+
+	Swap(static_cast<typename EaStlAllocatorMixin<EldritchAllocator>::PublicType&>(lhs), static_cast<typename EaStlAllocatorMixin<EldritchAllocator>::PublicType&>(rhs));
 }
 
 } // namespace Eldritch2
@@ -83,9 +85,8 @@ ETInlineHint ETForceInlineHint void Swap(EaStlAllocatorMixin<EldritchAllocator>&
 namespace eastl {
 
 template <typename T>
-ETInlineHint ETForceInlineHint void swap(::Eldritch2::EaStlAllocatorMixin<T>& a, ::Eldritch2::EaStlAllocatorMixin<T>& b) {
-	using ::Eldritch2::Swap;
-	Swap(a, b);
+ETInlineHint ETForceInlineHint void swap(Eldritch2::EaStlAllocatorMixin<T>& lhs, Eldritch2::EaStlAllocatorMixin<T>& rhs) {
+	Eldritch2::Swap(lhs, rhs);
 }
 
 } // namespace eastl

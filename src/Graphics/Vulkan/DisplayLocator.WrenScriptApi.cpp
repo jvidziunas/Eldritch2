@@ -9,6 +9,12 @@
 \*==================================================================*/
 
 //==================================================================//
+// PRECOMPILED HEADER
+//==================================================================//
+#include <Common/Precompiled.hpp>
+//------------------------------------------------------------------//
+
+//==================================================================//
 // INCLUDES
 //==================================================================//
 #include <Graphics/Vulkan/DisplayLocator.hpp>
@@ -17,8 +23,8 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	ET_IMPLEMENT_WREN_CLASS(DisplayLocator) {
-		api.DefineClass<DisplayLocator>(ET_BUILTIN_WREN_MODULE_NAME(Graphics), "DisplayLocator", { /* Static methods */ }, { /* Methods */ });
+	ET_IMPLEMENT_WREN_CLASS(DisplayLocator, api, moduleName) {
+		api.DefineClass<DisplayLocator>("DisplayLocator", moduleName, { /* Static methods */ }, { /* Methods */ });
 	}
 
 }}} // namespace Eldritch2::Graphics::Vulkan
