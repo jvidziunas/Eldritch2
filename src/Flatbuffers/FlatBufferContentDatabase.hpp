@@ -53,9 +53,9 @@ namespace Eldritch2 { namespace FlatBuffers {
 			// - DATA MEMBERS ------------------------------------
 
 		private:
+			Core::ContentDatabase* _content;
 			Atomic<RunBehavior>    _runBehavior;
 			Logging::FileLog       _log;
-			Core::ContentDatabase* _content;
 		};
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -63,7 +63,7 @@ namespace Eldritch2 { namespace FlatBuffers {
 	public:
 		//!	Disable copy construction.
 		FlatBufferContentDatabase(const FlatBufferContentDatabase&) = delete;
-		//!	Constructs this @ref FlatBufferPackageProvider instance.
+		//!	Constructs this @ref FlatBufferContentDatabase instance.
 		FlatBufferContentDatabase() ETNoexceptHint;
 
 		~FlatBufferContentDatabase() = default;

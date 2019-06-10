@@ -17,18 +17,27 @@
 
 namespace Eldritch2 {
 
-	template <class TargetBvh>
-	class BvhQuery {
-	public:
-		using TargetBvhType = TargetBvh;
+	template <typename Record>
 
-	public:
-		BvhQuery() ETNoexceptHint = default;
 
-		~BvhQuery() = default;
+template <class Bvh>
+class BvhQuery {
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-	public:
+public:
+	using BvhType = Bvh;
 
-	};
+	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
-}	// namespace Eldritch2
+public:
+	//!	Constructs this @ref BvhQuery instance.
+	BvhQuery(const BvhQuery&) = default;
+	//!	Constructs this @ref BvhQuery instance.
+	BvhQuery() ETNoexceptHint = default;
+
+	~BvhQuery() = default;
+
+public:
+};
+
+} // namespace Eldritch2

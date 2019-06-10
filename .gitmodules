@@ -25,9 +25,6 @@
 [submodule "extern/microprofile"]
 	path = extern/microprofile
 	url = https://github.com/jonasmr/microprofile.git
-[submodule "extern/crunch"]
-	path = extern/crunch
-	url = https://github.com/BinomialLLC/crunch.git
 [submodule "extern/libmorton"]
 	path = extern/libmorton
 	url = https://github.com/Forceflow/libmorton.git
@@ -40,6 +37,9 @@
 [submodule "extern/DirectXShaderCompiler"]
 	path = extern/DirectXShaderCompiler
 	url = https://github.com/Microsoft/DirectXShaderCompiler.git
-[submodule "extern/ozz"]
-	path = extern/ozz
-	url = https://github.com/guillaumeblanc/ozz-animation.git
+[submodule "extern/basis"]
+	path = extern/basis
+	url = https://github.com/jvidziunas/basis_universal.git
+[submodule "extern/blast"]
+	path = extern/blast
+	url = https://github.com/NVIDIAGameWorks/Blast.git

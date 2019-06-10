@@ -772,7 +772,7 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\SpirVShaderSet.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -32,7 +32,7 @@ public:
 	// ---
 
 public:
-	template <typename Index>
+	template <typename Index = typename SoaListAlloc<Allocator, Value, typename SortPredicateType::KeyType::SizeType>
 	struct Split {
 		Index minima[3];
 		Index maxima[3];
@@ -44,7 +44,7 @@ public:
 	// ---
 	
 public:
-	using LeafList           = SoaListAlloc<Allocator, Value /*values*/, typename SortPredicate::KeyType /*keys*/, Split<uint32> /*splits*/>;
+	using LeafList           = SoaListAlloc<Allocator, Value /*values*/, typename SortPredicate::KeyType /*keys*/, Split<> /*splits*/>;
 	using SortType           = SortPredicate;
 	using AllocatorType      = typename LeafList::AllocatorType;
 	using ValueType          = typename LeafList::template ValueType<Values>;
