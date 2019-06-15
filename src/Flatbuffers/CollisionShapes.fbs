@@ -7,7 +7,7 @@ table SphereShape {
 }
 
 table BoxShape {
-	HalfExtent	: Eldritch2.FlatBuffers.Float3;
+	HalfExtent	: flatbuffers.Float3;
 }
 
 table CapsuleShape {

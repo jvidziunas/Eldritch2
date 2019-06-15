@@ -18,48 +18,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	enum class ViewportId : Eldritch2::uintptr;
-
-	// ---
-
-	class RootView {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//! Constructs this @ref RootView instance.
-		RootView(ViewportId target, Transformation worldToView, Angle verticalFov) ETNoexceptHint;
-		//! Disable copy construction.
-		RootView(const RootView&) = delete;
-
-		~RootView() = default;
-
-		// ---------------------------------------------------
-
-	public:
-		ETConstexpr Transformation ETSimdCall GetWorldToView() const ETNoexceptHint;
-
-		ETConstexpr void ETSimdCall SetWorldToView(Transformation worldToView) ETNoexceptHint;
-
-		ETConstexpr Angle GetVerticalFov() const ETNoexceptHint;
-
-		ETConstexpr void SetVerticalFov(Angle angle) ETNoexceptHint;
-
-		// ---------------------------------------------------
-
-		//! Disable copy assignment.
-		RootView& operator=(const RootView&) = delete;
-
-		// - DATA MEMBERS ------------------------------------
-
-	private:
-		ViewportId     _target;
-		Transformation _worldToView;
-		Angle          _verticalFov;
-	};
-
-	// ---
-
-	class VulkanGraphicsScene : public GraphicsScene {
+	class VulkanGraphicsScene : public GraphicsScene<ViewRecord, LightRecord, MeshRecord> {
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -101,11 +60,11 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		PipelineBuilder _shadowMapPipelineBuilder;
-		GraphicsPipeline        _shadowMapPipeline;
-		Framebuffer             _shadowMapAtlas;
-		PipelineBuilder _litPipelineBuilder;
-		GraphicsPipeline        _litPipeline;
+		PipelineBuilder  _shadowMapPipelineBuilder;
+		GraphicsPipeline _shadowMapPipeline;
+		Framebuffer      _shadowMapAtlas;
+		PipelineBuilder  _litPipelineBuilder;
+		GraphicsPipeline _litPipeline;
 	};
 
 }}} // namespace Eldritch2::Graphics::Vulkan

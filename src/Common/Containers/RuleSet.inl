@@ -129,7 +129,7 @@ template <class Allocator2>
 ETInlineHint ArrayList<typename RuleSet<Builder, Response, Allocator>::MatchType, Allocator2> RuleSet<Builder, Response, Allocator>::Query::GetMatches(const Allocator2& allocator) const {
 	ArrayList<MatchType, Allocator2> matches(allocator);
 	//	We can optimize matching slightly by starting at 1-- this will cause rules that match 0 patterns to fail immediately.
-	SizeType threshold(1u);
+	ScoreType threshold(1u);
 
 	for (typename RuleList::ConstReference rule : _rules->_rules) {
 		const auto score(ScoreCriteria(rule->first, query.GetFacts()));
@@ -137,7 +137,7 @@ ETInlineHint ArrayList<typename RuleSet<Builder, Response, Allocator>::MatchType
 			continue; // Ignore, we've already found a more specific match.
 		}
 
-		if (threshold < score) { 
+		if (threshold < score) {
 			matches.Clear(); //	Clear previous findings if a better-quality match is found.
 		}
 
@@ -178,16 +178,27 @@ ETInlineHint ETForceInlineHint void RuleSet<Builder, Response, Allocator>::Empla
 
 // ---------------------------------------------------
 
-template <typename InputIterator, typename FactMap>
-ETInlineHint typename Span<InputIterator>::SizeType ScoreCriteria(Span<InputIterator> criteria, const FactMap& facts) {
-	for (; criteria != criteriaEnd; ++criteria) {
-		const auto fact(facts.Find(criteria->first));
+template <typename Builder, typename Response, typename Allocator>
+ETInlineHint ETForceInlineHint RuleSet<Builder, Response, Allocator>::Query RuleSet<Builder, Response, Allocator>::BeginQuery(const AllocatorType& allocator) const {
+	return Query(allocator, *this);
+}
+
+// ---------------------------------------------------
+
+template <typename Builder, typename Response, typename Allocator>
+template <typename FactMap>
+ETInlineHint typename RuleSet<Builder, Response, Allocator>::ScoreType RuleSet<Builder, Response, Allocator>::Score(const FactMap& facts) const ETNoexceptHint {
+	ScoreType score(0u);
+	for (typename FactMap::ConstReference criterion : _rules) {
+		const auto fact(_rules.Find(criteria->first));
 		if (fact == facts.End() || !criteria->second(fact->second)) {
 			return 0u;
 		}
+
+		++score;
 	}
 
-	return eastl::distance(criteria, criteriaEnd);
+	return score;
 }
 
 } // namespace Eldritch2

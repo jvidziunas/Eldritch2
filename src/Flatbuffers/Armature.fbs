@@ -5,7 +5,7 @@ file_extension	".e2armature";
 namespace Eldritch2.Animation.FlatBuffers;
 
 struct JointDescriptor {
-	BindPose	: Eldritch2.FlatBuffers.Transformation;
+	BindPose	: flatbuffers.Transformation;
 	Parent		: ushort;
 }
 

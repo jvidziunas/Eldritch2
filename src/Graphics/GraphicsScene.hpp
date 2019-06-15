@@ -12,111 +12,33 @@
 //==================================================================//
 // INCLUDES
 //==================================================================//
+#include <Animation/AnimationApi.hpp>
 #include <Graphics/RenderConcept.hpp>
 #include <Graphics/RgbColor.hpp>
 //------------------------------------------------------------------//
 
-namespace Eldritch2 {
-namespace Animation {
-	class Armature;
-} // namespace Animation
-
-namespace Graphics {
+namespace Eldritch2 { namespace Graphics {
 	class MeshSource;
-} // namespace Graphics
-} // namespace Eldritch2
+}} // namespace Eldritch2::Graphics
 
 namespace Eldritch2 { namespace Graphics {
 
-	enum MeshType {
-		WorldMesh,
-		DynamicMesh,
-
-		MeshTypes
+	enum ViewType {
+		Root,
+		Portal,
+		Mirror,
 	};
 
 	// ---
 
-	enum LightType {
-		WorldLight,
-		DynamicLight,
-
-		LightTypes
-	};
+	using ViewTableTraits  = QueryableTableTraits<0u, Transformation /*localToWorld*/, Transformation /*targetToWorld*/, ViewType /*type*/>;
+	using LightTableTraits = QueryableTableTraits<1u, Transformation /*localToWorld*/, RgbColor /*color*/, float32 /*radius*/>;
+	using MeshTableTraits  = QueryableTableTraits<2u, Animation::Armature /*armature*/, const MeshSource* /*mesh*/>;
 
 	// ---
 
-	class RenderMesh {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Constructs this @ref RenderMesh instance.
-		RenderMesh(const Animation::Armature& armature, const MeshSource& mesh) ETNoexceptHint;
-		//!	Constructs this @ref RenderMesh instance.
-		RenderMesh(const RenderMesh&) = default;
-
-		~RenderMesh() = default;
-
-		// - DATA MEMBERS ------------------------------------
-
-	public:
-		const Animation::Armature* armature;
-		const MeshSource*          mesh;
-	};
-
-	// ---
-
-	class RenderLight {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Constructs this @ref RenderLight instance.
-		RenderLight(Transformation localToWorld, RgbColor color, float32 radius) ETNoexceptHint;
-		//!	Constructs this @ref RenderLight instance.
-		RenderLight(const RenderLight&) = default;
-
-		~RenderLight() = default;
-
-		// - DATA MEMBERS ------------------------------------
-
-	public:
-		Transformation localToWorld;
-		RgbColor       color;
-		float32        radius;
-	};
-
-	// ---
-
-	class RenderView {
-		// - CONSTRUCTOR/DESTRUCTOR --------------------------
-
-	public:
-		//!	Constructs this @ref RenderView instance.
-		RenderView(Transformation view, bool isMirror) ETNoexceptHint;
-		//!	Constructs this @ref RenderView instance.
-		RenderView(const RenderView&) ETNoexceptHint = default;
-
-		~RenderView() = default;
-
-		// - DATA MEMBERS ------------------------------------
-
-	public:
-		Transformation viewTransform;
-		bool           isMirror;
-		struct {
-			float32 x, y, width, height;
-		} viewport;
-	};
-
-	// ---
-
+	template <typename... Tables>
 	class GraphicsScene {
-		// - TYPE PUBLISHING ---------------------------------
-
-	public:
-		using LightConcept = RenderConcept<RenderLight>;
-		using MeshConcept  = RenderConcept<RenderMesh>;
-
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	public:
@@ -129,22 +51,13 @@ namespace Eldritch2 { namespace Graphics {
 
 		// ---------------------------------------------------
 
-	public:
-		ETConstexpr const LightConcept& GetInstances(LightType concept) const ETNoexceptHint;
-		ETConstexpr const MeshConcept& GetInstances(MeshType concept) const ETNoexceptHint;
-		ETConstexpr LightConcept& GetInstances(LightType concept) ETNoexceptHint;
-		ETConstexpr MeshConcept& GetInstances(MeshType concept) ETNoexceptHint;
-
-		// ---------------------------------------------------
-
 		//!	Disable copy assignment.
 		GraphicsScene& operator=(const GraphicsScene&) = delete;
 
 		// - DATA MEMBERS ------------------------------------
 
 	private:
-		MeshConcept  _meshConcepts[MeshTypes];
-		LightConcept _lightConcepts[LightTypes];
+		Tuple<RenderConcept<Tables>...> _concepts;
 	};
 
 }} // namespace Eldritch2::Graphics

@@ -17,18 +17,6 @@
 
 namespace Eldritch2 { namespace Graphics {
 
-	ETInlineHint ETForceInlineHint RenderLight::RenderLight(Transformation localToWorld, RgbColor color, float32 radius) ETNoexceptHint : localToWorld(localToWorld), color(color), radius(radius) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint RenderMesh::RenderMesh(const Animation::Armature& armature, const MeshSource& mesh) ETNoexceptHint : armature(ETAddressOf(armature)), mesh(ETAddressOf(mesh)) {}
-
-	// ---------------------------------------------------
-
-	ETInlineHint ETForceInlineHint RenderView::RenderView(Transformation view, bool isMirror) ETNoexceptHint : viewTransform(view), isMirror(isMirror), viewport{ /*x =*/0.0f, /*y =*/1.0f, /*width =*/1.0f, /*height =*/0.0f } {}
-
-	// ---------------------------------------------------
-
 	ETConstexpr ETForceInlineHint const GraphicsScene::LightConcept& GraphicsScene::GetInstances(LightType concept) const ETNoexceptHint {
 		ETAssert(concept < LightTypes, "Concept must be valid!");
 		ET_SUPPRESS_MSVC_WARNINGS(6385)

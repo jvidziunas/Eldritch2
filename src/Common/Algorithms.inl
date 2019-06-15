@@ -44,6 +44,27 @@ namespace Detail {
 		return Move(predicate);
 	}
 
+	// ---------------------------------------------------
+
+	template <typename Tuple, size_t... Indices, typename... Arguments>
+	ETInlineHint ETForceInlineHint void ForEach2(const Tuple& tuple, IndexSequence<Indices...>, Arguments&&... arguments) {
+		DiscardArguments((eastl::invoke(Get<Indices>(tuple), Forward<Arguments>(arguments)...), 0)...);
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Tuple, size_t... Indices, typename... Arguments>
+	ETInlineHint ETForceInlineHint void ForEach2(Tuple&& tuple, IndexSequence<Indices...>, Arguments&&... arguments) {
+		DiscardArguments((eastl::invoke(Get<Indices>(Move(tuple)), Forward<Arguments>(arguments)...), 0)...);
+	}
+
+	// ---------------------------------------------------
+
+	template <typename Tuple, size_t... Indices, typename... Arguments>
+	ETInlineHint ETForceInlineHint void ForEach2(Tuple& tuple, IndexSequence<Indices...>, Arguments&&... arguments) {
+		DiscardArguments((eastl::invoke(Get<Indices>(tuple), Forward<Arguments>(arguments)...), 0)...);
+	}
+
 } // namespace Detail
 
 template <typename InputIterator, typename UnaryPredicate>
@@ -132,21 +153,34 @@ ETInlineHint ETForceInlineHint UnaryPredicate ForEach(Tuple& tuple, UnaryPredica
 
 // ---------------------------------------------------
 
-template <typename InputIterator, typename Value, typename BinaryPredicate>
-ETInlineHint ETForceInlineHint Value Reduce(InputIterator begin, InputIterator end, Value value, BinaryPredicate reducer) {
-	while (begin != end) {
-		value = reducer(*begin++, value);
-	}
-
-	return Move(value);
+template <typename Tuple, typename... Args>
+ETInlineHint ETForceInlineHint void ForEach2(const Tuple&, Args&&... args) {
+	Detail::ForEach2(tuple, MakeIntegerSequence<size_t, ETCountOf(tuple)>(), Forward<Args>(args)...)
 }
 
 // ---------------------------------------------------
 
-template <typename InputIterator, typename BinaryPredicate>
-ETInlineHint ETForceInlineHint typename DereferenceType<InputIterator>::Type Reduce(InputIterator begin, InputIterator end, BinaryPredicate reducer) {
-	using ValueType = typename eastl::iterator_traits<InputIterator>::value_type;
-	return Eldritch2::Reduce(Move(begin), Move(end), ValueType{}, Move(reducer));
+template <typename Tuple, typename... Args>
+ETInlineHint ETForceInlineHint void ForEach2(Tuple&&, Args&&... args) {
+	Detail::ForEach2(Move(tuple), MakeIntegerSequence<size_t, ETCountOf(tuple)>(), Forward<Args>(args)...);
+}
+
+// ---------------------------------------------------
+
+template <typename Tuple, typename... Args>
+ETInlineHint ETForceInlineHint void ForEach2(Tuple&, Args&&... args) {
+	Detail::ForEach2(tuple, MakeIntegerSequence<size_t, ETCountOf(tuple)>(), Forward<Args>(args)...);
+}
+
+// ---------------------------------------------------
+
+template <typename InputIterator, typename Value, typename BinaryPredicate>
+ETInlineHint ETForceInlineHint Value Reduce(InputIterator begin, InputIterator end, Value value, BinaryPredicate reducer) {
+	while (begin != end) {
+		value = Move(reducer(*begin++, Move(value)));
+	}
+
+	return Move(value);
 }
 
 // ---------------------------------------------------

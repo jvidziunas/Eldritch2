@@ -147,12 +147,17 @@ UnaryPredicate ForEach(Tuple&&, UnaryPredicate predicate);
 template <typename Tuple, typename UnaryPredicate>
 UnaryPredicate ForEach(Tuple&, UnaryPredicate predicate);
 
+template <typename Tuple, typename... Args>
+void ForEach2(const Tuple&, Args&&...);
+template <typename Tuple, typename... Args>
+void ForEach2(Tuple&&, Args&&...);
+template <typename Tuple, typename... Args>
+void ForEach2(Tuple&, Args&&...);
+
 // ---------------------------------------------------
 
 template <typename InputIterator, typename Value, typename BinaryPredicate>
 Value Reduce(InputIterator begin, InputIterator end, Value initial, BinaryPredicate reducer);
-template <typename InputIterator, typename BinaryPredicate>
-typename DereferenceType<InputIterator>::Type Reduce(InputIterator begin, InputIterator end, BinaryPredicate reducer);
 
 // ---------------------------------------------------
 

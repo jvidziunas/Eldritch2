@@ -13,6 +13,7 @@
 // INCLUDES
 //==================================================================//
 #include <Common/Containers/SoaList.hpp>
+#include <Common/Mpl/Queryable.hpp>
 #include <Common/Mpl/Vector.hpp>
 //------------------------------------------------------------------//
 
@@ -24,16 +25,16 @@ class ArrayBvh {
 
 public:
 	enum : size_t {
-		Values,
+		Sectors,
 		Keys,
-		Splits,
+		Values,
 	};
 
 	// ---
 
 public:
-	template <typename Index = typename SoaListAlloc<Allocator, Value, typename SortPredicateType::KeyType::SizeType>
-	struct Split {
+	template <typename Index = typename SoaListAlloc<Allocator, typename SortPredicate::KeyType, Value>::SizeType>
+	struct Sector {
 		Index minima[3];
 		Index maxima[3];
 		Index leftChild;
@@ -42,21 +43,21 @@ public:
 	};
 
 	// ---
-	
+
 public:
-	using LeafList           = SoaListAlloc<Allocator, Value /*values*/, typename SortPredicate::KeyType /*keys*/, Split<> /*splits*/>;
-	using SortType           = SortPredicate;
+	using LeafList           = SoaListAlloc<Allocator, Sector<> /*sectors*/, typename SortPredicate::KeyType /*keys*/, Value /*values*/>;
 	using AllocatorType      = typename LeafList::AllocatorType;
 	using ValueType          = typename LeafList::template ValueType<Values>;
 	using KeyType            = typename LeafList::template ValueType<Keys>;
-	using SplitType          = typename LeafList::template ValueType<Splits>;
-	using SplitConstIterator = typename LeafList::template LocalConstIterator<SplitType>;
-	using SplitIterator      = typename LeafList::template LocalConstIterator<SplitType>;
+	using SectorType         = typename LeafList::template ValueType<Sectors>;
+	using SplitConstIterator = typename LeafList::template LocalConstIterator<SectorType>;
+	using SplitIterator      = typename LeafList::template LocalConstIterator<SectorType>;
 	using ConstIterator      = typename LeafList::template LocalConstIterator<ValueType>;
 	using Iterator           = typename LeafList::template LocalConstIterator<ValueType>;
+	using SizeType           = typename LeafList::SizeType;
+	using SortType           = SortPredicate;
 	using ConstSliceType     = Span<ConstIterator>;
 	using SliceType          = Span<Iterator>;
-	using SizeType           = typename LeafList::SizeType;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -73,13 +74,11 @@ public:
 	// ---------------------------------------------------
 
 public:
-	const SplitType& operator[](SizeType index) const ETNoexceptHint;
+	template <typename... Selectors>
+	TableQuery<ArrayBvh<Value, SortPredicate, Allocator>> Select(Selectors&&... selectors) const ETNoexceptHint;
 
-	// ---------------------------------------------------
-
-public:
 	template <typename... ExtraArgs>
-	void Sort(ExtraArgs&... args);
+	void Rebuild(ExtraArgs&... args);
 
 	// ---------------------------------------------------
 
@@ -98,12 +97,12 @@ public:
 private:
 	LeafList _leaves;
 	SortType _sort;
-	SizeType _splits;
+	SizeType _sectors;
 
 	// ---------------------------------------------------
 
-	template <typename Value, class Allocator>
-	friend void Swap(ArrayBvh<Value, Allocator>&, ArrayBvh<Value, Allocator>&) ETNoexceptHint;
+	template <typename Value2, class Allocator2>
+	friend void Swap(ArrayBvh<Value2, Allocator2>&, ArrayBvh<Value2, Allocator2>&) ETNoexceptHint;
 };
 
 } // namespace Eldritch2

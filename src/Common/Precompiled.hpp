@@ -24,6 +24,7 @@
 #include <Common/Mpl/IntTypes.hpp>
 #include <Common/Mpl/Matrix.hpp>
 #include <Common/Mpl/Platform.hpp>
+#include <Common/Mpl/Queryable.hpp>
 #include <Common/Mpl/Tuple.hpp>
 #include <Common/Mpl/TypeTraits.hpp>
 #include <Common/Mpl/Vector.hpp>
@@ -47,10 +48,12 @@
 #include <Common/Containers/Path.hpp>
 #include <Common/Containers/PriorityQueue.hpp>
 #include <Common/Containers/Queue.hpp>
+#include <Common/Containers/RuleSet.hpp>
 #include <Common/Containers/SoaList.hpp>
 #include <Common/Containers/Span.hpp>
 #include <Common/Containers/Stack.hpp>
 #include <Common/Containers/String.hpp>
+#include <Common/Containers/SymbolSet.hpp>
 #include <Common/Containers/TreeMap.hpp>
 #include <Common/Containers/TreeSet.hpp>
 
@@ -96,13 +99,11 @@
 #include <Common/Platform.hpp>
 #include <Common/Ratio.hpp>
 #include <Common/Result.hpp>
-#include <Common/RuleSet.hpp>
 #include <Common/ScopeGuard.hpp>
 #include <Common/Semaphore.hpp>
 #include <Common/Sort.hpp>
 #include <Common/Stopwatch.hpp>
 #include <Common/StridingIterator.hpp>
-#include <Common/SymbolSet.hpp>
 #include <Common/Thread.hpp>
 #include <Common/UniquePointer.hpp>
 #include <Common/WaitableEvent.hpp>

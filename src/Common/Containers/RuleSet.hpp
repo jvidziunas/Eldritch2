@@ -95,6 +95,7 @@ public:
 	using RuleType        = typename RuleList::ValueType;
 	using MatchType       = typename RuleList::ConstIterator;
 	using SizeType        = typename RuleList::SizeType;
+	using ScoreType       = typename RuleList::SizeType;
 
 	// ---
 
@@ -103,8 +104,8 @@ public:
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using FactMap       = ArrayMap<typename Builder::SymbolType, typename Builder::FactType, LessThan<typename Builder::SymbolType>, Allocator>;
-		using FactNameType  = typename Builder::SymbolTableType;
+		using FactMap       = ArrayMap<typename RuleBuilderType::SymbolType, typename RuleBuilderType::FactType, LessThan<typename RuleBuilderType::SymbolType>, Allocator>;
+		using FactNameType  = typename RuleBuilderType::SymbolTableType;
 		using AllocatorType = typename FactMap::AllocatorType;
 		using FactType      = typename FactMap::MappedType;
 
@@ -115,6 +116,8 @@ public:
 		Query(const AllocatorType& allocator, const RuleSet<Builder, Response, Allocator>& rules) ETNoexceptHint;
 		//!	Constructs this @ref Query instance.
 		Query(const Query&) = default;
+		//!	Constructs this @ref Query instance.
+		Query(Query&&) ETNoexceptHint = default;
 
 		~Query() = default;
 
@@ -150,7 +153,7 @@ public:
 public:
 	//!	Constructs this @ref RuleSet instance.
 	template <typename... SymbolTableArgs>
-	RuleSet(const AllocatorType& allocator, SymbolTableArgs&&... symbolTableArgs) ETNoexceptHint;
+	RuleSet(const AllocatorType& allocator, SymbolTableArgs&&... args) ETNoexceptHint;
 	//!	Constructs this @ref RuleSet instance.
 	RuleSet(const RuleSet&) = default;
 
@@ -159,19 +162,19 @@ public:
 	// ---------------------------------------------------
 
 public:
+	template <typename FactMap>
+	ScoreType Score(const FactMap& facts) const ETNoexceptHint;
+
 	void Emplace(const RuleBuilderType& rule, const Response& response);
 	void Emplace(RuleBuilderType&& rule, Response&& response);
+
+	Query BeginQuery(const AllocatorType& allocator) const;
 
 	// - DATA MEMBERS ------------------------------------
 
 private:
 	RuleList _rules;
 };
-
-// ---
-
-template <typename InputIterator, typename FactMap>
-typename Span<InputIterator>::SizeType ScoreCriteria(Span<InputIterator> criteria, const FactMap& facts);
 
 } // namespace Eldritch2
 

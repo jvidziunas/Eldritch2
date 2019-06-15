@@ -37,7 +37,7 @@ using TupleCat = eastl::Internal::TupleCat<Tuples...>;
 template <typename T>
 using TupleDecay = eastl::decay_t<T>;
 
-static const decltype(eastl::ignore) ignore;
+static const decltype(eastl::ignore) Ignore;
 
 template <typename... Types>
 ETConstexpr Tuple<Types&...> Tie(Types&...) ETNoexceptHint;
@@ -70,7 +70,12 @@ template <typename... Types>
 ETConstexpr void Swap(Tuple<Types...>&, Tuple<Types...>&);
 
 template <typename... Tuples>
-ETConstexpr typename TupleCat<Tuples...>::ResultType Concatenate(Tuples&&... tuples);
+ETConstexpr typename TupleCat<Tuples...>::ResultType Concatenate(Tuples&&... tuples) ETNoexceptHint;
+
+template <size_t... Indices, typename... Columns>
+ETConstexpr ETForceInlineHint auto Pluck(Tuple<Columns...>&& columns) ETNoexceptHint {
+	return ForwardTuple(Get<Indices>(Move(columns))...);
+}
 
 } // namespace Eldritch2
 

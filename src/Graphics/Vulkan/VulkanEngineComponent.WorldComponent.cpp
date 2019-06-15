@@ -174,18 +174,18 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 				ET_PROFILE_SCOPE("World/VariableTick", "Update Accelerators (Dynamic Lights)", 0xFFAAFF);
 
 				if (lights.ShouldRebuildHierarchy()) {
-					lights.Sort(executor);
+					lights.Rebuild(executor);
 				}
 			},
 			[& meshes = _scene->GetInstances(DynamicMesh)](JobExecutor& executor) ETNoexceptHint {
 				ET_PROFILE_SCOPE("World/VariableTick", "Update Accelerators (Dynamic Meshes)", 0xFFAAFF);
 
 				if (meshes.ShouldRebuildHierarchy()) {
-					meshes.Sort(executor);
+					meshes.Rebuild(executor);
 				}
 			});
 
-		ArrayList<RenderView> sceneViews(ArrayList<RenderView>::AllocatorType("Scene View List Allocator"));
+		_scene->
 
 		BuildViewList(sceneViews, _scene->GetInstances(DynamicMesh));
 		BuildViewList(sceneViews, _scene->GetInstances(WorldMesh));

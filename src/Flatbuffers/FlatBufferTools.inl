@@ -23,7 +23,7 @@
 namespace flatbuffers {
 
 template <typename T>
-ETInlineHint ETForceInlineHint ETPureFunctionHint Eldritch2::Span<const T*> AsRange(const Vector<T>* vector) ETNoexceptHint {
+ETInlineHint ETForceInlineHint ETPureFunctionHint Eldritch2::Span<const T*> AsSpan(const Vector<T>* vector) ETNoexceptHint {
 	return vector ? Eldritch2::Span<const T*>(vector->data(), vector->data() + vector->size());
 }
 

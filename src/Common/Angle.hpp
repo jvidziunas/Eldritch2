@@ -67,5 +67,5 @@ ETConstexpr ETPureFunctionHint float32 AsDegrees(Angle angle) ETNoexceptHint;
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Common/Mpl/Angle.inl>
+#include <Common/Angle.inl>
 //------------------------------------------------------------------//

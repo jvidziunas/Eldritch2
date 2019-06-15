@@ -432,9 +432,6 @@
     <ClCompile Include="src\Physics\PhysX\PhysxAllocatorMixin.cpp">
       <Filter>Source Files\Physics\PhysX</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\RuleSet.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scripting\Wren\DialogueSet.cpp">
       <Filter>Source Files\Scripting\Wren</Filter>
     </ClCompile>
@@ -768,11 +765,14 @@
     <ClCompile Include="src\Graphics\Vulkan\AssetViews\BasisImageAsset.cpp">
       <Filter>Source Files\Graphics\Vulkan\AssetViews</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\SymbolSet.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphics\Vulkan\SpirVShaderSet.cpp">
       <Filter>Source Files\Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\RuleSet.cpp">
+      <Filter>Source Files\Common\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Containers\SymbolSet.cpp">
+      <Filter>Source Files\Common\Containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1358,13 +1358,16 @@
     <ClInclude Include="src\Graphics\Vulkan\AssetViews\BasisImageAsset.hpp">
       <Filter>Header Files\Graphics\Vulkan\AssetViews</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\BvhQuery.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Common\SymbolSet.hpp">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Containers\SoaList.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\RuleSet.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\SymbolSet.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\Queryable.hpp">
       <Filter>Header Files\Common\Containers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1506,9 +1509,6 @@
     <None Include="src\Common\Containers\PriorityQueue.inl">
       <Filter>Source Files\Common\Containers</Filter>
     </None>
-    <None Include="src\Common\Mpl\Angle.inl">
-      <Filter>Source Files\Common\Mpl</Filter>
-    </None>
     <None Include="src\Animation\KeyframeClip.inl">
       <Filter>Source Files\Animation</Filter>
     </None>
@@ -1562,9 +1562,6 @@
     </None>
     <None Include="src\Common\Memory\EaStlAllocatorMixin.hpp">
       <Filter>Header Files\Common\Memory</Filter>
-    </None>
-    <None Include="src\Common\RuleSet.inl">
-      <Filter>Source Files\Common</Filter>
     </None>
     <None Include="src\Scripting\Wren\DialogueSet.inl">
       <Filter>Source Files\Scripting\Wren</Filter>
@@ -1754,11 +1751,20 @@
     <None Include="src\Common\Containers\Cache.inl">
       <Filter>Source Files\Common\Containers</Filter>
     </None>
-    <None Include="src\Common\SymbolSet.inl">
-      <Filter>Source Files\Common</Filter>
-    </None>
     <None Include="src\Common\Containers\SoaList.inl">
       <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Containers\RuleSet.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Containers\SymbolSet.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Containers\Queryable.inl">
+      <Filter>Source Files\Common\Containers</Filter>
+    </None>
+    <None Include="src\Common\Angle.inl">
+      <Filter>Source Files\Common</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

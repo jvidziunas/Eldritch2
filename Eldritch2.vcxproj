@@ -294,6 +294,8 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Audio\XAudio2\XAudio2EngineComponent.WrenScriptApi.cpp" />
     <ClCompile Include="src\Build.cpp" />
     <ClCompile Include="src\Common\Containers\Path.Win32.cpp" />
+    <ClCompile Include="src\Common\Containers\RuleSet.cpp" />
+    <ClCompile Include="src\Common\Containers\SymbolSet.cpp" />
     <ClCompile Include="src\Common\Fiber.Linux.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -321,7 +323,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Common\Semaphore.Win32.cpp" />
     <ClCompile Include="src\Common\Sort.cpp" />
     <ClCompile Include="src\Common\Stopwatch.cpp" />
-    <ClCompile Include="src\Common\SymbolSet.cpp" />
     <ClCompile Include="src\Common\Thread.cpp" />
     <ClCompile Include="src\Common\Thread.Win32.cpp" />
     <ClCompile Include="src\Common\WaitableEvent.Win32.cpp" />
@@ -470,7 +471,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClCompile Include="src\Common\Memory\EaStlAllocatorMixin.cpp" />
     <ClCompile Include="src\Common\Memory\NullAllocator.cpp" />
     <ClCompile Include="src\Common\Mpl\Matrix.cpp" />
-    <ClCompile Include="src\Common\RuleSet.cpp" />
     <ClCompile Include="src\Common\CppType.cpp" />
     <ClCompile Include="src\Common\Win32Tools.cpp" />
     <ClCompile Include="src\Common\memory\InstanceNew.cpp" />
@@ -497,15 +497,17 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Audio\XAudio2\XAudioMarshals.hpp" />
     <ClInclude Include="src\Build.hpp" />
     <ClInclude Include="src\Common\Atomic.hpp" />
-    <ClInclude Include="src\Common\BvhQuery.hpp" />
+    <ClInclude Include="src\Common\Containers\Queryable.hpp" />
     <ClInclude Include="src\Common\Containers\Cache.hpp" />
     <ClInclude Include="src\Common\Containers\Dequeue.hpp" />
     <ClInclude Include="src\Common\Containers\Path.hpp" />
     <ClInclude Include="src\Common\Containers\PriorityQueue.hpp" />
     <ClInclude Include="src\Common\Containers\Queue.hpp" />
+    <ClInclude Include="src\Common\Containers\RuleSet.hpp" />
     <ClInclude Include="src\Common\Containers\SoaList.hpp" />
     <ClInclude Include="src\Common\Containers\Stack.hpp" />
     <ClInclude Include="src\Common\Containers\AbstractStringSpan.hpp" />
+    <ClInclude Include="src\Common\Containers\SymbolSet.hpp" />
     <ClInclude Include="src\Common\Fiber.hpp" />
     <ClInclude Include="src\Common\FileAppender.hpp" />
     <ClInclude Include="src\Common\FileReader.hpp" />
@@ -534,7 +536,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Common\Sort.hpp" />
     <ClInclude Include="src\Common\Stopwatch.hpp" />
     <ClInclude Include="src\Common\StridingIterator.hpp" />
-    <ClInclude Include="src\Common\SymbolSet.hpp" />
     <ClInclude Include="src\Common\Thread.hpp" />
     <ClInclude Include="src\Common\WaitableEvent.hpp" />
     <ClInclude Include="src\Common\Window.hpp" />
@@ -695,16 +696,20 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include="src\Audio\XAudio2\StreamingVoice.inl" />
     <None Include="src\Audio\XAudio2\XAudio2AudioScene.inl" />
     <None Include="src\Audio\XAudio2\XAudioMarshals.inl" />
+    <None Include="src\Common\Angle.inl" />
     <None Include="src\Common\Assert.inl" />
     <None Include="src\Common\ComPointer.inl" />
+    <None Include="src\Common\Containers\Queryable.inl" />
     <None Include="src\Common\Containers\Cache.inl" />
     <None Include="src\Common\Containers\Dequeue.inl" />
     <None Include="src\Common\Containers\PriorityQueue.inl" />
     <None Include="src\Common\Containers\Queue.inl" />
+    <None Include="src\Common\Containers\RuleSet.inl" />
     <None Include="src\Common\Containers\SoaList.inl" />
     <None Include="src\Common\Containers\Stack.inl" />
     <None Include="src\Common\Containers\Path.inl" />
     <None Include="src\Common\Containers\AbstractStringSpan.inl" />
+    <None Include="src\Common\Containers\SymbolSet.inl" />
     <None Include="src\Common\Filesystem.inl" />
     <None Include="src\Common\Function.inl" />
     <None Include="src\Common\FileView.inl" />
@@ -717,7 +722,6 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include="src\Common\ObjectInjector.inl" />
     <None Include="src\Common\Platform.inl" />
     <None Include="src\Common\Stopwatch.inl" />
-    <None Include="src\Common\SymbolSet.inl" />
     <None Include="src\Common\Thread.inl" />
     <None Include="src\Core\Asset.inl" />
     <None Include="src\Core\ContentLocator.inl" />
@@ -811,11 +815,9 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include="src\Common\Memory\EaStlAllocatorMixin.inl" />
     <None Include="src\Common\Memory\InstanceDeleter.inl" />
     <None Include="src\Common\Memory\UsageMixin.inl" />
-    <None Include="src\Common\Mpl\Angle.inl" />
     <None Include="src\Common\Mpl\CharTypes.inl" />
     <None Include="src\Common\Mpl\Matrix.inl" />
     <None Include="src\Common\Mpl\Vector.inl" />
-    <None Include="src\Common\RuleSet.inl" />
     <None Include="src\Common\CppType.inl" />
     <None Include="src\Common\UniquePointer.inl" />
     <None Include="src\Scripting\Wren\WrenInternal.inl" />

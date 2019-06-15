@@ -21,13 +21,13 @@ namespace Eldritch2 { namespace Scheduling {
 
 namespace Eldritch2 { namespace Graphics {
 
-	template <typename Instance, typename Key = uint32>
+	template <typename Record, typename Key = uint32>
 	class RenderSortPredicate {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using ConstIterator = const Instance*;
-		using Iterator      = Instance*;
+		using ConstIterator = const Record*;
+		using Iterator      = Record*;
 		using KeyType       = Key;
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
@@ -43,10 +43,10 @@ namespace Eldritch2 { namespace Graphics {
 		// ---------------------------------------------------
 
 	public:
-		void SortValues(Scheduling::JobExecutor& executor, Iterator begin, Iterator end, KeyType outKeys[]) ETNoexceptHint;
+		void Sort(Scheduling::JobExecutor& executor, Iterator begin, Iterator end, KeyType outKeys[]) ETNoexceptHint;
 
-		template <typename Split>
-		uint32 FindSplits(Scheduling::JobExecutor& executor, ConstIterator begin, ConstIterator end, Split splits[]) ETNoexceptHint;
+		template <typename Sector>
+		uint32 Split(Scheduling::JobExecutor& executor, ConstIterator begin, ConstIterator end, Sector sectors[]) ETNoexceptHint;
 
 		// - DATA MEMBERS ------------------------------------
 
@@ -56,12 +56,12 @@ namespace Eldritch2 { namespace Graphics {
 
 	// ---
 
-	template <typename Instance, class Allocator = Eldritch2::MallocAllocator>
-	class RenderConcept : public ArrayBvh<Instance, RenderSortPredicate<Instance>, Allocator> {
+	template <typename Record, class Allocator = Eldritch2::MallocAllocator>
+	class RenderConcept : public ArrayBvh<Record, RenderSortPredicate<Record>, Allocator> {
 		// - TYPE PUBLISHING ---------------------------------
 
 	public:
-		using BvhType       = ArrayBvh<Instance, RenderSortPredicate<Instance>, Allocator>;
+		using BvhType       = ArrayBvh<Record, RenderSortPredicate<Record>, Allocator>;
 		using AllocatorType = typename BvhType::AllocatorType;
 		using SortType      = typename BvhType::SortType;
 
@@ -91,14 +91,6 @@ namespace Eldritch2 { namespace Graphics {
 
 	private:
 		Atomic<bool> _shouldRebuildHierarchy;
-
-		// ---------------------------------------------------
-
-		template <typename ViewType, typename Instance2, class Allocator2>
-		friend void BuildShadowViewList(ArrayList<ViewType>& views, const RenderConcept<Instance2, Allocator2>& source);
-
-		template <typename ViewType, typename Instance2, class Allocator2>
-		friend void BuildViewList(ArrayList<ViewType>& views, const RenderConcept<Instance2, Allocator2>& source);
 	};
 
 }} // namespace Eldritch2::Graphics

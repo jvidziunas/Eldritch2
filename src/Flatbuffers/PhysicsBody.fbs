@@ -5,7 +5,7 @@ file_extension	".e2physicsbody";
 namespace Eldritch2.Physics.FlatBuffers;
 
 struct ClothVertex {
-	Position        : Eldritch2.FlatBuffers.Float3;
+	Position        : flatbuffers.Float3;
 	InverseMass     : float;
 }
 

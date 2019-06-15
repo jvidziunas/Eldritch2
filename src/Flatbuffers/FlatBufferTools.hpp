@@ -40,7 +40,7 @@ struct String;
 namespace flatbuffers {
 
 template <typename T>
-ETPureFunctionHint Eldritch2::Span<const T*> AsRange(const Vector<T>* vector) ETNoexceptHint;
+ETPureFunctionHint Eldritch2::Span<const T*> AsSpan(const Vector<T>* vector) ETNoexceptHint;
 
 ETPureFunctionHint Eldritch2::AbstractStringSpan<char> AsString(const String* string) ETNoexceptHint;
 
