@@ -179,7 +179,7 @@ ETInlineHint ETForceInlineHint void RuleSet<Builder, Response, Allocator>::Empla
 // ---------------------------------------------------
 
 template <typename Builder, typename Response, typename Allocator>
-ETInlineHint ETForceInlineHint RuleSet<Builder, Response, Allocator>::Query RuleSet<Builder, Response, Allocator>::BeginQuery(const AllocatorType& allocator) const {
+ETInlineHint ETForceInlineHint typename RuleSet<Builder, Response, Allocator>::Query RuleSet<Builder, Response, Allocator>::BeginQuery(const AllocatorType& allocator) const {
 	return Query(allocator, *this);
 }
 

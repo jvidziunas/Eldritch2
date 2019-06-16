@@ -272,14 +272,14 @@ ETInlineHint ETForceInlineHint void HashSet<Value, HashPredicate, EqualityPredic
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
-ETInlineHint ETForceInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::EqualityPredicateType HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetEqualityPredicate() const ETNoexceptHint {
+ETInlineHint ETForceInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::EqualityType HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetEqualityPredicate() const ETNoexceptHint {
 	return _container.key_eq();
 }
 
 // ---------------------------------------------------
 
 template <typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
-ETInlineHint ETForceInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashPredicateType HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetHash() const ETNoexceptHint {
+ETInlineHint ETForceInlineHint typename HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashType HashSet<Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetHash() const ETNoexceptHint {
 	return _container.hash_function();
 }
 

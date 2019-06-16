@@ -35,28 +35,28 @@ protected:
 	using UnderlyingContainer = eastl::hash_set<Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, CacheHashCode>;
 
 public:
-	using ValueType             = typename UnderlyingContainer::value_type;
-	using ConstReference        = typename UnderlyingContainer::const_reference;
-	using Reference             = typename UnderlyingContainer::reference;
-	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
-	using ConstIterator         = typename UnderlyingContainer::const_iterator;
-	using Iterator              = typename UnderlyingContainer::iterator;
-	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
-	using LocalIterator         = typename UnderlyingContainer::local_iterator;
-	using SizeType              = typename UnderlyingContainer::size_type;
-	using HashPredicateType     = HashPredicate;
-	using EqualityPredicateType = EqualityPredicate;
+	using ValueType          = typename UnderlyingContainer::value_type;
+	using ConstReference     = typename UnderlyingContainer::const_reference;
+	using Reference          = typename UnderlyingContainer::reference;
+	using AllocatorType      = typename UnderlyingContainer::allocator_type::PublicType;
+	using ConstIterator      = typename UnderlyingContainer::const_iterator;
+	using Iterator           = typename UnderlyingContainer::iterator;
+	using ConstLocalIterator = typename UnderlyingContainer::const_local_iterator;
+	using LocalIterator      = typename UnderlyingContainer::local_iterator;
+	using SizeType           = typename UnderlyingContainer::size_type;
+	using HashType           = HashPredicate;
+	using EqualityType       = EqualityPredicate;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//! Constructs this @ref HashSet instance.
-	HashSet(const AllocatorType& allocator = AllocatorType(), SizeType buckets = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
+	HashSet(const AllocatorType& allocator = AllocatorType(), SizeType buckets = 0u, const HashType& hash = HashType(), const EqualityType& equal = EqualityType());
 	//! Constructs this @ref HashSet instance.
 	template <typename InputIterator>
-	HashSet(const AllocatorType& allocator, SizeType buckets, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
+	HashSet(const AllocatorType& allocator, SizeType buckets, const HashType& hash, const EqualityType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashSet instance.
-	HashSet(const AllocatorType& allocator, SizeType buckets, const HashPredicateType& hash, const EqualityPredicateType& equal, InitializerList<ValueType>);
+	HashSet(const AllocatorType& allocator, SizeType buckets, const HashType& hash, const EqualityType& equal, InitializerList<ValueType>);
 	//! Constructs this @ref HashSet instance.
 	HashSet(const AllocatorType& allocator, const HashSet&);
 	//! Constructs this @ref HashSet instance.
@@ -162,9 +162,9 @@ public:
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	EqualityPredicateType GetEqualityPredicate() const ETNoexceptHint;
+	EqualityType GetEqualityPredicate() const ETNoexceptHint;
 
-	HashPredicateType GetHash() const ETNoexceptHint;
+	HashType GetHash() const ETNoexceptHint;
 
 	const AllocatorType& GetAllocator() const ETNoexceptHint;
 

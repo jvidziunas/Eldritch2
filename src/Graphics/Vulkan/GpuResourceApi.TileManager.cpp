@@ -22,7 +22,7 @@
 
 namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
-	TileManager::TileManager() ETNoexceptHint : _residentTiles(ResidentSet::AllocatorType("Tile Manager Resident Tile Set Allocator")), _tileExtent{ 0u, 0u, 0u } {}
+	TileManager::TileManager() ETNoexceptHint : Cache<ImageTile, VkDeviceSize>(AllocatorType("Tile Manager Resident Tile Set Allocator")), _tileExtent{ 0u, 0u, 0u } {}
 
 	// ---------------------------------------------------
 
@@ -32,16 +32,13 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	VkResult TileManager::BindResources(Gpu& /*gpu*/, VkExtent3D imageExtent, VkExtent3D tileExtent) {
-		ETAssert(imageExtent.width < MaxImageDimension, "tiled image width {} must be < {}", imageExtent.width, uint32(MaxImageDimension));
-		ETAssert(imageExtent.height < MaxImageDimension, "tiled image height {} must be < {} (was {})", imageExtent.height, uint32(MaxImageDimension));
-		ETAssert(imageExtent.depth < MaxImageDimension, "tiled image depth {} must be < {} (was {})", imageExtent.depth, uint32(MaxImageDimension));
-
+	VkResult TileManager::BindResources(VkExtent3D imageExtent, VkExtent3D tileExtent) {
 		using ::Eldritch2::Swap;
 
-		ResidentSet residentTiles(_residentTiles.GetAllocator());
+		ETAssert(imageExtent.width < ImageTile::MaxDimension, "tiled image width {} must be < {}", imageExtent.width, uint32(ImageTile::MaxDimension));
+		ETAssert(imageExtent.height < ImageTile::MaxDimension, "tiled image height {} must be < {} (was {})", imageExtent.height, uint32(ImageTile::MaxDimension));
+		ETAssert(imageExtent.depth < ImageTile::MaxDimension, "tiled image depth {} must be < {} (was {})", imageExtent.depth, uint32(ImageTile::MaxDimension));
 
-		Swap(_residentTiles, residentTiles);
 		Swap(_tileExtent, tileExtent);
 
 		return VK_SUCCESS;
@@ -49,9 +46,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
-	void TileManager::FreeResources(Gpu& gpu) ETNoexceptHint {
+	void TileManager::FreeResources() ETNoexceptHint {
 		_tileExtent = { 0u, 0u, 0u };
-		_residentTiles.Clear();
+		Clear();
 	}
 
 	// ---------------------------------------------------
@@ -59,7 +56,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 	void Swap(TileManager& lhs, TileManager& rhs) ETNoexceptHint {
 		using ::Eldritch2::Swap;
 
-		Swap(lhs._residentTiles, rhs._residentTiles);
 		Swap(lhs._tileExtent, rhs._tileExtent);
 	}
 

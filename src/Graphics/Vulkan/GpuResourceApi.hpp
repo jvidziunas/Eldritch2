@@ -414,9 +414,9 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 		// ---------------------------------------------------
 
 	public:
-		VkResult BindResources(Gpu& gpu, VkExtent3D imageExtent, VkExtent3D tileExtent);
+		VkResult BindResources(VkExtent3D imageExtent, VkExtent3D tileExtent);
 
-		void FreeResources(Gpu& gpu) ETNoexceptHint;
+		void FreeResources() ETNoexceptHint;
 
 		// ---------------------------------------------------
 
@@ -550,9 +550,6 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 		using ImageList     = SoaList<const GpuImage* /*sourceImages*/, VkImageView /*imageViews*/>;
 		using ResourceIndex = ImageList::SizeType;
-
-		ETStaticAssert(IsSame<typename ImageList::template ValueType<SourceImages>, const GpuImage*>(), "type mismatch for descriptor table");
-		ETStaticAssert(IsSame<typename ImageList::template ValueType<ImageViews>, VkImageView>(), "type mismatch for descriptor table");
 
 		// - CONSTRUCTOR/DESTRUCTOR --------------------------
 

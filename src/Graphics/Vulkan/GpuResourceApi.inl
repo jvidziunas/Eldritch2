@@ -87,6 +87,12 @@ namespace Eldritch2 { namespace Graphics { namespace Vulkan {
 
 	// ---------------------------------------------------
 
+	ETInlineHint ETForceInlineHint bool HostSparseTileCache::IsLoading(ImageTile tile) const ETNoexceptHint {
+		return _loadingTiles.Contains(tile);
+	}
+
+	// ---------------------------------------------------
+
 	ETInlineHint ETForceInlineHint bool HostSparseTileCache::ShouldDecode(VkDeviceSize& outOffset, ImageTile tile) const ETNoexceptHint {
 		return true;
 	}

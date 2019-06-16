@@ -33,32 +33,32 @@ private:
 	using UnderlyingContainer = eastl::hash_multimap<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, CacheHashCode>;
 
 public:
-	using ValueType             = typename UnderlyingContainer::value_type;
-	using KeyType               = typename UnderlyingContainer::key_type;
-	using MappedType            = typename UnderlyingContainer::mapped_type;
-	using ConstPointer          = typename UnderlyingContainer::const_pointer;
-	using Pointer               = typename UnderlyingContainer::pointer;
-	using ConstReference        = typename UnderlyingContainer::const_reference;
-	using Reference             = typename UnderlyingContainer::reference;
-	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
-	using SizeType              = typename UnderlyingContainer::size_type;
-	using ConstIterator         = typename UnderlyingContainer::const_iterator;
-	using Iterator              = typename UnderlyingContainer::iterator;
-	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
-	using LocalIterator         = typename UnderlyingContainer::local_iterator;
-	using EqualityPredicateType = EqualityPredicate;
-	using HashPredicateType     = HashPredicate;
+	using ValueType          = typename UnderlyingContainer::value_type;
+	using KeyType            = typename UnderlyingContainer::key_type;
+	using MappedType         = typename UnderlyingContainer::mapped_type;
+	using ConstPointer       = typename UnderlyingContainer::const_pointer;
+	using Pointer            = typename UnderlyingContainer::pointer;
+	using ConstReference     = typename UnderlyingContainer::const_reference;
+	using Reference          = typename UnderlyingContainer::reference;
+	using AllocatorType      = typename UnderlyingContainer::allocator_type::PublicType;
+	using SizeType           = typename UnderlyingContainer::size_type;
+	using ConstIterator      = typename UnderlyingContainer::const_iterator;
+	using Iterator           = typename UnderlyingContainer::iterator;
+	using ConstLocalIterator = typename UnderlyingContainer::const_local_iterator;
+	using LocalIterator      = typename UnderlyingContainer::local_iterator;
+	using EqualityType       = EqualityPredicate;
+	using HashType           = HashPredicate;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 public:
 	//! Constructs this @ref HashMultiMap instance.
-	HashMultiMap(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
+	HashMultiMap(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashType& hash = HashType(), const EqualityType& equal = EqualityType());
 	//! Constructs this @ref HashMultiMap instance.
 	template <typename InputIterator>
-	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
+	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashType& hash, const EqualityType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashMultiMap instance.
-	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InitializerList<ValueType>);
+	HashMultiMap(const AllocatorType& allocator, SizeType bucketCount, const HashType& hash, const EqualityType& equal, InitializerList<ValueType>);
 	//! Constructs this @ref HashMultiMap instance.
 	HashMultiMap(const AllocatorType& allocator, const HashMultiMap&);
 	//! Constructs this @ref HashMultiMap instance.
@@ -143,9 +143,9 @@ public:
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	EqualityPredicateType GetEqualityPredicate() const ETNoexceptHint;
+	EqualityType GetEqualityPredicate() const ETNoexceptHint;
 
-	HashPredicateType GetHash() const ETNoexceptHint;
+	HashType GetHash() const ETNoexceptHint;
 
 	const AllocatorType& GetAllocator() const ETNoexceptHint;
 

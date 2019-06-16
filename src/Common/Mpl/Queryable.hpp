@@ -65,7 +65,7 @@ public:
 
 public:
 	template <typename TableType>
-	ETConstexpr ETForceInlineHint QueryableJoinedTableTraits<TableType, ThisType> Join(TableType) const ETNoexceptHint {
+	ETConstexpr ETForceInlineHint QueryableJoinedTableTraits<TableType, ThisType> SpatialJoin(TableType) const ETNoexceptHint {
 		return QueryableJoinedTableTraits<TableType, ThisType>();
 	}
 
@@ -88,9 +88,9 @@ public:
 	template <size_t Column>
 	using ValueType = typename TupleElement<Column, RowType>;
 	template <size_t Column>
-	using Reference = typename TupleElement<Column, Tuple>&;
+	using Reference = typename TupleElement<Column, RowType>&;
 	template <size_t Column>
-	using ConstReference = typename ConstTupleElement<Column, Tuple>&;
+	using ConstReference = typename ConstTupleElement<Column, RowType>&;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
@@ -106,12 +106,13 @@ public:
 
 public:
 	template <typename TableType>
-	ETConstexpr ETForceInlineHint QueryableJoinedTableTraits<TableType, Tables...> Join(TableType) const ETNoexceptHint {
+	ETConstexpr ETForceInlineHint QueryableJoinedTableTraits<TableType, Tables...> SpatialJoin(TableType) const ETNoexceptHint {
 		return QueryableJoinedTableTraits<TableType, Tables...>();
 	}
 
 	template <typename... Conditions>
-	ETConstexpr ETForceInlineHint QueryableSelectTraits<ThisType, > Where(Conditions...) const ETNoexceptHint {
+	ETConstexpr ETForceInlineHint QueryableSelectTraits<> Where(Conditions...) const ETNoexceptHint {
+		return QueryableSelectTraits<>();
 	}
 };
 
@@ -131,7 +132,7 @@ public:
 	//!	Constructs this @ref TableQuery instance.
 	TableQuery(const TableQuery&) = default;
 	//!	Constructs this @ref TableQuery instance.
-	TableQuery(Table& table) ETNoexceptHint = default;
+	TableQuery(TableQuery&) ETNoexceptHint = default;
 
 	~TableQuery() = default;
 
@@ -140,10 +141,17 @@ public:
 private:
 };
 
+template <typename ThisType, typename... Columns>
+class Queryable {
+public:
+	template <typename... Selectors>
+	TableQuery<int, ArrayBvh<Value, SortPredicate, Allocator>> Select(Selectors&&... selectors) const ETNoexceptHint = delete;
+};
+
 } // namespace Eldritch2
 
 //==================================================================//
 // INLINE FUNCTION DEFINITIONS
 //==================================================================//
-#include <Common/Containers/Queryable.inl>
+#include <Common/Mpl/Queryable.inl>
 //------------------------------------------------------------------//

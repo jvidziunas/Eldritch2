@@ -20,7 +20,7 @@
 namespace Eldritch2 {
 
 template <typename Value, typename SortPredicate, class Allocator = MallocAllocator>
-class ArrayBvh {
+class ArrayBvh : public Queryable<ArrayBvh<Value, SortPredicate, Allocator>, Value> {
 	// - TYPE PUBLISHING ---------------------------------
 
 public:
@@ -74,9 +74,6 @@ public:
 	// ---------------------------------------------------
 
 public:
-	template <typename... Selectors>
-	TableQuery<ArrayBvh<Value, SortPredicate, Allocator>> Select(Selectors&&... selectors) const ETNoexceptHint;
-
 	template <typename... ExtraArgs>
 	void Rebuild(ExtraArgs&... args);
 

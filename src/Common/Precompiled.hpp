@@ -43,6 +43,7 @@
 #include <Common/Containers/HashSet.hpp>
 #include <Common/Containers/IntrusiveConcurrentQueue.hpp>
 #include <Common/Containers/IntrusiveForwardList.hpp>
+#include <Common/Containers/IntrusiveHashTable.hpp>
 #include <Common/Containers/IntrusiveLinkedList.hpp>
 #include <Common/Containers/LinkedList.hpp>
 #include <Common/Containers/Path.hpp>

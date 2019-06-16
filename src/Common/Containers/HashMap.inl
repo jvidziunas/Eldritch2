@@ -18,13 +18,13 @@ namespace Eldritch2 {
 
 template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 template <typename InputIterator>
-ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end) :
+ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashType& hash, const EqualityType& equal, InputIterator begin, InputIterator end) :
 	_container(begin, end, hash, equal, allocator) {}
 
 // ---------------------------------------------------
 
 template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
-ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal) :
+ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashType& hash, const EqualityType& equal) :
 	_container(bucketCount, hash, equal, allocator) {
 }
 
@@ -32,13 +32,13 @@ ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredic
 
 template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMap(const AllocatorType& allocator, InitializerList<ValueType> values) :
-	_container(values, 0u, HashPredicateType(), EqualityPredicateType(), allocator) {}
+	_container(values, 0u, HashType(), EqualityType(), allocator) {}
 
 // ---------------------------------------------------
 
 template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
 ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashMap(const AllocatorType& allocator, const HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>& map) :
-	_container(map.Begin(), map.End(), 0u, map.GetHash(), map.GetEqualityPredicate(), allocator) {
+	_container(map.Begin(), map.End(), 0u, map.GetHash(), map.GetEquality(), allocator) {
 }
 
 // ---------------------------------------------------
@@ -321,14 +321,14 @@ ETInlineHint ETForceInlineHint HashMap<Key, Value, HashPredicate, EqualityPredic
 // ---------------------------------------------------
 
 template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::EqualityPredicateType HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetEqualityPredicate() const ETNoexceptHint {
+ETInlineHint ETForceInlineHint typename HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::EqualityType HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetEquality() const ETNoexceptHint {
 	return _container.key_eq();
 }
 
 // ---------------------------------------------------
 
 template <typename Key, typename Value, class HashPredicate, class EqualityPredicate, class Allocator, bool CacheHashCode>
-ETInlineHint ETForceInlineHint typename HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashPredicateType HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetHash() const ETNoexceptHint {
+ETInlineHint ETForceInlineHint typename HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::HashType HashMap<Key, Value, HashPredicate, EqualityPredicate, Allocator, CacheHashCode>::GetHash() const ETNoexceptHint {
 	return _container.hash_function();
 }
 

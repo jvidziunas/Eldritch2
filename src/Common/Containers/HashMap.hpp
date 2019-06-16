@@ -34,29 +34,29 @@ private:
 	using UnderlyingContainer = eastl::hash_map<Key, Value, HashPredicate, EqualityPredicate, EaStlAllocatorMixin<Allocator>, CacheHashCode>;
 
 public:
-	using ValueType             = typename UnderlyingContainer::value_type;
-	using KeyType               = typename UnderlyingContainer::key_type;
-	using MappedType            = typename UnderlyingContainer::mapped_type;
-	using NodeType              = typename UnderlyingContainer::node_type;
-	using ConstReference        = typename UnderlyingContainer::const_reference;
-	using Reference             = typename UnderlyingContainer::reference;
-	using AllocatorType         = typename UnderlyingContainer::allocator_type::PublicType;
-	using SizeType              = typename UnderlyingContainer::size_type;
-	using HashCode              = typename UnderlyingContainer::hash_code_t;
-	using ConstIterator         = typename UnderlyingContainer::const_iterator;
-	using Iterator              = typename UnderlyingContainer::iterator;
-	using ConstLocalIterator    = typename UnderlyingContainer::const_local_iterator;
-	using LocalIterator         = typename UnderlyingContainer::local_iterator;
-	using EqualityPredicateType = EqualityPredicate;
-	using HashPredicateType     = HashPredicate;
+	using ValueType          = typename UnderlyingContainer::value_type;
+	using KeyType            = typename UnderlyingContainer::key_type;
+	using MappedType         = typename UnderlyingContainer::mapped_type;
+	using NodeType           = typename UnderlyingContainer::node_type;
+	using ConstReference     = typename UnderlyingContainer::const_reference;
+	using Reference          = typename UnderlyingContainer::reference;
+	using AllocatorType      = typename UnderlyingContainer::allocator_type::PublicType;
+	using SizeType           = typename UnderlyingContainer::size_type;
+	using HashCode           = typename UnderlyingContainer::hash_code_t;
+	using ConstIterator      = typename UnderlyingContainer::const_iterator;
+	using Iterator           = typename UnderlyingContainer::iterator;
+	using ConstLocalIterator = typename UnderlyingContainer::const_local_iterator;
+	using LocalIterator      = typename UnderlyingContainer::local_iterator;
+	using EqualityType       = EqualityPredicate;
+	using HashType           = HashPredicate;
 
 	// - CONSTRUCTOR/DESTRUCTOR --------------------------
 
 	//! Constructs this @ref HashMap instance.
-	HashMap(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashPredicateType& hash = HashPredicateType(), const EqualityPredicateType& equal = EqualityPredicateType());
+	HashMap(const AllocatorType& allocator = AllocatorType(), SizeType bucketCount = 0u, const HashType& hash = HashType(), const EqualityType& equal = EqualityType());
 	//! Constructs this @ref HashMap instance.
 	template <typename InputIterator>
-	HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashPredicateType& hash, const EqualityPredicateType& equal, InputIterator begin, InputIterator end);
+	HashMap(const AllocatorType& allocator, SizeType bucketCount, const HashType& hash, const EqualityType& equal, InputIterator begin, InputIterator end);
 	//! Constructs this @ref HashMap instance.
 	HashMap(const AllocatorType& allocator, InitializerList<ValueType>);
 	//! Constructs this @ref HashMap instance.
@@ -89,33 +89,21 @@ public:
 	// - ELEMENT ITERATION -------------------------------
 
 public:
-	ConstLocalIterator ConstBegin(SizeType bucketIndex) const ETNoexceptHint;
+	ConstLocalIterator ConstBegin(SizeType bucket) const ETNoexceptHint;
 	ConstIterator      ConstBegin() const ETNoexceptHint;
 
-	ConstLocalIterator ConstEnd(SizeType bucketIndex) const ETNoexceptHint;
+	ConstLocalIterator ConstEnd(SizeType bucket) const ETNoexceptHint;
 	ConstIterator      ConstEnd() const ETNoexceptHint;
 
-	ConstLocalIterator Begin(SizeType bucketIndex) const ETNoexceptHint;
-	LocalIterator      Begin(SizeType bucketIndex) ETNoexceptHint;
+	ConstLocalIterator Begin(SizeType bucket) const ETNoexceptHint;
+	LocalIterator      Begin(SizeType bucket) ETNoexceptHint;
 	ConstIterator      Begin() const ETNoexceptHint;
 	Iterator           Begin() ETNoexceptHint;
 
-	ConstLocalIterator End(SizeType bucketIndex) const ETNoexceptHint;
-	LocalIterator      End(SizeType bucketIndex) ETNoexceptHint;
+	ConstLocalIterator End(SizeType bucket) const ETNoexceptHint;
+	LocalIterator      End(SizeType bucket) ETNoexceptHint;
 	ConstIterator      End() const ETNoexceptHint;
 	Iterator           End() ETNoexceptHint;
-
-	// - ELEMENT ACCESS ----------------------------------
-
-public:
-	MappedType& operator[](const KeyType&);
-	MappedType& operator[](KeyType&&);
-
-	// - CONTAINER DUPLICATION ---------------------------
-
-public:
-	HashMap& operator=(const HashMap&) = default;
-	HashMap& operator=(HashMap&&) = default;
 
 	// - CONTAINER MANIPULATION --------------------------
 
@@ -142,6 +130,18 @@ public:
 
 	void Clear();
 
+	// - ELEMENT ACCESS ----------------------------------
+
+public:
+	MappedType& operator[](const KeyType&);
+	MappedType& operator[](KeyType&&);
+
+	// - CONTAINER DUPLICATION ---------------------------
+
+public:
+	HashMap& operator=(const HashMap&) = default;
+	HashMap& operator=(HashMap&&) = default;
+
 	// - CONTENT QUERY -----------------------------------
 
 public:
@@ -151,13 +151,16 @@ public:
 
 	explicit operator bool() const ETNoexceptHint;
 
+	// - INDEXING ACCESS ---------------------------------
+	
+public:
+	EqualityType GetEquality() const ETNoexceptHint;
+
+	HashType GetHash() const ETNoexceptHint;
+
 	// - ALLOCATOR ACCESS --------------------------------
 
 public:
-	EqualityPredicateType GetEqualityPredicate() const ETNoexceptHint;
-
-	HashPredicateType GetHash() const ETNoexceptHint;
-
 	const AllocatorType& GetAllocator() const ETNoexceptHint;
 
 	// - DATA MEMBERS ------------------------------------

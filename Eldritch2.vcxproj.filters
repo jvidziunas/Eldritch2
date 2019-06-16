@@ -1370,6 +1370,12 @@
     <ClInclude Include="src\Common\Containers\Queryable.hpp">
       <Filter>Header Files\Common\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Common\Containers\IntrusiveHashTable.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Containers\IntrusiveHashTableHook.hpp">
+      <Filter>Header Files\Common\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Eldritch2.ico">
@@ -1765,6 +1771,9 @@
     </None>
     <None Include="src\Common\Angle.inl">
       <Filter>Source Files\Common</Filter>
+    </None>
+    <None Include="src\Common\Containers\IntrusiveHashTable.inl">
+      <Filter>Source Files\Common\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

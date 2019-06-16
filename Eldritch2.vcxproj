@@ -497,6 +497,8 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <ClInclude Include="src\Audio\XAudio2\XAudioMarshals.hpp" />
     <ClInclude Include="src\Build.hpp" />
     <ClInclude Include="src\Common\Atomic.hpp" />
+    <ClInclude Include="src\Common\Containers\IntrusiveHashTable.hpp" />
+    <ClInclude Include="src\Common\Containers\IntrusiveHashTableHook.hpp" />
     <ClInclude Include="src\Common\Containers\Queryable.hpp" />
     <ClInclude Include="src\Common\Containers\Cache.hpp" />
     <ClInclude Include="src\Common\Containers\Dequeue.hpp" />
@@ -699,6 +701,7 @@ call "deploy.x64.bat" "$(ConfigurationName)"</Command>
     <None Include="src\Common\Angle.inl" />
     <None Include="src\Common\Assert.inl" />
     <None Include="src\Common\ComPointer.inl" />
+    <None Include="src\Common\Containers\IntrusiveHashTable.inl" />
     <None Include="src\Common\Containers\Queryable.inl" />
     <None Include="src\Common\Containers\Cache.inl" />
     <None Include="src\Common\Containers\Dequeue.inl" />

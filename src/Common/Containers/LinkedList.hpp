@@ -133,6 +133,10 @@ public:
 	//!	Removes an element at the position specified, reducing the size of the @ref LinkedList by one element.
 	Iterator Erase(Iterator where);
 
+	void MoveToFront(ConstIterator where);
+
+	void MoveToBack(ConstIterator where);
+
 	template <typename UnaryPredicate>
 	void ClearAndDispose(UnaryPredicate disposer);
 

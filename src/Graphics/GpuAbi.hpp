@@ -45,7 +45,7 @@ namespace Eldritch2 { namespace Graphics {
 	public:
 		enum : uint32 {
 			PageCoordinateBits  = 18u,
-			MaxImageDimension   = 1u << PageCoordinateBits,
+			MaxDimension   = 1u << PageCoordinateBits,
 			PageSubresourceBits = 10u
 		};
 

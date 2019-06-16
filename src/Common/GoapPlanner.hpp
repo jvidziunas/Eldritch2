@@ -14,9 +14,9 @@
 //==================================================================//
 #include <Common/Containers/PriorityQueue.hpp>
 #include <Common/Memory/ChildAllocator.hpp>
+#include <Common/Containers/SymbolSet.hpp>
 #include <Common/Containers/ArrayMap.hpp>
 #include <Common/Mpl/FloatTypes.hpp>
-#include <Common/SymbolSet.hpp>
 //------------------------------------------------------------------//
 
 namespace Eldritch2 {

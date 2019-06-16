@@ -204,6 +204,20 @@ ETInlineHint ETForceInlineHint typename LinkedList<Value, Allocator>::Iterator L
 // ---------------------------------------------------
 
 template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint void LinkedList<Value, Allocator>::MoveToFront(ConstIterator where) {
+	_container.splice(_container.begin(), _container, where);
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
+ETInlineHint ETForceInlineHint void LinkedList<Value, Allocator>::MoveToBack(ConstIterator where) {
+	_container.splice(_container.end(), _container, where);
+}
+
+// ---------------------------------------------------
+
+template <typename Value, typename Allocator>
 template <typename UnaryPredicate>
 ETInlineHint ETForceInlineHint void LinkedList<Value, Allocator>::ClearAndDispose(UnaryPredicate disposer) {
 	while (!_container.empty()) {
